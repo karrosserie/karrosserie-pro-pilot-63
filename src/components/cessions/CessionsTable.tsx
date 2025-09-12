@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { ValidationErrorDialog } from '@/components/cessions/form/components/ValidationErrorDialog';
 import { CessionEmailConfirmationDialog } from './CessionEmailConfirmationDialog';
-import { FileText, Download, Eye, Pencil, Trash, Play, Loader2, Mail } from 'lucide-react';
+import { FileText, Download, Eye, Pencil, Trash, Play, Loader2, Mail, BarChart3 } from 'lucide-react';
 import { Cession } from '@/services/supabase/cessions';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -31,6 +31,7 @@ import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { CessionMobileCard } from './CessionMobileCard';
 import { useSubscription } from '@/hooks/use-subscription';
+import { CessionProgressDialog } from './CessionProgressDialog';
 
 interface CessionsTableProps {
   cessions: Cession[];
@@ -54,6 +55,8 @@ export const CessionsTable = ({
   const [emailConfirmationOpen, setEmailConfirmationOpen] = useState(false);
   const [selectedCessionForEmail, setSelectedCessionForEmail] = useState<Cession | null>(null);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [progressDialogOpen, setProgressDialogOpen] = useState(false);
+  const [selectedCessionForProgress, setSelectedCessionForProgress] = useState<Cession | null>(null);
   
   const { companyData } = useCompany();
   const { insuranceCompanies } = useInsuranceCompanies();
@@ -689,17 +692,28 @@ export const CessionsTable = ({
                           )}
                         </Button>
                       )}
-                      {cession.status === 'en_attente' && (
-                        <Button 
-                          variant="delete" 
-                          size="sm" 
-                          onClick={() => onDeleteCession(cession.id)}
-                        >
-                          <Trash className="h-4 w-4 mr-1" />
-                          Supprimer
-                        </Button>
-                      )}
-                    </div>
+                       {cession.status === 'en_attente' && (
+                         <Button 
+                           variant="delete" 
+                           size="sm" 
+                           onClick={() => onDeleteCession(cession.id)}
+                         >
+                           <Trash className="h-4 w-4 mr-1" />
+                           Supprimer
+                         </Button>
+                       )}
+                       <Button 
+                         variant="validation" 
+                         size="sm"
+                         onClick={() => {
+                           setSelectedCessionForProgress(cession);
+                           setProgressDialogOpen(true);
+                         }}
+                       >
+                         <BarChart3 className="h-4 w-4 mr-1" />
+                         Suivi
+                       </Button>
+                     </div>
                   </TableCell>
                 </TableRow>
               </React.Fragment>
@@ -745,6 +759,15 @@ export const CessionsTable = ({
         tokensRemaining={tokensRemaining}
         cessionReference={selectedCessionForEmail?.reference || selectedCessionForEmail?.id || ''}
         incidentNumber={selectedCessionForEmail?.incident_number}
+      />
+
+      <CessionProgressDialog
+        isOpen={progressDialogOpen}
+        onClose={() => {
+          setProgressDialogOpen(false);
+          setSelectedCessionForProgress(null);
+        }}
+        cession={selectedCessionForProgress}
       />
     </div>
   );
