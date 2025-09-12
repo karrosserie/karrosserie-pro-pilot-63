@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, addMonths, subMonths } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import EditTimesheetModal from './EditTimesheetModal';
 
 interface TeamMember {
   id: string;
@@ -53,6 +54,7 @@ const EmployeeTimesheetModal: React.FC<EmployeeTimesheetModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -164,6 +166,14 @@ const EmployeeTimesheetModal: React.FC<EmployeeTimesheetModalProps> = ({
     }
   };
 
+  const handleEditTimesheet = () => {
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveTimesheet = () => {
+    fetchTimesheets(); // Recharger les données après modification
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
@@ -239,7 +249,7 @@ const EmployeeTimesheetModal: React.FC<EmployeeTimesheetModalProps> = ({
               </div>
             </div>
 
-            <Button variant="outline" size="sm" className="w-full">
+            <Button variant="outline" size="sm" className="w-full" onClick={handleEditTimesheet}>
               <Edit className="h-4 w-4 mr-2" />
               Modifier
             </Button>
@@ -393,6 +403,14 @@ const EmployeeTimesheetModal: React.FC<EmployeeTimesheetModalProps> = ({
             Fermer
           </Button>
         </div>
+
+        {/* Modal de modification */}
+        <EditTimesheetModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          timesheet={selectedTimesheet}
+          onSave={handleSaveTimesheet}
+        />
       </DialogContent>
     </Dialog>
   );
