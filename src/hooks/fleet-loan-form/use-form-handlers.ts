@@ -29,6 +29,12 @@ export const useFleetLoanFormHandlers = (
   const handleClientSelect = (clientId: string) => {
     setFormData(prev => ({ ...prev, clientId }));
     
+    // Si c'est un ID temporaire (nom libre saisi), extraire le nom
+    if (clientId.startsWith('temp_')) {
+      // Le nom libre est dans le SearchableSelect, on le récupère depuis l'input
+      return;
+    }
+    
     // Find the selected client and populate license information if available
     const selectedClient = clients?.find(client => client.id === clientId);
     if (selectedClient) {
@@ -55,6 +61,15 @@ export const useFleetLoanFormHandlers = (
     
     // Also update the client data in the parent component
     state.setFormData(prev => ({ ...prev, clientId }));
+  };
+
+  const handleFreeTextClientChange = (text: string) => {
+    setFormData(prev => ({ 
+      ...prev, 
+      clientId: text ? `free_text_${Date.now()}` : '',
+      clientName: text,
+      holderInfo: text
+    }));
   };
 
   const handleMileageChange = (mileage: number) => {
@@ -180,6 +195,7 @@ export const useFleetLoanFormHandlers = (
     createReservation: isEditing ? updateReservation : createReservation,
     handleInputChange,
     handleClientSelect,
+    handleFreeTextClientChange,
     handleMileageChange,
     handleFuelLevelChange,
     handleImageAdd,

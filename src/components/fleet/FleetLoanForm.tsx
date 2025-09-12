@@ -75,6 +75,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     createReservation,
     handleInputChange,
     handleClientSelect,
+    handleFreeTextClientChange,
     handleMileageChange,
     handleFuelLevelChange,
     handleImageAdd,
@@ -148,6 +149,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
             formData={formData}
             onInputChange={handleInputChange}
             onClientSelect={handleClientSelect}
+            onFreeTextClientChange={handleFreeTextClientChange}
             onDriverLicenseFrontUpload={handleDriverLicenseFrontUpload}
             onDriverLicenseBackUpload={handleDriverLicenseBackUpload}
             onLicenseAnalyzed={handleLicenseAnalyzed}

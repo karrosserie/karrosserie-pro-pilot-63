@@ -4,6 +4,7 @@ import { LoanFormData, DamageItem } from '@/components/fleet/FleetLoanForm';
 export interface FleetLoanFormHandlers {
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleClientSelect: (clientId: string) => void;
+  handleFreeTextClientChange: (text: string) => void;
   handleMileageChange: (mileage: number) => void;
   handleFuelLevelChange: (fuelLevel: number) => void;
   handleImageAdd: (url: string) => void;

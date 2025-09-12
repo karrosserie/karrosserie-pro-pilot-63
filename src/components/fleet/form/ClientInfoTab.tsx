@@ -11,6 +11,7 @@ interface ClientInfoTabProps {
   formData: LoanFormData;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onClientSelect: (clientId: string) => void;
+  onFreeTextClientChange: (text: string) => void;
   onDriverLicenseFrontUpload: (url: string) => void;
   onDriverLicenseBackUpload: (url: string) => void;
   onLicenseAnalyzed?: (data: any) => void;
@@ -21,6 +22,7 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
   formData,
   onInputChange,
   onClientSelect,
+  onFreeTextClientChange,
   onDriverLicenseFrontUpload,
   onDriverLicenseBackUpload,
   onLicenseAnalyzed,
@@ -54,6 +56,8 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
             placeholder="Sélectionner un client"
             disabled={isViewMode}
             searchPlaceholder="Rechercher un client..."
+            allowFreeText={true}
+            onFreeTextChange={onFreeTextClientChange}
           />
         </div>
 
