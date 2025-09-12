@@ -44,12 +44,10 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   );
 
   useEffect(() => {
-    if (selectedOption && !allowFreeText) {
+    if (selectedOption) {
       setInputValue(selectedOption.label);
-    } else if (allowFreeText && value && !selectedOption) {
-      setInputValue(value);
     }
-  }, [selectedOption, value, allowFreeText]);
+  }, [selectedOption]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
@@ -74,9 +72,9 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   };
 
   const handleInputBlur = () => {
-    // Si allowFreeText est activé et qu'il n'y a pas d'option correspondante exacte
-    if (allowFreeText && inputValue && !options.find(opt => opt.label === inputValue)) {
-      onValueChange(inputValue);
+    if (!allowFreeText) {
+      const exact = options.find(opt => opt.label.toLowerCase() === inputValue.toLowerCase());
+      if (exact) onValueChange(exact.value);
     }
   };
 
@@ -87,6 +85,11 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           <div className="relative">
             <Input
               ref={inputRef}
+              type="text"
+              autoComplete="off"
+              autoCorrect="off"
+              spellCheck={false}
+              inputMode="text"
               value={inputValue}
               onChange={handleInputChange}
               onBlur={handleInputBlur}

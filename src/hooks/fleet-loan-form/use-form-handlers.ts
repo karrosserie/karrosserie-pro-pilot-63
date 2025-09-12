@@ -66,7 +66,6 @@ export const useFleetLoanFormHandlers = (
   const handleFreeTextClientChange = (text: string) => {
     setFormData(prev => ({ 
       ...prev, 
-      clientId: text ? `free_text_${Date.now()}` : '',
       clientName: text,
       holderInfo: text
     }));
