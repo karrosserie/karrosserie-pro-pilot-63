@@ -113,20 +113,13 @@ Deno.serve(async (req) => {
     console.log(`➡️ Next task: ${nextTaskType}, required qualification: ${requiredQualification}`);
 
     // 3. Trouver les employés avec les bonnes qualifications
-    const { data: employees, error: employeesError } = await supabase
+    const { data: userCompanies, error: employeesError } = await supabase
       .from('user_companies')
-      .select(`
-        user_id,
-        qualifications,
-        profiles:user_id (
-          first_name,
-          last_name
-        )
-      `)
+      .select('user_id, qualifications')
       .eq('company_id', companyId)
       .eq('active', true);
 
-    if (employeesError || !employees) {
+    if (employeesError || !userCompanies) {
       console.error('❌ Error fetching employees:', employeesError);
       return new Response(
         JSON.stringify({ error: 'Error fetching employees' }),
@@ -136,6 +129,37 @@ Deno.serve(async (req) => {
         }
       );
     }
+
+    // Récupérer les profils séparément
+    const userIds = userCompanies.map(uc => uc.user_id);
+    const { data: profiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('id, first_name, last_name')
+      .in('id', userIds);
+
+    if (profilesError) {
+      console.error('❌ Error fetching profiles:', profilesError);
+      return new Response(
+        JSON.stringify({ error: 'Error fetching profiles' }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Combiner les données
+    const employees = userCompanies.map(uc => {
+      const profile = profiles?.find(p => p.id === uc.user_id);
+      return {
+        user_id: uc.user_id,
+        qualifications: uc.qualifications,
+        profiles: profile ? {
+          first_name: profile.first_name,
+          last_name: profile.last_name
+        } : null
+      };
+    });
 
     // Filtrer les employés ayant la qualification requise
     const qualifiedEmployees = employees.filter((employee: any) => 
