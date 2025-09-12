@@ -1,21 +1,18 @@
 import { useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Calendar, ChevronLeft, ChevronRight, Clock, User } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, User, MapPin } from 'lucide-react';
 
-interface PlanningEvent {
+interface PlanningTask {
   id: string;
-  title: string;
-  vehicleBrand: string;
-  vehicleModel: string;
-  licensePlate: string;
-  client: string;
-  technician: string;
-  startTime: string;
-  endTime: string;
+  time: string;
+  vehicleCode: string;
+  brand: string;
+  model: string;
   taskType: string;
-  status: 'Planifié' | 'En cours' | 'Terminé' | 'En retard';
+  technician: string;
+  client: string;
+  stage: string;
+  color: string;
 }
 
 interface PlanningCalendarProps {
@@ -29,327 +26,284 @@ export const PlanningCalendar = ({
   employees = [], 
   vehicles = [] 
 }: PlanningCalendarProps) => {
-  console.log('🔍 PlanningCalendar - Data received:', {
-    schedulesCount: schedules.length,
-    schedulesStructure: schedules.slice(0, 2).map(s => ({
-      id: s.id,
-      start_datetime: s.start_datetime,
-      end_datetime: s.end_datetime,
-      task_type: s.task_type,
-      dateAssignation: s.dateAssignation,
-      heure: s.heure,
-      tache: s.tache,
-      allKeys: Object.keys(s)
-    }))
-  });
-  const [selectedDate, setSelectedDate] = useState(() => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  });
   const [currentWeek, setCurrentWeek] = useState(0);
 
-  // Helper functions
-  const findEmployeeName = (userId: string): string => {
-    const employee = employees.find(emp => emp.user_id === userId);
-    return employee ? employee.nom : 'Technicien non assigné';
-  };
-
-  const findVehicleInfo = (vehicleId: string) => {
-    const vehicle = vehicles.find(v => v.id === vehicleId);
-    return {
-      brand: vehicle?.car_brands?.name || 'Marque inconnue',
-      model: vehicle?.car_models?.name || 'Modèle inconnu',
-      licensePlate: vehicle?.license_plate || 'Plaque inconnue',
-      client: vehicle?.clients ? `${vehicle.clients.first_name} ${vehicle.clients.last_name}` : 'Client inconnu'
-    };
-  };
-
-  const mapScheduleStatus = (status: string): PlanningEvent['status'] => {
-    switch (status) {
-      case 'en_cours': 
-      case 'En cours': 
-        return 'En cours';
-      case 'termine': 
-      case 'Terminé': 
-        return 'Terminé';
-      case 'En retard': 
-        return 'En retard';
-      case 'planifie':
-      case 'À planifier':
-      default: 
-        return 'Planifié';
-    }
-  };
-
-  // Convert schedules to events grouped by date
-  const eventsByDate = useMemo(() => {
-    const events: Record<string, PlanningEvent[]> = {};
-    
-    schedules.forEach(schedule => {
-      // Handle both schedule structures: new planningTaches and old schedules
-      let dateKey: string;
-      let startTime: string;
-      let endTime: string;
-      let vehicleInfo: any;
-      
-      if (schedule.dateAssignation) {
-        // New structure from planningTaches
-        dateKey = schedule.dateAssignation;
-        const timeRange = schedule.heure || '00h00-00h00';
-        const [start, end] = timeRange.split('-');
-        startTime = start.replace('h', ':');
-        endTime = end.replace('h', ':');
-        
-        vehicleInfo = {
-          brand: schedule.modele?.split(' ')[0] || 'Marque inconnue',
-          model: schedule.modele?.split(' ').slice(1).join(' ') || 'Modèle inconnu',
-          licensePlate: schedule.vehicule || 'Plaque inconnue',
-          client: schedule.client || 'Client inconnu'
-        };
-      } else if (schedule.start_datetime) {
-        // Old structure from employee_schedule
-        const startDate = new Date(schedule.start_datetime);
-        if (isNaN(startDate.getTime())) return; // Skip invalid dates
-        
-        dateKey = startDate.toISOString().split('T')[0];
-        startTime = startDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-        endTime = new Date(schedule.end_datetime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-        
-        vehicleInfo = findVehicleInfo(schedule.vehicle_id);
-      } else {
-        return; // Skip if neither structure is found
+  // Données de test correspondant à l'image
+  const mockTasks: Record<string, PlanningTask[]> = {
+    'lundi': [
+      {
+        id: '1',
+        time: '10h-12h',
+        vehicleCode: 'VS-901-AB',
+        brand: 'Audi',
+        model: 'A4',
+        taskType: 'Débosselage portière',
+        technician: 'Sophie Martin',
+        client: 'M. Bernard',
+        stage: 'Remplacement ou débosselage',
+        color: 'border-l-green-500 bg-green-50'
+      },
+      {
+        id: '2',
+        time: '14h-16h30',
+        vehicleCode: 'AB-789-XY',
+        brand: 'Peugeot',
+        model: '308',
+        taskType: 'Ponçage aile avant',
+        technician: 'Sophie Martin',
+        client: 'Mme Moreau',
+        stage: 'Préparation peinture',
+        color: 'border-l-yellow-500 bg-yellow-50'
+      },
+      {
+        id: '3',
+        time: '9h-10h',
+        vehicleCode: 'EZ-787-KL',
+        brand: 'Citroën',
+        model: 'C4',
+        taskType: 'Accueil & Préparation',
+        technician: 'Martin Dubois',
+        client: 'M. Durand',
+        stage: 'Accueil & Préparation du dossier',
+        color: 'border-l-blue-500 bg-blue-50'
       }
-      
-      const event: PlanningEvent = {
-        id: schedule.id,
-        title: schedule.task_type || schedule.tache,
-        vehicleBrand: vehicleInfo.brand,
-        vehicleModel: vehicleInfo.model,
-        licensePlate: vehicleInfo.licensePlate,
-        client: vehicleInfo.client,
-        technician: schedule.technicien || findEmployeeName(schedule.user_id),
-        startTime,
-        endTime,
-        taskType: schedule.task_type || schedule.tache,
-        status: mapScheduleStatus(schedule.status)
-      };
-
-      if (!events[dateKey]) {
-        events[dateKey] = [];
+    ],
+    'mardi': [
+      {
+        id: '4',
+        time: '14h-15h30',
+        vehicleCode: 'EF-456-UV',
+        brand: 'Volkswagen',
+        model: 'Golf',
+        taskType: 'Polissage final',
+        technician: 'Martin Dubois',
+        client: 'Mme Blanc',
+        stage: 'Finitions & remontage',
+        color: 'border-l-orange-500 bg-orange-50'
+      },
+      {
+        id: '5',
+        time: '8h-9h',
+        vehicleCode: 'QR-345-ST',
+        brand: 'Mercedes',
+        model: 'Classe C',
+        taskType: 'Accueil & Préparation du dossier',
+        technician: 'Martin Dubois',
+        client: 'Mme Leclerc',
+        stage: 'Accueil & Préparation du dossier',
+        color: 'border-l-blue-500 bg-blue-50'
+      },
+      {
+        id: '6',
+        time: '9h-13h',
+        vehicleCode: 'CD-123-ZW',
+        brand: 'Renault',
+        model: 'Clio',
+        taskType: 'Application base peinture',
+        technician: 'Sophie Martin',
+        client: 'M. Petit',
+        stage: 'Mise en peinture',
+        color: 'border-l-red-500 bg-red-50'
       }
-      events[dateKey].push(event);
-    });
-
-    return events;
-  }, [schedules, employees, vehicles]);
-
-  const getStatusBadge = (status: PlanningEvent['status']) => {
-    switch (status) {
-      case 'Planifié':
-        return <Badge variant="outline">Planifié</Badge>;
-      case 'En cours':
-        return <Badge className="bg-blue-100 text-blue-800">En cours</Badge>;
-      case 'Terminé':
-        return <Badge className="bg-green-100 text-green-800">Terminé</Badge>;
-      case 'En retard':
-        return <Badge className="bg-red-100 text-red-800">En retard</Badge>;
-    }
+    ],
+    'mercredi': [
+      {
+        id: '7',
+        time: '11h-11h30',
+        vehicleCode: 'GH-789-ST',
+        brand: 'Ford',
+        model: 'Focus',
+        taskType: 'Contrôle qualité',
+        technician: 'Martin Dubois',
+        client: 'M. Roux',
+        stage: 'Clôture du dossier et livraison',
+        color: 'border-l-purple-500 bg-purple-50'
+      },
+      {
+        id: '8',
+        time: '14h-15h',
+        vehicleCode: 'CD-123-ZW',
+        brand: 'Renault',
+        model: 'Clio',
+        taskType: 'Finitions peinture',
+        technician: 'Sophie Martin',
+        client: 'M. Petit',
+        stage: 'Finitions & remontage',
+        color: 'border-l-orange-500 bg-orange-50'
+      },
+      {
+        id: '9',
+        time: '8h-11h',
+        vehicleCode: 'HT-556-GH',
+        brand: 'BMW',
+        model: 'Série 1',
+        taskType: 'Remplacement pare-chocs',
+        technician: 'Sophie Martin',
+        client: 'M. Rousseau',
+        stage: 'Remplacement ou débosselage',
+        color: 'border-l-green-500 bg-green-50'
+      }
+    ],
+    'jeudi': [
+      {
+        id: '10',
+        time: '14h-16h',
+        vehicleCode: 'EZ-787-KL',
+        brand: 'Citroën',
+        model: 'C4',
+        taskType: 'Débosselage léger',
+        technician: 'Martin Dubois',
+        client: 'M. Durand',
+        stage: 'Remplacement ou débosselage',
+        color: 'border-l-green-500 bg-green-50'
+      },
+      {
+        id: '11',
+        time: '9h-12h',
+        vehicleCode: 'AB-789-XY',
+        brand: 'Peugeot',
+        model: '308',
+        taskType: 'Application peinture',
+        technician: 'Sophie Martin',
+        client: 'Mme Moreau',
+        stage: 'Mise en peinture',
+        color: 'border-l-red-500 bg-red-50'
+      },
+      {
+        id: '12',
+        time: '14h-14h30',
+        vehicleCode: 'EZ-787-KL',
+        brand: 'Citroën',
+        model: 'C4',
+        taskType: 'Livraison client',
+        technician: 'Martin Dubois',
+        client: 'M. Durand',
+        stage: 'Clôture du dossier et livraison',
+        color: 'border-l-purple-500 bg-purple-50'
+      }
+    ],
+    'vendredi': [
+      {
+        id: '13',
+        time: '10h-12h',
+        vehicleCode: 'AB-789-XY',
+        brand: 'Peugeot',
+        model: '308',
+        taskType: 'Finitions & remontage',
+        technician: 'Martin Dubois',
+        client: 'Mme Moreau',
+        stage: 'Finitions & remontage',
+        color: 'border-l-orange-500 bg-orange-50'
+      },
+      {
+        id: '14',
+        time: '8h-10h',
+        vehicleCode: 'HT-556-GH',
+        brand: 'BMW',
+        model: 'Série 1',
+        taskType: 'Préparation peinture',
+        technician: 'Sophie Martin',
+        client: 'M. Rousseau',
+        stage: 'Préparation peinture',
+        color: 'border-l-yellow-500 bg-yellow-50'
+      }
+    ]
   };
 
-  const getWeekDays = () => {
-    const today = new Date();
-    const baseDate = new Date(today);
-    baseDate.setDate(today.getDate() + (currentWeek * 7) - today.getDay() + 1); // Start from Monday
-    
-    const weekDays = [];
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(baseDate);
-      date.setDate(baseDate.getDate() + i);
-      weekDays.push({
-        date: date.toISOString().split('T')[0],
-        dayName: date.toLocaleDateString('fr-FR', { weekday: 'short' }),
-        dayNumber: date.getDate(),
-        monthName: date.toLocaleDateString('fr-FR', { month: 'short' }),
-        isWeekend: date.getDay() === 0 || date.getDay() === 6
-      });
-    }
-    return weekDays;
-  };
+  const weekDays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi'];
+  const weekDaysDisplay = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
 
-  const weekDays = getWeekDays();
-  const selectedEvents = eventsByDate[selectedDate] || [];
-
-  const timeSlots = Array.from({ length: 10 }, (_, i) => {
-    const hour = 8 + i;
-    return `${hour.toString().padStart(2, '0')}:00`;
-  });
-
-  // Helper function to calculate position based on time
-  const getEventPosition = (startTime: string): number => {
-    const [hours, minutes] = startTime.replace('h', ':').split(':').map(Number);
-    const totalMinutes = hours * 60 + minutes;
-    const startOfDay = 8 * 60; // 8:00 AM in minutes
-    const minutesFromStart = totalMinutes - startOfDay;
-    const hourHeight = 48; // Height per hour in pixels
-    return Math.max(0, (minutesFromStart / 60) * hourHeight);
-  };
-
-  const getEventHeight = (startTime: string, endTime: string): number => {
-    const [startHours, startMinutes] = startTime.replace('h', ':').split(':').map(Number);
-    const [endHours, endMinutes] = endTime.replace('h', ':').split(':').map(Number);
-    
-    const startTotalMinutes = startHours * 60 + startMinutes;
-    const endTotalMinutes = endHours * 60 + endMinutes;
-    const durationMinutes = endTotalMinutes - startTotalMinutes;
-    
-    const hourHeight = 48; // Height per hour in pixels
-    return Math.max(24, (durationMinutes / 60) * hourHeight); // Minimum height of 24px
+  const handleMoveTask = (taskId: string) => {
+    console.log('Déplacer tâche:', taskId);
   };
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold mb-2">Planning Atelier</h2>
-          <p className="text-muted-foreground">Vue calendrier avec répartition par technicien</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setCurrentWeek(prev => prev - 1)}>
-            <ChevronLeft className="w-4 h-4" />
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => setCurrentWeek(prev => prev + 1)}>
-            <ChevronRight className="w-4 h-4" />
-          </Button>
-        </div>
+      <div className="space-y-2">
+        <h2 className="text-2xl font-bold">Planning Détaillé</h2>
+        <p className="text-muted-foreground">Toutes les tâches par véhicule et jour par jour</p>
       </div>
 
-      {/* Week Calendar */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="w-5 h-5" />
-            Semaine du {weekDays[0]?.dayNumber} {weekDays[0]?.monthName} au {weekDays[6]?.dayNumber} {weekDays[6]?.monthName}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-8 gap-2">
-            {/* Time column */}
-            <div className="space-y-0">
-              <div className="h-8"></div> {/* Header space */}
-              {timeSlots.map(time => (
-                <div key={time} className="h-12 text-sm text-muted-foreground text-right pr-2 flex items-start pt-1 border-t border-gray-100">
-                  {time}
-                </div>
-              ))}
-            </div>
+      {/* Week Navigation */}
+      <div className="flex justify-end gap-2">
+        <Button variant="outline" size="sm" onClick={() => setCurrentWeek(prev => prev - 1)}>
+          <ChevronLeft className="w-4 h-4" />
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => setCurrentWeek(prev => prev + 1)}>
+          <ChevronRight className="w-4 h-4" />
+        </Button>
+      </div>
 
-            {/* Day columns */}
-            {weekDays.map(day => (
-              <div key={day.date} className="relative">
-                <div 
-                  className={`text-center p-2 rounded cursor-pointer transition-colors ${
-                    selectedDate === day.date 
-                      ? 'bg-primary text-primary-foreground' 
-                      : day.isWeekend 
-                        ? 'bg-muted text-muted-foreground' 
-                        : 'hover:bg-muted'
-                  }`}
-                  onClick={() => setSelectedDate(day.date)}
-                >
-                  <div className="font-medium">{day.dayName}</div>
-                  <div className="text-sm">{day.dayNumber}</div>
-                </div>
-                
-                {/* Time grid background */}
-                <div className="relative" style={{ height: '480px' }}> {/* 10 hours * 48px */}
-                  {timeSlots.map((_, index) => (
-                    <div 
-                      key={index} 
-                      className="absolute w-full border-t border-gray-100" 
-                      style={{ 
-                        top: `${index * 48}px`, 
-                        height: '48px' 
-                      }} 
-                    />
-                  ))}
-                  
-                  {/* Events for this day */}
-                  {(eventsByDate[day.date] || []).map(event => {
-                    const top = getEventPosition(event.startTime);
-                    const height = getEventHeight(event.startTime, event.endTime);
-                    
-                    return (
-                      <div 
-                        key={event.id}
-                        className="absolute left-1 right-1 bg-blue-50 border border-blue-200 rounded p-1 text-xs cursor-pointer hover:bg-blue-100 transition-colors z-10 overflow-hidden"
-                        style={{ 
-                          top: `${top}px`, 
-                          height: `${height}px`,
-                          minHeight: '24px'
-                        }}
-                      >
-                        <div className="font-medium truncate text-xs">{event.vehicleBrand} {event.vehicleModel}</div>
-                        <div className="text-muted-foreground truncate text-xs">{event.taskType}</div>
-                        <div className="flex items-center gap-1 mt-1">
-                          <Clock className="w-3 h-3" />
-                          <span className="text-xs">{event.startTime}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+      {/* Planning Grid */}
+      <div className="grid grid-cols-5 gap-4">
+        {weekDays.map((day, dayIndex) => {
+          const dayTasks = mockTasks[day] || [];
+          return (
+            <div key={day} className="bg-white border border-slate-200 rounded-lg">
+              {/* Day Header */}
+              <div className="bg-slate-50 p-4 rounded-t-lg border-b border-slate-200">
+                <h3 className="font-semibold text-lg text-blue-600">{weekDaysDisplay[dayIndex]}</h3>
+                <p className="text-sm text-slate-600">{dayTasks.length} tâche{dayTasks.length !== 1 ? 's' : ''}</p>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
 
-      {/* Selected Day Details */}
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            Détails du {new Date(selectedDate).toLocaleDateString('fr-FR', { 
-              weekday: 'long', 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {selectedEvents.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Aucune tâche planifiée pour cette journée
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {selectedEvents.map(event => (
-                <div key={event.id} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-semibold">{event.vehicleBrand} {event.vehicleModel}</h4>
-                      {getStatusBadge(event.status)}
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-muted-foreground">
-                      <div>{event.licensePlate} • {event.client}</div>
-                      <div className="flex items-center gap-1">
-                        <User className="w-3 h-3" />
-                        {event.technician}
+              {/* Tasks */}
+              <div className="p-4 space-y-3">
+                {dayTasks.map((task) => (
+                  <div key={task.id} className={`border-l-4 ${task.color} rounded-r-lg p-3 bg-white shadow-sm`}>
+                    {/* Time and Vehicle Code */}
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-slate-500" />
+                        <span className="text-sm font-medium">{task.time}</span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {event.startTime} - {event.endTime}
-                      </div>
+                      <span className="text-sm font-mono bg-slate-100 px-2 py-1 rounded">
+                        {task.vehicleCode}
+                      </span>
                     </div>
-                    <p className="text-sm">{event.taskType}</p>
+
+                    {/* Vehicle Info */}
+                    <div className="mb-2">
+                      <h4 className="font-semibold text-slate-900">{task.brand} {task.model}</h4>
+                      <p className="text-sm text-slate-600">{task.taskType}</p>
+                    </div>
+
+                    {/* Technician */}
+                    <div className="flex items-center gap-2 mb-2">
+                      <User className="w-4 h-4 text-slate-500" />
+                      <span className="text-sm text-slate-600">{task.technician}</span>
+                    </div>
+
+                    {/* Client */}
+                    <div className="text-sm text-slate-600 mb-2">
+                      Client: {task.client}
+                    </div>
+
+                    {/* Stage and Action */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-slate-500">{task.stage}</span>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="text-xs h-7"
+                        onClick={() => handleMoveTask(task.id)}
+                      >
+                        Déplacer
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+
+                {dayTasks.length === 0 && (
+                  <div className="text-center text-slate-400 py-8">
+                    Aucune tâche
+                  </div>
+                )}
+              </div>
             </div>
-          )}
-        </CardContent>
-      </Card>
+          );
+        })}
+      </div>
     </div>
   );
 };
