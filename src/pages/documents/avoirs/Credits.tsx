@@ -378,9 +378,19 @@ const Credits = () => {
   return (
     <div className="p-6 space-y-6">
       <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Avoirs</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Avoirs</h1>
+          {showArchived && (
+            <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-sm font-medium">
+              Archivés
+            </span>
+          )}
+        </div>
         <p className="text-gray-600 mt-1">
-          Consultez et gérez les avoirs émis pour vos clients.
+          {showArchived 
+            ? "Consultez les avoirs archivés." 
+            : "Consultez et gérez les avoirs émis pour vos clients."
+          }
         </p>
       </div>
       
@@ -398,8 +408,13 @@ const Credits = () => {
             />
           </div>
           
-          <Button variant="outline" size="icon">
-            <Filter className="h-4 w-4" />
+          <Button
+            variant={showArchived ? "default" : "outline"}
+            size="sm"
+            onClick={() => setShowArchived(!showArchived)}
+          >
+            <Archive className="h-4 w-4 mr-2" />
+            {showArchived ? 'Masquer archivés' : 'Voir archivés'}
           </Button>
           
           <Button 
