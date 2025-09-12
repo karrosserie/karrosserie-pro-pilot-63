@@ -130,7 +130,7 @@ export const RepairOrderTableRow = ({ order, onEditOrder, onDeleteOrder, onViewO
               onClick={() => onDeleteOrder(order)}
             >
               <Trash className="h-4 w-4 mr-1" />
-              Supprimer
+              Archivé
             </Button>
           </div>
         </TableCell>
