@@ -55,11 +55,43 @@ export const WorkshopPlanningInterface = ({
   const planningRef = useRef(planningTaches);
   planningRef.current = planningTaches;
 
-  // Gérer le changement de semaine dans le calendrier (stabilisé)
-  const handleWeekChange = useCallback((_weekStart: Date, _weekEnd: Date) => {
-    // Intentionnellement vide: le filtrage par semaine est géré dans PlanningCalendar
-    // Cela évite d'exclure les tâches sans date (qui utilisent seulement `jour`).
-  }, []);
+  // Gérer le changement de semaine dans le calendrier (filtrage local + demande de rafraîchissement Supabase)
+  const handleWeekChange = useCallback((weekStart: Date, weekEnd: Date) => {
+    const tryParse = (raw: any): Date | null => {
+      if (!raw) return null;
+      try {
+        if (typeof raw === 'string') {
+          const iso = parseISO(raw);
+          if (isValid(iso)) return iso;
+          const frParsed = parse(raw, 'dd/MM/yyyy', new Date());
+          if (isValid(frParsed)) return frParsed;
+        } else {
+          const d = new Date(raw);
+          if (isValid(d)) return d;
+        }
+      } catch {}
+      return null;
+    };
+
+    const source = Array.isArray(planningRef.current) ? planningRef.current : [];
+    const filtered = source.filter((t: any) => {
+      const rawDate = t.start_datetime || t.dateAssignation || t.date || t.startDate || t.date_debut || t.dateTime;
+      const d = tryParse(rawDate);
+      if (!d) {
+        // Conserver les tâches sans date mais avec un jour explicite
+        return !!t.jour;
+      }
+      return isSameWeek(d, weekStart, { weekStartsOn: 1 });
+    });
+
+    setCurrentWeekData(prev => {
+      if (prev.length === filtered.length && prev.every((p, i) => p.id === filtered[i]?.id)) return prev;
+      return filtered;
+    });
+
+    // Demande au parent de rafraîchir depuis Supabase pour cette plage
+    onScheduleUpdate?.({ action: 'refresh', weekStart: weekStart.toISOString(), weekEnd: weekEnd.toISOString() });
+  }, [onScheduleUpdate]);
 
   // Synchroniser les données avec toutes les tâches disponibles
   useEffect(() => {

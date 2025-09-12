@@ -134,8 +134,8 @@ export const PlanningCalendar = ({
           return; // Pas la bonne semaine
         }
       } else {
-        // Aucune date: n'afficher que sur la semaine courante (offset 0)
-        if (currentWeek !== 0) return;
+        // Aucune date: on conserve la tâche et on se base sur `jour` pour l'affecter au bon jour
+        // (utile pour les anciennes données qui n'ont pas de date complète)
       }
 
       // Déterminer le jour cible
