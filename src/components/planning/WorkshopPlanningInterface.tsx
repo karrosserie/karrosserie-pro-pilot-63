@@ -11,6 +11,7 @@ import { PlanningCalendar } from "./PlanningCalendar";
 import { EmployeePlanningTab } from "./EmployeePlanningTab";
 import { ProcessConfig } from "./ProcessConfig";
 import { useUserRole } from "@/hooks/use-user-role";
+import { useViewManagement } from "@/hooks/use-view-management";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { isSameWeek, startOfWeek, addDays, parseISO, isValid, parse } from 'date-fns';
@@ -42,16 +43,19 @@ export const WorkshopPlanningInterface = ({
     isOwner,
     isLoading
   } = useUserRole();
+  
+  // Utiliser le hook de gestion des vues qui gère correctement les rôles
+  const {
+    currentView,
+    selectedEmployeView,
+    setCurrentView,
+    setSelectedEmployeView,
+    canSwitchViews,
+    isEmployeeRole,
+    canManageUsers
+  } = useViewManagement();
+  
   const navigate = useNavigate();
-
-  // Déterminer la vue par défaut selon le rôle
-  const getDefaultView = () => {
-    if (isOwner) return 'manager';
-    if (isResponsable) return 'manager';
-    if (isCarrossier || isCarrossierCourtesy) return 'employee';
-    return 'manager'; // Par défaut pour manager
-  };
-  const [activeView, setActiveView] = useState<'manager' | 'employee'>(getDefaultView());
   const [currentWeekData, setCurrentWeekData] = useState<any[]>([]);
 
   // Source unifiée des tâches: préférer planningTaches si fourni, sinon schedules
@@ -117,8 +121,7 @@ export const WorkshopPlanningInterface = ({
     });
   }, [allTasks]);
 
-  // Déterminer si l'utilisateur peut changer de vue
-  const canSwitchView = isOwner;
+  // canSwitchViews est déjà défini par useViewManagement
 
   // Helper functions - MUST be defined before workflowSteps
   const calculateDuration = (start: string, end: string): string => {
@@ -325,20 +328,20 @@ export const WorkshopPlanningInterface = ({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 sm:items-center">
           {/* Afficher les boutons de changement de vue uniquement pour les propriétaires */}
-          {canSwitchView ? <div className="flex gap-2">
-              <Button variant={activeView === 'manager' ? 'default' : 'outline'} size="sm" onClick={() => setActiveView('manager')} className="flex items-center gap-2">
+          {canSwitchViews ? <div className="flex gap-2">
+              <Button variant={currentView === 'manager' ? 'default' : 'outline'} size="sm" onClick={() => setCurrentView('manager')} className="flex items-center gap-2">
                 <Crown className="w-4 h-4" />
                 <span className="hidden sm:inline">Vue Manager</span>
                 <span className="sm:hidden">Manager</span>
               </Button>
-              <Button variant={activeView === 'employee' ? 'default' : 'outline'} size="sm" onClick={() => setActiveView('employee')} className="flex items-center gap-2">
+              <Button variant={currentView === 'employe' ? 'default' : 'outline'} size="sm" onClick={() => setCurrentView('employe')} className="flex items-center gap-2">
                 <User className="w-4 h-4" />
                 <span className="hidden sm:inline">Vue Employé</span>
                 <span className="sm:hidden">Employé</span>
               </Button>
             </div> : (/* Afficher la vue actuelle sans possibilité de changement */
         <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-md">
-              {activeView === 'manager' ? <>
+              {currentView === 'manager' ? <>
                   <Crown className="w-4 h-4" />
                   <span className="text-sm font-medium">Vue Manager</span>
                 </> : <>
@@ -359,7 +362,7 @@ export const WorkshopPlanningInterface = ({
       </div>
 
       {/* Navigation Tabs - Only show for manager view */}
-      {activeView === 'manager' && <Tabs defaultValue="workshop" className="w-full">
+      {currentView === 'manager' && <Tabs defaultValue="workshop" className="w-full">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 lg:w-auto h-12 sm:h-11 bg-muted/60 p-1.5 rounded-xl">
             <TabsTrigger value="workshop" className="flex items-center gap-2 px-3 sm:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm">
@@ -441,8 +444,8 @@ export const WorkshopPlanningInterface = ({
         </Tabs>}
 
       {/* Employee View */}
-      {activeView === 'employee' && <div className="mt-6">
-          <EmployeeView />
+      {currentView === 'employe' && <div className="mt-6">
+          <EmployeeView employeeId={selectedEmployeView} />
         </div>}
     </div>;
 };
