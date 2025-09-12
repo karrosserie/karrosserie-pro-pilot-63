@@ -201,12 +201,25 @@ export const PlanVehicleModal = ({
                 <Clock className="w-4 h-4" />
                 Heure de début *
               </Label>
-              <Input
-                id="time"
-                type="time"
-                value={selectedTime}
-                onChange={(e) => setSelectedTime(e.target.value)}
-              />
+              <Select value={selectedTime} onValueChange={setSelectedTime}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner une heure" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 20 }, (_, index) => {
+                    const hour = Math.floor(8 + index / 2); // Commence à 8h
+                    const minute = index % 2 === 0 ? '00' : '30';
+                    const timeValue = `${hour.toString().padStart(2, '0')}:${minute}`;
+                    const displayTime = `${hour}h${minute === '00' ? '' : minute}`;
+                    
+                    return (
+                      <SelectItem key={timeValue} value={timeValue}>
+                        {displayTime}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Boutons d'action */}
