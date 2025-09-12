@@ -16,12 +16,17 @@ import { FloatingNotifications, type FloatingNotification } from '@/components/u
 
 // Modals
 import { VehiculeUrgenceModal } from '@/components/planning/VehiculeUrgenceModal';
-import { PointageModal } from '@/components/PointageModal';
+import { PointageModal } from '@/components/planning/PointageModal';
+import { RetourPauseModal } from '@/components/planning/RetourPauseModal';
 import { DeplacerTacheModal } from '@/components/planning/DeplacerTacheModal';
 import { VehicleDetailsModal } from '@/components/planning/VehicleDetailsModal';
 
 // Utilities
-import { aPointe as aPointeUtil, enregistrerArrivee, aPauseEnCours, enregistrerDepart, terminerPause } from '@/utils/pointageUtils';
+import { clockIn } from '@/utils/pointageSupabaseUtils';
+import { terminerPause } from '@/utils/pointageUtils';
+
+// Pointage Status Hook
+import { usePointageStatus } from '@/hooks/usePointageStatus';
 
 // Auth and role management
 import { useAuth } from '@/contexts/AuthContext';
@@ -38,7 +43,6 @@ const CarrosseriePlanning = () => {
   
   // Modal states for advanced features
   const [showVehiculeUrgenceModal, setShowVehiculeUrgenceModal] = useState(false);
-  const [showPointageModal, setShowPointageModal] = useState(false);
   const [showDeplacerModal, setShowDeplacerModal] = useState(false);
   const [showVehicleDetailsModal, setShowVehicleDetailsModal] = useState(false);
   const [selectedTacheForDeplacement, setSelectedTacheForDeplacement] = useState<any>(null);
@@ -58,6 +62,20 @@ const CarrosseriePlanning = () => {
   } = useViewManagement();
   
   const { toast } = useToast();
+
+  // Pointage status hook for automatic clock-in detection
+  const {
+    showPointageModal,
+    showRetourPauseModal,
+    closePointageModal,
+    closeRetourPauseModal,
+    refreshStatus
+  } = usePointageStatus({
+    employeeId: user?.id || null,
+    userRole,
+    isEnabled: true,
+    isTaskAction: false
+  });
 
   // Enhanced floating notifications handler
   const dismissFloatingNotification = (id: string) => {
@@ -225,22 +243,50 @@ const CarrosseriePlanning = () => {
 
       <PointageModal
         isOpen={showPointageModal}
-        onClose={() => setShowPointageModal(false)}
-        employeeName={employes.find(e => e.user_id === selectedEmployeView)?.nom}
-        onConfirm={async () => {
-          if (selectedEmployeView) {
-            const success = await enregistrerArrivee(selectedEmployeView);
-            if (success) {
-              setFloatingNotifications(prev => [...prev, {
-                id: Date.now().toString(),
-                type: 'success' as const,
-                title: 'Pointage',
-                message: 'Pointage enregistré avec succès',
-                duration: 3000
-              }]);
+        onPointer={async () => {
+          if (user?.id) {
+            try {
+              const result = await clockIn(user.id);
+              if (result.success) {
+                refreshStatus();
+                closePointageModal();
+                setFloatingNotifications(prev => [...prev, {
+                  id: Date.now().toString(),
+                  type: 'success' as const,
+                  title: 'Pointage',
+                  message: 'Pointage enregistré avec succès',
+                  duration: 3000
+                }]);
+              } else {
+                toast({
+                  variant: "destructive",
+                  title: "Erreur",
+                  description: result.message
+                });
+              }
+            } catch (error) {
+              toast({
+                variant: "destructive",
+                title: "Erreur",
+                description: "Impossible d'enregistrer le pointage"
+              });
             }
           }
         }}
+        employeNom={employes.find(e => e.user_id === user?.id)?.nom || 'Employé'}
+        employeId={user?.id || ''}
+      />
+
+      <RetourPauseModal
+        isOpen={showRetourPauseModal}
+        onRevenir={async () => {
+          if (user?.id) {
+            refreshStatus();
+            closeRetourPauseModal();
+          }
+        }}
+        employeNom={employes.find(e => e.user_id === user?.id)?.nom || 'Employé'}
+        employeId={user?.id || ''}
       />
 
       <DeplacerTacheModal
