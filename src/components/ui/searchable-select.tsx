@@ -5,7 +5,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
-import { Check, ChevronDown } from 'lucide-react';
+import { Check, ChevronDown, UserPlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SearchableSelectProps {
@@ -18,6 +18,8 @@ interface SearchableSelectProps {
   searchPlaceholder?: string;
   allowFreeText?: boolean;
   onFreeTextChange?: (text: string) => void;
+  onNewClientClick?: () => void;
+  showNewClientOption?: boolean;
 }
 
 export const SearchableSelect: React.FC<SearchableSelectProps> = ({
@@ -29,7 +31,9 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   className,
   searchPlaceholder = "Rechercher ou saisir...",
   allowFreeText = false,
-  onFreeTextChange
+  onFreeTextChange,
+  onNewClientClick,
+  showNewClientOption = false
 }) => {
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -78,6 +82,13 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
     }
   };
 
+  const handleNewClientClick = () => {
+    if (onNewClientClick) {
+      onNewClientClick();
+      setOpen(false);
+    }
+  };
+
   return (
     <div className="relative">
       <Popover open={open} onOpenChange={setOpen}>
@@ -107,6 +118,20 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
         <PopoverContent className="w-[--radix-popover-trigger-width] p-0 z-[120] bg-background border rounded-md shadow-md" align="start" sideOffset={4}>
           <Command>
             <CommandList className="max-h-[200px] overflow-y-auto">
+              {/* Option "Nouveau client" toujours en haut si activée */}
+              {showNewClientOption && (
+                <CommandGroup>
+                  <CommandItem
+                    key="new-client"
+                    onSelect={handleNewClientClick}
+                    className="cursor-pointer bg-muted/50 hover:bg-muted font-medium text-primary"
+                  >
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Nouveau client
+                  </CommandItem>
+                </CommandGroup>
+              )}
+              
               {filteredOptions.length === 0 ? (
                 <CommandEmpty>
                   {allowFreeText 

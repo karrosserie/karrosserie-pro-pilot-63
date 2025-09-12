@@ -16,6 +16,7 @@ interface ClientInfoTabProps {
   onDriverLicenseBackUpload: (url: string) => void;
   onLicenseAnalyzed?: (data: any) => void;
   isViewMode?: boolean;
+  onNewClientClick?: () => void;
 }
 
 const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
@@ -26,7 +27,8 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
   onDriverLicenseFrontUpload,
   onDriverLicenseBackUpload,
   onLicenseAnalyzed,
-  isViewMode = false
+  isViewMode = false,
+  onNewClientClick
 }) => {
   const { clients } = useClients();
 
@@ -58,6 +60,8 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
             searchPlaceholder="Rechercher un client..."
             allowFreeText={true}
             onFreeTextChange={onFreeTextClientChange}
+            showNewClientOption={true}
+            onNewClientClick={onNewClientClick}
           />
         </div>
 

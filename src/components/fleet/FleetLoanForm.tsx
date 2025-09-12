@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { useFleetLoanForm } from '@/hooks/use-fleet-loan-form';
@@ -10,6 +10,7 @@ import VehicleDetailsTab from './form/VehicleDetailsTab';
 import ClientInfoTab from './form/ClientInfoTab';
 import InsuranceTab from './form/InsuranceTab';
 import AttestationTab from './form/AttestationTab';
+import ClientDialog from '@/components/client/ClientDialog';
 
 interface FleetLoanFormProps {
   vehicle: FleetVehicle;
@@ -68,6 +69,9 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
   defaultValues,
   isViewMode = false
 }) => {
+  // État pour le dialog de création de client
+  const [isClientDialogOpen, setIsClientDialogOpen] = useState(false);
+
   const {
     activeTab,
     setActiveTab,
@@ -119,6 +123,18 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     }
   };
 
+  // Handler pour ouvrir le dialog de création de client
+  const handleNewClientClick = () => {
+    setIsClientDialogOpen(true);
+  };
+
+  // Handler pour la soumission du nouveau client
+  const handleNewClientSubmit = (clientData: any) => {
+    console.log('Nouveau client créé:', clientData);
+    // Le client sera automatiquement disponible dans la liste grâce à React Query
+    setIsClientDialogOpen(false);
+  };
+
   // Get vehicle display name - support both old and new structure
   const getVehicleDisplayName = () => {
     if (vehicle.car_brands?.name && vehicle.car_models?.name) {
@@ -154,6 +170,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
             onDriverLicenseBackUpload={handleDriverLicenseBackUpload}
             onLicenseAnalyzed={handleLicenseAnalyzed}
             isViewMode={isViewMode}
+            onNewClientClick={handleNewClientClick}
           />
         </TabsContent>
 
@@ -219,6 +236,16 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
         isFirstTab={isFirstTab}
         isLastTab={isLastTab}
         isViewMode={isViewMode}
+      />
+
+      {/* Dialog pour créer un nouveau client */}
+      <ClientDialog
+        open={isClientDialogOpen}
+        onOpenChange={setIsClientDialogOpen}
+        title="Nouveau client"
+        description="Créer un nouveau client"
+        onSubmit={handleNewClientSubmit}
+        mode="create"
       />
     </div>
   );
