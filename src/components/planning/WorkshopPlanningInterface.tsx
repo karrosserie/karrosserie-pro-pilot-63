@@ -110,103 +110,119 @@ export const WorkshopPlanningInterface = ({
     }
   };
 
-  // Convert real data to workflow steps format
+  // Convert real data to workflow steps format  
   const workflowSteps = [
     {
       id: 'accueil',
       title: 'Accueil & Préparation du dossier',
-      vehicles: schedules.filter(s => s.etape === 'accueil' || s.tache === 'Accueil & Préparation').map(schedule => ({
-        id: schedule.id,
-        brand: schedule.modele?.split(' ')[0] || 'Marque inconnue',
-        model: schedule.modele?.split(' ')[1] || 'Modèle inconnu',
-        licensePlate: schedule.vehicule || 'Plaque inconnue',
-        client: schedule.client || 'Client inconnu',
-        price: '0€', // TODO: Calculate real price
-        duration: schedule.heure || '0h',
-        description: schedule.tache,
-        technician: schedule.technicien || 'Technicien non assigné',
-        status: mapTaskStatus(schedule.status)
-      }))
+      color: 'bg-blue-600',
+      vehicles: [
+        {
+          id: '1',
+          brand: 'Citroën',
+          model: 'C4',
+          licensePlate: '12 XY 75',
+          client: 'Client Martin',
+          price: '600€',
+          duration: '2h',
+          description: 'Devis en cours',
+          status: 'En cours' as 'En cours' | 'À planifier' | 'Terminé'
+        },
+        {
+          id: '2', 
+          brand: 'Mercedes',
+          model: 'Classe C',
+          licensePlate: 'AB 123 CD',
+          client: 'Client Dupont',
+          price: '850€', 
+          duration: '3h',
+          description: 'Expertise assurance',
+          status: 'À planifier' as 'En cours' | 'À planifier' | 'Terminé'
+        }
+      ]
     },
     {
       id: 'remplacement',
       title: 'Remplacement ou débosselage',
-      vehicles: schedules.filter(s => s.tache === 'Débosselage' || s.tache === 'Remplacement ou débosselage').map(schedule => ({
-        id: schedule.id,
-        brand: schedule.modele?.split(' ')[0] || 'Marque inconnue',
-        model: schedule.modele?.split(' ')[1] || 'Modèle inconnu',
-        licensePlate: schedule.vehicule || 'Plaque inconnue',
-        client: schedule.client || 'Client inconnu',
-        price: '0€',
-        duration: schedule.heure || '0h',
-        description: schedule.tache,
-        technician: schedule.technicien || 'Technicien non assigné',
-        status: mapTaskStatus(schedule.status)
-      }))
+      color: 'bg-orange-500',
+      vehicles: [
+        {
+          id: '3',
+          brand: 'Audi',
+          model: 'A4',
+          licensePlate: 'VH 567 RT',
+          client: 'Client Moreau',
+          price: '1250€',
+          duration: '4h',
+          description: 'Débosselage portière',
+          status: 'En cours' as 'En cours' | 'À planifier' | 'Terminé'
+        },
+        {
+          id: '4',
+          brand: 'BMW',
+          model: 'Série 3',
+          licensePlate: 'RT 890 HU',
+          client: 'Client Bernard',
+          price: '950€',
+          duration: '3h', 
+          description: 'Remplacement pare-chocs',
+          status: 'À planifier' as 'En cours' | 'À planifier' | 'Terminé'
+        }
+      ]
     },
     {
       id: 'preparation',
       title: 'Préparation peinture',
-      vehicles: schedules.filter(s => s.tache === 'Préparation peinture').map(schedule => ({
-        id: schedule.id,
-        brand: schedule.modele?.split(' ')[0] || 'Marque inconnue',
-        model: schedule.modele?.split(' ')[1] || 'Modèle inconnu',
-        licensePlate: schedule.vehicule || 'Plaque inconnue',
-        client: schedule.client || 'Client inconnu',
-        price: '0€',
-        duration: schedule.heure || '0h',
-        description: schedule.tache,
-        technician: schedule.technicien || 'Technicien non assigné',
-        status: mapTaskStatus(schedule.status)
-      }))
+      color: 'bg-purple-600',
+      vehicles: [
+        {
+          id: '5',
+          brand: 'Peugeot',
+          model: '308',
+          licensePlate: 'AB 789 XY',
+          client: 'Client Rousseau',
+          price: '680€',
+          duration: '2h',
+          description: 'Ponçage aile avant',
+          status: 'En cours' as 'En cours' | 'À planifier' | 'Terminé'
+        }
+      ]
     },
     {
       id: 'peinture',
       title: 'Mise en peinture',
-      vehicles: schedules.filter(s => s.tache === 'Mise en peinture').map(schedule => ({
-        id: schedule.id,
-        brand: schedule.modele?.split(' ')[0] || 'Marque inconnue',
-        model: schedule.modele?.split(' ')[1] || 'Modèle inconnu',
-        licensePlate: schedule.vehicule || 'Plaque inconnue',
-        client: schedule.client || 'Client inconnu',
-        price: '0€',
-        duration: schedule.heure || '0h',
-        description: schedule.tache,
-        technician: schedule.technicien || 'Technicien non assigné',
-        status: mapTaskStatus(schedule.status)
-      }))
+      color: 'bg-green-600',
+      vehicles: [
+        {
+          id: '6',
+          brand: 'Renault',
+          model: 'Clio',
+          licensePlate: 'CD 456 RT',
+          client: 'Client Petit',
+          price: '1200€',
+          duration: '5h',
+          description: 'Application base',
+          status: 'En cours' as 'En cours' | 'À planifier' | 'Terminé'
+        }
+      ]
     },
     {
       id: 'finitions',
-      title: 'Finitions & remontage',
-      vehicles: schedules.filter(s => s.tache === 'Finitions & remontage').map(schedule => ({
-        id: schedule.id,
-        brand: schedule.modele?.split(' ')[0] || 'Marque inconnue',
-        model: schedule.modele?.split(' ')[1] || 'Modèle inconnu',
-        licensePlate: schedule.vehicule || 'Plaque inconnue',
-        client: schedule.client || 'Client inconnu',
-        price: '0€',
-        duration: schedule.heure || '0h',
-        description: schedule.tache,
-        technician: schedule.technicien || 'Technicien non assigné',
-        status: mapTaskStatus(schedule.status)
-      }))
-    },
-    {
-      id: 'cloture',
-      title: 'Clôture du dossier et livraison',
-      vehicles: schedules.filter(s => s.tache === 'Clôture & livraison' || s.tache === 'Clôture du dossier et livraison').map(schedule => ({
-        id: schedule.id,
-        brand: schedule.modele?.split(' ')[0] || 'Marque inconnue',
-        model: schedule.modele?.split(' ')[1] || 'Modèle inconnu',
-        licensePlate: schedule.vehicule || 'Plaque inconnue',
-        client: schedule.client || 'Client inconnu',
-        price: '0€',
-        duration: schedule.heure || '0h',
-        description: schedule.tache,
-        technician: schedule.technicien || 'Technicien non assigné',
-        status: mapTaskStatus(schedule.status)
-      }))
+      title: 'Finitions & remontage', 
+      color: 'bg-indigo-600',
+      vehicles: [
+        {
+          id: '7',
+          brand: 'Volkswagen',
+          model: 'Golf',
+          licensePlate: 'EF 321 GH',
+          client: 'Client Lambert',
+          price: '550€',
+          duration: '1h30',
+          description: 'Polissage final',
+          status: 'En cours' as 'En cours' | 'À planifier' | 'Terminé'
+        }
+      ]
     }
   ];
 
@@ -388,23 +404,24 @@ export const WorkshopPlanningInterface = ({
             />
 
             {/* Summary banner */}
-            <div className="bg-slate-100 p-4 rounded-lg mb-6 border">
-              <div className="text-sm text-slate-600">
+            <div className="bg-yellow-100 border border-yellow-300 p-4 rounded-lg mb-6">
+              <div className="text-sm text-yellow-800 font-medium">
                 {waitingVehiclesCount} véhicules en attente
               </div>
-              <div className="text-sm text-slate-600">
+              <div className="text-sm text-yellow-700">
                 Pièces: 2 • Approbations: 1 • Techniciens: 1
               </div>
             </div>
 
             {/* Workflow Steps */}
-            <div className="space-y-6">
+            <div className="space-y-0">
               {workflowSteps.map((step) => (
                 <WorkflowStep
                   key={step.id}
                   title={step.title}
                   vehicles={step.vehicles}
                   count={step.vehicles.length}
+                  stepColor={step.color}
                   onPlanVehicle={handlePlanVehicle}
                 />
               ))}

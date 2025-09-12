@@ -17,32 +17,35 @@ interface WorkflowStepProps {
   title: string;
   vehicles: Vehicle[];
   count: number;
+  stepColor: string;
   onPlanVehicle?: (vehicleId: string) => void;
 }
 
-export const WorkflowStep = ({ title, vehicles, count, onPlanVehicle }: WorkflowStepProps) => {
+export const WorkflowStep = ({ title, vehicles, count, stepColor, onPlanVehicle }: WorkflowStepProps) => {
   return (
-    <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
-        <span className="text-sm text-slate-600 bg-white px-2 py-1 rounded border">
+    <div className="bg-white rounded-lg border border-slate-200 mb-6">
+      <div className={`${stepColor} text-white p-4 rounded-t-lg flex items-center justify-between`}>
+        <h3 className="font-semibold text-lg">{title}</h3>
+        <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">
           {count} véhicule{count !== 1 ? 's' : ''}
         </span>
       </div>
       
-      <div className="space-y-3">
+      <div className="p-4">
         {vehicles.length === 0 ? (
-          <div className="text-center text-slate-500 py-8 bg-white rounded border-2 border-dashed">
+          <div className="text-center text-slate-500 py-8 border-2 border-dashed border-slate-200 rounded">
             Aucun véhicule à cette étape
           </div>
         ) : (
-          vehicles.map((vehicle) => (
-            <VehicleCard
-              key={vehicle.id}
-              vehicle={vehicle}
-              onPlan={onPlanVehicle}
-            />
-          ))
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {vehicles.map((vehicle) => (
+              <VehicleCard
+                key={vehicle.id}
+                vehicle={vehicle}
+                onPlan={onPlanVehicle}
+              />
+            ))}
+          </div>
         )}
       </div>
     </div>
