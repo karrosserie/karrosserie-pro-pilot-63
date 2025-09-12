@@ -200,8 +200,8 @@ const CarrosseriePlanning = () => {
     setShowVehicleDetailsModal(true);
   };
 
-  // Loading state
-  if (employesLoading || planningLoading || !companyId) {
+  // Loading state - ne bloque pas l'UI lors des refetch, uniquement si companyId absent
+  if (!companyId) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
