@@ -22,12 +22,14 @@ interface TeamMobileCardProps {
   member: TeamMember;
   onEditMember: (member: TeamMember) => void;
   onRemoveMember: (memberId: string) => void;
+  onViewTimesheet?: (member: TeamMember) => void;
 }
 
 const TeamMobileCard: React.FC<TeamMobileCardProps> = ({
   member,
   onEditMember,
-  onRemoveMember
+  onRemoveMember,
+  onViewTimesheet
 }) => {
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -91,15 +93,16 @@ const TeamMobileCard: React.FC<TeamMobileCardProps> = ({
 
         {/* Actions */}
         <div className="flex gap-2 pt-2 border-t">
-          {(member.role === 'carrossier' || member.role === 'carrossier-vehicule de courtoisie') && (
+          {(member.role === 'carrossier' || member.role === 'carrossier-vehicule de courtoisie') && onViewTimesheet && (
             <Button 
               variant="outline" 
               size="sm" 
+              onClick={() => onViewTimesheet(member)}
               className="flex-1 text-xs"
-              title="Gérer les horaires"
+              title="Voir les pointages"
             >
               <Clock className="h-3 w-3 mr-1" />
-              Horaires
+              Pointages
             </Button>
           )}
           <Button 

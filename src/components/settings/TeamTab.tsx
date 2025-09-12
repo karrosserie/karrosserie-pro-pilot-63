@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { CustomPhoneInput } from '@/components/ui/custom-phone-input';
 import { Plus, Pencil, UserX, Crown, User, Trash, Users, UserPlus, Clock } from 'lucide-react';
+import EmployeeTimesheetModal from './EmployeeTimesheetModal';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
 import { useConfirmation } from '@/hooks/use-confirmation';
@@ -76,6 +77,8 @@ const TeamTab = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTimesheetModalOpen, setIsTimesheetModalOpen] = useState(false);
+  const [selectedMemberForTimesheet, setSelectedMemberForTimesheet] = useState<TeamMember | null>(null);
 
   const addForm = useForm<AddMemberFormValues>({
     resolver: zodResolver(addMemberSchema),
@@ -325,6 +328,11 @@ const TeamTab = () => {
     setIsEditDialogOpen(true);
   };
 
+  const openTimesheetModal = (member: TeamMember) => {
+    setSelectedMemberForTimesheet(member);
+    setIsTimesheetModalOpen(true);
+  };
+
   const getRoleIcon = (role: string) => {
     switch (role) {
       case 'Propriétaire': return <Crown className="h-4 w-4" />;
@@ -527,6 +535,7 @@ const TeamTab = () => {
                 member={member}
                 onEditMember={openEditDialog}
                 onRemoveMember={handleRemoveMember}
+                onViewTimesheet={openTimesheetModal}
               />
             ))
           ) : (
@@ -581,8 +590,9 @@ const TeamTab = () => {
                       <Button
                         variant="ghost"
                         size="sm"
+                        onClick={() => openTimesheetModal(member)}
                         className="hover:bg-muted"
-                        title="Gérer les horaires"
+                        title="Voir les pointages"
                       >
                         <Clock className="h-4 w-4" />
                       </Button>
@@ -748,6 +758,18 @@ const TeamTab = () => {
           </Form>
         </DialogContent>
       </Dialog>
+
+      {/* Employee Timesheet Modal */}
+      {selectedMemberForTimesheet && (
+        <EmployeeTimesheetModal
+          isOpen={isTimesheetModalOpen}
+          onClose={() => {
+            setIsTimesheetModalOpen(false);
+            setSelectedMemberForTimesheet(null);
+          }}
+          member={selectedMemberForTimesheet}
+        />
+      )}
     </div>
   );
 };
