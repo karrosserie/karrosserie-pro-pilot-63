@@ -192,12 +192,27 @@ export const usePlanningTasks = (companyId: string | null) => {
     return todayTasks;
   };
 
+  // Obtenir toutes les tâches pour les étapes atelier (indépendamment de la date)
+  const getAllWorkflowTasks = (): PlanningTache[] => {
+    console.log('🏭 getAllWorkflowTasks - Returning all tasks for workshop stages:', planningTaches.length);
+    console.log('🏭 All workflow tasks:', planningTaches.map(t => ({ 
+      id: t.id, 
+      vehicule: t.vehicule, 
+      dateAssignation: t.dateAssignation,
+      status: t.status,
+      etape: t.etape
+    })));
+    
+    return planningTaches;
+  };
+
   return {
     planningTaches,
     planningTachesByEmployee,
     getTasksForEmployee,
     getTasksForEmployeeById, // Nouvelle fonction
     getTodayTasks,
+    getAllWorkflowTasks, // Nouvelle fonction pour les étapes atelier
     loading,
     refetch
   };
