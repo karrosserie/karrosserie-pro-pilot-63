@@ -10,9 +10,9 @@ import { VehiclesWaitingTab } from "./VehiclesWaitingTab";
 import { PlanningCalendar } from "./PlanningCalendar";
 import { EmployeePlanningTab } from "./EmployeePlanningTab";
 import { ProcessConfig } from "./ProcessConfig";
-import { EmployeesManagement } from "./EmployeesManagement";
 import { useUserRole } from "@/hooks/use-user-role";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 
 interface WorkshopPlanningInterfaceProps {
@@ -48,6 +48,7 @@ export const WorkshopPlanningInterface = ({
     technicien: s.technicien
   })));
   const { userRole, isCarrossier, isCarrossierCourtesy, isResponsable, isOwner, isLoading } = useUserRole();
+  const navigate = useNavigate();
   
   // Debug logs pour comprendre le problème de rôle
   console.log('🔍 WorkshopPlanningInterface - User Role Debug:', {
@@ -365,38 +366,46 @@ export const WorkshopPlanningInterface = ({
       {/* Navigation Tabs - Only show for manager view */}
       {activeView === 'manager' && (
         <Tabs defaultValue="workshop" className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="workshop" className="flex items-center gap-1">
-            <Wrench className="w-4 h-4" />
-            <span className="hidden sm:inline">Étapes atelier</span>
-            <span className="sm:hidden">Étapes</span>
-          </TabsTrigger>
-          <TabsTrigger value="waiting" className="flex items-center gap-1">
-            <Clock className="w-4 h-4" />
-            <span className="hidden sm:inline">Véhicules en Attente</span>
-            <span className="sm:hidden">Attente</span>
-          </TabsTrigger>
-          <TabsTrigger value="planning" className="flex items-center gap-1">
-            <BarChart className="w-4 h-4" />
-            <span className="hidden sm:inline">Planning</span>
-            <span className="sm:hidden">Plan</span>
-          </TabsTrigger>
-          <TabsTrigger value="employee-planning" className="flex items-center gap-1">
-            <Users className="w-4 h-4" />
-            <span className="hidden sm:inline">Planning Employés</span>
-            <span className="sm:hidden">P.Emp</span>
-          </TabsTrigger>
-          <TabsTrigger value="team-management" className="flex items-center gap-1">
+        <div className="flex items-center justify-between">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="workshop" className="flex items-center gap-1">
+              <Wrench className="w-4 h-4" />
+              <span className="hidden sm:inline">Étapes atelier</span>
+              <span className="sm:hidden">Étapes</span>
+            </TabsTrigger>
+            <TabsTrigger value="waiting" className="flex items-center gap-1">
+              <Clock className="w-4 h-4" />
+              <span className="hidden sm:inline">Véhicules en Attente</span>
+              <span className="sm:hidden">Attente</span>
+            </TabsTrigger>
+            <TabsTrigger value="planning" className="flex items-center gap-1">
+              <BarChart className="w-4 h-4" />
+              <span className="hidden sm:inline">Planning</span>
+              <span className="sm:hidden">Plan</span>
+            </TabsTrigger>
+            <TabsTrigger value="employee-planning" className="flex items-center gap-1">
+              <Users className="w-4 h-4" />
+              <span className="hidden sm:inline">Planning Employés</span>
+              <span className="sm:hidden">P.Emp</span>
+            </TabsTrigger>
+            <TabsTrigger value="process" className="flex items-center gap-1">
+              <Cog className="w-4 h-4" />
+              <span className="hidden sm:inline">Process</span>
+              <span className="sm:hidden">Proc</span>
+            </TabsTrigger>
+          </TabsList>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate('/parametres#equipe')}
+            className="flex items-center gap-2 ml-4"
+          >
             <Users className="w-4 h-4" />
             <span className="hidden sm:inline">Gérer l'équipe</span>
             <span className="sm:hidden">Équipe</span>
-          </TabsTrigger>
-          <TabsTrigger value="process" className="flex items-center gap-1">
-            <Cog className="w-4 h-4" />
-            <span className="hidden sm:inline">Process</span>
-            <span className="sm:hidden">Proc</span>
-          </TabsTrigger>
-        </TabsList>
+          </Button>
+        </div>
 
         {/* Workshop Steps Tab */}
         <TabsContent value="workshop" className="space-y-6">
@@ -457,10 +466,6 @@ export const WorkshopPlanningInterface = ({
                 employees={employees}
                 schedules={planningTaches}
               />
-            </TabsContent>
-
-            <TabsContent value="team-management" className="space-y-6">
-              <EmployeesManagement />
             </TabsContent>
 
             <TabsContent value="process" className="space-y-6">
