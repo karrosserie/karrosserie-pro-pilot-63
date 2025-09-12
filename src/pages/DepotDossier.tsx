@@ -27,7 +27,11 @@ const DepotDossier = () => {
   const [selectedTribunal, setSelectedTribunal] = useState('marseille');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [depositResult, setDepositResult] = useState(null);
+  const [depositResult, setDepositResult] = useState({
+    number: 'RIP-2025-001234',
+    tribunal: 'TJ Marseille',
+    date: new Date().toLocaleDateString('fr-FR')
+  });
   useEffect(() => {
     if (id && cases) {
       const foundCase = cases.find(c => c.id === id);
@@ -230,7 +234,7 @@ const DepotDossier = () => {
 
       <div className="container mx-auto p-8 max-w-5xl">
         {/* Accusé de réception - Affiché après succès du dépôt */}
-        {depositResult === 'success' && (
+        {depositResult && (
           <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8 shadow-sm">
             <div className="flex items-start space-x-4">
               <div className="flex-shrink-0">
