@@ -7,6 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { X } from 'lucide-react';
 import { useTeamMembers, TeamMember, CreateTeamMemberData, UpdateTeamMemberData } from '@/hooks/use-team-members';
+import { STANDARD_QUALIFICATIONS } from '@/hooks/useEmployeeData';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
@@ -15,27 +16,9 @@ interface TeamMemberFormProps {
   onClose: () => void;
 }
 
-// Qualifications disponibles pour les carrossiers
-const availableQualifications = [
-  'Accueil & Préparation',
-  'Carrosserie',
-  'Débosselage', 
-  'Peinture',
-  'Préparation peinture',
-  'Mise en peinture',
-  'Finitions & remontage',
-  'Clôture & livraison',
-  'Mécanique',
-  'Électricité',
-  'Diagnostic',
-  'Soudure',
-  'Polissage',
-  'Véhicule de courtoisie'
-];
-
 const roles = [
   'Carrossier',
-  'Carrossier-Véhicule de courtoisie',
+  'Carrossier-Véhicule de courtoisie', 
   'Responsable',
   'Responsable administratif'
 ];
@@ -87,14 +70,17 @@ export const TeamMemberForm: React.FC<TeamMemberFormProps> = ({
     }
   };
 
-  const handleQualificationToggle = (qualification: string) => {
+  const handleQualificationToggle = (qualificationId: string) => {
     setFormData(prev => ({
       ...prev,
-      qualifications: prev.qualifications.includes(qualification)
-        ? prev.qualifications.filter(q => q !== qualification)
-        : [...prev.qualifications, qualification]
+      qualifications: prev.qualifications.includes(qualificationId)
+        ? prev.qualifications.filter(q => q !== qualificationId)
+        : [...prev.qualifications, qualificationId]
     }));
   };
+
+  // Check if qualifications should be shown based on role
+  const shouldShowQualifications = formData.role === 'Carrossier' || formData.role === 'Carrossier-Véhicule de courtoisie';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -178,38 +164,33 @@ export const TeamMemberForm: React.FC<TeamMemberFormProps> = ({
         </Select>
       </div>
 
-      <div className="space-y-3">
-        <Label>Qualifications</Label>
-        <div className="grid grid-cols-2 gap-3">
-          {availableQualifications.map((qualification) => (
-            <div key={qualification} className="flex items-center space-x-2">
-              <Checkbox
-                id={qualification}
-                checked={formData.qualifications.includes(qualification)}
-                onCheckedChange={() => handleQualificationToggle(qualification)}
-              />
-              <Label htmlFor={qualification} className="text-sm font-normal">
-                {qualification}
-              </Label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {formData.qualifications.length > 0 && (
-        <div className="space-y-2">
-          <Label>Qualifications sélectionnées:</Label>
-          <div className="flex flex-wrap gap-2">
-            {formData.qualifications.map((qualification) => (
-              <Badge
-                key={qualification}
-                variant="secondary"
-                className="cursor-pointer"
-                onClick={() => handleQualificationToggle(qualification)}
-              >
-                {qualification}
-                <X className="ml-1 h-3 w-3" />
-              </Badge>
+      {shouldShowQualifications && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label>Qualifications * (sélectionnez une ou plusieurs)</Label>
+            {formData.qualifications.length > 0 && (
+              <span className="text-sm text-muted-foreground">
+                {formData.qualifications.length} qualification(s) sélectionnée(s)
+              </span>
+            )}
+          </div>
+          <div className="space-y-2 max-h-60 overflow-y-auto border rounded-lg p-3">
+            {STANDARD_QUALIFICATIONS.map((qualification) => (
+              <div key={qualification.id} className="flex items-center space-x-3">
+                <Checkbox
+                  id={qualification.id}
+                  checked={formData.qualifications.includes(qualification.id)}
+                  onCheckedChange={() => handleQualificationToggle(qualification.id)}
+                />
+                <Label 
+                  htmlFor={qualification.id} 
+                  className="text-sm font-normal flex-1 cursor-pointer"
+                >
+                  <span className={`inline-block px-2 py-1 rounded-sm text-xs mr-2 ${qualification.color}`}>
+                    {qualification.name}
+                  </span>
+                </Label>
+              </div>
             ))}
           </div>
         </div>
