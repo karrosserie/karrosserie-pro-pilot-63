@@ -57,7 +57,15 @@ export const QuoteRepairsAndPartsSection = ({
     if (isReadOnly) return;
     const updatedRepairs = repairs.map(repair => {
       if (repair.id === id) {
-        const updated = { ...repair, [field]: value };
+        const updated = { ...repair, [field]: value } as QuoteRepairItem;
+
+        // If user edits the total, respect it and do not auto-recalculate
+        if (field === 'total') {
+          const manualTotal = isNaN(Number(value)) ? 0 : Number(value);
+          updated.total = manualTotal;
+          return updated;
+        }
+
         // Ensure numeric values are valid numbers
         const quantity = isNaN(Number(updated.quantity)) ? 0 : Number(updated.quantity);
         const unitCost = isNaN(Number(updated.unitCost)) ? 0 : Number(updated.unitCost);
@@ -70,7 +78,7 @@ export const QuoteRepairsAndPartsSection = ({
         updated.discount = discount;
         updated.vat = vat;
         
-        // Calculate total using the centralized function
+        // Calculate total using the centralized function when not manually overridden
         updated.total = calculateLineTotal(quantity, unitCost, discount, vat);
         return updated;
       }
@@ -103,7 +111,14 @@ export const QuoteRepairsAndPartsSection = ({
     if (isReadOnly) return;
     const updatedParts = parts.map(part => {
       if (part.id === id) {
-        const updated = { ...part, [field]: value };
+        const updated = { ...part, [field]: value } as QuotePartItem;
+
+        // If user edits the total, respect it and do not auto-recalculate
+        if (field === 'total') {
+          const manualTotal = isNaN(Number(value)) ? 0 : Number(value);
+          updated.total = manualTotal;
+          return updated;
+        }
         
         // Ensure numeric values are valid numbers
         const quantity = isNaN(Number(updated.quantity)) ? 0 : Number(updated.quantity);
@@ -117,7 +132,7 @@ export const QuoteRepairsAndPartsSection = ({
         updated.discount = discount;
         updated.vat = vat;
         
-        // Calculate total using the centralized function
+        // Calculate total using the centralized function when not manually overridden
         updated.total = calculateLineTotal(quantity, unitCost, discount, vat);
         return updated;
       }
@@ -291,9 +306,15 @@ export const QuoteRepairsAndPartsSection = ({
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
-                  <div className="text-right font-medium bg-gray-50 border rounded px-3 py-1">
-                    {calculateLineTotal(repair.quantity, repair.unitCost, repair.discount, repair.vat).toFixed(2)} €
-                  </div>
+                  <Input
+                    type="number"
+                    value={isNaN(Number(repair.total)) ? 0 : Number(repair.total)}
+                    onChange={(e) => updateRepair(repair.id, 'total', parseFloat(e.target.value) || 0)}
+                    min="0"
+                    step="0.01"
+                    readOnly={isReadOnly}
+                    className={isReadOnly ? 'bg-gray-50' : ''}
+                  />
                   {!isReadOnly && (
                     <Button
                       type="button"
@@ -386,9 +407,15 @@ export const QuoteRepairsAndPartsSection = ({
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
-                  <div className="text-right font-medium bg-gray-50 border rounded px-3 py-1">
-                    {calculateLineTotal(part.quantity, part.unitCost, part.discount, part.vat).toFixed(2)} €
-                  </div>
+                  <Input
+                    type="number"
+                    value={isNaN(Number(part.total)) ? 0 : Number(part.total)}
+                    onChange={(e) => updatePart(part.id, 'total', parseFloat(e.target.value) || 0)}
+                    min="0"
+                    step="0.01"
+                    readOnly={isReadOnly}
+                    className={isReadOnly ? 'bg-gray-50' : ''}
+                  />
                   {!isReadOnly && (
                     <Button
                       type="button"
