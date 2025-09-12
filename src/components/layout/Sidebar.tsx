@@ -237,18 +237,31 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
     );
   }
 
+  const [isTablet, setIsTablet] = useState(false);
+
+  // Détecter si on est sur tablette
+  React.useEffect(() => {
+    const checkIsTablet = () => {
+      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024);
+    };
+
+    checkIsTablet();
+    window.addEventListener('resize', checkIsTablet);
+    return () => window.removeEventListener('resize', checkIsTablet);
+  }, []);
+
   const handleOverlayClick = () => {
-    if (isMobile) {
+    if (isMobile || isTablet) {
       onClose();
     }
   };
   
   return (
     <>
-      {/* Mobile overlay */}
-      {isMobile && isOpen && (
+      {/* Mobile and Tablet overlay */}
+      {(isMobile || isTablet) && isOpen && (
         <div 
-          className="fixed inset-0 bg-gray-800 bg-opacity-50 z-40 transition-opacity"
+          className="fixed inset-0 bg-gray-800 bg-opacity-50 z-40 transition-opacity lg:hidden"
           onClick={handleOverlayClick}
         ></div>
       )}
