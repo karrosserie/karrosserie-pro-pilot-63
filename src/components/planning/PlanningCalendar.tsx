@@ -75,9 +75,14 @@ export const PlanningCalendar = ({
   // Stabiliser la référence de onWeekChange
   const onWeekChangeRef = useRef(onWeekChange);
   onWeekChangeRef.current = onWeekChange;
+  const isFirstRenderRef = useRef(true);
 
-  // Notifier le parent du changement de semaine
+  // Notifier le parent du changement de semaine (sauf au premier rendu pour éviter les remounts)
   useEffect(() => {
+    if (isFirstRenderRef.current) {
+      isFirstRenderRef.current = false;
+      return; // éviter le refresh initial qui reset l'onglet
+    }
     if (onWeekChangeRef.current) {
       const weekEnd = addDays(currentWeekStart, 4);
       onWeekChangeRef.current(currentWeekStart, weekEnd);
