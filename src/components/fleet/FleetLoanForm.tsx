@@ -134,30 +134,21 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
 
   // Handler pour la soumission du nouveau client
   const handleNewClientSubmit = (clientData: any) => {
-    console.log('Nouveau client créé:', clientData);
+    console.log('Nouveau client créé (soumission):', clientData);
     
     // Vérifier que les champs requis sont remplis
     if (!clientData.firstName?.trim() || !clientData.lastName?.trim()) {
       console.error('Les champs prénom et nom sont obligatoires');
       return;
     }
-    
-    // Transformer les données du formulaire vers le format de la base de données
-    const clientForDB = {
-      first_name: clientData.firstName.trim(),
-      last_name: clientData.lastName.trim(),
-      email: clientData.email || '',
-      phone: clientData.phone || '',
-      address: clientData.address || '',
-      city: clientData.city || '',
-      postal_code: clientData.zipCode || '',
-      driver_license_front_url: clientData.driverLicenseFrontUrl || null,
-      driver_license_back_url: clientData.driverLicenseBackUrl || null,
-      auto_relances_disabled: clientData.autoRelancesDisabled || false
-    };
-    
-    // Créer le client en base de données
-    createClient.mutate(clientForDB);
+
+    // Envoyer les données au hook (il se charge du mapping et de company_id)
+    createClient.mutate({
+      ...clientData,
+      firstName: clientData.firstName.trim(),
+      lastName: clientData.lastName.trim(),
+    });
+
     setIsClientDialogOpen(false);
   };
 
