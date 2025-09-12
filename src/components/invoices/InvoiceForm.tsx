@@ -5,8 +5,7 @@ import { useClients } from '@/hooks/use-clients';
 import { Invoice } from '@/services/supabase/invoices';
 import { InvoiceBasicInfoSection } from './form/InvoiceBasicInfoSection';
 import { InvoiceAssignmentSection } from './form/InvoiceAssignmentSection';
-import { InvoiceRepairsSection } from './form/InvoiceRepairsSection';
-import { InvoicePartsSection } from './form/InvoicePartsSection';
+import { InvoiceRepairsAndPartsSection } from './form/InvoiceRepairsAndPartsSection';
 import { InvoiceGlobalDiscountsSection } from './form/InvoiceGlobalDiscountsSection';
 
 import { InvoiceDetailsSection } from './form/InvoiceDetailsSection';
@@ -100,14 +99,10 @@ export const InvoiceForm = ({
         isLoadingClients={isLoadingClients}
       />
 
-      <InvoiceRepairsSection
+      <InvoiceRepairsAndPartsSection
         repairs={repairs}
-        onRepairsChange={setRepairs}
-        isReadOnly={isReadOnly}
-      />
-
-      <InvoicePartsSection
         parts={parts}
+        onRepairsChange={setRepairs}
         onPartsChange={setParts}
         isReadOnly={isReadOnly}
       />
