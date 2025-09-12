@@ -20,19 +20,19 @@ export const WorkshopStats = ({
       
       <div className="grid grid-cols-4 gap-6">
         <div className="text-center">
-          <div className="text-2xl font-bold text-blue-600">8</div>
+          <div className="text-2xl font-bold text-blue-600">{totalVehicles}</div>
           <div className="text-sm text-muted-foreground">VÉHICULES</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-gray-600">0</div>
+          <div className="text-2xl font-bold text-gray-600">{completedVehicles}</div>
           <div className="text-sm text-muted-foreground">TERMINÉS</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-blue-600">5</div>
+          <div className="text-2xl font-bold text-blue-600">{waitingVehicles}</div>
           <div className="text-sm text-muted-foreground">EN ATTENTE</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-orange-600">18700€</div>
+          <div className="text-2xl font-bold text-orange-600">{totalRevenue.toLocaleString('fr-FR')}€</div>
           <div className="text-sm text-muted-foreground">CA EN COURS</div>
         </div>
       </div>
