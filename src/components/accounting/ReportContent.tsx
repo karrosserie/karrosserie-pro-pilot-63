@@ -7,6 +7,7 @@ import { GeneratedReportsTable } from './GeneratedReportsTable';
 import { EmailReportDialog } from './EmailReportDialog';
 import { useToast } from '@/hooks/use-toast';
 import { useGeneratedReports, GeneratedReport } from '@/hooks/use-generated-reports';
+import jsPDF from 'jspdf';
 type DialogType = 'monthly' | 'quarterly' | 'yearly' | 'fec' | 'csv' | 'excel' | 'social' | 'pdf' | null;
 const ReportContent = () => {
   const [openDialog, setOpenDialog] = useState<DialogType>(null);
@@ -22,6 +23,11 @@ const ReportContent = () => {
     downloadReport
   } = useGeneratedReports();
   const handleGenerate = (type: string, fromDate: Date, toDate: Date) => {
+    if (type === 'Export PDF') {
+      generatePDFReport(fromDate, toDate);
+      return;
+    }
+    
     const reportId = addReport(type, fromDate, toDate);
     toast({
       title: "Génération en cours",
@@ -33,6 +39,115 @@ const ReportContent = () => {
         description: `${type} prêt au téléchargement.`
       });
     }, 2000);
+  };
+
+  const generatePDFReport = (fromDate: Date, toDate: Date) => {
+    try {
+      const doc = new jsPDF();
+      
+      // Configuration du PDF
+      doc.setFont('helvetica', 'normal');
+      
+      // En-tête
+      doc.setFontSize(20);
+      doc.text('RAPPORT COMPTABLE', 105, 20, { align: 'center' });
+      
+      doc.setFontSize(12);
+      doc.text(`Période: ${fromDate.toLocaleDateString('fr-FR')} - ${toDate.toLocaleDateString('fr-FR')}`, 105, 35, { align: 'center' });
+      doc.text(`Généré le: ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}`, 105, 45, { align: 'center' });
+      
+      // Ligne de séparation
+      doc.line(20, 55, 190, 55);
+      
+      // Section Résumé financier
+      doc.setFontSize(16);
+      doc.text('RÉSUMÉ FINANCIER', 20, 70);
+      
+      doc.setFontSize(11);
+      let yPos = 85;
+      
+      // Données fictives pour démonstration
+      const financialData = [
+        { label: 'Chiffre d\'affaires HT:', value: '245 680,00 €' },
+        { label: 'TVA collectée:', value: '49 136,00 €' },
+        { label: 'Total TTC:', value: '294 816,00 €' },
+        { label: 'Charges d\'exploitation:', value: '156 420,00 €' },
+        { label: 'Résultat net:', value: '89 260,00 €' }
+      ];
+      
+      financialData.forEach(item => {
+        doc.text(item.label, 25, yPos);
+        doc.text(item.value, 120, yPos, { align: 'right' });
+        yPos += 10;
+      });
+      
+      // Section Détail des opérations
+      yPos += 15;
+      doc.setFontSize(16);
+      doc.text('DÉTAIL DES OPÉRATIONS', 20, yPos);
+      
+      yPos += 15;
+      doc.setFontSize(10);
+      
+      // En-têtes du tableau
+      doc.text('Date', 25, yPos);
+      doc.text('Libellé', 50, yPos);
+      doc.text('Débit', 120, yPos);
+      doc.text('Crédit', 150, yPos);
+      doc.text('Solde', 175, yPos);
+      
+      // Ligne sous les en-têtes
+      doc.line(20, yPos + 3, 190, yPos + 3);
+      yPos += 12;
+      
+      // Données d'exemple
+      const operations = [
+        { date: '15/01/2025', libelle: 'Vente - Facture FAC-001', debit: '', credit: '1 200,00', solde: '1 200,00' },
+        { date: '16/01/2025', libelle: 'Achat matériel', debit: '450,00', credit: '', solde: '750,00' },
+        { date: '18/01/2025', libelle: 'Vente - Facture FAC-002', debit: '', credit: '2 350,00', solde: '3 100,00' },
+        { date: '20/01/2025', libelle: 'Frais bancaires', debit: '25,00', credit: '', solde: '3 075,00' },
+        { date: '22/01/2025', libelle: 'Vente - Facture FAC-003', debit: '', credit: '1 850,00', solde: '4 925,00' }
+      ];
+      
+      operations.forEach(op => {
+        if (yPos > 250) { // Nouvelle page si nécessaire
+          doc.addPage();
+          yPos = 30;
+        }
+        
+        doc.text(op.date, 25, yPos);
+        doc.text(op.libelle, 50, yPos);
+        doc.text(op.debit, 130, yPos, { align: 'right' });
+        doc.text(op.credit, 160, yPos, { align: 'right' });
+        doc.text(op.solde, 185, yPos, { align: 'right' });
+        yPos += 8;
+      });
+      
+      // Pied de page
+      const pageCount = doc.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.text(`Page ${i} / ${pageCount}`, 105, 290, { align: 'center' });
+        doc.text('Document généré automatiquement par le système comptable', 105, 285, { align: 'center' });
+      }
+      
+      // Télécharger le PDF
+      const fileName = `rapport-comptable-${fromDate.toISOString().split('T')[0]}-${toDate.toISOString().split('T')[0]}.pdf`;
+      doc.save(fileName);
+      
+      toast({
+        title: "PDF généré",
+        description: "Le rapport PDF a été téléchargé avec succès."
+      });
+      
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer le PDF.",
+        variant: "destructive"
+      });
+    }
   };
   const handleSendEmail = (reportId: string) => {
     const report = reports.find(r => r.id === reportId);
