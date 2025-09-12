@@ -398,7 +398,7 @@ export const WorkshopPlanningInterface = ({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/parametres#equipe')}
+            onClick={() => navigate('/settings?tab=team')}
             className="flex items-center gap-2 ml-4"
           >
             <Users className="w-4 h-4" />
