@@ -58,7 +58,7 @@ export const deleteRepairOrder = async (id: string) => {
 export const archiveRepairOrder = async (id: string) => {
   const { data, error } = await supabase
     .from('repair_orders')
-    .update({ archived: true })
+    .update({ archived: true, updated_at: new Date().toISOString() })
     .eq('id', id)
     .select()
     .single();

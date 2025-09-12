@@ -388,7 +388,7 @@ const RepairOrders = () => {
         <RepairOrdersTable
           orders={filteredOrders}
           onEditOrder={handleEditOrder}
-          onDeleteOrder={showArchived ? handleDeleteOrder : handleArchiveOrder}
+          onDeleteOrder={handleDeleteOrder}
           onViewOrder={handleViewOrder}
           contextMenuProps={{
             onDownload: handleDownload,
