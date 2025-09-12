@@ -38,6 +38,17 @@ export const TacheCard: React.FC<TacheCardProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   
+  // Fonction pour déterminer si une tâche nécessite des photos
+  const requiresPhotos = (taskType: string): boolean => {
+    const noPhotoTasks = [
+      'Accueil & Préparation du dossier',
+      'Préparation peinture', 
+      'Clôture & livraison',
+      'Clôture du dossier et livraison'
+    ];
+    return !noPhotoTasks.includes(taskType);
+  };
+  
   // Fonction pour déterminer si la tâche est urgente (dans les 30 prochaines minutes)
   const isUrgent = () => {
     const now = new Date();
@@ -131,13 +142,28 @@ export const TacheCard: React.FC<TacheCardProps> = ({
 
   const handleCommencer = async () => {
     console.log('DEBUG TacheCard - handleCommencer called for task:', tache.id);
-    setEstCommencee(true); // Marquer immédiatement comme commencée pour cacher le bouton
-    setPrisePhotosEnCours(true);
-    await startCamera();
-    toast({
-      title: "Prise de photos",
-      description: "Prenez des photos du véhicule avant de commencer",
-    });
+    const needsPhoto = requiresPhotos(tache.tache);
+    
+    if (needsPhoto) {
+      setEstCommencee(true); // Marquer immédiatement comme commencée pour cacher le bouton
+      setPrisePhotosEnCours(true);
+      await startCamera();
+      toast({
+        title: "Prise de photos",
+        description: "Prenez des photos du véhicule avant de commencer",
+      });
+    } else {
+      // Pas de photo nécessaire, démarrer directement
+      setEstCommencee(true);
+      setPhotosTerminees(true);
+      if (onCommencer) {
+        onCommencer(tache.id);
+      }
+      toast({
+        title: "Tâche commencée",
+        description: "La tâche a été démarrée avec succès",
+      });
+    }
   };
 
   const terminerPhotos = () => {
@@ -155,12 +181,23 @@ export const TacheCard: React.FC<TacheCardProps> = ({
   };
 
   const handleTerminer = async () => {
-    setPrisePhotosFinEnCours(true);
-    await startCamera();
-    toast({
-      title: "Prise de photos",
-      description: "Prenez des photos du travail terminé",
-    });
+    const needsPhoto = requiresPhotos(tache.tache);
+    
+    if (needsPhoto) {
+      setPrisePhotosFinEnCours(true);
+      await startCamera();
+      toast({
+        title: "Prise de photos",
+        description: "Prenez des photos du travail terminé",
+      });
+    } else {
+      // Pas de photo nécessaire, terminer directement
+      onTerminer(tache.id);
+      toast({
+        title: "Tâche terminée",
+        description: "La tâche a été terminée avec succès",
+      });
+    }
   };
 
   const terminerPhotosFinales = () => {

@@ -121,37 +121,62 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   const upcomingTasks = tasks.filter(task => task.status === 'En attente');
   const completedTasks = tasks.filter(task => task.status === 'Terminé');
 
+  // Fonction pour déterminer si une tâche nécessite des photos
+  const requiresPhotos = (taskType: string): boolean => {
+    const noPhotoTasks = [
+      'Accueil & Préparation du dossier',
+      'Préparation peinture', 
+      'Clôture & livraison',
+      'Clôture du dossier et livraison'
+    ];
+    return !noPhotoTasks.includes(taskType);
+  };
+
   const handleStartTask = async (taskId: string) => {
     if (!currentUserId) return;
     
     setIsProcessingPhoto(true);
     
     try {
-      // Prendre une photo avant de commencer la tâche
-      toast({
-        title: "Photo requise",
-        description: "Veuillez prendre une photo pour commencer la tâche",
-      });
+      const task = tasks.find(t => t.id === taskId);
+      const needsPhoto = task ? requiresPhotos(task.taskType) : true;
       
-      const photoResult = await takeTaskPhoto(currentUserId, taskId, 'start');
+      let photoUrl = null;
       
-      if (!photoResult.success) {
+      if (needsPhoto) {
+        // Prendre une photo avant de commencer la tâche
         toast({
-          title: "Erreur",
-          description: photoResult.error || "Impossible de prendre la photo",
-          variant: "destructive",
+          title: "Photo requise",
+          description: "Veuillez prendre une photo pour commencer la tâche",
         });
-        return;
+        
+        const photoResult = await takeTaskPhoto(currentUserId, taskId, 'start');
+        
+        if (!photoResult.success) {
+          toast({
+            title: "Erreur",
+            description: photoResult.error || "Impossible de prendre la photo",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        photoUrl = photoResult.photoUrl;
       }
 
-      // Mettre à jour le statut de la tâche dans Supabase avec la photo
+      // Mettre à jour le statut de la tâche dans Supabase avec ou sans photo
+      const updateData: any = { 
+        status: 'En cours',
+        real_start_datetime: new Date().toISOString()
+      };
+      
+      if (photoUrl) {
+        updateData.start_photo_url = photoUrl;
+      }
+
       const { error } = await supabase
         .from('employee_schedule')
-        .update({ 
-          status: 'En cours',
-          real_start_datetime: new Date().toISOString(),
-          start_photo_url: photoResult.photoUrl
-        })
+        .update(updateData)
         .eq('id', taskId);
 
       if (error) {
@@ -298,31 +323,45 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
     setIsProcessingPhoto(true);
     
     try {
-      // Prendre une photo avant de terminer la tâche
-      toast({
-        title: "Photo requise",
-        description: "Veuillez prendre une photo pour terminer la tâche",
-      });
+      const task = tasks.find(t => t.id === taskId);
+      const needsPhoto = task ? requiresPhotos(task.taskType) : true;
       
-      const photoResult = await takeTaskPhoto(currentUserId, taskId, 'end');
+      let photoUrl = null;
       
-      if (!photoResult.success) {
+      if (needsPhoto) {
+        // Prendre une photo avant de terminer la tâche
         toast({
-          title: "Erreur",
-          description: photoResult.error || "Impossible de prendre la photo",
-          variant: "destructive",
+          title: "Photo requise",
+          description: "Veuillez prendre une photo pour terminer la tâche",
         });
-        return;
+        
+        const photoResult = await takeTaskPhoto(currentUserId, taskId, 'end');
+        
+        if (!photoResult.success) {
+          toast({
+            title: "Erreur",
+            description: photoResult.error || "Impossible de prendre la photo",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        photoUrl = photoResult.photoUrl;
       }
 
-      // Mettre à jour le statut de la tâche dans Supabase avec la photo
+      // Mettre à jour le statut de la tâche dans Supabase avec ou sans photo
+      const updateData: any = { 
+        status: 'Terminé',
+        real_end_datetime: new Date().toISOString()
+      };
+      
+      if (photoUrl) {
+        updateData.end_photo_url = photoUrl;
+      }
+
       const { error } = await supabase
         .from('employee_schedule')
-        .update({ 
-          status: 'Terminé',
-          real_end_datetime: new Date().toISOString(),
-          end_photo_url: photoResult.photoUrl
-        })
+        .update(updateData)
         .eq('id', taskId);
 
       if (error) {
