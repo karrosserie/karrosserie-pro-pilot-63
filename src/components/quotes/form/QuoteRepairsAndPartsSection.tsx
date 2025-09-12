@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Wrench, Settings, Plus, Trash } from 'lucide-react';
 import { QuoteRepairItem, QuotePartItem } from './types';
+import { calculateLineTotal } from './utils/calculations';
 
 interface QuoteRepairsAndPartsSectionProps {
   repairs: QuoteRepairItem[];
@@ -69,12 +70,8 @@ export const QuoteRepairsAndPartsSection = ({
         updated.discount = discount;
         updated.vat = vat;
         
-        // Calculate total with validated values
-        const subtotal = quantity * unitCost;
-        const discountAmount = subtotal * (discount / 100);
-        const afterDiscount = subtotal - discountAmount;
-        const vatAmount = afterDiscount * (vat / 100);
-        updated.total = afterDiscount + vatAmount;
+        // Calculate total using the centralized function
+        updated.total = calculateLineTotal(quantity, unitCost, discount, vat);
         return updated;
       }
       return repair;
@@ -107,12 +104,21 @@ export const QuoteRepairsAndPartsSection = ({
     const updatedParts = parts.map(part => {
       if (part.id === id) {
         const updated = { ...part, [field]: value };
-        // Calculate total
-        const subtotal = updated.quantity * updated.unitCost;
-        const discountAmount = subtotal * (updated.discount / 100);
-        const afterDiscount = subtotal - discountAmount;
-        const vatAmount = afterDiscount * (updated.vat / 100);
-        updated.total = afterDiscount + vatAmount;
+        
+        // Ensure numeric values are valid numbers
+        const quantity = isNaN(Number(updated.quantity)) ? 0 : Number(updated.quantity);
+        const unitCost = isNaN(Number(updated.unitCost)) ? 0 : Number(updated.unitCost);
+        const discount = isNaN(Number(updated.discount)) ? 0 : Number(updated.discount);
+        const vat = isNaN(Number(updated.vat)) ? 0 : Number(updated.vat);
+        
+        // Update values
+        updated.quantity = quantity;
+        updated.unitCost = unitCost;
+        updated.discount = discount;
+        updated.vat = vat;
+        
+        // Calculate total using the centralized function
+        updated.total = calculateLineTotal(quantity, unitCost, discount, vat);
         return updated;
       }
       return part;
@@ -285,20 +291,9 @@ export const QuoteRepairsAndPartsSection = ({
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
-                  <Input
-                    type="number"
-                    defaultValue=""
-                    onChange={(e) => {
-                      const newTotal = parseFloat(e.target.value) || 0;
-                      const newUnitCost = newTotal * 0.8;
-                      updateRepair(repair.id, 'unitCost', newUnitCost);
-                    }}
-                    min="0"
-                    step="0.01"
-                    readOnly={isReadOnly}
-                    className={`text-right font-medium ${isReadOnly ? 'bg-gray-50' : ''}`}
-                    placeholder="Saisir le montant total"
-                  />
+                  <div className="text-right font-medium bg-gray-50 border rounded px-3 py-1">
+                    {calculateLineTotal(repair.quantity, repair.unitCost, repair.discount, repair.vat).toFixed(2)} €
+                  </div>
                   {!isReadOnly && (
                     <Button
                       type="button"
@@ -391,20 +386,9 @@ export const QuoteRepairsAndPartsSection = ({
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
-                  <Input
-                    type="number"
-                    defaultValue=""
-                    onChange={(e) => {
-                      const newTotal = parseFloat(e.target.value) || 0;
-                      const newUnitCost = newTotal * 0.8;
-                      updatePart(part.id, 'unitCost', newUnitCost);
-                    }}
-                    min="0"
-                    step="0.01"
-                    readOnly={isReadOnly}
-                    className={`text-right font-medium ${isReadOnly ? 'bg-gray-50' : ''}`}
-                    placeholder="Saisir le montant total"
-                  />
+                  <div className="text-right font-medium bg-gray-50 border rounded px-3 py-1">
+                    {calculateLineTotal(part.quantity, part.unitCost, part.discount, part.vat).toFixed(2)} €
+                  </div>
                   {!isReadOnly && (
                     <Button
                       type="button"

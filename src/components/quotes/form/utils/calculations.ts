@@ -1,6 +1,20 @@
 
 import { QuoteRepairItem, QuotePartItem, QuoteDiscountItem, GlobalTotals } from '../types';
 
+// Fonction utilitaire pour calculer le total d'une ligne (réparation ou pièce)
+export const calculateLineTotal = (
+  quantity: number,
+  unitCost: number,
+  discount: number = 0,
+  vat: number = 0
+): number => {
+  const subtotal = quantity * unitCost;
+  const discountAmount = subtotal * (discount / 100);
+  const afterDiscount = subtotal - discountAmount;
+  const vatAmount = afterDiscount * (vat / 100);
+  return afterDiscount + vatAmount;
+};
+
 export const calculateGlobalTotals = (
   repairs: QuoteRepairItem[],
   parts: QuotePartItem[],
@@ -11,12 +25,13 @@ export const calculateGlobalTotals = (
     const discountAmount = subtotal * (repair.discount / 100);
     const afterDiscount = subtotal - discountAmount;
     const vatAmount = afterDiscount * (repair.vat / 100);
+    const lineTotal = afterDiscount + vatAmount; // Calcul correct du total de ligne
     
     return {
       subTotal: acc.subTotal + subtotal,
       totalVat: acc.totalVat + vatAmount,
       totalDiscount: acc.totalDiscount + discountAmount,
-      total: acc.total + repair.total
+      total: acc.total + lineTotal // Utiliser le calcul correct
     };
   }, { subTotal: 0, totalVat: 0, totalDiscount: 0, total: 0 });
 
@@ -25,12 +40,13 @@ export const calculateGlobalTotals = (
     const discountAmount = subtotal * (part.discount / 100);
     const afterDiscount = subtotal - discountAmount;
     const vatAmount = afterDiscount * (part.vat / 100);
+    const lineTotal = afterDiscount + vatAmount; // Calcul correct du total de ligne
     
     return {
       subTotal: acc.subTotal + subtotal,
       totalVat: acc.totalVat + vatAmount,
       totalDiscount: acc.totalDiscount + discountAmount,
-      total: acc.total + part.total
+      total: acc.total + lineTotal // Utiliser le calcul correct
     };
   }, { subTotal: 0, totalVat: 0, totalDiscount: 0, total: 0 });
 
