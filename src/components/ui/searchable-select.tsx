@@ -46,9 +46,9 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0 z-[120] bg-background border rounded-md shadow-md min-w-[var(--radix-popover-trigger-width)]" align="start" sideOffset={4}>
         <Command>
-          <CommandInput placeholder={searchPlaceholder} className="h-9" />
+          <CommandInput placeholder={searchPlaceholder} className="h-9" autoFocus />
           <CommandList>
             <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
             <CommandGroup>
