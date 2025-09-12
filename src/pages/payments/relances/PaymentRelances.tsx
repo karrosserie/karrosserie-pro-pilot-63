@@ -1007,7 +1007,7 @@ Garage Martin`
             <CardHeader>
               <CardTitle className="text-lg font-semibold flex items-center">
                 <Calendar className="h-5 w-5 mr-2" />
-                Journal d'Activité Temps Réel
+                Journal des relances
               </CardTitle>
             </CardHeader>
             <CardContent>
