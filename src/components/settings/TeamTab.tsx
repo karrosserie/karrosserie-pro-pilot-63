@@ -233,7 +233,7 @@ const TeamTab = () => {
         newData: data
       });
 
-      // Utiliser la edge function pour mettre à jour l'utilisateur
+      // 1. Mettre à jour le profil utilisateur via l'edge function
       const { data: session } = await supabase.auth.getSession();
       
       const response = await fetch(`https://jukdsypvuehnniskgpfd.supabase.co/functions/v1/update-user`, {
@@ -245,13 +245,11 @@ const TeamTab = () => {
         },
         body: JSON.stringify({
           userId: editingMember.user_id,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-          phoneNumber: data.phoneNumber,
-          role: data.role,
-          active: data.active,
-          userCompanyId: editingMember.id
+          profileData: {
+            first_name: data.firstName,
+            last_name: data.lastName,
+            phone_number: data.phoneNumber
+          }
         }),
       });
 
@@ -259,7 +257,22 @@ const TeamTab = () => {
       console.log('Résultat edge function:', result);
 
       if (!response.ok) {
-        throw new Error(result.error || 'Erreur lors de la mise à jour');
+        throw new Error(result.error || 'Erreur lors de la mise à jour du profil');
+      }
+
+      // 2. Mettre à jour le rôle et le statut actif dans user_companies
+      const { error: userCompanyError } = await supabase
+        .from('user_companies')
+        .update({
+          role: data.role,
+          active: data.active,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', editingMember.id);
+
+      if (userCompanyError) {
+        console.error('Error updating user_companies:', userCompanyError);
+        throw new Error('Erreur lors de la mise à jour du rôle/statut');
       }
 
       toast({

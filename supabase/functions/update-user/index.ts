@@ -63,16 +63,51 @@ Deno.serve(async (req) => {
     // Use the authenticated user's ID if no userId is provided, or verify the user has permission
     const targetUserId = userId || user.id;
     
-    // For security, only allow users to update their own profile unless they have admin permissions
+    // For security, only allow users to update their own profile unless they have admin permissions or are company owners
     if (targetUserId !== user.id) {
-      console.error('User attempting to update different user profile:', { requestingUser: user.id, targetUser: targetUserId });
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized to update this user' }),
-        { 
-          status: 403, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+      console.log('User attempting to update different user profile:', { requestingUser: user.id, targetUser: targetUserId });
+      
+      // Check if the requesting user is a company owner who can manage their team members
+      const { data: requestingUserCompany, error: ownerError } = await supabaseClient
+        .from('user_companies')
+        .select('role, company_id')
+        .eq('user_id', user.id)
+        .eq('role', 'Propriétaire')
+        .eq('active', true)
+        .single();
+
+      if (ownerError || !requestingUserCompany) {
+        console.error('User is not a company owner:', ownerError);
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized to update this user' }),
+          { 
+            status: 403, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+
+      // Check if the target user belongs to the same company
+      const { data: targetUserCompany, error: targetError } = await supabaseClient
+        .from('user_companies')
+        .select('company_id')
+        .eq('user_id', targetUserId)
+        .eq('company_id', requestingUserCompany.company_id)
+        .eq('active', true)
+        .single();
+
+      if (targetError || !targetUserCompany) {
+        console.error('Target user does not belong to the same company:', targetError);
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized to update this user' }),
+          { 
+            status: 403, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+
+      console.log('Company owner authorized to update team member profile');
     }
 
     if (!profileData) {
