@@ -188,14 +188,35 @@ export class UrgencyVehicleService {
       
       console.log('✅ Employee profile exists:', existingProfile);
       
-      // 5. Créer la tâche dans le planning
+      // 5. Créer la tâche dans le planning avec gestion des dates
       const today = new Date();
+      const currentTime = new Date();
       const [heureStr, minuteStr] = heure.split(':');
-      const startDateTime = new Date(today);
+      
+      // Calculer la date de la tâche
+      let taskDate = new Date(today);
+      const selectedTime = new Date(today);
+      selectedTime.setHours(parseInt(heureStr), parseInt(minuteStr), 0, 0);
+      
+      // Si l'heure sélectionnée est antérieure à l'heure actuelle, programmer pour le lendemain
+      if (selectedTime <= currentTime) {
+        taskDate = new Date(today);
+        taskDate.setDate(today.getDate() + 1); // Ajouter un jour
+        console.log('⏰ Heure sélectionnée antérieure à maintenant, programmé pour demain');
+      }
+      
+      const startDateTime = new Date(taskDate);
       startDateTime.setHours(parseInt(heureStr), parseInt(minuteStr), 0, 0);
       
       const endDateTime = new Date(startDateTime);
       endDateTime.setHours(startDateTime.getHours() + 1); // 1 heure par défaut
+      
+      console.log('📅 Planning emergency vehicle:', {
+        selectedTime: selectedTime.toLocaleString('fr-FR'),
+        currentTime: currentTime.toLocaleString('fr-FR'),
+        plannedStartTime: startDateTime.toLocaleString('fr-FR'),
+        plannedEndTime: endDateTime.toLocaleString('fr-FR')
+      });
       
       const { data: newSchedule, error: scheduleError } = await supabase
         .from('employee_schedule')
@@ -206,7 +227,7 @@ export class UrgencyVehicleService {
           task_type: 'Accueil & Préparation du dossier',
           start_datetime: startDateTime.toISOString(),
           end_datetime: endDateTime.toISOString(),
-          status: 'En cours'
+          status: 'En attente'
         })
         .select('id')
         .single();
@@ -225,9 +246,17 @@ export class UrgencyVehicleService {
         scheduleId: newSchedule.id
       });
       
+      // Déterminer le message selon si c'est programmé aujourd'hui ou demain
+      let successMessage = 'Véhicule d\'urgence ajouté avec succès';
+      if (selectedTime <= currentTime) {
+        successMessage += ` et programmé pour demain à ${heure}`;
+      } else {
+        successMessage += ` et programmé pour aujourd'hui à ${heure}`;
+      }
+      
       return {
         success: true,
-        message: 'Véhicule d\'urgence ajouté avec succès',
+        message: successMessage,
         clientId,
         vehicleId,
         scheduleId: newSchedule.id

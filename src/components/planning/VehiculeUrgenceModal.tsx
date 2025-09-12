@@ -11,7 +11,7 @@ import { Employe } from '@/hooks/usePlanningManager';
 interface VehiculeUrgenceModalProps {
   isOpen: boolean;
   onClose: () => void;
-  employes: Employe[];
+  employes: (Employe & { role: string })[];
   onAjouterVehicule: (vehiculeUrgence: {
     plaque: string;
     nom: string;
@@ -212,7 +212,12 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
                 <SelectValue placeholder="Sélectionner un employé" />
               </SelectTrigger>
               <SelectContent>
-                {employes.filter(emp => emp.actif).map((employe) => (
+                {employes
+                  .filter(emp => 
+                    emp.actif && 
+                    (emp.role === 'carrossier' || emp.role === 'carrossier-vehicule de courtoisie')
+                  )
+                  .map((employe) => (
                   <SelectItem key={employe.id} value={employe.id.toString()}>
                     <div className="flex items-center gap-2">
                       <span>{employe.nom}</span>
