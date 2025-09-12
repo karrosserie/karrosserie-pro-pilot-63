@@ -71,12 +71,31 @@ export function useCredits() {
     }
   });
 
+  const archiveCredit = useMutation({
+    mutationFn: creditsService.archiveCredit,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['credits'] });
+      toast({
+        title: "Avoir archivé",
+        description: "L'avoir a été archivé avec succès."
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erreur",
+        description: `Impossible d'archiver l'avoir: ${error.message}`,
+        variant: "destructive"
+      });
+    }
+  });
+
   return {
     credits,
     isLoading,
     error,
     createCredit,
     updateCredit,
-    deleteCredit
+    deleteCredit,
+    archiveCredit
   };
 }
