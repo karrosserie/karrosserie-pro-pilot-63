@@ -39,7 +39,7 @@ export const TeamMemberForm: React.FC<TeamMemberFormProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     user_id: teamMember?.user_id || '',
-    role: teamMember?.role || 'Carrossier',
+    role: teamMember?.role || '',
     qualifications: teamMember?.qualifications || []
   });
 
@@ -48,6 +48,14 @@ export const TeamMemberForm: React.FC<TeamMemberFormProps> = ({
       fetchAvailableUsers();
     }
   }, [teamMember]);
+
+  // Reset qualifications when role changes to non-carrossier role
+  useEffect(() => {
+    const shouldShow = formData.role === 'Carrossier' || formData.role === 'Carrossier-Véhicule de courtoisie';
+    if (!shouldShow && formData.qualifications.length > 0) {
+      setFormData(prev => ({ ...prev, qualifications: [] }));
+    }
+  }, [formData.role]);
 
   const fetchAvailableUsers = async () => {
     try {
