@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Clock, User, MapPin } from 'lucide-react';
-import { startOfWeek, addWeeks, format, addDays } from 'date-fns';
+import { startOfWeek, addWeeks, format, addDays, isSameWeek, parseISO, isValid } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 interface PlanningTask {
@@ -21,12 +21,14 @@ interface PlanningCalendarProps {
   schedules?: any[];
   employees?: any[];
   vehicles?: any[];
+  onWeekChange?: (weekStart: Date, weekEnd: Date) => void;
 }
 
 export const PlanningCalendar = ({ 
   schedules = [], 
   employees = [], 
-  vehicles = [] 
+  vehicles = [],
+  onWeekChange
 }: PlanningCalendarProps) => {
   const [currentWeek, setCurrentWeek] = useState(0);
 
@@ -70,6 +72,14 @@ export const PlanningCalendar = ({
     );
   }, [currentWeekStart]);
 
+  // Notifier le parent du changement de semaine
+  useEffect(() => {
+    if (onWeekChange) {
+      const weekEnd = addDays(currentWeekStart, 4);
+      onWeekChange(currentWeekStart, weekEnd);
+    }
+  }, [currentWeekStart, onWeekChange]);
+
   // Organiser les vraies données par jour de la semaine
   const tasksByDay = useMemo(() => {
     const days: Record<string, PlanningTask[]> = {
@@ -82,6 +92,22 @@ export const PlanningCalendar = ({
 
     schedules.forEach(schedule => {
       if (!schedule.jour || !days[schedule.jour]) return;
+      
+      // Filtrer par semaine si une date est disponible
+      if (schedule.date) {
+        let scheduleDate: Date;
+        try {
+          scheduleDate = typeof schedule.date === 'string' ? parseISO(schedule.date) : new Date(schedule.date);
+          if (!isValid(scheduleDate)) return;
+          
+          // Vérifier si la tâche appartient à la semaine actuelle
+          if (!isSameWeek(scheduleDate, currentWeekStart, { weekStartsOn: 1 })) {
+            return;
+          }
+        } catch {
+          // Si la date n'est pas valide, continuer sans filtrage par date
+        }
+      }
       
       const task: PlanningTask = {
         id: schedule.id,
@@ -100,7 +126,7 @@ export const PlanningCalendar = ({
     });
 
     return days;
-  }, [schedules, currentWeek]);
+  }, [schedules, currentWeekStart]);
 
   const weekDays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi'];
   const weekDaysDisplay = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];

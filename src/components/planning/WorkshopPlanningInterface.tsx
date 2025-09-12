@@ -69,14 +69,20 @@ export const WorkshopPlanningInterface = ({
   };
   
   const [activeView, setActiveView] = useState<'manager' | 'employee'>(getDefaultView());
+  const [currentWeekData, setCurrentWeekData] = useState<any[]>([]);
 
-  // Mettre à jour la vue si le rôle change
+  // Gérer le changement de semaine dans le calendrier
+  const handleWeekChange = (weekStart: Date, weekEnd: Date) => {
+    console.log('📅 Changement de semaine:', { weekStart, weekEnd });
+    // Filtrer les données selon la semaine si nécessaire
+    // Pour l'instant, on utilise toutes les données planningTaches
+    setCurrentWeekData(planningTaches);
+  };
+
+  // Initialiser les données de la semaine courante
   useEffect(() => {
-    if (!isLoading) {
-      const defaultView = getDefaultView();
-      setActiveView(defaultView);
-    }
-  }, [isCarrossier, isCarrossierCourtesy, isResponsable, isLoading]);
+    setCurrentWeekData(planningTaches);
+  }, [planningTaches]);
 
   // Déterminer si l'utilisateur peut changer de vue
   const canSwitchView = isOwner;
@@ -453,9 +459,10 @@ export const WorkshopPlanningInterface = ({
 
             <TabsContent value="planning" className="space-y-6">
               <PlanningCalendar 
-                schedules={planningTaches}
+                schedules={currentWeekData}
                 employees={employees}
                 vehicles={vehicles}
+                onWeekChange={handleWeekChange}
               />
             </TabsContent>
 
