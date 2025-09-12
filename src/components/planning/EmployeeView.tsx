@@ -25,6 +25,7 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   const [currentTimer, setCurrentTimer] = useState<string | null>(null);
   const [showPointageModal, setShowPointageModal] = useState(false);
   const [isOnBreak, setIsOnBreak] = useState(false);
+  const [isClockedOut, setIsClockedOut] = useState(false);
 
   // Utiliser l'ID de l'utilisateur connecté ou celui passé en prop
   const currentUserId = employeeId || user?.id;
@@ -40,12 +41,18 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
       const today = new Date().toISOString().split('T')[0];
       const { data: timesheet } = await supabase
         .from('employee_timesheets')
-        .select('id')
+        .select('id, clock_out_time')
         .eq('user_id', currentUserId)
         .eq('date', today)
         .single();
 
       if (timesheet) {
+        // Vérifier si l'employé a déjà dépointé
+        if (timesheet.clock_out_time) {
+          setIsClockedOut(true);
+          return;
+        }
+
         const { data: activeBreak } = await supabase
           .from('employee_breaks')
           .select('id')
@@ -220,7 +227,39 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
       }
 
       console.log('Dépointage effectué avec succès');
-      // Vous pourriez vouloir rafraîchir les données ou rediriger l'utilisateur
+      setIsClockedOut(true);
+      
+    } catch (error) {
+      console.error('Erreur:', error);
+    }
+  };
+
+  const handleClockIn = async () => {
+    if (!currentUserId || !companyInfo?.id) return;
+    
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Créer une nouvelle feuille de temps pour aujourd'hui
+      const { error } = await supabase
+        .from('employee_timesheets')
+        .insert({
+          user_id: currentUserId,
+          company_id: companyInfo.id,
+          date: today,
+          clock_in_time: new Date().toISOString()
+        });
+
+      if (error) {
+        console.error('Erreur lors du pointage:', error);
+        return;
+      }
+
+      console.log('Pointage effectué avec succès');
+      setIsClockedOut(false);
+      setShowPointageModal(false);
+      // Rafraîchir les données
+      checkBreakStatus();
       
     } catch (error) {
       console.error('Erreur:', error);
@@ -271,6 +310,30 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
           <p>Chargement du planning...</p>
         </div>
+      </div>
+    );
+  }
+
+  // Afficher l'interface de dépointage si l'employé a terminé sa journée
+  if (isClockedOut) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Card className="w-full max-w-md">
+          <CardContent className="text-center py-8">
+            <LogOut className="w-16 h-16 text-green-600 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold mb-2">Journée terminée</h2>
+            <p className="text-muted-foreground mb-6">
+              Vous avez dépointé avec succès. Pour reprendre le travail, vous devez repointer.
+            </p>
+            <Button 
+              onClick={handleClockIn}
+              className="w-full"
+            >
+              <Clock className="w-4 h-4 mr-2" />
+              Repointer
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
