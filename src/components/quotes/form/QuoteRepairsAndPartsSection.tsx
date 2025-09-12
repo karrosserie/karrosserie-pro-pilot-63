@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,6 +21,16 @@ export const QuoteRepairsAndPartsSection = ({
   isReadOnly = false 
 }: QuoteRepairsAndPartsSectionProps) => {
   const [activeTab, setActiveTab] = useState<'repairs' | 'parts'>('repairs');
+
+  // Ensure there's always at least one item on mount
+  useEffect(() => {
+    if (repairs.length === 0 && !isReadOnly) {
+      addRepair();
+    }
+    if (parts.length === 0 && !isReadOnly) {
+      addPart();
+    }
+  }, []);
 
   // Repairs functions
   const addRepair = () => {
@@ -216,88 +226,82 @@ export const QuoteRepairsAndPartsSection = ({
         {/* Contenu des onglets */}
         {activeTab === 'repairs' && (
           <div className="space-y-4">
-            {repairs.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                Aucune réparation ajoutée
+            <div className="space-y-2">
+              {/* Header */}
+              <div className="grid gap-2 text-sm font-medium text-gray-700 pb-2 border-b" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
+                <div>Désignation</div>
+                <div>Qté</div>
+                <div>Coût Unitaire (€)</div>
+                <div>Remise (%)</div>
+                <div>TVA (%)</div>
+                <div>Total (€)</div>
+                <div></div>
               </div>
-            ) : (
-              <div className="space-y-2">
-                {/* Header */}
-                <div className="grid gap-2 text-sm font-medium text-gray-700 pb-2 border-b" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
-                  <div>Désignation</div>
-                  <div>Qté</div>
-                  <div>Coût Unitaire (€)</div>
-                  <div>Remise (%)</div>
-                  <div>TVA (%)</div>
-                  <div>Total (€)</div>
-                  <div></div>
-                </div>
 
-                {/* Repair items */}
-                {repairs.map((repair) => (
-                  <div key={repair.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
-                    <Input
-                      value={repair.description}
-                      onChange={(e) => updateRepair(repair.id, 'description', e.target.value)}
-                      placeholder="Désignation de la réparation"
-                      readOnly={isReadOnly}
-                      className={isReadOnly ? 'bg-gray-50' : ''}
-                    />
-                    <Input
-                      type="number"
-                      value={repair.quantity}
-                      onChange={(e) => updateRepair(repair.id, 'quantity', parseFloat(e.target.value) || 0)}
-                      min="0"
-                      step="0.01"
-                      readOnly={isReadOnly}
-                      className={isReadOnly ? 'bg-gray-50' : ''}
-                    />
-                    <Input
-                      type="number"
-                      value={repair.unitCost}
-                      onChange={(e) => updateRepair(repair.id, 'unitCost', parseFloat(e.target.value) || 0)}
-                      min="0"
-                      step="0.01"
-                      readOnly={isReadOnly}
-                      className={isReadOnly ? 'bg-gray-50' : ''}
-                    />
-                    <Input
-                      type="number"
-                      value={repair.discount}
-                      onChange={(e) => updateRepair(repair.id, 'discount', parseFloat(e.target.value) || 0)}
-                      min="0"
-                      max="100"
-                      step="0.1"
-                      readOnly={isReadOnly}
-                      className={isReadOnly ? 'bg-gray-50' : ''}
-                    />
-                    <Input
-                      type="number"
-                      value={repair.vat}
-                      onChange={(e) => updateRepair(repair.id, 'vat', parseFloat(e.target.value) || 0)}
-                      min="0"
-                      step="0.1"
-                      readOnly={isReadOnly}
-                      className={isReadOnly ? 'bg-gray-50' : ''}
-                    />
-                    <div className="text-right font-medium">
-                      {repair.total.toFixed(2)} €
-                    </div>
-                    {!isReadOnly && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => removeRepair(repair.id)}
-                        className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
-                    )}
+              {/* Repair items */}
+              {repairs.map((repair) => (
+                <div key={repair.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
+                  <Input
+                    value={repair.description}
+                    onChange={(e) => updateRepair(repair.id, 'description', e.target.value)}
+                    placeholder="Désignation de la réparation"
+                    readOnly={isReadOnly}
+                    className={isReadOnly ? 'bg-gray-50' : ''}
+                  />
+                  <Input
+                    type="number"
+                    value={repair.quantity}
+                    onChange={(e) => updateRepair(repair.id, 'quantity', parseFloat(e.target.value) || 0)}
+                    min="0"
+                    step="0.01"
+                    readOnly={isReadOnly}
+                    className={isReadOnly ? 'bg-gray-50' : ''}
+                  />
+                  <Input
+                    type="number"
+                    value={repair.unitCost}
+                    onChange={(e) => updateRepair(repair.id, 'unitCost', parseFloat(e.target.value) || 0)}
+                    min="0"
+                    step="0.01"
+                    readOnly={isReadOnly}
+                    className={isReadOnly ? 'bg-gray-50' : ''}
+                  />
+                  <Input
+                    type="number"
+                    value={repair.discount}
+                    onChange={(e) => updateRepair(repair.id, 'discount', parseFloat(e.target.value) || 0)}
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    readOnly={isReadOnly}
+                    className={isReadOnly ? 'bg-gray-50' : ''}
+                  />
+                  <Input
+                    type="number"
+                    value={repair.vat}
+                    onChange={(e) => updateRepair(repair.id, 'vat', parseFloat(e.target.value) || 0)}
+                    min="0"
+                    step="0.1"
+                    readOnly={isReadOnly}
+                    className={isReadOnly ? 'bg-gray-50' : ''}
+                  />
+                  <div className="text-right font-medium">
+                    {repair.total.toFixed(2)} €
                   </div>
-                ))}
-              </div>
-            )}
+                  {!isReadOnly && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => removeRepair(repair.id)}
+                      className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
 
             {!isReadOnly && (
               <div className="flex justify-end">
@@ -317,88 +321,82 @@ export const QuoteRepairsAndPartsSection = ({
 
         {activeTab === 'parts' && (
           <div className="space-y-4">
-            {parts.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                Aucune pièce ajoutée
+            <div className="space-y-2">
+              {/* Header */}
+              <div className="grid gap-2 text-sm font-medium text-gray-700 pb-2 border-b" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
+                <div>Désignation</div>
+                <div>Qté</div>
+                <div>Coût Unitaire (€)</div>
+                <div>Remise (%)</div>
+                <div>TVA (%)</div>
+                <div>Total (€)</div>
+                <div></div>
               </div>
-            ) : (
-              <div className="space-y-2">
-                {/* Header */}
-                <div className="grid gap-2 text-sm font-medium text-gray-700 pb-2 border-b" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
-                  <div>Désignation</div>
-                  <div>Qté</div>
-                  <div>Coût Unitaire (€)</div>
-                  <div>Remise (%)</div>
-                  <div>TVA (%)</div>
-                  <div>Total (€)</div>
-                  <div></div>
-                </div>
 
-                {/* Part items */}
-                {parts.map((part) => (
-                  <div key={part.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
-                    <Input
-                      value={part.description}
-                      onChange={(e) => updatePart(part.id, 'description', e.target.value)}
-                      placeholder="Désignation de la pièce"
-                      readOnly={isReadOnly}
-                      className={isReadOnly ? 'bg-gray-50' : ''}
-                    />
-                    <Input
-                      type="number"
-                      value={part.quantity}
-                      onChange={(e) => updatePart(part.id, 'quantity', parseFloat(e.target.value) || 0)}
-                      min="0"
-                      step="0.01"
-                      readOnly={isReadOnly}
-                      className={isReadOnly ? 'bg-gray-50' : ''}
-                    />
-                    <Input
-                      type="number"
-                      value={part.unitCost}
-                      onChange={(e) => updatePart(part.id, 'unitCost', parseFloat(e.target.value) || 0)}
-                      min="0"
-                      step="0.01"
-                      readOnly={isReadOnly}
-                      className={isReadOnly ? 'bg-gray-50' : ''}
-                    />
-                    <Input
-                      type="number"
-                      value={part.discount}
-                      onChange={(e) => updatePart(part.id, 'discount', parseFloat(e.target.value) || 0)}
-                      min="0"
-                      max="100"
-                      step="0.1"
-                      readOnly={isReadOnly}
-                      className={isReadOnly ? 'bg-gray-50' : ''}
-                    />
-                    <Input
-                      type="number"
-                      value={part.vat}
-                      onChange={(e) => updatePart(part.id, 'vat', parseFloat(e.target.value) || 0)}
-                      min="0"  
-                      step="0.1"
-                      readOnly={isReadOnly}
-                      className={isReadOnly ? 'bg-gray-50' : ''}
-                    />
-                    <div className="text-right font-medium">
-                      {part.total.toFixed(2)} €
-                    </div>
-                    {!isReadOnly && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => removePart(part.id)}
-                        className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
-                    )}
+              {/* Part items */}
+              {parts.map((part) => (
+                <div key={part.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
+                  <Input
+                    value={part.description}
+                    onChange={(e) => updatePart(part.id, 'description', e.target.value)}
+                    placeholder="Désignation de la pièce"
+                    readOnly={isReadOnly}
+                    className={isReadOnly ? 'bg-gray-50' : ''}
+                  />
+                  <Input
+                    type="number"
+                    value={part.quantity}
+                    onChange={(e) => updatePart(part.id, 'quantity', parseFloat(e.target.value) || 0)}
+                    min="0"
+                    step="0.01"
+                    readOnly={isReadOnly}
+                    className={isReadOnly ? 'bg-gray-50' : ''}
+                  />
+                  <Input
+                    type="number"
+                    value={part.unitCost}
+                    onChange={(e) => updatePart(part.id, 'unitCost', parseFloat(e.target.value) || 0)}
+                    min="0"
+                    step="0.01"
+                    readOnly={isReadOnly}
+                    className={isReadOnly ? 'bg-gray-50' : ''}
+                  />
+                  <Input
+                    type="number"
+                    value={part.discount}
+                    onChange={(e) => updatePart(part.id, 'discount', parseFloat(e.target.value) || 0)}
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    readOnly={isReadOnly}
+                    className={isReadOnly ? 'bg-gray-50' : ''}
+                  />
+                  <Input
+                    type="number"
+                    value={part.vat}
+                    onChange={(e) => updatePart(part.id, 'vat', parseFloat(e.target.value) || 0)}
+                    min="0"  
+                    step="0.1"
+                    readOnly={isReadOnly}
+                    className={isReadOnly ? 'bg-gray-50' : ''}
+                  />
+                  <div className="text-right font-medium">
+                    {part.total.toFixed(2)} €
                   </div>
-                ))}
-              </div>
-            )}
+                  {!isReadOnly && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => removePart(part.id)}
+                      className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
 
             {!isReadOnly && (
               <div className="flex justify-end">
