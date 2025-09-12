@@ -97,13 +97,6 @@ export const VehiclesWaitingTab = ({
               <div className="flex gap-2">
                 <Button 
                   size="sm" 
-                  className="bg-green-600 hover:bg-green-700 text-white"
-                  onClick={() => handleUnblockVehicle(vehicle.id)}
-                >
-                  Débloquer
-                </Button>
-                <Button 
-                  size="sm" 
                   variant="default" 
                   className="bg-blue-600 hover:bg-blue-700"
                   onClick={() => handlePlanVehicle(vehicle)}
