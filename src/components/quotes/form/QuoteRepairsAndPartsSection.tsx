@@ -285,9 +285,20 @@ export const QuoteRepairsAndPartsSection = ({
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
-                  <div className="text-right font-medium">
-                    {repair.total.toFixed(2)} €
-                  </div>
+                  <Input
+                    type="number"
+                    value={repair.total.toFixed(2)}
+                    onChange={(e) => {
+                      const newTotal = parseFloat(e.target.value) || 0;
+                      const newUnitCost = newTotal * 0.8;
+                      updateRepair(repair.id, 'unitCost', newUnitCost);
+                    }}
+                    min="0"
+                    step="0.01"
+                    readOnly={isReadOnly}
+                    className={`text-right font-medium ${isReadOnly ? 'bg-gray-50' : ''}`}
+                    placeholder="0.00"
+                  />
                   {!isReadOnly && (
                     <Button
                       type="button"
@@ -380,9 +391,20 @@ export const QuoteRepairsAndPartsSection = ({
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
-                  <div className="text-right font-medium">
-                    {part.total.toFixed(2)} €
-                  </div>
+                  <Input
+                    type="number"
+                    value={part.total.toFixed(2)}
+                    onChange={(e) => {
+                      const newTotal = parseFloat(e.target.value) || 0;
+                      const newUnitCost = newTotal * 0.8;
+                      updatePart(part.id, 'unitCost', newUnitCost);
+                    }}
+                    min="0"
+                    step="0.01"
+                    readOnly={isReadOnly}
+                    className={`text-right font-medium ${isReadOnly ? 'bg-gray-50' : ''}`}
+                    placeholder="0.00"
+                  />
                   {!isReadOnly && (
                     <Button
                       type="button"
