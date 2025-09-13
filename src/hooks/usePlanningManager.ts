@@ -321,15 +321,18 @@ export const usePlanningManager = () => {
       });
       
       if (result.success) {
-        // Créer notification de succès
+        // Créer notification de succès avec information sur les tâches décalées
+        const baseMessage = `Traitement immédiat - ${vehiculeUrgence.plaque} (${vehiculeUrgence.prenom} ${vehiculeUrgence.nom})`;
+        const shiftInfo = result.data?.conflictsResolved ? ` - ${result.data.conflictsResolved} tâche(s) décalée(s)` : '';
+        
         const notificationUrgence: Notification = {
           id: `notif_urgence_${Date.now()}`,
           type: 'nouvelle_tache',
-          titre: '🚨 VÉHICULE URGENCE AJOUTÉ',
-          message: `Traitement immédiat - ${vehiculeUrgence.plaque} (${vehiculeUrgence.prenom} ${vehiculeUrgence.nom}) - Persisté en base`,
+          titre: '🚨 VÉHICULE URGENCE AJOUTÉ - PRIORITÉ',
+          message: baseMessage + shiftInfo,
           employeId: vehiculeUrgence.employeId.toString(),
           vehiculeId: 0, // Sera mis à jour par la vraie donnée DB
-          tacheId: result.scheduleId || 'unknown',
+          tacheId: result.data?.scheduleId || 'unknown',
           timestamp: new Date(),
           lue: false
         };

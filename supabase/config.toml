@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.auto-assign-next-task]
 verify_jwt = false
+
+[functions.insert-emergency-with-priority]
+verify_jwt = false

@@ -116,17 +116,23 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
             </div>
             <div>
               <DialogTitle className="text-xl font-semibold bg-gradient-elegant bg-clip-text text-transparent">
-                Véhicule en Urgence
+                Véhicule en Urgence - PRIORITÉ ABSOLUE
               </DialogTitle>
               <DialogDescription className="text-muted-foreground">
-                Ajout immédiat au planning - Traitement prioritaire
+                Insertion immédiate à l'heure choisie - Les autres tâches seront décalées si nécessaire
               </DialogDescription>
             </div>
           </div>
-          <Badge variant="destructive" className="w-fit animate-bounce">
-            <AlertTriangle className="h-3 w-3 mr-1" />
-            URGENCE - Traitement immédiat
-          </Badge>
+          <div className="flex flex-col gap-2">
+            <Badge variant="destructive" className="w-fit animate-bounce">
+              <AlertTriangle className="h-3 w-3 mr-1" />
+              URGENCE - Traitement immédiat
+            </Badge>
+            <Badge variant="outline" className="w-fit text-warning border-warning/50">
+              <Clock className="h-3 w-3 mr-1" />
+              Priorité sur les tâches existantes
+            </Badge>
+          </div>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">

@@ -12,9 +12,19 @@ export interface VehiculeUrgenceData {
 export interface VehiculeUrgenceResult {
   success: boolean;
   message: string;
-  clientId?: string;
-  vehicleId?: string;
-  scheduleId?: string;
+  data?: {
+    clientId: string;
+    vehicleId: string;
+    scheduleId: string;
+    shiftedTasks?: Array<{
+      id: string;
+      task_type: string;
+      old_start: string;
+      new_start: string;
+      employee_name: string;
+    }>;
+    conflictsResolved?: number;
+  };
 }
 
 /**
@@ -23,271 +33,54 @@ export interface VehiculeUrgenceResult {
 export class UrgencyVehicleService {
   
   /**
-   * Ajoute un véhicule d'urgence complet en base de données
+   * Ajoute un véhicule d'urgence avec priorité absolue (décale les autres tâches si nécessaire)
    */
   static async ajouterVehiculeUrgence(data: VehiculeUrgenceData): Promise<VehiculeUrgenceResult> {
+    console.log('🚨 Service: Adding PRIORITY emergency vehicle:', data);
+    
     try {
-      const { plaque, nom, prenom, heure, employeId, companyId } = data;
+      // Use the new priority insertion edge function
+      console.log('📞 Calling insert-emergency-with-priority edge function...');
       
-      console.log('🚨 UrgencyVehicleService: Adding emergency vehicle via Supabase JS:', data);
-      
-      // 1. Créer ou récupérer le client
-      let clientId: string;
-      
-      // Chercher si le client existe déjà
-      const { data: existingClient, error: clientSearchError } = await supabase
-        .from('clients')
-        .select('id')
-        .eq('first_name', prenom)
-        .eq('last_name', nom)
-        .eq('company_id', companyId)
-        .maybeSingle();
-      
-      if (clientSearchError) {
-        console.error('❌ Error searching for client:', clientSearchError);
-        return {
-          success: false,
-          message: `Erreur lors de la recherche du client: ${clientSearchError.message}`
-        };
-      }
-      
-      if (existingClient) {
-        clientId = existingClient.id;
-        console.log('✅ Client existant trouvé:', clientId);
-      } else {
-        // Créer un nouveau client
-        const { data: newClient, error: clientError } = await supabase
-          .from('clients')
-          .insert({
-            first_name: prenom,
-            last_name: nom,
-            company_id: companyId
-          })
-          .select('id')
-          .single();
-        
-        if (clientError) {
-          console.error('❌ Error creating client:', clientError);
-          return {
-            success: false,
-            message: `Erreur lors de la création du client: ${clientError.message}`
-          };
-        }
-        
-        clientId = newClient.id;
-        console.log('✅ Nouveau client créé:', clientId);
-      }
-      
-      // 2. Créer ou récupérer le véhicule
-      let vehicleId: string;
-      
-      // Chercher si le véhicule existe déjà
-      const { data: existingVehicle, error: vehicleSearchError } = await supabase
-        .from('vehicles')
-        .select('id')
-        .eq('license_plate', plaque)
-        .eq('company_id', companyId)
-        .maybeSingle();
-      
-      if (vehicleSearchError) {
-        console.error('❌ Error searching for vehicle:', vehicleSearchError);
-        return {
-          success: false,
-          message: `Erreur lors de la recherche du véhicule: ${vehicleSearchError.message}`
-        };
-      }
-      
-      if (existingVehicle) {
-        vehicleId = existingVehicle.id;
-        console.log('✅ Véhicule existant trouvé:', vehicleId);
-        
-        // Mettre à jour le client du véhicule
-        const { error: updateError } = await supabase
-          .from('vehicles')
-          .update({ client_id: clientId })
-          .eq('id', vehicleId);
-        
-        if (updateError) {
-          console.warn('⚠️ Warning updating vehicle client:', updateError);
-        }
-      } else {
-        // Créer un nouveau véhicule
-        const { data: newVehicle, error: vehicleError } = await supabase
-          .from('vehicles')
-          .insert({
-            license_plate: plaque,
-            client_id: clientId,
-            company_id: companyId,
-            status: 'En attente'
-          })
-          .select('id')
-          .single();
-        
-        if (vehicleError) {
-          console.error('❌ Error creating vehicle:', vehicleError);
-          return {
-            success: false,
-            message: `Erreur lors de la création du véhicule: ${vehicleError.message}`
-          };
-        }
-        
-        vehicleId = newVehicle.id;
-        console.log('✅ Nouveau véhicule créé:', vehicleId);
-      }
-      
-      // 3. Récupérer l'ID utilisateur réel depuis user_companies
-      const { data: userCompany, error: userCompanyError } = await supabase
-        .from('user_companies')
-        .select('user_id, role, active')
-        .eq('id', employeId)
-        .eq('company_id', companyId)
-        .eq('active', true)
-        .maybeSingle();
-      
-      if (userCompanyError) {
-        console.error('❌ Error fetching user_companies:', userCompanyError);
-        return {
-          success: false,
-          message: `Employé non trouvé dans l'entreprise: ${userCompanyError.message}`
-        };
-      }
-      
-      if (!userCompany) {
-        console.log('❌ Employee ID not found in user_companies:', employeId);
-        return {
-          success: false,
-          message: `L'employé sélectionné n'existe pas ou n'est pas actif dans cette entreprise.`
-        };
-      }
-      
-      const actualUserId = userCompany.user_id;
-      console.log('✅ Found employee in user_companies:', { employeId, actualUserId, role: userCompany.role });
-      
-      // 4. Vérifier que l'employé a un profil utilisateur
-      const { data: existingProfile, error: profileCheckError } = await supabase
-        .from('profiles')
-        .select('id, first_name, last_name')
-        .eq('id', actualUserId)
-        .maybeSingle();
-      
-      if (profileCheckError) {
-        console.error('❌ Error checking employee profile:', profileCheckError);
-        return {
-          success: false,
-          message: `L'employé sélectionné n'a pas de profil utilisateur valide: ${profileCheckError.message}`
-        };
-      }
-      
-      if (!existingProfile) {
-        console.log('❌ Employee has no profile in auth system:', actualUserId);
-        return {
-          success: false,
-          message: `L'employé sélectionné n'a pas de profil utilisateur dans le système d'authentification.`
-        };
-      }
-      
-      console.log('✅ Employee profile exists:', existingProfile);
-      
-      // 5. Créer la tâche dans le planning avec gestion des dates
-      const today = new Date();
-      const currentTime = new Date();
-      const [heureStr, minuteStr] = heure.split(':');
-      
-      // Fonction pour obtenir le prochain jour ouvrable
-      const getNextWorkingDay = (date: Date): Date => {
-        const nextDay = new Date(date);
-        nextDay.setDate(date.getDate() + 1);
-        
-        // Si c'est samedi (6) ou dimanche (0), passer au lundi suivant
-        while (nextDay.getDay() === 0 || nextDay.getDay() === 6) {
-          nextDay.setDate(nextDay.getDate() + 1);
-        }
-        
-        return nextDay;
-      };
-      
-      // Calculer la date de la tâche
-      let taskDate = new Date(today);
-      const selectedTime = new Date(today);
-      selectedTime.setHours(parseInt(heureStr), parseInt(minuteStr), 0, 0);
-      
-      // Si l'heure sélectionnée est antérieure à l'heure actuelle, programmer pour le prochain jour ouvrable
-      if (selectedTime <= currentTime) {
-        taskDate = getNextWorkingDay(today);
-        console.log('⏰ Heure sélectionnée antérieure à maintenant, programmé pour le prochain jour ouvrable');
-      }
-      
-      const startDateTime = new Date(taskDate);
-      startDateTime.setHours(parseInt(heureStr), parseInt(minuteStr), 0, 0);
-      
-      const endDateTime = new Date(startDateTime);
-      endDateTime.setHours(startDateTime.getHours() + 1); // 1 heure par défaut
-      
-      console.log('📅 Planning emergency vehicle:', {
-        selectedTime: selectedTime.toLocaleString('fr-FR'),
-        currentTime: currentTime.toLocaleString('fr-FR'),
-        plannedStartTime: startDateTime.toLocaleString('fr-FR'),
-        plannedEndTime: endDateTime.toLocaleString('fr-FR')
+      const { data: result, error } = await supabase.functions.invoke('insert-emergency-with-priority', {
+        body: data
       });
-      
-      const { data: newSchedule, error: scheduleError } = await supabase
-        .from('employee_schedule')
-        .insert({
-          company_id: companyId,
-          user_id: actualUserId,
-          vehicle_id: vehicleId,
-          task_type: 'Accueil & Préparation du dossier',
-          start_datetime: startDateTime.toISOString(),
-          end_datetime: endDateTime.toISOString(),
-          status: 'En attente'
-        })
-        .select('id')
-        .single();
-      
-      if (scheduleError) {
-        console.error('❌ Error creating schedule:', scheduleError);
-        return {
-          success: false,
-          message: `Erreur lors de la création de la tâche: ${scheduleError.message}`
-        };
+
+      if (error) {
+        console.error('❌ Priority insertion error:', error);
+        throw new Error(`Erreur lors de l'insertion prioritaire: ${error.message}`);
       }
+
+      if (!result?.success) {
+        console.error('❌ Priority insertion failed:', result);
+        throw new Error(result?.message || 'Échec de l\'insertion prioritaire du véhicule d\'urgence');
+      }
+
+      console.log('✅ Priority emergency vehicle created successfully:', result);
       
-      console.log('✅ Emergency vehicle created successfully:', {
-        clientId,
-        vehicleId,
-        scheduleId: newSchedule.id
-      });
-      
-      // Déterminer le message selon le jour de programmation
-      let successMessage = 'Véhicule d\'urgence ajouté avec succès';
-      if (selectedTime <= currentTime) {
-        const dayOfWeek = taskDate.getDay();
-        const dayNames = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
-        
-        if (taskDate.toDateString() === new Date(today.getTime() + 24 * 60 * 60 * 1000).toDateString()) {
-          // C'est demain
-          successMessage += ` et programmé pour demain (${dayNames[dayOfWeek]}) à ${heure}`;
-        } else {
-          // C'est plus tard (lundi après un weekend)
-          successMessage += ` et programmé pour ${dayNames[dayOfWeek]} à ${heure}`;
-        }
-      } else {
-        successMessage += ` et programmé pour aujourd'hui à ${heure}`;
+      // Log shifted tasks if any
+      if (result.data?.shiftedTasks?.length > 0) {
+        console.log(`🔄 Tasks shifted due to priority insertion:`, result.data.shiftedTasks);
       }
       
       return {
         success: true,
-        message: successMessage,
-        clientId,
-        vehicleId,
-        scheduleId: newSchedule.id
+        message: result.message + (result.data?.conflictsResolved > 0 ? 
+          ` (${result.data.conflictsResolved} tâche(s) décalée(s))` : ''),
+        data: {
+          clientId: result.data.clientId,
+          vehicleId: result.data.vehicleId,
+          scheduleId: result.data.scheduleId,
+          shiftedTasks: result.data.shiftedTasks || [],
+          conflictsResolved: result.data.conflictsResolved || 0
+        }
       };
-      
+
     } catch (error) {
-      console.error('❌ UrgencyVehicleService: Unexpected error:', error);
+      console.error('❌ Priority insertion service error:', error);
       return {
         success: false,
-        message: `Erreur inattendue: ${error instanceof Error ? error.message : 'Erreur inconnue'}`
+        message: error instanceof Error ? error.message : 'Erreur inconnue'
       };
     }
   }

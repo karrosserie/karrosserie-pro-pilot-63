@@ -1,0 +1,332 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+interface TaskConflict {
+  id: string;
+  task_type: string;
+  start_datetime: string;
+  end_datetime: string;
+  user_id: string;
+  vehicle_id: string;
+  status: string;
+}
+
+interface ShiftedTask {
+  id: string;
+  task_type: string;
+  old_start: string;
+  new_start: string;
+  employee_name: string;
+}
+
+Deno.serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    )
+
+    const { plaque, nom, prenom, heure, employeId, companyId } = await req.json();
+
+    if (!plaque || !nom || !prenom || !heure || !employeId || !companyId) {
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          message: 'Données manquantes' 
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
+
+    console.log('🚨 PRIORITY: Creating emergency vehicle:', { plaque, nom, prenom, heure, employeId, companyId });
+
+    // 1. Validate employee exists and get user_id
+    const { data: userCompany, error: userCompanyError } = await supabase
+      .from('user_companies')
+      .select('user_id, role, active')
+      .eq('id', employeId)
+      .eq('company_id', companyId)
+      .eq('active', true)
+      .maybeSingle();
+
+    if (userCompanyError || !userCompany) {
+      console.error('❌ Employee validation failed:', userCompanyError);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          message: 'Employé non valide ou inactif' 
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    const actualUserId = userCompany.user_id;
+    console.log('✅ Employee validated:', actualUserId);
+
+    // 2. Calculate the emergency time slot
+    const now = new Date();
+    const [hours, minutes] = heure.split(':').map(Number);
+    
+    const emergencyStart = new Date(now);
+    emergencyStart.setHours(hours, minutes, 0, 0);
+    
+    // If time is in the past today, schedule for tomorrow
+    if (emergencyStart <= now) {
+      emergencyStart.setDate(emergencyStart.getDate() + 1);
+      console.log(`⏰ Time ${heure} is in the past, scheduling for tomorrow:`, emergencyStart.toISOString());
+    }
+    
+    // Emergency task duration (1 hour for "Accueil & Préparation du dossier")
+    const emergencyEnd = new Date(emergencyStart);
+    emergencyEnd.setHours(emergencyStart.getHours() + 1);
+
+    console.log('🎯 Emergency time slot:', {
+      start: emergencyStart.toISOString(),
+      end: emergencyEnd.toISOString()
+    });
+
+    // 3. Find conflicting tasks for the same employee on the same day
+    const dayStart = new Date(emergencyStart);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(emergencyStart);
+    dayEnd.setHours(23, 59, 59, 999);
+
+    const { data: existingTasks, error: tasksError } = await supabase
+      .from('employee_schedule')
+      .select('id, task_type, start_datetime, end_datetime, user_id, vehicle_id, status')
+      .eq('user_id', actualUserId)
+      .eq('company_id', companyId)
+      .gte('start_datetime', dayStart.toISOString())
+      .lte('start_datetime', dayEnd.toISOString())
+      .in('status', ['En attente', 'En cours'])
+      .order('start_datetime', { ascending: true });
+
+    if (tasksError) {
+      console.error('❌ Error fetching existing tasks:', tasksError);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          message: 'Erreur lors de la vérification des tâches existantes' 
+        }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    console.log(`📋 Found ${existingTasks?.length || 0} existing tasks for employee`);
+
+    // 4. Identify conflicts and calculate shifts
+    const conflictingTasks: TaskConflict[] = [];
+    const shiftedTasks: ShiftedTask[] = [];
+
+    if (existingTasks) {
+      for (const task of existingTasks) {
+        const taskStart = new Date(task.start_datetime);
+        const taskEnd = new Date(task.end_datetime);
+
+        // Check if task overlaps with emergency slot
+        const hasConflict = (taskStart < emergencyEnd && taskEnd > emergencyStart);
+        
+        if (hasConflict) {
+          conflictingTasks.push(task);
+          console.log(`⚠️ Conflict detected with task: ${task.task_type} (${task.start_datetime} - ${task.end_datetime})`);
+        }
+      }
+    }
+
+    // 5. Create client and vehicle first
+    const { data: clientData, error: clientError } = await supabase
+      .from('clients')
+      .insert({
+        first_name: prenom,
+        last_name: nom,
+        company_id: companyId
+      })
+      .select()
+      .single();
+
+    if (clientError) {
+      console.error('❌ Error creating client:', clientError);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          message: `Erreur lors de la création du client: ${clientError.message}` 
+        }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    const { data: vehicleData, error: vehicleError } = await supabase
+      .from('vehicles')
+      .insert({
+        license_plate: plaque.toUpperCase(),
+        client_id: clientData.id,
+        company_id: companyId,
+        status: 'En attente'
+      })
+      .select()
+      .single();
+
+    if (vehicleError) {
+      console.error('❌ Error creating vehicle:', vehicleError);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          message: `Erreur lors de la création du véhicule: ${vehicleError.message}` 
+        }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    console.log('✅ Client and vehicle created successfully');
+
+    // 6. Shift conflicting tasks
+    if (conflictingTasks.length > 0) {
+      console.log(`🔄 Shifting ${conflictingTasks.length} conflicting tasks...`);
+      
+      // Find the end time of the emergency task as the start point for shifts
+      let nextAvailableTime = new Date(emergencyEnd);
+      
+      // Get employee profile for logging
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('first_name, last_name')
+        .eq('id', actualUserId)
+        .single();
+
+      const employeeName = profile ? `${profile.first_name} ${profile.last_name}` : 'Unknown';
+
+      for (const conflictTask of conflictingTasks) {
+        const originalStart = new Date(conflictTask.start_datetime);
+        const originalEnd = new Date(conflictTask.end_datetime);
+        const taskDuration = originalEnd.getTime() - originalStart.getTime();
+        
+        // Calculate new end time
+        const newEnd = new Date(nextAvailableTime.getTime() + taskDuration);
+        
+        // Update the task with new times
+        const { error: updateError } = await supabase
+          .from('employee_schedule')
+          .update({
+            start_datetime: nextAvailableTime.toISOString(),
+            end_datetime: newEnd.toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', conflictTask.id);
+
+        if (updateError) {
+          console.error(`❌ Error shifting task ${conflictTask.id}:`, updateError);
+        } else {
+          console.log(`✅ Shifted task ${conflictTask.task_type}: ${originalStart.toLocaleTimeString()} → ${nextAvailableTime.toLocaleTimeString()}`);
+          
+          shiftedTasks.push({
+            id: conflictTask.id,
+            task_type: conflictTask.task_type,
+            old_start: originalStart.toISOString(),
+            new_start: nextAvailableTime.toISOString(),
+            employee_name: employeeName
+          });
+        }
+        
+        // Next task starts after this one ends
+        nextAvailableTime = newEnd;
+      }
+    }
+
+    // 7. Create the emergency task at the exact requested time
+    const { data: scheduleData, error: scheduleError } = await supabase
+      .from('employee_schedule')
+      .insert({
+        company_id: companyId,
+        user_id: actualUserId,
+        vehicle_id: vehicleData.id,
+        task_type: 'Accueil & Préparation du dossier',
+        start_datetime: emergencyStart.toISOString(),
+        end_datetime: emergencyEnd.toISOString(),
+        status: 'En attente'
+      })
+      .select()
+      .single();
+
+    if (scheduleError) {
+      console.error('❌ Error creating emergency schedule:', scheduleError);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          message: `Erreur lors de la création de la tâche d'urgence: ${scheduleError.message}` 
+        }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    console.log('🎯 Emergency task created successfully at exact requested time');
+
+    const response = {
+      success: true,
+      message: 'Véhicule d\'urgence ajouté avec priorité absolue',
+      data: {
+        clientId: clientData.id,
+        vehicleId: vehicleData.id,
+        scheduleId: scheduleData.id,
+        emergencyTime: {
+          start: emergencyStart.toISOString(),
+          end: emergencyEnd.toISOString()
+        },
+        shiftedTasks: shiftedTasks,
+        conflictsResolved: conflictingTasks.length
+      }
+    };
+
+    console.log('✅ PRIORITY INSERTION COMPLETE:', {
+      emergencyTaskId: scheduleData.id,
+      tasksShifted: shiftedTasks.length,
+      conflictsResolved: conflictingTasks.length
+    });
+
+    return new Response(
+      JSON.stringify(response),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    );
+
+  } catch (error) {
+    console.error('❌ Unexpected error:', error);
+    return new Response(
+      JSON.stringify({ 
+        success: false, 
+        message: `Erreur inattendue: ${error instanceof Error ? error.message : 'Erreur inconnue'}` 
+      }),
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    );
+  }
+});
