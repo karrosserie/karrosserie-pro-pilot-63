@@ -41,7 +41,8 @@ class TrackingService {
 
   constructor() {
     this.sessionId = this.generateSessionId();
-    this.initializeSession();
+    // Initialiser de manière asynchrone pour éviter les erreurs au chargement
+    this.initializeSession().catch(console.error);
   }
 
   private generateSessionId(): string {
@@ -50,34 +51,49 @@ class TrackingService {
 
   private async initializeSession() {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      // Attendre un peu pour s'assurer que Supabase est initialisé
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const { data: { user }, error } = await supabase.auth.getUser();
+      
+      if (error) {
+        console.warn('Auth not ready yet, tracking will be initialized later');
+        return;
+      }
       
       if (user) {
         this.userId = user.id;
         
         // Récupérer la company_id de l'utilisateur
-        const { data: userCompany } = await supabase
-          .from('user_companies')
-          .select('company_id')
-          .eq('user_id', user.id)
-          .eq('active', true)
-          .single();
-        
-        this.companyId = userCompany?.company_id || null;
-        
-        // Créer la session
-        await this.createSession();
-        this.isSessionActive = true;
+        try {
+          const { data: userCompany } = await supabase
+            .from('user_companies')
+            .select('company_id')
+            .eq('user_id', user.id)
+            .eq('active', true)
+            .single();
+          
+          this.companyId = userCompany?.company_id || null;
+          
+          // Créer la session
+          await this.createSession();
+          this.isSessionActive = true;
+        } catch (companyError) {
+          console.warn('Could not fetch company info, continuing without it');
+          this.isSessionActive = true;
+        }
 
         // Écouter les changements d'authentification
         supabase.auth.onAuthStateChange((event, session) => {
           if (event === 'SIGNED_OUT') {
-            this.endSession();
+            this.endSession().catch(console.error);
+          } else if (event === 'SIGNED_IN' && !this.isSessionActive) {
+            this.initializeSession().catch(console.error);
           }
         });
       }
     } catch (error) {
-      console.error('Erreur lors de l\'initialisation de la session de tracking:', error);
+      console.warn('Tracking service initialization failed, continuing without tracking:', error);
     }
   }
 
@@ -125,7 +141,8 @@ class TrackingService {
           metadata: event.metadata || {},
         });
     } catch (error) {
-      console.error('Erreur lors de l\'enregistrement de l\'événement:', error);
+      // Silently fail to avoid breaking the app
+      console.warn('Could not track event:', error);
     }
   }
 

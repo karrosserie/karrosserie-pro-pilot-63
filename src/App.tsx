@@ -13,11 +13,12 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <ConfirmationProvider>
-        <TrackingProvider>
+        {/* TrackingProvider temporairement désactivé pour debug */}
+        {/* <TrackingProvider> */}
           <Toaster />
           <Sonner />
           <AppRouter />
-        </TrackingProvider>
+        {/* </TrackingProvider> */}
       </ConfirmationProvider>
     </TooltipProvider>
   </QueryClientProvider>

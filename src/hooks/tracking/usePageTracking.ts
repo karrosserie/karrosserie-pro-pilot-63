@@ -6,8 +6,12 @@ export const usePageTracking = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Tracker la nouvelle page
-    trackingService.trackPageView(location.pathname + location.search);
+    // Tracker la nouvelle page de manière sûre
+    try {
+      trackingService.trackPageView(location.pathname + location.search);
+    } catch (error) {
+      console.warn('Failed to track page view:', error);
+    }
   }, [location.pathname, location.search]);
 
   return {
