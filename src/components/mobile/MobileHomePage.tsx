@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bot, Car, Users, FileText, ArrowRight, Zap, Camera, Receipt } from 'lucide-react';
+import { Bot, Car, Users, FileText, ArrowRight, Zap, Camera, Receipt, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useDashboardData } from '@/hooks/use-dashboard-data';
 import { useVehicles } from '@/hooks/use-vehicles';
+import { useUserRole } from '@/hooks/use-user-role';
 import ImportDialog from '@/components/layout/navbar/ImportDialog';
 import VehiclePhotoDialog from './VehiclePhotoDialog';
 import ExpenseDialog from '@/components/expenses/ExpenseDialog';
@@ -16,6 +17,7 @@ const MobileHomePage = () => {
   
   const { dashboardStats } = useDashboardData();
   const { vehicles } = useVehicles();
+  const { userRole, isOwner } = useUserRole();
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showPhotoDialog, setShowPhotoDialog] = useState(false);
   const [showVehiclePhotoDialog, setShowVehiclePhotoDialog] = useState(false);
@@ -124,6 +126,20 @@ const MobileHomePage = () => {
             Importer un rapport d&apos;expertise
           </Button>
         </div>
+        
+        {/* Bouton Tour de contrôle - uniquement pour les propriétaires */}
+        {isOwner && (
+          <div className="mb-8">
+            <Link to="/tour-controle">
+              <Button 
+                className="w-full h-12 bg-red-600 text-white hover:bg-red-700 font-medium transition-all duration-300"
+              >
+                <Shield className="h-4 w-4 mr-2" />
+                Tour de contrôle
+              </Button>
+            </Link>
+          </div>
+        )}
         
         <div className="grid grid-cols-2 gap-4 mb-8">
           {quickActions.map((action, index) => {
