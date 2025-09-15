@@ -90,8 +90,8 @@ Deno.serve(async (req) => {
     for (const [companyId, companyTasks] of Object.entries(tasksByCompany)) {
       console.log(`🏢 Processing ${companyTasks.length} tasks for company ${companyId}`);
       
-      // Get next working day start time (8:00 AM), skip weekends
-      const nextWorkingDay = getNextWorkingDay(today);
+      // Get next working day start time (8:00 AM), start with today if it's a working day
+      const nextWorkingDay = getNextWorkingDay(today, true); // true = include today
       nextWorkingDay.setHours(8, 0, 0, 0);
       
       let currentTime = new Date(nextWorkingDay);
@@ -185,48 +185,92 @@ async function findNextAvailableSlot(
   durationMs: number,
   companyId: string
 ): Promise<Date> {
-  const startDate = startFrom.toISOString().split('T')[0];
-  const endDate = new Date(startFrom.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-
-  // Get existing tasks for the employee on the target day
-  const { data: existingTasks, error } = await supabase
-    .from('employee_schedule')
-    .select('start_datetime, end_datetime')
-    .eq('user_id', userId)
-    .eq('company_id', companyId)
-    .gte('start_datetime', `${startDate}T00:00:00.000Z`)
-    .lt('start_datetime', `${endDate}T23:59:59.999Z`)
-    .order('start_datetime', { ascending: true });
-
-  if (error) {
-    console.error('Error fetching existing tasks:', error);
-    return startFrom;
-  }
-
-  if (!existingTasks || existingTasks.length === 0) {
-    return startFrom;
-  }
-
-  // Find first available slot
-  let proposedStart = new Date(startFrom);
+  let currentDate = new Date(startFrom);
+  let maxAttempts = 7; // Maximum 7 jours pour trouver un créneau
   
-  for (const existingTask of existingTasks) {
-    const existingStart = new Date(existingTask.start_datetime);
-    const existingEnd = new Date(existingTask.end_datetime);
-    const proposedEnd = new Date(proposedStart.getTime() + durationMs);
+  while (maxAttempts > 0) {
+    const startDate = currentDate.toISOString().split('T')[0];
+    const endDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-    // Check if proposed slot conflicts with existing task
-    if (proposedStart < existingEnd && proposedEnd > existingStart) {
-      // Move proposed start to after the existing task ends
-      proposedStart = new Date(existingEnd.getTime() + 5 * 60 * 1000); // 5 minutes buffer
+    console.log(`🔍 Recherche créneau pour ${userId} le ${startDate}`);
+
+    // Get existing tasks for the employee on the target day
+    const { data: existingTasks, error } = await supabase
+      .from('employee_schedule')
+      .select('start_datetime, end_datetime')
+      .eq('user_id', userId)
+      .eq('company_id', companyId)
+      .gte('start_datetime', `${startDate}T00:00:00.000Z`)
+      .lt('start_datetime', `${endDate}T23:59:59.999Z`)
+      .order('start_datetime', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching existing tasks:', error);
+      return currentDate;
     }
+
+    // Si pas de tâches ce jour-là, retourner le créneau proposé
+    if (!existingTasks || existingTasks.length === 0) {
+      console.log(`✅ Jour libre trouvé: ${startDate}`);
+      return currentDate;
+    }
+
+    // Find first available slot in the day
+    let proposedStart = new Date(currentDate);
+    let slotFound = false;
+    
+    for (const existingTask of existingTasks) {
+      const existingStart = new Date(existingTask.start_datetime);
+      const existingEnd = new Date(existingTask.end_datetime);
+      const proposedEnd = new Date(proposedStart.getTime() + durationMs);
+
+      // Check if proposed slot conflicts with existing task
+      if (proposedStart < existingEnd && proposedEnd > existingStart) {
+        // Move proposed start to after the existing task ends
+        proposedStart = new Date(existingEnd.getTime() + 5 * 60 * 1000); // 5 minutes buffer
+      } else {
+        // Créneau trouvé
+        slotFound = true;
+        break;
+      }
+    }
+    
+    // Vérifier si le créneau proposé est avant la fin de la journée de travail (18h)
+    const endOfWorkDay = new Date(currentDate);
+    endOfWorkDay.setHours(18, 0, 0, 0);
+    const proposedEnd = new Date(proposedStart.getTime() + durationMs);
+    
+    if (proposedEnd <= endOfWorkDay) {
+      console.log(`✅ Créneau libre trouvé le ${startDate} à ${proposedStart.getHours()}:${proposedStart.getMinutes().toString().padStart(2, '0')}`);
+      return proposedStart;
+    }
+    
+    // Passer au prochain jour de travail
+    console.log(`❌ Pas de créneau libre le ${startDate}, passage au jour suivant`);
+    currentDate = getNextWorkingDay(currentDate, false);
+    currentDate.setHours(8, 0, 0, 0);
+    maxAttempts--;
   }
 
-  return proposedStart;
+  // Si aucun créneau trouvé après 7 tentatives, retourner la date de départ
+  console.log('⚠️ Aucun créneau libre trouvé après 7 tentatives');
+  return startFrom;
 }
 
-function getNextWorkingDay(fromDate: Date): Date {
-  const nextDay = new Date(fromDate);
+function getNextWorkingDay(fromDate: Date, includeToday: boolean = false): Date {
+  const startDate = new Date(fromDate);
+  
+  // Si includeToday est true et que c'est un jour de semaine, commencer par aujourd'hui
+  if (includeToday) {
+    const currentDayOfWeek = startDate.getDay();
+    // 1-5 = lundi à vendredi (jours de travail)
+    if (currentDayOfWeek >= 1 && currentDayOfWeek <= 5) {
+      return startDate;
+    }
+  }
+  
+  // Sinon, chercher le prochain jour de travail
+  const nextDay = new Date(startDate);
   nextDay.setDate(nextDay.getDate() + 1);
   
   // Si c'est samedi (6), aller à lundi (+2 jours)
