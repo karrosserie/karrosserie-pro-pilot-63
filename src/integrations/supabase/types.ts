@@ -796,12 +796,10 @@ export type Database = {
           company_id: string
           created_at: string
           end_datetime: string
-          end_photo_url: string | null
           id: string
           real_end_datetime: string | null
           real_start_datetime: string | null
           start_datetime: string
-          start_photo_url: string | null
           status: Database["public"]["Enums"]["task_status"]
           task_type: Database["public"]["Enums"]["schedule_task_type"]
           updated_at: string
@@ -813,12 +811,10 @@ export type Database = {
           company_id: string
           created_at?: string
           end_datetime: string
-          end_photo_url?: string | null
           id?: string
           real_end_datetime?: string | null
           real_start_datetime?: string | null
           start_datetime: string
-          start_photo_url?: string | null
           status?: Database["public"]["Enums"]["task_status"]
           task_type: Database["public"]["Enums"]["schedule_task_type"]
           updated_at?: string
@@ -830,12 +826,10 @@ export type Database = {
           company_id?: string
           created_at?: string
           end_datetime?: string
-          end_photo_url?: string | null
           id?: string
           real_end_datetime?: string | null
           real_start_datetime?: string | null
           start_datetime?: string
-          start_photo_url?: string | null
           status?: Database["public"]["Enums"]["task_status"]
           task_type?: Database["public"]["Enums"]["schedule_task_type"]
           updated_at?: string
