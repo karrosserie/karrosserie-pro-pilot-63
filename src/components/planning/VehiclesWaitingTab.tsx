@@ -6,7 +6,6 @@ import { PlanVehicleModal } from './PlanVehicleModal';
 
 interface VehiclesWaitingTabProps {
   vehicles?: any[];
-  schedules?: any[];
   employees?: any[];
   onAddToWorkflow?: (vehicleId: string) => void;
   companyId?: string | null;
@@ -15,7 +14,6 @@ interface VehiclesWaitingTabProps {
 
 export const VehiclesWaitingTab = ({ 
   vehicles = [], 
-  schedules = [], 
   employees = [],
   onAddToWorkflow,
   companyId,
@@ -24,55 +22,18 @@ export const VehiclesWaitingTab = ({
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   
-  // DEBUG: Log les données reçues
-  console.log('🔍 VehiclesWaitingTab - Données reçues:', {
-    vehiclesCount: vehicles.length,
-    schedulesCount: schedules.length,
-    vehicles: vehicles.map(v => ({
-      id: v.id,
-      license_plate: v.license_plate,
-      waiting_reason: v.waiting_reason,
-      waiting_since: v.waiting_since
-    })),
-    schedules: schedules.map(s => ({
-      id: s.id,
-      vehicle_id: s.vehicle_id,
-      waiting_reason: s.waiting_reason,
-      status: s.status,
-      updated_at: s.updated_at
-    }))
-  });
-  
-  // Utiliser les vraies données de la base
-  const waitingVehicles = vehicles.filter(vehicle => {
-    // Inclure les véhicules qui n'ont pas de schedule OU qui ont un schedule avec waiting_reason
-    const vehicleSchedule = schedules.find(schedule => schedule.vehicle_id === vehicle.id);
-    
-    console.log('🔍 Filtering vehicle:', {
-      vehicleId: vehicle.id,
-      licensePlate: vehicle.license_plate,
-      vehicleSchedule: vehicleSchedule,
-      hasWaitingReason: vehicleSchedule?.waiting_reason,
-      shouldInclude: !vehicleSchedule || vehicleSchedule.waiting_reason
+  // Utiliser directement les données du hook useWaitingVehicles qui sont déjà consolidées
+  const waitingVehicles = vehicles.map(vehicle => {
+    console.log('🔍 Processing waiting vehicle:', {
+      id: vehicle.id,
+      license_plate: vehicle.license_plate,
+      waiting_reason: vehicle.waiting_reason,
+      waiting_since: vehicle.waiting_since
     });
-    
-    return !vehicleSchedule || vehicleSchedule.waiting_reason;
-  }).map(vehicle => {
-    // Chercher si ce véhicule a une tâche avec waiting_reason
-    const waitingSchedule = schedules.find(schedule => 
-      schedule.vehicle_id === vehicle.id && schedule.waiting_reason
-    );
-    
-    console.log('🔍 Processing vehicle for display:', {
-      vehicleId: vehicle.id,
-      licensePlate: vehicle.license_plate,
-      waitingSchedule: waitingSchedule,
-      vehicleWaitingReason: vehicle.waiting_reason,
-      scheduleWaitingReason: waitingSchedule?.waiting_reason
-    });
-    
-    const finalWaitingReason = waitingSchedule?.waiting_reason || vehicle.waiting_reason;
-    const hasWaitingReason = !!finalWaitingReason;
+
+    const hasWaitingReason = !!vehicle.waiting_reason;
+    const waitingSinceDays = vehicle.waiting_since ? 
+      Math.floor((new Date().getTime() - new Date(vehicle.waiting_since).getTime()) / (1000 * 60 * 60 * 24)) : 0;
     
     return {
       id: vehicle.id,
@@ -82,33 +43,21 @@ export const VehiclesWaitingTab = ({
       client: vehicle.clients ? `${vehicle.clients.first_name} ${vehicle.clients.last_name}` : 'Client inconnu',
       price: '0€',
       blockedStage: hasWaitingReason ? 'Mis en attente par employé' : 'En attente de planification',
-      waitingSince: vehicle.waiting_since ? 
-        `${Math.floor((new Date().getTime() - new Date(vehicle.waiting_since).getTime()) / (1000 * 60 * 60 * 24))} jour(s)` :
-        waitingSchedule?.updated_at ?
-        `${Math.floor((new Date().getTime() - new Date(waitingSchedule.updated_at).getTime()) / (1000 * 60 * 60 * 24))} jour(s)` :
-        '0 jour(s)',
-      blockingReason: finalWaitingReason || 'En attente',
+      waitingSince: `${waitingSinceDays} jour(s)`,
+      blockingReason: vehicle.waiting_reason || 'En attente de planification',
       blockingDescription: hasWaitingReason ? 
-        `Véhicule mis en attente par un employé pour la raison suivante : ${finalWaitingReason}` :
+        `Véhicule mis en attente par un employé pour la raison suivante : ${vehicle.waiting_reason}` :
         'Véhicule en attente de planification dans l\'atelier',
       urgent: false,
-      hasWaitingReason: hasWaitingReason,
-      // DEBUG
-      _debug: {
-        vehicleWaitingReason: vehicle.waiting_reason,
-        scheduleWaitingReason: waitingSchedule?.waiting_reason,
-        finalWaitingReason: finalWaitingReason,
-        hasWaitingReason: hasWaitingReason
-      }
+      hasWaitingReason: hasWaitingReason
     };
   });
 
-  console.log('✅ Final waitingVehicles:', waitingVehicles.map(v => ({
+  console.log('✅ Final processed waitingVehicles:', waitingVehicles.map(v => ({
     id: v.id,
     licensePlate: v.licensePlate,
     blockingReason: v.blockingReason,
-    hasWaitingReason: v.hasWaitingReason,
-    debug: v._debug
+    hasWaitingReason: v.hasWaitingReason
   })));
 
   const blockedCount = waitingVehicles.length;

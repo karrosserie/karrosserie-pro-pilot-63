@@ -423,9 +423,15 @@ export const WorkshopPlanningInterface = ({
         </TabsContent>
 
             <TabsContent value="waiting" className="space-y-6">
-              <VehiclesWaitingTab vehicles={waitingVehiclesProps} schedules={schedules} employees={employees} onAddToWorkflow={handlePlanVehicle} companyId={companyId} onRefresh={() => onScheduleUpdate && onScheduleUpdate({
-          action: 'refresh'
-        })} />
+              <VehiclesWaitingTab 
+                vehicles={waitingVehiclesProps} 
+                employees={employees} 
+                onAddToWorkflow={handlePlanVehicle} 
+                companyId={companyId} 
+                onRefresh={() => onScheduleUpdate && onScheduleUpdate({
+                  action: 'refresh'
+                })} 
+              />
             </TabsContent>
 
             <TabsContent value="planning" className="space-y-6">
