@@ -511,12 +511,8 @@ const Invoices = () => {
                              <FileText className="h-4 w-4 mr-1" />
                              Restaurer
                            </Button>
-                         ) : null}
-                         <Button variant="delete" size="sm" onClick={() => handleDelete(invoice)}>
-                           <Trash className="h-4 w-4 mr-1" />
-                           {showArchived ? 'Supprimer' : 'Archiver'}
-                         </Button>
-                      </div>
+                          ) : null}
+                       </div>
                     </TableCell>
                   </TableRow>
                 </React.Fragment>
