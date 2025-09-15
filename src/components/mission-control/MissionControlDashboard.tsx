@@ -3,13 +3,20 @@ import MissionControlHeader from './MissionControlHeader';
 import AlertCard from './AlertCard';
 import { Eye, Package, Wrench, Calendar, Users, Clock, FileText } from 'lucide-react';
 import { useSystemAlerts } from '@/hooks/use-system-alerts';
+import { createMissingVehicleAlerts } from '@/utils/createMissingVehicleAlerts';
 
 
 const MissionControlDashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'month'>('today');
   const [isAIOn, setIsAIOn] = useState(true);
   const [selectedMode, setSelectedMode] = useState<'super_admin' | 'finance' | 'chef_equipe' | 'ouvrier'>('super_admin');
-  const { alerts, resolveAlert } = useSystemAlerts();
+  const { alerts, resolveAlert, refetch } = useSystemAlerts();
+
+  const handleCreateMissingAlerts = async () => {
+    await createMissingVehicleAlerts();
+    // Recharger les alertes après création
+    refetch();
+  };
 
   const handleAIToggle = () => {
     setIsAIOn(!isAIOn);
@@ -525,6 +532,14 @@ const MissionControlDashboard = () => {
         selectedMode={selectedMode}
         onModeChange={setSelectedMode}
       />
+      
+      {/* Bouton temporaire pour créer les alertes manquantes */}
+      <button 
+        onClick={handleCreateMissingAlerts}
+        className="mb-4 px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
+      >
+        🔧 Créer alertes véhicules manquantes
+      </button>
       
       
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
