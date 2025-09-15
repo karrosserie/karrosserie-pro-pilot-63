@@ -176,14 +176,73 @@ Deno.serve(async (req) => {
 
     if (qualifiedEmployees.length === 0) {
       console.log(`⚠️ No employees found with qualification: ${requiredQualification}`);
+      console.log(`🔄 Creating waiting task for vehicle with reason: Aucun employé ayant les qualifications pour l'étape suivante`);
+      
+      // Créer une tâche en attente avec la raison d'attente
+      const waitingReason = "Aucun employé ayant les qualifications pour l'étape suivante";
+      
+      // Calculer les heures par défaut (peut commencer maintenant)
+      const taskStartTime = calculateNextWorkingSlot(new Date().getTime());
+      const taskDurationHours = getTaskDuration(nextTaskType);
+      const taskEndTime = new Date(taskStartTime.getTime() + (taskDurationHours * 60 * 60 * 1000));
+      
+      // Créer la tâche en attente sans employé assigné
+      const { data: waitingTask, error: waitingError } = await supabase
+        .from('employee_schedule')
+        .insert({
+          company_id: companyId,
+          vehicle_id: completedTask.vehicle_id,
+          task_type: nextTaskType,
+          user_id: null, // Pas d'employé assigné
+          start_datetime: taskStartTime.toISOString(),
+          end_datetime: taskEndTime.toISOString(),
+          status: 'En attente',
+          waiting_reason: waitingReason
+        })
+        .select()
+        .single();
+
+      if (waitingError) {
+        console.error('❌ Error creating waiting task:', waitingError);
+        return new Response(
+          JSON.stringify({ error: 'Error creating waiting task', details: waitingError }),
+          { 
+            status: 500, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
+      }
+
+      console.log(`🎯 Waiting task created with ID: ${waitingTask.id}`);
+
+      // Supprimer la tâche terminée du planning
+      const { error: deleteError } = await supabase
+        .from('employee_schedule')
+        .delete()
+        .eq('id', taskId);
+
+      if (deleteError) {
+        console.error('⚠️ Error deleting completed task:', deleteError);
+      } else {
+        console.log(`🗑️ Completed task ${taskId} removed from schedule`);
+      }
+
       return new Response(
         JSON.stringify({ 
-          error: `No employees available with required qualification: ${nextTaskType}`,
-          nextTaskType,
-          requiredQualification
+          success: true,
+          completedTask: completedTask.task_type,
+          removedTaskId: taskId,
+          waitingTask: {
+            id: waitingTask.id,
+            type: nextTaskType,
+            waiting_reason: waitingReason,
+            startTime: taskStartTime.toISOString(),
+            endTime: taskEndTime.toISOString()
+          },
+          message: `Vehicle moved to waiting status: ${waitingReason}`
         }),
         { 
-          status: 400, 
+          status: 200, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       );
