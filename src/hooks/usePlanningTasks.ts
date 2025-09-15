@@ -1,38 +1,13 @@
-import { useMemo, useCallback, useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { useRealPlanningData } from './useRealPlanningData';
 import { PlanningTache } from './usePlanningManager';
-import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Hook pour convertir les données de planning réelles en format PlanningTache
  * compatible avec l'ancien système et PlanningEmploye
  */
 export const usePlanningTasks = (companyId: string | null) => {
-  const { planningData, loading, refetch, fetchWaitingTasks } = useRealPlanningData(companyId);
-  
-  // État pour les tâches en attente
-  const [waitingTasks, setWaitingTasks] = useState<any[]>([]);
-  const [waitingTasksLoading, setWaitingTasksLoading] = useState(false);
-
-  // Charger les tâches en attente
-  const loadWaitingTasks = useCallback(async () => {
-    if (!companyId) return;
-    
-    setWaitingTasksLoading(true);
-    try {
-      const tasks = await fetchWaitingTasks();
-      setWaitingTasks(tasks);
-    } catch (error) {
-      console.error('❌ Error loading waiting tasks:', error);
-    } finally {
-      setWaitingTasksLoading(false);
-    }
-  }, [companyId, fetchWaitingTasks]);
-
-  // Charger les tâches en attente au montage et quand companyId change
-  useEffect(() => {
-    loadWaitingTasks();
-  }, [loadWaitingTasks]);
+  const { planningData, loading, refetch } = useRealPlanningData(companyId);
 
   // Convertir PlanningTask[] vers PlanningTache[] pour chaque jour
   const planningTaches = useMemo(() => {
@@ -231,69 +206,6 @@ export const usePlanningTasks = (companyId: string | null) => {
     return planningTaches;
   };
 
-  // Fonction pour changer le statut d'une tâche vers "En attente"
-  const setTaskWaiting = async (taskId: string, reason?: string) => {
-    try {
-      console.log('🔄 Setting task to waiting status:', { taskId, reason });
-      
-      const { error } = await supabase
-        .from('employee_schedule')
-        .update({ 
-          status: 'En attente',
-          // Optionnellement, on pourrait ajouter une colonne pour la raison
-        })
-        .eq('id', taskId);
-
-      if (error) {
-        console.error('❌ Error updating task status:', error);
-        throw error;
-      }
-
-      // Recharger les données
-      await Promise.all([
-        refetch(),
-        loadWaitingTasks()
-      ]);
-      
-      console.log('✅ Task status updated successfully');
-      return { success: true };
-    } catch (error) {
-      console.error('❌ Error in setTaskWaiting:', error);
-      return { success: false, error };
-    }
-  };
-
-  // Fonction pour reprendre une tâche en attente
-  const resumeWaitingTask = async (taskId: string) => {
-    try {
-      console.log('🔄 Resuming waiting task:', taskId);
-      
-      const { error } = await supabase
-        .from('employee_schedule')
-        .update({ 
-          status: 'En attente' // Remettre en "En attente" normal (pas "En attente")
-        })
-        .eq('id', taskId);
-
-      if (error) {
-        console.error('❌ Error resuming task:', error);
-        throw error;
-      }
-
-      // Recharger les données
-      await Promise.all([
-        refetch(),
-        loadWaitingTasks()
-      ]);
-      
-      console.log('✅ Task resumed successfully');
-      return { success: true };
-    } catch (error) {
-      console.error('❌ Error in resumeWaitingTask:', error);
-      return { success: false, error };
-    }
-  };
-
   return {
     planningTaches,
     planningTachesByEmployee,
@@ -301,14 +213,7 @@ export const usePlanningTasks = (companyId: string | null) => {
     getTasksForEmployeeById, // Nouvelle fonction
     getTodayTasks,
     getAllWorkflowTasks, // Nouvelle fonction pour les étapes atelier
-    waitingTasks, // Nouvelles tâches en attente
-    waitingTasksLoading,
-    setTaskWaiting, // Fonction pour mettre en attente
-    resumeWaitingTask, // Fonction pour reprendre une tâche
     loading,
-    refetch: async () => {
-      await refetch();
-      await loadWaitingTasks();
-    }
+    refetch
   };
 };

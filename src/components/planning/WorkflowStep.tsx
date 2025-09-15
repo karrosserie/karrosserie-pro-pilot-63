@@ -19,10 +19,9 @@ interface WorkflowStepProps {
   count: number;
   stepColor: string;
   onPlanVehicle?: (vehicleId: string) => void;
-  onSetTaskWaiting?: (taskId: string, reason?: string) => Promise<{ success: boolean; error?: any }>;
 }
 
-export const WorkflowStep = ({ title, vehicles, count, stepColor, onPlanVehicle, onSetTaskWaiting }: WorkflowStepProps) => {
+export const WorkflowStep = ({ title, vehicles, count, stepColor, onPlanVehicle }: WorkflowStepProps) => {
   return (
     <div className="bg-white rounded-lg border border-slate-200 mb-6">
       <div className={`${stepColor} text-white p-4 rounded-t-lg flex items-center justify-between`}>
@@ -44,8 +43,6 @@ export const WorkflowStep = ({ title, vehicles, count, stepColor, onPlanVehicle,
                 key={vehicle.id}
                 vehicle={vehicle}
                 onPlan={onPlanVehicle}
-                onSetTaskWaiting={onSetTaskWaiting}
-                taskId={vehicle.id} // Utiliser l'ID du véhicule comme taskId
               />
             ))}
           </div>

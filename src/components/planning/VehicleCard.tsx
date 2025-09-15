@@ -8,7 +8,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCompany } from "@/hooks/use-company";
 import { VehiclePhotosViewer } from "@/components/vehicle/VehiclePhotosViewer";
 import { takeTaskPhoto } from "@/utils/cameraUtils";
-import { TaskWaitingActions } from "./TaskWaitingActions";
 
 interface VehicleCardProps {
   vehicle: {
@@ -24,11 +23,9 @@ interface VehicleCardProps {
     status: 'En cours' | 'À planifier' | 'Terminé';
   };
   onPlan?: (vehicleId: string) => void;
-  onSetTaskWaiting?: (taskId: string, reason?: string) => Promise<{ success: boolean; error?: any }>;
-  taskId?: string; // ID de la tâche associée pour pouvoir la mettre en attente
 }
 
-export const VehicleCard = ({ vehicle, onPlan, onSetTaskWaiting, taskId }: VehicleCardProps) => {
+export const VehicleCard = ({ vehicle, onPlan }: VehicleCardProps) => {
   const [showPhotosViewer, setShowPhotosViewer] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
@@ -109,22 +106,11 @@ export const VehicleCard = ({ vehicle, onPlan, onSetTaskWaiting, taskId }: Vehic
           </div>
         </div>
         
-        <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center justify-between">
           <div className="text-xs text-slate-500">
             {vehicle.technician || 'À planifier'}
           </div>
           <div className="flex gap-1">
-            {/* Bouton pour mettre en attente (seulement si tâche en cours ou à planifier) */}
-            {taskId && onSetTaskWaiting && vehicle.status !== 'Terminé' && (
-              <TaskWaitingActions
-                taskId={taskId}
-                taskName={vehicle.description}
-                vehiclePlate={vehicle.licensePlate}
-                isWaiting={false}
-                onSetWaiting={onSetTaskWaiting}
-              />
-            )}
-            
             <Button
               onClick={() => setShowPhotosViewer(true)}
               size="sm"

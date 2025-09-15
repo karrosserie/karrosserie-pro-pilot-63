@@ -97,19 +97,7 @@ const CarrosseriePlanning = () => {
   const { employees: employesFromData, loading: employesLoading, createEmployee, refetch: refetchEmployees } = useEmployeeData(companyId);
   const { vehicles, loading: vehiclesLoading, refetch: refetchVehicles } = useVehicleData(companyId);
   const { waitingVehicles, loading: waitingVehiclesLoading, refetch: refetchWaitingVehicles } = useWaitingVehicles(companyId);
-  const { 
-    planningTaches, 
-    getTasksForEmployee, 
-    getTasksForEmployeeById, 
-    getTodayTasks, 
-    getAllWorkflowTasks, 
-    waitingTasks, // Nouvelles tâches en attente
-    waitingTasksLoading,
-    setTaskWaiting, // Fonction pour mettre en attente
-    resumeWaitingTask, // Fonction pour reprendre une tâche
-    loading: planningLoading, 
-    refetch: refetchPlanning 
-  } = usePlanningTasks(companyId);
+  const { planningTaches, getTasksForEmployee, getTasksForEmployeeById, getTodayTasks, getAllWorkflowTasks, loading: planningLoading, refetch: refetchPlanning } = usePlanningTasks(companyId);
 
   console.log('🚀 COMPOSANT CARROSSERIE PLANNING - HOOKS APPELÉS:', {
     employesFromDataLength: employesFromData.length,
@@ -230,15 +218,12 @@ const CarrosseriePlanning = () => {
       <WorkshopPlanningInterface
         employees={employes}
         vehicles={vehicles}
-        waitingVehicles={waitingTasks} // Utiliser les nouvelles tâches en attente
+        waitingVehicles={waitingVehicles}
         schedules={getAllWorkflowTasks()} // Utiliser toutes les tâches pour les étapes atelier
         planningTaches={getAllWorkflowTasks()} // Utiliser toutes les tâches pour le planning hebdomadaire
         companyId={companyId}
         onScheduleUpdate={handleScheduleUpdate}
         onOpenUrgenceModal={() => setShowVehiculeUrgenceModal(true)}
-        // Nouvelles props pour gérer les tâches en attente
-        onSetTaskWaiting={setTaskWaiting}
-        onResumeWaitingTask={resumeWaitingTask}
       />
 
       {/* Enhanced Modals */}

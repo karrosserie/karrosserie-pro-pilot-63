@@ -7,7 +7,6 @@ import { WorkshopStats } from "./WorkshopStats";
 import { WorkflowStep } from "./WorkflowStep";
 import { EmployeeView } from "./EmployeeView";
 import { VehiclesWaitingTab } from "./VehiclesWaitingTab";
-import { WaitingTasksTab } from "./WaitingTasksTab";
 import { PlanningCalendar } from "./PlanningCalendar";
 import { EmployeePlanningTab } from "./EmployeePlanningTab";
 import { ProcessConfig } from "./ProcessConfig";
@@ -25,8 +24,6 @@ interface WorkshopPlanningInterfaceProps {
   companyId?: string | null;
   onScheduleUpdate?: (data: any) => void;
   onOpenUrgenceModal?: () => void;
-  onSetTaskWaiting?: (taskId: string, reason?: string) => Promise<{ success: boolean; error?: any }>;
-  onResumeWaitingTask?: (taskId: string) => Promise<{ success: boolean; error?: any }>;
 }
 export const WorkshopPlanningInterface = ({
   employees = [],
@@ -36,9 +33,7 @@ export const WorkshopPlanningInterface = ({
   planningTaches = [],
   companyId,
   onScheduleUpdate,
-  onOpenUrgenceModal,
-  onSetTaskWaiting,
-  onResumeWaitingTask
+  onOpenUrgenceModal
 }: WorkshopPlanningInterfaceProps) => {
   const {
     userRole,
@@ -422,48 +417,35 @@ export const WorkshopPlanningInterface = ({
 
             {/* Workflow Steps */}
             <div className="space-y-0">
-              {workflowSteps.map(step => 
-                <WorkflowStep 
-                  key={step.id} 
-                  title={step.title} 
-                  vehicles={step.vehicles} 
-                  count={step.vehicles.length} 
-                  stepColor={step.color} 
-                  onPlanVehicle={handlePlanVehicle}
-                  onSetTaskWaiting={onSetTaskWaiting}
-                />
-              )}
+              {workflowSteps.map(step => <WorkflowStep key={step.id} title={step.title} vehicles={step.vehicles} count={step.vehicles.length} stepColor={step.color} onPlanVehicle={handlePlanVehicle} />)}
             </div>
           </div>
         </TabsContent>
 
-        {/* Waiting Tasks Tab */}
-        <TabsContent value="waiting" className="space-y-6">
-          <WaitingTasksTab
-            waitingTasks={waitingVehiclesProps}
-            loading={false}
-            onResumeTask={onResumeWaitingTask}
-          />
-        </TabsContent>
+            <TabsContent value="waiting" className="space-y-6">
+              <VehiclesWaitingTab vehicles={waitingVehiclesProps} schedules={schedules} employees={employees} onAddToWorkflow={handlePlanVehicle} companyId={companyId} onRefresh={() => onScheduleUpdate && onScheduleUpdate({
+          action: 'refresh'
+        })} />
+            </TabsContent>
 
-        <TabsContent value="planning" className="space-y-6">
-          <PlanningCalendar schedules={currentWeekData} employees={employees} vehicles={vehicles} onWeekChange={handleWeekChange} onTaskUpdated={() => onScheduleUpdate?.({
-            action: 'refresh'
-          })} />
-        </TabsContent>
+            <TabsContent value="planning" className="space-y-6">
+              <PlanningCalendar schedules={currentWeekData} employees={employees} vehicles={vehicles} onWeekChange={handleWeekChange} onTaskUpdated={() => onScheduleUpdate?.({
+          action: 'refresh'
+        })} />
+            </TabsContent>
 
-        <TabsContent value="employee-planning" className="space-y-6">
-          <EmployeePlanningTab employees={employees} schedules={planningTaches} />
-        </TabsContent>
+            <TabsContent value="employee-planning" className="space-y-6">
+              <EmployeePlanningTab employees={employees} schedules={planningTaches} />
+            </TabsContent>
 
-        <TabsContent value="process" className="space-y-6">
-          <ProcessConfig />
-        </TabsContent>
-      </Tabs>}
+            <TabsContent value="process" className="space-y-6">
+              <ProcessConfig />
+            </TabsContent>
+        </Tabs>}
 
       {/* Employee View */}
       {currentView === 'employe' && <div className="mt-6">
-        <EmployeeView employeeId={selectedEmployeView} />
-      </div>}
-    </div>
+          <EmployeeView employeeId={selectedEmployeView} />
+        </div>}
+    </div>;
 };
