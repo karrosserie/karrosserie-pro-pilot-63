@@ -43,12 +43,13 @@ Deno.serve(async (req) => {
 
     console.log(`🔄 Starting task rescheduling for ${yesterdayStr}`);
 
-    // Get all uncompleted tasks from yesterday and before
+    // Get all uncompleted tasks from yesterday and before (excluding tasks with waiting_reason)
     const { data: pendingTasks, error: tasksError } = await supabase
       .from('employee_schedule')
       .select('*')
       .in('status', ['En attente', 'En cours'])
       .lt('start_datetime', `${todayStr}T00:00:00.000Z`)
+      .is('waiting_reason', null) // Exclure les tâches en attente avec raison
       .order('start_datetime', { ascending: true });
 
     if (tasksError) {
@@ -89,8 +90,8 @@ Deno.serve(async (req) => {
     for (const [companyId, companyTasks] of Object.entries(tasksByCompany)) {
       console.log(`🏢 Processing ${companyTasks.length} tasks for company ${companyId}`);
       
-      // Get next working day start time (8:00 AM today)
-      const nextWorkingDay = new Date(today);
+      // Get next working day start time (8:00 AM), skip weekends
+      const nextWorkingDay = getNextWorkingDay(today);
       nextWorkingDay.setHours(8, 0, 0, 0);
       
       let currentTime = new Date(nextWorkingDay);
@@ -222,4 +223,20 @@ async function findNextAvailableSlot(
   }
 
   return proposedStart;
+}
+
+function getNextWorkingDay(fromDate: Date): Date {
+  const nextDay = new Date(fromDate);
+  nextDay.setDate(nextDay.getDate() + 1);
+  
+  // Si c'est samedi (6), aller à lundi (+2 jours)
+  // Si c'est dimanche (0), aller à lundi (+1 jour)
+  const dayOfWeek = nextDay.getDay();
+  if (dayOfWeek === 6) { // Samedi
+    nextDay.setDate(nextDay.getDate() + 2);
+  } else if (dayOfWeek === 0) { // Dimanche
+    nextDay.setDate(nextDay.getDate() + 1);
+  }
+  
+  return nextDay;
 }
