@@ -52,10 +52,22 @@ export const usePlanningTasks = (companyId: string | null) => {
         console.log(`📅 Processing day: ${dayKey}, tasks: ${dayTasks.length}`);
         
         dayTasks.forEach(task => {
+          // Debug: Log vehicle association for debugging
+          if (task.tache === 'Débosselage') {
+            console.log('🔍 Débosselage Task-Vehicle Association:', {
+              taskId: task.id,
+              vehicleId: task.vehicle_id,
+              vehiculeId: task.vehiculeId,
+              vehicule: task.vehicule,
+              tache: task.tache,
+              status: task.status
+            });
+          }
+          
           const planningTache: PlanningTache = {
             id: task.id,
             vehiculeId: task.vehiculeId || parseInt(task.id.toString()), // Fallback en cas de vehiculeId manquant
-            vehicle_id: task.vehicle_id || task.vehiculeId?.toString() || task.id, // Ajouter le vehicle_id pour la jointure en utilisant différentes sources
+            vehicle_id: task.vehicle_id || task.vehiculeId?.toString() || task.id,
             vehicule: task.vehicule,
             modele: task.modele,
             marque: task.modele.split(' ')[0] || 'Inconnue', // Extraire la marque du modèle
