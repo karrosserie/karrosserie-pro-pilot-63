@@ -3,7 +3,7 @@ import MissionControlHeader from './MissionControlHeader';
 import AlertCard from './AlertCard';
 import { Eye, Package, Wrench, Calendar, Users, Clock, FileText } from 'lucide-react';
 import { useSystemAlerts } from '@/hooks/use-system-alerts';
-import { triggerAlertsForExistingWaitingVehicles } from '@/utils/catchupVehicleAlerts';
+
 
 const MissionControlDashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'month'>('today');
@@ -526,13 +526,6 @@ const MissionControlDashboard = () => {
         onModeChange={setSelectedMode}
       />
       
-      {/* Bouton temporaire pour déclencher les alertes existantes */}
-      <button 
-        onClick={triggerAlertsForExistingWaitingVehicles}
-        className="mb-4 px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
-      >
-        🔄 Déclencher alertes véhicules en attente
-      </button>
       
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
         {currentMissions.length === 0 ? (
