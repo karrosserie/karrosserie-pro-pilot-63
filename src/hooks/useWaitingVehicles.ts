@@ -75,6 +75,7 @@ export const useWaitingVehicles = (companyId: string | null) => {
       console.log('📅 Active schedules fetched:', activeSchedules?.length || 0, activeSchedules);
 
       // Récupérer les véhicules avec des tâches en attente avec raison
+      console.log('🔍 Fetching waiting reason schedules for company:', companyId);
       const { data: waitingReasonSchedules, error: waitingError } = await supabase
         .from('employee_schedule')
         .select(`
@@ -97,6 +98,11 @@ export const useWaitingVehicles = (companyId: string | null) => {
         `)
         .eq('company_id', companyId)
         .not('waiting_reason', 'is', null);
+
+      console.log('🔍 Raw waiting reason schedules response:', { 
+        data: waitingReasonSchedules, 
+        error: waitingError 
+      });
 
       if (waitingError) {
         console.error('❌ Error fetching waiting reason schedules:', waitingError);

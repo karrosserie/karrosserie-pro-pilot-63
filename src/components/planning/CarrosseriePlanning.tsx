@@ -13,9 +13,6 @@ import { usePlanningManager } from '@/hooks/usePlanningManager';
 // UI Components
 import { useToast } from '@/hooks/use-toast';
 import { FloatingNotifications, type FloatingNotification } from '@/components/ui/floating-notifications';
-import { Button } from '@/components/ui/button';
-import { RefreshCcw } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 
 // Modals
 import { VehiculeUrgenceModal } from '@/components/planning/VehiculeUrgenceModal';
@@ -39,12 +36,10 @@ import { useViewManagement } from '@/hooks/use-view-management';
 
 const CarrosseriePlanning = () => {
   console.log('🚀 COMPOSANT CARROSSERIE PLANNING CHARGÉ - DEBUT');
-  console.log('🔧 Debug: Composant CarrosseriePlanning initialisé');
   
   // Enhanced state variables for modals and actions
   const [selectedVehicule, setSelectedVehicule] = useState<any>(null);
   const [floatingNotifications, setFloatingNotifications] = useState<FloatingNotification[]>([]);
-  const [isRescheduling, setIsRescheduling] = useState(false);
   
   // Modal states for advanced features
   const [showVehiculeUrgenceModal, setShowVehiculeUrgenceModal] = useState(false);
@@ -205,67 +200,6 @@ const CarrosseriePlanning = () => {
     setShowVehicleDetailsModal(true);
   };
 
-  // Fonction pour déclencher manuellement la reprogrammation des tâches
-  console.log('🔧 Debug: Définition de handleRescheduleOldTasks');
-  const handleRescheduleOldTasks = async () => {
-    if (isRescheduling) return;
-    
-    setIsRescheduling(true);
-    console.log('🔄 Déclenchement manuel de la reprogrammation...');
-    
-    try {
-      const { data, error } = await supabase.functions.invoke('reschedule-pending-tasks', {
-        body: {
-          manual_trigger: true,
-          execution_time: new Date().toISOString()
-        }
-      });
-
-      if (error) {
-        console.error('❌ Erreur lors de la reprogrammation:', error);
-        toast({
-          variant: "destructive",
-          title: "Erreur de reprogrammation",
-          description: "Impossible de reprogrammer les tâches"
-        });
-        return;
-      }
-
-      console.log('✅ Reprogrammation réussie:', data);
-      
-      // Forcer le refetch des données
-      await Promise.all([
-        refetchPlanning(),
-        refetchWaitingVehicles(),
-        refetchEmployees()
-      ]);
-      
-      const rescheduledCount = data?.rescheduledTasks?.length || 0;
-      
-      setFloatingNotifications(prev => [...prev, {
-        id: Date.now().toString(),
-        type: 'success' as const,
-        title: 'Reprogrammation terminée',
-        message: `${rescheduledCount} tâches ont été reprogrammées`,
-        duration: 5000
-      }]);
-
-      toast({
-        title: "Reprogrammation réussie",
-        description: `${rescheduledCount} tâches ont été reprogrammées vers les prochains jours de travail`
-      });
-    } catch (error) {
-      console.error('❌ Erreur inattendue:', error);
-      toast({
-        variant: "destructive", 
-        title: "Erreur",
-        description: "Une erreur inattendue s'est produite"
-      });
-    } finally {
-      setIsRescheduling(false);
-    }
-  };
-
   // Loading state - ne bloque pas l'UI lors des refetch, uniquement si companyId absent
   if (!companyId) {
     return (
@@ -280,19 +214,6 @@ const CarrosseriePlanning = () => {
 
   return (
     <div className="space-y-6">
-      {/* Bouton temporaire pour reprogrammer les tâches anciennes */}
-      <div className="flex justify-end mb-4">
-        <Button
-          onClick={handleRescheduleOldTasks}
-          disabled={isRescheduling}
-          variant="outline"
-          className="flex items-center gap-2"
-        >
-          <RefreshCcw className={`h-4 w-4 ${isRescheduling ? 'animate-spin' : ''}`} />
-          {isRescheduling ? 'Reprogrammation...' : 'Reprogrammer les tâches anciennes'}
-        </Button>
-      </div>
-
       {/* Main Planning Interface */}
       <WorkshopPlanningInterface
         employees={employes}
