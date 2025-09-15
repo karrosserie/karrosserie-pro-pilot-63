@@ -1,33 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { PlanningTask, PlanningDay } from './useRealPlanningData';
 
-export interface PlanningTask {
-  id: string;
-  vehicule: string;
-  modele: string;
-  heure: string;
-  technicien: string;
-  tache: string;
-  etape: string;
-  client: string;
-  status: 'planifie' | 'en_cours' | 'termine';
-  // Champs additionnels pour compatibilité avec PlanningEmploye
-  dateAssignation?: string;
-  dateCreation?: Date;
-  vehiculeId?: number;
-  duree?: number;
-  jour?: string;
-  user_id?: string; // Ajout du user_id pour l'association correcte
-  waiting_reason?: string; // Ajout de la raison d'attente
-  updated_at?: string; // Ajout de la date de mise à jour
-}
-
-export interface PlanningDay {
-  [key: string]: PlanningTask[];
-}
-
-export const useRealPlanningData = (companyId: string | null) => {
-  console.log('🎯 HOOK START - companyId:', companyId);
+// Hook similaire à useRealPlanningData mais qui inclut TOUTES les tâches, même celles avec waiting_reason
+export const useAllPlanningData = (companyId: string | null) => {
+  console.log('🎯 ALL PLANNING HOOK START - companyId:', companyId);
   
   const [planningData, setPlanningData] = useState<PlanningDay>({
     lundi: [],
@@ -40,24 +17,19 @@ export const useRealPlanningData = (companyId: string | null) => {
   });
   const [loading, setLoading] = useState(true);
 
-  console.log('🎯 HOOK STATE INITIALIZED');
-
-  const fetchPlanningData = useCallback(async () => {
+  const fetchAllPlanningData = useCallback(async () => {
     try {
-      console.log('🚀 fetchPlanningData START - companyId:', companyId);
+      console.log('🚀 fetchAllPlanningData START - companyId:', companyId);
       setLoading(true);
       
       if (!companyId) {
-        console.log('❌ fetchPlanningData: Cannot fetch data - companyId is null/undefined');
+        console.log('❌ fetchAllPlanningData: Cannot fetch data - companyId is null/undefined');
         setLoading(false);
         return;
       }
 
-      // Test de connectivité Supabase
-      console.log('🔌 Testing Supabase connectivity...');
-      
-      // Récupérer les tâches programmées avec jointures
-      console.log('📡 Querying employee_schedule with joins...');
+      // Récupérer TOUTES les tâches programmées (y compris celles avec waiting_reason)
+      console.log('📡 Querying ALL employee_schedule with joins...');
       const { data, error } = await supabase
         .from('employee_schedule')
         .select(`
@@ -86,10 +58,9 @@ export const useRealPlanningData = (companyId: string | null) => {
           )
         `)
         .eq('company_id', companyId)
-        .is('waiting_reason', null) // Filtrer les tâches en attente avec raison
         .order('start_datetime', { ascending: true });
 
-      console.log('📦 Query result:', {
+      console.log('📦 ALL Query result:', {
         dataLength: data?.length || 0,
         error: error,
         companyId,
@@ -97,7 +68,7 @@ export const useRealPlanningData = (companyId: string | null) => {
       });
 
       if (error) {
-        console.error('❌ Error fetching planning data:', error);
+        console.error('❌ Error fetching all planning data:', error);
         setLoading(false);
         return;
       }
@@ -129,19 +100,6 @@ export const useRealPlanningData = (companyId: string | null) => {
       };
 
       const dayNames = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
-      
-      console.log('🔍 Processing joined data:', {
-        totalTasks: data.length,
-        rawData: data.map(item => ({
-          id: item.id,
-          user_id: item.user_id,
-          vehicle_id: item.vehicle_id,
-          task_type: item.task_type,
-          start_datetime: item.start_datetime,
-          profile: item.profiles,
-          vehicle: item.vehicles
-        }))
-      });
 
       data.forEach((item: any) => {
         const startDate = new Date(item.start_datetime);
@@ -157,19 +115,6 @@ export const useRealPlanningData = (companyId: string | null) => {
         const modelName = vehicle?.car_models?.name || '';
         const clientName = vehicle?.clients ? `${vehicle.clients.first_name || ''} ${vehicle.clients.last_name || ''}`.trim() : '';
         
-        console.log('🚀 Converting task:', {
-          taskId: item.id,
-          user_id: item.user_id,
-          vehicleId: item.vehicle_id,
-          task_type: item.task_type,
-          technicienName,
-          vehiculePlate: vehicle?.license_plate,
-          clientName,
-          dayOfWeek,
-          profile,
-          vehicle
-        });
-        
         const task: PlanningTask = {
           id: item.id,
           vehicule: vehicle?.license_plate || `Véhicule-${item.id}`,
@@ -180,13 +125,15 @@ export const useRealPlanningData = (companyId: string | null) => {
           etape: item.task_type || 'accueil',
           client: clientName || 'Client non défini',
           status: mapTaskStatus(item.status),
-          // Mapper les champs DB vers les champs attendus par PlanningEmploye
-          dateAssignation: startDate.toISOString().split('T')[0], // Convertir start_datetime en dateAssignation
+          dateAssignation: startDate.toISOString().split('T')[0],
           dateCreation: new Date(item.created_at),
           vehiculeId: item.vehicle_id ? parseInt(item.vehicle_id.toString()) : Date.now(),
-          duree: Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60)), // Durée en heures
+          duree: Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60)),
           jour: dayOfWeek,
-          user_id: item.user_id // Important : conserver le user_id pour l'association
+          user_id: item.user_id,
+          // Ajouter les champs spécifiques aux tâches en attente
+          waiting_reason: item.waiting_reason,
+          updated_at: item.updated_at
         };
 
         if (planningByDay[dayOfWeek]) {
@@ -194,18 +141,18 @@ export const useRealPlanningData = (companyId: string | null) => {
         }
       });
 
-      console.log('✅ Planning data loaded:', planningByDay);
+      console.log('✅ ALL Planning data loaded:', planningByDay);
       setPlanningData(planningByDay);
 
     } catch (error) {
-      console.error('❌ Unexpected error fetching planning data:', error);
+      console.error('❌ Unexpected error fetching all planning data:', error);
     } finally {
       setLoading(false);
     }
   }, [companyId]);
 
   useEffect(() => {
-    console.log('🎯 useEffect TRIGGERED - companyId:', companyId, typeof companyId);
+    console.log('🎯 ALL useEffect TRIGGERED - companyId:', companyId, typeof companyId);
     
     if (!companyId) {
       console.log('🎯 NO companyId - returning early');
@@ -213,15 +160,15 @@ export const useRealPlanningData = (companyId: string | null) => {
       return;
     }
 
-    console.log('🎯 CALLING fetchPlanningData...');
-    fetchPlanningData();
+    console.log('🎯 CALLING fetchAllPlanningData...');
+    fetchAllPlanningData();
 
-  }, [companyId, fetchPlanningData]);
+  }, [companyId, fetchAllPlanningData]);
 
   return {
     planningData,
     loading,
-    refetch: fetchPlanningData
+    refetch: fetchAllPlanningData
   };
 };
 

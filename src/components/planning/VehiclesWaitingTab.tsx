@@ -25,9 +25,11 @@ export const VehiclesWaitingTab = ({
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   
   // Utiliser les vraies données de la base
-  const waitingVehicles = vehicles.filter(vehicle => 
-    !schedules.some(schedule => schedule.vehicle_id === vehicle.id)
-  ).map(vehicle => {
+  const waitingVehicles = vehicles.filter(vehicle => {
+    // Inclure les véhicules qui n'ont pas de schedule OU qui ont un schedule avec waiting_reason
+    const vehicleSchedule = schedules.find(schedule => schedule.vehicle_id === vehicle.id);
+    return !vehicleSchedule || vehicleSchedule.waiting_reason;
+  }).map(vehicle => {
     // Chercher si ce véhicule a une tâche avec waiting_reason
     const waitingSchedule = schedules.find(schedule => 
       schedule.vehicle_id === vehicle.id && schedule.waiting_reason
@@ -40,13 +42,15 @@ export const VehiclesWaitingTab = ({
       licensePlate: vehicle.license_plate || 'N/A',
       client: vehicle.clients ? `${vehicle.clients.first_name} ${vehicle.clients.last_name}` : 'Client inconnu',
       price: '0€',
-      blockedStage: 'En attente de planification',
+      blockedStage: waitingSchedule?.waiting_reason ? 'Mis en attente par employé' : 'En attente de planification',
       waitingSince: vehicle.waiting_since ? 
         `${Math.floor((new Date().getTime() - new Date(vehicle.waiting_since).getTime()) / (1000 * 60 * 60 * 24))} jour(s)` :
+        waitingSchedule?.updated_at ?
+        `${Math.floor((new Date().getTime() - new Date(waitingSchedule.updated_at).getTime()) / (1000 * 60 * 60 * 24))} jour(s)` :
         '0 jour(s)',
-      blockingReason: vehicle.waiting_reason || waitingSchedule?.waiting_reason || 'En attente',
-      blockingDescription: vehicle.waiting_reason || waitingSchedule?.waiting_reason ? 
-        `Véhicule mis en attente : ${vehicle.waiting_reason || waitingSchedule?.waiting_reason}` :
+      blockingReason: waitingSchedule?.waiting_reason || vehicle.waiting_reason || 'En attente',
+      blockingDescription: waitingSchedule?.waiting_reason || vehicle.waiting_reason ? 
+        `Véhicule mis en attente par un employé pour la raison suivante : ${waitingSchedule?.waiting_reason || vehicle.waiting_reason}` :
         'Véhicule en attente de planification dans l\'atelier',
       urgent: false,
       hasWaitingReason: !!(vehicle.waiting_reason || waitingSchedule?.waiting_reason)

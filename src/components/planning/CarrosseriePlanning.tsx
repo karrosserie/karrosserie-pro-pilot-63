@@ -97,7 +97,7 @@ const CarrosseriePlanning = () => {
   const { employees: employesFromData, loading: employesLoading, createEmployee, refetch: refetchEmployees } = useEmployeeData(companyId);
   const { vehicles, loading: vehiclesLoading, refetch: refetchVehicles } = useVehicleData(companyId);
   const { waitingVehicles, loading: waitingVehiclesLoading, refetch: refetchWaitingVehicles } = useWaitingVehicles(companyId);
-  const { planningTaches, getTasksForEmployee, getTasksForEmployeeById, getTodayTasks, getAllWorkflowTasks, loading: planningLoading, refetch: refetchPlanning } = usePlanningTasks(companyId);
+  const { planningTaches, getTasksForEmployee, getTasksForEmployeeById, getTodayTasks, getAllWorkflowTasks, getAllTasksIncludingWaiting, loading: planningLoading, refetch: refetchPlanning } = usePlanningTasks(companyId);
 
   console.log('🚀 COMPOSANT CARROSSERIE PLANNING - HOOKS APPELÉS:', {
     employesFromDataLength: employesFromData.length,
@@ -219,8 +219,8 @@ const CarrosseriePlanning = () => {
         employees={employes}
         vehicles={vehicles}
         waitingVehicles={waitingVehicles}
-        schedules={getAllWorkflowTasks()} // Utiliser toutes les tâches pour les étapes atelier
-        planningTaches={getAllWorkflowTasks()} // Utiliser toutes les tâches pour le planning hebdomadaire
+        schedules={getAllTasksIncludingWaiting()} // Utiliser toutes les tâches Y COMPRIS celles en attente
+        planningTaches={getAllWorkflowTasks()} // Utiliser seulement les tâches actives pour le planning hebdomadaire
         companyId={companyId}
         onScheduleUpdate={handleScheduleUpdate}
         onOpenUrgenceModal={() => setShowVehiculeUrgenceModal(true)}
