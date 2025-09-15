@@ -4,7 +4,7 @@ export const createMissingVehicleAlerts = async () => {
   try {
     console.log('🔍 Recherche des véhicules en attente sans alerte...');
     
-    // Récupérer tous les véhicules en attente depuis employee_schedule
+    // Récupérer tous les véhicules avec le statut "En attente" dans employee_schedule
     const { data: waitingVehicles, error } = await supabase
       .from('employee_schedule')
       .select(`
@@ -12,6 +12,7 @@ export const createMissingVehicleAlerts = async () => {
         waiting_reason,
         vehicle_id,
         company_id,
+        status,
         vehicles!inner(
           id,
           license_plate,
@@ -19,7 +20,7 @@ export const createMissingVehicleAlerts = async () => {
           car_models(name)
         )
       `)
-      .not('waiting_reason', 'is', null)
+      .eq('status', 'En attente')
       .not('vehicle_id', 'is', null);
 
     if (error) {
