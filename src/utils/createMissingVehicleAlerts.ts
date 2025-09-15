@@ -62,11 +62,14 @@ export const createMissingVehicleAlerts = async () => {
           .insert({
             company_id: vehicleTask.company_id,
             entity_type: 'vehicle',
+            employee_id: null,
             vehicle_id: vehicleTask.vehicle_id,
+            repair_order_id: null,
             alert_type: 'vehicule_attente',
             title: 'Véhicule en attente - Étapes atelier',
             message: `Le véhicule ${vehicleName} est bloqué dans les étapes atelier. Raison: ${vehicleTask.waiting_reason}`,
-            reason: vehicleTask.waiting_reason
+            reason: vehicleTask.waiting_reason,
+            clock_in_time: null
           });
 
         if (insertError) {

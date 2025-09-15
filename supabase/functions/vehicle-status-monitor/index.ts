@@ -93,12 +93,14 @@ Deno.serve(async (req) => {
           .insert({
             company_id: repairOrder.company_id,
             entity_type: 'vehicle',
+            employee_id: null,
             vehicle_id: repairOrder.vehicle_id,
             repair_order_id: repairOrder.id,
             alert_type: 'vehicule_attente',
             title: 'Véhicule en attente',
             message: fullMessage,
-            reason: reason || null
+            reason: reason || null,
+            clock_in_time: null
           })
 
         if (insertError) {
