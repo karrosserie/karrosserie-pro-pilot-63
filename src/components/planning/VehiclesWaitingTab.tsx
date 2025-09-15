@@ -27,19 +27,31 @@ export const VehiclesWaitingTab = ({
   // Utiliser les vraies données de la base
   const waitingVehicles = vehicles.filter(vehicle => 
     !schedules.some(schedule => schedule.vehicle_id === vehicle.id)
-  ).map(vehicle => ({
-    id: vehicle.id,
-    brand: vehicle.car_brands?.name || 'Marque inconnue',
-    model: vehicle.car_models?.name || 'Modèle inconnu',
-    licensePlate: vehicle.license_plate || 'N/A',
-    client: vehicle.clients ? `${vehicle.clients.first_name} ${vehicle.clients.last_name}` : 'Client inconnu',
-    price: '0€',
-    blockedStage: 'En attente de planification',
-    waitingSince: '0 jour(s)',
-    blockingReason: 'En attente',
-    blockingDescription: 'Véhicule en attente de planification dans l\'atelier',
-    urgent: false
-  }));
+  ).map(vehicle => {
+    // Chercher si ce véhicule a une tâche avec waiting_reason
+    const waitingSchedule = schedules.find(schedule => 
+      schedule.vehicle_id === vehicle.id && schedule.waiting_reason
+    );
+    
+    return {
+      id: vehicle.id,
+      brand: vehicle.car_brands?.name || 'Marque inconnue',
+      model: vehicle.car_models?.name || 'Modèle inconnu',
+      licensePlate: vehicle.license_plate || 'N/A',
+      client: vehicle.clients ? `${vehicle.clients.first_name} ${vehicle.clients.last_name}` : 'Client inconnu',
+      price: '0€',
+      blockedStage: 'En attente de planification',
+      waitingSince: vehicle.waiting_since ? 
+        `${Math.floor((new Date().getTime() - new Date(vehicle.waiting_since).getTime()) / (1000 * 60 * 60 * 24))} jour(s)` :
+        '0 jour(s)',
+      blockingReason: vehicle.waiting_reason || waitingSchedule?.waiting_reason || 'En attente',
+      blockingDescription: vehicle.waiting_reason || waitingSchedule?.waiting_reason ? 
+        `Véhicule mis en attente : ${vehicle.waiting_reason || waitingSchedule?.waiting_reason}` :
+        'Véhicule en attente de planification dans l\'atelier',
+      urgent: false,
+      hasWaitingReason: !!(vehicle.waiting_reason || waitingSchedule?.waiting_reason)
+    };
+  });
 
   const blockedCount = waitingVehicles.length;
 
@@ -128,12 +140,24 @@ export const VehiclesWaitingTab = ({
             </div>
 
             {/* Raison du blocage */}
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+            <div className={`rounded-lg p-3 ${
+              vehicle.hasWaitingReason 
+                ? 'bg-red-50 border border-red-200' 
+                : 'bg-yellow-50 border border-yellow-200'
+            }`}>
               <div className="flex items-center gap-2 mb-2">
-                <AlertTriangle className="w-4 h-4 text-yellow-600" />
-                <span className="font-medium text-yellow-800">Raison du blocage : {vehicle.blockingReason}</span>
+                <AlertTriangle className={`w-4 h-4 ${
+                  vehicle.hasWaitingReason ? 'text-red-600' : 'text-yellow-600'
+                }`} />
+                <span className={`font-medium ${
+                  vehicle.hasWaitingReason ? 'text-red-800' : 'text-yellow-800'
+                }`}>
+                  {vehicle.hasWaitingReason ? 'Mis en attente par l\'employé' : 'Raison du blocage'} : {vehicle.blockingReason}
+                </span>
               </div>
-              <div className="text-sm text-yellow-700">
+              <div className={`text-sm ${
+                vehicle.hasWaitingReason ? 'text-red-700' : 'text-yellow-700'
+              }`}>
                 {vehicle.blockingDescription}
               </div>
             </div>
