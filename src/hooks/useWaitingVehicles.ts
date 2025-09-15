@@ -74,15 +74,17 @@ export const useWaitingVehicles = (companyId: string | null) => {
 
       console.log('📅 Active schedules fetched:', activeSchedules?.length || 0, activeSchedules);
 
-      // Récupérer les véhicules avec des tâches en attente avec raison
-      console.log('🔍 Fetching waiting reason schedules for company:', companyId);
-        const { data: waitingReasonSchedules, error: waitingError } = await supabase
+      // Approche simplifiée: récupérer directement tous les véhicules en attente avec leurs raisons
+      console.log('🔍 Fetching vehicles with waiting reasons for company:', companyId);
+      
+      // 1. Récupérer tous les véhicules avec waiting_reason
+      const { data: vehiclesWithReasons, error: reasonsError } = await supabase
         .from('employee_schedule')
         .select(`
           vehicle_id,
           waiting_reason,
           updated_at,
-          vehicles!left (
+          vehicles!inner (
             id,
             license_plate,
             color,
@@ -97,65 +99,62 @@ export const useWaitingVehicles = (companyId: string | null) => {
           )
         `)
         .eq('company_id', companyId)
-        .not('waiting_reason', 'is', null);
+        .not('waiting_reason', 'is', null)
+        .eq('status', 'En attente');
 
-      console.log('🔍 Raw waiting reason schedules response:', { 
-        data: waitingReasonSchedules, 
-        error: waitingError 
-      });
-
-      if (waitingError) {
-        console.error('❌ Error fetching waiting reason schedules:', waitingError);
-        return;
+      if (reasonsError) {
+        console.error('❌ Error fetching vehicles with waiting reasons:', reasonsError);
       }
 
-      console.log('⏳ Waiting reason schedules fetched:', waitingReasonSchedules?.length || 0, waitingReasonSchedules);
+      console.log('🔍 Vehicles with waiting reasons:', vehiclesWithReasons?.length || 0, vehiclesWithReasons);
 
-      // Filtrer les véhicules qui ne sont pas dans un planning actif (sans waiting_reason)
+      // 2. Filtrer les véhicules qui ne sont pas dans un planning actif
       const activeVehicleIds = new Set(
         activeSchedules?.filter(s => !s.waiting_reason).map(s => s.vehicle_id) || []
       );
-      const waitingVehiclesList = vehicles?.filter(vehicle => 
+      const regularWaitingVehicles = vehicles?.filter(vehicle => 
         !activeVehicleIds.has(vehicle.id)
       ) || [];
 
-      console.log('🚗 Regular waiting vehicles (no active schedules):', waitingVehiclesList.length, waitingVehiclesList);
+      console.log('🚗 Regular waiting vehicles (no active schedules):', regularWaitingVehicles.length, regularWaitingVehicles);
 
-      // Ajouter les véhicules avec waiting_reason à la liste
-      const waitingReasonVehicles = waitingReasonSchedules?.map(schedule => ({
-        id: schedule.vehicles.id,
-        license_plate: schedule.vehicles.license_plate,
-        color: schedule.vehicles.color,
-        created_at: schedule.vehicles.created_at,
-        car_brands: schedule.vehicles.car_brands,
-        car_models: schedule.vehicles.car_models,
-        clients: schedule.vehicles.clients,
-        waiting_reason: schedule.waiting_reason,
-        waiting_since: schedule.updated_at
-      })) || [];
-
-      // Traiter les véhicules normaux en attente (sans waiting_reason spécifique)
-      const regularWaitingVehicles = waitingVehiclesList.map(vehicle => ({
-        ...vehicle,
-        waiting_reason: undefined, // Pas de raison spécifique
-        waiting_since: vehicle.created_at // Utiliser la date de création comme référence
-      }));
-
-      console.log('⏳ Vehicles with waiting reasons:', waitingReasonVehicles.length, waitingReasonVehicles);
-
-      // Combiner les deux listes en évitant les doublons
-      const allWaitingVehicles: WaitingVehicle[] = [
-        ...regularWaitingVehicles,
-        ...waitingReasonVehicles.filter(wrv => 
-          !regularWaitingVehicles.some(wv => wv.id === wrv.id)
-        )
-      ];
+      // 3. Construire la liste complète
+      const allWaitingVehicles: WaitingVehicle[] = [];
+      
+      // Ajouter les véhicules avec waiting_reason en priorité
+      if (vehiclesWithReasons) {
+        for (const scheduleWithVehicle of vehiclesWithReasons) {
+          allWaitingVehicles.push({
+            id: scheduleWithVehicle.vehicles.id,
+            license_plate: scheduleWithVehicle.vehicles.license_plate,
+            color: scheduleWithVehicle.vehicles.color,
+            created_at: scheduleWithVehicle.vehicles.created_at,
+            car_brands: scheduleWithVehicle.vehicles.car_brands,
+            car_models: scheduleWithVehicle.vehicles.car_models,
+            clients: scheduleWithVehicle.vehicles.clients,
+            waiting_reason: scheduleWithVehicle.waiting_reason,
+            waiting_since: scheduleWithVehicle.updated_at
+          });
+        }
+      }
+      
+      // Ajouter les véhicules en attente normale (pas de waiting_reason)
+      const vehiclesWithReasonsIds = new Set(vehiclesWithReasons?.map(v => v.vehicles.id) || []);
+      for (const vehicle of regularWaitingVehicles) {
+        if (!vehiclesWithReasonsIds.has(vehicle.id)) {
+          allWaitingVehicles.push({
+            ...vehicle,
+            waiting_reason: undefined,
+            waiting_since: vehicle.created_at
+          });
+        }
+      }
 
       console.log('✅ Waiting vehicles loaded:', {
         totalVehicles: vehicles?.length || 0,
         activeVehicles: activeVehicleIds.size,
         waitingVehicles: regularWaitingVehicles.length,
-        waitingReasonVehicles: waitingReasonVehicles.length,
+        vehiclesWithReasons: vehiclesWithReasons?.length || 0,
         totalWaitingVehicles: allWaitingVehicles.length,
         allWaitingVehicles: allWaitingVehicles.map(v => ({
           id: v.id,
