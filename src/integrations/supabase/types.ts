@@ -2276,6 +2276,7 @@ export type Database = {
           photo_type: string
           task_id: string
           updated_at: string
+          vehicle_id: string | null
         }
         Insert: {
           company_id: string
@@ -2287,6 +2288,7 @@ export type Database = {
           photo_type: string
           task_id: string
           updated_at?: string
+          vehicle_id?: string | null
         }
         Update: {
           company_id?: string
@@ -2298,6 +2300,7 @@ export type Database = {
           photo_type?: string
           task_id?: string
           updated_at?: string
+          vehicle_id?: string | null
         }
         Relationships: []
       }

@@ -7,7 +7,7 @@ import { Camera, Clock, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { getVehiclePhotos, VehiclePhoto } from '@/utils/vehiclePhotoService';
-import { getTaskPhotos, TaskPhoto } from '@/utils/taskPhotoService';
+import { getTaskPhotosByVehicle, TaskPhoto } from '@/utils/taskPhotoService';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -36,18 +36,14 @@ export const VehicleImagesTab: React.FC<VehicleImagesTabProps> = ({ vehicleId })
   }, [vehicleId]);
 
   const loadPhotos = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
+      const vehiclePhotosResult = await getVehiclePhotos(vehicleId);
+      setVehiclePhotos(vehiclePhotosResult);
       
-      // Charger les photos du véhicule
-      const vPhotos = await getVehiclePhotos(vehicleId);
-      setVehiclePhotos(vPhotos);
-
-      // Charger les photos de tâches (nous devrons filtrer par véhicule si possible)
-      // Pour l'instant, on charge toutes les photos de tâches
-      const tPhotos = await getTaskPhotos(''); // Vide pour récupérer toutes
-      setTaskPhotos(tPhotos);
-      
+      // Récupérer les photos de tâches liées au véhicule
+      const taskPhotosResult = await getTaskPhotosByVehicle(vehicleId);
+      setTaskPhotos(taskPhotosResult);
     } catch (error) {
       console.error('Erreur lors du chargement des photos:', error);
     } finally {

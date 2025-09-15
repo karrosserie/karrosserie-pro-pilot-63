@@ -5,6 +5,7 @@ export interface TaskPhoto {
   task_id: string;
   employee_id: string;
   company_id: string;
+  vehicle_id: string;
   photo_type: 'start' | 'end';
   file_url: string;
   file_name: string;
@@ -32,6 +33,7 @@ export async function uploadTaskPhoto(
   taskId: string,
   employeeId: string,
   companyId: string,
+  vehicleId: string,
   photoType: 'start' | 'end',
   photoBlob: Blob
 ): Promise<{ success: boolean; photo?: TaskPhoto; error?: string }> {
@@ -80,6 +82,7 @@ export async function uploadTaskPhoto(
         task_id: taskId,
         employee_id: employeeId,
         company_id: companyId,
+        vehicle_id: vehicleId,
         photo_type: photoType,
         file_url: urlData.publicUrl,
         file_name: fileName
@@ -101,16 +104,13 @@ export async function uploadTaskPhoto(
   }
 }
 
-export async function getTaskPhotos(
-  taskId: string,
-  photoType?: 'start' | 'end'
-): Promise<TaskPhoto[]> {
+export async function getTaskPhotos(taskId: string, photoType?: 'start' | 'end'): Promise<TaskPhoto[]> {
   try {
     let query = supabase
       .from('task_photos')
       .select('*')
       .eq('task_id', taskId)
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: false });
 
     if (photoType) {
       query = query.eq('photo_type', photoType);
@@ -119,13 +119,39 @@ export async function getTaskPhotos(
     const { data, error } = await query;
 
     if (error) {
-      console.error('Error fetching task photos:', error);
+      console.error('Erreur lors de la récupération des photos de tâche:', error);
       return [];
     }
 
     return (data as TaskPhoto[]) || [];
   } catch (error) {
-    console.error('Get task photos error:', error);
+    console.error('Erreur générale:', error);
+    return [];
+  }
+}
+
+export async function getTaskPhotosByVehicle(vehicleId: string, photoType?: 'start' | 'end'): Promise<TaskPhoto[]> {
+  try {
+    let query = supabase
+      .from('task_photos')
+      .select('*')
+      .eq('vehicle_id', vehicleId)
+      .order('created_at', { ascending: false });
+
+    if (photoType) {
+      query = query.eq('photo_type', photoType);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Erreur lors de la récupération des photos de tâche par véhicule:', error);
+      return [];
+    }
+
+    return (data as TaskPhoto[]) || [];
+  } catch (error) {
+    console.error('Erreur générale:', error);
     return [];
   }
 }

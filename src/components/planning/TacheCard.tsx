@@ -110,6 +110,7 @@ export const TacheCard: React.FC<TacheCardProps> = ({
                 tache.id,
                 employeeId,
                 companyId,
+                tache.vehiculeId?.toString() || '',
                 photoType,
                 blob
               );

@@ -22,7 +22,7 @@ import { useInvoices } from '@/hooks/use-invoices';
 import { useCredits } from '@/hooks/use-credits';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { getVehiclePhotos } from '@/utils/vehiclePhotoService';
-import { getTaskPhotos } from '@/utils/taskPhotoService';
+import { getTaskPhotosByVehicle } from '@/utils/taskPhotoService';
 import { VehicleImagesTab } from './tabs/VehicleImagesTab';
 
 
@@ -93,20 +93,16 @@ const VehicleDetailsDialog: React.FC<VehicleDetailsDialogProps> = ({
 
   // Count total photos for this vehicle
   useEffect(() => {
-    const countPhotos = async () => {
-      if (!defaultValues?.id) return;
-      
-      try {
-        const vehiclePhotos = await getVehiclePhotos(defaultValues.id);
-        const taskPhotos = await getTaskPhotos(''); // Get all task photos
-        
-        const totalCount = vehiclePhotos.length + taskPhotos.length;
-        setTotalPhotos(totalCount);
-      } catch (error) {
-        console.error('Error counting photos:', error);
-        setTotalPhotos(0);
-      }
-    };
+  const countPhotos = async () => {
+    try {
+      const vehiclePhotos = await getVehiclePhotos(defaultValues.id);
+      const taskPhotos = await getTaskPhotosByVehicle(defaultValues.id);
+      setTotalPhotos(vehiclePhotos.length + taskPhotos.length);
+    } catch (error) {
+      console.error('Erreur lors du comptage des photos:', error);
+      setTotalPhotos(0);
+    }
+  };
 
     if (mode === 'view' && defaultValues?.id) {
       countPhotos();
