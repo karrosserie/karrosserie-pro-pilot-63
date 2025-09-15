@@ -1766,6 +1766,56 @@ export type Database = {
         }
         Relationships: []
       }
+      page_visit_durations: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          duration_seconds: number | null
+          enter_time: string
+          exit_time: string | null
+          id: string
+          interactions_count: number | null
+          page_url: string
+          scroll_depth_percent: number | null
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          enter_time?: string
+          exit_time?: string | null
+          id?: string
+          interactions_count?: number | null
+          page_url: string
+          scroll_depth_percent?: number | null
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          enter_time?: string
+          exit_time?: string | null
+          id?: string
+          interactions_count?: number | null
+          page_url?: string
+          scroll_depth_percent?: number | null
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "page_visit_durations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       paint_types: {
         Row: {
           brand: string
@@ -2441,6 +2491,59 @@ export type Database = {
         }
         Relationships: []
       }
+      user_activity_logs: {
+        Row: {
+          company_id: string | null
+          component_name: string | null
+          created_at: string
+          event_category: string
+          event_name: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          page_url: string
+          session_id: string
+          timestamp: string
+          user_id: string
+        }
+        Insert: {
+          company_id?: string | null
+          component_name?: string | null
+          created_at?: string
+          event_category: string
+          event_name: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          page_url: string
+          session_id: string
+          timestamp?: string
+          user_id: string
+        }
+        Update: {
+          company_id?: string | null
+          component_name?: string | null
+          created_at?: string
+          event_category?: string
+          event_name?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          page_url?: string
+          session_id?: string
+          timestamp?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_activity_logs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_companies: {
         Row: {
           active: boolean
@@ -2475,6 +2578,183 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "user_companies_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_errors_abandons: {
+        Row: {
+          company_id: string | null
+          component_name: string | null
+          created_at: string
+          error_message: string | null
+          error_type: string
+          form_data: Json | null
+          funnel_name: string | null
+          id: string
+          metadata: Json | null
+          page_url: string
+          session_id: string
+          stack_trace: string | null
+          step_name: string | null
+          timestamp: string
+          user_id: string
+        }
+        Insert: {
+          company_id?: string | null
+          component_name?: string | null
+          created_at?: string
+          error_message?: string | null
+          error_type: string
+          form_data?: Json | null
+          funnel_name?: string | null
+          id?: string
+          metadata?: Json | null
+          page_url: string
+          session_id: string
+          stack_trace?: string | null
+          step_name?: string | null
+          timestamp?: string
+          user_id: string
+        }
+        Update: {
+          company_id?: string | null
+          component_name?: string | null
+          created_at?: string
+          error_message?: string | null
+          error_type?: string
+          form_data?: Json | null
+          funnel_name?: string | null
+          id?: string
+          metadata?: Json | null
+          page_url?: string
+          session_id?: string
+          stack_trace?: string | null
+          step_name?: string | null
+          timestamp?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_errors_abandons_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_funnel_progress: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          duration_seconds: number | null
+          end_time: string | null
+          form_data: Json | null
+          funnel_name: string
+          id: string
+          metadata: Json | null
+          session_id: string
+          start_time: string
+          status: string
+          step_name: string
+          step_order: number
+          user_id: string
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          end_time?: string | null
+          form_data?: Json | null
+          funnel_name: string
+          id?: string
+          metadata?: Json | null
+          session_id: string
+          start_time?: string
+          status?: string
+          step_name: string
+          step_order: number
+          user_id: string
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          end_time?: string | null
+          form_data?: Json | null
+          funnel_name?: string
+          id?: string
+          metadata?: Json | null
+          session_id?: string
+          start_time?: string
+          status?: string
+          step_name?: string
+          step_order?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_funnel_progress_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_sessions: {
+        Row: {
+          actions_performed: number | null
+          company_id: string | null
+          created_at: string
+          device_info: Json | null
+          duration_seconds: number | null
+          end_time: string | null
+          id: string
+          pages_visited: number | null
+          session_id: string
+          start_time: string
+          updated_at: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          actions_performed?: number | null
+          company_id?: string | null
+          created_at?: string
+          device_info?: Json | null
+          duration_seconds?: number | null
+          end_time?: string | null
+          id?: string
+          pages_visited?: number | null
+          session_id: string
+          start_time?: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          actions_performed?: number | null
+          company_id?: string | null
+          created_at?: string
+          device_info?: Json | null
+          duration_seconds?: number | null
+          end_time?: string | null
+          id?: string
+          pages_visited?: number | null
+          session_id?: string
+          start_time?: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_sessions_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "company_info"
