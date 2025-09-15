@@ -238,13 +238,14 @@ export const usePlanningTasks = (companyId: string | null) => {
 
   // Obtenir toutes les tâches pour les étapes atelier (indépendamment de la date)
   const getAllWorkflowTasks = (): PlanningTache[] => {
-    console.log('🏭 getAllWorkflowTasks - Returning all tasks for workshop stages:', planningTaches.length);
-    console.log('🏭 All workflow tasks:', planningTaches.map(t => ({ 
+    console.log('🏭 getAllWorkflowTasks - Returning filtered tasks for workshop stages:', planningTaches.length);
+    console.log('🏭 Filtered workflow tasks (no waiting_reason):', planningTaches.map(t => ({ 
       id: t.id, 
       vehicule: t.vehicule, 
       dateAssignation: t.dateAssignation,
       status: t.status,
-      etape: t.etape
+      etape: t.etape,
+      waiting_reason: t.waiting_reason
     })));
     
     return planningTaches;

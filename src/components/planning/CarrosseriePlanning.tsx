@@ -219,7 +219,7 @@ const CarrosseriePlanning = () => {
         employees={employes}
         vehicles={vehicles}
         waitingVehicles={waitingVehicles}
-        schedules={getAllTasksIncludingWaiting()} // Utiliser toutes les tâches Y COMPRIS celles en attente
+        schedules={getAllWorkflowTasks()} // Utiliser seulement les tâches actives (sans waiting_reason) pour les étapes atelier
         planningTaches={getAllWorkflowTasks()} // Utiliser seulement les tâches actives pour le planning hebdomadaire
         companyId={companyId}
         onScheduleUpdate={handleScheduleUpdate}
