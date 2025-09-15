@@ -58,6 +58,8 @@ export const useWaitingVehicles = (companyId: string | null) => {
         return;
       }
 
+      console.log('🚗 Vehicles fetched:', vehicles?.length || 0, vehicles);
+
       // Récupérer les véhicules qui ont des tâches actives ou en attente normale (sans waiting_reason)
       const { data: activeSchedules, error: schedulesError } = await supabase
         .from('employee_schedule')
@@ -69,6 +71,8 @@ export const useWaitingVehicles = (companyId: string | null) => {
         console.error('❌ Error fetching active schedules:', schedulesError);
         return;
       }
+
+      console.log('📅 Active schedules fetched:', activeSchedules?.length || 0, activeSchedules);
 
       // Récupérer les véhicules avec des tâches en attente avec raison
       const { data: waitingReasonSchedules, error: waitingError } = await supabase
@@ -99,6 +103,8 @@ export const useWaitingVehicles = (companyId: string | null) => {
         return;
       }
 
+      console.log('⏳ Waiting reason schedules fetched:', waitingReasonSchedules?.length || 0, waitingReasonSchedules);
+
       // Filtrer les véhicules qui ne sont pas dans un planning actif (sans waiting_reason)
       const activeVehicleIds = new Set(
         activeSchedules?.filter(s => !s.waiting_reason).map(s => s.vehicle_id) || []
@@ -106,6 +112,8 @@ export const useWaitingVehicles = (companyId: string | null) => {
       const waitingVehiclesList = vehicles?.filter(vehicle => 
         !activeVehicleIds.has(vehicle.id)
       ) || [];
+
+      console.log('🚗 Regular waiting vehicles (no active schedules):', waitingVehiclesList.length, waitingVehiclesList);
 
       // Ajouter les véhicules avec waiting_reason à la liste
       const waitingReasonVehicles = waitingReasonSchedules?.map(schedule => ({
@@ -119,6 +127,8 @@ export const useWaitingVehicles = (companyId: string | null) => {
         waiting_reason: schedule.waiting_reason,
         waiting_since: schedule.updated_at
       })) || [];
+
+      console.log('⏳ Vehicles with waiting reasons:', waitingReasonVehicles.length, waitingReasonVehicles);
 
       // Combiner les deux listes en évitant les doublons
       const allWaitingVehicles: WaitingVehicle[] = [
@@ -134,7 +144,11 @@ export const useWaitingVehicles = (companyId: string | null) => {
         waitingVehicles: waitingVehiclesList.length,
         waitingReasonVehicles: waitingReasonVehicles.length,
         totalWaitingVehicles: allWaitingVehicles.length,
-        allWaitingVehicles
+        allWaitingVehicles: allWaitingVehicles.map(v => ({
+          id: v.id,
+          license_plate: v.license_plate,
+          waiting_reason: v.waiting_reason
+        }))
       });
 
       setWaitingVehicles(allWaitingVehicles);

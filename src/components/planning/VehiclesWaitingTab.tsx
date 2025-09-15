@@ -24,16 +24,55 @@ export const VehiclesWaitingTab = ({
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   
+  // DEBUG: Log les données reçues
+  console.log('🔍 VehiclesWaitingTab - Données reçues:', {
+    vehiclesCount: vehicles.length,
+    schedulesCount: schedules.length,
+    vehicles: vehicles.map(v => ({
+      id: v.id,
+      license_plate: v.license_plate,
+      waiting_reason: v.waiting_reason,
+      waiting_since: v.waiting_since
+    })),
+    schedules: schedules.map(s => ({
+      id: s.id,
+      vehicle_id: s.vehicle_id,
+      waiting_reason: s.waiting_reason,
+      status: s.status,
+      updated_at: s.updated_at
+    }))
+  });
+  
   // Utiliser les vraies données de la base
   const waitingVehicles = vehicles.filter(vehicle => {
     // Inclure les véhicules qui n'ont pas de schedule OU qui ont un schedule avec waiting_reason
     const vehicleSchedule = schedules.find(schedule => schedule.vehicle_id === vehicle.id);
+    
+    console.log('🔍 Filtering vehicle:', {
+      vehicleId: vehicle.id,
+      licensePlate: vehicle.license_plate,
+      vehicleSchedule: vehicleSchedule,
+      hasWaitingReason: vehicleSchedule?.waiting_reason,
+      shouldInclude: !vehicleSchedule || vehicleSchedule.waiting_reason
+    });
+    
     return !vehicleSchedule || vehicleSchedule.waiting_reason;
   }).map(vehicle => {
     // Chercher si ce véhicule a une tâche avec waiting_reason
     const waitingSchedule = schedules.find(schedule => 
       schedule.vehicle_id === vehicle.id && schedule.waiting_reason
     );
+    
+    console.log('🔍 Processing vehicle for display:', {
+      vehicleId: vehicle.id,
+      licensePlate: vehicle.license_plate,
+      waitingSchedule: waitingSchedule,
+      vehicleWaitingReason: vehicle.waiting_reason,
+      scheduleWaitingReason: waitingSchedule?.waiting_reason
+    });
+    
+    const finalWaitingReason = waitingSchedule?.waiting_reason || vehicle.waiting_reason;
+    const hasWaitingReason = !!finalWaitingReason;
     
     return {
       id: vehicle.id,
@@ -42,20 +81,35 @@ export const VehiclesWaitingTab = ({
       licensePlate: vehicle.license_plate || 'N/A',
       client: vehicle.clients ? `${vehicle.clients.first_name} ${vehicle.clients.last_name}` : 'Client inconnu',
       price: '0€',
-      blockedStage: waitingSchedule?.waiting_reason ? 'Mis en attente par employé' : 'En attente de planification',
+      blockedStage: hasWaitingReason ? 'Mis en attente par employé' : 'En attente de planification',
       waitingSince: vehicle.waiting_since ? 
         `${Math.floor((new Date().getTime() - new Date(vehicle.waiting_since).getTime()) / (1000 * 60 * 60 * 24))} jour(s)` :
         waitingSchedule?.updated_at ?
         `${Math.floor((new Date().getTime() - new Date(waitingSchedule.updated_at).getTime()) / (1000 * 60 * 60 * 24))} jour(s)` :
         '0 jour(s)',
-      blockingReason: waitingSchedule?.waiting_reason || vehicle.waiting_reason || 'En attente',
-      blockingDescription: waitingSchedule?.waiting_reason || vehicle.waiting_reason ? 
-        `Véhicule mis en attente par un employé pour la raison suivante : ${waitingSchedule?.waiting_reason || vehicle.waiting_reason}` :
+      blockingReason: finalWaitingReason || 'En attente',
+      blockingDescription: hasWaitingReason ? 
+        `Véhicule mis en attente par un employé pour la raison suivante : ${finalWaitingReason}` :
         'Véhicule en attente de planification dans l\'atelier',
       urgent: false,
-      hasWaitingReason: !!(vehicle.waiting_reason || waitingSchedule?.waiting_reason)
+      hasWaitingReason: hasWaitingReason,
+      // DEBUG
+      _debug: {
+        vehicleWaitingReason: vehicle.waiting_reason,
+        scheduleWaitingReason: waitingSchedule?.waiting_reason,
+        finalWaitingReason: finalWaitingReason,
+        hasWaitingReason: hasWaitingReason
+      }
     };
   });
+
+  console.log('✅ Final waitingVehicles:', waitingVehicles.map(v => ({
+    id: v.id,
+    licensePlate: v.licensePlate,
+    blockingReason: v.blockingReason,
+    hasWaitingReason: v.hasWaitingReason,
+    debug: v._debug
+  })));
 
   const blockedCount = waitingVehicles.length;
 
