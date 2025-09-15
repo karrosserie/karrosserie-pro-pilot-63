@@ -8,7 +8,8 @@ import {
   Receipt, 
   CreditCard, 
   Banknote,
-  ClipboardList
+  ClipboardList,
+  Camera
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -88,7 +89,8 @@ export const getVehicleSidebarItems = (
   vehicleOrders: any[],
   vehicleInvoices: any[],
   vehicleCredits: any[],
-  vehicleReceipts: any[]
+  vehicleReceipts: any[],
+  totalPhotos: number = 0
 ): SidebarItem[] => [
   {
     id: 'details',
@@ -131,5 +133,11 @@ export const getVehicleSidebarItems = (
     label: 'Encaissements',
     icon: Banknote,
     count: vehicleReceipts.length
+  },
+  {
+    id: 'images',
+    label: 'Images',
+    icon: Camera,
+    count: totalPhotos
   }
 ];
