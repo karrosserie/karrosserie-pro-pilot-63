@@ -199,20 +199,20 @@ Deno.serve(async (req) => {
       // Récupérer les tâches actuelles de cet employé
       const { data: employeeTasks } = await supabase
         .from('employee_schedule')
-        .select('start_datetime, end_datetime, status')
+        .select('start_datetime, end_datetime, real_end_datetime, status')
         .eq('user_id', employee.user_id)
         .eq('company_id', companyId)
         .in('status', ['En attente', 'En cours'])
-        .order('end_datetime', { ascending: false });
+        .order('start_datetime', { ascending: true }); // Trier par heure de début pour analyser les créneaux
 
-      // Calculer le temps de disponibilité en respectant les horaires de travail
-      let availableTime = calculateNextWorkingSlot(new Date().getTime()); // Maintenant par défaut, mais en respectant les horaires
+      // Calculer le temps de disponibilité en respectant les horaires de travail et les créneaux libres
+      let availableTime = calculateNextWorkingSlot(new Date().getTime()); // Maintenant par défaut
       
       if (employeeTasks && employeeTasks.length > 0) {
-        // L'employé sera disponible après sa dernière tâche, mais en respectant les horaires de travail
-        const lastTask = employeeTasks[0];
-        const lastTaskEndTime = new Date(lastTask.end_datetime);
-        availableTime = calculateNextWorkingSlot(lastTaskEndTime.getTime());
+        // Trouver le prochain créneau libre en analysant toutes les tâches
+        availableTime = findNextAvailableSlot(employeeTasks, new Date());
+        // S'assurer que c'est dans les horaires de travail
+        availableTime = calculateNextWorkingSlot(availableTime.getTime());
       }
 
       console.log(`👤 Employee ${employee.profiles?.first_name} ${employee.profiles?.last_name} available at: ${availableTime.toISOString()}`);
@@ -390,4 +390,46 @@ function getNextWorkingDay(date: Date): Date {
   
   console.log(`📅 Next working day: ${nextDay.toLocaleString()}`);
   return nextDay;
+}
+
+/**
+ * Trouve le prochain créneau libre pour un employé en analysant ses tâches
+ */
+function findNextAvailableSlot(employeeTasks: any[], currentTime: Date): Date {
+  console.log(`🔍 Finding next available slot from ${currentTime.toLocaleString()} with ${employeeTasks.length} tasks`);
+  
+  // Commencer à partir de maintenant
+  let checkTime = new Date(currentTime);
+  
+  // Trier les tâches par heure de début
+  const sortedTasks = employeeTasks.sort((a, b) => 
+    new Date(a.start_datetime).getTime() - new Date(b.start_datetime).getTime()
+  );
+  
+  for (const task of sortedTasks) {
+    const taskStart = new Date(task.start_datetime);
+    const taskEnd = task.real_end_datetime ? 
+      new Date(task.real_end_datetime) : // Utiliser l'heure réelle si disponible
+      new Date(task.end_datetime);      // Sinon l'heure théorique
+    
+    console.log(`📋 Task: ${taskStart.toLocaleString()} - ${taskEnd.toLocaleString()} (real: ${task.real_end_datetime ? 'yes' : 'no'})`);
+    
+    // Si il y a un créneau libre entre checkTime et le début de cette tâche
+    if (taskStart.getTime() > checkTime.getTime()) {
+      const availableMinutes = (taskStart.getTime() - checkTime.getTime()) / (1000 * 60);
+      console.log(`⏰ Found ${availableMinutes} minutes gap before next task`);
+      
+      // Si le créneau est assez long (au moins 1h pour une tâche), l'utiliser
+      if (availableMinutes >= 60) {
+        console.log(`✅ Using available slot at ${checkTime.toLocaleString()}`);
+        return checkTime;
+      }
+    }
+    
+    // Passer à après cette tâche
+    checkTime = new Date(Math.max(checkTime.getTime(), taskEnd.getTime()));
+  }
+  
+  console.log(`📅 No gaps found, next available time: ${checkTime.toLocaleString()}`);
+  return checkTime;
 }
