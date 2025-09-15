@@ -4,7 +4,7 @@ export const createMissingVehicleAlerts = async () => {
   try {
     console.log('🔍 Recherche des véhicules en attente sans alerte...');
     
-    // Récupérer tous les véhicules en attente depuis employee_schedule avec leurs repair_orders éventuels
+    // Récupérer tous les véhicules en attente depuis employee_schedule
     const { data: waitingVehicles, error } = await supabase
       .from('employee_schedule')
       .select(`
@@ -16,11 +16,7 @@ export const createMissingVehicleAlerts = async () => {
           id,
           license_plate,
           car_brands(name),
-          car_models(name),
-          repair_orders!inner(
-            id,
-            status
-          )
+          car_models(name)
         )
       `)
       .not('waiting_reason', 'is', null)
@@ -40,12 +36,44 @@ export const createMissingVehicleAlerts = async () => {
 
     // Pour chaque véhicule en attente, vérifier s'il a déjà une alerte
     for (const vehicleTask of waitingVehicles) {
-      // Prendre le premier repair_order actif pour ce véhicule
-      const repairOrder = vehicleTask.vehicles?.repair_orders?.[0];
-      
-      if (!repairOrder) {
-        console.log(`⚠️ Pas de repair order trouvé pour le véhicule ${vehicleTask.vehicle_id}, on ignore`);
-        continue;
+      // Chercher un repair_order existant pour ce véhicule
+      const { data: existingRepairOrders } = await supabase
+        .from('repair_orders')
+        .select('id, status')
+        .eq('vehicle_id', vehicleTask.vehicle_id)
+        .eq('company_id', vehicleTask.company_id)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      let repairOrderId = existingRepairOrders?.[0]?.id;
+
+      // Si pas de repair_order existant, en créer un automatiquement
+      if (!repairOrderId) {
+        console.log(`📝 Création d'un repair order pour le véhicule ${vehicleTask.vehicle_id}`);
+        
+        const vehicle = vehicleTask.vehicles;
+        const brandName = vehicle?.car_brands?.name || 'Marque inconnue';
+        const modelName = vehicle?.car_models?.name || 'Modèle inconnu';
+        
+        const { data: newRepairOrder, error: createError } = await supabase
+          .from('repair_orders')
+          .insert({
+            company_id: vehicleTask.company_id,
+            vehicle_id: vehicleTask.vehicle_id,
+            reference: `AUTO-${Date.now()}`,
+            status: 'En attente',
+            description: `Véhicule en attente - ${vehicleTask.waiting_reason}`,
+            amount: 0
+          })
+          .select('id')
+          .single();
+
+        if (createError) {
+          console.error(`❌ Erreur lors de la création du repair order pour véhicule ${vehicleTask.vehicle_id}:`, createError);
+          continue;
+        }
+
+        repairOrderId = newRepairOrder.id;
       }
 
       // Vérifier si une alerte existe déjà pour ce véhicule/repair_order
@@ -54,7 +82,7 @@ export const createMissingVehicleAlerts = async () => {
         .select('id')
         .eq('entity_type', 'vehicle')
         .eq('vehicle_id', vehicleTask.vehicle_id)
-        .eq('repair_order_id', repairOrder.id)
+        .eq('repair_order_id', repairOrderId)
         .eq('alert_type', 'vehicule_attente')
         .eq('resolved', false)
         .single();
@@ -78,7 +106,7 @@ export const createMissingVehicleAlerts = async () => {
             entity_type: 'vehicle',
             employee_id: null,
             vehicle_id: vehicleTask.vehicle_id,
-            repair_order_id: repairOrder.id,
+            repair_order_id: repairOrderId,
             alert_type: 'vehicule_attente',
             title: 'Véhicule en attente - Étapes atelier',
             message: `Le véhicule ${vehicleName} est bloqué dans les étapes atelier. Raison: ${vehicleTask.waiting_reason}`,
