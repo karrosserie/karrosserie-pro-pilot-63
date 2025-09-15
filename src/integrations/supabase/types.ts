@@ -807,6 +807,7 @@ export type Database = {
           updated_at: string
           user_id: string
           vehicle_id: string | null
+          waiting_reason: string | null
         }
         Insert: {
           company_id: string
@@ -823,6 +824,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           vehicle_id?: string | null
+          waiting_reason?: string | null
         }
         Update: {
           company_id?: string
@@ -839,6 +841,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           vehicle_id?: string | null
+          waiting_reason?: string | null
         }
         Relationships: [
           {

@@ -53,6 +53,7 @@ export const useEmployeeSchedule = (userId?: string) => {
           `)
           .eq('company_id', companyInfo.id)
           .eq('user_id', userId)
+          .is('waiting_reason', null) // Filtrer les tâches en attente avec raison
           .order('start_datetime', { ascending: true });
 
         if (error) throw error;

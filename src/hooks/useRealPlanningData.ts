@@ -84,6 +84,7 @@ export const useRealPlanningData = (companyId: string | null) => {
           )
         `)
         .eq('company_id', companyId)
+        .is('waiting_reason', null) // Filtrer les tâches en attente avec raison
         .order('start_datetime', { ascending: true });
 
       console.log('📦 Query result:', {
