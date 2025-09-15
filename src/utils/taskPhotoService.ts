@@ -37,21 +37,49 @@ export async function uploadTaskPhoto(
   photoType: 'start' | 'end',
   photoBlob: Blob
 ): Promise<{ success: boolean; photo?: TaskPhoto; error?: string }> {
+  console.log('🔄 [taskPhotoService] Starting photo upload:', {
+    taskId,
+    employeeId,
+    companyId,
+    vehicleId,
+    photoType,
+    blobSize: photoBlob.size
+  });
+
   try {
     // Vérifier l'authentification
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
+      console.error('❌ [taskPhotoService] User not authenticated');
       return { success: false, error: 'Utilisateur non connecté' };
     }
 
-    // Vérifier que le companyId est valide
+    // Validations strictes
     if (!companyId) {
+      console.error('❌ [taskPhotoService] Invalid company ID');
       return { success: false, error: 'ID d\'entreprise non valide' };
     }
+
+    if (!vehicleId) {
+      console.error('❌ [taskPhotoService] Invalid vehicle ID');
+      return { success: false, error: 'ID de véhicule manquant' };
+    }
+
+    if (!taskId) {
+      console.error('❌ [taskPhotoService] Invalid task ID');
+      return { success: false, error: 'ID de tâche manquant' };
+    }
+
     // Create unique filename
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const fileName = `${taskId}_${employeeId}_${timestamp}_${photoType}.jpg`;
     const filePath = `task_photos/${fileName}`;
+
+    console.log('📁 [taskPhotoService] Uploading to storage:', {
+      fileName,
+      filePath,
+      bucket: 'documents'
+    });
 
     // Upload to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage
@@ -62,9 +90,11 @@ export async function uploadTaskPhoto(
       });
 
     if (uploadError) {
-      console.error('Storage upload error:', uploadError);
+      console.error('❌ [taskPhotoService] Storage upload error:', uploadError);
       return { success: false, error: `Erreur upload: ${uploadError.message}` };
     }
+
+    console.log('✅ [taskPhotoService] File uploaded successfully:', uploadData?.path);
 
     // Get public URL
     const { data: urlData } = supabase.storage
@@ -72,34 +102,43 @@ export async function uploadTaskPhoto(
       .getPublicUrl(filePath);
 
     if (!urlData?.publicUrl) {
+      console.error('❌ [taskPhotoService] Failed to generate public URL');
       return { success: false, error: 'Impossible de générer l\'URL publique' };
     }
 
+    console.log('🔗 [taskPhotoService] Public URL generated:', urlData.publicUrl);
+
     // Save metadata to database
+    const photoRecord = {
+      task_id: taskId,
+      employee_id: employeeId,
+      company_id: companyId,
+      vehicle_id: vehicleId,
+      photo_type: photoType,
+      file_url: urlData.publicUrl,
+      file_name: fileName
+    };
+
+    console.log('💾 [taskPhotoService] Saving to database:', photoRecord);
+
     const { data: photoData, error: dbError } = await supabase
       .from('task_photos')
-      .insert({
-        task_id: taskId,
-        employee_id: employeeId,
-        company_id: companyId,
-        vehicle_id: vehicleId,
-        photo_type: photoType,
-        file_url: urlData.publicUrl,
-        file_name: fileName
-      })
+      .insert(photoRecord)
       .select()
       .single();
 
     if (dbError) {
-      console.error('Database insert error:', dbError);
+      console.error('❌ [taskPhotoService] Database insert error:', dbError);
       // Try to cleanup uploaded file
       await supabase.storage.from('documents').remove([filePath]);
       return { success: false, error: `Erreur BDD: ${dbError.message}` };
     }
 
+    console.log('✅ [taskPhotoService] Photo saved successfully:', photoData?.id);
+
     return { success: true, photo: photoData as TaskPhoto };
   } catch (error) {
-    console.error('Upload task photo error:', error);
+    console.error('💥 [taskPhotoService] Upload task photo error:', error);
     return { success: false, error: 'Erreur inattendue lors de l\'upload' };
   }
 }
