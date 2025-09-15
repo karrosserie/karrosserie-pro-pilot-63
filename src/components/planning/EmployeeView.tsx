@@ -116,6 +116,7 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
     
     return {
       id: schedule.id,
+      vehicleId: schedule.vehicle_id,
       vehicleBrand: schedule.vehicles?.car_brands?.name || 'Marque inconnue',
       vehicleModel: schedule.vehicles?.car_models?.name || 'Modèle inconnu',
       licensePlate: schedule.vehicles?.license_plate || 'Plaque inconnue',
@@ -167,7 +168,13 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
           description: "Veuillez prendre une photo pour commencer la tâche",
         });
         
-        const photoResult = await takeTaskPhoto(currentUserId, taskId, 'start');
+        const photoResult = await takeTaskPhoto(
+          taskId, 
+          currentUserId!, 
+          companyInfo?.id!, 
+          task?.vehicleId || '', 
+          'start'
+        );
         
         if (!photoResult.success) {
           toast({
@@ -348,7 +355,13 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
           description: "Veuillez prendre une photo pour terminer la tâche",
         });
         
-        const photoResult = await takeTaskPhoto(currentUserId, taskId, 'end');
+        const photoResult = await takeTaskPhoto(
+          taskId, 
+          currentUserId!, 
+          companyInfo?.id!, 
+          task?.vehicleId || '', 
+          'end'
+        );
         
         if (!photoResult.success) {
           toast({

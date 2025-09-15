@@ -1,6 +1,6 @@
 import { Camera, CameraResultType, CameraSource, CameraPermissionState } from '@capacitor/camera';
 import { Capacitor } from '@capacitor/core';
-import { supabase } from '@/integrations/supabase/client';
+import { uploadTaskPhoto } from './taskPhotoService';
 
 export interface PhotoResult {
   success: boolean;
@@ -149,7 +149,13 @@ const takePhotoWeb = async (): Promise<string> => {
   });
 };
 
-export const takeTaskPhoto = async (userId: string, taskId: string, type: 'start' | 'end'): Promise<PhotoResult> => {
+export const takeTaskPhoto = async (
+  taskId: string, 
+  employeeId: string, 
+  companyId: string, 
+  vehicleId: string, 
+  type: 'start' | 'end'
+): Promise<PhotoResult> => {
   try {
     // Vérifier et demander les permissions
     const hasPermission = await checkAndRequestPermissions();
@@ -188,29 +194,21 @@ export const takeTaskPhoto = async (userId: string, taskId: string, type: 'start
     const response = await fetch(dataUrl);
     const blob = await response.blob();
 
-    // Créer le nom du fichier
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const fileName = `${userId}/${taskId}_${type}_${timestamp}.jpg`;
+    // Utiliser le service taskPhotoService pour uploader et enregistrer en base
+    const result = await uploadTaskPhoto(
+      taskId,
+      employeeId,
+      companyId,
+      vehicleId,
+      type,
+      blob
+    );
 
-    // Uploader vers Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('employee-tasks')
-      .upload(fileName, blob, {
-        contentType: 'image/jpeg',
-        upsert: false
-      });
-
-    if (uploadError) {
-      console.error('Erreur upload:', uploadError);
-      return { success: false, error: 'Erreur lors de l\'upload de la photo' };
+    if (result.success && result.photo) {
+      return { success: true, photoUrl: result.photo.file_url };
+    } else {
+      return { success: false, error: result.error || 'Erreur lors de l\'upload de la photo' };
     }
-
-    // Obtenir l'URL publique
-    const { data: urlData } = supabase.storage
-      .from('employee-tasks')
-      .getPublicUrl(fileName);
-
-    return { success: true, photoUrl: urlData.publicUrl };
 
   } catch (error: any) {
     console.error('Erreur prise de photo:', error);

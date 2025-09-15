@@ -45,7 +45,13 @@ export const VehicleCard = ({ vehicle, onPlan }: VehicleCardProps) => {
     setIsProcessing(true);
     
     try {
-      const result = await takeTaskPhoto(user.id, vehicle.id, 'start');
+      const result = await takeTaskPhoto(
+        vehicle.id, // taskId (using vehicle.id as a temporary task ID)
+        user.id, // employeeId
+        companyInfo.id, // companyId
+        vehicle.id, // vehicleId
+        'start'
+      );
       
       if (result.success && result.photoUrl) {
         // Convertir l'URL en blob pour utiliser notre service existant
