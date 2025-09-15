@@ -63,14 +63,14 @@ Deno.serve(async (req) => {
     const isCompletedStatus = newStatus === 'Signé' || newStatus === 'Terminé' || newStatus === 'En cours'
     const wasWaitingStatus = oldStatus === 'En attente' || (oldStatus && oldStatus.toLowerCase().includes('attente'))
 
-    if (isWaitingStatus && !wasWaitingStatus) {
+    if (isWaitingStatus) {
       // Le véhicule passe en attente - créer une alerte
       const vehicle = repairOrder.vehicles
       const vehicleName = vehicle 
         ? `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate}`
         : 'Véhicule inconnu'
 
-      // Vérifier si une alerte existe déjà
+      // Vérifier si une alerte existe déjà pour ce repair order spécifique
       const { data: existingAlert } = await supabaseClient
         .from('system_alerts')
         .select('id')
