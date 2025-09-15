@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { UrgencyVehicleService } from '@/services/urgencyVehicleService';
 
 export interface Vehicule {
   id: number;
@@ -313,45 +314,49 @@ export const usePlanningManager = () => {
     if (companyId) {
       console.log('🚨 Ajout véhicule urgence en base de données');
       
-      // Utiliser le service de persistance
-      const { UrgencyVehicleService } = await import('@/services/urgencyVehicleService');
-      const result = await UrgencyVehicleService.ajouterVehiculeUrgence({
-        ...vehiculeUrgence,
-        companyId
-      });
-      
-      if (result.success) {
-        // Créer notification de succès avec information sur les tâches décalées
-        const baseMessage = `Traitement immédiat - ${vehiculeUrgence.plaque} (${vehiculeUrgence.prenom} ${vehiculeUrgence.nom})`;
-        const shiftInfo = result.data?.conflictsResolved ? ` - ${result.data.conflictsResolved} tâche(s) décalée(s)` : '';
+      try {
+        // Utiliser le service de persistance
+        const result = await UrgencyVehicleService.ajouterVehiculeUrgence({
+          ...vehiculeUrgence,
+          companyId
+        });
         
-        const notificationUrgence: Notification = {
-          id: `notif_urgence_${Date.now()}`,
-          type: 'nouvelle_tache',
-          titre: '🚨 VÉHICULE URGENCE AJOUTÉ - PRIORITÉ',
-          message: baseMessage + shiftInfo,
-          employeId: vehiculeUrgence.employeId.toString(),
-          vehiculeId: 0, // Sera mis à jour par la vraie donnée DB
-          tacheId: result.data?.scheduleId || 'unknown',
-          timestamp: new Date(),
-          lue: false
-        };
+        if (result.success) {
+          // Créer notification de succès avec information sur les tâches décalées
+          const baseMessage = `Traitement immédiat - ${vehiculeUrgence.plaque} (${vehiculeUrgence.prenom} ${vehiculeUrgence.nom})`;
+          const shiftInfo = result.data?.conflictsResolved ? ` - ${result.data.conflictsResolved} tâche(s) décalée(s)` : '';
+          
+          const notificationUrgence: Notification = {
+            id: `notif_urgence_${Date.now()}`,
+            type: 'nouvelle_tache',
+            titre: '🚨 VÉHICULE URGENCE AJOUTÉ - PRIORITÉ',
+            message: baseMessage + shiftInfo,
+            employeId: vehiculeUrgence.employeId.toString(),
+            vehiculeId: 0, // Sera mis à jour par la vraie donnée DB
+            tacheId: result.data?.scheduleId || 'unknown',
+            timestamp: new Date(),
+            lue: false
+          };
 
-        setNotifications(prev => [notificationUrgence, ...prev]);
-        
-        // Déclencher un refresh automatique des données si les callbacks sont fournis
-        if (refreshCallbacks) {
-          console.log('🔄 Triggering automatic data refresh after urgent vehicle creation');
-          setTimeout(() => {
-            refreshCallbacks.refetchEmployees?.();
-            refreshCallbacks.refetchVehicles?.();
-            refreshCallbacks.refetchPlanning?.();
-          }, 1500); // Délai pour s'assurer que les données sont bien persistées
+          setNotifications(prev => [notificationUrgence, ...prev]);
+          
+          // Déclencher un refresh automatique des données si les callbacks sont fournis
+          if (refreshCallbacks) {
+            console.log('🔄 Triggering automatic data refresh after urgent vehicle creation');
+            setTimeout(() => {
+              refreshCallbacks.refetchEmployees?.();
+              refreshCallbacks.refetchVehicles?.();
+              refreshCallbacks.refetchPlanning?.();
+            }, 1500); // Délai pour s'assurer que les données sont bien persistées
+          }
+          
+          return { success: true, message: 'Véhicule d\'urgence ajouté et persisté en base', data: result };
+        } else {
+          return result;
         }
-        
-        return { success: true, message: 'Véhicule d\'urgence ajouté et persisté en base', data: result };
-      } else {
-        return result;
+      } catch (error) {
+        console.error('❌ Erreur lors de l\'ajout du véhicule d\'urgence:', error);
+        return { success: false, message: 'Erreur lors de l\'ajout du véhicule d\'urgence' };
       }
     }
 
