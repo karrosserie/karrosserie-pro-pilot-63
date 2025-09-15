@@ -181,15 +181,11 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
         photoUrl = photoResult.photoUrl;
       }
 
-      // Mettre à jour le statut de la tâche dans Supabase avec ou sans photo
-      const updateData: any = { 
-        status: 'En cours',
+      // Mettre à jour le statut de la tâche dans Supabase (plus de photo URL ici, elles sont dans task_photos)
+      const updateData = { 
+        status: 'En cours' as const,
         real_start_datetime: new Date().toISOString()
       };
-      
-      if (photoUrl) {
-        updateData.start_photo_url = photoUrl;
-      }
 
       const { error } = await supabase
         .from('employee_schedule')
@@ -366,15 +362,11 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
         photoUrl = photoResult.photoUrl;
       }
 
-      // Mettre à jour le statut de la tâche dans Supabase avec ou sans photo
-      const updateData: any = { 
-        status: 'Terminé',
+      // Mettre à jour le statut de la tâche dans Supabase (plus de photo URL ici, elles sont dans task_photos)
+      const updateData = { 
+        status: 'Terminé' as const,
         real_end_datetime: new Date().toISOString()
       };
-      
-      if (photoUrl) {
-        updateData.end_photo_url = photoUrl;
-      }
 
       const { error } = await supabase
         .from('employee_schedule')
