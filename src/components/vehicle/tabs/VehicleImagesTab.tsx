@@ -15,15 +15,6 @@ interface VehicleImagesTabProps {
   vehicleId: string;
 }
 
-interface PhotoWithCategory extends VehiclePhoto {
-  category: 'vehicle' | 'task-start' | 'task-end';
-  taskId?: string;
-}
-
-interface TaskPhotoWithCategory extends TaskPhoto {
-  category: 'task-start' | 'task-end';
-}
-
 export const VehicleImagesTab: React.FC<VehicleImagesTabProps> = ({ vehicleId }) => {
   const [vehiclePhotos, setVehiclePhotos] = useState<VehiclePhoto[]>([]);
   const [taskPhotos, setTaskPhotos] = useState<TaskPhoto[]>([]);
@@ -62,9 +53,30 @@ export const VehicleImagesTab: React.FC<VehicleImagesTabProps> = ({ vehicleId })
   };
 
   const renderPhotoCard = (photo: VehiclePhoto | TaskPhoto, category: string) => {
-    const isTaskPhoto = 'photo_type' in photo;
+    const isTaskPhoto = 'task_id' in photo;
+    const isWorkshopPhoto = !isTaskPhoto && (photo as VehiclePhoto).photo_type === 'workshop';
     const photoDate = new Date(photo.created_at);
-    const description = 'description' in photo ? photo.description : undefined;
+    const description = isTaskPhoto ? `Photo de tâche (${(photo as TaskPhoto).photo_type})` : (photo as VehiclePhoto).description;
+
+    const getBadgeContent = () => {
+      if (isTaskPhoto) {
+        return (photo as TaskPhoto).photo_type === 'start' ? 'Début' : 'Fin';
+      } else if (isWorkshopPhoto) {
+        return 'Atelier';
+      } else {
+        return 'Véhicule';
+      }
+    };
+
+    const getBadgeVariant = (): "default" | "destructive" | "outline" | "secondary" => {
+      if (isTaskPhoto) {
+        return (photo as TaskPhoto).photo_type === 'start' ? 'secondary' : 'destructive';
+      } else if (isWorkshopPhoto) {
+        return 'default';
+      } else {
+        return 'outline';
+      }
+    };
     
     return (
       <Card 
@@ -80,8 +92,8 @@ export const VehicleImagesTab: React.FC<VehicleImagesTabProps> = ({ vehicleId })
             loading="lazy"
           />
           <div className="absolute top-2 right-2">
-            <Badge variant="secondary" className="text-xs">
-              {isTaskPhoto ? (photo as TaskPhoto).photo_type === 'start' ? 'Début' : 'Fin' : 'Véhicule'}
+            <Badge variant={getBadgeVariant()} className="text-xs">
+              {getBadgeContent()}
             </Badge>
           </div>
         </div>
@@ -137,8 +149,11 @@ export const VehicleImagesTab: React.FC<VehicleImagesTabProps> = ({ vehicleId })
     );
   }
 
-  const taskStartPhotos = taskPhotos.filter(p => p.photo_type === 'start');
-  const taskEndPhotos = taskPhotos.filter(p => p.photo_type === 'end');
+  // Organiser les photos par catégorie
+  const workshopPhotos = vehiclePhotos.filter(photo => photo.photo_type === 'workshop');
+  const generalPhotos = vehiclePhotos.filter(photo => photo.photo_type !== 'workshop');
+  const startPhotos = taskPhotos.filter(photo => photo.photo_type === 'start');
+  const endPhotos = taskPhotos.filter(photo => photo.photo_type === 'end');
 
   const totalPhotos = vehiclePhotos.length + taskPhotos.length;
 
@@ -159,20 +174,17 @@ export const VehicleImagesTab: React.FC<VehicleImagesTabProps> = ({ vehicleId })
   return (
     <>
       <div className="p-6 space-y-8">
-        {renderPhotoSection('Photos du véhicule', vehiclePhotos, 'vehicle')}
+        {renderPhotoSection('Photos d\'atelier', workshopPhotos, 'workshop')}
+        {workshopPhotos.length > 0 && generalPhotos.length > 0 && <Separator />}
         
-        {(taskStartPhotos.length > 0 || taskEndPhotos.length > 0) && (
-          <>
-            <Separator />
-            {renderPhotoSection('Photos début de tâche', taskStartPhotos, 'task-start')}
-            {taskEndPhotos.length > 0 && (
-              <>
-                <Separator />
-                {renderPhotoSection('Photos fin de tâche', taskEndPhotos, 'task-end')}
-              </>
-            )}
-          </>
-        )}
+        {renderPhotoSection('Photos générales du véhicule', generalPhotos, 'vehicle')}
+        
+        {(startPhotos.length > 0 || endPhotos.length > 0) && (generalPhotos.length > 0 || workshopPhotos.length > 0) && <Separator />}
+        
+        {renderPhotoSection('Photos de début de tâche', startPhotos, 'task-start')}
+        {startPhotos.length > 0 && endPhotos.length > 0 && <Separator />}
+        
+        {renderPhotoSection('Photos de fin de tâche', endPhotos, 'task-end')}
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -208,9 +220,9 @@ export const VehicleImagesTab: React.FC<VehicleImagesTabProps> = ({ vehicleId })
                 )}
                 <div className="flex items-center gap-2">
                   <Badge variant="secondary">
-                    {'photo_type' in selectedPhoto 
+                    {'task_id' in selectedPhoto 
                       ? (selectedPhoto.photo_type === 'start' ? 'Début de tâche' : 'Fin de tâche')
-                      : 'Photo véhicule'
+                      : selectedPhoto.photo_type === 'workshop' ? 'Photo atelier' : 'Photo véhicule'
                     }
                   </Badge>
                 </div>
