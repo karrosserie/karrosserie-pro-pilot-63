@@ -44,7 +44,7 @@ export const VehiclesWaitingTab = ({
       price: '0€',
       blockedStage: hasWaitingReason ? 'Mis en attente par employé' : 'En attente de planification',
       waitingSince: `${waitingSinceDays} jour(s)`,
-      blockingReason: vehicle.waiting_reason || 'En attente de planification',
+      blockingReason: hasWaitingReason ? vehicle.waiting_reason : 'En attente de planification',
       blockingDescription: hasWaitingReason ? 
         `Véhicule mis en attente par un employé pour la raison suivante : ${vehicle.waiting_reason}` :
         'Véhicule en attente de planification dans l\'atelier',

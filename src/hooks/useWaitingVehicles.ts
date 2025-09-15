@@ -134,20 +134,27 @@ export const useWaitingVehicles = (companyId: string | null) => {
         waiting_since: schedule.updated_at
       })) || [];
 
+      // Traiter les véhicules normaux en attente (sans waiting_reason spécifique)
+      const regularWaitingVehicles = waitingVehiclesList.map(vehicle => ({
+        ...vehicle,
+        waiting_reason: undefined, // Pas de raison spécifique
+        waiting_since: vehicle.created_at // Utiliser la date de création comme référence
+      }));
+
       console.log('⏳ Vehicles with waiting reasons:', waitingReasonVehicles.length, waitingReasonVehicles);
 
       // Combiner les deux listes en évitant les doublons
       const allWaitingVehicles: WaitingVehicle[] = [
-        ...waitingVehiclesList,
+        ...regularWaitingVehicles,
         ...waitingReasonVehicles.filter(wrv => 
-          !waitingVehiclesList.some(wv => wv.id === wrv.id)
+          !regularWaitingVehicles.some(wv => wv.id === wrv.id)
         )
       ];
 
       console.log('✅ Waiting vehicles loaded:', {
         totalVehicles: vehicles?.length || 0,
         activeVehicles: activeVehicleIds.size,
-        waitingVehicles: waitingVehiclesList.length,
+        waitingVehicles: regularWaitingVehicles.length,
         waitingReasonVehicles: waitingReasonVehicles.length,
         totalWaitingVehicles: allWaitingVehicles.length,
         allWaitingVehicles: allWaitingVehicles.map(v => ({
