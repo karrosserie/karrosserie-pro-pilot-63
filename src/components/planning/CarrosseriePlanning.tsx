@@ -39,6 +39,7 @@ import { useViewManagement } from '@/hooks/use-view-management';
 
 const CarrosseriePlanning = () => {
   console.log('🚀 COMPOSANT CARROSSERIE PLANNING CHARGÉ - DEBUT');
+  console.log('🔧 Debug: Composant CarrosseriePlanning initialisé');
   
   // Enhanced state variables for modals and actions
   const [selectedVehicule, setSelectedVehicule] = useState<any>(null);
@@ -205,11 +206,14 @@ const CarrosseriePlanning = () => {
   };
 
   // Fonction pour déclencher manuellement la reprogrammation des tâches
+  console.log('🔧 Debug: Définition de handleRescheduleOldTasks');
   const handleRescheduleOldTasks = async () => {
+    if (isRescheduling) return;
+    
     setIsRescheduling(true);
+    console.log('🔄 Déclenchement manuel de la reprogrammation...');
+    
     try {
-      console.log('🔄 Déclenchement manuel de la reprogrammation...');
-      
       const { data, error } = await supabase.functions.invoke('reschedule-pending-tasks', {
         body: {
           manual_trigger: true,
@@ -224,31 +228,32 @@ const CarrosseriePlanning = () => {
           title: "Erreur de reprogrammation",
           description: "Impossible de reprogrammer les tâches"
         });
-      } else {
-        console.log('✅ Reprogrammation réussie:', data);
-        
-        // Forcer le refetch des données
-        await Promise.all([
-          refetchPlanning(),
-          refetchWaitingVehicles(),
-          refetchEmployees()
-        ]);
-        
-        const rescheduledCount = data?.rescheduledTasks?.length || 0;
-        
-        setFloatingNotifications(prev => [...prev, {
-          id: Date.now().toString(),
-          type: 'success' as const,
-          title: 'Reprogrammation terminée',
-          message: `${rescheduledCount} tâches ont été reprogrammées`,
-          duration: 5000
-        }]);
-
-        toast({
-          title: "Reprogrammation réussie",
-          description: `${rescheduledCount} tâches ont été reprogrammées vers les prochains jours de travail`
-        });
+        return;
       }
+
+      console.log('✅ Reprogrammation réussie:', data);
+      
+      // Forcer le refetch des données
+      await Promise.all([
+        refetchPlanning(),
+        refetchWaitingVehicles(),
+        refetchEmployees()
+      ]);
+      
+      const rescheduledCount = data?.rescheduledTasks?.length || 0;
+      
+      setFloatingNotifications(prev => [...prev, {
+        id: Date.now().toString(),
+        type: 'success' as const,
+        title: 'Reprogrammation terminée',
+        message: `${rescheduledCount} tâches ont été reprogrammées`,
+        duration: 5000
+      }]);
+
+      toast({
+        title: "Reprogrammation réussie",
+        description: `${rescheduledCount} tâches ont été reprogrammées vers les prochains jours de travail`
+      });
     } catch (error) {
       console.error('❌ Erreur inattendue:', error);
       toast({
