@@ -2322,6 +2322,7 @@ export type Database = {
           entity_type: string
           id: string
           message: string
+          messagerie_id: string | null
           reason: string | null
           repair_order_id: string | null
           resolved: boolean
@@ -2338,6 +2339,7 @@ export type Database = {
           entity_type?: string
           id?: string
           message: string
+          messagerie_id?: string | null
           reason?: string | null
           repair_order_id?: string | null
           resolved?: boolean
@@ -2354,6 +2356,7 @@ export type Database = {
           entity_type?: string
           id?: string
           message?: string
+          messagerie_id?: string | null
           reason?: string | null
           repair_order_id?: string | null
           resolved?: boolean
@@ -2361,7 +2364,15 @@ export type Database = {
           title?: string
           vehicle_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "system_alerts_messagerie_id_fkey"
+            columns: ["messagerie_id"]
+            isOneToOne: false
+            referencedRelation: "messageries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       task_photos: {
         Row: {
