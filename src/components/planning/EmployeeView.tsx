@@ -481,22 +481,22 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
     );
   }
 
-  // Afficher l'interface de dépointage si l'employé a terminé sa journée
+  // Afficher l'interface de dépointage si l'employé a terminé sa journée - Mobile responsive
   if (isClockedOut) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen p-4">
         <Card className="w-full max-w-md">
-          <CardContent className="text-center py-8">
-            <LogOut className="w-16 h-16 text-green-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Journée terminée</h2>
-            <p className="text-muted-foreground mb-6">
+          <CardContent className="text-center py-6 sm:py-8 px-4 sm:px-6">
+            <LogOut className="w-12 h-12 sm:w-16 sm:h-16 text-green-600 mx-auto mb-4" />
+            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold mb-2">Journée terminée</h2>
+            <p className="text-muted-foreground mb-6 text-sm sm:text-base">
               Vous avez dépointé avec succès. Pour reprendre le travail, vous devez repointer.
             </p>
             <Button 
               onClick={handleClockIn}
-              className="w-full"
+              className="w-full flex items-center justify-center gap-2"
             >
-              <Clock className="w-4 h-4 mr-2" />
+              <Clock className="w-4 h-4" />
               Repointer
             </Button>
           </CardContent>
@@ -506,38 +506,42 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Badge "En pause" fixe en haut */}
+    <div className="space-y-4 sm:space-y-6 p-2 sm:p-4 max-w-full">
+      {/* Badge "En pause" fixe en haut - Mobile responsive */}
       {isOnBreak && (
-        <div className="fixed top-8 left-1/2 transform -translate-x-1/2 z-50">
-          <div className="bg-red-500 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-3">
-            <div className="w-3 h-3 bg-white rounded-full"></div>
-            <span className="font-bold text-lg">En pause</span>
+        <div className="fixed top-4 sm:top-8 left-1/2 transform -translate-x-1/2 z-50">
+          <div className="bg-red-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full shadow-lg flex items-center gap-2 sm:gap-3">
+            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full"></div>
+            <span className="font-bold text-sm sm:text-lg">En pause</span>
           </div>
         </div>
       )}
       
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <User className="w-6 h-6 text-primary" />
-          <div>
-            <h1 className="text-2xl font-bold">Mon Planning</h1>
-            <p className="text-muted-foreground">Vue employé - {new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+      {/* Header - Mobile responsive */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <User className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0" />
+          <div className="min-w-0 flex-1">
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold">Mon Planning</h1>
+            <p className="text-muted-foreground text-xs sm:text-sm line-clamp-1">
+              Vue employé - {new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            </p>
           </div>
         </div>
+        
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 self-start sm:self-auto w-full sm:w-auto justify-center sm:justify-start"
             >
               <BarChart className="w-4 h-4" />
-              Gestion des pointages
+              <span className="hidden xs:inline">Gestion des pointages</span>
+              <span className="xs:hidden">Pointages</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="w-56">
             {isOnBreak ? (
               <DropdownMenuItem onClick={handleEndBreak}>
                 <Coffee className="w-4 h-4 mr-2" />
@@ -561,120 +565,131 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
         </DropdownMenu>
       </div>
 
-      {/* Tâche en cours */}
+      {/* Tâche en cours - Mobile responsive */}
       {currentTask ? (
         <Card className="border-blue-200 bg-blue-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-blue-800">
-              <Play className="w-5 h-5" />
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-blue-800 text-base sm:text-lg">
+              <Play className="w-4 h-4 sm:w-5 sm:h-5" />
               Tâche en cours
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <h3 className="font-semibold">{currentTask.vehicleBrand} {currentTask.vehicleModel}</h3>
-                <p className="text-sm text-muted-foreground">{currentTask.licensePlate} • {currentTask.client}</p>
-                <p className="text-sm font-medium">{currentTask.taskType}</p>
-                <p className="text-sm">{currentTask.description}</p>
+          <CardContent className="p-4 sm:p-6 pt-0 space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="space-y-2 sm:space-y-3">
+                <h3 className="font-semibold text-sm sm:text-base">{currentTask.vehicleBrand} {currentTask.vehicleModel}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
+                  {currentTask.licensePlate} • {currentTask.client}
+                </p>
+                <p className="text-xs sm:text-sm font-medium text-blue-700">{currentTask.taskType}</p>
+                <p className="text-xs sm:text-sm line-clamp-2">{currentTask.description}</p>
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+                  <Clock className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                  <span>{currentTask.startTime} - {currentTask.endTime}</span>
+                </div>
               </div>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm">
-                  <Clock className="w-4 h-4" />
-                  {currentTask.startTime} - {currentTask.endTime}
-                </div>
-                <div className="flex gap-2">
-                  <Button 
-                    size="sm" 
-                    onClick={() => handleCompleteTask(currentTask.id)}
-                    className="flex items-center gap-1"
-                    disabled={isProcessingPhoto}
-                  >
-                    {isProcessingPhoto ? (
-                      <>
-                        <Camera className="w-4 h-4 animate-pulse" />
-                        Photo...
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle className="w-4 h-4" />
-                        Terminer
-                      </>
-                    )}
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="destructive"
-                    onClick={() => handlePutOnHold(currentTask.id)}
-                    className="flex items-center gap-1"
-                    disabled={isOnBreak || isProcessingPhoto}
-                  >
-                    <AlertTriangle className="w-4 h-4" />
-                    Mettre en attente
-                  </Button>
-                </div>
+              
+              <div className="flex flex-col sm:flex-row lg:flex-col gap-2 sm:gap-3 lg:gap-2 justify-start sm:justify-end lg:justify-start">
+                <Button 
+                  size="sm" 
+                  onClick={() => handleCompleteTask(currentTask.id)}
+                  className="flex items-center gap-2 w-full sm:w-auto"
+                  disabled={isProcessingPhoto}
+                >
+                  {isProcessingPhoto ? (
+                    <>
+                      <Camera className="w-4 h-4 animate-pulse" />
+                      <span className="text-xs sm:text-sm">Photo...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="w-4 h-4" />
+                      <span className="text-xs sm:text-sm">Terminer</span>
+                    </>
+                  )}
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="destructive"
+                  onClick={() => handlePutOnHold(currentTask.id)}
+                  className="flex items-center gap-2 w-full sm:w-auto"
+                  disabled={isOnBreak || isProcessingPhoto}
+                >
+                  <AlertTriangle className="w-4 h-4" />
+                  <span className="text-xs sm:text-sm">Mettre en attente</span>
+                </Button>
               </div>
             </div>
           </CardContent>
         </Card>
       ) : (
         <Card>
-          <CardContent className="text-center py-8">
-            <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
-            <h3 className="font-semibold mb-1">Aucune tâche en cours</h3>
-            <p className="text-muted-foreground text-sm">Commencez votre prochaine tâche</p>
+          <CardContent className="text-center py-6 sm:py-8 p-4 sm:p-6">
+            <Clock className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mx-auto mb-3 sm:mb-4" />
+            <h3 className="font-semibold mb-1 text-sm sm:text-base">Aucune tâche en cours</h3>
+            <p className="text-muted-foreground text-xs sm:text-sm">Commencez votre prochaine tâche</p>
           </CardContent>
         </Card>
       )}
 
-      {/* Prochaines tâches */}
+      {/* Prochaines tâches - Mobile responsive */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="w-5 h-5" />
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
             Prochaines tâches ({upcomingTasks.length})
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="p-4 sm:p-6 pt-0 space-y-3 sm:space-y-4">
           {upcomingTasks.length === 0 ? (
-            <div className="text-center py-4 text-muted-foreground">
-              Aucune tâche planifiée
+            <div className="text-center py-6 sm:py-8 text-muted-foreground">
+              <Calendar className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 opacity-50" />
+              <p className="text-sm sm:text-base font-medium">Aucune tâche planifiée</p>
             </div>
           ) : (
             upcomingTasks.map((task) => (
-              <div key={task.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-semibold">{task.vehicleBrand} {task.vehicleModel}</h4>
-                    {getStatusBadge(task.status)}
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-1">
-                    {task.licensePlate} • {task.client}
-                  </p>
-                  <p className="text-sm font-medium">{task.taskType}</p>
-                  <p className="text-sm">{task.description}</p>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground mt-2">
-                    <Clock className="w-3 h-3" />
-                    {task.startTime} - {task.endTime}
+              <div key={task.id} className="border rounded-lg p-3 sm:p-4 space-y-3 hover:shadow-md transition-shadow">
+                {/* En-tête de la tâche */}
+                <div className="flex flex-col xs:flex-row xs:items-start xs:justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col xs:flex-row xs:items-center gap-2 mb-2">
+                      <h4 className="font-semibold text-sm sm:text-base line-clamp-1">
+                        {task.vehicleBrand} {task.vehicleModel}
+                      </h4>
+                      {getStatusBadge(task.status)}
+                    </div>
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-1 line-clamp-1">
+                      {task.licensePlate} • {task.client}
+                    </p>
+                    <p className="text-xs sm:text-sm font-medium text-blue-700 mb-1">{task.taskType}</p>
+                    <p className="text-xs sm:text-sm line-clamp-2 mb-2">{task.description}</p>
+                    <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
+                      <Clock className="w-3 h-3 flex-shrink-0" />
+                      <span>{task.startTime} - {task.endTime}</span>
+                    </div>
                   </div>
                 </div>
-                <div className="ml-4 flex gap-2">
+                
+                {/* Boutons d'action */}
+                <div className="flex flex-col xs:flex-row gap-2 pt-2 border-t border-gray-100">
                   <Button 
                     size="sm" 
                     variant="outline"
                     onClick={() => handleStartTask(task.id)}
-                    className="flex items-center gap-1"
+                    className="flex items-center gap-2 w-full xs:w-auto flex-1 xs:flex-initial justify-center"
                     disabled={isOnBreak || isProcessingPhoto}
                   >
                     {isProcessingPhoto ? (
                       <>
                         <Camera className="w-4 h-4 animate-pulse" />
-                        Photo...
+                        <span className="text-xs sm:text-sm">Photo...</span>
                       </>
                     ) : (
                       <>
                         <Play className="w-4 h-4" />
-                        {isOnBreak ? 'En pause' : 'Commencer'}
+                        <span className="text-xs sm:text-sm">
+                          {isOnBreak ? 'En pause' : 'Commencer'}
+                        </span>
                       </>
                     )}
                   </Button>
@@ -682,11 +697,11 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
                     size="sm" 
                     variant="destructive"
                     onClick={() => handlePutOnHold(task.id)}
-                    className="flex items-center gap-1"
+                    className="flex items-center gap-2 w-full xs:w-auto justify-center"
                     disabled={isOnBreak || isProcessingPhoto}
                   >
                     <AlertTriangle className="w-4 h-4" />
-                    Mettre en attente
+                    <span className="text-xs sm:text-sm">Mettre en attente</span>
                   </Button>
                 </div>
               </div>
@@ -695,24 +710,30 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
         </CardContent>
       </Card>
 
-      {/* Tâches terminées */}
+      {/* Tâches terminées - Mobile responsive */}
       {completedTasks.length > 0 && (
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-600" />
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
               Tâches terminées ({completedTasks.length})
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="p-4 sm:p-6 pt-0 space-y-2 sm:space-y-3">
             {completedTasks.map((task) => (
               <div key={task.id} className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                <div className="flex-1">
-                  <h4 className="font-semibold">{task.vehicleBrand} {task.vehicleModel}</h4>
-                  <p className="text-sm text-muted-foreground">{task.taskType} • {task.client}</p>
+                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-semibold text-sm sm:text-base line-clamp-1">
+                    {task.vehicleBrand} {task.vehicleModel}
+                  </h4>
+                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
+                    {task.taskType} • {task.client}
+                  </p>
                 </div>
-                {getStatusBadge(task.status)}
+                <div className="flex-shrink-0">
+                  {getStatusBadge(task.status)}
+                </div>
               </div>
             ))}
           </CardContent>
@@ -729,15 +750,15 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
         }}
       />
 
-      {/* Modal de mise en attente */}
+      {/* Modal de mise en attente - Mobile responsive */}
       <Dialog open={showWaitingModal} onOpenChange={setShowWaitingModal}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-orange-500" />
+        <DialogContent className="sm:max-w-[425px] w-[95vw] max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="text-left">
+            <DialogTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
               Mettre la tâche en attente
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-sm">
               Sélectionnez la raison pour laquelle cette tâche doit être mise en attente.
             </DialogDescription>
           </DialogHeader>
@@ -745,7 +766,7 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
             <div className="space-y-2">
               <label className="text-sm font-medium">Raison de l'attente</label>
               <Select value={waitingReason} onValueChange={setWaitingReason}>
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Choisir une raison" />
                 </SelectTrigger>
                 <SelectContent>
@@ -756,7 +777,7 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
               </Select>
             </div>
           </div>
-          <div className="flex gap-2 justify-end">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 sm:justify-end">
             <Button
               variant="outline"
               onClick={() => {
@@ -764,13 +785,14 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
                 setWaitingReason('');
                 setSelectedTaskId(null);
               }}
+              className="w-full sm:w-auto order-2 sm:order-1"
             >
               Annuler
             </Button>
             <Button
               onClick={handleConfirmWaiting}
               disabled={!waitingReason}
-              className="bg-orange-500 hover:bg-orange-600"
+              className="bg-orange-500 hover:bg-orange-600 w-full sm:w-auto order-1 sm:order-2"
             >
               Valider la mise en attente
             </Button>
