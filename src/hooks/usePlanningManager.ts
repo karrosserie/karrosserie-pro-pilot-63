@@ -45,6 +45,7 @@ export interface Employe {
 export interface PlanningTache {
   id: string;
   vehiculeId: number;
+  vehicle_id?: string; // UUID du véhicule pour les photos et la base de données
   vehicule: string;
   modele: string;
   marque?: string; // Marque de la voiture

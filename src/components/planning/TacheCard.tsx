@@ -34,6 +34,8 @@ export const TacheCard: React.FC<TacheCardProps> = ({
   const [prisePhotosEnCours, setPrisePhotosEnCours] = useState(false);
   const [photosTerminees, setPhotosTerminees] = useState(false);
   const [prisePhotosFinEnCours, setPrisePhotosFinEnCours] = useState(false);
+  const [photosDebutPrises, setPhotosDebutPrises] = useState(0);
+  const [photosFinPrises, setPhotosFinPrises] = useState(0);
   const { toast } = useToast();
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -106,20 +108,48 @@ export const TacheCard: React.FC<TacheCardProps> = ({
         canvas.toBlob(async (blob) => {
           if (blob) {
             try {
+              console.log('🔍 TacheCard - Taking photo:', {
+                taskId: tache.id,
+                employeeId,
+                companyId,
+                vehicleId: tache.vehicle_id,
+                photoType,
+                taskType: tache.tache
+              });
+              
+              if (!tache.vehicle_id) {
+                console.error('❌ TacheCard - vehicle_id is missing!', tache);
+                toast({
+                  title: "Erreur",
+                  description: "ID du véhicule manquant",
+                  variant: "destructive",
+                });
+                return;
+              }
+
               const result = await uploadTaskPhoto(
                 tache.id,
                 employeeId,
                 companyId,
-                tache.vehiculeId?.toString() || '',
+                tache.vehicle_id, // CORRECTION: Utiliser vehicle_id (UUID) au lieu de vehiculeId (number)
                 photoType,
                 blob
               );
               
               if (result.success) {
+                // Incrémenter le compteur de photos
+                if (photoType === 'start') {
+                  setPhotosDebutPrises(prev => prev + 1);
+                } else {
+                  setPhotosFinPrises(prev => prev + 1);
+                }
+                
                 toast({
                   title: "Photo sauvegardée",
                   description: `Photo ${photoType === 'start' ? 'de début' : 'de fin'} sauvegardée avec succès`,
                 });
+                
+                console.log('✅ TakePhoto success:', result);
               } else {
                 toast({
                   title: "Erreur",
@@ -168,6 +198,15 @@ export const TacheCard: React.FC<TacheCardProps> = ({
   };
 
   const terminerPhotos = () => {
+    if (photosDebutPrises === 0) {
+      toast({
+        title: "Photos obligatoires",
+        description: "Vous devez prendre au moins une photo avant de commencer la tâche",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     stopCamera();
     setPrisePhotosEnCours(false);
     setPhotosTerminees(true);
@@ -177,7 +216,7 @@ export const TacheCard: React.FC<TacheCardProps> = ({
     }
     toast({
       title: "Photos terminées",
-      description: "Vous pouvez maintenant commencer la tâche",
+      description: `${photosDebutPrises} photo(s) sauvegardée(s). Vous pouvez maintenant commencer la tâche`,
     });
   };
 
@@ -202,12 +241,21 @@ export const TacheCard: React.FC<TacheCardProps> = ({
   };
 
   const terminerPhotosFinales = () => {
+    if (photosFinPrises === 0) {
+      toast({
+        title: "Photos obligatoires",
+        description: "Vous devez prendre au moins une photo du travail terminé pour valider la tâche",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     stopCamera();
     setPrisePhotosFinEnCours(false);
     onTerminer(tache.id);
     toast({
       title: "Tâche terminée",
-      description: "Photos sauvegardées, tâche validée avec succès",
+      description: `${photosFinPrises} photo(s) sauvegardée(s), tâche validée avec succès`,
     });
   };
 
@@ -266,9 +314,17 @@ export const TacheCard: React.FC<TacheCardProps> = ({
               
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
                 <h4 className="font-semibold text-sm sm:text-base">{tache.tache}</h4>
-                <Badge variant={getStatusVariant(tache.status)} className="self-start text-xs">
-                  {getStatusLabel(tache.status)}
-                </Badge>
+                <div className="flex gap-2">
+                  <Badge variant={getStatusVariant(tache.status)} className="self-start text-xs">
+                    {getStatusLabel(tache.status)}
+                  </Badge>
+                  {requiresPhotos(tache.tache) && (
+                    <Badge variant="outline" className="self-start text-xs bg-blue-50 text-blue-700 border-blue-200">
+                      <Camera className="w-3 h-3 mr-1" />
+                      Photos requises
+                    </Badge>
+                  )}
+                </div>
               </div>
               <div className="space-y-2 text-sm mb-3">
                 <div className="flex justify-between">
@@ -325,12 +381,17 @@ export const TacheCard: React.FC<TacheCardProps> = ({
 
           {/* Interface de prise de photos */}
           {prisePhotosEnCours && (
-            <div className="mt-4 p-4 border-t border-border">
+            <div className="mt-4 p-4 border-t border-border bg-blue-50/50">
               <div className="text-center mb-4">
-                <h3 className="text-lg font-semibold mb-2">Prise de photos</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="text-lg font-semibold mb-2">Prise de photos - Début de tâche</h3>
+                <p className="text-sm text-muted-foreground mb-2">
                   Prenez des photos du véhicule avant de commencer la tâche
                 </p>
+                {photosDebutPrises > 0 && (
+                  <Badge variant="secondary" className="bg-green-100 text-green-800">
+                    {photosDebutPrises} photo(s) prise(s)
+                  </Badge>
+                )}
               </div>
               
               <div className="flex flex-col items-center gap-4">
@@ -348,15 +409,16 @@ export const TacheCard: React.FC<TacheCardProps> = ({
                     className="bg-primary hover:bg-primary/90"
                   >
                     <Camera className="w-4 h-4 mr-1" />
-                    Prendre photo
+                    Prendre photo ({photosDebutPrises})
                   </Button>
                   
                   <Button
                     onClick={terminerPhotos}
                     size="sm"
-                    variant="outline"
+                    variant={photosDebutPrises > 0 ? "default" : "outline"}
+                    disabled={photosDebutPrises === 0}
                   >
-                    Terminer photos
+                    {photosDebutPrises > 0 ? '✓ Terminer photos' : 'Au moins 1 photo requise'}
                   </Button>
                 </div>
               </div>
@@ -365,12 +427,17 @@ export const TacheCard: React.FC<TacheCardProps> = ({
 
           {/* Interface de prise de photos de fin */}
           {prisePhotosFinEnCours && (
-            <div className="mt-4 p-4 border-t border-border">
+            <div className="mt-4 p-4 border-t border-border bg-green-50/50">
               <div className="text-center mb-4">
                 <h3 className="text-lg font-semibold mb-2">Photos du travail terminé</h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground mb-2">
                   Prenez des photos du travail effectué pour valider la tâche
                 </p>
+                {photosFinPrises > 0 && (
+                  <Badge variant="secondary" className="bg-green-100 text-green-800">
+                    {photosFinPrises} photo(s) prise(s)
+                  </Badge>
+                )}
               </div>
               
               <div className="flex flex-col items-center gap-4">
@@ -388,15 +455,16 @@ export const TacheCard: React.FC<TacheCardProps> = ({
                     className="bg-primary hover:bg-primary/90"
                   >
                     <Camera className="w-4 h-4 mr-1" />
-                    Prendre photo
+                    Prendre photo ({photosFinPrises})
                   </Button>
                   
                   <Button
                     onClick={terminerPhotosFinales}
                     size="sm"
-                    variant="outline"
+                    variant={photosFinPrises > 0 ? "default" : "outline"}
+                    disabled={photosFinPrises === 0}
                   >
-                    Valider la tâche
+                    {photosFinPrises > 0 ? '✅ Valider la tâche' : 'Au moins 1 photo requise'}
                   </Button>
                 </div>
               </div>
