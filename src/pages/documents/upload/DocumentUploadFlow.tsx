@@ -147,25 +147,33 @@ export default function DocumentUploadFlow() {
         const clientUpdates: { driver_license_front_url?: string; driver_license_back_url?: string } = {};
 
         if (documents.driver_license_front) {
+          const frontFilePath = `${tokenData.client_id}/driver-license/front_${Date.now()}.jpg`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('documents')
+            .upload(frontFilePath, documents.driver_license_front);
+          
+          if (uploadError) throw uploadError;
+          
           const { data: frontUrl } = supabase.storage
             .from('documents')
-            .getPublicUrl(`${tokenData.client_id}/driver-license/front_${Date.now()}.jpg`);
-          
-          await supabase.storage
-            .from('documents')
-            .upload(`${tokenData.client_id}/driver-license/front_${Date.now()}.jpg`, documents.driver_license_front);
+            .getPublicUrl(frontFilePath);
           
           clientUpdates.driver_license_front_url = frontUrl.publicUrl;
         }
 
         if (documents.driver_license_back) {
+          const backFilePath = `${tokenData.client_id}/driver-license/back_${Date.now()}.jpg`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('documents')
+            .upload(backFilePath, documents.driver_license_back);
+          
+          if (uploadError) throw uploadError;
+          
           const { data: backUrl } = supabase.storage
             .from('documents')
-            .getPublicUrl(`${tokenData.client_id}/driver-license/back_${Date.now()}.jpg`);
-          
-          await supabase.storage
-            .from('documents')
-            .upload(`${tokenData.client_id}/driver-license/back_${Date.now()}.jpg`, documents.driver_license_back);
+            .getPublicUrl(backFilePath);
           
           clientUpdates.driver_license_back_url = backUrl.publicUrl;
         }
@@ -185,25 +193,33 @@ export default function DocumentUploadFlow() {
         const vehicleUpdates: { registration_document_front_url?: string; registration_document_back_url?: string } = {};
 
         if (documents.registration_front) {
+          const frontFilePath = `${tokenData.vehicule_id}/registration/front_${Date.now()}.jpg`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('documents')
+            .upload(frontFilePath, documents.registration_front);
+          
+          if (uploadError) throw uploadError;
+          
           const { data: frontUrl } = supabase.storage
             .from('documents')
-            .getPublicUrl(`${tokenData.vehicule_id}/registration/front_${Date.now()}.jpg`);
-          
-          await supabase.storage
-            .from('documents')
-            .upload(`${tokenData.vehicule_id}/registration/front_${Date.now()}.jpg`, documents.registration_front);
+            .getPublicUrl(frontFilePath);
           
           vehicleUpdates.registration_document_front_url = frontUrl.publicUrl;
         }
 
         if (documents.registration_back) {
+          const backFilePath = `${tokenData.vehicule_id}/registration/back_${Date.now()}.jpg`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('documents')
+            .upload(backFilePath, documents.registration_back);
+          
+          if (uploadError) throw uploadError;
+          
           const { data: backUrl } = supabase.storage
             .from('documents')
-            .getPublicUrl(`${tokenData.vehicule_id}/registration/back_${Date.now()}.jpg`);
-          
-          await supabase.storage
-            .from('documents')
-            .upload(`${tokenData.vehicule_id}/registration/back_${Date.now()}.jpg`, documents.registration_back);
+            .getPublicUrl(backFilePath);
           
           vehicleUpdates.registration_document_back_url = backUrl.publicUrl;
         }
@@ -237,10 +253,9 @@ export default function DocumentUploadFlow() {
         // On ne fait pas échouer le processus si l'email ne peut pas être envoyé
       }
       
-      setShowWorkflow(false);
-      
       // Mettre à jour l'état pour afficher directement l'écran de confirmation
       setMissingDocuments([]);
+      // Ne pas retourner au workflow, laisser l'écran de confirmation s'afficher
       
     } catch (error) {
       console.error("Erreur lors de la sauvegarde des documents:", error);
