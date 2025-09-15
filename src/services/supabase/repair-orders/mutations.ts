@@ -21,6 +21,25 @@ export const createRepairOrder = async (order: NewRepairOrder, companyId: string
     console.error('Error creating repair order:', error);
     throw new Error(error.message);
   }
+
+  // Déclencher le monitoring des véhicules si créé avec un statut "En attente"
+  if (data && order.status) {
+    const isWaitingStatus = order.status === 'En attente' || order.status.toLowerCase().includes('attente');
+    if (isWaitingStatus) {
+      try {
+        await supabase.functions.invoke('vehicle-status-monitor', {
+          body: {
+            repairOrderId: data.id,
+            newStatus: order.status,
+            oldStatus: null
+          }
+        });
+      } catch (monitorError) {
+        console.error('Error calling vehicle status monitor on create:', monitorError);
+        // Ne pas faire échouer la création si le monitoring échoue
+      }
+    }
+  }
   
   return data;
 };
