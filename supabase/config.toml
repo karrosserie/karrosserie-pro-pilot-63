@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.insert-emergency-with-priority]
 verify_jwt = false
+
+[functions.vehicle-status-monitor]
+verify_jwt = false

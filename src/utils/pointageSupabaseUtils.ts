@@ -208,17 +208,18 @@ export const clockIn = async (employeId: string): Promise<{success: boolean, mes
         minute: '2-digit' 
       });
       
-      // Créer une alerte de retard
-      await supabase
-        .from('employee_alerts')
-        .insert({
-          company_id: companyId,
-          employee_id: employeId,
-          alert_type: 'retard_pointage',
-          title: `Retard de pointage`,
-          message: `L'employé ${employeeName} a pointé à ${heurePointage}. N'oubliez pas de voir avec lui pourquoi il a du retard.`,
-          clock_in_time: now
-        });
+        // Créer une alerte de retard
+        await supabase
+          .from('system_alerts')
+          .insert({
+            company_id: companyId,
+            entity_type: 'employee',
+            employee_id: employeId,
+            alert_type: 'retard_pointage',
+            title: `Retard de pointage`,
+            message: `L'employé ${employeeName} a pointé à ${heurePointage}. N'oubliez pas de voir avec lui pourquoi il a du retard.`,
+            clock_in_time: now
+          });
       
       console.log(`⚠️ Alerte de retard créée pour ${employeeName} - pointage à ${heurePointage}`);
     }

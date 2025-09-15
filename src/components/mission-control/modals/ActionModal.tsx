@@ -457,6 +457,128 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
           </div>
         );
 
+      case 'resolve_vehicle_alert':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2 flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-red-500" />
+                Débloquer le véhicule
+              </h4>
+              <div className="space-y-2 text-sm">
+                <p className="text-muted-foreground">
+                  Vous vous apprêtez à débloquer ce véhicule et résoudre l'alerte.
+                </p>
+                <p className="font-medium">
+                  Véhicule: {modalData?.vehicleInfo || 'Non spécifié'}
+                </p>
+                {modalData?.reason && (
+                  <p className="text-muted-foreground">
+                    Raison de l'attente: {modalData.reason}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button 
+                className="flex-1 bg-primary hover:bg-primary/90 text-xs sm:text-sm h-8 sm:h-10"
+                onClick={async () => {
+                  setIsLoading('resolve');
+                  if (modalData?.resolveAlert && modalData?.alertId) {
+                    const success = await modalData.resolveAlert(modalData.alertId);
+                    if (success) {
+                      toast({
+                        title: "Véhicule débloqué",
+                        description: "L'alerte de véhicule en attente a été résolue avec succès.",
+                      });
+                    } else {
+                      toast({
+                        title: "Erreur",
+                        description: "Impossible de débloquer le véhicule. Veuillez réessayer.",
+                        variant: "destructive"
+                      });
+                    }
+                  }
+                  setIsLoading(null);
+                  onClose();
+                }}
+                disabled={isLoading === 'resolve'}
+              >
+                {isLoading === 'resolve' ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Déblocage...</span>
+                  </div>
+                ) : (
+                  <>
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    Débloquer le véhicule
+                  </>
+                )}
+              </Button>
+              <Button 
+                variant="outline" 
+                className="flex-1 text-xs sm:text-sm h-8 sm:h-10"
+                onClick={onClose}
+                disabled={isLoading !== null}
+              >
+                <X className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                Annuler
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'vehicle_details':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2 flex items-center gap-2">
+                <Package className="h-4 w-4 text-blue-500" />
+                Détails du véhicule
+              </h4>
+              <div className="space-y-2 text-sm">
+                <p className="text-muted-foreground">
+                  Informations détaillées sur le véhicule en attente.
+                </p>
+                <p className="font-medium">
+                  Véhicule: {modalData?.vehicleInfo || 'Non spécifié'}
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <Button 
+                variant="outline"
+                className="text-xs sm:text-sm h-8 sm:h-10"
+                onClick={() => {
+                  toast({
+                    title: "Planning ouvert",
+                    description: "Redirection vers le planning véhicule...",
+                  });
+                  onClose();
+                }}
+              >
+                <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                Voir planning
+              </Button>
+              <Button 
+                variant="outline"
+                className="text-xs sm:text-sm h-8 sm:h-10"
+                onClick={() => {
+                  toast({
+                    title: "Historique affiché",
+                    description: "Consultation de l'historique du véhicule.",
+                  });
+                  onClose();
+                }}
+              >
+                <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                Historique
+              </Button>
+            </div>
+          </div>
+        );
+
       case 'contact_employee':
         return (
           <div className="space-y-4">

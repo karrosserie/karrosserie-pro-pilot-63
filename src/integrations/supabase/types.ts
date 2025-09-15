@@ -756,45 +756,6 @@ export type Database = {
         }
         Relationships: []
       }
-      employee_alerts: {
-        Row: {
-          alert_type: string
-          clock_in_time: string
-          company_id: string
-          created_at: string
-          employee_id: string
-          id: string
-          message: string
-          resolved: boolean
-          resolved_at: string | null
-          title: string
-        }
-        Insert: {
-          alert_type?: string
-          clock_in_time: string
-          company_id: string
-          created_at?: string
-          employee_id: string
-          id?: string
-          message: string
-          resolved?: boolean
-          resolved_at?: string | null
-          title: string
-        }
-        Update: {
-          alert_type?: string
-          clock_in_time?: string
-          company_id?: string
-          created_at?: string
-          employee_id?: string
-          id?: string
-          message?: string
-          resolved?: boolean
-          resolved_at?: string | null
-          title?: string
-        }
-        Relationships: []
-      }
       employee_breaks: {
         Row: {
           break_end_time: string | null
@@ -2348,6 +2309,57 @@ export type Database = {
           price?: number
           tokens_included?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      system_alerts: {
+        Row: {
+          alert_type: string
+          clock_in_time: string | null
+          company_id: string
+          created_at: string
+          employee_id: string | null
+          entity_type: string
+          id: string
+          message: string
+          reason: string | null
+          repair_order_id: string | null
+          resolved: boolean
+          resolved_at: string | null
+          title: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          alert_type?: string
+          clock_in_time?: string | null
+          company_id: string
+          created_at?: string
+          employee_id?: string | null
+          entity_type?: string
+          id?: string
+          message: string
+          reason?: string | null
+          repair_order_id?: string | null
+          resolved?: boolean
+          resolved_at?: string | null
+          title: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          alert_type?: string
+          clock_in_time?: string | null
+          company_id?: string
+          created_at?: string
+          employee_id?: string | null
+          entity_type?: string
+          id?: string
+          message?: string
+          reason?: string | null
+          repair_order_id?: string | null
+          resolved?: boolean
+          resolved_at?: string | null
+          title?: string
+          vehicle_id?: string | null
         }
         Relationships: []
       }
