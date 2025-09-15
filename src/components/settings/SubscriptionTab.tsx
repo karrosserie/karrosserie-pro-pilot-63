@@ -236,66 +236,6 @@ const SubscriptionTab: React.FC = () => {
         </Dialog>
       </div>
 
-      {/* Available Plans */}
-      {(!hasActiveSubscription || (hasActiveSubscription && (companySubscription as any).subscription_plans?.price === 0)) && (
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {hasActiveSubscription && (companySubscription as any).subscription_plans?.price === 0 
-                ? 'Passez à un plan payant' 
-                : 'Plans d\'abonnement'
-              }
-            </CardTitle>
-            <CardDescription>
-              {hasActiveSubscription && (companySubscription as any).subscription_plans?.price === 0
-                ? 'Continuez à utiliser toutes les fonctionnalités après votre essai gratuit.'
-                : 'Choisissez le plan qui correspond à vos besoins.'
-              }
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
-              {subscriptionPlans?.filter(plan => plan.price > 0).map((plan) => (
-                <div key={plan.id} className="border rounded-lg p-6 space-y-4">
-                  <div>
-                    <h3 className="font-semibold text-lg">{plan.name}</h3>
-                    <p className="text-sm text-muted-foreground">{plan.description}</p>
-                  </div>
-                  
-                  <div className="text-center">
-                    <span className="text-3xl font-bold">{plan.price}€</span>
-                    <span className="text-muted-foreground">
-                      / {plan.billing_period === 'monthly' ? 'mois' : 'an'}
-                    </span>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">{plan.tokens_included} jetons inclus</p>
-                    {Array.isArray(plan.features) && plan.features.map((feature, index) => (
-                      <div key={index} className="flex items-center text-sm">
-                        <CheckIcon className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
-                        {String(feature)}
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <Button 
-                    className="w-full"
-                    onClick={() => createSubscription({ planId: plan.id, tokensIncluded: plan.tokens_included })}
-                    disabled={true}
-                  >
-                    <CreditCardIcon className="w-4 h-4 mr-2" />
-                    {hasActiveSubscription && (companySubscription as any).subscription_plans?.price === 0
-                      ? 'Passer à ce plan'
-                      : 'Choisir ce plan'
-                    }
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Token Packages (always visible for easy access) */}
       <Card>
