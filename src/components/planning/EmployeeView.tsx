@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Play, Pause, CheckCircle, Calendar, User, BarChart, Coffee, LogOut, Camera } from 'lucide-react';
+import { Clock, Play, Pause, CheckCircle, Calendar, User, BarChart, Coffee, LogOut, Camera, AlertTriangle } from 'lucide-react';
 import { useEmployeeSchedule } from '@/hooks/use-employee-schedule';
 import { useCompany } from '@/hooks/use-company';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,6 +14,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { clockIn, startBreak, endBreak } from '@/utils/pointageSupabaseUtils';
 import { takeTaskPhoto } from '@/utils/cameraUtils';
 import { useToast } from '@/hooks/use-toast';
@@ -31,6 +45,9 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   const [isOnBreak, setIsOnBreak] = useState(false);
   const [isClockedOut, setIsClockedOut] = useState(false);
   const [isProcessingPhoto, setIsProcessingPhoto] = useState(false);
+  const [showWaitingModal, setShowWaitingModal] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [waitingReason, setWaitingReason] = useState<string>('');
 
   // Utiliser l'ID de l'utilisateur connecté ou celui passé en prop
   const currentUserId = employeeId || user?.id;
@@ -394,6 +411,53 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
     }
   };
 
+  const handlePutOnHold = (taskId: string) => {
+    setSelectedTaskId(taskId);
+    setShowWaitingModal(true);
+  };
+
+  const handleConfirmWaiting = async () => {
+    if (!selectedTaskId || !waitingReason) return;
+    
+    try {
+      const { error } = await supabase
+        .from('employee_schedule')
+        .update({ 
+          status: 'En attente',
+          waiting_reason: waitingReason 
+        })
+        .eq('id', selectedTaskId);
+
+      if (error) {
+        console.error('Erreur lors de la mise en attente:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de mettre la tâche en attente",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Tâche mise en attente",
+        description: `Tâche mise en attente : ${waitingReason}`,
+      });
+
+      // Réinitialiser les états et rafraîchir
+      setShowWaitingModal(false);
+      setSelectedTaskId(null);
+      setWaitingReason('');
+      refetch();
+    } catch (error) {
+      console.error('Erreur:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getStatusBadge = (status: 'En attente' | 'En cours' | 'Terminé') => {
     switch (status) {
       case 'En cours':
@@ -584,7 +648,7 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
                     {task.startTime} - {task.endTime}
                   </div>
                 </div>
-                <div className="ml-4">
+                <div className="ml-4 flex gap-2">
                   <Button 
                     size="sm" 
                     variant="outline"
@@ -603,6 +667,16 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
                         {isOnBreak ? 'En pause' : 'Commencer'}
                       </>
                     )}
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="destructive"
+                    onClick={() => handlePutOnHold(task.id)}
+                    className="flex items-center gap-1"
+                    disabled={isOnBreak || isProcessingPhoto}
+                  >
+                    <AlertTriangle className="w-4 h-4" />
+                    Mettre en attente
                   </Button>
                 </div>
               </div>
@@ -644,6 +718,55 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
           nom: user?.email?.split('@')[0] || 'Employé'
         }}
       />
+
+      {/* Modal de mise en attente */}
+      <Dialog open={showWaitingModal} onOpenChange={setShowWaitingModal}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-orange-500" />
+              Mettre la tâche en attente
+            </DialogTitle>
+            <DialogDescription>
+              Sélectionnez la raison pour laquelle cette tâche doit être mise en attente.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Raison de l'attente</label>
+              <Select value={waitingReason} onValueChange={setWaitingReason}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choisir une raison" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="manque de piece">Manque de pièce</SelectItem>
+                  <SelectItem value="probleme client">Problème client</SelectItem>
+                  <SelectItem value="probleme assurance">Problème assurance</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex gap-2 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowWaitingModal(false);
+                setWaitingReason('');
+                setSelectedTaskId(null);
+              }}
+            >
+              Annuler
+            </Button>
+            <Button
+              onClick={handleConfirmWaiting}
+              disabled={!waitingReason}
+              className="bg-orange-500 hover:bg-orange-600"
+            >
+              Valider la mise en attente
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
