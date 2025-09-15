@@ -1531,6 +1531,7 @@ export type Database = {
       invoices: {
         Row: {
           amount: number
+          archived: boolean
           claim_number: string | null
           client_id: string | null
           company_id: string | null
@@ -1558,6 +1559,7 @@ export type Database = {
         }
         Insert: {
           amount?: number
+          archived?: boolean
           claim_number?: string | null
           client_id?: string | null
           company_id?: string | null
@@ -1585,6 +1587,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          archived?: boolean
           claim_number?: string | null
           client_id?: string | null
           company_id?: string | null

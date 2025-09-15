@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Invoice } from './types';
 
 export const invoiceQueries = {
-  getAll: async (): Promise<Invoice[]> => {
+  getAll: async (showArchived: boolean = false): Promise<Invoice[]> => {
     console.log('=== DEBUT RÉCUPÉRATION FACTURES ===');
     console.log('Fetching invoices...');
     
@@ -48,6 +48,9 @@ export const invoiceQueries = {
       }
     }
     
+    // Filtrer par statut d'archivage
+    query = query.eq('archived', showArchived);
+    
     const { data: invoicesWithJoins, error: joinError } = await query.order('created_at', { ascending: false });
 
     // If joins fail, fall back to basic query
@@ -64,6 +67,9 @@ export const invoiceQueries = {
           console.error('Error parsing impersonation data for basic invoices:', error);
         }
       }
+      
+      // Filtrer par statut d'archivage
+      basicQuery = basicQuery.eq('archived', showArchived);
       
       const { data: basicInvoices, error: basicError } = await basicQuery.order('created_at', { ascending: false });
 

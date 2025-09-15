@@ -47,6 +47,7 @@ export interface Invoice {
     };
   };
   company_id: string;
+  archived: boolean;
 }
 
 export type NewInvoice = Omit<Invoice, 'id' | 'created_at' | 'company_id'>;

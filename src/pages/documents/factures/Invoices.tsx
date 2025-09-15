@@ -47,6 +47,7 @@ import { useSendRelance } from '@/hooks/use-send-relance';
 const Invoices = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
+  const [showArchived, setShowArchived] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
@@ -57,7 +58,7 @@ const Invoices = () => {
   const { toast } = useToast();
   const { confirm } = useConfirmation();
   
-  const { invoices, isLoading, error, deleteInvoice, createInvoice } = useInvoices();
+  const { invoices, isLoading, error, deleteInvoice, createInvoice, archiveInvoice, restoreInvoice } = useInvoices(showArchived);
   const { credits } = useCredits();
   const { receipts } = useReceiptsData();
   const { companyData } = useCompany();
@@ -70,11 +71,14 @@ const Invoices = () => {
   console.log('Premier invoice (si existant):', invoices?.[0]);
   console.log('Premier invoice.clients:', invoices?.[0]?.clients);
   
-  const filteredInvoices = sortedInvoices?.filter(invoice => 
-    invoice.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (invoice.clients && `${invoice.clients.first_name} ${invoice.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (invoice.vehicles && `${invoice.vehicles.car_brands?.name || 'Marque inconnue'} ${invoice.vehicles.car_models?.name || 'Modèle inconnu'} - ${invoice.vehicles.license_plate}`.toLowerCase().includes(searchTerm.toLowerCase()))
-  ) || [];
+  const filteredInvoices = sortedInvoices?.filter(invoice => {
+    const matchesSearch = invoice.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (invoice.clients && `${invoice.clients.first_name} ${invoice.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (invoice.vehicles && `${invoice.vehicles.car_brands?.name || 'Marque inconnue'} ${invoice.vehicles.car_models?.name || 'Modèle inconnu'} - ${invoice.vehicles.license_plate}`.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    const matchesArchiveStatus = showArchived ? invoice.archived : !invoice.archived;
+    return matchesSearch && matchesArchiveStatus;
+  }) || [];
   
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -147,15 +151,34 @@ const Invoices = () => {
 
   const handleDelete = async (invoice: Invoice) => {
     const confirmed = await confirm({
-      title: 'Supprimer la facture',
-      description: `Êtes-vous sûr de vouloir supprimer la facture ${invoice.reference} ? Cette action est irréversible.`,
-      confirmText: 'Supprimer',
+      title: showArchived ? 'Supprimer définitivement la facture' : 'Archiver la facture',
+      description: showArchived 
+        ? `Êtes-vous sûr de vouloir supprimer définitivement la facture ${invoice.reference} ? Cette action est irréversible.`
+        : `Êtes-vous sûr de vouloir archiver la facture ${invoice.reference} ? Vous pourrez la restaurer plus tard.`,
+      confirmText: showArchived ? 'Supprimer définitivement' : 'Archiver',
       cancelText: 'Annuler',
       variant: 'destructive'
     });
 
     if (confirmed) {
-      await deleteInvoice.mutateAsync(invoice.id);
+      if (showArchived) {
+        await deleteInvoice.mutateAsync(invoice.id);
+      } else {
+        await archiveInvoice.mutateAsync(invoice.id);
+      }
+    }
+  };
+
+  const handleRestore = async (invoice: Invoice) => {
+    const confirmed = await confirm({
+      title: 'Restaurer la facture',
+      description: `Êtes-vous sûr de vouloir restaurer la facture ${invoice.reference} ?`,
+      confirmText: 'Restaurer',
+      cancelText: 'Annuler'
+    });
+
+    if (confirmed) {
+      await restoreInvoice.mutateAsync(invoice.id);
     }
   };
 
@@ -303,7 +326,30 @@ const Invoices = () => {
       </div>
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-      <div className="flex-1" />
+        <div className="flex items-center space-x-2 mb-4 md:mb-0">
+          <Button
+            variant={!showArchived ? "default" : "outline"}
+            onClick={() => setShowArchived(false)}
+            className={
+              !showArchived 
+                ? "bg-karrosserie-orange hover:bg-karrosserie-orange/90" 
+                : ""
+            }
+          >
+            Factures actives
+          </Button>
+          <Button
+            variant={showArchived ? "default" : "outline"}
+            onClick={() => setShowArchived(true)}
+            className={
+              showArchived 
+                ? "bg-karrosserie-orange hover:bg-karrosserie-orange/90" 
+                : ""
+            }
+          >
+            Factures archivées
+          </Button>
+        </div>
         
         <div className="flex items-center w-full md:w-auto space-x-2">
           <div className="relative flex-1 md:w-60">
@@ -320,13 +366,15 @@ const Invoices = () => {
             <Filter className="h-4 w-4" />
           </Button>
           
-          <Button 
-            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
-            onClick={handleCreateInvoice}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Nouvelle facture
-          </Button>
+          {!showArchived && (
+            <Button 
+              className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+              onClick={handleCreateInvoice}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Nouvelle facture
+            </Button>
+          )}
         </div>
       </div>
       
@@ -336,19 +384,22 @@ const Invoices = () => {
             filteredInvoices.map((invoice) => {
               const invoiceCredits = getInvoiceCredits(invoice.id);
               return (
-                <InvoiceMobileCard
-                  key={invoice.id}
-                  invoice={invoice}
-                  onViewInvoice={handleViewInvoice}
-                  onEditInvoice={handleEditInvoice}
-                  onRelance={handleRelance}
-                  onDownload={handleDownload}
-                  onPrint={handlePrint}
-                  onSendEmail={handleSendEmail}
-                  onAddPayment={handleAddPayment}
-                  onAddCredit={handleAddCredit}
-                  invoiceCredits={invoiceCredits}
-                />
+                 <InvoiceMobileCard
+                   key={invoice.id}
+                   invoice={invoice}
+                   onViewInvoice={handleViewInvoice}
+                   onEditInvoice={handleEditInvoice}
+                   onRelance={handleRelance}
+                   onDownload={handleDownload}
+                   onPrint={handlePrint}
+                   onSendEmail={handleSendEmail}
+                   onAddPayment={handleAddPayment}
+                   onAddCredit={handleAddCredit}
+                   onDeleteInvoice={handleDelete}
+                   onRestoreInvoice={showArchived ? handleRestore : undefined}
+                   invoiceCredits={invoiceCredits}
+                   showArchived={showArchived}
+                 />
               );
             })
           ) : (
@@ -451,10 +502,20 @@ const Invoices = () => {
                           <FileX className="h-4 w-4 mr-1" />
                           Créer un avoir
                         </Button>
-                        <Button variant="send" size="sm" onClick={() => handleRelance(invoice)}>
-                          <Send className="h-4 w-4 mr-1" />
-                          Relance
-                        </Button>
+                         <Button variant="send" size="sm" onClick={() => handleRelance(invoice)}>
+                           <Send className="h-4 w-4 mr-1" />
+                           Relance
+                         </Button>
+                         {showArchived ? (
+                           <Button variant="edit" size="sm" onClick={() => handleRestore(invoice)}>
+                             <FileText className="h-4 w-4 mr-1" />
+                             Restaurer
+                           </Button>
+                         ) : null}
+                         <Button variant="delete" size="sm" onClick={() => handleDelete(invoice)}>
+                           <Trash className="h-4 w-4 mr-1" />
+                           {showArchived ? 'Supprimer' : 'Archiver'}
+                         </Button>
                       </div>
                     </TableCell>
                   </TableRow>

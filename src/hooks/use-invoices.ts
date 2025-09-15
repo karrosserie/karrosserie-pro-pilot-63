@@ -5,7 +5,7 @@ import { invoicesService } from '@/services/supabase/invoices';
 import { useImpersonation } from '@/hooks/use-impersonation';
 import { useEffect } from 'react';
 
-export function useInvoices() {
+export function useInvoices(showArchived: boolean = false) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { isImpersonating, impersonationData } = useImpersonation();
@@ -20,9 +20,9 @@ export function useInvoices() {
     isLoading,
     error
   } = useQuery({
-    queryKey: ['invoices', impersonationData?.company_id || 'normal'],
+    queryKey: ['invoices', impersonationData?.company_id || 'normal', showArchived],
     queryFn: async () => {
-      return await invoicesService.getAll();
+      return await invoicesService.getAll(showArchived);
     }
   });
 
@@ -87,12 +87,54 @@ export function useInvoices() {
     }
   });
 
+  const archiveInvoice = useMutation({
+    mutationFn: async (id: string) => {
+      return await invoicesService.archive(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      toast({
+        title: "Facture archivée",
+        description: "La facture a été archivée avec succès."
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erreur",
+        description: `Impossible d'archiver la facture: ${error.message}`,
+        variant: "destructive"
+      });
+    }
+  });
+
+  const restoreInvoice = useMutation({
+    mutationFn: async (id: string) => {
+      return await invoicesService.restore(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      toast({
+        title: "Facture restaurée",
+        description: "La facture a été restaurée avec succès."
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erreur",
+        description: `Impossible de restaurer la facture: ${error.message}`,
+        variant: "destructive"
+      });
+    }
+  });
+
   return {
     invoices,
     isLoading,
     error,
     createInvoice,
     updateInvoice,
-    deleteInvoice
+    deleteInvoice,
+    archiveInvoice,
+    restoreInvoice
   };
 }

@@ -98,5 +98,33 @@ export const invoiceMutations = {
     }
     
     return true;
+  },
+
+  archive: async (id: string) => {
+    const { error } = await supabase
+      .from('invoices')
+      .update({ archived: true })
+      .eq('id', id);
+
+    if (error) {
+      console.error(`Error archiving invoice with id ${id}:`, error);
+      throw new Error(error.message);
+    }
+
+    return true;
+  },
+
+  restore: async (id: string) => {
+    const { error } = await supabase
+      .from('invoices')
+      .update({ archived: false })
+      .eq('id', id);
+
+    if (error) {
+      console.error(`Error restoring invoice with id ${id}:`, error);
+      throw new Error(error.message);
+    }
+
+    return true;
   }
 };

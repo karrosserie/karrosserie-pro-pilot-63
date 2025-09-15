@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Pencil, Send, Download, Printer, Mail, CreditCard, FileX, Calendar, User, Car, Euro } from 'lucide-react';
+import { Eye, Pencil, Send, Download, Printer, Mail, CreditCard, FileX, Calendar, User, Car, Euro, Trash } from 'lucide-react';
 import { Invoice } from '@/services/supabase/invoices';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -16,7 +16,10 @@ interface InvoiceMobileCardProps {
   onSendEmail: (invoice: Invoice) => void;
   onAddPayment: (invoice: Invoice) => void;
   onAddCredit: (invoice: Invoice) => void;
+  onDeleteInvoice?: (invoice: Invoice) => void;
+  onRestoreInvoice?: (invoice: Invoice) => void;
   invoiceCredits?: any[];
+  showArchived?: boolean;
 }
 
 const InvoiceMobileCard: React.FC<InvoiceMobileCardProps> = ({
@@ -29,7 +32,10 @@ const InvoiceMobileCard: React.FC<InvoiceMobileCardProps> = ({
   onSendEmail,
   onAddPayment,
   onAddCredit,
-  invoiceCredits = []
+  onDeleteInvoice,
+  onRestoreInvoice,
+  invoiceCredits = [],
+  showArchived = false
 }) => {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '-';
@@ -156,6 +162,18 @@ const InvoiceMobileCard: React.FC<InvoiceMobileCardProps> = ({
           <Send className="h-3 w-3 mr-1" />
           Relance
         </Button>
+        {showArchived && onRestoreInvoice && (
+          <Button variant="edit" size="sm" onClick={() => onRestoreInvoice(invoice)}>
+            <FileX className="h-3 w-3 mr-1" />
+            Restaurer
+          </Button>
+        )}
+        {onDeleteInvoice && (
+          <Button variant="delete" size="sm" onClick={() => onDeleteInvoice(invoice)}>
+            <Trash className="h-3 w-3 mr-1" />
+            {showArchived ? 'Supprimer' : 'Archiver'}
+          </Button>
+        )}
       </div>
     </div>
   );
