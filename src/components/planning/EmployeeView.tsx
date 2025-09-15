@@ -602,6 +602,16 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
                       </>
                     )}
                   </Button>
+                  <Button 
+                    size="sm" 
+                    variant="destructive"
+                    onClick={() => handlePutOnHold(currentTask.id)}
+                    className="flex items-center gap-1"
+                    disabled={isOnBreak || isProcessingPhoto}
+                  >
+                    <AlertTriangle className="w-4 h-4" />
+                    Mettre en attente
+                  </Button>
                 </div>
               </div>
             </div>
