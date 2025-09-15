@@ -26,6 +26,18 @@ export const createRepairOrder = async (order: NewRepairOrder, companyId: string
 };
 
 export const updateRepairOrder = async (id: string, order: UpdateRepairOrder) => {
+  // Récupérer l'ancien statut avant la mise à jour si le statut change
+  let oldStatus = null;
+  if (order.status) {
+    const { data: currentOrder } = await supabase
+      .from('repair_orders')
+      .select('status')
+      .eq('id', id)
+      .single();
+    
+    oldStatus = currentOrder?.status;
+  }
+
   const { data, error } = await supabase
     .from('repair_orders')
     .update(order)
@@ -36,6 +48,22 @@ export const updateRepairOrder = async (id: string, order: UpdateRepairOrder) =>
   if (error) {
     console.error(`Error updating repair order with id ${id}:`, error);
     throw new Error(error.message);
+  }
+
+  // Déclencher le monitoring des véhicules si le statut a changé
+  if (order.status && oldStatus && order.status !== oldStatus) {
+    try {
+      await supabase.functions.invoke('vehicle-status-monitor', {
+        body: {
+          repairOrderId: id,
+          newStatus: order.status,
+          oldStatus: oldStatus
+        }
+      });
+    } catch (monitorError) {
+      console.error('Error calling vehicle status monitor:', monitorError);
+      // Ne pas faire échouer la mise à jour si le monitoring échoue
+    }
   }
   
   return data;
