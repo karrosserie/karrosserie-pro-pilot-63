@@ -5,10 +5,11 @@ import { useCompany } from '@/hooks/use-company';
 export interface SystemAlert {
   id: string;
   company_id: string;
-  entity_type: 'employee' | 'vehicle';
+  entity_type: 'employee' | 'vehicle' | 'messagerie';
   employee_id: string | null;
   vehicle_id: string | null;
   repair_order_id: string | null;
+  messagerie_id: string | null;
   alert_type: string;
   title: string;
   message: string;
@@ -19,6 +20,12 @@ export interface SystemAlert {
   resolved_at: string | null;
   employee_name?: string;
   vehicle_info?: string;
+  messagerie_info?: {
+    title: string;
+    priority: number;
+    channel: string;
+    summary: string;
+  };
 }
 
 export const useSystemAlerts = () => {
@@ -87,6 +94,18 @@ export const useSystemAlerts = () => {
             ...alert,
             entity_type: 'vehicle',
             vehicle_info: displayInfo
+          } as SystemAlert);
+        } else if (alert.entity_type === 'messagerie' && alert.messagerie_id) {
+          const { data: messagerie } = await supabase
+            .from('messageries')
+            .select('title, priority, channel, summary')
+            .eq('id', alert.messagerie_id)
+            .single();
+          
+          enrichedAlerts.push({
+            ...alert,
+            entity_type: 'messagerie',
+            messagerie_info: messagerie || undefined
           } as SystemAlert);
         }
       }

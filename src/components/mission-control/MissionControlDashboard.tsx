@@ -27,7 +27,7 @@ const MissionControlDashboard = () => {
       today: [
         // Ajouter dynamiquement les alertes système en premier
         ...alerts
-          .filter(alert => alert.alert_type === 'retard_pointage' || alert.alert_type === 'vehicule_attente')
+          .filter(alert => alert.alert_type === 'retard_pointage' || alert.alert_type === 'vehicule_attente' || alert.alert_type === 'messagerie_urgente')
           .map(alert => {
             if (alert.entity_type === 'employee' && alert.alert_type === 'retard_pointage') {
               const clockInTime = new Date(alert.clock_in_time || '');
@@ -105,6 +105,51 @@ const MissionControlDashboard = () => {
                   }
                 ],
                 modes: ['super_admin', 'chef_equipe']
+              };
+            } else if (alert.entity_type === 'messagerie' && alert.alert_type === 'messagerie_urgente') {
+              const priorityLabel = alert.messagerie_info?.priority === 4 ? 'CRITICAL' : 'IMPORTANT';
+              const isCritical = alert.messagerie_info?.priority === 4;
+              
+              return {
+                type: isCritical ? 'critical' as const : 'important' as const,
+                icon: 'administration' as const,
+                title: 'Message urgent - ' + priorityLabel,
+                subtitle: `${alert.messagerie_info?.title || 'Message sans titre'}`,
+                description: alert.message,
+                impact: 'Message nécessitant une attention immédiate - Impact sur la communication client/fournisseur',
+                suggestion: `Traiter le message via le canal ${alert.messagerie_info?.channel || 'non spécifié'} et donner une réponse appropriée`,
+                metrics: [
+                  { value: priorityLabel, label: 'Priorité', unit: '' },
+                  { value: alert.messagerie_info?.channel || 'Non spécifié', label: 'Canal', unit: '' },
+                  { value: Math.ceil((Date.now() - new Date(alert.created_at).getTime()) / (1000 * 60)).toString(), label: 'Minutes écoulées', unit: 'min' }
+                ],
+                actions: [
+                  { 
+                    label: 'Traiter le message', 
+                    variant: 'primary' as const,
+                    modalType: 'resolve_message_alert',
+                    modalData: { 
+                      title: 'Traiter le message urgent', 
+                      alertId: alert.id, 
+                      messageTitle: alert.messagerie_info?.title,
+                      messageSummary: alert.messagerie_info?.summary,
+                      channel: alert.messagerie_info?.channel,
+                      priority: priorityLabel,
+                      resolveAlert 
+                    }
+                  },
+                  { 
+                    label: 'Voir messagerie', 
+                    variant: 'outline' as const,
+                    modalType: 'view_messagerie',
+                    modalData: { 
+                      title: 'Voir dans messagerie', 
+                      messagerieId: alert.messagerie_id,
+                      messageTitle: alert.messagerie_info?.title 
+                    }
+                  }
+                ],
+                modes: ['super_admin', 'chef_equipe', 'finance']
               };
             }
             return null;
