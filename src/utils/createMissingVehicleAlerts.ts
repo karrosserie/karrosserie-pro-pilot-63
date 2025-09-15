@@ -2,14 +2,14 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const createMissingVehicleAlerts = async () => {
   try {
-    console.log('🔍 Recherche des repair orders en attente sans alerte...');
+    console.log('🔍 Recherche des véhicules en attente sans alerte...');
     
-    // Récupérer tous les repair orders en attente qui n'ont pas d'alerte système
-    const { data: waitingOrders, error } = await supabase
-      .from('repair_orders')
+    // Récupérer tous les véhicules en attente depuis employee_schedule
+    const { data: waitingVehicles, error } = await supabase
+      .from('employee_schedule')
       .select(`
         id,
-        status,
+        waiting_reason,
         vehicle_id,
         company_id,
         vehicles(
@@ -18,70 +18,68 @@ export const createMissingVehicleAlerts = async () => {
           car_models(name)
         )
       `)
-      .ilike('status', '%attente%')
+      .not('waiting_reason', 'is', null)
       .not('vehicle_id', 'is', null);
 
     if (error) {
-      console.error('❌ Erreur lors de la récupération des repair orders:', error);
+      console.error('❌ Erreur lors de la récupération des véhicules en attente:', error);
       return;
     }
 
-    console.log(`📋 Trouvé ${waitingOrders?.length || 0} repair orders en attente avec véhicule`);
+    console.log(`📋 Trouvé ${waitingVehicles?.length || 0} véhicules en attente dans les étapes atelier`);
 
-    if (!waitingOrders || waitingOrders.length === 0) {
-      console.log('ℹ️ Aucun repair order en attente avec véhicule trouvé');
+    if (!waitingVehicles || waitingVehicles.length === 0) {
+      console.log('ℹ️ Aucun véhicule en attente trouvé');
       return;
     }
 
-    // Pour chaque repair order, vérifier s'il a déjà une alerte
-    for (const order of waitingOrders) {
-      // Vérifier si une alerte existe déjà
+    // Pour chaque véhicule en attente, vérifier s'il a déjà une alerte
+    for (const vehicleTask of waitingVehicles) {
+      // Vérifier si une alerte existe déjà pour ce véhicule/tâche
       const { data: existingAlert, error: alertError } = await supabase
         .from('system_alerts')
         .select('id')
         .eq('entity_type', 'vehicle')
-        .eq('vehicle_id', order.vehicle_id)
-        .eq('repair_order_id', order.id)
+        .eq('vehicle_id', vehicleTask.vehicle_id)
         .eq('alert_type', 'vehicule_attente')
         .eq('resolved', false)
         .single();
 
       if (alertError && alertError.code !== 'PGRST116') {
-        console.error(`❌ Erreur lors de la vérification d'alerte pour ${order.id}:`, alertError);
+        console.error(`❌ Erreur lors de la vérification d'alerte pour véhicule ${vehicleTask.vehicle_id}:`, alertError);
         continue;
       }
 
       // Si pas d'alerte existante, en créer une
       if (!existingAlert) {
-        const vehicle = order.vehicles;
+        const vehicle = vehicleTask.vehicles;
         const vehicleName = vehicle 
-          ? `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate}`
+          ? `${vehicle.car_brands?.name || 'Marque non renseignée'} ${vehicle.car_models?.name || 'Modèle non renseigné'} - ${vehicle.license_plate}`
           : 'Véhicule inconnu';
 
         const { error: insertError } = await supabase
           .from('system_alerts')
           .insert({
-            company_id: order.company_id,
+            company_id: vehicleTask.company_id,
             entity_type: 'vehicle',
-            vehicle_id: order.vehicle_id,
-            repair_order_id: order.id,
+            vehicle_id: vehicleTask.vehicle_id,
             alert_type: 'vehicule_attente',
-            title: 'Véhicule en attente',
-            message: `Le véhicule ${vehicleName} est en attente. Vérifiez les causes du blocage.`,
-            reason: 'Génération automatique d\'alerte manquante'
+            title: 'Véhicule en attente - Étapes atelier',
+            message: `Le véhicule ${vehicleName} est bloqué dans les étapes atelier. Raison: ${vehicleTask.waiting_reason}`,
+            reason: vehicleTask.waiting_reason
           });
 
         if (insertError) {
           console.error(`❌ Erreur lors de la création d'alerte pour ${vehicleName}:`, insertError);
         } else {
-          console.log(`✅ Alerte créée pour ${vehicleName} (${order.id})`);
+          console.log(`✅ Alerte créée pour ${vehicleName} (raison: ${vehicleTask.waiting_reason})`);
         }
       } else {
-        console.log(`ℹ️ Alerte déjà existante pour repair order ${order.id}`);
+        console.log(`ℹ️ Alerte déjà existante pour véhicule ${vehicleTask.vehicle_id}`);
       }
     }
 
-    console.log('🎉 Processus de création d\'alertes manquantes terminé');
+    console.log('🎉 Processus de création d\'alertes pour véhicules en attente terminé');
   } catch (error) {
     console.error('❌ Erreur générale:', error);
   }
