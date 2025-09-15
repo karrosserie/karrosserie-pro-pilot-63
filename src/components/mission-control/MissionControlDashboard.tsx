@@ -27,7 +27,7 @@ const MissionControlDashboard = () => {
       today: [
         // Ajouter dynamiquement les alertes système en premier
         ...alerts
-          .filter(alert => alert.alert_type === 'retard_pointage' || alert.alert_type === 'vehicule_attente' || alert.alert_type === 'messagerie_urgente')
+          .filter(alert => alert.alert_type === 'retard_pointage' || alert.alert_type === 'vehicle_waiting' || alert.alert_type === 'messagerie_urgente')
           .map(alert => {
             if (alert.entity_type === 'employee' && alert.alert_type === 'retard_pointage') {
               const clockInTime = new Date(alert.clock_in_time || '');
@@ -70,7 +70,7 @@ const MissionControlDashboard = () => {
                 ],
                 modes: ['super_admin', 'chef_equipe']
               };
-            } else if (alert.entity_type === 'vehicle' && alert.alert_type === 'vehicule_attente') {
+            } else if (alert.entity_type === 'vehicle' && alert.alert_type === 'vehicle_waiting') {
               return {
                 type: 'critical' as const,
                 icon: 'supplier' as const,
