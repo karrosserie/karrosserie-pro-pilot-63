@@ -130,7 +130,7 @@ const MobileHomePage = () => {
         {/* Bouton Tour de contrôle - uniquement pour les propriétaires */}
         {isOwner && (
           <div className="mb-8">
-            <Link to="/planning#tour-controle">
+            <Link to="/tour-de-controle">
               <Button 
                 className="w-full h-12 bg-red-600 text-white hover:bg-red-700 font-medium transition-all duration-300"
               >
