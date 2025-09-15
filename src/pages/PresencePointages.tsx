@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useGeneratedReports } from "@/hooks/use-generated-reports";
 import { useNavigate } from "react-router-dom";
 import { useEmployeeTimesheets } from "@/hooks/use-employee-timesheets";
+import { usePointages } from "@/hooks/use-pointages";
 
 // ------------------ Types & Helpers ------------------
 type Pointage = {
@@ -68,101 +69,7 @@ function durationHours(p: Pointage, heuresJour = 7): { duree: number; normales: 
   return { duree: Number(hours.toFixed(2)), normales: Number(normales.toFixed(2)), sup: Number(sup.toFixed(2)) };
 }
 
-// ------------------ Sample Data ------------------
-const SAMPLE: Pointage[] = [
-  {
-    id: "P-001",
-    date: "2025-08-25",
-    employe: "Jean Martin",
-    matricule: "EMP001",
-    metier: "Carrossier",
-    chantier: "Atelier Central",
-    codeChantier: "ATEL-001",
-    latlonChantier: "43.2965,5.3698",
-    debut: "2025-08-25T08:02:00",
-    fin: "2025-08-25T16:15:00",
-    typePause: "Repas",
-    pauseDebut: "2025-08-25T12:00:00",
-    pauseFin: "2025-08-25T12:45:00",
-    gpsDebut: "43.2966,5.3697",
-    gpsFin: "43.2966,5.3697",
-    distDebut: 42,
-    distFin: 55,
-    statutDebut: "VALIDE",
-    statutFin: "VALIDE",
-    absence: "",
-    validationChef: true,
-    commentaire: "RAS"
-  },
-  {
-    id: "P-002",
-    date: "2025-08-26",
-    employe: "Jean Martin",
-    matricule: "EMP001",
-    metier: "Carrossier",
-    chantier: "Atelier Central",
-    codeChantier: "ATEL-001",
-    latlonChantier: "43.2965,5.3698",
-    debut: "2025-08-26T07:58:00",
-    fin: "2025-08-26T12:00:00",
-    typePause: "Demi-journée AM",
-    gpsDebut: "43.2965,5.3698",
-    gpsFin: "43.2965,5.3698",
-    distDebut: 15,
-    distFin: 18,
-    statutDebut: "VALIDE",
-    statutFin: "VALIDE",
-    absence: "",
-    validationChef: true,
-    commentaire: "Intervention terminée en AM"
-  },
-  {
-    id: "P-003",
-    date: "2025-08-25",
-    employe: "Sophie Leroy",
-    matricule: "EMP002",
-    metier: "Mécanicienne",
-    chantier: "Atelier Central",
-    codeChantier: "ATEL-001",
-    latlonChantier: "43.2965,5.3698",
-    debut: "2025-08-25T09:03:00",
-    fin: "2025-08-25T17:05:00",
-    typePause: "Repas",
-    pauseDebut: "2025-08-25T12:30:00",
-    pauseFin: "2025-08-25T13:15:00",
-    gpsDebut: "43.2965,5.3697",
-    gpsFin: "43.2965,5.3697",
-    distDebut: 30,
-    distFin: 25,
-    statutDebut: "VALIDE",
-    statutFin: "VALIDE",
-    absence: "",
-    validationChef: true,
-    commentaire: ""
-  },
-  {
-    id: "P-004",
-    date: "2025-08-26",
-    employe: "Sophie Leroy",
-    matricule: "EMP002",
-    metier: "Mécanicienne",
-    chantier: "Atelier Central",
-    codeChantier: "ATEL-001",
-    latlonChantier: "43.2965,5.3698",
-    debut: null,
-    fin: null,
-    typePause: "",
-    gpsDebut: "",
-    gpsFin: "",
-    distDebut: null,
-    distFin: null,
-    statutDebut: "REFUSE",
-    statutFin: "REFUSE",
-    absence: "MAL",
-    validationChef: true,
-    commentaire: "Arrêt maladie"
-  }
-];
+// Données d'exemple supprimées - utilisation des vraies données via usePointages
 
 const HEURES_JOUR = 7; // Paramétrable
 
@@ -193,6 +100,7 @@ export default function PresencePointages() {
   const { addReport } = useGeneratedReports();
   const navigate = useNavigate();
   const { createOrUpdateTimesheet, markAsSickLeave, markAsAbsent, calculateWorkMinutes } = useEmployeeTimesheets();
+  const { pointages, isLoading: loadingPointages } = usePointages();
 
   // Gérer l'ouverture du modal de complétion
   const handleCompletePointage = (pointage: Pointage) => {
@@ -267,13 +175,13 @@ export default function PresencePointages() {
   };
 
   const filtered = useMemo(() => {
-    return SAMPLE.filter((p) =>
+    return pointages.filter((p) =>
       (employe === "tous" || p.employe === employe) &&
       (chantier === "tous" || p.chantier === chantier) &&
       (statutGps === "tous" || (statutGps === "valide" ? (p.statutDebut === "VALIDE" && p.statutFin === "VALIDE") : (p.statutDebut !== "VALIDE" || p.statutFin !== "VALIDE"))) &&
       (recherche.trim() === "" || `${p.employe} ${p.matricule} ${p.chantier} ${p.codeChantier}`.toLowerCase().includes(recherche.toLowerCase()))
     );
-  }, [employe, chantier, statutGps, recherche]);
+  }, [employe, chantier, statutGps, recherche, pointages]);
 
   const kpis = useMemo(() => {
     let total = 0, normales = 0, sup = 0, valides = 0, lignes = 0, absences = 0;
@@ -306,8 +214,8 @@ export default function PresencePointages() {
     ];
   }, [filtered]);
 
-  const employes = Array.from(new Set(SAMPLE.map(s => s.employe)));
-  const chantiers = Array.from(new Set(SAMPLE.map(s => s.chantier)));
+  const employes = Array.from(new Set(pointages.map(s => s.employe)));
+  const chantiers = Array.from(new Set(pointages.map(s => s.chantier)));
 
   const handleGenerateReport = async () => {
     try {
@@ -557,6 +465,31 @@ export default function PresencePointages() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Indicateur de chargement */}
+      {loadingPointages && (
+        <Card className="shadow-sm">
+          <CardContent className="flex items-center justify-center py-8">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-karrosserie-orange mx-auto mb-2"></div>
+              <p className="text-sm text-muted-foreground">Chargement des pointages...</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Message si aucune donnée */}
+      {!loadingPointages && pointages.length === 0 && (
+        <Card className="shadow-sm">
+          <CardContent className="flex items-center justify-center py-8">
+            <div className="text-center">
+              <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
+              <p className="text-lg font-medium">Aucun pointage disponible</p>
+              <p className="text-sm text-muted-foreground">Les pointages de vos employés s'afficheront ici une fois qu'ils auront commencé à pointer.</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
