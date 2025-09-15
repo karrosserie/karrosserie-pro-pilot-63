@@ -43,7 +43,8 @@ export default function DocumentUploadStep({
       setSelectedFile(file);
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
-      onImageUpload(file);
+      // Ne pas appeler onImageUpload automatiquement
+      // L'utilisateur doit cliquer sur "Suivant" pour valider
     }
   });
 
@@ -59,6 +60,7 @@ export default function DocumentUploadStep({
     e.preventDefault();
     e.stopPropagation();
     if (selectedFile) {
+      onImageUpload(selectedFile); // Appeler onImageUpload seulement quand l'utilisateur clique
       onNext(selectedFile);
     }
   };
