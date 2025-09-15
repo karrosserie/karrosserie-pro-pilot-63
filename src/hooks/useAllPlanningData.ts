@@ -132,6 +132,7 @@ export const useAllPlanningData = (companyId: string | null) => {
           jour: dayOfWeek,
           user_id: item.user_id,
           // Ajouter les champs spécifiques aux tâches en attente
+          vehicle_id: item.vehicle_id, // IMPORTANT: Ajouter le vehicle_id original
           waiting_reason: item.waiting_reason,
           updated_at: item.updated_at
         };

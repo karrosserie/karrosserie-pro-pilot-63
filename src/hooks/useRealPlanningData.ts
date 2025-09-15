@@ -18,6 +18,7 @@ export interface PlanningTask {
   duree?: number;
   jour?: string;
   user_id?: string; // Ajout du user_id pour l'association correcte
+  vehicle_id?: string; // Ajout du vehicle_id pour les jointures
   waiting_reason?: string; // Ajout de la raison d'attente
   updated_at?: string; // Ajout de la date de mise à jour
 }
@@ -186,7 +187,8 @@ export const useRealPlanningData = (companyId: string | null) => {
           vehiculeId: item.vehicle_id ? parseInt(item.vehicle_id.toString()) : Date.now(),
           duree: Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60)), // Durée en heures
           jour: dayOfWeek,
-          user_id: item.user_id // Important : conserver le user_id pour l'association
+          user_id: item.user_id, // Important : conserver le user_id pour l'association
+          vehicle_id: item.vehicle_id // IMPORTANT: Ajouter le vehicle_id pour les jointures
         };
 
         if (planningByDay[dayOfWeek]) {

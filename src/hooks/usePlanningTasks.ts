@@ -5,6 +5,7 @@ import { useAllPlanningData } from './useAllPlanningData';
 export interface PlanningTache {
   id: string;
   vehiculeId: number;
+  vehicle_id?: string; // Ajouter le vehicle_id pour la jointure
   vehicule: string;
   modele: string;
   marque: string;
@@ -54,6 +55,7 @@ export const usePlanningTasks = (companyId: string | null) => {
           const planningTache: PlanningTache = {
             id: task.id,
             vehiculeId: task.vehiculeId || parseInt(task.id.toString()), // Fallback en cas de vehiculeId manquant
+            vehicle_id: task.vehicle_id || task.vehiculeId?.toString() || task.id, // Ajouter le vehicle_id pour la jointure en utilisant différentes sources
             vehicule: task.vehicule,
             modele: task.modele,
             marque: task.modele.split(' ')[0] || 'Inconnue', // Extraire la marque du modèle
@@ -122,6 +124,7 @@ export const usePlanningTasks = (companyId: string | null) => {
           const planningTache: PlanningTache = {
             id: task.id,
             vehiculeId: task.vehiculeId || parseInt(task.id.toString()),
+            vehicle_id: task.vehicle_id || task.vehiculeId?.toString() || task.id, // Ajouter le vehicle_id pour la jointure en utilisant différentes sources
             vehicule: task.vehicule,
             modele: task.modele,
             marque: task.modele.split(' ')[0] || 'Inconnue',
