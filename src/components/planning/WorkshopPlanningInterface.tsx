@@ -361,42 +361,47 @@ export const WorkshopPlanningInterface = ({
         </Button>
       </div>
 
-      {/* Navigation Tabs - Only show for manager view */}
+      {/* Navigation Tabs - Only show for manager view - Mobile responsive */}
       {currentView === 'manager' && <Tabs defaultValue="workshop" className="w-full">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 lg:w-auto h-12 sm:h-11 bg-muted/60 p-1.5 rounded-xl">
-            <TabsTrigger value="workshop" className="flex items-center gap-2 px-3 sm:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <Wrench className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="hidden sm:inline">Étapes atelier</span>
-              <span className="sm:hidden">Étapes</span>
-            </TabsTrigger>
-            <TabsTrigger value="waiting" className="flex items-center gap-2 px-3 sm:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="hidden sm:inline">En attente</span>
-              <span className="sm:hidden">Attente</span>
-            </TabsTrigger>
-            <TabsTrigger value="planning" className="flex items-center gap-2 px-3 sm:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <BarChart className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="hidden sm:inline">Planning</span>
-              <span className="sm:hidden">Planning</span>
-            </TabsTrigger>
-            <TabsTrigger value="employee-planning" className="flex items-center gap-2 px-3 sm:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <Users className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="hidden sm:inline">Employés</span>
-              <span className="sm:hidden">Equipe</span>
-            </TabsTrigger>
-            <TabsTrigger value="process" className="flex items-center gap-2 px-3 sm:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <Cog className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="hidden sm:inline">Process</span>
-              <span className="sm:hidden">Config</span>
-            </TabsTrigger>
-          </TabsList>
+        <div className="flex flex-col gap-4 sm:gap-6">
+          {/* Tabs avec scroll horizontal sur mobile */}
+          <div className="relative">
+            <TabsList className="w-full flex justify-start overflow-x-auto no-scrollbar h-12 sm:h-11 bg-muted/60 p-1.5 rounded-xl">
+              <TabsTrigger value="workshop" className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 lg:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm whitespace-nowrap flex-shrink-0">
+                <Wrench className="w-4 h-4" />
+                <span className="hidden xs:inline sm:hidden lg:inline">Étapes atelier</span>
+                <span className="xs:hidden sm:inline lg:hidden">Étapes</span>
+              </TabsTrigger>
+              <TabsTrigger value="waiting" className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 lg:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm whitespace-nowrap flex-shrink-0">
+                <Clock className="w-4 h-4" />
+                <span className="hidden xs:inline sm:hidden lg:inline">En attente</span>
+                <span className="xs:hidden sm:inline lg:hidden">Attente</span>
+              </TabsTrigger>
+              <TabsTrigger value="planning" className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 lg:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm whitespace-nowrap flex-shrink-0">
+                <BarChart className="w-4 h-4" />
+                <span className="hidden xs:inline">Planning</span>
+              </TabsTrigger>
+              <TabsTrigger value="employee-planning" className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 lg:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm whitespace-nowrap flex-shrink-0">
+                <Users className="w-4 h-4" />
+                <span className="hidden xs:inline sm:hidden lg:inline">Employés</span>
+                <span className="xs:hidden sm:inline lg:hidden">Equipe</span>
+              </TabsTrigger>
+              <TabsTrigger value="process" className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 lg:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm whitespace-nowrap flex-shrink-0">
+                <Cog className="w-4 h-4" />
+                <span className="hidden xs:inline sm:hidden lg:inline">Process</span>
+                <span className="xs:hidden sm:inline lg:hidden">Config</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
           
-          <Button variant="outline" size="sm" onClick={() => navigate('/settings?tab=team')} className="flex items-center gap-2 w-full lg:w-auto h-10 px-4 hover:bg-accent/50 border-border/50">
-            <Users className="w-4 h-4" />
-            <span className="hidden sm:inline">Gérer l'équipe</span>
-            <span className="sm:hidden">Équipe</span>
-          </Button>
+          {/* Button séparé sur mobile */}
+          <div className="flex justify-center sm:justify-end">
+            <Button variant="outline" size="sm" onClick={() => navigate('/settings?tab=team')} className="flex items-center gap-2 w-full sm:w-auto h-10 px-4 hover:bg-accent/50 border-border/50">
+              <Users className="w-4 h-4" />
+              <span className="sm:hidden">Gérer l'équipe</span>
+              <span className="hidden sm:inline">Gérer l'équipe</span>
+            </Button>
+          </div>
         </div>
 
         {/* Workshop Steps Tab */}
