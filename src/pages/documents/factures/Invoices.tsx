@@ -10,7 +10,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Search, FileText, Plus, Filter, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
+import { Search, FileText, Plus, Filter, Eye, Pencil, Trash } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { useTableSorting } from '@/hooks/use-table-sorting';
@@ -38,11 +38,12 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Printer, Mail, Signature, CreditCard, FileX, Download, Send } from 'lucide-react';
+import { Printer, Mail, Signature, CreditCard, FileX, Download, Send, MoreVertical } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import InvoiceMobileCard from '@/components/invoices/InvoiceMobileCard';
 import RelanceModal from '@/components/invoices/RelanceModal';
 import { useSendRelance } from '@/hooks/use-send-relance';
+import { formatAmount } from '@/utils/invoiceCalculations';
 
 const Invoices = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -445,8 +446,7 @@ const Invoices = () => {
               filteredInvoices.map((invoice) => {
                 const invoiceCredits = getInvoiceCredits(invoice.id);
                 return (
-                <React.Fragment key={invoice.id}>
-                  <TableRow className="hover:bg-gray-50 border-b-0">
+                  <TableRow key={invoice.id} className="hover:bg-gray-50 border-b-0">
                     <TableCell className="font-medium">{invoice.reference}</TableCell>
                     <TableCell>{formatDate(invoice.created_at)}</TableCell>
                     <TableCell>
@@ -454,68 +454,89 @@ const Invoices = () => {
                         ? `${invoice.clients.first_name} ${invoice.clients.last_name}`
                         : '-'
                       }
-                    </TableCell>
-                    <TableCell>
-                      {invoice.vehicles 
-                        ? `${invoice.vehicles.car_brands?.name || 'Marque inconnue'} ${invoice.vehicles.car_models?.name || 'Modèle inconnu'} - ${invoice.vehicles.license_plate}`
-                        : '-'
-                      }
-                    </TableCell>
-                    <TableCell>{formatAmount(invoice.amount || 0)}</TableCell>
-                    <TableCell>
-                      {renderCreditsBadges(invoiceCredits)}
-                    </TableCell>
-                    <TableCell>
-                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status || 'En attente de paiement')}`}>
-                        {invoice.status || 'En attente de paiement'}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow className="border-t-0">
-                    <TableCell colSpan={7} className="py-3 border-t-0">
-                      <div className="flex flex-wrap gap-2 justify-end px-4">
-                        <Button variant="view" size="sm" onClick={() => handleViewInvoice(invoice)}>
-                          <Eye className="h-4 w-4 mr-1" />
-                          Voir
-                        </Button>
-                        <Button variant="edit" size="sm" onClick={() => handleEditInvoice(invoice)}>
-                          <Pencil className="h-4 w-4 mr-1" />
-                          Modifier
-                        </Button>
-                        <Button variant="download" size="sm" onClick={() => handleDownload(invoice)}>
-                          <Download className="h-4 w-4 mr-1" />
-                          Télécharger
-                        </Button>
-                        <Button variant="print" size="sm" onClick={() => handlePrint(invoice)}>
-                          <Printer className="h-4 w-4 mr-1" />
-                          Imprimer
-                        </Button>
-                        <Button variant="send" size="sm" onClick={() => handleSendEmail(invoice)}>
-                          <Mail className="h-4 w-4 mr-1" />
-                          Envoyer
-                        </Button>
-                        <Button variant="payment" size="sm" onClick={() => handleAddPayment(invoice)}>
-                          <CreditCard className="h-4 w-4 mr-1" />
-                          Créer un paiement
-                        </Button>
-                        <Button variant="create" size="sm" onClick={() => handleAddCredit(invoice)}>
-                          <FileX className="h-4 w-4 mr-1" />
-                          Créer un avoir
-                        </Button>
-                         <Button variant="send" size="sm" onClick={() => handleRelance(invoice)}>
-                           <Send className="h-4 w-4 mr-1" />
-                           Relance
-                         </Button>
-                         {showArchived ? (
-                           <Button variant="edit" size="sm" onClick={() => handleRestore(invoice)}>
-                             <FileText className="h-4 w-4 mr-1" />
-                             Restaurer
-                           </Button>
-                          ) : null}
+                     </TableCell>
+                     <TableCell>
+                       {invoice.vehicles 
+                         ? `${invoice.vehicles.car_brands?.name || 'Marque inconnue'} ${invoice.vehicles.car_models?.name || 'Modèle inconnu'} - ${invoice.vehicles.license_plate}`
+                         : '-'
+                       }
+                     </TableCell>
+                     <TableCell className="text-right font-medium">
+                       {formatAmount(invoice.amount || 0)}
+                     </TableCell>
+                     <TableCell>
+                       {invoiceCredits.length > 0 ? (
+                         <div className="flex items-center gap-1">
+                           <span className="text-orange-600">
+                             {formatAmount(invoiceCredits.reduce((sum, credit) => sum + (credit.amount || 0), 0))}
+                           </span>
+                         </div>
+                       ) : '-'}
+                     </TableCell>
+                     <TableCell>
+                       <div className="flex items-center gap-1">
+                         <Badge 
+                           variant="secondary"
+                           className={`${getStatusColor(invoice.status)} text-white border-0 font-normal text-xs px-2 py-1`}
+                         >
+                           {invoice.status}
+                         </Badge>
                        </div>
-                    </TableCell>
-                  </TableRow>
-                </React.Fragment>
+                     </TableCell>
+                     <TableCell>
+                       <div className="flex items-center gap-1">
+                         <DropdownMenu>
+                           <DropdownMenuTrigger asChild>
+                             <Button variant="ghost" className="h-8 w-8 p-0">
+                               <span className="sr-only">Ouvrir le menu</span>
+                               <MoreVertical className="h-4 w-4" />
+                             </Button>
+                           </DropdownMenuTrigger>
+                           <DropdownMenuContent align="end">
+                             <DropdownMenuItem onClick={() => handleViewInvoice(invoice)}>
+                               <Eye className="mr-2 h-4 w-4" />
+                               Voir
+                             </DropdownMenuItem>
+                             <DropdownMenuItem onClick={() => handleEditInvoice(invoice)}>
+                               <Pencil className="mr-2 h-4 w-4" />
+                               Modifier
+                             </DropdownMenuItem>
+                             <DropdownMenuSeparator />
+                             <DropdownMenuItem onClick={() => handlePrint(invoice)}>
+                               <Printer className="mr-2 h-4 w-4" />
+                               Imprimer
+                             </DropdownMenuItem>
+                             <DropdownMenuItem onClick={() => handleSendEmail(invoice)}>
+                               <Mail className="mr-2 h-4 w-4" />
+                               Envoyer par email
+                             </DropdownMenuItem>
+                             <DropdownMenuSeparator />
+                             <DropdownMenuItem onClick={() => handleAddPayment(invoice)}>
+                               <CreditCard className="mr-2 h-4 w-4" />
+                               Encaisser
+                             </DropdownMenuItem>
+                             <DropdownMenuItem onClick={() => handleAddCredit(invoice)}>
+                               <FileX className="mr-2 h-4 w-4" />
+                               Avoir
+                             </DropdownMenuItem>
+                             <DropdownMenuSeparator />
+                             {!showArchived && (
+                               <DropdownMenuItem onClick={() => handleDelete(invoice)}>
+                                 <FileText className="mr-2 h-4 w-4" />
+                                 Archiver
+                               </DropdownMenuItem>
+                             )}
+                             {showArchived && (
+                               <DropdownMenuItem onClick={() => handleRestore(invoice)}>
+                                 <FileText className="mr-2 h-4 w-4" />
+                                 Restaurer
+                               </DropdownMenuItem>
+                             )}
+                           </DropdownMenuContent>
+                         </DropdownMenu>
+                       </div>
+                  </TableCell>
+                </TableRow>
                 );
               })
             ) : (
