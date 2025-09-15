@@ -15,6 +15,13 @@ const TASK_ORDER = [
   'Clôture & livraison'
 ];
 
+// Horaires de travail
+const WORKING_HOURS = {
+  START: 8, // 8h
+  END: 18,  // 18h
+  WORKING_DAYS: [1, 2, 3, 4, 5] // Lundi à vendredi (0 = dimanche)
+};
+
 // Mapping des types de tâches vers les IDs de qualifications
 const TASK_TO_QUALIFICATION_MAP = {
   'Accueil & Préparation du dossier': 'accueil',
@@ -198,13 +205,14 @@ Deno.serve(async (req) => {
         .in('status', ['En attente', 'En cours'])
         .order('end_datetime', { ascending: false });
 
-      // Calculer le temps de disponibilité
-      let availableTime = new Date(); // Maintenant par défaut
+      // Calculer le temps de disponibilité en respectant les horaires de travail
+      let availableTime = calculateNextWorkingSlot(new Date().getTime()); // Maintenant par défaut, mais en respectant les horaires
       
       if (employeeTasks && employeeTasks.length > 0) {
-        // L'employé sera disponible après sa dernière tâche
+        // L'employé sera disponible après sa dernière tâche, mais en respectant les horaires de travail
         const lastTask = employeeTasks[0];
-        availableTime = new Date(lastTask.end_datetime);
+        const lastTaskEndTime = new Date(lastTask.end_datetime);
+        availableTime = calculateNextWorkingSlot(lastTaskEndTime.getTime());
       }
 
       console.log(`👤 Employee ${employee.profiles?.first_name} ${employee.profiles?.last_name} available at: ${availableTime.toISOString()}`);
@@ -228,15 +236,27 @@ Deno.serve(async (req) => {
 
     console.log(`✅ Selected employee: ${selectedEmployee.profiles?.first_name} ${selectedEmployee.profiles?.last_name}`);
 
-    // 5. Calculer les heures de la nouvelle tâche
-    const taskStartTime = new Date(Math.max(
+    // 5. Calculer les heures de la nouvelle tâche en respectant les horaires de travail
+    let taskStartTime = calculateNextWorkingSlot(Math.max(
       earliestAvailableTime.getTime(),
       new Date().getTime() // Ne peut pas commencer dans le passé
     ));
     
     // Durée estimée par défaut (2h, peut être personnalisée selon le type de tâche)
     const taskDurationHours = getTaskDuration(nextTaskType);
-    const taskEndTime = new Date(taskStartTime.getTime() + (taskDurationHours * 60 * 60 * 1000));
+    let taskEndTime = new Date(taskStartTime.getTime() + (taskDurationHours * 60 * 60 * 1000));
+
+    // Vérifier si la tâche se termine après les heures de travail
+    if (taskEndTime.getHours() > WORKING_HOURS.END || 
+        (taskEndTime.getHours() === WORKING_HOURS.END && taskEndTime.getMinutes() > 0)) {
+      console.log(`⏰ Task would end at ${taskEndTime.toLocaleTimeString()}, moving to next working day`);
+      // Déplacer au jour ouvrable suivant
+      taskStartTime = getNextWorkingDay(taskStartTime);
+      taskStartTime.setHours(WORKING_HOURS.START, 0, 0, 0);
+      taskEndTime = new Date(taskStartTime.getTime() + (taskDurationHours * 60 * 60 * 1000));
+    }
+
+    console.log(`📅 Task scheduled: ${taskStartTime.toLocaleString()} - ${taskEndTime.toLocaleString()}`);
 
     // 6. Créer la nouvelle tâche
     const { data: newTask, error: createError } = await supabase
@@ -322,4 +342,52 @@ function getTaskDuration(taskType: string): number {
   };
   
   return durations[taskType] || 2; // 2h par défaut
+}
+
+/**
+ * Calcule le prochain créneau de travail disponible
+ */
+function calculateNextWorkingSlot(timestamp: number): Date {
+  const date = new Date(timestamp);
+  
+  console.log(`🕐 Calculating next working slot from: ${date.toLocaleString()}`);
+  
+  // Si c'est un jour non ouvrable, aller au prochain jour ouvrable à 8h
+  if (!WORKING_HOURS.WORKING_DAYS.includes(date.getDay())) {
+    console.log(`📅 ${date.toLocaleDateString()} is not a working day, moving to next working day`);
+    return getNextWorkingDay(date);
+  }
+  
+  // Si c'est avant 8h, commencer à 8h le même jour
+  if (date.getHours() < WORKING_HOURS.START) {
+    console.log(`⏰ Before working hours, starting at ${WORKING_HOURS.START}h`);
+    date.setHours(WORKING_HOURS.START, 0, 0, 0);
+    return date;
+  }
+  
+  // Si c'est après 18h, aller au prochain jour ouvrable à 8h
+  if (date.getHours() >= WORKING_HOURS.END) {
+    console.log(`⏰ After working hours, moving to next working day`);
+    return getNextWorkingDay(date);
+  }
+  
+  // C'est dans les heures de travail, utiliser l'heure actuelle
+  console.log(`✅ Within working hours, using current time`);
+  return date;
+}
+
+/**
+ * Trouve le prochain jour ouvrable à 8h
+ */
+function getNextWorkingDay(date: Date): Date {
+  const nextDay = new Date(date);
+  
+  do {
+    nextDay.setDate(nextDay.getDate() + 1);
+  } while (!WORKING_HOURS.WORKING_DAYS.includes(nextDay.getDay()));
+  
+  nextDay.setHours(WORKING_HOURS.START, 0, 0, 0);
+  
+  console.log(`📅 Next working day: ${nextDay.toLocaleString()}`);
+  return nextDay;
 }

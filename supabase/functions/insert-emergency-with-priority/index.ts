@@ -5,6 +5,13 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Horaires de travail
+const WORKING_HOURS = {
+  START: 8, // 8h
+  END: 18,  // 18h
+  WORKING_DAYS: [1, 2, 3, 4, 5] // Lundi à vendredi (0 = dimanche)
+};
+
 interface TaskConflict {
   id: string;
   task_type: string;
@@ -78,24 +85,33 @@ Deno.serve(async (req) => {
     const actualUserId = userCompany.user_id;
     console.log('✅ Employee validated:', actualUserId);
 
-    // 2. Calculate the emergency time slot
+    // 2. Calculate the emergency time slot with working hours validation
     const now = new Date();
     const [hours, minutes] = heure.split(':').map(Number);
     
-    const emergencyStart = new Date(now);
+    let emergencyStart = new Date(now);
     emergencyStart.setHours(hours, minutes, 0, 0);
     
-    // If time is in the past today, schedule for tomorrow
-    if (emergencyStart <= now) {
-      emergencyStart.setDate(emergencyStart.getDate() + 1);
-      console.log(`⏰ Time ${heure} is in the past, scheduling for tomorrow:`, emergencyStart.toISOString());
-    }
+    // Validate working hours and days
+    emergencyStart = validateWorkingTime(emergencyStart);
+    
+    console.log(`🎯 Emergency time slot (validated): ${emergencyStart.toLocaleString()}`);
     
     // Emergency task duration (1 hour for "Accueil & Préparation du dossier")
-    const emergencyEnd = new Date(emergencyStart);
+    let emergencyEnd = new Date(emergencyStart);
     emergencyEnd.setHours(emergencyStart.getHours() + 1);
+    
+    // Check if the task would end after working hours
+    if (emergencyEnd.getHours() > WORKING_HOURS.END || 
+        (emergencyEnd.getHours() === WORKING_HOURS.END && emergencyEnd.getMinutes() > 0)) {
+      console.log(`⏰ Emergency task would end at ${emergencyEnd.toLocaleTimeString()}, adjusting to next working day`);
+      // Move to next working day
+      emergencyStart = getNextWorkingDay(emergencyStart);
+      emergencyEnd = new Date(emergencyStart);
+      emergencyEnd.setHours(emergencyStart.getHours() + 1);
+    }
 
-    console.log('🎯 Emergency time slot:', {
+    console.log('🎯 Final emergency time slot:', {
       start: emergencyStart.toISOString(),
       end: emergencyEnd.toISOString()
     });
@@ -330,3 +346,57 @@ Deno.serve(async (req) => {
     );
   }
 });
+
+/**
+ * Valide et ajuste une heure pour respecter les horaires de travail
+ */
+function validateWorkingTime(date: Date): Date {
+  const now = new Date();
+  
+  console.log(`🕐 Validating working time from: ${date.toLocaleString()}`);
+  
+  // Si c'est dans le passé, utiliser maintenant comme base
+  if (date <= now) {
+    console.log(`⏰ Time ${date.toLocaleTimeString()} is in the past, using current time as base`);
+    date = new Date(now);
+  }
+  
+  // Si c'est un jour non ouvrable, aller au prochain jour ouvrable
+  if (!WORKING_HOURS.WORKING_DAYS.includes(date.getDay())) {
+    console.log(`📅 ${date.toLocaleDateString()} is not a working day, moving to next working day`);
+    return getNextWorkingDay(date);
+  }
+  
+  // Si c'est avant les heures de travail, commencer à 8h le même jour
+  if (date.getHours() < WORKING_HOURS.START) {
+    console.log(`⏰ Before working hours, starting at ${WORKING_HOURS.START}h`);
+    date.setHours(WORKING_HOURS.START, 0, 0, 0);
+    return date;
+  }
+  
+  // Si c'est après les heures de travail, aller au prochain jour ouvrable
+  if (date.getHours() >= WORKING_HOURS.END) {
+    console.log(`⏰ After working hours, moving to next working day`);
+    return getNextWorkingDay(date);
+  }
+  
+  // C'est dans les heures de travail, utiliser l'heure demandée
+  console.log(`✅ Within working hours, using requested time`);
+  return date;
+}
+
+/**
+ * Trouve le prochain jour ouvrable à 8h
+ */
+function getNextWorkingDay(date: Date): Date {
+  const nextDay = new Date(date);
+  
+  do {
+    nextDay.setDate(nextDay.getDate() + 1);
+  } while (!WORKING_HOURS.WORKING_DAYS.includes(nextDay.getDay()));
+  
+  nextDay.setHours(WORKING_HOURS.START, 0, 0, 0);
+  
+  console.log(`📅 Next working day: ${nextDay.toLocaleString()}`);
+  return nextDay;
+}
