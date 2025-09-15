@@ -148,6 +148,28 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Email de notification envoyé à ${companyData.email} pour le client ${clientName}`);
 
+    // Déclencher le webhook n8n
+    try {
+      const webhookResponse = await fetch('https://n8n.karrosserie.pro/webhook/3b7decda-859c-46bc-836a-cfe53eed5b70', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          idClient: clientId
+        })
+      });
+
+      if (webhookResponse.ok) {
+        console.log(`Webhook n8n déclenché avec succès pour le client ${clientId}`);
+      } else {
+        console.error(`Erreur webhook n8n: ${webhookResponse.status} - ${webhookResponse.statusText}`);
+      }
+    } catch (webhookError) {
+      console.error('Erreur lors de l\'appel du webhook n8n:', webhookError);
+      // On ne fait pas échouer le processus si le webhook échoue
+    }
+
     return new Response(
       JSON.stringify({ 
         success: true, 
