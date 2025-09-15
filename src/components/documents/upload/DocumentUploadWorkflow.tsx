@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import DocumentUploadStep from "./DocumentUploadStep";
+import WhatsAppConsentStep from "./WhatsAppConsentStep";
 
 const ALL_DOCUMENT_STEPS = [
   {
@@ -31,7 +32,7 @@ const ALL_DOCUMENT_STEPS = [
 
 interface DocumentUploadWorkflowProps {
   onBack: () => void;
-  onComplete: (documents: { [key: string]: File }) => void;
+  onComplete: (documents: { [key: string]: File }, whatsappConsent: boolean) => void;
   missingDocuments: string[];
   tokenData: {
     client_id: string | null;
@@ -47,37 +48,25 @@ export default function DocumentUploadWorkflow({
 }: DocumentUploadWorkflowProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [documents, setDocuments] = useState<{ [key: string]: File }>({});
+  const [whatsappConsent, setWhatsappConsent] = useState<boolean | null>(null);
 
   // Filtrer les étapes selon les documents manquants
   const documentSteps = useMemo(() => {
     return ALL_DOCUMENT_STEPS.filter(step => missingDocuments.includes(step.key));
   }, [missingDocuments]);
 
-  // Si aucun document n'est manquant, retourner un message de confirmation
+  // Calculer le nombre total d'étapes (documents + WhatsApp)
+  const totalSteps = documentSteps.length + 1;
+
+  // Si aucun document n'est manquant, afficher directement l'étape WhatsApp
   if (documentSteps.length === 0) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="max-w-lg w-full text-center space-y-8">
-          <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto shadow-lg">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-bold text-foreground">
-            Tous vos documents sont déjà enregistrés
-          </h1>
-          <p className="text-muted-foreground">
-            Nous avons déjà tous les documents nécessaires pour traiter votre dossier.
-          </p>
-          <Button 
-            type="button"
-            onClick={onBack}
-            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white px-6 py-2 rounded-md"
-          >
-            Retour
-          </Button>
-        </div>
-      </div>
+      <WhatsAppConsentStep
+        step={1}
+        totalSteps={1}
+        onNext={(consent) => onComplete({}, consent)}
+        onBack={onBack}
+      />
     );
   }
 
@@ -89,8 +78,14 @@ export default function DocumentUploadWorkflow({
     if (currentStep < documentSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      onComplete(updatedDocuments);
+      // Tous les documents sont uploadés, passer à l'étape WhatsApp
+      setCurrentStep(currentStep + 1);
     }
+  };
+
+  const handleWhatsAppConsent = (consent: boolean) => {
+    setWhatsappConsent(consent);
+    onComplete(documents, consent);
   };
 
   const handleBack = () => {
@@ -106,11 +101,23 @@ export default function DocumentUploadWorkflow({
     console.log("Image uploaded:", file.name);
   };
 
+  // Vérifier si nous sommes à l'étape WhatsApp (après tous les documents)
+  if (currentStep >= documentSteps.length) {
+    return (
+      <WhatsAppConsentStep
+        step={currentStep + 1}
+        totalSteps={totalSteps}
+        onNext={handleWhatsAppConsent}
+        onBack={handleBack}
+      />
+    );
+  }
+
   return (
     <DocumentUploadStep
       key={currentStep}
       step={currentStep + 1}
-      totalSteps={documentSteps.length}
+      totalSteps={totalSteps}
       title={documentSteps[currentStep].title}
       description={documentSteps[currentStep].description}
       documentType={documentSteps[currentStep].documentType}

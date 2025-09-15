@@ -129,8 +129,9 @@ export default function DocumentUploadFlow() {
     setShowWorkflow(false);
   };
 
-  const handleComplete = async (documents: { [key: string]: File }) => {
+  const handleComplete = async (documents: { [key: string]: File }, whatsappConsent: boolean) => {
     console.log("Documents uploaded:", documents);
+    console.log("WhatsApp consent:", whatsappConsent);
     
     if (!tokenData) {
       console.error("Token data not available");
@@ -144,7 +145,11 @@ export default function DocumentUploadFlow() {
 
       // Upload et mise à jour des documents du permis de conduire
       if (tokenData.client_id) {
-        const clientUpdates: { driver_license_front_url?: string; driver_license_back_url?: string } = {};
+        const clientUpdates: { 
+          driver_license_front_url?: string; 
+          driver_license_back_url?: string;
+          whatsapp_consent?: boolean;
+        } = {};
 
         if (documents.driver_license_front) {
           const frontFilePath = `${tokenData.client_id}/driver-license/front_${Date.now()}.jpg`;
@@ -178,14 +183,15 @@ export default function DocumentUploadFlow() {
           clientUpdates.driver_license_back_url = backUrl.publicUrl;
         }
 
-        if (Object.keys(clientUpdates).length > 0) {
-          updatePromises.push(
-            supabase
-              .from('clients')
-              .update(clientUpdates)
-              .eq('id', tokenData.client_id)
-          );
-        }
+        // Ajouter le consentement WhatsApp aux mises à jour client
+        clientUpdates.whatsapp_consent = whatsappConsent;
+
+        updatePromises.push(
+          supabase
+            .from('clients')
+            .update(clientUpdates)
+            .eq('id', tokenData.client_id)
+        );
       }
 
       // Upload et mise à jour des documents du véhicule

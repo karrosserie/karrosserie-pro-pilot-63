@@ -381,6 +381,7 @@ export type Database = {
           postal_code: string | null
           prefecture: string | null
           updated_at: string
+          whatsapp_consent: boolean | null
         }
         Insert: {
           address?: string | null
@@ -403,6 +404,7 @@ export type Database = {
           postal_code?: string | null
           prefecture?: string | null
           updated_at?: string
+          whatsapp_consent?: boolean | null
         }
         Update: {
           address?: string | null
@@ -425,6 +427,7 @@ export type Database = {
           postal_code?: string | null
           prefecture?: string | null
           updated_at?: string
+          whatsapp_consent?: boolean | null
         }
         Relationships: []
       }
