@@ -76,13 +76,13 @@ export const useWaitingVehicles = (companyId: string | null) => {
 
       // Récupérer les véhicules avec des tâches en attente avec raison
       console.log('🔍 Fetching waiting reason schedules for company:', companyId);
-      const { data: waitingReasonSchedules, error: waitingError } = await supabase
+        const { data: waitingReasonSchedules, error: waitingError } = await supabase
         .from('employee_schedule')
         .select(`
           vehicle_id,
           waiting_reason,
           updated_at,
-          vehicles!inner (
+          vehicles!left (
             id,
             license_plate,
             color,

@@ -37,10 +37,10 @@ export const VehiclesWaitingTab = ({
     
     return {
       id: vehicle.id,
-      brand: vehicle.car_brands?.name || 'Marque inconnue',
-      model: vehicle.car_models?.name || 'Modèle inconnu',
+      brand: vehicle.car_brands?.name || 'Marque non renseignée',
+      model: vehicle.car_models?.name || 'Modèle non renseigné',
       licensePlate: vehicle.license_plate || 'N/A',
-      client: vehicle.clients ? `${vehicle.clients.first_name} ${vehicle.clients.last_name}` : 'Client inconnu',
+      client: vehicle.clients ? `${vehicle.clients.first_name} ${vehicle.clients.last_name}` : 'Client non renseigné',
       price: '0€',
       blockedStage: hasWaitingReason ? 'Mis en attente par employé' : 'En attente de planification',
       waitingSince: `${waitingSinceDays} jour(s)`,
