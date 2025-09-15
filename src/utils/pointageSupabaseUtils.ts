@@ -134,6 +134,7 @@ export const clockIn = async (employeId: string): Promise<{success: boolean, mes
   try {
     const today = new Date().toISOString().split('T')[0];
     const now = new Date().toISOString();
+    const clockInTime = new Date(now);
     
     // Récupérer l'ID de la compagnie
     const companyId = await getCurrentCompanyId();
@@ -190,6 +191,37 @@ export const clockIn = async (employeId: string): Promise<{success: boolean, mes
       });
 
     if (error) throw error;
+
+    // Vérifier si l'employé arrive en retard après 9h00
+    const hourOfClockIn = clockInTime.getHours();
+    if (hourOfClockIn >= 9) {
+      // Récupérer les informations de l'employé pour l'alerte
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('first_name, last_name')
+        .eq('id', employeId)
+        .single();
+      
+      const employeeName = profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 'Employé inconnu';
+      const heurePointage = clockInTime.toLocaleTimeString('fr-FR', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+      
+      // Créer une alerte de retard
+      await supabase
+        .from('employee_alerts')
+        .insert({
+          company_id: companyId,
+          employee_id: employeId,
+          alert_type: 'retard_pointage',
+          title: `Retard de pointage`,
+          message: `L'employé ${employeeName} a pointé à ${heurePointage}. N'oubliez pas de voir avec lui pourquoi il a du retard.`,
+          clock_in_time: now
+        });
+      
+      console.log(`⚠️ Alerte de retard créée pour ${employeeName} - pointage à ${heurePointage}`);
+    }
 
     console.log('✅ Pointage d\'arrivée enregistré pour:', employeId);
     return { success: true, message: `Pointage d'arrivée enregistré avec succès. Distance: ${locationResult.distance}m` };

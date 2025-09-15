@@ -390,6 +390,123 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
   }
   const renderModalContent = () => {
     switch (actionType) {
+      case 'resolve_alert':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2 flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-orange-500" />
+                Résolution d'alerte de retard
+              </h4>
+              <div className="space-y-2 text-sm">
+                <p className="text-muted-foreground">
+                  Vous vous apprêtez à marquer cette alerte comme traitée. Cette action est irréversible.
+                </p>
+                <p className="font-medium">
+                  Employé concerné: {modalData?.employeeName || 'Non spécifié'}
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button 
+                className="flex-1 bg-primary hover:bg-primary/90 text-xs sm:text-sm h-8 sm:h-10"
+                onClick={async () => {
+                  setIsLoading('resolve');
+                  if (modalData?.resolveAlert && modalData?.alertId) {
+                    const success = await modalData.resolveAlert(modalData.alertId);
+                    if (success) {
+                      toast({
+                        title: "Alerte résolue",
+                        description: "L'alerte de retard a été marquée comme traitée avec succès.",
+                      });
+                    } else {
+                      toast({
+                        title: "Erreur",
+                        description: "Impossible de résoudre l'alerte. Veuillez réessayer.",
+                        variant: "destructive"
+                      });
+                    }
+                  }
+                  setIsLoading(null);
+                  onClose();
+                }}
+                disabled={isLoading === 'resolve'}
+              >
+                {isLoading === 'resolve' ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Résolution...</span>
+                  </div>
+                ) : (
+                  <>
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    Marquer comme traité
+                  </>
+                )}
+              </Button>
+              <Button 
+                variant="outline" 
+                className="flex-1 text-xs sm:text-sm h-8 sm:h-10"
+                onClick={onClose}
+                disabled={isLoading !== null}
+              >
+                <X className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                Annuler
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'contact_employee':
+        return (
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm mb-2 flex items-center gap-2">
+                <User className="h-4 w-4 text-blue-500" />
+                Contact employé
+              </h4>
+              <div className="space-y-2 text-sm">
+                <p className="text-muted-foreground">
+                  Actions rapides pour contacter l'employé concernant son retard.
+                </p>
+                <p className="font-medium">
+                  Employé: {modalData?.employeeName || 'Non spécifié'}
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <Button 
+                variant="outline"
+                className="text-xs sm:text-sm h-8 sm:h-10"
+                onClick={() => {
+                  toast({
+                    title: "Appel en cours",
+                    description: "Numérotation automatique vers l'employé...",
+                  });
+                  onClose();
+                }}
+              >
+                <Phone className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                Appeler
+              </Button>
+              <Button 
+                variant="outline"
+                className="text-xs sm:text-sm h-8 sm:h-10"
+                onClick={() => {
+                  toast({
+                    title: "SMS envoyé",
+                    description: "Message de rappel envoyé à l'employé.",
+                  });
+                  onClose();
+                }}
+              >
+                <Mail className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                Envoyer SMS
+              </Button>
+            </div>
+          </div>
+        );
+
       case 'replanifier_meteo':
         return (
           <div className="space-y-4">

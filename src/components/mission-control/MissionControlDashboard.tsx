@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import MissionControlHeader from './MissionControlHeader';
 import AlertCard from './AlertCard';
 import { Eye, Package, Wrench, Calendar, Users, Clock, FileText } from 'lucide-react';
+import { useEmployeeAlerts } from '@/hooks/use-employee-alerts';
 
 const MissionControlDashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'month'>('today');
   const [isAIOn, setIsAIOn] = useState(true);
   const [selectedMode, setSelectedMode] = useState<'super_admin' | 'finance' | 'chef_equipe' | 'ouvrier'>('super_admin');
+  const { alerts, resolveAlert } = useEmployeeAlerts();
 
   const handleAIToggle = () => {
     setIsAIOn(!isAIOn);
@@ -15,6 +17,51 @@ const MissionControlDashboard = () => {
   const getMissionsForPeriod = (period: 'today' | 'week' | 'month', mode: string) => {
     const allMissions = {
       today: [
+        // Ajouter dynamiquement les alertes de retard en premier
+        ...alerts
+          .filter(alert => alert.alert_type === 'retard_pointage')
+          .map(alert => {
+            const clockInTime = new Date(alert.clock_in_time);
+            const timeString = clockInTime.toLocaleTimeString('fr-FR', { 
+              hour: '2-digit', 
+              minute: '2-digit' 
+            });
+            
+            return {
+              type: 'important' as const,
+              icon: 'administration' as const,
+              title: 'Retard employé détecté',
+              subtitle: `${alert.employee_name} - Pointage ${timeString}`,
+              description: alert.message,
+              impact: 'Gestion des retards nécessaire pour maintenir la discipline',
+              suggestion: 'Contacter l\'employé pour comprendre les raisons du retard et prendre les mesures appropriées',
+              metrics: [
+                { value: timeString, label: 'Heure de pointage', unit: '' },
+                { value: '9h00', label: 'Heure limite', unit: '' },
+                { value: `${Math.max(0, clockInTime.getHours() - 9)}h${String(clockInTime.getMinutes()).padStart(2, '0')}`, label: 'Retard', unit: '' }
+              ],
+              actions: [
+                { 
+                  label: 'Marquer comme traité', 
+                  variant: 'primary' as const,
+                  modalType: 'resolve_alert',
+                  modalData: { 
+                    title: 'Résoudre l\'alerte', 
+                    alertId: alert.id, 
+                    employeeName: alert.employee_name,
+                    resolveAlert 
+                  }
+                },
+                { 
+                  label: 'Contacter employé', 
+                  variant: 'outline' as const,
+                  modalType: 'contact_employee',
+                  modalData: { title: 'Contacter l\'employé', employeeName: alert.employee_name }
+                }
+              ],
+              modes: ['super_admin', 'chef_equipe']
+            };
+          }),
         // Alerte météo pour peinture extérieure
         {
           type: 'critical' as const,

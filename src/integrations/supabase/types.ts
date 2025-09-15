@@ -756,6 +756,45 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_alerts: {
+        Row: {
+          alert_type: string
+          clock_in_time: string
+          company_id: string
+          created_at: string
+          employee_id: string
+          id: string
+          message: string
+          resolved: boolean
+          resolved_at: string | null
+          title: string
+        }
+        Insert: {
+          alert_type?: string
+          clock_in_time: string
+          company_id: string
+          created_at?: string
+          employee_id: string
+          id?: string
+          message: string
+          resolved?: boolean
+          resolved_at?: string | null
+          title: string
+        }
+        Update: {
+          alert_type?: string
+          clock_in_time?: string
+          company_id?: string
+          created_at?: string
+          employee_id?: string
+          id?: string
+          message?: string
+          resolved?: boolean
+          resolved_at?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       employee_breaks: {
         Row: {
           break_end_time: string | null
