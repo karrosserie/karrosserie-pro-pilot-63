@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import ActionModalExtended from './ActionModalExtended';
-import { VehiculePlanifierModal } from '@/components/planning/VehiculePlanifierModal';
+import PlanVehicleModal from './PlanVehicleModal';
 import { useToast } from '@/hooks/use-toast';
 import { X, User, Calendar, Phone, Mail, CreditCard, FileText, AlertTriangle, Package, CheckCircle, Calculator } from 'lucide-react';
 
@@ -574,55 +574,13 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
               </div>
             </div>
             
-            <VehiculePlanifierModal
+            <PlanVehicleModal
               isOpen={showPlanningModal}
               onClose={() => setShowPlanningModal(false)}
-              vehicule={{
-                id: modalData?.alertId,
-                plaque: modalData?.vehicleInfo || 'N/A',
-                modele: 'Véhicule',
-                client: 'Client',
-                prix: 'À définir',
-                priorite: 'normale',
-                etapeBloquee: modalData?.reason || 'En attente'
-              }}
-              employes={[
-                { 
-                  id: '1', 
-                  user_id: '1',
-                  nom: 'Martin Dubois', 
-                  email: 'martin@example.com',
-                  telephone: '0123456789',
-                  actif: true, 
-                  role: 'carrossier', 
-                  qualifications: ['peinture', 'débosselage'] 
-                },
-                { 
-                  id: '2', 
-                  user_id: '2',
-                  nom: 'Sophie Martin', 
-                  email: 'sophie@example.com',
-                  telephone: '0123456790',
-                  actif: true, 
-                  role: 'carrossier', 
-                  qualifications: ['finitions'] 
-                },
-                { 
-                  id: '3', 
-                  user_id: '3',
-                  nom: 'Pierre Durand', 
-                  email: 'pierre@example.com',
-                  telephone: '0123456791',
-                  actif: true, 
-                  role: 'carrossier-vehicule de courtoisie',
-                  qualifications: ['mécanique']
-                }
-              ]}
-              onPlanifier={async (vehiculeId, employeId, datePrevu, heurePrevu, notes) => {
+              vehicleInfo={modalData?.vehicleInfo || 'Véhicule'}
+              alertId={modalData?.alertId || ''}
+              onPlanified={async () => {
                 setIsLoading('planning');
-                
-                // Simuler la planification
-                await new Promise(resolve => setTimeout(resolve, 1500));
                 
                 // Résoudre l'alerte une fois planifiée
                 if (modalData?.resolveAlert && modalData?.alertId) {
@@ -631,7 +589,7 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
                 
                 toast({
                   title: "Véhicule planifié",
-                  description: `Planification confirmée pour le ${datePrevu} ${heurePrevu}. L'alerte a été résolue.`,
+                  description: "La planification a été confirmée. L'alerte a été résolue.",
                 });
                 
                 setIsLoading(null);
