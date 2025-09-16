@@ -124,14 +124,10 @@ class TrackingService {
   }
 
   public async trackEvent(event: TrackingEvent) {
-    if (!this.userId || !this.isSessionActive) {
-      console.log('TrackingService: Cannot track event - userId:', this.userId, 'isSessionActive:', this.isSessionActive);
-      return;
-    }
+    if (!this.userId || !this.isSessionActive) return;
 
     try {
-      console.log('TrackingService: Attempting to track event:', event.eventName, 'for user:', this.userId);
-      const result = await supabase
+      await supabase
         .from('user_activity_logs')
         .insert({
           user_id: this.userId,
@@ -144,14 +140,9 @@ class TrackingService {
           component_name: event.componentName,
           metadata: event.metadata || {},
         });
-      
-      if (result.error) {
-        console.error('TrackingService: Error tracking event:', result.error);
-      } else {
-        console.log('TrackingService: Successfully tracked event:', event.eventName);
-      }
     } catch (error) {
-      console.error('TrackingService: Exception tracking event:', error);
+      // Silently fail to avoid breaking the app
+      console.warn('Could not track event:', error);
     }
   }
 
