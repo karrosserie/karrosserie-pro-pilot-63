@@ -13,6 +13,8 @@ export interface Messagerie {
   date: string;
   summary: string;
   message: string;
+  reponse?: string;
+  contact?: string;
   tags: string[];
   resolved: boolean;
   archived: boolean;

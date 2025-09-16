@@ -23,6 +23,7 @@ import {
 import { useMessageries } from "@/hooks/use-messageries";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MessagerieMobileCard } from './MessagerieMobileCard';
+import { SemiAutoModal } from './SemiAutoModal';
 
 // -------------------------------
 // MessageriePriorites (connecté à Supabase)
@@ -94,6 +95,8 @@ export default function MessageriePriorites() {
   const [selectedItem, setSelectedItem] = useState<typeof messageries[0] | null>(null);
   const [showResolved, setShowResolved] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
+  const [semiAutoModalOpen, setSemiAutoModalOpen] = useState(false);
+  const [semiAutoMessage, setSemiAutoMessage] = useState<typeof messageries[0] | null>(null);
   const isMobile = useIsMobile();
 
   // Auto-select message when messageId is provided in URL
@@ -135,6 +138,14 @@ export default function MessageriePriorites() {
 
   const handleArchive = (id: string) => {
     toggleArchived(id);
+  };
+
+  const handleSemiAutoClick = (id: string) => {
+    const messagerie = messageries.find(m => m.id === id);
+    if (messagerie) {
+      setSemiAutoMessage(messagerie);
+      setSemiAutoModalOpen(true);
+    }
   };
 
   // Composant pour le tableau de bord des priorités
@@ -226,7 +237,7 @@ export default function MessageriePriorites() {
                   onArchive={handleArchive}
                   onEscalate={escalateMessage}
                   onAutoManage={autoManage}
-                  onSemiAuto={handleSemiAuto}
+                  onSemiAuto={handleSemiAutoClick}
                   showResolved={showResolved}
                 />
               ))}
@@ -280,9 +291,9 @@ export default function MessageriePriorites() {
                                Réponse auto
                              </Button>
                            )}
-                           <Button size="sm" className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => handleSemiAuto(it.id)}>
-                             Semi auto
-                           </Button>
+                           <Button size="sm" className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => handleSemiAutoClick(it.id)}>
+                              Semi auto
+                            </Button>
                            <Button size="sm" variant="destructive" onClick={() => escalateMessage(it.id)}>
                              Escalader
                            </Button>
@@ -450,9 +461,9 @@ export default function MessageriePriorites() {
                       <Button size="sm" className="bg-violet-500 hover:bg-violet-600 text-white" onClick={() => { autoManage(selectedItem.id); setSelectedItem(null); }}>
                         Réponse auto
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => { handleSemiAuto(selectedItem.id); setSelectedItem(null); }}>
-                        Semi auto
-                      </Button>
+                       <Button size="sm" variant="outline" onClick={() => { handleSemiAutoClick(selectedItem.id); setSelectedItem(null); }}>
+                         Semi auto
+                       </Button>
                     </>
                   )}
                   <Button size="sm" variant="outline" onClick={() => { escalateMessage(selectedItem.id); setSelectedItem(null); }}>
