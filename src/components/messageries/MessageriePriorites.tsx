@@ -24,6 +24,7 @@ import { useMessageries } from "@/hooks/use-messageries";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MessagerieMobileCard } from './MessagerieMobileCard';
 import { SemiAutoModal } from './SemiAutoModal';
+import { ReplyModal } from './ReplyModal';
 
 // -------------------------------
 // MessageriePriorites (connecté à Supabase)
@@ -97,6 +98,8 @@ export default function MessageriePriorites() {
   const [showArchived, setShowArchived] = useState(false);
   const [semiAutoModalOpen, setSemiAutoModalOpen] = useState(false);
   const [semiAutoMessage, setSemiAutoMessage] = useState<typeof messageries[0] | null>(null);
+  const [replyModalOpen, setReplyModalOpen] = useState(false);
+  const [replyMessage, setReplyMessage] = useState<typeof messageries[0] | null>(null);
   const isMobile = useIsMobile();
 
   // Auto-select message when messageId is provided in URL
@@ -145,6 +148,14 @@ export default function MessageriePriorites() {
     if (messagerie) {
       setSemiAutoMessage(messagerie);
       setSemiAutoModalOpen(true);
+    }
+  };
+
+  const handleReplyClick = (id: string) => {
+    const messagerie = messageries.find(m => m.id === id);
+    if (messagerie) {
+      setReplyMessage(messagerie);
+      setReplyModalOpen(true);
     }
   };
 
@@ -232,7 +243,7 @@ export default function MessageriePriorites() {
                   key={it.id}
                   item={it}
                   onViewDetails={handleViewDetails}
-                  onReply={handleReply}
+                  onReply={handleReplyClick}
                   onToggleResolved={toggleResolved}
                   onArchive={handleArchive}
                   onEscalate={escalateMessage}
@@ -283,7 +294,7 @@ export default function MessageriePriorites() {
                       </Button>
                       {!showResolved && (
                         <>
-                          <Button size="sm" className="bg-teal-500 hover:bg-teal-600 text-white" onClick={() => handleReply(it.id)}>
+                          <Button size="sm" className="bg-teal-500 hover:bg-teal-600 text-white" onClick={() => handleReplyClick(it.id)}>
                             Répondre
                           </Button>
                            {it.priority !== 1 && (
@@ -453,7 +464,7 @@ export default function MessageriePriorites() {
               <div className="border-t pt-4">
                 <h3 className="font-semibold mb-3">Actions rapides</h3>
                 <div className="flex flex-wrap gap-3">
-                  <Button size="sm" onClick={() => { handleReply(selectedItem.id); setSelectedItem(null); }}>
+                  <Button size="sm" onClick={() => { handleReplyClick(selectedItem.id); setSelectedItem(null); }}>
                     Répondre
                   </Button>
                   {selectedItem.priority !== 1 && (
@@ -485,6 +496,20 @@ export default function MessageriePriorites() {
           </Card>
         </div>
       )}
+      
+      {/* Modal Semi Auto */}
+      <SemiAutoModal
+        isOpen={semiAutoModalOpen}
+        onClose={() => setSemiAutoModalOpen(false)}
+        messagerie={semiAutoMessage}
+      />
+      
+      {/* Modal Réponse */}
+      <ReplyModal
+        isOpen={replyModalOpen}
+        onClose={() => setReplyModalOpen(false)}
+        messagerie={replyMessage}
+      />
     </div>
   );
 }
