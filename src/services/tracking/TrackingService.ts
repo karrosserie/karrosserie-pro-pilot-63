@@ -326,22 +326,10 @@ class TrackingService {
   }
 }
 
-// Instance globale du service de tracking - désactivée temporairement pour debug
-// export const trackingService = new TrackingService();
-export const trackingService = {
-  trackEvent: () => Promise.resolve(),
-  trackPageView: () => Promise.resolve(),
-  trackFunnelStep: () => Promise.resolve(),
-  trackError: () => Promise.resolve(),
-  trackFormInteraction: () => Promise.resolve(),
-  trackBusinessAction: () => Promise.resolve(),
-  endSession: () => Promise.resolve(),
-  getSessionId: () => 'disabled',
-  getUserId: () => null,
-  getCompanyId: () => null,
-} as any;
+// Instance globale du service de tracking
+export const trackingService = new TrackingService();
 
-// Nettoyer la session à la fermeture de la page - désactivé temporairement
-// window.addEventListener('beforeunload', () => {
-//   trackingService.endSession();
-// });
+// Nettoyer la session à la fermeture de la page 
+window.addEventListener('beforeunload', () => {
+  trackingService.endSession();
+});
