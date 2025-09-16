@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import ActionModalExtended from './ActionModalExtended';
-import PlanVehicleModal from './PlanVehicleModal';
+import { PlanVehicleModal } from '../../../components/planning/PlanVehicleModal';
 import { useToast } from '@/hooks/use-toast';
 import { X, User, Calendar, Phone, Mail, CreditCard, FileText, AlertTriangle, Package, CheckCircle, Calculator } from 'lucide-react';
 
@@ -577,9 +577,10 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
             <PlanVehicleModal
               isOpen={showPlanningModal}
               onClose={() => setShowPlanningModal(false)}
-              vehicleInfo={modalData?.vehicleInfo || 'Véhicule'}
-              alertId={modalData?.alertId || ''}
-              onPlanified={async () => {
+              vehicle={modalData?.vehicle || null}
+              employees={modalData?.employees || []}
+              companyId={modalData?.companyId || null}
+              onSuccess={async () => {
                 setIsLoading('planning');
                 
                 // Résoudre l'alerte une fois planifiée

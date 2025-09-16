@@ -4,6 +4,8 @@ import AlertCard from './AlertCard';
 import { Eye, Package, Wrench, Calendar, Users, Clock, FileText } from 'lucide-react';
 import { useSystemAlerts } from '@/hooks/use-system-alerts';
 import { createMissingVehicleAlerts } from '@/utils/createMissingVehicleAlerts';
+import { useCompany } from '@/hooks/use-company';
+import { useEmployeeData } from '@/hooks/useEmployeeData';
 
 
 const MissionControlDashboard = () => {
@@ -11,6 +13,8 @@ const MissionControlDashboard = () => {
   const [isAIOn, setIsAIOn] = useState(true);
   const [selectedMode, setSelectedMode] = useState<'super_admin' | 'finance' | 'chef_equipe' | 'ouvrier'>('super_admin');
   const { alerts, resolveAlert, refetch } = useSystemAlerts();
+  const { companyData } = useCompany();
+  const { employees } = useEmployeeData(companyData?.id || null);
 
   const handleCreateMissingAlerts = async () => {
     await createMissingVehicleAlerts();
@@ -93,6 +97,15 @@ const MissionControlDashboard = () => {
                       title: 'Planifier le véhicule', 
                       alertId: alert.id, 
                       vehicleInfo: alert.vehicle_info,
+                      vehicle: {
+                        id: alert.vehicle_id || '',
+                        brand: 'Marque non renseignée',
+                        model: 'Modèle non renseigné', 
+                        licensePlate: alert.message?.split('Le véhicule ')[1]?.split(' est en attente')[0] || 'Plaque inconnue',
+                        client: 'Client non renseigné'
+                      },
+                      employees: employees || [],
+                      companyId: companyData?.id || null,
                       reason: alert.reason,
                       resolveAlert 
                     }
