@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import ActionModalExtended from './ActionModalExtended';
+import { VehiculePlanifierModal } from '@/components/planning/VehiculePlanifierModal';
 import { useToast } from '@/hooks/use-toast';
 import { X, User, Calendar, Phone, Mail, CreditCard, FileText, AlertTriangle, Package, CheckCircle, Calculator } from 'lucide-react';
 
@@ -15,6 +16,7 @@ interface ActionModalProps {
 const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, modalData }) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState<string | null>(null);
+  const [showPlanningModal, setShowPlanningModal] = useState(false);
 
   // Fonctions pour gérer les actions des boutons
   const handleMiseAbri = async () => {
@@ -527,6 +529,117 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, actionType, 
               </Button>
             </div>
           </div>
+        );
+
+      case 'plan_vehicle_alert':
+        return (
+          <>
+            <div className="space-y-4">
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <h4 className="font-medium text-sm mb-2 flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-primary" />
+                  Planifier le véhicule
+                </h4>
+                <div className="space-y-2 text-sm">
+                  <p className="text-muted-foreground">
+                    Programmer la reprise des travaux pour ce véhicule en attente.
+                  </p>
+                  <p className="font-medium">
+                    Véhicule: {modalData?.vehicleInfo || 'Non spécifié'}
+                  </p>
+                  {modalData?.reason && (
+                    <p className="text-muted-foreground">
+                      Raison de l'attente: {modalData.reason}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  className="flex-1 bg-primary hover:bg-primary/90 text-xs sm:text-sm h-8 sm:h-10"
+                  onClick={() => setShowPlanningModal(true)}
+                >
+                  <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                  Ouvrir planification
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="flex-1 text-xs sm:text-sm h-8 sm:h-10"
+                  onClick={onClose}
+                  disabled={isLoading !== null}
+                >
+                  <X className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                  Annuler
+                </Button>
+              </div>
+            </div>
+            
+            <VehiculePlanifierModal
+              isOpen={showPlanningModal}
+              onClose={() => setShowPlanningModal(false)}
+              vehicule={{
+                id: modalData?.alertId,
+                plaque: modalData?.vehicleInfo || 'N/A',
+                modele: 'Véhicule',
+                client: 'Client',
+                prix: 'À définir',
+                priorite: 'normale',
+                etapeBloquee: modalData?.reason || 'En attente'
+              }}
+              employes={[
+                { 
+                  id: '1', 
+                  user_id: '1',
+                  nom: 'Martin Dubois', 
+                  email: 'martin@example.com',
+                  telephone: '0123456789',
+                  actif: true, 
+                  role: 'carrossier', 
+                  qualifications: ['peinture', 'débosselage'] 
+                },
+                { 
+                  id: '2', 
+                  user_id: '2',
+                  nom: 'Sophie Martin', 
+                  email: 'sophie@example.com',
+                  telephone: '0123456790',
+                  actif: true, 
+                  role: 'carrossier', 
+                  qualifications: ['finitions'] 
+                },
+                { 
+                  id: '3', 
+                  user_id: '3',
+                  nom: 'Pierre Durand', 
+                  email: 'pierre@example.com',
+                  telephone: '0123456791',
+                  actif: true, 
+                  role: 'carrossier-vehicule de courtoisie',
+                  qualifications: ['mécanique']
+                }
+              ]}
+              onPlanifier={async (vehiculeId, employeId, datePrevu, heurePrevu, notes) => {
+                setIsLoading('planning');
+                
+                // Simuler la planification
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Résoudre l'alerte une fois planifiée
+                if (modalData?.resolveAlert && modalData?.alertId) {
+                  await modalData.resolveAlert(modalData.alertId);
+                }
+                
+                toast({
+                  title: "Véhicule planifié",
+                  description: `Planification confirmée pour le ${datePrevu} ${heurePrevu}. L'alerte a été résolue.`,
+                });
+                
+                setIsLoading(null);
+                setShowPlanningModal(false);
+                onClose();
+              }}
+            />
+          </>
         );
 
       case 'vehicle_details':

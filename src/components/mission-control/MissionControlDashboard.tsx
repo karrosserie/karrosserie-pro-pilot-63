@@ -86,11 +86,11 @@ const MissionControlDashboard = () => {
                 ],
                 actions: [
                   { 
-                    label: 'Débloquer véhicule', 
+                    label: 'Planifier', 
                     variant: 'primary' as const,
-                    modalType: 'resolve_vehicle_alert',
+                    modalType: 'plan_vehicle_alert',
                     modalData: { 
-                      title: 'Débloquer le véhicule', 
+                      title: 'Planifier le véhicule', 
                       alertId: alert.id, 
                       vehicleInfo: alert.vehicle_info,
                       reason: alert.reason,
