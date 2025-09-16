@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import ActionModal from './modals/ActionModal';
@@ -40,6 +41,7 @@ interface AlertCardProps {
     icon?: React.ReactNode;
     modalType?: string;
     modalData?: any;
+    navigationTo?: string;
   }>;
   className?: string;
 }
@@ -72,6 +74,7 @@ const AlertCard: React.FC<AlertCardProps> = ({
   actions,
   className = ""
 }) => {
+  const navigate = useNavigate();
   const [activeModal, setActiveModal] = useState<{
     isOpen: boolean;
     modalType: string;
@@ -83,7 +86,9 @@ const AlertCard: React.FC<AlertCardProps> = ({
   });
 
   const handleActionClick = (action: any) => {
-    if (action.modalType) {
+    if (action.navigationTo) {
+      navigate(action.navigationTo);
+    } else if (action.modalType) {
       setActiveModal({
         isOpen: true,
         modalType: action.modalType,

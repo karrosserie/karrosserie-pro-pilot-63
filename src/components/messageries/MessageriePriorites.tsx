@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -75,6 +76,9 @@ const getChannelIcon = (channel: string) => {
 };
 
 export default function MessageriePriorites() {
+  const [searchParams] = useSearchParams();
+  const messageIdFromUrl = searchParams.get('messageId');
+  
   const {
     messageries,
     loading,
@@ -91,6 +95,17 @@ export default function MessageriePriorites() {
   const [showResolved, setShowResolved] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
   const isMobile = useIsMobile();
+
+  // Auto-select message when messageId is provided in URL
+  useEffect(() => {
+    if (messageIdFromUrl && messageries.length > 0) {
+      const targetMessage = messageries.find(msg => msg.id === messageIdFromUrl);
+      if (targetMessage) {
+        setSelectedPriority(targetMessage.priority);
+        setSelectedItem(targetMessage);
+      }
+    }
+  }, [messageIdFromUrl, messageries]);
 
   const activeItems = useMemo(() => {
     if (showResolved) {

@@ -141,12 +141,7 @@ const MissionControlDashboard = () => {
                   { 
                     label: 'Voir messagerie', 
                     variant: 'outline' as const,
-                    modalType: 'view_messagerie',
-                    modalData: { 
-                      title: 'Voir dans messagerie', 
-                      messagerieId: alert.messagerie_id,
-                      messageTitle: alert.messagerie_info?.title 
-                    }
+                    navigationTo: `/messageries?messageId=${alert.messagerie_id}`
                   }
                 ],
                 modes: ['super_admin', 'chef_equipe', 'finance']
