@@ -2317,16 +2317,19 @@ export type Database = {
           action: string | null
           created_at: string
           id: number
+          userId: string | null
         }
         Insert: {
           action?: string | null
           created_at?: string
           id?: number
+          userId?: string | null
         }
         Update: {
           action?: string | null
           created_at?: string
           id?: number
+          userId?: string | null
         }
         Relationships: []
       }
