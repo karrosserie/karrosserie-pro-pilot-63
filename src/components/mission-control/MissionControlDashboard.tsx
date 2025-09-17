@@ -873,16 +873,6 @@ const MissionControlDashboard = () => {
         selectedMode={selectedMode}
         onModeChange={setSelectedMode}
       />
-      
-      {/* Bouton temporaire pour créer les alertes manquantes */}
-      <button 
-        onClick={handleCreateMissingAlerts}
-        className="mb-4 px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
-      >
-        🔧 Créer alertes véhicules manquantes
-      </button>
-      
-      
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
         {currentMissions.length === 0 ? (
           <div className="col-span-full text-center py-12">
