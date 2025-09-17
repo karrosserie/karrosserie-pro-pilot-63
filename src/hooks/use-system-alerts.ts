@@ -39,16 +39,16 @@ export const useSystemAlerts = () => {
     try {
       setIsLoading(true);
       
-      // Récupérer les alertes non résolues des dernières 24 heures
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
+      // Récupérer les alertes non résolues du dernier mois
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
       
       const { data: alertsData, error } = await supabase
         .from('system_alerts')
         .select('*')
         .eq('company_id', companyData.id)
         .eq('resolved', false)
-        .gte('created_at', yesterday.toISOString())
+        .gte('created_at', oneMonthAgo.toISOString())
         .order('created_at', { ascending: false });
 
       if (error) {
