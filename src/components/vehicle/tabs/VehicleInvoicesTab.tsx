@@ -301,10 +301,6 @@ const VehicleInvoicesTab: React.FC<VehicleInvoicesTabProps> = ({ vehicleId }) =>
                           <Eye className="h-4 w-4 mr-1" />
                           Voir
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleEdit(invoice)}>
-                          <Pencil className="h-4 w-4 mr-1" />
-                          Modifier
-                        </Button>
                         <Button variant="outline" size="sm" onClick={() => handleDownload(invoice)}>
                           <Download className="h-4 w-4 mr-1" />
                           Télécharger
