@@ -33,6 +33,7 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
     handleRegistrationBackUpload,
     handleVehicleImageUpload,
     handleVehicleImagesUpdate,
+    handleValidationChange,
     handleSubmit
   } = useVehicleFormLogic({ defaultValues, onSubmit, isViewMode });
 
@@ -55,6 +56,7 @@ const VehicleForm: React.FC<VehicleFormProps> = ({
         onAddWorkItem={handleAddWorkItem}
         onRemoveWorkItem={handleRemoveWorkItem}
         onWorkItemChange={handleWorkItemChange}
+        onValidationChange={handleValidationChange}
       />
       
       <VehicleFormActions

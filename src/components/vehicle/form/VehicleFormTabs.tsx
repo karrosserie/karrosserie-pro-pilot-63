@@ -27,6 +27,7 @@ interface VehicleFormTabsProps {
   onAddWorkItem: () => void;
   onRemoveWorkItem: (index: number) => void;
   onWorkItemChange: (index: number, value: string) => void;
+  onValidationChange?: (field: string, isValid: boolean) => void;
 }
 
 const VehicleFormTabs: React.FC<VehicleFormTabsProps> = ({
@@ -45,7 +46,8 @@ const VehicleFormTabs: React.FC<VehicleFormTabsProps> = ({
   onFuelLevelChange,
   onAddWorkItem,
   onRemoveWorkItem,
-  onWorkItemChange
+  onWorkItemChange,
+  onValidationChange
 }) => {
   return (
     <Tabs defaultValue="info" className="w-full">
@@ -61,6 +63,7 @@ const VehicleFormTabs: React.FC<VehicleFormTabsProps> = ({
           isViewMode={isViewMode}
           onInputChange={onInputChange}
           onSelectChange={onSelectChange}
+          onValidationChange={onValidationChange}
         />
       </TabsContent>
 

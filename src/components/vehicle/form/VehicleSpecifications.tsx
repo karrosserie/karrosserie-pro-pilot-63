@@ -6,12 +6,14 @@ interface VehicleSpecificationsProps {
   formData: any;
   isViewMode: boolean;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onValidationChange?: (field: string, isValid: boolean) => void;
 }
 
 const VehicleSpecifications: React.FC<VehicleSpecificationsProps> = ({
   formData,
   isViewMode,
-  onInputChange
+  onInputChange,
+  onValidationChange
 }) => {
   // Validation des formats de plaque d'immatriculation française
   const validateLicensePlate = (value: string): boolean => {
@@ -42,6 +44,10 @@ const VehicleSpecifications: React.FC<VehicleSpecificationsProps> = ({
     
     // Modifier directement la valeur de l'événement
     e.target.value = formattedValue;
+    
+    // Valider le format et notifier le parent
+    const isValid = formattedValue === '' || validateLicensePlate(formattedValue);
+    onValidationChange?.('licensePlate', isValid);
     
     onInputChange(e);
   };

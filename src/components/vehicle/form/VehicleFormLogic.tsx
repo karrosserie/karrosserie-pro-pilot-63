@@ -43,6 +43,11 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
   const { error } = useNotification();
   const { carBrands } = useCarBrands();
   
+  // État de validation des champs
+  const [fieldValidation, setFieldValidation] = useState<Record<string, boolean>>({
+    licensePlate: true
+  });
+  
   // Ensure defaultValues is an object to prevent null access errors
   const safeDefaultValues = defaultValues || {};
   
@@ -214,6 +219,13 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
     setFormData(prev => ({ ...prev, vehicleImages: images }));
   };
 
+  const handleValidationChange = (field: string, isValid: boolean) => {
+    setFieldValidation(prev => ({
+      ...prev,
+      [field]: isValid
+    }));
+  };
+
   const validateRequiredFields = () => {
     const requiredFields = ['clientId', 'vin', 'brandId', 'modelId', 'licensePlate'];
     const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
@@ -222,6 +234,13 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
       error('Les champs suivants sont obligatoires : Client, Numéro de série (VIN), Marque, Modèle, Plaque d\'immatriculation', 'Champs manquants');
       return false;
     }
+    
+    // Vérifier la validation du format de la plaque d'immatriculation
+    if (!fieldValidation.licensePlate) {
+      error('Le format de la plaque d\'immatriculation est invalide. Utilisez : AB-456-CD ou 2567 AB 33', 'Format invalide');
+      return false;
+    }
+    
     return true;
   };
 
@@ -254,6 +273,7 @@ export function useVehicleFormLogic({ defaultValues, onSubmit, isViewMode }: Use
     handleRegistrationBackUpload,
     handleVehicleImageUpload,
     handleVehicleImagesUpdate,
+    handleValidationChange,
     handleSubmit
   };
 }

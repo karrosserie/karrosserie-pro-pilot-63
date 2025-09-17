@@ -11,13 +11,15 @@ interface VehicleBasicInfoFormProps {
   isViewMode: boolean;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onSelectChange: (name: string, value: string) => void;
+  onValidationChange?: (field: string, isValid: boolean) => void;
 }
 
 const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
   formData,
   isViewMode,
   onInputChange,
-  onSelectChange
+  onSelectChange,
+  onValidationChange
 }) => {
   return (
     <div className="space-y-4">
@@ -41,6 +43,7 @@ const VehicleBasicInfoForm: React.FC<VehicleBasicInfoFormProps> = ({
         formData={formData}
         isViewMode={isViewMode}
         onInputChange={onInputChange}
+        onValidationChange={onValidationChange}
       />
 
       {/* Insurance information */}
