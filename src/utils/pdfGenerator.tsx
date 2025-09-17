@@ -42,11 +42,12 @@ export const generateInvoicePDF = async (
 export const generateDenunciationPDF = async (
   violationData: any,
   companyData: any,
-  signature?: string
+  signature?: string,
+  signatoryName?: string
 ) => {
   try {
     // Créer le document PDF
-    const doc = <DenunciationPDF violationData={violationData} companyData={companyData} signature={signature} />;
+    const doc = <DenunciationPDF violationData={violationData} companyData={companyData} signature={signature} signatoryName={signatoryName} />;
     
     // Générer le blob PDF
     const asPdf = pdf(doc);

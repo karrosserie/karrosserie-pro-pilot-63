@@ -25,10 +25,12 @@ export const DenunciationDialog: React.FC<DenunciationDialogProps> = ({
   onOpenChange,
   violationData
 }) => {
-  const [signature, setSignature] = useState('');
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const { toast } = useToast();
   const { companyData } = useCompany();
+  
+  const [signature, setSignature] = useState('');
+  const [signatoryName, setSignatoryName] = useState(companyData?.name || '');
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   const handleSignatureChange = (signatureData: string) => {
     setSignature(signatureData);
@@ -56,7 +58,7 @@ export const DenunciationDialog: React.FC<DenunciationDialogProps> = ({
     setIsGeneratingPDF(true);
     
     try {
-      await generateDenunciationPDF(violationData, companyData, signature);
+      await generateDenunciationPDF(violationData, companyData, signature, signatoryName);
       
       toast({
         title: "Dénonciation générée",
@@ -258,6 +260,19 @@ export const DenunciationDialog: React.FC<DenunciationDialogProps> = ({
           <div className="bg-card border rounded-lg p-6">
             <h3 className="font-semibold text-lg mb-4">Signature du responsable</h3>
             <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Nom et prénom du signataire
+                </label>
+                <input
+                  type="text"
+                  value={signatoryName}
+                  onChange={(e) => setSignatoryName(e.target.value)}
+                  className="w-full px-3 py-2 border border-input rounded-md bg-background"
+                  placeholder="Nom et prénom du responsable"
+                />
+              </div>
+              
               <p className="text-sm text-muted-foreground">
                 En signant ce document, vous certifiez sur l'honneur l'exactitude des informations fournies 
                 et attestez que le véhicule était bien conduit par la personne désignée au moment de l'infraction.

@@ -18,8 +18,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   section: {
-    marginBottom: 15,
-    padding: 10,
+    marginBottom: 10,
+    padding: 8,
     backgroundColor: '#f8f9fa',
   },
   sectionTitle: {
@@ -40,11 +40,11 @@ const styles = StyleSheet.create({
     width: '60%',
   },
   letterContent: {
-    lineHeight: 1.5,
-    marginBottom: 15,
+    lineHeight: 1.3,
+    marginBottom: 10,
   },
   paragraph: {
-    marginBottom: 10,
+    marginBottom: 6,
     textAlign: 'justify',
   },
   signature: {
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   },
   conductorInfo: {
     marginLeft: 20,
-    marginBottom: 10,
+    marginBottom: 6,
   },
 });
 
@@ -82,12 +82,14 @@ interface DenunciationPDFProps {
   };
   companyData: any;
   signature?: string;
+  signatoryName?: string;
 }
 
 const DenunciationPDF: React.FC<DenunciationPDFProps> = ({
   violationData,
   companyData,
-  signature
+  signature,
+  signatoryName
 }) => {
   const { violation, reservation, conductor } = violationData;
 
@@ -213,6 +215,9 @@ const DenunciationPDF: React.FC<DenunciationPDFProps> = ({
         <View style={styles.signature}>
           <Text>Fait le {format(new Date(), 'dd/MM/yyyy', { locale: fr })}</Text>
           <Text>Signature du responsable :</Text>
+          {signatoryName && (
+            <Text style={{ marginTop: 5, fontSize: 10 }}>{signatoryName}</Text>
+          )}
           <View style={styles.signatureBox}>
             {signature ? (
               <Image style={styles.signatureImage} src={signature} />
