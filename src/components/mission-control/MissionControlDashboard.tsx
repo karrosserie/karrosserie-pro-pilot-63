@@ -102,16 +102,14 @@ const MissionControlDashboard = () => {
             return {
               type: 'critical' as const,
               icon: 'supplier' as const,
-              title: `Véhicule en attente - ${displayReason}`,
-              subtitle: `🚗 **${licensePlate.toUpperCase()}** - RAISON: **${displayReason.toUpperCase()}**`,
-              description: `**VÉHICULE:** ${alert.vehicle_info || 'Véhicule inconnu'}\n**RAISON D'ATTENTE:** ${displayReason}\n**PLAQUE:** ${licensePlate.toUpperCase()}`,
-              impact: 'Véhicule immobilisé - Impact sur la productivité et satisfaction client',
-              suggestion: displayReason === 'En attente de planification' ? 
-                'Planifier les tâches nécessaires pour débloquer le véhicule' : 
-                `Traiter la raison de l'attente : ${displayReason}`,
+              title: 'Véhicule en attente',
+              subtitle: `🚗 **${licensePlate.toUpperCase()}**`,
+              description: `Véhicule immobilisé - Impact sur la productivité et satisfaction client`,
+              impact: 'Immobilisation prolongée du véhicule client',
+              suggestion: `Raison de l'attente: ${displayReason}`,
               metrics: [
                 { value: licensePlate.toUpperCase(), label: '🚗 PLAQUE', unit: '' },
-                { value: displayReason, label: '⚠️ RAISON', unit: '' },
+                { value: new Date(alert.created_at).toLocaleDateString('fr-FR'), label: 'Date mise en attente', unit: '' },
                 { value: Math.ceil((Date.now() - new Date(alert.created_at).getTime()) / (1000 * 60 * 60)).toString(), label: 'Heures d\'attente', unit: 'h' }
               ],
               actions: [
