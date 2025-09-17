@@ -10,7 +10,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
-import { Wrench, Eye, Pencil, Trash, Download, Printer, Mail, Signature, FileCheck, ArrowRight } from 'lucide-react';
+import { Wrench, Eye, Pencil, Archive, Download, Printer, Mail, Signature, FileCheck, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { RepairOrderActionsDropdown } from '@/components/repair-orders/RepairOrderActionsDropdown';
@@ -30,7 +30,7 @@ interface VehicleRepairOrdersTabProps {
 }
 
 const VehicleRepairOrdersTab: React.FC<VehicleRepairOrdersTabProps> = ({ vehicleId }) => {
-  const { orders, isLoading, deleteOrder } = useRepairOrders();
+  const { orders, isLoading, archiveOrder } = useRepairOrders();
   const { toast } = useToast();
   const { confirm } = useConfirmation();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -64,26 +64,27 @@ const VehicleRepairOrdersTab: React.FC<VehicleRepairOrdersTabProps> = ({ vehicle
     setEditDialogOpen(true);
   };
 
-  const handleDeleteOrder = async (order: RepairOrder) => {
+  const handleArchiveOrder = async (order: RepairOrder) => {
     const confirmed = await confirm({
-      title: 'Supprimer l\'ordre de réparation',
-      description: `Êtes-vous sûr de vouloir supprimer l'ordre de réparation ${order.reference} ? Cette action est irréversible.`,
-      confirmText: 'Supprimer',
+      title: 'Archiver l\'ordre de réparation',
+      description: `Êtes-vous sûr de vouloir archiver l'ordre de réparation ${order.reference} ? L'ordre restera visible mais sera marqué comme archivé.`,
+      confirmText: 'Archiver',
       cancelText: 'Annuler',
-      variant: 'destructive'
+      variant: 'default'
     });
 
     if (confirmed) {
       try {
-        await deleteOrder.mutateAsync(order.id);
+        await archiveOrder.mutateAsync(order.id);
         toast({
-          title: "Ordre supprimé",
-          description: "L'ordre de réparation a été supprimé avec succès."
+          title: "Ordre archivé",
+          description: `L'ordre de réparation ${order.reference} a été archivé avec succès.`
         });
       } catch (error: any) {
+        console.error('Error archiving repair order:', error);
         toast({
           title: "Erreur",
-          description: `Impossible de supprimer l'ordre de réparation: ${error.message}`,
+          description: "Impossible d'archiver l'ordre de réparation.",
           variant: "destructive"
         });
       }
@@ -324,12 +325,12 @@ const VehicleRepairOrdersTab: React.FC<VehicleRepairOrdersTabProps> = ({ vehicle
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
-                          onClick={() => handleDeleteOrder(order)}
-                          title="Supprimer"
+                          className="text-orange-600 hover:text-orange-700 border-orange-600 hover:border-orange-700"
+                          onClick={() => handleArchiveOrder(order)}
+                          title="Archiver"
                         >
-                          <Trash className="h-4 w-4 mr-1" />
-                          Supprimer
+                          <Archive className="h-4 w-4 mr-1" />
+                          Archiver
                         </Button>
                       </div>
                     </TableCell>
