@@ -7,30 +7,30 @@ const styles = StyleSheet.create({
   page: {
     flexDirection: 'column',
     backgroundColor: '#FFFFFF',
-    padding: 30,
-    fontSize: 11,
+    padding: 20,
+    fontSize: 10,
     fontFamily: 'Helvetica',
   },
   header: {
     textAlign: 'center',
-    marginBottom: 30,
-    fontSize: 14,
+    marginBottom: 15,
+    fontSize: 12,
     fontWeight: 'bold',
   },
   section: {
-    marginBottom: 10,
-    padding: 8,
+    marginBottom: 8,
+    padding: 6,
     backgroundColor: '#f8f9fa',
   },
   sectionTitle: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 6,
     textDecoration: 'underline',
   },
   row: {
     flexDirection: 'row',
-    marginBottom: 5,
+    marginBottom: 3,
   },
   label: {
     fontWeight: 'bold',
@@ -40,22 +40,22 @@ const styles = StyleSheet.create({
     width: '60%',
   },
   letterContent: {
-    lineHeight: 1.3,
-    marginBottom: 10,
+    lineHeight: 1.2,
+    marginBottom: 8,
   },
   paragraph: {
-    marginBottom: 6,
+    marginBottom: 4,
     textAlign: 'justify',
   },
   signature: {
-    marginTop: 30,
+    marginTop: 15,
     alignItems: 'flex-end',
   },
   signatureBox: {
-    width: 200,
-    height: 80,
-    border: '2 solid #cccccc',
-    marginTop: 10,
+    width: 180,
+    height: 60,
+    border: '1 solid #cccccc',
+    marginTop: 5,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -69,8 +69,8 @@ const styles = StyleSheet.create({
     color: '#666666',
   },
   conductorInfo: {
-    marginLeft: 20,
-    marginBottom: 6,
+    marginLeft: 15,
+    marginBottom: 4,
   },
 });
 
