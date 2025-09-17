@@ -10,7 +10,7 @@ const corsHeaders = {
 // Configuration email avec les variables d'environnement
 async function sendEmail(to: string, subject: string, html: string): Promise<{ success: boolean; messageId?: string; message: string; }> {
   try {
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
       host: Deno.env.get('SMTP_HOST'),
       port: parseInt(Deno.env.get('SMTP_PORT') || '587'),
       secure: false,
