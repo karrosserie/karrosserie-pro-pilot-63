@@ -497,10 +497,6 @@ const Invoices = () => {
                                <Eye className="mr-2 h-4 w-4" />
                                Voir
                              </DropdownMenuItem>
-                             <DropdownMenuItem onClick={() => handleEditInvoice(invoice)}>
-                               <Pencil className="mr-2 h-4 w-4" />
-                               Modifier
-                             </DropdownMenuItem>
                              <DropdownMenuSeparator />
                              <DropdownMenuItem onClick={() => handlePrint(invoice)}>
                                <Printer className="mr-2 h-4 w-4" />
