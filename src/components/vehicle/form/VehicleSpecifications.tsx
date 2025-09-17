@@ -40,16 +40,10 @@ const VehicleSpecifications: React.FC<VehicleSpecificationsProps> = ({
   const handleLicensePlateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formattedValue = formatLicensePlate(e.target.value);
     
-    // Créer un nouvel événement avec la valeur formatée
-    const syntheticEvent = {
-      ...e,
-      target: {
-        ...e.target,
-        value: formattedValue
-      }
-    };
+    // Modifier directement la valeur de l'événement
+    e.target.value = formattedValue;
     
-    onInputChange(syntheticEvent);
+    onInputChange(e);
   };
 
   const isLicensePlateValid = formData.licensePlate ? validateLicensePlate(formData.licensePlate) : true;
