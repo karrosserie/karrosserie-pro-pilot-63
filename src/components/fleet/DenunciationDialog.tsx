@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MapPin, User, FileText, Euro, Signature } from 'lucide-react';
+import { Calendar, MapPin, User, FileText, Euro, Signature, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
+import { useCompany } from '@/hooks/use-company';
+import SignaturePad from '@/components/shared/SignaturePad';
+import { generateDenunciationPDF } from '@/utils/pdfGenerator';
 
 interface DenunciationDialogProps {
   open: boolean;
@@ -22,20 +25,17 @@ export const DenunciationDialog: React.FC<DenunciationDialogProps> = ({
   onOpenChange,
   violationData
 }) => {
-  const [isSigned, setIsSigned] = useState(false);
+  const [signature, setSignature] = useState('');
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const { toast } = useToast();
+  const { companyData } = useCompany();
 
-  const handleSign = () => {
-    setIsSigned(true);
-    toast({
-      title: "Document signé",
-      description: "Le courrier de dénonciation a été signé électroniquement."
-    });
+  const handleSignatureChange = (signatureData: string) => {
+    setSignature(signatureData);
   };
 
   const handleGeneratePDF = async () => {
-    if (!isSigned) {
+    if (!signature) {
       toast({
         title: "Signature requise",
         description: "Vous devez signer le document avant de le générer.",
@@ -44,19 +44,28 @@ export const DenunciationDialog: React.FC<DenunciationDialogProps> = ({
       return;
     }
 
+    if (!violationData || !companyData) {
+      toast({
+        title: "Données manquantes",
+        description: "Impossible de générer le PDF sans les données complètes.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsGeneratingPDF(true);
     
     try {
-      // Ici on générerait le PDF et on facturerait le client
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulation
+      await generateDenunciationPDF(violationData, companyData, signature);
       
       toast({
-        title: "Dénonciation envoyée",
-        description: "Le courrier de dénonciation ANTAI a été généré et une facture de 15€ TTC a été créée."
+        title: "Dénonciation générée",
+        description: "Le courrier de dénonciation ANTAI a été téléchargé avec succès. Une facture de 15€ TTC sera créée."
       });
       
       onOpenChange(false);
     } catch (error) {
+      console.error('Erreur génération PDF:', error);
       toast({
         title: "Erreur",
         description: "Impossible de générer le courrier de dénonciation.",
@@ -240,17 +249,31 @@ export const DenunciationDialog: React.FC<DenunciationDialogProps> = ({
 
               <div className="mt-8 text-right">
                 <p>Fait le {format(new Date(), 'dd/MM/yyyy', { locale: fr })}</p>
-                <div className="mt-8 border border-dashed border-gray-300 h-20 flex items-center justify-center">
-                  {isSigned ? (
-                    <div className="flex items-center space-x-2 text-green-600">
-                      <Signature className="h-5 w-5" />
-                      <span>Document signé électroniquement</span>
-                    </div>
-                  ) : (
-                    <span className="text-muted-foreground">Zone de signature</span>
-                  )}
-                </div>
+                <p>Signature du responsable :</p>
               </div>
+            </div>
+          </div>
+
+          {/* Section signature du carrossier */}
+          <div className="bg-card border rounded-lg p-6">
+            <h3 className="font-semibold text-lg mb-4">Signature du responsable</h3>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                En signant ce document, vous certifiez sur l'honneur l'exactitude des informations fournies 
+                et attestez que le véhicule était bien conduit par la personne désignée au moment de l'infraction.
+              </p>
+              
+              <SignaturePad
+                value={signature}
+                onSignatureChange={handleSignatureChange}
+              />
+              
+              {signature && (
+                <div className="text-sm text-green-600 flex items-center space-x-2">
+                  <Signature className="h-4 w-4" />
+                  <span>Document signé électroniquement</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -263,30 +286,23 @@ export const DenunciationDialog: React.FC<DenunciationDialogProps> = ({
               <Button variant="outline" onClick={() => onOpenChange(false)}>
                 Annuler
               </Button>
-              {!isSigned ? (
-                <Button onClick={handleSign} className="bg-primary hover:bg-primary/90">
-                  <Signature className="h-4 w-4 mr-2" />
-                  Signer le document
-                </Button>
-              ) : (
-                <Button 
-                  onClick={handleGeneratePDF}
-                  disabled={isGeneratingPDF}
-                  className="bg-primary hover:bg-primary/90"
-                >
-                  {isGeneratingPDF ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Génération...
-                    </>
-                  ) : (
-                    <>
-                      <FileText className="h-4 w-4 mr-2" />
-                      Générer et envoyer
-                    </>
-                  )}
-                </Button>
-              )}
+              <Button 
+                onClick={handleGeneratePDF}
+                disabled={isGeneratingPDF || !signature}
+                className="bg-primary hover:bg-primary/90"
+              >
+                {isGeneratingPDF ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Génération...
+                  </>
+                ) : (
+                  <>
+                    <Download className="h-4 w-4 mr-2" />
+                    Télécharger le PDF
+                  </>
+                )}
+              </Button>
             </div>
           </div>
         </div>
