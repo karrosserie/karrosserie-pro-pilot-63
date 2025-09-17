@@ -11,7 +11,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
-import { FileText, Eye, Pencil, Trash, MoreVertical } from 'lucide-react';
+import { FileText, Eye, Pencil, Archive, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import {
@@ -37,7 +37,7 @@ interface VehicleQuotesTabProps {
 
 const VehicleQuotesTab: React.FC<VehicleQuotesTabProps> = ({ vehicleId }) => {
   const navigate = useNavigate();
-  const { quotes, isLoading, deleteQuote } = useQuotes();
+  const { quotes, isLoading, archiveQuote } = useQuotes();
   const { toast } = useToast();
   const { confirm } = useConfirmation();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -69,20 +69,29 @@ const VehicleQuotesTab: React.FC<VehicleQuotesTabProps> = ({ vehicleId }) => {
     setEditDialogOpen(true);
   };
 
-  const handleDelete = async (quote: any) => {
+  const handleArchive = async (quote: any) => {
     const confirmed = await confirm({
-      title: 'Supprimer le devis',
-      description: `Êtes-vous sûr de vouloir supprimer le devis ${quote.reference} ? Cette action est irréversible.`,
-      confirmText: 'Supprimer',
+      title: 'Archiver le devis',
+      description: `Êtes-vous sûr de vouloir archiver le devis ${quote.reference} ? Le devis restera visible mais sera marqué comme archivé.`,
+      confirmText: 'Archiver',
       cancelText: 'Annuler',
-      variant: 'destructive'
+      variant: 'default'
     });
 
     if (confirmed) {
       try {
-        await deleteQuote.mutateAsync(quote.id);
+        await archiveQuote.mutateAsync(quote.id);
+        toast({
+          title: "Devis archivé",
+          description: `Le devis ${quote.reference} a été archivé avec succès.`
+        });
       } catch (error: any) {
-        console.error('Error deleting quote:', error);
+        console.error('Error archiving quote:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible d'archiver le devis.",
+          variant: "destructive"
+        });
       }
     }
   };
@@ -304,12 +313,12 @@ const VehicleQuotesTab: React.FC<VehicleQuotesTabProps> = ({ vehicleId }) => {
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
-                          onClick={() => handleDelete(quote)}
-                          title="Supprimer"
+                          className="text-orange-600 hover:text-orange-700 border-orange-600 hover:border-orange-700"
+                          onClick={() => handleArchive(quote)}
+                          title="Archiver"
                         >
-                          <Trash className="h-4 w-4 mr-1" />
-                          Supprimer
+                          <Archive className="h-4 w-4 mr-1" />
+                          Archiver
                         </Button>
                       </div>
                     </TableCell>
