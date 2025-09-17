@@ -11,7 +11,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
-import { Receipt, Eye, Pencil, Trash, Download, Printer, Mail, CreditCard, FileX } from 'lucide-react';
+import { Receipt, Eye, Pencil, Archive, Download, Printer, Mail, CreditCard, FileX } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
@@ -46,7 +46,7 @@ interface VehicleInvoicesTabProps {
 }
 
 const VehicleInvoicesTab: React.FC<VehicleInvoicesTabProps> = ({ vehicleId }) => {
-  const { invoices, isLoading, deleteInvoice } = useInvoices();
+  const { invoices, isLoading, archiveInvoice } = useInvoices();
   const { credits } = useCredits();
   const { toast } = useToast();
   const { confirm } = useConfirmation();
@@ -79,26 +79,27 @@ const VehicleInvoicesTab: React.FC<VehicleInvoicesTabProps> = ({ vehicleId }) =>
     setDialogOpen(true);
   };
 
-  const handleDelete = async (invoice: Invoice) => {
+  const handleArchive = async (invoice: Invoice) => {
     const confirmed = await confirm({
-      title: 'Supprimer la facture',
-      description: `Êtes-vous sûr de vouloir supprimer la facture ${invoice.reference} ? Cette action est irréversible.`,
-      confirmText: 'Supprimer',
+      title: 'Archiver la facture',
+      description: `Êtes-vous sûr de vouloir archiver la facture ${invoice.reference} ? La facture restera visible mais sera marquée comme archivée.`,
+      confirmText: 'Archiver',
       cancelText: 'Annuler',
-      variant: 'destructive'
+      variant: 'default'
     });
 
     if (confirmed) {
       try {
-        await deleteInvoice.mutateAsync(invoice.id);
+        await archiveInvoice.mutateAsync(invoice.id);
         toast({
-          title: "Facture supprimée",
-          description: "La facture a été supprimée avec succès."
+          title: "Facture archivée",
+          description: `La facture ${invoice.reference} a été archivée avec succès.`
         });
       } catch (error: any) {
+        console.error('Error archiving invoice:', error);
         toast({
           title: "Erreur",
-          description: `Impossible de supprimer la facture: ${error.message}`,
+          description: "Impossible d'archiver la facture.",
           variant: "destructive"
         });
       }
@@ -324,12 +325,12 @@ const VehicleInvoicesTab: React.FC<VehicleInvoicesTabProps> = ({ vehicleId }) =>
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
-                          onClick={() => handleDelete(invoice)}
-                          title="Supprimer"
+                          className="text-orange-600 hover:text-orange-700 border-orange-600 hover:border-orange-700"
+                          onClick={() => handleArchive(invoice)}
+                          title="Archiver"
                         >
-                          <Trash className="h-4 w-4 mr-1" />
-                          Supprimer
+                          <Archive className="h-4 w-4 mr-1" />
+                          Archiver
                         </Button>
                       </div>
                     </TableCell>
