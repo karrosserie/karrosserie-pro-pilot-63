@@ -2312,6 +2312,24 @@ export type Database = {
         }
         Relationships: []
       }
+      "suivi action user": {
+        Row: {
+          action: string | null
+          created_at: string
+          id: number
+        }
+        Insert: {
+          action?: string | null
+          created_at?: string
+          id?: number
+        }
+        Update: {
+          action?: string | null
+          created_at?: string
+          id?: number
+        }
+        Relationships: []
+      }
       system_alerts: {
         Row: {
           alert_type: string
@@ -3129,6 +3147,88 @@ export type Database = {
             columns: ["vehicle_specification_id"]
             isOneToOne: false
             referencedRelation: "vehicle_specifications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webhook_configurations: {
+        Row: {
+          company_id: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          n8n_webhook_url: string
+          updated_at: string | null
+          usage_threshold: number | null
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          n8n_webhook_url: string
+          updated_at?: string | null
+          usage_threshold?: number | null
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          n8n_webhook_url?: string
+          updated_at?: string | null
+          usage_threshold?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_configurations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webhook_executions: {
+        Row: {
+          alerts_sent: number | null
+          clients_analyzed: number | null
+          created_at: string | null
+          error_message: string | null
+          execution_date: string | null
+          execution_details: Json | null
+          id: string
+          status: string | null
+          webhook_config_id: string | null
+        }
+        Insert: {
+          alerts_sent?: number | null
+          clients_analyzed?: number | null
+          created_at?: string | null
+          error_message?: string | null
+          execution_date?: string | null
+          execution_details?: Json | null
+          id?: string
+          status?: string | null
+          webhook_config_id?: string | null
+        }
+        Update: {
+          alerts_sent?: number | null
+          clients_analyzed?: number | null
+          created_at?: string | null
+          error_message?: string | null
+          execution_date?: string | null
+          execution_details?: Json | null
+          id?: string
+          status?: string | null
+          webhook_config_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_executions_webhook_config_id_fkey"
+            columns: ["webhook_config_id"]
+            isOneToOne: false
+            referencedRelation: "webhook_configurations"
             referencedColumns: ["id"]
           },
         ]
