@@ -85,6 +85,21 @@ export const useSystemAlerts = () => {
             .eq('id', alert.vehicle_id)
             .single();
           
+          // Récupérer la raison depuis employee_schedule si elle existe
+          let waitingReason = alert.reason;
+          const { data: schedule } = await supabase
+            .from('employee_schedule')
+            .select('waiting_reason')
+            .eq('vehicle_id', alert.vehicle_id)
+            .not('waiting_reason', 'is', null)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+          
+          if (schedule?.waiting_reason) {
+            waitingReason = schedule.waiting_reason;
+          }
+          
           let displayInfo = 'Véhicule inconnu';
           if (vehicle) {
             displayInfo = `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate}`;
@@ -93,7 +108,8 @@ export const useSystemAlerts = () => {
           enrichedAlerts.push({
             ...alert,
             entity_type: 'vehicle',
-            vehicle_info: displayInfo
+            vehicle_info: displayInfo,
+            reason: waitingReason
           } as SystemAlert);
         } else if (alert.entity_type === 'messagerie' && alert.messagerie_id) {
           const { data: messagerie } = await supabase
