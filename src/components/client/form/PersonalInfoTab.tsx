@@ -8,6 +8,7 @@ interface PersonalInfoTabProps {
   formData: any;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handlePhoneChange?: (value: string | undefined) => void;
+  handlePhoneValidationChange?: (isValid: boolean) => void;
   handleAutoRelancesToggle?: (checked: boolean) => void;
   isViewMode: boolean;
 }
@@ -16,6 +17,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
   formData,
   handleChange,
   handlePhoneChange,
+  handlePhoneValidationChange,
   handleAutoRelancesToggle,
   isViewMode
 }) => {
@@ -71,6 +73,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
           <CustomPhoneInput
             value={formData.phone}
             onChange={handlePhoneChange || (() => {})}
+            onValidationChange={handlePhoneValidationChange}
             placeholder="Numéro de téléphone"
             disabled={isViewMode}
           />

@@ -19,6 +19,7 @@ const ClientForm: React.FC<ClientFormProps> = ({
   onCancel
 }) => {
   const { error } = useNotification();
+  const [phoneIsValid, setPhoneIsValid] = useState(true);
   const [formData, setFormData] = useState({
     firstName: defaultValues?.firstName || '',
     lastName: defaultValues?.lastName || '',
@@ -40,6 +41,10 @@ const ClientForm: React.FC<ClientFormProps> = ({
 
   const handlePhoneChange = (value: string | undefined) => {
     setFormData(prev => ({ ...prev, phone: value || '' }));
+  };
+
+  const handlePhoneValidationChange = (isValid: boolean) => {
+    setPhoneIsValid(isValid);
   };
 
   const handleDriverLicenseFrontUpload = (url: string) => {
@@ -70,6 +75,13 @@ const ClientForm: React.FC<ClientFormProps> = ({
         return false;
       }
     }
+    
+    // Vérification spécifique du format du téléphone français
+    if (!phoneIsValid) {
+      error('Le numéro de téléphone français doit comporter 9 chiffres et commencer par 6 ou 7 (ex: 06 12 34 56 78).', 'Téléphone invalide');
+      return false;
+    }
+    
     return true;
   };
 
@@ -109,6 +121,7 @@ const ClientForm: React.FC<ClientFormProps> = ({
             formData={formData} 
             handleChange={handleChange}
             handlePhoneChange={handlePhoneChange}
+            handlePhoneValidationChange={handlePhoneValidationChange}
             handleAutoRelancesToggle={handleAutoRelancesToggle}
             isViewMode={isViewMode}
           />

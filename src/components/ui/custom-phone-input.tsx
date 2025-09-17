@@ -29,6 +29,7 @@ interface CustomPhoneInputProps {
   disabled?: boolean;
   className?: string;
   defaultCountry?: string;
+  onValidationChange?: (isValid: boolean) => void;
 }
 
 export const CustomPhoneInput: React.FC<CustomPhoneInputProps> = ({
@@ -37,13 +38,27 @@ export const CustomPhoneInput: React.FC<CustomPhoneInputProps> = ({
   placeholder = "Numéro de téléphone",
   disabled = false,
   className,
-  defaultCountry = "FR"
+  defaultCountry = "FR",
+  onValidationChange
 }) => {
   const [selectedCountry, setSelectedCountry] = useState(
     countries.find(country => country.code === defaultCountry) || countries[0]
   );
   const [phoneNumber, setPhoneNumber] = useState('');
   const [open, setOpen] = useState(false);
+
+  // Validation française : 9 chiffres commençant par 6 ou 7
+  const validateFrenchMobile = (phoneNumber: string, countryCode: string): boolean => {
+    if (countryCode !== 'FR') return true; // Pas de validation pour les autres pays
+    if (!phoneNumber) return true; // Champ vide accepté
+    
+    // Nettoyer le numéro (enlever espaces, points, tirets)
+    const cleanNumber = phoneNumber.replace(/[\s.-]/g, '');
+    
+    // Vérifier : exactement 9 chiffres et commence par 6 ou 7
+    const frenchMobileRegex = /^[67]\d{8}$/;
+    return frenchMobileRegex.test(cleanNumber);
+  };
 
   // Effet pour analyser la valeur initiale
   useEffect(() => {
@@ -52,15 +67,23 @@ export const CustomPhoneInput: React.FC<CustomPhoneInputProps> = ({
       const matchingCountry = countries.find(country => value.startsWith(country.dialCode));
       if (matchingCountry) {
         setSelectedCountry(matchingCountry);
-        setPhoneNumber(value.substring(matchingCountry.dialCode.length));
+        const extractedNumber = value.substring(matchingCountry.dialCode.length);
+        setPhoneNumber(extractedNumber);
+        
+        // Valider le numéro initial
+        const isValid = validateFrenchMobile(extractedNumber, matchingCountry.code);
+        onValidationChange?.(isValid);
       } else {
         // Si aucun indicatif trouvé, utiliser la valeur complète comme numéro
         setPhoneNumber(value);
+        const isValid = validateFrenchMobile(value, selectedCountry.code);
+        onValidationChange?.(isValid);
       }
     } else {
       setPhoneNumber('');
+      onValidationChange?.(true); // Champ vide = valide
     }
-  }, [value]);
+  }, [value, onValidationChange]);
 
   const handleCountrySelect = (country: typeof countries[0]) => {
     setSelectedCountry(country);
@@ -68,6 +91,10 @@ export const CustomPhoneInput: React.FC<CustomPhoneInputProps> = ({
     // Mettre à jour la valeur complète
     const fullNumber = phoneNumber ? `${country.dialCode}${phoneNumber}` : country.dialCode;
     onChange(fullNumber);
+    
+    // Valider avec le nouveau pays
+    const isValid = validateFrenchMobile(phoneNumber, country.code);
+    onValidationChange?.(isValid);
   };
 
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,6 +103,10 @@ export const CustomPhoneInput: React.FC<CustomPhoneInputProps> = ({
     // Mettre à jour la valeur complète
     const fullNumber = number ? `${selectedCountry.dialCode}${number}` : selectedCountry.dialCode;
     onChange(fullNumber);
+    
+    // Valider le numéro français
+    const isValid = validateFrenchMobile(number, selectedCountry.code);
+    onValidationChange?.(isValid);
   };
 
   return (
