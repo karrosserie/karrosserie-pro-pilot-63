@@ -261,7 +261,8 @@ export default function DocumentUploadFlow() {
       
       // Mettre à jour l'état pour afficher directement l'écran de confirmation
       setMissingDocuments([]);
-      // Ne pas retourner au workflow, laisser l'écran de confirmation s'afficher
+      setShowWorkflow(false);
+      // Maintenant l'écran de confirmation sera affiché
       
     } catch (error) {
       console.error("Erreur lors de la sauvegarde des documents:", error);
