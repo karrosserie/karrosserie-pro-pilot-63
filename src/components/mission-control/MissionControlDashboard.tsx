@@ -94,10 +94,18 @@ const MissionControlDashboard = () => {
               modes: ['super_admin', 'chef_equipe']
             };
           } else if (alert.entity_type === 'vehicle' && alert.alert_type === 'vehicle_waiting') {
-            const displayReason = alert.reason || 'En attente de planification';
             const licensePlate = alert.vehicle_info?.split(' - ')[1] || 
                                 alert.message?.split('Le véhicule ')[1]?.split(' est en attente')[0] || 
                                 'Plaque inconnue';
+            
+            // Gérer les raisons vides ou non descriptives
+            let displayReason = 'En attente de planification';
+            if (alert.reason && 
+                alert.reason.trim() !== '' && 
+                alert.reason.toLowerCase() !== 'en attente' && 
+                alert.reason.toLowerCase() !== 'attente') {
+              displayReason = alert.reason;
+            }
             
             return {
               type: 'critical' as const,
