@@ -78,7 +78,7 @@ const ClientForm: React.FC<ClientFormProps> = ({
     
     // Vérification spécifique du format du téléphone français
     if (!phoneIsValid) {
-      error('Le numéro de téléphone français doit comporter 9 chiffres et commencer par 6 ou 7 (ex: 06 12 34 56 78).', 'Téléphone invalide');
+      error('Le numéro de téléphone français doit comporter 9 chiffres et commencer par 6 ou 7 (ex: 6 12 34 56 78).', 'Téléphone invalide');
       return false;
     }
     
