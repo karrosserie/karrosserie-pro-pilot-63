@@ -94,17 +94,24 @@ const MissionControlDashboard = () => {
               modes: ['super_admin', 'chef_equipe']
             };
           } else if (alert.entity_type === 'vehicle' && alert.alert_type === 'vehicle_waiting') {
+            const displayReason = alert.reason || 'En attente de planification';
+            const licensePlate = alert.vehicle_info?.split(' - ')[1] || 
+                                alert.message?.split('Le véhicule ')[1]?.split(' est en attente')[0] || 
+                                'Plaque inconnue';
+            
             return {
               type: 'critical' as const,
               icon: 'supplier' as const,
               title: 'Véhicule en attente',
-              subtitle: `${alert.vehicle_info || 'Véhicule inconnu'}`,
-              description: alert.message,
+              subtitle: `🚗 ${licensePlate.toUpperCase()} - ${displayReason}`,
+              description: `${alert.vehicle_info || 'Véhicule inconnu'} - Raison: ${displayReason}`,
               impact: 'Véhicule immobilisé - Impact sur la productivité et satisfaction client',
-              suggestion: alert.reason ? `Traiter la raison de l'attente : ${alert.reason}` : 'Vérifier les causes du blocage et débloquer le véhicule',
+              suggestion: displayReason === 'En attente de planification' ? 
+                'Planifier les tâches nécessaires pour débloquer le véhicule' : 
+                `Traiter la raison de l'attente : ${displayReason}`,
               metrics: [
                 { value: new Date(alert.created_at).toLocaleDateString('fr-FR'), label: 'Date mise en attente', unit: '' },
-                { value: alert.reason || 'Non spécifiée', label: 'Raison', unit: '' },
+                { value: displayReason, label: 'Raison', unit: '' },
                 { value: Math.ceil((Date.now() - new Date(alert.created_at).getTime()) / (1000 * 60 * 60)).toString(), label: 'Heures d\'attente', unit: 'h' }
               ],
               actions: [
@@ -120,12 +127,12 @@ const MissionControlDashboard = () => {
                       id: alert.vehicle_id || '',
                       brand: 'Marque non renseignée',
                       model: 'Modèle non renseigné', 
-                      licensePlate: alert.message?.split('Le véhicule ')[1]?.split(' est en attente')[0] || 'Plaque inconnue',
+                      licensePlate: licensePlate,
                       client: 'Client non renseigné'
                     },
                     employees: employees || [],
                     companyId: companyData?.id || null,
-                    reason: alert.reason,
+                    reason: displayReason,
                     resolveAlert 
                   }
                 },
