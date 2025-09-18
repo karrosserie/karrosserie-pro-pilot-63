@@ -34,30 +34,25 @@ export const CurrentTaskDisplay = ({
 }: CurrentTaskDisplayProps) => {
   const [elapsedTime, setElapsedTime] = useState('00:00:00');
 
-  // Calculer le temps écoulé depuis le début de la tâche
+  // Chronomètre qui commence à 0
   useEffect(() => {
-    const calculateElapsedTime = () => {
-      const now = new Date();
-      const today = now.toISOString().split('T')[0];
-      const startDateTime = new Date(`${today}T${task.startTime}:00`);
-      
-      const diff = now.getTime() - startDateTime.getTime();
+    const startTime = Date.now();
+    
+    const updateTimer = () => {
+      const now = Date.now();
+      const diff = now - startTime;
       const hours = Math.floor(diff / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
       
-      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    };
-
-    const updateTimer = () => {
-      setElapsedTime(calculateElapsedTime());
+      setElapsedTime(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
     };
 
     updateTimer();
     const interval = setInterval(updateTimer, 1000);
 
     return () => clearInterval(interval);
-  }, [task.startTime]);
+  }, [task.id]);
 
   // Calculer la durée estimée (en minutes)
   const calculateEstimatedDuration = () => {
