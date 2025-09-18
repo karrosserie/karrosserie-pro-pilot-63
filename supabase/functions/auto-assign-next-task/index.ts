@@ -57,14 +57,12 @@ serve(async (req: Request) => {
     // 2. Déterminer l'étape suivante selon le workflow
     const getNextTaskType = (currentTaskType: string): string | null => {
       const workflow = {
-        'Accueil': 'Démontage',
-        'Démontage': 'Débosselage & Ponçage',
-        'Débosselage & Ponçage': 'Préparation peinture',
-        'Remplacement': 'Préparation peinture',
+        'Accueil & Préparation du dossier': 'Remplacement ou débosselage',
+        'Remplacement ou débosselage': 'Préparation peinture',
         'Préparation peinture': 'Mise en peinture',
-        'Mise en peinture': 'Finitions & Remontage',
-        'Finitions & Remontage': 'Clôture & Livraison',
-        'Clôture & Livraison': null // Dernière étape
+        'Mise en peinture': 'Finitions & remontage',
+        'Finitions & remontage': 'Clôture & livraison',
+        'Clôture & livraison': null // Dernière étape
       };
       
       return workflow[currentTaskType as keyof typeof workflow] || null;
