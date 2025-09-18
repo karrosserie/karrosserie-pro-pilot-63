@@ -82,7 +82,7 @@ serve(async (req: Request) => {
 
     console.log(`📋 Next task type determined: ${nextTaskType}`);
 
-    // 3. Récupérer les employés qualifiés et disponibles
+    // 3. Récupérer UNIQUEMENT les employés qualifiés et disponibles - PAS DE FALLBACK
     const { data: employees, error: empError } = await supabase
       .rpc('get_available_employees', {
         p_company_id: companyId,
@@ -90,27 +90,21 @@ serve(async (req: Request) => {
       });
 
     if (empError) {
-      console.error('❌ Error fetching employees:', empError);
-      // Fallback: récupérer tous les employés de l'entreprise
-      const { data: allEmployees, error: allEmpError } = await supabase
-        .from('user_companies')
-        .select('user_id')
-        .eq('company_id', companyId)
-        .eq('active', true);
-        
-      if (allEmpError || !allEmployees || allEmployees.length === 0) {
-        console.error('❌ No employees found for company:', companyId);
-        return new Response(
-          JSON.stringify({ error: 'No available employees' }),
-          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
+      console.error('❌ Error fetching qualified employees:', empError);
+      console.log('⚠️ Cannot proceed without qualified employees due to RPC error');
+      return new Response(
+        JSON.stringify({ error: 'Unable to find qualified employees', details: empError.message }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // 4. Si on a des employés qualifiés, utiliser le premier disponible
+    const selectedEmployee = employees && employees.length > 0 ? employees[0] : null;
+    
+    if (!selectedEmployee) {
+      console.log('⚠️ No qualified employees available, creating task with waiting reason');
       
-      // Sélectionner le premier employé disponible
-      const selectedEmployeeId = allEmployees[0].user_id;
-      console.log(`👤 Selected employee (fallback): ${selectedEmployeeId}`);
-      
-      // 4. Créer la nouvelle tâche
+      // Créer la tâche mais avec une raison d'attente pour indiquer qu'elle attend un employé qualifié
       const startTime = new Date();
       startTime.setHours(startTime.getHours() + 1); // Commencer dans 1 heure
       
@@ -121,68 +115,42 @@ serve(async (req: Request) => {
         .from('employee_schedule')
         .insert({
           company_id: companyId,
-          user_id: selectedEmployeeId,
+          user_id: null, // Pas d'employé assigné
           vehicle_id: completedTask.vehicle_id,
           task_type: nextTaskType,
           start_datetime: startTime.toISOString(),
           end_datetime: endTime.toISOString(),
-          status: 'En attente'
+          status: 'En attente',
+          waiting_reason: `Aucun employé qualifié disponible pour: ${nextTaskType}`
         })
         .select()
         .single();
 
       if (createError) {
-        console.error('❌ Error creating new task:', createError);
+        console.error('❌ Error creating waiting task:', createError);
         return new Response(
-          JSON.stringify({ error: 'Failed to create next task' }),
+          JSON.stringify({ error: 'Failed to create waiting task' }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
-      console.log('✅ New task created successfully:', newTask.id);
+      console.log('⏳ Task created in waiting state for qualified employee:', newTask.id);
       
       return new Response(
         JSON.stringify({ 
           success: true, 
           nextTaskId: newTask.id,
           nextTaskType,
-          assignedEmployeeId: selectedEmployeeId
+          status: 'waiting_for_qualified_employee',
+          message: `Tâche créée en attente d'un employé qualifié pour: ${nextTaskType}`
         }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Si on a des employés qualifiés, utiliser le premier disponible
-    let selectedEmployee = employees && employees.length > 0 ? employees[0] : null;
-    
-    if (!selectedEmployee) {
-      console.log('⚠️ No qualified employees available, looking for most available employee...');
-      
-      // Fallback: trouver l'employé le plus disponible (même principe que lignes 94-111)
-      const { data: allEmployees, error: allEmpError } = await supabase
-        .from('user_companies')
-        .select('user_id')
-        .eq('company_id', companyId)
-        .eq('active', true);
-        
-      if (allEmpError || !allEmployees || allEmployees.length === 0) {
-        console.error('❌ No employees found for company:', companyId);
-        return new Response(
-          JSON.stringify({ error: 'No available employees' }),
-          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      
-      // Créer un objet selectedEmployee compatible avec la suite du code
-      selectedEmployee = { user_id: allEmployees[0].user_id };
-      console.log(`👤 Selected most available employee (fallback): ${selectedEmployee.user_id}`);
-    } else {
-      console.log(`👤 Selected qualified employee: ${selectedEmployee.user_id}`);
-    }
+    console.log(`👤 Selected qualified employee: ${selectedEmployee.user_id} (score: ${selectedEmployee.availability_score || 'N/A'})`);
 
-    console.log(`👤 Selected qualified employee: ${selectedEmployee.user_id}`);
-
-    // 4. Créer la nouvelle tâche assignée
+    // 5. Créer la nouvelle tâche assignée à l'employé qualifié
     const startTime = new Date();
     startTime.setHours(startTime.getHours() + 1); // Commencer dans 1 heure
     
@@ -211,9 +179,9 @@ serve(async (req: Request) => {
       );
     }
 
-    console.log('✅ New task created and assigned successfully:', newTask.id);
+    console.log('✅ New task created and assigned to qualified employee:', newTask.id);
     
-    // 5. Créer une notification pour l'employé assigné (optionnel)
+    // 6. Créer une notification pour l'employé assigné (optionnel)
     try {
       const { error: notifError } = await supabase
         .from('system_alerts')
@@ -225,13 +193,13 @@ serve(async (req: Request) => {
           alert_type: 'task_assigned',
           title: 'Nouvelle tâche assignée',
           message: `Nouvelle tâche: ${nextTaskType}`,
-          reason: 'Auto-assignation'
+          reason: 'Auto-assignation avec qualification requise'
         });
         
       if (notifError) {
         console.error('⚠️ Error creating notification:', notifError);
       } else {
-        console.log('📬 Notification created for employee');
+        console.log('📬 Notification created for qualified employee');
       }
     } catch (notifError) {
       console.error('⚠️ Error in notification creation:', notifError);
@@ -242,7 +210,8 @@ serve(async (req: Request) => {
         success: true, 
         nextTaskId: newTask.id,
         nextTaskType,
-        assignedEmployeeId: selectedEmployee.user_id
+        assignedEmployeeId: selectedEmployee.user_id,
+        qualificationMatched: true
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
