@@ -110,6 +110,33 @@ export const WorkshopPlanningInterface = ({
     });
   }, [onScheduleUpdate]);
 
+  // Écouter les changements en temps réel des tâches
+  useEffect(() => {
+    if (!companyId) return;
+
+    const channel = supabase
+      .channel('schedule-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'employee_schedule',
+          filter: `company_id=eq.${companyId}`
+        },
+        (payload) => {
+          console.log('Real-time schedule change:', payload);
+          // Rafraîchir les données de planning
+          onScheduleUpdate?.({ action: 'refresh' });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [companyId, onScheduleUpdate]);
+
   // Synchroniser les données avec toutes les tâches disponibles
   useEffect(() => {
     setCurrentWeekData(prev => {

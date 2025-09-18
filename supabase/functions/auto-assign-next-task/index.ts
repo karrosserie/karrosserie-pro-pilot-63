@@ -80,7 +80,29 @@ serve(async (req: Request) => {
 
     console.log(`📋 Next task type determined: ${nextTaskType}`);
 
-    // 3. Récupérer les employés qualifiés et disponibles
+    // 3. Vérifier s'il n'y a pas déjà une tâche en cours/attente pour ce véhicule dans cette étape
+    const { data: existingTask, error: existingError } = await supabase
+      .from('employee_schedule')
+      .select('*')
+      .eq('company_id', companyId)
+      .eq('vehicle_id', completedTask.vehicle_id)
+      .eq('task_type', nextTaskType)
+      .in('status', ['En attente', 'En cours'])
+      .maybeSingle();
+
+    if (existingError) {
+      console.error('❌ Error checking existing task:', existingError);
+    }
+
+    if (existingTask) {
+      console.log(`⚠️ Task already exists for vehicle ${completedTask.vehicle_id} in step ${nextTaskType}`);
+      return new Response(
+        JSON.stringify({ success: true, message: 'Task already exists for this step' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // 4. Récupérer les employés qualifiés et disponibles
     const { data: employees, error: empError } = await supabase
       .rpc('get_available_employees', {
         p_company_id: companyId,
@@ -108,7 +130,7 @@ serve(async (req: Request) => {
       const selectedEmployeeId = allEmployees[0].user_id;
       console.log(`👤 Selected employee (fallback): ${selectedEmployeeId}`);
       
-      // 4. Créer la nouvelle tâche
+      // 5. Créer la nouvelle tâche
       const startTime = new Date();
       startTime.setHours(startTime.getHours() + 1); // Commencer dans 1 heure
       
@@ -163,7 +185,7 @@ serve(async (req: Request) => {
 
     console.log(`👤 Selected qualified employee: ${selectedEmployee.user_id}`);
 
-    // 4. Créer la nouvelle tâche assignée
+    // 6. Créer la nouvelle tâche assignée
     const startTime = new Date();
     startTime.setHours(startTime.getHours() + 1); // Commencer dans 1 heure
     
@@ -194,7 +216,7 @@ serve(async (req: Request) => {
 
     console.log('✅ New task created and assigned successfully:', newTask.id);
     
-    // 5. Créer une notification pour l'employé assigné (optionnel)
+    // 7. Créer une notification pour l'employé assigné (optionnel)
     try {
       const { error: notifError } = await supabase
         .from('system_alerts')
