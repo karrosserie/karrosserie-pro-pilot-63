@@ -152,8 +152,11 @@ async function insertTaskAndShiftSchedule(
   const { taskId, userId, companyId, duration, taskType, originalStart, originalEnd } = options
   
   try {
-    // Trouver le prochain créneau de travail (demain 8h ou le prochain jour ouvrable)
-    const insertionTime = getNextWorkingSlot()
+    // Récupérer les horaires de travail de l'entreprise
+    const workingHours = await getCompanyWorkingHours(supabase, companyId)
+    
+    // Trouver le prochain créneau de travail en utilisant les horaires réels
+    const insertionTime = await getNextWorkingSlot(workingHours)
     const insertionEnd = new Date(insertionTime.getTime() + duration)
 
     console.log(`🔄 Inserting overdue task ${taskId} at ${insertionTime.toISOString()}`)
@@ -181,21 +184,37 @@ async function insertTaskAndShiftSchedule(
       const taskDuration = new Date(existingTask.end_datetime).getTime() - new Date(existingTask.start_datetime).getTime()
       
       // Ajuster l'heure si on dépasse les heures de travail ou si c'est un weekend
-      currentShiftTime = adjustToWorkingHours(currentShiftTime)
+      currentShiftTime = await adjustToWorkingHours(currentShiftTime, workingHours)
       
       const newStart = new Date(currentShiftTime)
       const newEnd = new Date(currentShiftTime.getTime() + taskDuration)
       
-      updatedTasks.push({
-        id: existingTask.id,
-        start_datetime: newStart.toISOString(),
-        end_datetime: newEnd.toISOString()
-      })
-      
-      // Préparer le prochain créneau
-      currentShiftTime = new Date(newEnd)
-      
-      console.log(`📅 Task ${existingTask.id} will be shifted to ${newStart.toISOString()}`)
+      // Vérifier si la tâche dépasse les heures de travail
+      const endOfWorkDay = await getEndOfWorkDay(newStart, workingHours)
+      if (newEnd > endOfWorkDay) {
+        // Si la tâche dépasse, la reporter au jour suivant
+        currentShiftTime = await getNextWorkingSlot(workingHours, newStart)
+        const adjustedStart = new Date(currentShiftTime)
+        const adjustedEnd = new Date(currentShiftTime.getTime() + taskDuration)
+        
+        updatedTasks.push({
+          id: existingTask.id,
+          start_datetime: adjustedStart.toISOString(),
+          end_datetime: adjustedEnd.toISOString()
+        })
+        
+        currentShiftTime = new Date(adjustedEnd)
+        console.log(`📅 Task ${existingTask.id} shifted to next day: ${adjustedStart.toISOString()}`)
+      } else {
+        updatedTasks.push({
+          id: existingTask.id,
+          start_datetime: newStart.toISOString(),
+          end_datetime: newEnd.toISOString()
+        })
+        
+        currentShiftTime = new Date(newEnd)
+        console.log(`📅 Task ${existingTask.id} will be shifted to ${newStart.toISOString()}`)
+      }
     }
 
     // Commencer une transaction pour mettre à jour toutes les tâches
@@ -245,51 +264,126 @@ async function insertTaskAndShiftSchedule(
   }
 }
 
+// Helper function pour récupérer les horaires de travail d'une entreprise
+async function getCompanyWorkingHours(supabase: any, companyId: string) {
+  const { data: schedules, error } = await supabase
+    .from('workshop_schedule')
+    .select('*')
+    .eq('company_id', companyId)
+    .eq('enabled', true)
+    .order('day_of_week')
+
+  if (error || !schedules || schedules.length === 0) {
+    console.log('⚠️ No workshop schedule found, using default hours (8h-18h)')
+    // Horaires par défaut si pas de configuration
+    return {
+      1: { morning_start: '08:00', morning_end: '12:00', afternoon_start: '13:00', afternoon_end: '18:00' }, // Lundi
+      2: { morning_start: '08:00', morning_end: '12:00', afternoon_start: '13:00', afternoon_end: '18:00' }, // Mardi
+      3: { morning_start: '08:00', morning_end: '12:00', afternoon_start: '13:00', afternoon_end: '18:00' }, // Mercredi
+      4: { morning_start: '08:00', morning_end: '12:00', afternoon_start: '13:00', afternoon_end: '18:00' }, // Jeudi
+      5: { morning_start: '08:00', morning_end: '12:00', afternoon_start: '13:00', afternoon_end: '18:00' }  // Vendredi
+    }
+  }
+
+  // Convertir les données en format utilisable
+  const workingHours: any = {}
+  for (const schedule of schedules) {
+    const dayNum = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].indexOf(schedule.day_of_week)
+    if (dayNum >= 1 && dayNum <= 5) { // Jours ouvrables seulement
+      workingHours[dayNum] = {
+        morning_start: schedule.morning_start,
+        morning_end: schedule.morning_end,
+        afternoon_start: schedule.afternoon_start,
+        afternoon_end: schedule.afternoon_end,
+        full_day: schedule.full_day
+      }
+    }
+  }
+
+  return workingHours
+}
+
 // Helper function pour obtenir le prochain créneau de travail
-function getNextWorkingSlot(): Date {
-  const now = new Date()
-  let nextSlot = new Date()
+async function getNextWorkingSlot(workingHours: any, fromDate?: Date): Promise<Date> {
+  const now = fromDate || new Date()
+  let nextSlot = new Date(now)
   
-  // Si nous sommes en semaine et avant 18h, programmer pour demain 8h
-  // Sinon, trouver le prochain jour ouvrable
-  if (now.getDay() >= 1 && now.getDay() <= 5 && now.getHours() < 18) {
-    nextSlot.setDate(now.getDate() + 1)
-  } else {
-    // Trouver le prochain lundi
-    const daysUntilMonday = (8 - now.getDay()) % 7 || 7
-    nextSlot.setDate(now.getDate() + daysUntilMonday)
+  // Chercher le prochain jour ouvrable
+  for (let i = 1; i <= 7; i++) {
+    nextSlot.setDate(now.getDate() + i)
+    const dayOfWeek = nextSlot.getDay()
+    
+    if (workingHours[dayOfWeek]) {
+      const schedule = workingHours[dayOfWeek]
+      const morningStart = schedule.morning_start || '08:00'
+      const [hour, minute] = morningStart.split(':').map(Number)
+      nextSlot.setHours(hour, minute, 0, 0)
+      return nextSlot
+    }
   }
   
+  // Fallback : lundi prochain à 8h
+  const daysUntilMonday = (8 - now.getDay()) % 7 || 7
+  nextSlot.setDate(now.getDate() + daysUntilMonday)
   nextSlot.setHours(8, 0, 0, 0)
   return nextSlot
 }
 
 // Helper function pour ajuster une heure aux heures de travail
-function adjustToWorkingHours(dateTime: Date): Date {
+async function adjustToWorkingHours(dateTime: Date, workingHours: any): Promise<Date> {
   const adjusted = new Date(dateTime)
+  const dayOfWeek = adjusted.getDay()
   
-  // Si c'est un weekend, passer au lundi suivant
-  if (adjusted.getDay() === 0) { // Dimanche
-    adjusted.setDate(adjusted.getDate() + 1)
-    adjusted.setHours(8, 0, 0, 0)
-  } else if (adjusted.getDay() === 6) { // Samedi
-    adjusted.setDate(adjusted.getDate() + 2)
-    adjusted.setHours(8, 0, 0, 0)
+  // Si c'est un weekend ou jour non travaillé, passer au prochain jour ouvrable
+  if (!workingHours[dayOfWeek]) {
+    return await getNextWorkingSlot(workingHours, adjusted)
   }
   
-  // Si c'est après 18h, passer au jour suivant à 8h
-  if (adjusted.getHours() >= 18) {
-    adjusted.setDate(adjusted.getDate() + 1)
-    adjusted.setHours(8, 0, 0, 0)
-    
-    // Vérifier à nouveau si le nouveau jour est un weekend
-    return adjustToWorkingHours(adjusted)
+  const schedule = workingHours[dayOfWeek]
+  
+  // Déterminer les heures de fin (afternoon_end ou morning_end si pas d'après-midi)
+  const endTime = schedule.afternoon_end || schedule.morning_end || '18:00'
+  const [endHour, endMinute] = endTime.split(':').map(Number)
+  
+  const endOfDay = new Date(adjusted)
+  endOfDay.setHours(endHour, endMinute, 0, 0)
+  
+  // Si on dépasse les heures de travail, passer au jour suivant
+  if (adjusted >= endOfDay) {
+    return await getNextWorkingSlot(workingHours, adjusted)
   }
   
-  // Si c'est avant 8h, ajuster à 8h
-  if (adjusted.getHours() < 8) {
-    adjusted.setHours(8, 0, 0, 0)
+  // Vérifier si on est avant le début de la journée
+  const startTime = schedule.morning_start || '08:00'
+  const [startHour, startMinute] = startTime.split(':').map(Number)
+  
+  const startOfDay = new Date(adjusted)
+  startOfDay.setHours(startHour, startMinute, 0, 0)
+  
+  if (adjusted < startOfDay) {
+    adjusted.setHours(startHour, startMinute, 0, 0)
   }
   
   return adjusted
+}
+
+// Helper function pour obtenir la fin de journée de travail
+async function getEndOfWorkDay(date: Date, workingHours: any): Promise<Date> {
+  const dayOfWeek = date.getDay()
+  const schedule = workingHours[dayOfWeek]
+  
+  if (!schedule) {
+    // Jour non travaillé, retourner début de journée
+    const result = new Date(date)
+    result.setHours(0, 0, 0, 0)
+    return result
+  }
+  
+  const endTime = schedule.afternoon_end || schedule.morning_end || '18:00'
+  const [endHour, endMinute] = endTime.split(':').map(Number)
+  
+  const endOfDay = new Date(date)
+  endOfDay.setHours(endHour, endMinute, 0, 0)
+  
+  return endOfDay
 }
