@@ -138,6 +138,9 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   const currentTask = tasks.find(task => task.status === 'En cours');
   const upcomingTasks = tasks.filter(task => task.status === 'En attente');
   const completedTasks = tasks.filter(task => task.status === 'Terminé');
+  
+  // Prochaine tâche = première tâche en attente (affichage d'une seule tâche à la fois)
+  const nextTask = upcomingTasks.length > 0 ? upcomingTasks[0] : null;
 
   // Fonction pour déterminer si une tâche nécessite des photos
   const requiresPhotos = (taskType: string): boolean => {
@@ -637,83 +640,91 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
         </Card>
       )}
 
-      {/* Prochaines tâches - Mobile responsive */}
-      <Card>
-        <CardHeader className="p-4 sm:p-6">
-          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-            <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
-            Prochaines tâches ({upcomingTasks.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4 sm:p-6 pt-0 space-y-3 sm:space-y-4">
-          {upcomingTasks.length === 0 ? (
-            <div className="text-center py-6 sm:py-8 text-muted-foreground">
-              <Calendar className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 opacity-50" />
-              <p className="text-sm sm:text-base font-medium">Aucune tâche planifiée</p>
-            </div>
-          ) : (
-            upcomingTasks.map((task) => (
-              <div key={task.id} className="border rounded-lg p-3 sm:p-4 space-y-3 hover:shadow-md transition-shadow">
-                {/* En-tête de la tâche */}
-                <div className="flex flex-col xs:flex-row xs:items-start xs:justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-col xs:flex-row xs:items-center gap-2 mb-2">
-                      <h4 className="font-semibold text-sm sm:text-base line-clamp-1">
-                        {task.vehicleBrand} {task.vehicleModel}
-                      </h4>
-                      {getStatusBadge(task.status)}
-                    </div>
-                    <p className="text-xs sm:text-sm text-muted-foreground mb-1 line-clamp-1">
-                      {task.licensePlate} • {task.client}
-                    </p>
-                    <p className="text-xs sm:text-sm font-medium text-blue-700 mb-1">{task.taskType}</p>
-                    <p className="text-xs sm:text-sm line-clamp-2 mb-2">{task.description}</p>
-                    <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
-                      <Clock className="w-3 h-3 flex-shrink-0" />
-                      <span>{task.startTime} - {task.endTime}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Boutons d'action */}
-                <div className="flex flex-col xs:flex-row gap-2 pt-2 border-t border-gray-100">
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    onClick={() => handleStartTask(task.id)}
-                    className="flex items-center gap-2 w-full xs:w-auto flex-1 xs:flex-initial justify-center"
-                    disabled={isOnBreak || isProcessingPhoto}
-                  >
-                    {isProcessingPhoto ? (
-                      <>
-                        <Camera className="w-4 h-4 animate-pulse" />
-                        <span className="text-xs sm:text-sm">Photo...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Play className="w-4 h-4" />
-                        <span className="text-xs sm:text-sm">
-                          {isOnBreak ? 'En pause' : 'Commencer'}
-                        </span>
-                      </>
-                    )}
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="destructive"
-                    onClick={() => handlePutOnHold(task.id)}
-                    className="flex items-center gap-2 w-full xs:w-auto justify-center"
-                    disabled={isOnBreak || isProcessingPhoto}
-                  >
-                    <AlertTriangle className="w-4 h-4" />
-                    <span className="text-xs sm:text-sm">Mettre en attente</span>
-                  </Button>
+      {/* Prochaines tâches - Affichage d'une seule tâche à la fois */}
+      {nextTask ? (
+        <Card className="border-orange-200 bg-orange-50">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-orange-800 text-base sm:text-lg">
+              <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
+              Prochaine tâche
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6 pt-0 space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="space-y-2 sm:space-y-3">
+                <h3 className="font-semibold text-sm sm:text-base">{nextTask.vehicleBrand} {nextTask.vehicleModel}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
+                  {nextTask.licensePlate} • {nextTask.client}
+                </p>
+                <p className="text-xs sm:text-sm font-medium text-orange-700">{nextTask.taskType}</p>
+                <p className="text-xs sm:text-sm line-clamp-2">{nextTask.description}</p>
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+                  <Clock className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                  <span>{nextTask.startTime} - {nextTask.endTime}</span>
                 </div>
               </div>
-            ))
-          )}
-        </CardContent>
-      </Card>
+              
+              <div className="flex flex-col sm:flex-row lg:flex-col gap-2 sm:gap-3 lg:gap-2 justify-start sm:justify-end lg:justify-start">
+                <Button 
+                  size="sm" 
+                  onClick={() => handleStartTask(nextTask.id)}
+                  className="flex items-center gap-2 w-full sm:w-auto"
+                  disabled={isOnBreak || isProcessingPhoto}
+                >
+                  {isProcessingPhoto ? (
+                    <>
+                      <Camera className="w-4 h-4 animate-pulse" />
+                      <span className="text-xs sm:text-sm">Photo...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-4 h-4" />
+                      <span className="text-xs sm:text-sm">
+                        {isOnBreak ? 'En pause' : 'Commencer'}
+                      </span>
+                    </>
+                  )}
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="destructive"
+                  onClick={() => handlePutOnHold(nextTask.id)}
+                  className="flex items-center gap-2 w-full sm:w-auto"
+                  disabled={isOnBreak || isProcessingPhoto}
+                >
+                  <AlertTriangle className="w-4 h-4" />
+                  <span className="text-xs sm:text-sm">Mettre en attente</span>
+                </Button>
+              </div>
+            </div>
+            
+            {/* Indicateur des tâches restantes */}
+            {upcomingTasks.length > 1 && (
+              <div className="mt-4 p-3 bg-white/60 rounded-lg border border-orange-200">
+                <div className="flex items-center gap-2 text-sm text-orange-700">
+                  <Calendar className="w-4 h-4" />
+                  <span className="font-medium">
+                    {upcomingTasks.length - 1} autres tâches planifiées aujourd'hui
+                  </span>
+                </div>
+                <p className="text-xs text-orange-600 mt-1">
+                  Les tâches suivantes apparaîtront automatiquement après avoir terminé celle-ci
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      ) : !currentTask ? (
+        <Card>
+          <CardContent className="text-center py-6 sm:py-8 p-4 sm:p-6">
+            <CheckCircle className="w-10 h-10 sm:w-12 sm:h-12 text-green-600 mx-auto mb-3 sm:mb-4" />
+            <h3 className="font-semibold mb-1 text-sm sm:text-base">Toutes les tâches terminées !</h3>
+            <p className="text-muted-foreground text-xs sm:text-sm">
+              Excellente journée de travail. Vous avez terminé toutes vos tâches.
+            </p>
+          </CardContent>
+        </Card>
+      ) : null}
 
       {/* Tâches terminées - Mobile responsive */}
       {completedTasks.length > 0 && (
