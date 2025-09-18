@@ -33,14 +33,22 @@ export const CurrentTaskDisplay = ({
   isOnBreak = false
 }: CurrentTaskDisplayProps) => {
   const [elapsedTime, setElapsedTime] = useState('00:00:00');
+  const [startTime, setStartTime] = useState<number | null>(null);
 
   // Chronomètre qui commence à 0
   useEffect(() => {
-    const startTime = Date.now();
+    // Initialiser le temps de départ une seule fois
+    if (startTime === null) {
+      setStartTime(Date.now());
+    }
+  }, [startTime]);
+
+  useEffect(() => {
+    if (startTime === null) return;
     
     const updateTimer = () => {
       const now = Date.now();
-      const diff = now - startTime;
+      const diff = Math.max(0, now - startTime); // S'assurer que diff n'est jamais négatif
       const hours = Math.floor(diff / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
@@ -52,7 +60,7 @@ export const CurrentTaskDisplay = ({
     const interval = setInterval(updateTimer, 1000);
 
     return () => clearInterval(interval);
-  }, [task.id]);
+  }, [startTime]);
 
   // Calculer la durée estimée (en minutes)
   const calculateEstimatedDuration = () => {
