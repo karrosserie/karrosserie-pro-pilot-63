@@ -33,6 +33,11 @@ export const PointageModal: React.FC<PointageModalProps> = ({
           title: "✅ Pointage effectué",
           description: result.message,
         });
+        
+        // Recharger la page après un pointage réussi
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
       } else {
         toast({
           title: "❌ Pointage refusé",
