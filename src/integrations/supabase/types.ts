@@ -3451,7 +3451,7 @@ export type Database = {
         Args: { p_company_id: string; p_task_type: string }
         Returns: {
           availability_score: number
-          qualification: string
+          qualifications: Json
           user_id: string
         }[]
       }
