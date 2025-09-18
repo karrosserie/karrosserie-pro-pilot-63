@@ -20,6 +20,8 @@ interface CurrentTaskDisplayProps {
     description: string;
     paint_brand?: string;
     color_code?: string;
+    vehicleId: string;
+    companyId: string;
   };
   onCompleteTask: (taskId: string) => void;
   onPauseTask: (taskId: string) => void;
@@ -83,15 +85,43 @@ export const CurrentTaskDisplay = ({
   const estimatedDuration = calculateEstimatedDuration();
 
   const handleValidatePaintInfo = async () => {
+    // Vérifier que les champs sont remplis
+    if (!paintBrand.trim() || !colorCode.trim()) {
+      toast({
+        title: "Champs obligatoires",
+        description: "Veuillez remplir la marque de peinture et le code couleur.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsUpdating(true);
     try {
+      // D'abord récupérer les informations du véhicule pour obtenir la marque et le modèle
+      const { data: vehicleData, error: vehicleError } = await supabase
+        .from('vehicles')
+        .select(`
+          id,
+          car_brands (name),
+          car_models (name)
+        `)
+        .eq('id', task.vehicleId)
+        .single();
+
+      if (vehicleError) throw vehicleError;
+
+      // Sauvegarder dans la table peinture_info
       const { error } = await supabase
-        .from('employee_schedule')
-        .update({
-          paint_brand: paintBrand || null,
-          color_code: colorCode || null
-        })
-        .eq('id', task.id);
+        .from('peinture_info')
+        .insert({
+          company_id: task.companyId,
+          task_id: task.id,
+          vehicle_id: task.vehicleId,
+          paint_brand: paintBrand.trim(),
+          color_code: colorCode.trim(),
+          vehicle_brand: vehicleData?.car_brands?.name || null,
+          vehicle_model: vehicleData?.car_models?.name || null
+        });
 
       if (error) throw error;
 

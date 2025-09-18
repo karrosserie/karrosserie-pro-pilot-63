@@ -121,6 +121,7 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
     return {
       id: schedule.id,
       vehicleId: schedule.vehicle_id,
+      companyId: schedule.company_id,
       vehicleBrand: schedule.vehicles?.car_brands?.name || 'Marque inconnue',
       vehicleModel: schedule.vehicles?.car_models?.name || 'Modèle inconnu',
       licensePlate: schedule.vehicles?.license_plate || 'Plaque inconnue',

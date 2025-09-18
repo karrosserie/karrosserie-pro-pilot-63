@@ -1894,6 +1894,45 @@ export type Database = {
         }
         Relationships: []
       }
+      peinture_info: {
+        Row: {
+          color_code: string
+          company_id: string
+          created_at: string
+          id: string
+          paint_brand: string
+          task_id: string
+          updated_at: string
+          vehicle_brand: string | null
+          vehicle_id: string
+          vehicle_model: string | null
+        }
+        Insert: {
+          color_code: string
+          company_id: string
+          created_at?: string
+          id?: string
+          paint_brand: string
+          task_id: string
+          updated_at?: string
+          vehicle_brand?: string | null
+          vehicle_id: string
+          vehicle_model?: string | null
+        }
+        Update: {
+          color_code?: string
+          company_id?: string
+          created_at?: string
+          id?: string
+          paint_brand?: string
+          task_id?: string
+          updated_at?: string
+          vehicle_brand?: string | null
+          vehicle_id?: string
+          vehicle_model?: string | null
+        }
+        Relationships: []
+      }
       performance_metrics: {
         Row: {
           calculated_at: string
