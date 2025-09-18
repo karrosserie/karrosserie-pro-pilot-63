@@ -21,20 +21,28 @@ export const useAuthSession = () => {
   };
 
   useEffect(() => {
-    // Initialize auth state
+    // Initialize auth state with error handling
     const initializeAuth = async () => {
-      setLoading(true);
-      
-      // Get initial session
-      const initialSession = await authService.getSession();
-      setSession(initialSession);
-      setUser(initialSession?.user ?? null);
-      
-      if (initialSession?.user) {
-        await fetchProfile(initialSession.user.id);
+      try {
+        setLoading(true);
+        
+        // Get initial session
+        const initialSession = await authService.getSession();
+        setSession(initialSession);
+        setUser(initialSession?.user ?? null);
+        
+        if (initialSession?.user) {
+          await fetchProfile(initialSession.user.id);
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        // Set default values on error to prevent app crash
+        setSession(null);
+        setUser(null);
+        setProfile(null);
+      } finally {
+        setLoading(false);
       }
-      
-      setLoading(false);
     };
     
     initializeAuth();
