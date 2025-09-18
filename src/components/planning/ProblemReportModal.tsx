@@ -249,29 +249,41 @@ export const ProblemReportModal: React.FC<ProblemReportModalProps> = ({
 
   // Mapper le type de tâche à l'étape correspondante
   const getStepFromTaskType = (taskType: string): StepProblems | null => {
-    const taskTypeLower = taskType.toLowerCase();
+    const taskTypeLower = taskType.toLowerCase().trim();
     
-    if (taskTypeLower.includes('démontage') || taskTypeLower.includes('demontage') || 
-        taskTypeLower.includes('accueil') || taskTypeLower.includes('préparation du dossier')) {
-      return STEP_PROBLEMS[0]; // Démontage
-    }
+    console.log('Task type reçu:', taskType, 'Task type lower:', taskTypeLower);
     
-    if (taskTypeLower.includes('débosselage') || taskTypeLower.includes('debosselage') || 
-        taskTypeLower.includes('ponçage') || taskTypeLower.includes('poncage') ||
-        taskTypeLower.includes('remplacement')) {
-      return STEP_PROBLEMS[1]; // Débosselage & Ponçage
-    }
-    
-    if (taskTypeLower.includes('préparation peinture')) {
+    // Préparation peinture (vérifier en premier pour éviter confusion avec "préparation")
+    if (taskTypeLower.includes('préparation peinture') || taskTypeLower === 'préparation peinture') {
+      console.log('Mapping vers Préparation peinture');
       return STEP_PROBLEMS[2]; // Préparation peinture
     }
     
+    // Mise en peinture et finitions
     if (taskTypeLower.includes('mise en peinture') || taskTypeLower.includes('finitions') ||
-        taskTypeLower.includes('remontage')) {
+        taskTypeLower.includes('remontage') || taskTypeLower.includes('cloture') ||
+        taskTypeLower.includes('clôture') || taskTypeLower.includes('livraison')) {
+      console.log('Mapping vers Mise en peinture');
       return STEP_PROBLEMS[3]; // Mise en peinture
     }
     
+    // Débosselage & Ponçage
+    if (taskTypeLower.includes('débosselage') || taskTypeLower.includes('debosselage') || 
+        taskTypeLower.includes('ponçage') || taskTypeLower.includes('poncage') ||
+        taskTypeLower.includes('remplacement')) {
+      console.log('Mapping vers Débosselage & Ponçage');
+      return STEP_PROBLEMS[1]; // Débosselage & Ponçage
+    }
+    
+    // Démontage et accueil (en dernier car "préparation" pourrait matcher)
+    if (taskTypeLower.includes('démontage') || taskTypeLower.includes('demontage') || 
+        taskTypeLower.includes('accueil') || taskTypeLower.includes('préparation du dossier')) {
+      console.log('Mapping vers Démontage');
+      return STEP_PROBLEMS[0]; // Démontage
+    }
+    
     // Par défaut, retourner la première étape
+    console.log('Mapping par défaut vers Démontage');
     return STEP_PROBLEMS[0];
   };
 
