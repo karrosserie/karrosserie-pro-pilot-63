@@ -2,10 +2,11 @@ import React, { useState, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, Calendar, Clock, Play, Camera } from 'lucide-react';
+import { CheckCircle, Calendar, Clock, Play, Camera, AlertTriangle } from 'lucide-react';
 import { PlanningTache } from '@/hooks/usePlanningManager';
 import { useToast } from '@/hooks/use-toast';
 import { uploadTaskPhoto } from '@/utils/taskPhotoService';
+import { ProblemReportModal } from './ProblemReportModal';
 
 interface TacheCardProps {
   tache: PlanningTache;
@@ -36,6 +37,7 @@ export const TacheCard: React.FC<TacheCardProps> = ({
   const [prisePhotosFinEnCours, setPrisePhotosFinEnCours] = useState(false);
   const [photosDebutPrises, setPhotosDebutPrises] = useState(0);
   const [photosFinPrises, setPhotosFinPrises] = useState(0);
+  const [showProblemReportModal, setShowProblemReportModal] = useState(false);
   const { toast } = useToast();
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -356,7 +358,17 @@ export const TacheCard: React.FC<TacheCardProps> = ({
                 </span>
               </div>
             </div>
-            <div className="self-end sm:self-start sm:ml-4">
+            <div className="self-end sm:self-start sm:ml-4 flex flex-col sm:flex-row gap-2">
+              <Button
+                onClick={() => setShowProblemReportModal(true)}
+                size="sm"
+                variant="destructive"
+                className="transition-all hover:scale-105 w-full sm:w-auto"
+              >
+                <AlertTriangle className="w-4 h-4 mr-1" />
+                Signaler problème
+              </Button>
+              
               {!estCommencee ? (
                 <Button
                   onClick={handleCommencer}
@@ -375,7 +387,7 @@ export const TacheCard: React.FC<TacheCardProps> = ({
                   <CheckCircle className="w-4 h-4 mr-1" />
                   Terminer
                 </Button>
-               )}
+                )}
             </div>
           </div>
 
@@ -472,6 +484,19 @@ export const TacheCard: React.FC<TacheCardProps> = ({
           )}
         </CardContent>
       </Card>
+
+      {/* Modal de signalement de problème */}
+      <ProblemReportModal
+        isOpen={showProblemReportModal}
+        onClose={() => setShowProblemReportModal(false)}
+        taskType={tache.tache}
+        vehicleInfo={{
+          vehicule: tache.vehicule,
+          marque: tache.marque,
+          modele: tache.modele,
+          client: tache.client
+        }}
+      />
     </>
   );
 };
