@@ -57,17 +57,28 @@ serve(async (req: Request) => {
     // 2. Déterminer l'étape suivante selon le workflow
     const getNextTaskType = (currentTaskType: string): string | null => {
       const workflow = {
-        'Accueil': 'Démontage',
-        'Démontage': 'Débosselage & Ponçage',
+        // Workflow basé sur les vrais types de tâches dans la DB
+        'Accueil & Préparation du dossier': 'Remplacement ou débosselage',
+        'Remplacement ou débosselage': 'Préparation peinture',
+        'Préparation peinture': 'Mise en peinture',
+        'Mise en peinture': 'Finitions & remontage',
+        'Finitions & remontage': 'Clôture & livraison',
+        'Clôture & livraison': null, // Dernière étape
+        
+        // Anciens types pour compatibilité
+        'Accueil': 'Remplacement ou débosselage',
+        'Démontage': 'Préparation peinture',
         'Débosselage & Ponçage': 'Préparation peinture',
         'Remplacement': 'Préparation peinture',
-        'Préparation peinture': 'Mise en peinture',
-        'Mise en peinture': 'Finitions & Remontage',
-        'Finitions & Remontage': 'Clôture & Livraison',
-        'Clôture & Livraison': null // Dernière étape
+        'Finitions & Remontage': 'Clôture & livraison',
+        'Clôture & Livraison': null
       };
       
-      return workflow[currentTaskType as keyof typeof workflow] || null;
+      console.log(`🔍 Current task type: "${currentTaskType}"`);
+      const nextType = workflow[currentTaskType as keyof typeof workflow] || null;
+      console.log(`➡️ Next task type: "${nextType}"`);
+      
+      return nextType;
     };
 
     const nextTaskType = getNextTaskType(completedTask.task_type);
