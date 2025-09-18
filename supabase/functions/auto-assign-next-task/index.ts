@@ -153,14 +153,31 @@ serve(async (req: Request) => {
     }
 
     // Si on a des employés qualifiés, utiliser le premier disponible
-    const selectedEmployee = employees && employees.length > 0 ? employees[0] : null;
+    let selectedEmployee = employees && employees.length > 0 ? employees[0] : null;
     
     if (!selectedEmployee) {
-      console.log('⚠️ No qualified employees available, task will remain unassigned');
-      return new Response(
-        JSON.stringify({ success: true, message: 'No qualified employees available' }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      console.log('⚠️ No qualified employees available, looking for most available employee...');
+      
+      // Fallback: trouver l'employé le plus disponible (même principe que lignes 94-111)
+      const { data: allEmployees, error: allEmpError } = await supabase
+        .from('user_companies')
+        .select('user_id')
+        .eq('company_id', companyId)
+        .eq('active', true);
+        
+      if (allEmpError || !allEmployees || allEmployees.length === 0) {
+        console.error('❌ No employees found for company:', companyId);
+        return new Response(
+          JSON.stringify({ error: 'No available employees' }),
+          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      // Créer un objet selectedEmployee compatible avec la suite du code
+      selectedEmployee = { user_id: allEmployees[0].user_id };
+      console.log(`👤 Selected most available employee (fallback): ${selectedEmployee.user_id}`);
+    } else {
+      console.log(`👤 Selected qualified employee: ${selectedEmployee.user_id}`);
     }
 
     console.log(`👤 Selected qualified employee: ${selectedEmployee.user_id}`);
