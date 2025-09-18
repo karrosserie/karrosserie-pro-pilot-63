@@ -135,7 +135,9 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
         ? endDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
         : '--:--',
       status: schedule.status,
-      description: `${schedule.task_type} - ${schedule.vehicles?.license_plate || ''}`
+      description: `${schedule.task_type} - ${schedule.vehicles?.license_plate || ''}`,
+      paint_brand: schedule.paint_brand,
+      color_code: schedule.color_code
     };
   });
 

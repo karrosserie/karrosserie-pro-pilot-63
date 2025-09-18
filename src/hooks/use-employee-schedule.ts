@@ -13,6 +13,8 @@ export interface EmployeeSchedule {
   status: 'En attente' | 'En cours' | 'Terminé';
   real_start_datetime: string | null;
   real_end_datetime: string | null;
+  paint_brand?: string | null;
+  color_code?: string | null;
   created_at: string;
   updated_at: string;
   vehicles?: {

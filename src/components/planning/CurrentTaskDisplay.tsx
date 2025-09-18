@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Clock, Car, CheckCircle, Pause, AlertTriangle, Camera } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Clock, Car, CheckCircle, Pause, AlertTriangle, Camera, Paintbrush } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CurrentTaskDisplayProps {
   task: {
@@ -14,6 +18,8 @@ interface CurrentTaskDisplayProps {
     startTime: string;
     endTime: string;
     description: string;
+    paint_brand?: string;
+    color_code?: string;
   };
   onCompleteTask: (taskId: string) => void;
   onPauseTask: (taskId: string) => void;
@@ -34,6 +40,10 @@ export const CurrentTaskDisplay = ({
 }: CurrentTaskDisplayProps) => {
   const [elapsedTime, setElapsedTime] = useState('00:00:00');
   const [startTime, setStartTime] = useState<number | null>(null);
+  const [paintBrand, setPaintBrand] = useState(task.paint_brand || '');
+  const [colorCode, setColorCode] = useState(task.color_code || '');
+  const [isUpdating, setIsUpdating] = useState(false);
+  const { toast } = useToast();
 
   // Chronomètre qui commence à 0
   useEffect(() => {
@@ -71,6 +81,37 @@ export const CurrentTaskDisplay = ({
   };
 
   const estimatedDuration = calculateEstimatedDuration();
+
+  const handleValidatePaintInfo = async () => {
+    setIsUpdating(true);
+    try {
+      const { error } = await supabase
+        .from('employee_schedule')
+        .update({
+          paint_brand: paintBrand || null,
+          color_code: colorCode || null
+        })
+        .eq('id', task.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Informations validées",
+        description: "Les détails de peinture ont été sauvegardés avec succès.",
+      });
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder les informations de peinture.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const isPaintPreparationTask = task.taskType === 'Préparation peinture';
 
   return (
     <div className="space-y-0">
@@ -122,6 +163,57 @@ export const CurrentTaskDisplay = ({
               </p>
             </CardContent>
           </Card>
+
+          {/* Champs spécifiques pour la préparation peinture */}
+          {isPaintPreparationTask && (
+            <Card className="bg-blue-50 border-blue-200">
+              <CardContent className="p-4 space-y-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Paintbrush className="w-4 h-4 text-blue-600" />
+                  <h4 className="font-medium text-blue-800">Détails de peinture</h4>
+                </div>
+                
+                <div className="space-y-3">
+                  <div>
+                    <Label htmlFor="paint-brand" className="text-sm font-medium">
+                      Marque de peinture
+                    </Label>
+                    <Input
+                      id="paint-brand"
+                      value={paintBrand}
+                      onChange={(e) => setPaintBrand(e.target.value)}
+                      placeholder="Ex: Sikkens, PPG, BASF..."
+                      className="mt-1"
+                      disabled={isUpdating}
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="color-code" className="text-sm font-medium">
+                      Code couleur
+                    </Label>
+                    <Input
+                      id="color-code"
+                      value={colorCode}
+                      onChange={(e) => setColorCode(e.target.value)}
+                      placeholder="Ex: L041, 147/A, etc."
+                      className="mt-1"
+                      disabled={isUpdating}
+                    />
+                  </div>
+                  
+                  <Button 
+                    onClick={handleValidatePaintInfo}
+                    disabled={isUpdating || (!paintBrand && !colorCode)}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    size="sm"
+                  >
+                    {isUpdating ? 'Validation...' : 'Valider les infos'}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Boutons d'action */}
           <div className="space-y-3">
