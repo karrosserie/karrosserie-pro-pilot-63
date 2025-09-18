@@ -250,8 +250,11 @@ export const usePlanningTasks = (companyId: string | null) => {
 
   // Obtenir toutes les tâches pour les étapes atelier (indépendamment de la date)
   const getAllWorkflowTasks = (): PlanningTache[] => {
-    console.log('🏭 getAllWorkflowTasks - Returning filtered tasks for workshop stages:', planningTaches.length);
-    console.log('🏭 Filtered workflow tasks (no waiting_reason):', planningTaches.map(t => ({ 
+    // Filtrer les tâches terminées pour éviter les doublons dans l'affichage
+    const activeTasks = planningTaches.filter(t => t.status !== 'termine' && t.status !== 'Terminé');
+    
+    console.log('🏭 getAllWorkflowTasks - Returning filtered tasks for workshop stages:', activeTasks.length);
+    console.log('🏭 Filtered workflow tasks (no waiting_reason, no completed):', activeTasks.map(t => ({ 
       id: t.id, 
       vehicule: t.vehicule, 
       dateAssignation: t.dateAssignation,
@@ -260,7 +263,7 @@ export const usePlanningTasks = (companyId: string | null) => {
       waiting_reason: t.waiting_reason
     })));
     
-    return planningTaches;
+    return activeTasks;
   };
 
   // Fonction pour récupérer TOUTES les tâches (y compris celles avec waiting_reason) pour l'onglet véhicules en attente
