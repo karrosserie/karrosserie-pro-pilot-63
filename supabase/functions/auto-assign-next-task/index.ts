@@ -93,7 +93,28 @@ serve(async (req: Request) => {
 
     console.log(`📋 Next task type determined: ${nextTaskType}`);
 
-    // 3. Récupérer UNIQUEMENT les employés qualifiés et disponibles - PAS DE FALLBACK
+    // 3. VÉRIFIER S'IL N'Y A PAS DÉJÀ UNE TÂCHE DE CE TYPE POUR CE VÉHICULE (éviter les doublons)
+    const { data: existingTasks, error: existingError } = await supabase
+      .from('employee_schedule')
+      .select('id')
+      .eq('company_id', companyId)
+      .eq('vehicle_id', completedTask.vehicle_id)
+      .eq('task_type', nextTaskType)
+      .neq('status', 'Terminé');
+
+    if (existingError) {
+      console.error('❌ Error checking existing tasks:', existingError);
+    }
+
+    if (existingTasks && existingTasks.length > 0) {
+      console.log('⚠️ Task already exists for this vehicle and task type, skipping creation');
+      return new Response(
+        JSON.stringify({ success: true, message: 'Task already exists', existingTaskId: existingTasks[0].id }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // 4. Récupérer UNIQUEMENT les employés qualifiés et disponibles - PAS DE FALLBACK
     const { data: employees, error: empError } = await supabase
       .rpc('get_available_employees', {
         p_company_id: companyId,
@@ -161,7 +182,7 @@ serve(async (req: Request) => {
 
     console.log(`👤 Selected qualified employee: ${selectedEmployee.user_id} (score: ${selectedEmployee.availability_score || 'N/A'})`);
 
-    // 5. Créer la nouvelle tâche assignée à l'employé qualifié
+    // 7. Créer la nouvelle tâche assignée à l'employé qualifié
     const startTime = new Date();
     startTime.setHours(startTime.getHours() + 1); // Commencer dans 1 heure
     
