@@ -7,8 +7,8 @@ import { TrackingProvider } from "@/components/tracking/TrackingProvider";
 const AppRouter = () => {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <TrackingProvider>
+      <TrackingProvider>
+        <AuthProvider>
           <Routes>
             {routes.map((route, index) => {
               // For the auth route and document upload, we don't want to wrap it in the AppLayout
@@ -25,8 +25,8 @@ const AppRouter = () => {
               return <Route key={index} path={route.path} element={route.element} />;
             })}
           </Routes>
-        </TrackingProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </TrackingProvider>
     </BrowserRouter>
   );
 };

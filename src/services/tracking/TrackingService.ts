@@ -83,15 +83,14 @@ class TrackingService {
           this.isSessionActive = true;
         }
 
-        // Temporarily disable auth state listener to prevent WebSocket errors
-        // TODO: Re-implement with proper browser WebSocket handling
-        // supabase.auth.onAuthStateChange((event, session) => {
-        //   if (event === 'SIGNED_OUT') {
-        //     this.endSession().catch(console.error);
-        //   } else if (event === 'SIGNED_IN' && !this.isSessionActive) {
-        //     this.initializeSession().catch(console.error);
-        //   }
-        // });
+        // Écouter les changements d'authentification
+        supabase.auth.onAuthStateChange((event, session) => {
+          if (event === 'SIGNED_OUT') {
+            this.endSession().catch(console.error);
+          } else if (event === 'SIGNED_IN' && !this.isSessionActive) {
+            this.initializeSession().catch(console.error);
+          }
+        });
       }
     } catch (error) {
       console.warn('Tracking service initialization failed, continuing without tracking:', error);

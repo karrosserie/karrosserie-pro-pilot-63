@@ -405,7 +405,30 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
 
       console.log('Tâche terminée avec succès:', taskId);
       
-      // L'auto-assignation se fait automatiquement via le trigger de base de données
+      // Déclencher l'auto-assignation de la tâche suivante
+      try {
+        console.log('🔄 Déclenchement de l\'auto-assignation pour la tâche suivante...');
+        const { data: autoAssignResult, error: autoAssignError } = await supabase.functions.invoke('auto-assign-next-task', {
+          body: { 
+            taskId: taskId,
+            companyId: companyInfo?.id
+          }
+        });
+
+        if (autoAssignError) {
+          console.error('⚠️ Erreur lors de l\'auto-assignation:', autoAssignError);
+        } else if (autoAssignResult?.success) {
+          console.log('✅ Auto-assignation réussie:', autoAssignResult);
+          if (autoAssignResult.nextTaskId) {
+            toast({
+              title: "Tâche suivante assignée",
+              description: `${autoAssignResult.nextTaskType} a été automatiquement assignée`,
+            });
+          }
+        }
+      } catch (autoAssignError) {
+        console.error('⚠️ Erreur lors de l\'appel à l\'auto-assignation:', autoAssignError);
+      }
 
       setCurrentTimer(null);
       toast({

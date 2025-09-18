@@ -57,12 +57,14 @@ serve(async (req: Request) => {
     // 2. Déterminer l'étape suivante selon le workflow
     const getNextTaskType = (currentTaskType: string): string | null => {
       const workflow = {
-        'Accueil & Préparation du dossier': 'Remplacement ou débosselage',
-        'Remplacement ou débosselage': 'Préparation peinture',
+        'Accueil': 'Démontage',
+        'Démontage': 'Débosselage & Ponçage',
+        'Débosselage & Ponçage': 'Préparation peinture',
+        'Remplacement': 'Préparation peinture',
         'Préparation peinture': 'Mise en peinture',
-        'Mise en peinture': 'Finitions & remontage',
-        'Finitions & remontage': 'Clôture & livraison',
-        'Clôture & livraison': null // Dernière étape
+        'Mise en peinture': 'Finitions & Remontage',
+        'Finitions & Remontage': 'Clôture & Livraison',
+        'Clôture & Livraison': null // Dernière étape
       };
       
       return workflow[currentTaskType as keyof typeof workflow] || null;
@@ -80,29 +82,7 @@ serve(async (req: Request) => {
 
     console.log(`📋 Next task type determined: ${nextTaskType}`);
 
-    // 3. Vérifier s'il n'y a pas déjà une tâche en cours/attente pour ce véhicule dans cette étape
-    const { data: existingTask, error: existingError } = await supabase
-      .from('employee_schedule')
-      .select('*')
-      .eq('company_id', companyId)
-      .eq('vehicle_id', completedTask.vehicle_id)
-      .eq('task_type', nextTaskType)
-      .in('status', ['En attente', 'En cours'])
-      .maybeSingle();
-
-    if (existingError) {
-      console.error('❌ Error checking existing task:', existingError);
-    }
-
-    if (existingTask) {
-      console.log(`⚠️ Task already exists for vehicle ${completedTask.vehicle_id} in step ${nextTaskType}`);
-      return new Response(
-        JSON.stringify({ success: true, message: 'Task already exists for this step' }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // 4. Récupérer les employés qualifiés et disponibles
+    // 3. Récupérer les employés qualifiés et disponibles
     const { data: employees, error: empError } = await supabase
       .rpc('get_available_employees', {
         p_company_id: companyId,
@@ -130,7 +110,7 @@ serve(async (req: Request) => {
       const selectedEmployeeId = allEmployees[0].user_id;
       console.log(`👤 Selected employee (fallback): ${selectedEmployeeId}`);
       
-      // 5. Créer la nouvelle tâche
+      // 4. Créer la nouvelle tâche
       const startTime = new Date();
       startTime.setHours(startTime.getHours() + 1); // Commencer dans 1 heure
       
@@ -185,7 +165,7 @@ serve(async (req: Request) => {
 
     console.log(`👤 Selected qualified employee: ${selectedEmployee.user_id}`);
 
-    // 6. Créer la nouvelle tâche assignée
+    // 4. Créer la nouvelle tâche assignée
     const startTime = new Date();
     startTime.setHours(startTime.getHours() + 1); // Commencer dans 1 heure
     
@@ -216,7 +196,7 @@ serve(async (req: Request) => {
 
     console.log('✅ New task created and assigned successfully:', newTask.id);
     
-    // 7. Créer une notification pour l'employé assigné (optionnel)
+    // 5. Créer une notification pour l'employé assigné (optionnel)
     try {
       const { error: notifError } = await supabase
         .from('system_alerts')
