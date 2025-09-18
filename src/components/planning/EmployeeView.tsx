@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Play, Pause, CheckCircle, Calendar, User, BarChart, Coffee, LogOut, Camera, AlertTriangle } from 'lucide-react';
+import { CurrentTaskDisplay } from '@/components/planning/CurrentTaskDisplay';
 import { useEmployeeSchedule } from '@/hooks/use-employee-schedule';
 import { useCompany } from '@/hooks/use-company';
 import { useAuth } from '@/contexts/AuthContext';
@@ -576,77 +577,38 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
         </DropdownMenu>
       </div>
 
-      {/* Tâche en cours - Mobile responsive */}
+      {/* Tâche en cours - Nouveau design */}
       {currentTask ? (
-        <Card className="border-blue-200 bg-blue-50">
-          <CardHeader className="p-4 sm:p-6">
-            <CardTitle className="flex items-center gap-2 text-blue-800 text-base sm:text-lg">
-              <Play className="w-4 h-4 sm:w-5 sm:h-5" />
-              Tâche en cours
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4 sm:p-6 pt-0 space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div className="space-y-2 sm:space-y-3">
-                <h3 className="font-semibold text-sm sm:text-base">{currentTask.vehicleBrand} {currentTask.vehicleModel}</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
-                  {currentTask.licensePlate} • {currentTask.client}
-                </p>
-                <p className="text-xs sm:text-sm font-medium text-blue-700">{currentTask.taskType}</p>
-                <p className="text-xs sm:text-sm line-clamp-2">{currentTask.description}</p>
-                <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
-                  <Clock className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                  <span>{currentTask.startTime} - {currentTask.endTime}</span>
-                </div>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row lg:flex-col gap-2 sm:gap-3 lg:gap-2 justify-start sm:justify-end lg:justify-start">
-                <Button 
-                  size="sm" 
-                  variant="outline"
-                  onClick={() => {
-                    setSelectedTaskForReport(currentTask);
-                    setShowProblemReportModal(true);
-                  }}
-                  className="flex items-center gap-2 w-full sm:w-auto"
-                  disabled={isProcessingPhoto}
-                >
-                  <AlertTriangle className="w-4 h-4" />
-                  <span className="text-xs sm:text-sm">Signaler problème</span>
-                </Button>
-                
-                <Button 
-                  size="sm" 
-                  onClick={() => handleCompleteTask(currentTask.id)}
-                  className="flex items-center gap-2 w-full sm:w-auto"
-                  disabled={isProcessingPhoto}
-                >
-                  {isProcessingPhoto ? (
-                    <>
-                      <Camera className="w-4 h-4 animate-pulse" />
-                      <span className="text-xs sm:text-sm">Photo...</span>
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle className="w-4 h-4" />
-                      <span className="text-xs sm:text-sm">Terminer</span>
-                    </>
-                  )}
-                </Button>
-                <Button 
-                  size="sm" 
-                  variant="destructive"
-                  onClick={() => handlePutOnHold(currentTask.id)}
-                  className="flex items-center gap-2 w-full sm:w-auto"
-                  disabled={isOnBreak || isProcessingPhoto}
-                >
-                  <AlertTriangle className="w-4 h-4" />
-                  <span className="text-xs sm:text-sm">Mettre en attente</span>
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <CurrentTaskDisplay
+          task={currentTask}
+          onCompleteTask={handleCompleteTask}
+          onPauseTask={handlePutOnHold}
+          onReportProblem={() => {
+            setSelectedTaskForReport(currentTask);
+            setShowProblemReportModal(true);
+          }}
+          onTakePhoto={async (taskId: string) => {
+            setIsProcessingPhoto(true);
+            try {
+              await takeTaskPhoto(taskId, currentUserId!, companyInfo?.id!, currentTask.vehicleId || '', 'end');
+              toast({
+                title: "Photo prise avec succès",
+                description: "La photo a été enregistrée avec la tâche",
+              });
+            } catch (error) {
+              console.error('Erreur lors de la prise de photo:', error);
+              toast({
+                title: "Erreur",
+                description: "Impossible de prendre la photo",
+                variant: "destructive",
+              });
+            } finally {
+              setIsProcessingPhoto(false);
+            }
+          }}
+          isProcessingPhoto={isProcessingPhoto}
+          isOnBreak={isOnBreak}
+        />
       ) : (
         <Card>
           <CardContent className="text-center py-6 sm:py-8 p-4 sm:p-6">
