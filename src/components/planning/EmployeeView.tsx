@@ -8,6 +8,7 @@ import { useCompany } from '@/hooks/use-company';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { EmployePointageModal } from '@/components/EmployePointageModal';
+import { ProblemReportModal } from '@/components/planning/ProblemReportModal';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -48,6 +49,8 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   const [showWaitingModal, setShowWaitingModal] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [waitingReason, setWaitingReason] = useState<string>('');
+  const [showProblemReportModal, setShowProblemReportModal] = useState(false);
+  const [selectedTaskForReport, setSelectedTaskForReport] = useState<any>(null);
 
   // Utiliser l'ID de l'utilisateur connecté ou celui passé en prop
   const currentUserId = employeeId || user?.id;
@@ -600,6 +603,20 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
               <div className="flex flex-col sm:flex-row lg:flex-col gap-2 sm:gap-3 lg:gap-2 justify-start sm:justify-end lg:justify-start">
                 <Button 
                   size="sm" 
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedTaskForReport(currentTask);
+                    setShowProblemReportModal(true);
+                  }}
+                  className="flex items-center gap-2 w-full sm:w-auto"
+                  disabled={isProcessingPhoto}
+                >
+                  <AlertTriangle className="w-4 h-4" />
+                  <span className="text-xs sm:text-sm">Signaler problème</span>
+                </Button>
+                
+                <Button 
+                  size="sm" 
                   onClick={() => handleCompleteTask(currentTask.id)}
                   className="flex items-center gap-2 w-full sm:w-auto"
                   disabled={isProcessingPhoto}
@@ -665,6 +682,20 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
               </div>
               
               <div className="flex flex-col sm:flex-row lg:flex-col gap-2 sm:gap-3 lg:gap-2 justify-start sm:justify-end lg:justify-start">
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedTaskForReport(nextTask);
+                    setShowProblemReportModal(true);
+                  }}
+                  className="flex items-center gap-2 w-full sm:w-auto"
+                  disabled={isOnBreak || isProcessingPhoto}
+                >
+                  <AlertTriangle className="w-4 h-4" />
+                  <span className="text-xs sm:text-sm">Signaler problème</span>
+                </Button>
+                
                 <Button 
                   size="sm" 
                   onClick={() => handleStartTask(nextTask.id)}
@@ -815,6 +846,22 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Modal de signalement de problème */}
+      <ProblemReportModal
+        isOpen={showProblemReportModal}
+        onClose={() => {
+          setShowProblemReportModal(false);
+          setSelectedTaskForReport(null);
+        }}
+        taskType={selectedTaskForReport?.taskType || ''}
+        vehicleInfo={{
+          vehicule: selectedTaskForReport?.licensePlate || '',
+          marque: selectedTaskForReport?.vehicleBrand || '',
+          modele: selectedTaskForReport?.vehicleModel || '',
+          client: selectedTaskForReport?.client || ''
+        }}
+      />
     </div>
   );
 };
