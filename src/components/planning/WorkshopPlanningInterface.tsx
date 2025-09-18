@@ -379,7 +379,8 @@ export const WorkshopPlanningInterface = ({
               </TabsTrigger>
               <TabsTrigger value="planning" className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 lg:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm whitespace-nowrap flex-shrink-0">
                 <BarChart className="w-4 h-4" />
-                <span className="hidden xs:inline">Planning</span>
+                <span className="hidden xs:inline sm:hidden lg:inline">Planning</span>
+                <span className="xs:hidden sm:inline lg:hidden">Plan</span>
               </TabsTrigger>
               <TabsTrigger value="employee-planning" className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 lg:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm whitespace-nowrap flex-shrink-0">
                 <Users className="w-4 h-4" />
