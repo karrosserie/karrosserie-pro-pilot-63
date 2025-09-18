@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PaintDetailsSection } from './PaintDetailsSection';
 
 interface TaskDetailsModalProps {
   isOpen: boolean;
@@ -144,6 +145,9 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({ isOpen, onClose, ta
               </CardContent>
             </Card>
           )}
+
+          {/* Détails de peinture pour les tâches Préparation peinture en cours */}
+          <PaintDetailsSection task={task} />
 
           {/* Temps réels si la tâche est commencée ou terminée */}
           {(task.real_start_datetime || task.real_end_datetime) && (

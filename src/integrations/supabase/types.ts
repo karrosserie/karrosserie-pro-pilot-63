@@ -796,10 +796,12 @@ export type Database = {
       }
       employee_schedule: {
         Row: {
+          color_code: string | null
           company_id: string
           created_at: string
           end_datetime: string
           id: string
+          paint_brand: string | null
           real_end_datetime: string | null
           real_start_datetime: string | null
           start_datetime: string
@@ -811,10 +813,12 @@ export type Database = {
           waiting_reason: string | null
         }
         Insert: {
+          color_code?: string | null
           company_id: string
           created_at?: string
           end_datetime: string
           id?: string
+          paint_brand?: string | null
           real_end_datetime?: string | null
           real_start_datetime?: string | null
           start_datetime: string
@@ -826,10 +830,12 @@ export type Database = {
           waiting_reason?: string | null
         }
         Update: {
+          color_code?: string | null
           company_id?: string
           created_at?: string
           end_datetime?: string
           id?: string
+          paint_brand?: string | null
           real_end_datetime?: string | null
           real_start_datetime?: string | null
           start_datetime?: string
