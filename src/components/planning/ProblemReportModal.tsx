@@ -123,7 +123,7 @@ const STEP_PROBLEMS: StepProblems[] = [
     ]
   },
   {
-    step: "Préparation & Peinture",
+    step: "Préparation peinture",
     icon: <Palette className="w-5 h-5" />,
     color: "green",
     problems: [
@@ -142,22 +142,6 @@ const STEP_PROBLEMS: StepProblems[] = [
         solutions: [
           "Stock mini garanti (apprêt, diluant, durcisseur)",
           "Liste de sécurité affichée dans cabine pour vérifier avant chaque peinture"
-        ]
-      },
-      {
-        id: "defaut-cabine",
-        title: "Défaut cabine (chauffage, filtration)",
-        solutions: [
-          "Maintenance préventive planifiée",
-          "Avoir une cabine de secours ou créneaux partagés avec atelier partenaire"
-        ]
-      },
-      {
-        id: "temps-sechage",
-        title: "Temps de séchage non respecté",
-        solutions: [
-          "Utiliser lampes infrarouges pour accélérer",
-          "Contrôle avec hygromètre/thermomètre cabine"
         ]
       },
       {
@@ -183,6 +167,56 @@ const STEP_PROBLEMS: StepProblems[] = [
         solutions: [
           "Check-list avant peinture",
           "Coller check visuel signé par préparateur sur le pare-brise du véhicule"
+        ]
+      }
+    ]
+  },
+  {
+    step: "Mise en peinture",
+    icon: <Palette className="w-5 h-5" />,
+    color: "purple",
+    problems: [
+      {
+        id: "defaut-cabine",
+        title: "Défaut cabine (chauffage, filtration)",
+        solutions: [
+          "Maintenance préventive planifiée",
+          "Avoir une cabine de secours ou créneaux partagés avec atelier partenaire"
+        ]
+      },
+      {
+        id: "temps-sechage",
+        title: "Temps de séchage non respecté",
+        solutions: [
+          "Utiliser lampes infrarouges pour accélérer",
+          "Contrôle avec hygromètre/thermomètre cabine"
+        ]
+      },
+      {
+        id: "produits-peinture",
+        title: "Produits de peinture défaillants",
+        solutions: [
+          "Vérifier la date de péremption des produits",
+          "Tester la compatibilité des mélanges",
+          "Respecter les ratios de mélange constructeur"
+        ]
+      },
+      {
+        id: "conditions-cabine",
+        title: "Mauvaises conditions en cabine",
+        solutions: [
+          "Contrôler température et hygrométrie avant peinture",
+          "Vérifier la pression et filtration d'air",
+          "Nettoyer les grilles d'aération"
+        ]
+      },
+      {
+        id: "defauts-application",
+        title: "Défauts d'application (coulures, orange)",
+        solutions: [
+          "Ajuster la pression et distance du pistolet",
+          "Contrôler la viscosité du produit",
+          "Revoir la technique d'application"
         ]
       }
     ]
@@ -226,10 +260,13 @@ export const ProblemReportModal: React.FC<ProblemReportModalProps> = ({
       return STEP_PROBLEMS[1]; // Débosselage & Ponçage
     }
     
-    if (taskTypeLower.includes('peinture') || taskTypeLower.includes('préparation peinture') ||
-        taskTypeLower.includes('mise en peinture') || taskTypeLower.includes('finitions') ||
+    if (taskTypeLower.includes('préparation peinture')) {
+      return STEP_PROBLEMS[2]; // Préparation peinture
+    }
+    
+    if (taskTypeLower.includes('mise en peinture') || taskTypeLower.includes('finitions') ||
         taskTypeLower.includes('remontage')) {
-      return STEP_PROBLEMS[2]; // Préparation & Peinture
+      return STEP_PROBLEMS[3]; // Mise en peinture
     }
     
     // Par défaut, retourner la première étape
@@ -296,6 +333,13 @@ export const ProblemReportModal: React.FC<ProblemReportModalProps> = ({
           border: 'border-green-200',
           text: 'text-green-800',
           badge: 'bg-green-100 text-green-800'
+        };
+      case 'purple':
+        return {
+          bg: 'bg-purple-50',
+          border: 'border-purple-200',
+          text: 'text-purple-800',
+          badge: 'bg-purple-100 text-purple-800'
         };
       default:
         return {
