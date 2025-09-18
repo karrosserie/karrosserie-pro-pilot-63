@@ -34,13 +34,14 @@ export const useVehicleData = (companyId: string | null) => {
     try {
       setLoading(true);
       
-      // Récupérer les véhicules depuis employee_schedule
+      // Récupérer les véhicules depuis employee_schedule (exclure les tâches terminées)
       const { data, error } = await supabase
         .from('employee_schedule')
         .select(`
           *
         `)
         .eq('company_id', companyId)
+        .neq('status', 'Terminé')  // Exclure les tâches terminées pour éviter les doublons
         .order('start_datetime', { ascending: true });
 
       if (error) {
