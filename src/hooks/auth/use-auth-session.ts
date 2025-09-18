@@ -34,24 +34,25 @@ export const useAuthSession = () => {
         await fetchProfile(initialSession.user.id);
       }
       
-      // Set up auth state change listener
-      const subscription = authService.onAuthStateChange((currentSession, currentUser) => {
-        setSession(currentSession);
-        setUser(currentUser);
-        
-        if (currentUser) {
-          fetchProfile(currentUser.id);
-        } else {
-          setProfile(null);
-        }
-      });
+      // Temporarily disable auth state listener to prevent WebSocket errors
+      // TODO: Re-implement with proper browser WebSocket handling
+      // const subscription = authService.onAuthStateChange((currentSession, currentUser) => {
+      //   setSession(currentSession);
+      //   setUser(currentUser);
+      //   
+      //   if (currentUser) {
+      //     fetchProfile(currentUser.id);
+      //   } else {
+      //     setProfile(null);
+      //   }
+      // });
       
       setLoading(false);
       
-      // Cleanup subscription
-      return () => {
-        subscription.unsubscribe();
-      };
+      // Cleanup function (no subscription to clean up for now)
+      // return () => {
+      //   subscription.unsubscribe();
+      // };
     };
     
     initializeAuth();
