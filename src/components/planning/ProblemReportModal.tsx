@@ -3,8 +3,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, CheckCircle, Wrench, Palette, Hammer } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Wrench, Palette, Hammer, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Problem {
   id: string;
@@ -227,6 +228,7 @@ interface ProblemReportModalProps {
   isOpen: boolean;
   onClose: () => void;
   taskType: string;
+  taskId?: string;
   vehicleInfo: {
     vehicule: string;
     marque: string;
@@ -239,11 +241,11 @@ export const ProblemReportModal: React.FC<ProblemReportModalProps> = ({
   isOpen,
   onClose,
   taskType,
+  taskId,
   vehicleInfo
 }) => {
   const { toast } = useToast();
   const [selectedProblems, setSelectedProblems] = useState<string[]>([]);
-  const [reportSent, setReportSent] = useState(false);
 
   // Mapper le type de tâche à l'étape correspondante
   const getStepFromTaskType = (taskType: string): StepProblems | null => {
@@ -283,7 +285,7 @@ export const ProblemReportModal: React.FC<ProblemReportModalProps> = ({
     );
   };
 
-  const handleSendReport = () => {
+  const handlePutOnWait = async () => {
     if (selectedProblems.length === 0) {
       toast({
         title: "Sélection requise",
@@ -293,20 +295,55 @@ export const ProblemReportModal: React.FC<ProblemReportModalProps> = ({
       return;
     }
 
-    // Simuler l'envoi du rapport
-    setReportSent(true);
-    
-    toast({
-      title: "Rapport envoyé",
-      description: `${selectedProblems.length} problème(s) signalé(s) pour le véhicule ${vehicleInfo.vehicule}`,
-    });
+    if (!taskId) {
+      toast({
+        title: "Erreur",
+        description: "ID de tâche manquant",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    // Réinitialiser après 2 secondes
-    setTimeout(() => {
-      setReportSent(false);
+    try {
+      // Obtenir le titre du premier problème sélectionné
+      const selectedProblem = currentStep?.problems.find(p => selectedProblems.includes(p.id));
+      const waitingReason = selectedProblem?.title || "Problème signalé";
+
+      const { error } = await supabase
+        .from('employee_schedule')
+        .update({ 
+          status: 'En attente',
+          waiting_reason: waitingReason 
+        })
+        .eq('id', taskId);
+
+      if (error) {
+        console.error('Erreur lors de la mise en attente:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de mettre la tâche en attente",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Tâche mise en attente",
+        description: `Raison: ${waitingReason}`,
+      });
+
+      // Fermer le modal et réinitialiser
       setSelectedProblems([]);
       onClose();
-    }, 2000);
+
+    } catch (error) {
+      console.error('Erreur lors de la mise en attente:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue",
+        variant: "destructive",
+      });
+    }
   };
 
   if (!currentStep) return null;
@@ -384,90 +421,80 @@ export const ProblemReportModal: React.FC<ProblemReportModalProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        {reportSent ? (
-          <div className="text-center py-8">
-            <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-green-800 mb-2">Rapport envoyé!</h3>
-            <p className="text-green-600">
-              Le responsable d'atelier a été notifié et vous contactera bientôt.
-            </p>
+        <div className="space-y-4">
+          <div className="text-sm text-muted-foreground">
+            Sélectionnez le(s) problème(s) rencontré(s) pour mettre la tâche en attente:
           </div>
-        ) : (
-          <div className="space-y-4">
+
+          <div className="grid gap-3">
+            {currentStep.problems.map((problem) => (
+              <Card 
+                key={problem.id}
+                className={`cursor-pointer transition-all ${
+                  selectedProblems.includes(problem.id)
+                    ? `${colors.bg} ${colors.border} border-2`
+                    : 'hover:shadow-md border'
+                }`}
+                onClick={() => toggleProblem(problem.id)}
+              >
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-start gap-3 text-sm">
+                    <div className="mt-1">
+                      {selectedProblems.includes(problem.id) ? (
+                        <CheckCircle className={`w-5 h-5 ${currentStep.color === 'blue' ? 'text-blue-600' : currentStep.color === 'orange' ? 'text-orange-600' : 'text-green-600'}`} />
+                      ) : (
+                        <AlertTriangle className="w-5 h-5 text-gray-400" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className={`font-medium ${selectedProblems.includes(problem.id) ? colors.text : ''}`}>
+                        {problem.title}
+                      </div>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                
+                {selectedProblems.includes(problem.id) && (
+                  <CardContent className="pt-0">
+                    <div className="pl-8">
+                      <div className="text-sm font-medium text-green-700 mb-2">
+                        💡 Solutions recommandées:
+                      </div>
+                      <ul className="space-y-1">
+                        {problem.solutions.map((solution, idx) => (
+                          <li key={idx} className="text-sm flex items-start gap-2">
+                            <span className="text-green-600 mt-1">•</span>
+                            <span className="text-green-700">{solution}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </CardContent>
+                )}
+              </Card>
+            ))}
+          </div>
+
+          <div className="flex justify-between items-center pt-4 border-t">
             <div className="text-sm text-muted-foreground">
-              Sélectionnez le(s) problème(s) rencontré(s) pour recevoir les solutions adaptées:
+              {selectedProblems.length} problème(s) sélectionné(s)
             </div>
-
-            <div className="grid gap-3">
-              {currentStep.problems.map((problem) => (
-                <Card 
-                  key={problem.id}
-                  className={`cursor-pointer transition-all ${
-                    selectedProblems.includes(problem.id)
-                      ? `${colors.bg} ${colors.border} border-2`
-                      : 'hover:shadow-md border'
-                  }`}
-                  onClick={() => toggleProblem(problem.id)}
-                >
-                  <CardHeader className="pb-2">
-                    <CardTitle className="flex items-start gap-3 text-sm">
-                      <div className="mt-1">
-                        {selectedProblems.includes(problem.id) ? (
-                          <CheckCircle className={`w-5 h-5 ${currentStep.color === 'blue' ? 'text-blue-600' : currentStep.color === 'orange' ? 'text-orange-600' : 'text-green-600'}`} />
-                        ) : (
-                          <AlertTriangle className="w-5 h-5 text-gray-400" />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <div className={`font-medium ${selectedProblems.includes(problem.id) ? colors.text : ''}`}>
-                          {problem.title}
-                        </div>
-                      </div>
-                    </CardTitle>
-                  </CardHeader>
-                  
-                  {selectedProblems.includes(problem.id) && (
-                    <CardContent className="pt-0">
-                      <div className="pl-8">
-                        <div className="text-sm font-medium text-green-700 mb-2">
-                          💡 Solutions recommandées:
-                        </div>
-                        <ul className="space-y-1">
-                          {problem.solutions.map((solution, idx) => (
-                            <li key={idx} className="text-sm flex items-start gap-2">
-                              <span className="text-green-600 mt-1">•</span>
-                              <span className="text-green-700">{solution}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </CardContent>
-                  )}
-                </Card>
-              ))}
-            </div>
-
-            <div className="flex justify-between items-center pt-4 border-t">
-              <div className="text-sm text-muted-foreground">
-                {selectedProblems.length} problème(s) sélectionné(s)
-              </div>
-              
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={onClose}>
-                  Annuler
-                </Button>
-                <Button 
-                  onClick={handleSendReport}
-                  disabled={selectedProblems.length === 0}
-                  className="bg-red-600 hover:bg-red-700"
-                >
-                  <AlertTriangle className="w-4 h-4 mr-2" />
-                  Envoyer le rapport ({selectedProblems.length})
-                </Button>
-              </div>
+            
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={onClose}>
+                Annuler
+              </Button>
+              <Button 
+                onClick={handlePutOnWait}
+                disabled={selectedProblems.length === 0}
+                className="bg-orange-600 hover:bg-orange-700"
+              >
+                <Clock className="w-4 h-4 mr-2" />
+                Mettre en attente ({selectedProblems.length})
+              </Button>
             </div>
           </div>
-        )}
+        </div>
       </DialogContent>
     </Dialog>
   );
