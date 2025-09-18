@@ -3447,6 +3447,14 @@ export type Database = {
         Args: { setting_name: string }
         Returns: string
       }
+      get_available_employees: {
+        Args: { p_company_id: string; p_task_type: string }
+        Returns: {
+          availability_score: number
+          qualification: string
+          user_id: string
+        }[]
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
