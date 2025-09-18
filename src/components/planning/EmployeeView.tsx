@@ -816,7 +816,7 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
           setShowProblemReportModal(false);
           setSelectedTaskForReport(null);
         }}
-        taskType={selectedTaskForReport?.task_type || ''}
+        taskType={selectedTaskForReport?.taskType || ''}
         taskId={selectedTaskForReport?.id}
         vehicleInfo={{
           vehicule: selectedTaskForReport?.vehicles?.license_plate || '',
