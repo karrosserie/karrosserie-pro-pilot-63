@@ -75,34 +75,24 @@ serve(async (req) => {
           const originalEnd = new Date(task.end_datetime)
           const taskDuration = originalEnd.getTime() - originalStart.getTime()
 
-          // Trouver le prochain créneau disponible
-          const nextSlot = await findNextAvailableSlot(supabase, {
+          // Insérer la tâche en retard dans le planning et décaler les autres
+          const insertionResult = await insertTaskAndShiftSchedule(supabase, {
+            taskId: task.id,
             userId: task.user_id,
             companyId: task.company_id,
             duration: taskDuration,
-            taskType: task.task_type
+            taskType: task.task_type,
+            originalStart: task.start_datetime,
+            originalEnd: task.end_datetime
           })
 
-          if (nextSlot) {
-            // Mettre à jour la tâche avec la nouvelle plage horaire et une priorité élevée
-            const { error: updateError } = await supabase
-              .from('employee_schedule')
-              .update({
-                start_datetime: nextSlot.start.toISOString(),
-                end_datetime: nextSlot.end.toISOString(),
-                waiting_reason: 'Tâche reportée - Priorité élevée',
-                updated_at: new Date().toISOString()
-              })
-              .eq('id', task.id)
-
-            if (updateError) {
-              console.error(`❌ Error updating task ${task.id}:`, updateError)
-            } else {
-              console.log(`✅ Rescheduled task ${task.id} from ${task.start_datetime} to ${nextSlot.start.toISOString()}`)
-              totalRescheduled++
-            }
+          if (insertionResult.success) {
+            console.log(`✅ Inserted and shifted task ${task.id}: ${insertionResult.message}`)
+            totalRescheduled++
           } else {
-            // Si aucun créneau disponible, marquer comme en attente avec une priorité élevée
+            console.error(`❌ Failed to insert task ${task.id}: ${insertionResult.message}`)
+            
+            // En cas d'échec, marquer comme en attente avec priorité élevée
             const { error: updateError } = await supabase
               .from('employee_schedule')
               .update({
@@ -111,9 +101,7 @@ serve(async (req) => {
               })
               .eq('id', task.id)
 
-            if (updateError) {
-              console.error(`❌ Error marking task ${task.id} as waiting:`, updateError)
-            } else {
+            if (!updateError) {
               console.log(`⏳ Marked task ${task.id} as waiting with high priority`)
               totalRescheduled++
             }
@@ -148,69 +136,160 @@ serve(async (req) => {
   }
 })
 
-// Helper function pour trouver le prochain créneau disponible
-async function findNextAvailableSlot(
+// Helper function pour insérer une tâche en retard et décaler le planning existant
+async function insertTaskAndShiftSchedule(
   supabase: any, 
   options: {
+    taskId: string
     userId: string
     companyId: string
     duration: number
     taskType: string
+    originalStart: string
+    originalEnd: string
   }
-): Promise<{ start: Date, end: Date } | null> {
-  const { userId, companyId, duration, taskType } = options
+): Promise<{ success: boolean, message: string }> {
+  const { taskId, userId, companyId, duration, taskType, originalStart, originalEnd } = options
   
-  // Commencer à chercher à partir de demain
-  const searchStart = new Date()
-  searchStart.setDate(searchStart.getDate() + 1)
-  searchStart.setHours(8, 0, 0, 0) // Commencer à 8h
+  try {
+    // Trouver le prochain créneau de travail (demain 8h ou le prochain jour ouvrable)
+    const insertionTime = getNextWorkingSlot()
+    const insertionEnd = new Date(insertionTime.getTime() + duration)
 
-  // Chercher jusqu'à 2 semaines dans le futur
-  const searchEnd = new Date(searchStart)
-  searchEnd.setDate(searchEnd.getDate() + 14)
+    console.log(`🔄 Inserting overdue task ${taskId} at ${insertionTime.toISOString()}`)
 
-  // Récupérer les créneaux existants pour cet employé
-  const { data: existingTasks, error } = await supabase
-    .from('employee_schedule')
-    .select('start_datetime, end_datetime')
-    .eq('user_id', userId)
-    .eq('company_id', companyId)
-    .gte('start_datetime', searchStart.toISOString())
-    .lte('end_datetime', searchEnd.toISOString())
+    // Récupérer toutes les tâches existantes pour cet employé à partir du point d'insertion
+    const { data: tasksToShift, error: fetchError } = await supabase
+      .from('employee_schedule')
+      .select('id, start_datetime, end_datetime, task_type')
+      .eq('user_id', userId)
+      .eq('company_id', companyId)
+      .gte('start_datetime', insertionTime.toISOString())
+      .neq('id', taskId) // Exclure la tâche qu'on est en train de reprogrammer
+      .order('start_datetime', { ascending: true })
 
-  if (error) {
-    console.error('Error fetching existing tasks:', error)
-    return null
-  }
+    if (fetchError) {
+      console.error('Error fetching tasks to shift:', fetchError)
+      return { success: false, message: `Error fetching tasks: ${fetchError.message}` }
+    }
 
-  // Créer des créneaux de travail (8h-18h, lundi-vendredi)
-  const workingHours = { start: 8, end: 18 }
-  const durationHours = duration / (1000 * 60 * 60)
+    // Calculer les nouveaux créneaux pour toutes les tâches existantes
+    let currentShiftTime = new Date(insertionEnd)
+    const updatedTasks = []
 
-  for (let day = new Date(searchStart); day <= searchEnd; day.setDate(day.getDate() + 1)) {
-    // Ignorer les weekends
-    if (day.getDay() === 0 || day.getDay() === 6) continue
-
-    // Chercher un créneau libre dans cette journée
-    for (let hour = workingHours.start; hour <= workingHours.end - durationHours; hour += 0.5) {
-      const slotStart = new Date(day)
-      slotStart.setHours(Math.floor(hour), (hour % 1) * 60, 0, 0)
+    for (const existingTask of tasksToShift || []) {
+      const taskDuration = new Date(existingTask.end_datetime).getTime() - new Date(existingTask.start_datetime).getTime()
       
-      const slotEnd = new Date(slotStart.getTime() + duration)
-
-      // Vérifier si ce créneau est libre
-      const isSlotFree = !existingTasks?.some(task => {
-        const taskStart = new Date(task.start_datetime)
-        const taskEnd = new Date(task.end_datetime)
-        
-        return (slotStart < taskEnd && slotEnd > taskStart)
+      // Ajuster l'heure si on dépasse les heures de travail ou si c'est un weekend
+      currentShiftTime = adjustToWorkingHours(currentShiftTime)
+      
+      const newStart = new Date(currentShiftTime)
+      const newEnd = new Date(currentShiftTime.getTime() + taskDuration)
+      
+      updatedTasks.push({
+        id: existingTask.id,
+        start_datetime: newStart.toISOString(),
+        end_datetime: newEnd.toISOString()
       })
+      
+      // Préparer le prochain créneau
+      currentShiftTime = new Date(newEnd)
+      
+      console.log(`📅 Task ${existingTask.id} will be shifted to ${newStart.toISOString()}`)
+    }
 
-      if (isSlotFree) {
-        return { start: slotStart, end: slotEnd }
+    // Commencer une transaction pour mettre à jour toutes les tâches
+    console.log(`🔄 Updating ${updatedTasks.length + 1} tasks...`)
+
+    // 1. Mettre à jour la tâche en retard avec le nouveau créneau d'insertion
+    const { error: overdueUpdateError } = await supabase
+      .from('employee_schedule')
+      .update({
+        start_datetime: insertionTime.toISOString(),
+        end_datetime: insertionEnd.toISOString(),
+        waiting_reason: null, // Retirer le waiting_reason car la tâche est maintenant programmée
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', taskId)
+
+    if (overdueUpdateError) {
+      console.error('Error updating overdue task:', overdueUpdateError)
+      return { success: false, message: `Error updating overdue task: ${overdueUpdateError.message}` }
+    }
+
+    // 2. Mettre à jour toutes les tâches décalées
+    for (const updatedTask of updatedTasks) {
+      const { error: shiftError } = await supabase
+        .from('employee_schedule')
+        .update({
+          start_datetime: updatedTask.start_datetime,
+          end_datetime: updatedTask.end_datetime,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', updatedTask.id)
+
+      if (shiftError) {
+        console.error(`Error shifting task ${updatedTask.id}:`, shiftError)
+        // Continue avec les autres tâches même si une échoue
       }
     }
-  }
 
-  return null // Aucun créneau trouvé
+    return { 
+      success: true, 
+      message: `Task inserted at ${insertionTime.toISOString()}, ${updatedTasks.length} tasks shifted`
+    }
+
+  } catch (error) {
+    console.error('Error in insertTaskAndShiftSchedule:', error)
+    return { success: false, message: `Unexpected error: ${error.message}` }
+  }
+}
+
+// Helper function pour obtenir le prochain créneau de travail
+function getNextWorkingSlot(): Date {
+  const now = new Date()
+  let nextSlot = new Date()
+  
+  // Si nous sommes en semaine et avant 18h, programmer pour demain 8h
+  // Sinon, trouver le prochain jour ouvrable
+  if (now.getDay() >= 1 && now.getDay() <= 5 && now.getHours() < 18) {
+    nextSlot.setDate(now.getDate() + 1)
+  } else {
+    // Trouver le prochain lundi
+    const daysUntilMonday = (8 - now.getDay()) % 7 || 7
+    nextSlot.setDate(now.getDate() + daysUntilMonday)
+  }
+  
+  nextSlot.setHours(8, 0, 0, 0)
+  return nextSlot
+}
+
+// Helper function pour ajuster une heure aux heures de travail
+function adjustToWorkingHours(dateTime: Date): Date {
+  const adjusted = new Date(dateTime)
+  
+  // Si c'est un weekend, passer au lundi suivant
+  if (adjusted.getDay() === 0) { // Dimanche
+    adjusted.setDate(adjusted.getDate() + 1)
+    adjusted.setHours(8, 0, 0, 0)
+  } else if (adjusted.getDay() === 6) { // Samedi
+    adjusted.setDate(adjusted.getDate() + 2)
+    adjusted.setHours(8, 0, 0, 0)
+  }
+  
+  // Si c'est après 18h, passer au jour suivant à 8h
+  if (adjusted.getHours() >= 18) {
+    adjusted.setDate(adjusted.getDate() + 1)
+    adjusted.setHours(8, 0, 0, 0)
+    
+    // Vérifier à nouveau si le nouveau jour est un weekend
+    return adjustToWorkingHours(adjusted)
+  }
+  
+  // Si c'est avant 8h, ajuster à 8h
+  if (adjusted.getHours() < 8) {
+    adjusted.setHours(8, 0, 0, 0)
+  }
+  
+  return adjusted
 }
