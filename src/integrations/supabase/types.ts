@@ -1769,6 +1769,27 @@ export type Database = {
         }
         Relationships: []
       }
+      n8n_chat_histories: {
+        Row: {
+          created_at: string
+          id: number
+          message: Json | null
+          session_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          message?: Json | null
+          session_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          message?: Json | null
+          session_id?: string | null
+        }
+        Relationships: []
+      }
       page_visit_durations: {
         Row: {
           company_id: string | null
@@ -2316,20 +2337,20 @@ export type Database = {
         Row: {
           action: string | null
           created_at: string
-          id: number
-          userId: string | null
+          id: string
+          userid: string | null
         }
         Insert: {
           action?: string | null
           created_at?: string
-          id?: number
-          userId?: string | null
+          id?: string
+          userid?: string | null
         }
         Update: {
           action?: string | null
           created_at?: string
-          id?: number
-          userId?: string | null
+          id?: string
+          userid?: string | null
         }
         Relationships: []
       }
