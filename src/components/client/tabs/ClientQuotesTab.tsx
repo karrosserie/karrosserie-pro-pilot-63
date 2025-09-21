@@ -310,12 +310,10 @@ const ClientQuotesTab: React.FC<ClientQuotesTabProps> = ({ clientId }) => {
                           <FileCheck className="h-4 w-4 mr-1" />
                           Justificatifs
                         </Button>
-                        {!quote.repair_orders || quote.repair_orders.length === 0 ? (
-                          <Button size="sm" variant="validation" onClick={() => handleConvertToRepairOrder(quote)}>
-                            <ArrowRight className="h-4 w-4 mr-1" />
-                            Convertir
-                          </Button>
-                        ) : null}
+                        <Button size="sm" variant="validation" onClick={() => handleConvertToRepairOrder(quote)}>
+                          <ArrowRight className="h-4 w-4 mr-1" />
+                          Convertir
+                        </Button>
                         <Button variant="delete" size="sm" onClick={() => handleDelete(quote)}>
                           <Trash className="h-4 w-4 mr-1" />
                           Supprimer

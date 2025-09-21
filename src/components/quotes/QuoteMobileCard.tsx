@@ -149,7 +149,7 @@ const QuoteMobileCard: React.FC<QuoteMobileCardProps> = ({
             Justificatifs
           </Button>
         )}
-        {onConvertToRepairOrder && (!quote.repair_orders || quote.repair_orders.length === 0) && (
+        {onConvertToRepairOrder && (
           <Button size="sm" variant="validation" onClick={() => onConvertToRepairOrder(quote)}>
             <ArrowRight className="h-3 w-3 mr-1" />
             Convertir

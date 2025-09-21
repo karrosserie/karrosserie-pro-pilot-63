@@ -7,12 +7,14 @@ export const invoiceQueries = {
     console.log('=== DEBUT RÉCUPÉRATION FACTURES ===');
     console.log('Fetching invoices...');
     
-    // Gérer l'impersonation côté client
-    const impersonationData = localStorage.getItem('admin_impersonation');
-    let baseQuery = supabase.from('invoices');
+    // Utiliser getCurrentUserCompanyId pour gérer correctement l'impersonation
+    const { getCurrentUserCompanyId } = await import('../auth-company');
+    const companyId = await getCurrentUserCompanyId();
     
     // First, try to get invoices with joins
-    let query = baseQuery.select(`
+    const { data: invoicesWithJoins, error: joinError } = await supabase
+      .from('invoices')
+      .select(`
         *,
         clients (
           id,
@@ -35,43 +37,20 @@ export const invoiceQueries = {
           id,
           reference
         )
-      `);
-    
-    if (impersonationData) {
-      try {
-        const data = JSON.parse(impersonationData);
-        console.log('Using impersonation company_id for invoices:', data.company_id);
-        // Filtrer par la company_id d'impersonation
-        query = query.eq('company_id', data.company_id);
-      } catch (error) {
-        console.error('Error parsing impersonation data for invoices:', error);
-      }
-    }
-    
-    // Filtrer par statut d'archivage
-    query = query.eq('archived', showArchived);
-    
-    const { data: invoicesWithJoins, error: joinError } = await query.order('created_at', { ascending: false });
-
+      `)
+      .eq('company_id', companyId)
+      .eq('archived', showArchived)
+      .order('created_at', { ascending: false });
     // If joins fail, fall back to basic query
     if (joinError) {
       console.log('Joins failed, falling back to basic query:', joinError);
       
-      let basicQuery = baseQuery.select('*');
-      
-      if (impersonationData) {
-        try {
-          const data = JSON.parse(impersonationData);
-          basicQuery = basicQuery.eq('company_id', data.company_id);
-        } catch (error) {
-          console.error('Error parsing impersonation data for basic invoices:', error);
-        }
-      }
-      
-      // Filtrer par statut d'archivage
-      basicQuery = basicQuery.eq('archived', showArchived);
-      
-      const { data: basicInvoices, error: basicError } = await basicQuery.order('created_at', { ascending: false });
+      const { data: basicInvoices, error: basicError } = await supabase
+        .from('invoices')
+        .select('*')
+        .eq('company_id', companyId)
+        .eq('archived', showArchived)
+        .order('created_at', { ascending: false });
 
       if (basicError) {
         console.error('Error fetching invoices (basic):', basicError);

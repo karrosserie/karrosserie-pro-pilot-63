@@ -20,20 +20,21 @@ export type Quote = Database['public']['Tables']['quotes']['Row'] & {
       name: string;
     } | null;
   } | null;
-  repair_orders?: {
-    id: string;
-    reference: string;
-  }[] | null;
 };
 export type NewQuote = Database['public']['Tables']['quotes']['Insert'];
 export type UpdateQuote = Database['public']['Tables']['quotes']['Update'];
 
 export const quotesService = {
   getAll: async () => {
-    // Récupérer d'abord tous les devis
+    // Utiliser getCurrentUserCompanyId pour gérer correctement l'impersonation
+    const { getCurrentUserCompanyId } = await import('./auth-company');
+    const companyId = await getCurrentUserCompanyId();
+    
+    // Récupérer les devis filtrés par company_id
     const { data: quotes, error: quotesError } = await supabase
       .from('quotes')
       .select('*')
+      .eq('company_id', companyId)
       .order('created_at', { ascending: false });
 
     if (quotesError) {

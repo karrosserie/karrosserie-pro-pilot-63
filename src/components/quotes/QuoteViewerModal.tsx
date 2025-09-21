@@ -404,12 +404,10 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
                 Justificatifs
               </Button>
 
-              {!currentQuote.repair_orders || currentQuote.repair_orders.length === 0 ? (
-                <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90" onClick={handleConvertToRepairOrder}>
-                  <ArrowRight className="h-4 w-4 mr-1" />
-                  Convertir
-                </Button>
-              ) : null}
+              <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90" onClick={handleConvertToRepairOrder}>
+                <ArrowRight className="h-4 w-4 mr-1" />
+                Convertir
+              </Button>
 
               <Button 
                 variant="outline" 

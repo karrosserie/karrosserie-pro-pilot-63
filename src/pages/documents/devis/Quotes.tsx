@@ -516,12 +516,10 @@ const Quotes = () => {
                           Justificatifs
                         </Button>
 
-                        {!quote.repair_orders || quote.repair_orders.length === 0 ? (
-                          <Button size="sm" variant="validation" onClick={() => handleConvertToRepairOrder(quote)}>
-                            <ArrowRight className="h-4 w-4 mr-1" />
+                        <Button size="sm" variant="validation" onClick={() => handleConvertToRepairOrder(quote)}>
+                          <ArrowRight className="h-4 w-4 mr-1" />
                             Convertir
                           </Button>
-                        ) : null}
 
                         {showArchived ? (
                           <Button 

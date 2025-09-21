@@ -13,6 +13,7 @@ export function useQuotes() {
   // Invalider les requêtes lors du changement d'impersonation
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ['quotes'] });
+    queryClient.invalidateQueries({ queryKey: ['invoices'] });
   }, [isImpersonating, impersonationData?.company_id, queryClient]);
 
   const {
@@ -22,27 +23,8 @@ export function useQuotes() {
   } = useQuery({
     queryKey: ['quotes', impersonationData?.company_id || 'normal'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('quotes')
-        .select(`
-          *,
-          clients(id, first_name, last_name),
-          vehicles(
-            id,
-            license_plate,
-            car_brands(id, name),
-            car_models(id, name)
-          ),
-          repair_orders!quote_id(id, reference)
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching quotes:', error);
-        throw new Error(error.message);
-      }
-
-      return data;
+      const { quotesService } = await import('@/services/supabase/quotes');
+      return await quotesService.getAll();
     }
   });
 
