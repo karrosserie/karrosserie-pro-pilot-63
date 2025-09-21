@@ -2,17 +2,25 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fleetVehiclesService, NewFleetVehicle, UpdateFleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { useToast } from '@/hooks/use-toast';
+import { useImpersonation } from '@/hooks/use-impersonation';
+import { useEffect } from 'react';
 
 export function useFleetVehicles() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { isImpersonating, impersonationData } = useImpersonation();
+
+  // Invalider les requêtes lors du changement d'impersonation
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ['fleetVehicles'] });
+  }, [isImpersonating, impersonationData?.company_id, queryClient]);
   
   const {
     data: vehicles,
     isLoading,
     error
   } = useQuery({
-    queryKey: ['fleetVehicles'],
+    queryKey: ['fleetVehicles', impersonationData?.company_id || 'normal'],
     queryFn: fleetVehiclesService.getAll
   });
   

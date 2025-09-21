@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 import { VehicleStatus } from '@/types/vehicle';
+import { getCurrentUserCompanyId } from './auth-company';
 
 export type Vehicle = Database['public']['Tables']['vehicles']['Row'] & {
   car_brands?: {
@@ -30,9 +31,10 @@ export const vehiclesService = {
   getAll: async () => {
     console.log('Fetching all vehicles...');
     
-    // Gérer l'impersonation côté client
-    const impersonationData = localStorage.getItem('admin_impersonation');
-    let query = supabase
+    // Utiliser getCurrentUserCompanyId pour gérer correctement l'impersonation
+    const companyId = await getCurrentUserCompanyId();
+    
+    const { data, error } = await supabase
       .from('vehicles')
       .select(`
         *,
@@ -40,20 +42,9 @@ export const vehiclesService = {
         car_models(id, name),
         clients(id, first_name, last_name),
         insurance_companies(id, name)
-      `);
-    
-    if (impersonationData) {
-      try {
-        const data = JSON.parse(impersonationData);
-        console.log('Using impersonation company_id for vehicles:', data.company_id);
-        // Filtrer par la company_id d'impersonation
-        query = query.eq('company_id', data.company_id);
-      } catch (error) {
-        console.error('Error parsing impersonation data for vehicles:', error);
-      }
-    }
-    
-    const { data, error } = await query.order('created_at', { ascending: false });
+      `)
+      .eq('company_id', companyId)
+      .order('created_at', { ascending: false });
 
     if (error) {
       console.error('Error fetching vehicles:', error);

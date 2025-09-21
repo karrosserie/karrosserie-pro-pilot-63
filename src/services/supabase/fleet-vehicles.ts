@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
+import { getCurrentUserCompanyId } from './auth-company';
 
 export type FleetVehicle = Database['public']['Tables']['fleet_vehicles']['Row'] & {
   vin?: string;
@@ -44,7 +45,9 @@ export const fleetVehiclesService = {
   getAll: async () => {
     console.log('Fetching fleet vehicles with relations');
     
-    // RLS policies handle company filtering automatically with impersonation
+    // Utiliser getCurrentUserCompanyId pour gérer correctement l'impersonation
+    const companyId = await getCurrentUserCompanyId();
+    
     const { data, error } = await supabase
       .from('fleet_vehicles')
       .select(`
@@ -67,6 +70,7 @@ export const fleetVehiclesService = {
         car_brands(id, name),
         car_models(id, name)
       `)
+      .eq('company_id', companyId)
       .order('created_at', { ascending: false });
     
     if (error) {
@@ -118,9 +122,13 @@ export const fleetVehiclesService = {
   create: async (vehicle: NewFleetVehicle) => {
     console.log('Creating fleet vehicle:', vehicle);
     
+    // Utiliser getCurrentUserCompanyId pour s'assurer que le véhicule est assigné à la bonne entreprise
+    const companyId = await getCurrentUserCompanyId();
+    const vehicleWithCompany = { ...vehicle, company_id: companyId };
+    
     const { data, error } = await supabase
       .from('fleet_vehicles')
-      .insert([vehicle])
+      .insert([vehicleWithCompany])
       .select(`
         id,
         brand_id,
