@@ -19,25 +19,14 @@ export const clientsService = {
   getAll: async () => {
     console.log('Fetching all clients...');
     
-    // Gérer l'impersonation côté client
-    const impersonationData = localStorage.getItem('admin_impersonation');
-    let query = supabase
+    // Utiliser getCurrentUserCompanyId pour gérer correctement l'impersonation
+    const companyId = await getCurrentUserCompanyId();
+    
+    const { data, error } = await supabase
       .from('clients')
       .select('*')
+      .eq('company_id', companyId)
       .order('last_name');
-    
-    if (impersonationData) {
-      try {
-        const data = JSON.parse(impersonationData);
-        console.log('Using impersonation company_id:', data.company_id);
-        // Filtrer par la company_id d'impersonation
-        query = query.eq('company_id', data.company_id);
-      } catch (error) {
-        console.error('Error parsing impersonation data:', error);
-      }
-    }
-    
-    const { data, error } = await query;
 
     if (error) {
       console.error('Error fetching clients:', error);
