@@ -7,6 +7,7 @@ import Quotes from "@/pages/documents/devis/Quotes";
 import RepairOrders from "@/pages/documents/ordres/RepairOrders";
 import Invoices from "@/pages/documents/factures/Invoices";
 import Credits from "@/pages/documents/avoirs/Credits";
+import BonCommande from "@/pages/documents/bon-commande/BonCommande";
 import DocumentUploadFlow from "@/pages/documents/upload/DocumentUploadFlow";
 
 export const documentRoutes = [
@@ -66,6 +67,16 @@ export const documentRoutes = [
       <ProtectedRoute>
         <AppLayout>
           <Credits />
+        </AppLayout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/documents/bon-commande",
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <BonCommande />
         </AppLayout>
       </ProtectedRoute>
     )

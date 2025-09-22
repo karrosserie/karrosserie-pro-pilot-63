@@ -167,6 +167,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
         { label: 'Ordres de réparation', path: '/documents/ordres' },
         { label: 'Factures', path: '/documents/factures' },
         { label: 'Avoirs', path: '/documents/avoirs' },
+        { label: 'Bon de commande', path: '/documents/bon-commande' },
       ]
     },
     { 
