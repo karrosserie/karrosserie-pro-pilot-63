@@ -32,8 +32,7 @@ const BonLivraisonModal = ({
   const [formData, setFormData] = useState({
     transporteur: '',
     date_livraison_prevue: '',
-    notes: '',
-    statut: 'En préparation'
+    notes: ''
   });
 
   const handleInputChange = (field: string, value: string) => {
@@ -96,7 +95,7 @@ const BonLivraisonModal = ({
           transporteur: formData.transporteur || null,
           date_livraison_prevue: formData.date_livraison_prevue || null,
           notes: formData.notes || null,
-          statut: formData.statut,
+          statut: 'Livré',
           file_url: fileData?.publicUrl || null,
           file_name: fileData?.fileName || null,
           file_type: fileData?.fileType || null
@@ -115,8 +114,7 @@ const BonLivraisonModal = ({
       setFormData({
         transporteur: '',
         date_livraison_prevue: '',
-        notes: '',
-        statut: 'En préparation'
+        notes: ''
       });
       setSelectedFile(null);
       onOpenChange(false);
@@ -137,8 +135,7 @@ const BonLivraisonModal = ({
     setFormData({
       transporteur: '',
       date_livraison_prevue: '',
-      notes: '',
-      statut: 'En préparation'
+      notes: ''
     });
     setSelectedFile(null);
     onOpenChange(false);
@@ -183,24 +180,6 @@ const BonLivraisonModal = ({
               value={formData.date_livraison_prevue}
               onChange={(e) => handleInputChange('date_livraison_prevue', e.target.value)}
             />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="statut">Statut</Label>
-            <Select 
-              value={formData.statut} 
-              onValueChange={(value) => handleInputChange('statut', value)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="En préparation">En préparation</SelectItem>
-                <SelectItem value="Prêt à expédier">Prêt à expédier</SelectItem>
-                <SelectItem value="En transit">En transit</SelectItem>
-                <SelectItem value="Livré">Livré</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           <div className="space-y-2">
