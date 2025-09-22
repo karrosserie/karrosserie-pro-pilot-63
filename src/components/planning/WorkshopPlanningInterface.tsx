@@ -10,6 +10,7 @@ import { VehiclesWaitingTab } from "./VehiclesWaitingTab";
 import { PlanningCalendar } from "./PlanningCalendar";
 import { EmployeePlanningTab } from "./EmployeePlanningTab";
 import { ProcessConfig } from "./ProcessConfig";
+import { OwnerPlanningTab } from "./OwnerPlanningTab";
 import { useUserRole } from "@/hooks/use-user-role";
 import { useViewManagement } from "@/hooks/use-view-management";
 import { supabase } from "@/integrations/supabase/client";
@@ -475,15 +476,11 @@ export const WorkshopPlanningInterface = ({
 
             {isOwner && (
               <TabsContent value="planning-patron" className="space-y-6">
-                <div className="p-6 bg-card rounded-lg border">
-                  <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                    <Crown className="w-5 h-5 text-primary" />
-                    Planning Patron
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Fonctionnalités réservées au propriétaire de l'atelier.
-                  </p>
-                </div>
+                <OwnerPlanningTab 
+                  schedules={currentWeekData} 
+                  employees={employees} 
+                  vehicles={vehicles} 
+                />
               </TabsContent>
             )}
         </Tabs>}
