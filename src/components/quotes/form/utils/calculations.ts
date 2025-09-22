@@ -8,11 +8,11 @@ export const calculateLineTotal = (
   discount: number = 0,
   vat: number = 0
 ): number => {
-  const subtotal = quantity * unitCost;
-  const discountAmount = subtotal * (discount / 100);
-  const afterDiscount = subtotal - discountAmount;
-  const vatAmount = afterDiscount * (vat / 100);
-  return afterDiscount + vatAmount;
+  const subtotal = Math.round((quantity * unitCost) * 100) / 100;
+  const discountAmount = Math.round((subtotal * (discount / 100)) * 100) / 100;
+  const afterDiscount = Math.round((subtotal - discountAmount) * 100) / 100;
+  const vatAmount = Math.round((afterDiscount * (vat / 100)) * 100) / 100;
+  return Math.round((afterDiscount + vatAmount) * 100) / 100;
 };
 
 export const calculateGlobalTotals = (
@@ -21,32 +21,32 @@ export const calculateGlobalTotals = (
   discounts: QuoteDiscountItem[]
 ): GlobalTotals => {
   const repairTotals = repairs.reduce((acc, repair) => {
-    const subtotal = repair.quantity * repair.unitCost;
-    const discountAmount = subtotal * (repair.discount / 100);
-    const afterDiscount = subtotal - discountAmount;
-    const vatAmount = afterDiscount * (repair.vat / 100);
-    const lineTotal = afterDiscount + vatAmount; // Calcul correct du total de ligne
+    const subtotal = Math.round((repair.quantity * repair.unitCost) * 100) / 100;
+    const discountAmount = Math.round((subtotal * (repair.discount / 100)) * 100) / 100;
+    const afterDiscount = Math.round((subtotal - discountAmount) * 100) / 100;
+    const vatAmount = Math.round((afterDiscount * (repair.vat / 100)) * 100) / 100;
+    const lineTotal = Math.round((afterDiscount + vatAmount) * 100) / 100;
     
     return {
-      subTotal: acc.subTotal + subtotal,
-      totalVat: acc.totalVat + vatAmount,
-      totalDiscount: acc.totalDiscount + discountAmount,
-      total: acc.total + lineTotal // Utiliser le calcul correct
+      subTotal: Math.round((acc.subTotal + subtotal) * 100) / 100,
+      totalVat: Math.round((acc.totalVat + vatAmount) * 100) / 100,
+      totalDiscount: Math.round((acc.totalDiscount + discountAmount) * 100) / 100,
+      total: Math.round((acc.total + lineTotal) * 100) / 100
     };
   }, { subTotal: 0, totalVat: 0, totalDiscount: 0, total: 0 });
 
   const partTotals = parts.reduce((acc, part) => {
-    const subtotal = part.quantity * part.unitCost;
-    const discountAmount = subtotal * (part.discount / 100);
-    const afterDiscount = subtotal - discountAmount;
-    const vatAmount = afterDiscount * (part.vat / 100);
-    const lineTotal = afterDiscount + vatAmount; // Calcul correct du total de ligne
+    const subtotal = Math.round((part.quantity * part.unitCost) * 100) / 100;
+    const discountAmount = Math.round((subtotal * (part.discount / 100)) * 100) / 100;
+    const afterDiscount = Math.round((subtotal - discountAmount) * 100) / 100;
+    const vatAmount = Math.round((afterDiscount * (part.vat / 100)) * 100) / 100;
+    const lineTotal = Math.round((afterDiscount + vatAmount) * 100) / 100;
     
     return {
-      subTotal: acc.subTotal + subtotal,
-      totalVat: acc.totalVat + vatAmount,
-      totalDiscount: acc.totalDiscount + discountAmount,
-      total: acc.total + lineTotal // Utiliser le calcul correct
+      subTotal: Math.round((acc.subTotal + subtotal) * 100) / 100,
+      totalVat: Math.round((acc.totalVat + vatAmount) * 100) / 100,
+      totalDiscount: Math.round((acc.totalDiscount + discountAmount) * 100) / 100,
+      total: Math.round((acc.total + lineTotal) * 100) / 100
     };
   }, { subTotal: 0, totalVat: 0, totalDiscount: 0, total: 0 });
 
@@ -54,9 +54,9 @@ export const calculateGlobalTotals = (
   const additionalDiscounts = discounts.reduce((sum, discount) => sum + discount.amount, 0);
 
   return {
-    subTotal: repairTotals.subTotal + partTotals.subTotal,
-    totalVat: repairTotals.totalVat + partTotals.totalVat,
-    totalDiscount: repairTotals.totalDiscount + partTotals.totalDiscount + additionalDiscounts,
-    total: repairTotals.total + partTotals.total - additionalDiscounts
+    subTotal: Math.round((repairTotals.subTotal + partTotals.subTotal) * 100) / 100,
+    totalVat: Math.round((repairTotals.totalVat + partTotals.totalVat) * 100) / 100,
+    totalDiscount: Math.round((repairTotals.totalDiscount + partTotals.totalDiscount + additionalDiscounts) * 100) / 100,
+    total: Math.round((repairTotals.total + partTotals.total - additionalDiscounts) * 100) / 100
   };
 };
