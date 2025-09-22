@@ -404,6 +404,13 @@ export const WorkshopPlanningInterface = ({
                 <span className="hidden xs:inline sm:hidden lg:inline">Process</span>
                 <span className="xs:hidden sm:inline lg:hidden">Config</span>
               </TabsTrigger>
+              {isOwner && (
+                <TabsTrigger value="planning-patron" className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 lg:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm whitespace-nowrap flex-shrink-0">
+                  <Crown className="w-4 h-4" />
+                  <span className="hidden xs:inline sm:hidden lg:inline">Planning Patron</span>
+                  <span className="xs:hidden sm:inline lg:hidden">Patron</span>
+                </TabsTrigger>
+              )}
             </TabsList>
           </div>
           
@@ -465,6 +472,20 @@ export const WorkshopPlanningInterface = ({
             <TabsContent value="process" className="space-y-6">
               <ProcessConfig />
             </TabsContent>
+
+            {isOwner && (
+              <TabsContent value="planning-patron" className="space-y-6">
+                <div className="p-6 bg-card rounded-lg border">
+                  <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                    <Crown className="w-5 h-5 text-primary" />
+                    Planning Patron
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Fonctionnalités réservées au propriétaire de l'atelier.
+                  </p>
+                </div>
+              </TabsContent>
+            )}
         </Tabs>}
 
       {/* Employee View */}
