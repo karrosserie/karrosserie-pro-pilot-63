@@ -299,7 +299,7 @@ export const QuoteRepairsAndPartsSection = ({
                     onChange={(e) => updateRepair(repair.id, 'discount', parseFloat(e.target.value) || 0)}
                     min="0"
                     max="100"
-                    step="0.1"
+                    step="0.01"
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
@@ -400,7 +400,7 @@ export const QuoteRepairsAndPartsSection = ({
                     onChange={(e) => updatePart(part.id, 'discount', parseFloat(e.target.value) || 0)}
                     min="0"
                     max="100"
-                    step="0.1"
+                    step="0.01"
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
