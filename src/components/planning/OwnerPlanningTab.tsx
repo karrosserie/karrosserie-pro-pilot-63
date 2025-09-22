@@ -453,9 +453,10 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleMoveTask(task)}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
+                                className="opacity-0 group-hover:opacity-100 transition-opacity h-auto w-auto px-2 py-1 text-xs"
                               >
-                                <Move className="w-3 h-3" />
+                                <Move className="w-3 h-3 mr-1" />
+                                Déplacer
                               </Button>
                             </div>
                             <div className="text-xs text-muted-foreground">
