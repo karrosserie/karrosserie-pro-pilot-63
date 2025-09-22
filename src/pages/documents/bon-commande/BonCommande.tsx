@@ -10,6 +10,7 @@ import { useCompanyId } from '@/hooks/use-company-id';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import BonLivraisonModal from '@/components/bon-commande/BonLivraisonModal';
 
 interface BonCommandeItem {
   id: string;
@@ -28,6 +29,8 @@ export default function BonCommande() {
   const [searchTerm, setSearchTerm] = useState('');
   const [bonCommandes, setBonCommandes] = useState<BonCommandeItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [livraisonModalOpen, setLivraisonModalOpen] = useState(false);
+  const [selectedBonCommande, setSelectedBonCommande] = useState<BonCommandeItem | null>(null);
   const { companyId } = useCompanyId();
   const { toast } = useToast();
 
@@ -111,11 +114,8 @@ export default function BonCommande() {
   );
 
   const handleBonLivraison = (bonCommande: BonCommandeItem) => {
-    // TODO: Ouvrir modal pour créer bon de livraison
-    toast({
-      title: "Bon de livraison",
-      description: `Création d'un bon de livraison pour ${bonCommande.file_name}`
-    });
+    setSelectedBonCommande(bonCommande);
+    setLivraisonModalOpen(true);
   };
 
   const handleDownload = async (bonCommande: BonCommandeItem) => {
@@ -288,6 +288,17 @@ export default function BonCommande() {
           )}
         </CardContent>
       </Card>
+
+      {/* Modal pour créer un bon de livraison */}
+      {selectedBonCommande && (
+        <BonLivraisonModal
+          open={livraisonModalOpen}
+          onOpenChange={setLivraisonModalOpen}
+          bonCommandeId={selectedBonCommande.id}
+          clientId={selectedBonCommande.client_id}
+          fileName={selectedBonCommande.file_name}
+        />
+      )}
     </div>
   );
 }

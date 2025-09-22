@@ -137,6 +137,56 @@ export type Database = {
           },
         ]
       }
+      bon_livraison: {
+        Row: {
+          bon_commande_id: string
+          client_id: string | null
+          company_id: string
+          created_at: string
+          date_livraison_prevue: string | null
+          date_livraison_reelle: string | null
+          id: string
+          notes: string | null
+          statut: string
+          transporteur: string | null
+          updated_at: string
+        }
+        Insert: {
+          bon_commande_id: string
+          client_id?: string | null
+          company_id: string
+          created_at?: string
+          date_livraison_prevue?: string | null
+          date_livraison_reelle?: string | null
+          id?: string
+          notes?: string | null
+          statut?: string
+          transporteur?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bon_commande_id?: string
+          client_id?: string | null
+          company_id?: string
+          created_at?: string
+          date_livraison_prevue?: string | null
+          date_livraison_reelle?: string | null
+          id?: string
+          notes?: string | null
+          statut?: string
+          transporteur?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bon_livraison_bon_commande_id_fkey"
+            columns: ["bon_commande_id"]
+            isOneToOne: false
+            referencedRelation: "bon_commande"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bridge: {
         Row: {
           access_token: string
