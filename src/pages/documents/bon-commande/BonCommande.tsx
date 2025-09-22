@@ -19,14 +19,9 @@ interface BonCommandeItem {
   file_name: string;
   file_type: string;
   created_at: string;
-  // Données relationnelles
-  clients?: {
-    first_name: string;
-    last_name: string;
-  };
-  quotes?: {
-    reference: string;
-  };
+  // Données relationnelles (optionnelles)
+  client_name?: string;
+  quote_reference?: string;
 }
 
 export default function BonCommande() {
@@ -44,16 +39,7 @@ export default function BonCommande() {
     try {
       const { data, error } = await supabase
         .from('bon_commande')
-        .select(`
-          *,
-          clients (
-            first_name,
-            last_name
-          ),
-          quotes (
-            reference
-          )
-        `)
+        .select('*')
         .eq('company_id', companyId)
         .order('created_at', { ascending: false });
 
@@ -61,7 +47,47 @@ export default function BonCommande() {
         throw error;
       }
 
-      setBonCommandes(data || []);
+      // Enrichir avec les données des clients et devis
+      const enrichedData = await Promise.all(
+        (data || []).map(async (bc) => {
+          let client_name = 'Client inconnu';
+          let quote_reference = 'N/A';
+
+          // Récupérer le nom du client
+          if (bc.client_id) {
+            const { data: client } = await supabase
+              .from('clients')
+              .select('first_name, last_name')
+              .eq('id', bc.client_id)
+              .single();
+            
+            if (client) {
+              client_name = `${client.first_name} ${client.last_name}`;
+            }
+          }
+
+          // Récupérer la référence du devis
+          if (bc.quote_id) {
+            const { data: quote } = await supabase
+              .from('quotes')
+              .select('reference')
+              .eq('id', bc.quote_id)
+              .single();
+            
+            if (quote) {
+              quote_reference = quote.reference;
+            }
+          }
+
+          return {
+            ...bc,
+            client_name,
+            quote_reference
+          };
+        })
+      );
+
+      setBonCommandes(enrichedData);
     } catch (error: any) {
       console.error('Erreur lors de la récupération des bons de commande:', error);
       toast({
@@ -80,8 +106,8 @@ export default function BonCommande() {
 
   const filteredBonCommandes = bonCommandes.filter(bc =>
     bc.file_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    bc.quotes?.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (bc.clients && `${bc.clients.first_name} ${bc.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()))
+    bc.quote_reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    bc.client_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleBonLivraison = (bonCommande: BonCommandeItem) => {
@@ -110,18 +136,29 @@ export default function BonCommande() {
     }
   };
 
-  const filteredBonCommandes = bonCommandes.filter(bc =>
-    bc.numero.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    bc.fournisseur.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleDelete = async (bonCommande: BonCommandeItem) => {
+    try {
+      const { error } = await supabase
+        .from('bon_commande')
+        .delete()
+        .eq('id', bonCommande.id);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Livré': return 'bg-green-100 text-green-800';
-      case 'Validé': return 'bg-blue-100 text-blue-800';
-      case 'En attente': return 'bg-yellow-100 text-yellow-800';
-      case 'Annulé': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: "Bon de commande supprimé avec succès."
+      });
+
+      // Rafraîchir la liste
+      fetchBonCommandes();
+    } catch (error: any) {
+      console.error('Erreur lors de la suppression:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer le bon de commande.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -177,7 +214,7 @@ export default function BonCommande() {
               <Label htmlFor="search" className="sr-only">Rechercher</Label>
               <Input
                 id="search"
-                placeholder="Rechercher par numéro ou fournisseur..."
+                placeholder="Rechercher par nom, devis ou client..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -199,10 +236,10 @@ export default function BonCommande() {
                     <div>
                       <h3 className="font-semibold">{bc.file_name}</h3>
                       <p className="text-sm text-muted-foreground">
-                        {bc.clients ? `${bc.clients.first_name} ${bc.clients.last_name}` : 'Client inconnu'}
+                        {bc.client_name || 'Client inconnu'}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Devis: {bc.quotes?.reference || 'N/A'} • 
+                        Devis: {bc.quote_reference || 'N/A'} • 
                         Ajouté le {format(new Date(bc.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
                       </p>
                     </div>
@@ -228,7 +265,11 @@ export default function BonCommande() {
                         Bon de livraison
                       </Button>
                       
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleDelete(bc)}
+                      >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
