@@ -20,28 +20,8 @@ interface BonCommandeItem {
 export default function BonCommande() {
   const [searchTerm, setSearchTerm] = useState('');
   
-  // Données d'exemple - à remplacer par de vraies données depuis Supabase
-  const [bonCommandes] = useState<BonCommandeItem[]>([
-    {
-      id: '1',
-      numero: 'BC001',
-      fournisseur: 'Pièces Auto Service',
-      dateCommande: '2024-01-15',
-      dateLivraison: '2024-01-20',
-      montant: 1250.50,
-      statut: 'Livré',
-      articles: 5
-    },
-    {
-      id: '2',
-      numero: 'BC002',
-      fournisseur: 'Euro Carrosserie',
-      dateCommande: '2024-01-18',
-      montant: 890.00,
-      statut: 'En attente',
-      articles: 3
-    }
-  ]);
+  // Données vides - à connecter avec Supabase
+  const [bonCommandes] = useState<BonCommandeItem[]>([]);
 
   const filteredBonCommandes = bonCommandes.filter(bc =>
     bc.numero.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -74,25 +54,25 @@ export default function BonCommande() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">4</div>
+            <div className="text-2xl font-bold text-blue-600">0</div>
             <div className="text-sm text-muted-foreground">Total des commandes</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-yellow-600">2</div>
+            <div className="text-2xl font-bold text-yellow-600">0</div>
             <div className="text-sm text-muted-foreground">En attente</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-green-600">1</div>
+            <div className="text-2xl font-bold text-green-600">0</div>
             <div className="text-sm text-muted-foreground">Livrées</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-primary">2 140,50 €</div>
+            <div className="text-2xl font-bold text-primary">0,00 €</div>
             <div className="text-sm text-muted-foreground">Montant total</div>
           </CardContent>
         </Card>
@@ -114,51 +94,14 @@ export default function BonCommande() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {filteredBonCommandes.map((bc) => (
-              <div key={bc.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center space-x-4">
-                  <FileText className="w-8 h-8 text-blue-600" />
-                  <div>
-                    <h3 className="font-semibold">{bc.numero}</h3>
-                    <p className="text-sm text-muted-foreground">{bc.fournisseur}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Commandé le {new Date(bc.dateCommande).toLocaleDateString()}
-                      {bc.dateLivraison && ` • Livré le ${new Date(bc.dateLivraison).toLocaleDateString()}`}
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-4">
-                  <div className="text-right">
-                    <div className="font-semibold">{bc.montant.toFixed(2)} €</div>
-                    <div className="text-sm text-muted-foreground">{bc.articles} articles</div>
-                  </div>
-                  <Badge className={getStatusColor(bc.statut)}>
-                    {bc.statut}
-                  </Badge>
-                  
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm">
-                      <Download className="w-4 h-4" />
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))}
-            
-            {filteredBonCommandes.length === 0 && (
-              <div className="text-center py-8">
-                <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">Aucun bon de commande trouvé</p>
-              </div>
-            )}
+          <div className="text-center py-12">
+            <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun bon de commande</h3>
+            <p className="text-gray-500 mb-4">Commencez par créer votre premier bon de commande</p>
+            <Button className="flex items-center gap-2 mx-auto">
+              <Plus className="w-4 h-4" />
+              Créer un bon de commande
+            </Button>
           </div>
         </CardContent>
       </Card>
