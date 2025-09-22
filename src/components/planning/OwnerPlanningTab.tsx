@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ChevronLeft, ChevronRight, Crown, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Crown, Plus, Move } from 'lucide-react';
 import { format, startOfWeek, addWeeks, subWeeks, addDays, isSameDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
@@ -31,12 +31,19 @@ interface PlanningPatronTask {
 export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = [] }: OwnerPlanningTabProps) => {
   const [currentWeek, setCurrentWeek] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
+  const [selectedTaskToMove, setSelectedTaskToMove] = useState<PlanningPatronTask | null>(null);
   const [patronTasks, setPatronTasks] = useState<PlanningPatronTask[]>([]);
   const [newTask, setNewTask] = useState({
     name: '',
     date: format(new Date(), 'yyyy-MM-dd'),
     duration: '',
     description: ''
+  });
+  const [moveTask, setMoveTask] = useState({
+    date: '',
+    time: '',
+    duration: ''
   });
 
   const { user } = useAuth();
@@ -144,6 +151,52 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
     }
   };
 
+  const handleMoveTask = (task: PlanningPatronTask) => {
+    setSelectedTaskToMove(task);
+    setMoveTask({
+      date: task.date,
+      time: '09:00', // heure par défaut
+      duration: task.duration.toString()
+    });
+    setIsMoveModalOpen(true);
+  };
+
+  const handleMoveTaskSubmit = async () => {
+    if (!selectedTaskToMove) return;
+
+    try {
+      const { error } = await supabase
+        .from('planning_patron')
+        .update({
+          date: moveTask.date,
+          duration: parseFloat(moveTask.duration),
+        })
+        .eq('id', selectedTaskToMove.id);
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Succès",
+        description: "Tâche déplacée avec succès"
+      });
+
+      setIsMoveModalOpen(false);
+      setSelectedTaskToMove(null);
+      
+      // Rafraîchir la liste des tâches
+      fetchPatronTasks();
+    } catch (error) {
+      console.error('Erreur lors du déplacement de la tâche:', error);
+      toast({
+        title: "Erreur",
+        description: "Erreur lors du déplacement de la tâche",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* En-tête avec navigation */}
@@ -228,7 +281,63 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
                   </div>
                 </DialogContent>
               </Dialog>
-              <Button 
+              
+              {/* Modal pour déplacer une tâche */}
+              <Dialog open={isMoveModalOpen} onOpenChange={setIsMoveModalOpen}>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Déplacer la tâche</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="move-date">Date</Label>
+                      <Input
+                        id="move-date"
+                        type="date"
+                        value={moveTask.date}
+                        onChange={(e) => setMoveTask(prev => ({ ...prev, date: e.target.value }))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="move-time">Heure</Label>
+                      <Input
+                        id="move-time"
+                        type="time"
+                        value={moveTask.time}
+                        onChange={(e) => setMoveTask(prev => ({ ...prev, time: e.target.value }))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="move-duration">Durée (en heures)</Label>
+                      <Input
+                        id="move-duration"
+                        type="number"
+                        step="0.5"
+                        min="0.5"
+                        value={moveTask.duration}
+                        onChange={(e) => setMoveTask(prev => ({ ...prev, duration: e.target.value }))}
+                        placeholder="2.5"
+                      />
+                    </div>
+                    <div className="flex justify-end gap-2 pt-4">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setIsMoveModalOpen(false)}
+                      >
+                        Annuler
+                      </Button>
+                      <Button 
+                        onClick={handleMoveTaskSubmit}
+                        disabled={!moveTask.date || !moveTask.duration}
+                      >
+                        Déplacer la tâche
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              
+              <Button
                 variant="outline" 
                 size="sm" 
                 onClick={goToCurrentWeek}
@@ -333,11 +442,21 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
                     {weekPatronTasks
                       .filter(task => isSameDay(new Date(task.date), day))
                       .map((task, idx) => (
-                        <Card key={`patron-${idx}`} className="p-2 border-l-4 border-l-orange-500 bg-orange-50">
+                        <Card key={`patron-${idx}`} className="p-2 border-l-4 border-l-orange-500 bg-orange-50 group relative">
                           <div className="space-y-1">
-                            <div className="font-medium text-sm flex items-center gap-1">
-                              <Crown className="w-3 h-3 text-orange-600" />
-                              {task.name}
+                            <div className="font-medium text-sm flex items-center justify-between">
+                              <div className="flex items-center gap-1">
+                                <Crown className="w-3 h-3 text-orange-600" />
+                                {task.name}
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleMoveTask(task)}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
+                              >
+                                <Move className="w-3 h-3" />
+                              </Button>
                             </div>
                             <div className="text-xs text-muted-foreground">
                               ⏱️ {task.duration}h
