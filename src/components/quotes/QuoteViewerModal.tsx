@@ -14,12 +14,13 @@ import { calculateGlobalTotals } from '@/components/quotes/form/utils/calculatio
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Edit, Trash, Printer, Download, Mail, FileText, Wrench, Eye, Pencil, FileCheck, ArrowRight } from 'lucide-react';
+import { Edit, Trash, Printer, Download, Mail, FileText, Wrench, Eye, Pencil, FileCheck, ArrowRight, ShoppingCart } from 'lucide-react';
 import DefaultQuotePreview from './templates/DefaultQuotePreview';
 import AlternativeQuotePreview from './templates/AlternativeQuotePreview';
 import QuoteDialog from './QuoteDialog';
 import QuoteEmailDialog from './QuoteEmailDialog';
 import RepairOrderDialog from '../repair-orders/RepairOrderDialog';
+import BonCommandeModal from './BonCommandeModal';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 
 interface QuoteViewerModalProps {
@@ -43,6 +44,7 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [repairOrderDialogOpen, setRepairOrderDialogOpen] = useState(false);
+  const [bonCommandeModalOpen, setBonCommandeModalOpen] = useState(false);
   const [prefilledRepairOrder, setPrefilledRepairOrder] = useState<Partial<RepairOrder> | null>(null);
 
   // Mettre à jour le devis actuel quand la prop change
@@ -371,6 +373,10 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
     setRepairOrderDialogOpen(true);
   };
 
+  const handleBonCommande = () => {
+    setBonCommandeModalOpen(true);
+  };
+
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -402,6 +408,11 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
               <Button variant="outline" size="sm" onClick={handleRequestDocuments}>
                 <FileCheck className="h-4 w-4 mr-1" />
                 Justificatifs
+              </Button>
+
+              <Button variant="outline" size="sm" onClick={handleBonCommande}>
+                <ShoppingCart className="h-4 w-4 mr-1" />
+                Bon de commande
               </Button>
 
               <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90" onClick={handleConvertToRepairOrder}>
@@ -470,6 +481,13 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
             description: `L'ordre de réparation a été créé à partir du devis ${currentQuote.reference}.`
           });
         }}
+      />
+
+      <BonCommandeModal
+        open={bonCommandeModalOpen}
+        onOpenChange={setBonCommandeModalOpen}
+        quoteId={currentQuote.id}
+        quoteReference={currentQuote.reference}
       />
     </>
   );
