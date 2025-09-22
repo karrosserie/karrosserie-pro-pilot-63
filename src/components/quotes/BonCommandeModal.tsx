@@ -6,20 +6,23 @@ import { Input } from '@/components/ui/input';
 import { Camera, Upload, Check, X } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useCompanyId } from '@/hooks/use-company-id';
 
 interface BonCommandeModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   quoteId: string;
   quoteReference: string;
+  clientId?: string;
 }
 
-const BonCommandeModal = ({ open, onOpenChange, quoteId, quoteReference }: BonCommandeModalProps) => {
+const BonCommandeModal = ({ open, onOpenChange, quoteId, quoteReference, clientId }: BonCommandeModalProps) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+  const { companyId } = useCompanyId();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -57,6 +60,15 @@ const BonCommandeModal = ({ open, onOpenChange, quoteId, quoteReference }: BonCo
       return;
     }
 
+    if (!companyId) {
+      toast({
+        title: "Erreur",
+        description: "ID de l'entreprise manquant.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsUploading(true);
     
     try {
@@ -81,6 +93,22 @@ const BonCommandeModal = ({ open, onOpenChange, quoteId, quoteReference }: BonCo
       const { data: urlData } = supabase.storage
         .from('documents')
         .getPublicUrl(filePath);
+
+      // Sauvegarder en base de données dans la table bon_commande
+      const { data: insertData, error: insertError } = await supabase
+        .from('bon_commande')
+        .insert({
+          company_id: companyId,
+          client_id: clientId,
+          quote_id: quoteId,
+          file_url: urlData.publicUrl,
+          file_name: selectedFile.name,
+          file_type: selectedFile.type
+        });
+
+      if (insertError) {
+        throw insertError;
+      }
 
       toast({
         title: "Succès",

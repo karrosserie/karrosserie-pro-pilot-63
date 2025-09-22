@@ -488,6 +488,7 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
         onOpenChange={setBonCommandeModalOpen}
         quoteId={currentQuote.id}
         quoteReference={currentQuote.reference}
+        clientId={currentQuote.client_id || undefined}
       />
     </>
   );

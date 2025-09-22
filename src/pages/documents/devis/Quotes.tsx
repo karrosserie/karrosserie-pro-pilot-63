@@ -617,6 +617,7 @@ const Quotes = () => {
         onOpenChange={setBonCommandeModalOpen}
         quoteId={selectedQuoteForBonCommande?.id || ''}
         quoteReference={selectedQuoteForBonCommande?.reference || ''}
+        clientId={selectedQuoteForBonCommande?.client_id || undefined}
       />
     </div>
     </TooltipProvider>

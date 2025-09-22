@@ -86,6 +86,42 @@ export type Database = {
         }
         Relationships: []
       }
+      bon_commande: {
+        Row: {
+          client_id: string | null
+          company_id: string
+          created_at: string
+          file_name: string
+          file_type: string | null
+          file_url: string
+          id: string
+          quote_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          client_id?: string | null
+          company_id: string
+          created_at?: string
+          file_name: string
+          file_type?: string | null
+          file_url: string
+          id?: string
+          quote_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string | null
+          company_id?: string
+          created_at?: string
+          file_name?: string
+          file_type?: string | null
+          file_url?: string
+          id?: string
+          quote_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bridge: {
         Row: {
           access_token: string
