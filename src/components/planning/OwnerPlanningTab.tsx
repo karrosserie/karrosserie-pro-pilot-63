@@ -23,6 +23,7 @@ interface PlanningPatronTask {
   id: string;
   name: string;
   date: string;
+  time?: string;
   duration: number;
   description?: string;
   created_at: string;
@@ -37,6 +38,7 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
   const [newTask, setNewTask] = useState({
     name: '',
     date: format(new Date(), 'yyyy-MM-dd'),
+    time: '09:00',
     duration: '',
     description: ''
   });
@@ -118,6 +120,7 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
           user_id: user.id,
           name: newTask.name,
           date: newTask.date,
+          time: newTask.time,
           duration: parseFloat(newTask.duration),
           description: newTask.description || null
         });
@@ -135,6 +138,7 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
       setNewTask({
         name: '',
         date: format(new Date(), 'yyyy-MM-dd'),
+        time: '09:00',
         duration: '',
         description: ''
       });
@@ -155,7 +159,7 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
     setSelectedTaskToMove(task);
     setMoveTask({
       date: task.date,
-      time: '09:00', // heure par défaut
+      time: task.time || '09:00',
       duration: task.duration.toString()
     });
     setIsMoveModalOpen(true);
@@ -169,6 +173,7 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
         .from('planning_patron')
         .update({
           date: moveTask.date,
+          time: moveTask.time,
           duration: parseFloat(moveTask.duration),
         })
         .eq('id', selectedTaskToMove.id);
@@ -243,6 +248,15 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
                       />
                     </div>
                     <div className="space-y-2">
+                      <Label htmlFor="task-time">Heure</Label>
+                      <Input
+                        id="task-time"
+                        type="time"
+                        value={newTask.time}
+                        onChange={(e) => setNewTask(prev => ({ ...prev, time: e.target.value }))}
+                      />
+                    </div>
+                    <div className="space-y-2">
                       <Label htmlFor="task-duration">Durée (en heures)</Label>
                       <Input
                         id="task-duration"
@@ -273,7 +287,7 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
                       </Button>
                       <Button 
                         onClick={handleTaskSubmit}
-                        disabled={!newTask.name || !newTask.date || !newTask.duration}
+                        disabled={!newTask.name || !newTask.date || !newTask.time || !newTask.duration}
                       >
                         Créer la tâche
                       </Button>
@@ -460,7 +474,7 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
                               </Button>
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              ⏱️ {task.duration}h
+                              ⏰ {task.time || '09:00'} - ⏱️ {task.duration}h
                             </div>
                             {task.description && (
                               <div className="text-xs text-muted-foreground">
