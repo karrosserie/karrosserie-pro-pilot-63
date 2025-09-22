@@ -225,6 +225,7 @@ export const QuoteRepairsAndPartsSection = ({
         {/* Onglets */}
         <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
           <button
+            type="button"
             onClick={() => setActiveTab('repairs')}
             className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
               activeTab === 'repairs'
@@ -236,6 +237,7 @@ export const QuoteRepairsAndPartsSection = ({
             Réparations
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab('parts')}
             className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
               activeTab === 'parts'
