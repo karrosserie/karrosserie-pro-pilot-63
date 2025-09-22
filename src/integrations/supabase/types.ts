@@ -145,6 +145,9 @@ export type Database = {
           created_at: string
           date_livraison_prevue: string | null
           date_livraison_reelle: string | null
+          file_name: string | null
+          file_type: string | null
+          file_url: string | null
           id: string
           notes: string | null
           statut: string
@@ -158,6 +161,9 @@ export type Database = {
           created_at?: string
           date_livraison_prevue?: string | null
           date_livraison_reelle?: string | null
+          file_name?: string | null
+          file_type?: string | null
+          file_url?: string | null
           id?: string
           notes?: string | null
           statut?: string
@@ -171,6 +177,9 @@ export type Database = {
           created_at?: string
           date_livraison_prevue?: string | null
           date_livraison_reelle?: string | null
+          file_name?: string | null
+          file_type?: string | null
+          file_url?: string | null
           id?: string
           notes?: string | null
           statut?: string

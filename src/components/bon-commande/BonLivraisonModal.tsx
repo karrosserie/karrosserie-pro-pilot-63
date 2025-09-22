@@ -9,6 +9,7 @@ import { Check, X } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompanyId } from '@/hooks/use-company-id';
+import { FileUpload } from '@/components/ui/file-upload';
 
 interface BonLivraisonModalProps {
   open: boolean;
@@ -26,6 +27,7 @@ const BonLivraisonModal = ({
   fileName 
 }: BonLivraisonModalProps) => {
   const [isCreating, setIsCreating] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const { companyId } = useCompanyId();
   const [formData, setFormData] = useState({
     transporteur: '',
@@ -36,6 +38,33 @@ const BonLivraisonModal = ({
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleFileUpload = (file: File) => {
+    setSelectedFile(file);
+  };
+
+  const uploadFileToStorage = async (file: File) => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+    const filePath = `bon-livraison/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('documents')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('documents')
+      .getPublicUrl(filePath);
+
+    return { publicUrl, fileName: file.name, fileType: file.type };
   };
 
   const handleCreate = async () => {
@@ -51,6 +80,13 @@ const BonLivraisonModal = ({
     setIsCreating(true);
     
     try {
+      let fileData = null;
+      
+      // Upload du fichier si présent
+      if (selectedFile) {
+        fileData = await uploadFileToStorage(selectedFile);
+      }
+
       const { data, error } = await supabase
         .from('bon_livraison')
         .insert({
@@ -60,7 +96,10 @@ const BonLivraisonModal = ({
           transporteur: formData.transporteur || null,
           date_livraison_prevue: formData.date_livraison_prevue || null,
           notes: formData.notes || null,
-          statut: formData.statut
+          statut: formData.statut,
+          file_url: fileData?.publicUrl || null,
+          file_name: fileData?.fileName || null,
+          file_type: fileData?.fileType || null
         });
 
       if (error) {
@@ -79,6 +118,7 @@ const BonLivraisonModal = ({
         notes: '',
         statut: 'En préparation'
       });
+      setSelectedFile(null);
       onOpenChange(false);
 
     } catch (error: any) {
@@ -100,6 +140,7 @@ const BonLivraisonModal = ({
       notes: '',
       statut: 'En préparation'
     });
+    setSelectedFile(null);
     onOpenChange(false);
   };
 
@@ -114,6 +155,15 @@ const BonLivraisonModal = ({
           <p className="text-sm text-muted-foreground">
             Créer un bon de livraison pour: <strong>{fileName}</strong>
           </p>
+
+          <div className="space-y-2">
+            <Label>Document de livraison (optionnel)</Label>
+            <FileUpload
+              onUpload={handleFileUpload}
+              accept=".pdf,.jpg,.jpeg,.png"
+              maxSize={10}
+            />
+          </div>
 
           <div className="space-y-2">
             <Label htmlFor="transporteur">Transporteur (optionnel)</Label>
