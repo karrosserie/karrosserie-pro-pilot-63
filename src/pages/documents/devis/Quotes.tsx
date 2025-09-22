@@ -13,7 +13,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Search, FileText, Plus, Filter, Eye, Pencil, Trash, Download, Printer, Mail, FileCheck, ArrowRight, RotateCcw } from 'lucide-react';
+import { Search, FileText, Plus, Filter, Eye, Pencil, Trash, Download, Printer, Mail, FileCheck, ArrowRight, RotateCcw, ShoppingCart } from 'lucide-react';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { useTableSorting } from '@/hooks/use-table-sorting';
 import { useQuotes } from '@/hooks/use-quotes';
@@ -21,6 +21,7 @@ import { useToast } from '@/hooks/use-toast';
 import QuoteViewerModal from '@/components/quotes/QuoteViewerModal';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
 import QuoteEmailDialog from '@/components/quotes/QuoteEmailDialog';
+import BonCommandeModal from '@/components/quotes/BonCommandeModal';
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
 import { Quote } from '@/services/supabase/quotes';
 import { RepairOrder } from '@/services/supabase/repair-orders';
@@ -39,8 +40,10 @@ const Quotes = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [repairOrderDialogOpen, setRepairOrderDialogOpen] = useState(false);
+  const [bonCommandeModalOpen, setBonCommandeModalOpen] = useState(false);
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [selectedQuoteForEmail, setSelectedQuoteForEmail] = useState<Quote | null>(null);
+  const [selectedQuoteForBonCommande, setSelectedQuoteForBonCommande] = useState<Quote | null>(null);
   const [prefilledRepairOrder, setPrefilledRepairOrder] = useState<Partial<RepairOrder> | null>(null);
   const [viewerModalOpen, setViewerModalOpen] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
@@ -280,6 +283,11 @@ const Quotes = () => {
     }
   };
 
+  const handleBonCommande = (quote: Quote) => {
+    setSelectedQuoteForBonCommande(quote);
+    setBonCommandeModalOpen(true);
+  };
+
   const handleConvertToRepairOrder = (quote: Quote) => {
     // Préparer les données de l'ordre de réparation à partir du devis
     
@@ -516,6 +524,11 @@ const Quotes = () => {
                           Justificatifs
                         </Button>
 
+                        <Button variant="outline" size="sm" onClick={() => handleBonCommande(quote)}>
+                          <ShoppingCart className="h-4 w-4 mr-1" />
+                          Bon de commande
+                        </Button>
+
                         <Button size="sm" variant="validation" onClick={() => handleConvertToRepairOrder(quote)}>
                           <ArrowRight className="h-4 w-4 mr-1" />
                             Convertir
@@ -597,6 +610,13 @@ const Quotes = () => {
         quote={selectedQuote}
         open={viewerModalOpen}
         onOpenChange={setViewerModalOpen}
+      />
+
+      <BonCommandeModal
+        open={bonCommandeModalOpen}
+        onOpenChange={setBonCommandeModalOpen}
+        quoteId={selectedQuoteForBonCommande?.id || ''}
+        quoteReference={selectedQuoteForBonCommande?.reference || ''}
       />
     </div>
     </TooltipProvider>
