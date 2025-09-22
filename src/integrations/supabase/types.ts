@@ -1972,6 +1972,42 @@ export type Database = {
         }
         Relationships: []
       }
+      planning_patron: {
+        Row: {
+          company_id: string
+          created_at: string
+          date: string
+          description: string | null
+          duration: number
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          date: string
+          description?: string | null
+          duration: number
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          date?: string
+          description?: string | null
+          duration?: number
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       process_templates: {
         Row: {
           company_id: string

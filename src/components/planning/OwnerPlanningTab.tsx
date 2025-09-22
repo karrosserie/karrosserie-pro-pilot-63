@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -8,6 +8,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { ChevronLeft, ChevronRight, Crown, Plus } from 'lucide-react';
 import { format, startOfWeek, addWeeks, subWeeks, addDays, isSameDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCompanyId } from '@/hooks/use-company-id';
+import { useToast } from '@/hooks/use-toast';
 
 interface OwnerPlanningTabProps {
   schedules?: any[];
@@ -15,15 +19,51 @@ interface OwnerPlanningTabProps {
   vehicles?: any[];
 }
 
+interface PlanningPatronTask {
+  id: string;
+  name: string;
+  date: string;
+  duration: number;
+  description?: string;
+  created_at: string;
+}
+
 export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = [] }: OwnerPlanningTabProps) => {
   const [currentWeek, setCurrentWeek] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [patronTasks, setPatronTasks] = useState<PlanningPatronTask[]>([]);
   const [newTask, setNewTask] = useState({
     name: '',
     date: format(new Date(), 'yyyy-MM-dd'),
     duration: '',
     description: ''
   });
+
+  const { user } = useAuth();
+  const { companyId } = useCompanyId();
+  const { toast } = useToast();
+
+  // Récupérer les tâches du planning patron
+  const fetchPatronTasks = async () => {
+    if (!companyId) return;
+
+    const { data, error } = await supabase
+      .from('planning_patron')
+      .select('*')
+      .eq('company_id', companyId)
+      .order('date', { ascending: true });
+
+    if (error) {
+      console.error('Erreur lors de la récupération des tâches patron:', error);
+      return;
+    }
+
+    setPatronTasks(data || []);
+  };
+
+  useEffect(() => {
+    fetchPatronTasks();
+  }, [companyId]);
 
   const goToPreviousWeek = () => {
     setCurrentWeek(prev => subWeeks(prev, 1));
@@ -47,16 +87,61 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
     return weekDays.some(day => isSameDay(scheduleDate, day));
   });
 
-  const handleTaskSubmit = () => {
-    // TODO: Implémenter la création de tâche
-    console.log('Nouvelle tâche:', newTask);
-    setIsModalOpen(false);
-    setNewTask({
-      name: '',
-      date: format(new Date(), 'yyyy-MM-dd'),
-      duration: '',
-      description: ''
-    });
+  // Filtrer les tâches patron pour la semaine actuelle
+  const weekPatronTasks = patronTasks.filter(task => {
+    const taskDate = new Date(task.date);
+    return weekDays.some(day => isSameDay(taskDate, day));
+  });
+
+  const handleTaskSubmit = async () => {
+    if (!user || !companyId) {
+      toast({
+        title: "Erreur",
+        description: "Vous devez être connecté pour créer une tâche.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('planning_patron')
+        .insert({
+          company_id: companyId,
+          user_id: user.id,
+          name: newTask.name,
+          date: newTask.date,
+          duration: parseFloat(newTask.duration),
+          description: newTask.description || null
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Succès",
+        description: "Tâche créée avec succès"
+      });
+
+      setIsModalOpen(false);
+      setNewTask({
+        name: '',
+        date: format(new Date(), 'yyyy-MM-dd'),
+        duration: '',
+        description: ''
+      });
+
+      // Rafraîchir la liste des tâches
+      fetchPatronTasks();
+    } catch (error) {
+      console.error('Erreur lors de la création de la tâche:', error);
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de la création de la tâche",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -213,40 +298,64 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
 
                   {/* Tâches du jour */}
                   <div className="space-y-2 min-h-[200px]">
-                    {daySchedules.length === 0 ? (
+                    {/* Tâches normales */}
+                    {daySchedules.map((schedule, idx) => {
+                      const employee = employees.find(emp => emp.user_id === schedule.employee_id);
+                      const vehicle = vehicles.find(v => v.id === schedule.vehicle_id);
+                      
+                      return (
+                        <Card key={`schedule-${idx}`} className="p-2 border-l-4 border-l-primary">
+                          <div className="space-y-1">
+                            <div className="font-medium text-sm">
+                              {schedule.task_type || 'Tâche'}
+                            </div>
+                            {employee && (
+                              <div className="text-xs text-muted-foreground">
+                                👤 {employee.full_name}
+                              </div>
+                            )}
+                            {vehicle && (
+                              <div className="text-xs text-muted-foreground">
+                                🚗 {vehicle.license_plate}
+                              </div>
+                            )}
+                            {schedule.scheduled_start_time && (
+                              <div className="text-xs text-muted-foreground">
+                                ⏰ {schedule.scheduled_start_time}
+                              </div>
+                            )}
+                          </div>
+                        </Card>
+                      );
+                    })}
+
+                    {/* Tâches patron */}
+                    {weekPatronTasks
+                      .filter(task => isSameDay(new Date(task.date), day))
+                      .map((task, idx) => (
+                        <Card key={`patron-${idx}`} className="p-2 border-l-4 border-l-orange-500 bg-orange-50">
+                          <div className="space-y-1">
+                            <div className="font-medium text-sm flex items-center gap-1">
+                              <Crown className="w-3 h-3 text-orange-600" />
+                              {task.name}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              ⏱️ {task.duration}h
+                            </div>
+                            {task.description && (
+                              <div className="text-xs text-muted-foreground">
+                                📝 {task.description}
+                              </div>
+                            )}
+                          </div>
+                        </Card>
+                      ))}
+
+                    {/* Aucune tâche */}
+                    {daySchedules.length === 0 && weekPatronTasks.filter(task => isSameDay(new Date(task.date), day)).length === 0 && (
                       <div className="p-2 text-center text-sm text-muted-foreground border border-dashed rounded">
                         Aucune tâche
                       </div>
-                    ) : (
-                      daySchedules.map((schedule, idx) => {
-                        const employee = employees.find(emp => emp.user_id === schedule.employee_id);
-                        const vehicle = vehicles.find(v => v.id === schedule.vehicle_id);
-                        
-                        return (
-                          <Card key={idx} className="p-2 border-l-4 border-l-primary">
-                            <div className="space-y-1">
-                              <div className="font-medium text-sm">
-                                {schedule.task_type || 'Tâche'}
-                              </div>
-                              {employee && (
-                                <div className="text-xs text-muted-foreground">
-                                  👤 {employee.full_name}
-                                </div>
-                              )}
-                              {vehicle && (
-                                <div className="text-xs text-muted-foreground">
-                                  🚗 {vehicle.license_plate}
-                                </div>
-                              )}
-                              {schedule.scheduled_start_time && (
-                                <div className="text-xs text-muted-foreground">
-                                  ⏰ {schedule.scheduled_start_time}
-                                </div>
-                              )}
-                            </div>
-                          </Card>
-                        );
-                      })
                     )}
                   </div>
                 </div>
@@ -264,7 +373,7 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center p-4 bg-muted rounded-lg">
-              <div className="text-2xl font-bold text-primary">{weekSchedules.length}</div>
+              <div className="text-2xl font-bold text-primary">{weekSchedules.length + weekPatronTasks.length}</div>
               <div className="text-sm text-muted-foreground">Tâches total</div>
             </div>
             <div className="text-center p-4 bg-muted rounded-lg">
@@ -275,9 +384,9 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
             </div>
             <div className="text-center p-4 bg-muted rounded-lg">
               <div className="text-2xl font-bold text-orange-600">
-                {weekSchedules.filter(s => s.status === 'in_progress').length}
+                {weekSchedules.filter(s => s.status === 'in_progress').length + weekPatronTasks.length}
               </div>
-              <div className="text-sm text-muted-foreground">En cours</div>
+              <div className="text-sm text-muted-foreground">En cours/Patron</div>
             </div>
             <div className="text-center p-4 bg-muted rounded-lg">
               <div className="text-2xl font-bold text-blue-600">
