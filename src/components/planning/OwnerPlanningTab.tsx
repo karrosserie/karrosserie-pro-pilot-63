@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChevronLeft, ChevronRight, Crown } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { ChevronLeft, ChevronRight, Crown, Plus } from 'lucide-react';
 import { format, startOfWeek, addWeeks, subWeeks, addDays, isSameDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -13,6 +17,13 @@ interface OwnerPlanningTabProps {
 
 export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = [] }: OwnerPlanningTabProps) => {
   const [currentWeek, setCurrentWeek] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newTask, setNewTask] = useState({
+    name: '',
+    date: format(new Date(), 'yyyy-MM-dd'),
+    duration: '',
+    description: ''
+  });
 
   const goToPreviousWeek = () => {
     setCurrentWeek(prev => subWeeks(prev, 1));
@@ -36,6 +47,18 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
     return weekDays.some(day => isSameDay(scheduleDate, day));
   });
 
+  const handleTaskSubmit = () => {
+    // TODO: Implémenter la création de tâche
+    console.log('Nouvelle tâche:', newTask);
+    setIsModalOpen(false);
+    setNewTask({
+      name: '',
+      date: format(new Date(), 'yyyy-MM-dd'),
+      duration: '',
+      description: ''
+    });
+  };
+
   return (
     <div className="space-y-6">
       {/* En-tête avec navigation */}
@@ -46,14 +69,89 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
               <Crown className="w-5 h-5 text-primary" />
               <span>Planning Patron</span>
             </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={goToCurrentWeek}
-              className="text-xs"
-            >
-              Semaine actuelle
-            </Button>
+            <div className="flex items-center gap-2">
+              <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                <DialogTrigger asChild>
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    className="flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Ajouter une tâche
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Ajouter une nouvelle tâche</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="task-name">Nom de la tâche</Label>
+                      <Input
+                        id="task-name"
+                        value={newTask.name}
+                        onChange={(e) => setNewTask(prev => ({ ...prev, name: e.target.value }))}
+                        placeholder="Nom de la tâche"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="task-date">Date</Label>
+                      <Input
+                        id="task-date"
+                        type="date"
+                        value={newTask.date}
+                        onChange={(e) => setNewTask(prev => ({ ...prev, date: e.target.value }))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="task-duration">Durée (en heures)</Label>
+                      <Input
+                        id="task-duration"
+                        type="number"
+                        step="0.5"
+                        min="0.5"
+                        value={newTask.duration}
+                        onChange={(e) => setNewTask(prev => ({ ...prev, duration: e.target.value }))}
+                        placeholder="2.5"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="task-description">Description (optionnel)</Label>
+                      <Textarea
+                        id="task-description"
+                        value={newTask.description}
+                        onChange={(e) => setNewTask(prev => ({ ...prev, description: e.target.value }))}
+                        placeholder="Description de la tâche..."
+                        rows={3}
+                      />
+                    </div>
+                    <div className="flex justify-end gap-2 pt-4">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setIsModalOpen(false)}
+                      >
+                        Annuler
+                      </Button>
+                      <Button 
+                        onClick={handleTaskSubmit}
+                        disabled={!newTask.name || !newTask.date || !newTask.duration}
+                      >
+                        Créer la tâche
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={goToCurrentWeek}
+                className="text-xs"
+              >
+                Semaine actuelle
+              </Button>
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
