@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, FileText, Download, Edit, Trash2, Truck } from 'lucide-react';
+import { Plus, FileText, Download, Edit, Trash2, Truck, ChevronDown, ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,6 +23,20 @@ interface BonCommandeItem {
   // Données relationnelles (optionnelles)
   client_name?: string;
   quote_reference?: string;
+  bons_livraison?: BonLivraisonItem[];
+}
+
+interface BonLivraisonItem {
+  id: string;
+  transporteur: string | null;
+  date_livraison_prevue: string | null;
+  date_livraison_reelle: string | null;
+  notes: string | null;
+  statut: string;
+  file_url: string | null;
+  file_name: string | null;
+  file_type: string | null;
+  created_at: string;
 }
 
 export default function BonCommande() {
@@ -31,6 +45,7 @@ export default function BonCommande() {
   const [isLoading, setIsLoading] = useState(true);
   const [livraisonModalOpen, setLivraisonModalOpen] = useState(false);
   const [selectedBonCommande, setSelectedBonCommande] = useState<BonCommandeItem | null>(null);
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const { companyId } = useCompanyId();
   const { toast } = useToast();
 
@@ -50,7 +65,7 @@ export default function BonCommande() {
         throw error;
       }
 
-      // Enrichir avec les données des clients et devis
+      // Enrichir avec les données des clients, devis et bons de livraison
       const enrichedData = await Promise.all(
         (data || []).map(async (bc) => {
           let client_name = 'Client inconnu';
@@ -62,7 +77,7 @@ export default function BonCommande() {
               .from('clients')
               .select('first_name, last_name')
               .eq('id', bc.client_id)
-              .single();
+              .maybeSingle();
             
             if (client) {
               client_name = `${client.first_name} ${client.last_name}`;
@@ -75,17 +90,25 @@ export default function BonCommande() {
               .from('quotes')
               .select('reference')
               .eq('id', bc.quote_id)
-              .single();
+              .maybeSingle();
             
             if (quote) {
               quote_reference = quote.reference;
             }
           }
 
+          // Récupérer les bons de livraison associés
+          const { data: bonsLivraison } = await supabase
+            .from('bon_livraison')
+            .select('*')
+            .eq('bon_commande_id', bc.id)
+            .order('created_at', { ascending: false });
+
           return {
             ...bc,
             client_name,
-            quote_reference
+            quote_reference,
+            bons_livraison: bonsLivraison || []
           };
         })
       );
@@ -116,6 +139,18 @@ export default function BonCommande() {
   const handleBonLivraison = (bonCommande: BonCommandeItem) => {
     setSelectedBonCommande(bonCommande);
     setLivraisonModalOpen(true);
+  };
+
+  const toggleExpanded = (bonCommandeId: string) => {
+    setExpandedItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(bonCommandeId)) {
+        newSet.delete(bonCommandeId);
+      } else {
+        newSet.add(bonCommandeId);
+      }
+      return newSet;
+    });
   };
 
   const handleDownload = async (bonCommande: BonCommandeItem) => {
@@ -230,50 +265,123 @@ export default function BonCommande() {
           ) : filteredBonCommandes.length > 0 ? (
             <div className="space-y-4">
               {filteredBonCommandes.map((bc) => (
-                <div key={bc.id} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center space-x-4">
-                    <FileText className="w-8 h-8 text-blue-600" />
-                    <div>
-                      <h3 className="font-semibold">{bc.file_name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {bc.client_name || 'Client inconnu'}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Devis: {bc.quote_reference || 'N/A'} • 
-                        Ajouté le {format(new Date(bc.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
-                      </p>
+                <div key={bc.id} className="border rounded-lg overflow-hidden">
+                  {/* Bon de commande principal */}
+                  <div className="flex items-center justify-between p-4 bg-background">
+                    <div className="flex items-center space-x-4 flex-1">
+                      <FileText className="w-8 h-8 text-blue-600" />
+                      <div className="flex-1">
+                        <h3 className="font-semibold">{bc.file_name}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {bc.client_name || 'Client inconnu'}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Devis: {bc.quote_reference || 'N/A'} • 
+                          Ajouté le {format(new Date(bc.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Badge variant="secondary">
-                      {bc.file_type || 'Document'}
-                    </Badge>
                     
-                    <div className="flex space-x-2">
-                      <Button variant="outline" size="sm" onClick={() => handleDownload(bc)}>
-                        <Download className="w-4 h-4" />
-                      </Button>
+                    <div className="flex items-center space-x-2">
+                      <Badge variant="secondary">
+                        {bc.file_type || 'Document'}
+                      </Badge>
                       
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleBonLivraison(bc)}
-                        className="flex items-center gap-1"
-                      >
-                        <Truck className="w-4 h-4" />
-                        Bon de livraison
-                      </Button>
-                      
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleDelete(bc)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <div className="flex space-x-2">
+                        <Button variant="outline" size="sm" onClick={() => handleDownload(bc)}>
+                          <Download className="w-4 h-4" />
+                        </Button>
+                        
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleBonLivraison(bc)}
+                          className="flex items-center gap-1"
+                        >
+                          <Truck className="w-4 h-4" />
+                          Bon de livraison
+                        </Button>
+                        
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleDelete(bc)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+
+                        {/* Bouton d'expansion si il y a des bons de livraison */}
+                        {bc.bons_livraison && bc.bons_livraison.length > 0 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleExpanded(bc.id)}
+                          >
+                            {expandedItems.has(bc.id) ? (
+                              <ChevronDown className="w-4 h-4" />
+                            ) : (
+                              <ChevronRight className="w-4 h-4" />
+                            )}
+                            {bc.bons_livraison.length}
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
+
+                  {/* Bons de livraison associés */}
+                  {expandedItems.has(bc.id) && bc.bons_livraison && bc.bons_livraison.length > 0 && (
+                    <div className="border-t bg-muted/20 p-4 space-y-3">
+                      <h4 className="text-sm font-medium text-muted-foreground">Bons de livraison associés</h4>
+                      {bc.bons_livraison.map((bl) => (
+                        <div key={bl.id} className="flex items-center justify-between p-3 bg-background rounded border">
+                          <div className="flex items-center space-x-3">
+                            <Truck className="w-5 h-5 text-green-600" />
+                            <div>
+                              <p className="text-sm font-medium">
+                                {bl.transporteur || 'Transporteur non spécifié'}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {bl.date_livraison_prevue 
+                                  ? `Prévu le ${format(new Date(bl.date_livraison_prevue), 'dd/MM/yyyy', { locale: fr })}`
+                                  : 'Date non spécifiée'
+                                } • Créé le {format(new Date(bl.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
+                              </p>
+                              {bl.notes && (
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {bl.notes}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center space-x-2">
+                            <Badge variant="default">
+                              {bl.statut}
+                            </Badge>
+                            
+                            {bl.file_url && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  const link = document.createElement('a');
+                                  link.href = bl.file_url!;
+                                  link.download = bl.file_name || 'bon-livraison';
+                                  link.target = '_blank';
+                                  document.body.appendChild(link);
+                                  link.click();
+                                  document.body.removeChild(link);
+                                }}
+                              >
+                                <Download className="w-4 h-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -293,7 +401,13 @@ export default function BonCommande() {
       {selectedBonCommande && (
         <BonLivraisonModal
           open={livraisonModalOpen}
-          onOpenChange={setLivraisonModalOpen}
+          onOpenChange={(open) => {
+            setLivraisonModalOpen(open);
+            if (!open) {
+              // Rafraîchir les données après fermeture du modal
+              fetchBonCommandes();
+            }
+          }}
           bonCommandeId={selectedBonCommande.id}
           clientId={selectedBonCommande.client_id}
           fileName={selectedBonCommande.file_name}
