@@ -16,12 +16,113 @@ interface N8NTaskInstruction {
 }
 
 interface N8NResponse {
-  instructions: N8NTaskInstruction[];
-  output: {
+  instructions?: N8NTaskInstruction[];
+  output?: {
     task_type: string;
     vehicules_id: string;
     task_id: string;
   };
+  // Pour les réponses sous forme de tableau (comme dans les logs)
+  [index: number]: N8NTaskInstruction | { output: any };
+}
+
+// Fonction pour traiter les instructions N8N
+async function processN8NInstructions(
+  n8nResponse: any, 
+  taskId: string, 
+  taskData: TaskData, 
+  webhookPayload: any,
+  supabaseClient: any
+) {
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+
+  let instructions: N8NTaskInstruction[] = [];
+  let outputData: any = null;
+
+  // Analyser le format de la réponse N8N
+  if (Array.isArray(n8nResponse)) {
+    // Format tableau : extraire les instructions et l'output
+    instructions = n8nResponse.filter((item: any) => 
+      typeof item.number === 'number' && typeof item.task === 'string'
+    ) as N8NTaskInstruction[];
+    
+    const outputItem = n8nResponse.find((item: any) => item.output);
+    outputData = outputItem?.output;
+  } else if (n8nResponse.instructions && Array.isArray(n8nResponse.instructions)) {
+    // Format objet avec propriété instructions
+    instructions = n8nResponse.instructions;
+    outputData = n8nResponse.output;
+  }
+
+  console.log(`🔍 Instructions trouvées: ${instructions.length}`);
+  console.log('🔍 Output data:', outputData);
+
+  if (instructions && instructions.length > 0) {
+    // Préparer les instructions détaillées
+    const detailedInstructions = {
+      instructions: instructions,
+      received_at: new Date().toISOString(),
+      task_type_confirmed: outputData?.task_type || taskData.task_type,
+      source: 'n8n_analysis'
+    };
+
+    console.log('💾 Sauvegarde des instructions pour la tâche:', taskId);
+
+    // Mettre à jour la tâche avec les instructions détaillées
+    const { error: updateError } = await supabaseClient
+      .from('employee_schedule')
+      .update({
+        detailed_instructions: detailedInstructions,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', taskId);
+
+    if (updateError) {
+      console.error('❌ Erreur mise à jour tâche:', updateError);
+      return new Response(
+        JSON.stringify({ 
+          success: false,
+          error: 'Failed to save instructions',
+          details: updateError.message
+        }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    console.log('✅ Instructions sauvegardées avec succès');
+
+    return new Response(
+      JSON.stringify({ 
+        success: true,
+        message: 'Instructions N8N reçues et sauvegardées',
+        instructions_count: instructions.length,
+        payload: webhookPayload 
+      }),
+      { 
+        status: 200, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
+  } else {
+    console.log('⚠️ Aucune instruction reçue de N8N');
+    return new Response(
+      JSON.stringify({ 
+        success: true,
+        message: 'Webhook N8N déclenché avec succès - aucune instruction reçue',
+        payload: webhookPayload 
+      }),
+      { 
+        status: 200, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
+  }
 }
 
 interface TaskData {
@@ -270,7 +371,9 @@ Deno.serve(async (req) => {
         try {
           const n8nResponse = JSON.parse(responseText);
           console.log('📥 Réponse N8N parsée (GET):', JSON.stringify(n8nResponse, null, 2));
-          // Continuer avec le traitement...
+          
+          // Traiter les instructions de la réponse GET
+          return await processN8NInstructions(n8nResponse, taskId, taskData, webhookPayload, supabaseClient);
         } catch (parseError) {
           console.error('❌ Erreur parsing réponse GET:', parseError);
           return new Response(
@@ -315,69 +418,8 @@ Deno.serve(async (req) => {
 
       console.log('📥 Réponse N8N POST parsée:', JSON.stringify(n8nResponse, null, 2));
 
-      if (n8nResponse.instructions && n8nResponse.instructions.length > 0) {
-        // Préparer les instructions détaillées
-        const detailedInstructions = {
-          instructions: n8nResponse.instructions,
-          received_at: new Date().toISOString(),
-          task_type_confirmed: n8nResponse.output?.task_type || taskData.task_type,
-          source: 'n8n_analysis'
-        };
-
-        console.log('💾 Sauvegarde des instructions pour la tâche:', taskId);
-
-        // Mettre à jour la tâche avec les instructions détaillées
-        const { error: updateError } = await supabaseClient
-          .from('employee_schedule')
-          .update({
-            detailed_instructions: detailedInstructions,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', taskId);
-
-        if (updateError) {
-          console.error('❌ Erreur mise à jour tâche:', updateError);
-          return new Response(
-            JSON.stringify({ 
-              success: false,
-              error: 'Failed to save instructions',
-              details: updateError.message
-            }),
-            { 
-              status: 500,
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-            }
-          );
-        }
-
-        console.log('✅ Instructions sauvegardées avec succès');
-
-        return new Response(
-          JSON.stringify({ 
-            success: true,
-            message: 'Instructions N8N reçues et sauvegardées',
-            instructions_count: n8nResponse.instructions.length,
-            payload: webhookPayload 
-          }),
-          { 
-            status: 200, 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-          }
-        );
-      } else {
-        console.log('⚠️ Aucune instruction reçue de N8N');
-        return new Response(
-          JSON.stringify({ 
-            success: true,
-            message: 'Webhook N8N déclenché avec succès - aucune instruction reçue',
-            payload: webhookPayload 
-          }),
-          { 
-            status: 200, 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-          }
-        );
-      }
+      // Traiter les instructions de la réponse POST
+      return await processN8NInstructions(n8nResponse, taskId, taskData, webhookPayload, supabaseClient);
 
     } catch (fetchError) {
       console.error('❌ Erreur lors de l\'appel du webhook:', fetchError);
