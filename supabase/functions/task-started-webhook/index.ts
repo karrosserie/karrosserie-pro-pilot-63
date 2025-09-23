@@ -131,6 +131,9 @@ Deno.serve(async (req) => {
             console.log(`👤 Données client récupérées:`, clientData);
           }
         }
+      } else {
+        console.error(`❌ Erreur lors de la récupération du véhicule:`, vehicleError);
+      }
     }
 
     // 2. Récupérer le rapport d'expertise lié au véhicule si il existe
