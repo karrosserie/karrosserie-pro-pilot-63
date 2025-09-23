@@ -2090,7 +2090,11 @@ export type Database = {
           description: string | null
           duration: number
           id: string
+          mail: string | null
           name: string
+          nom: string | null
+          prenom: string | null
+          telephone: string | null
           time: string | null
           updated_at: string
           user_id: string
@@ -2102,7 +2106,11 @@ export type Database = {
           description?: string | null
           duration: number
           id?: string
+          mail?: string | null
           name: string
+          nom?: string | null
+          prenom?: string | null
+          telephone?: string | null
           time?: string | null
           updated_at?: string
           user_id: string
@@ -2114,7 +2122,11 @@ export type Database = {
           description?: string | null
           duration?: number
           id?: string
+          mail?: string | null
           name?: string
+          nom?: string | null
+          prenom?: string | null
+          telephone?: string | null
           time?: string | null
           updated_at?: string
           user_id?: string
