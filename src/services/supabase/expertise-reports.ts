@@ -133,6 +133,29 @@ export const expertiseReportsService = {
       console.error('Error creating expertise report:', error);
       throw new Error(error.message);
     }
+
+    // Créer automatiquement un token pour l'accès public si client_id et vehicle_id sont fournis
+    if (data && report.client_id && report.vehicle_id && report.company_id) {
+      try {
+        const { error: tokenError } = await supabase
+          .from('tokens')
+          .insert([{
+            company_id: report.company_id,
+            client_id: report.client_id,
+            vehicule_id: report.vehicle_id
+          }]);
+        
+        if (tokenError) {
+          console.error('Error creating token for expertise report:', tokenError);
+          // Ne pas faire échouer la création du rapport si le token échoue
+        } else {
+          console.log('Token created successfully for expertise report:', data.id);
+        }
+      } catch (tokenError) {
+        console.error('Exception when creating token for expertise report:', tokenError);
+        // Ne pas faire échouer la création du rapport si le token échoue
+      }
+    }
     
     return data;
   },
