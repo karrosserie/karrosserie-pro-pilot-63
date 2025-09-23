@@ -6,6 +6,14 @@ import { Label } from '@/components/ui/label';
 import { Clock, Car, CheckCircle, Pause, AlertTriangle, Camera, Paintbrush } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { TaskInstructions } from './TaskInstructions';
+
+interface DetailedInstructions {
+  instructions: { number: number; task: string }[];
+  received_at: string;
+  task_type_confirmed: string;
+  source: string;
+}
 
 interface CurrentTaskDisplayProps {
   task: {
@@ -29,6 +37,7 @@ interface CurrentTaskDisplayProps {
   onTakePhoto: (taskId: string) => void;
   isProcessingPhoto?: boolean;
   isOnBreak?: boolean;
+  instructions?: DetailedInstructions | null;
 }
 
 export const CurrentTaskDisplay = ({
@@ -38,7 +47,8 @@ export const CurrentTaskDisplay = ({
   onReportProblem,
   onTakePhoto,
   isProcessingPhoto = false,
-  isOnBreak = false
+  isOnBreak = false,
+  instructions
 }: CurrentTaskDisplayProps) => {
   const [elapsedTime, setElapsedTime] = useState('00:00:00');
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -243,6 +253,14 @@ export const CurrentTaskDisplay = ({
                 </div>
               </CardContent>
             </Card>
+          )}
+
+          {/* Instructions détaillées de N8N */}
+          {instructions && (
+            <TaskInstructions 
+              instructions={instructions}
+              className="mb-4"
+            />
           )}
 
           {/* Boutons d'action */}

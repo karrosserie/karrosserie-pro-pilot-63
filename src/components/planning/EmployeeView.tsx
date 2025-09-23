@@ -53,12 +53,37 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   const [waitingReason, setWaitingReason] = useState<string>('');
   const [showProblemReportModal, setShowProblemReportModal] = useState(false);
   const [selectedTaskForReport, setSelectedTaskForReport] = useState<any>(null);
+  const [taskInstructions, setTaskInstructions] = useState<any>(null);
 
   // Utiliser l'ID de l'utilisateur connecté ou celui passé en prop
   const currentUserId = employeeId || user?.id;
   
   // Récupérer les vraies données depuis Supabase
   const { schedules, isLoading, refetch } = useEmployeeSchedule(currentUserId);
+
+  // Fonction pour récupérer les instructions détaillées pour une tâche
+  const fetchTaskInstructions = async (taskId: string) => {
+    if (!taskId) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('employee_schedule')
+        .select('detailed_instructions')
+        .eq('id', taskId)
+        .single();
+        
+      if (error) throw error;
+      
+      if (data?.detailed_instructions) {
+        setTaskInstructions(data.detailed_instructions);
+      } else {
+        setTaskInstructions(null);
+      }
+    } catch (error) {
+      console.error('Erreur lors du fetch des instructions:', error);
+      setTaskInstructions(null);
+    }
+  };
 
   // Vérifier si l'employé est en pause
   const checkBreakStatus = async () => {
@@ -146,6 +171,15 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   const currentTask = tasks.find(task => task.status === 'En cours');
   const upcomingTasks = tasks.filter(task => task.status === 'En attente');
   const completedTasks = tasks.filter(task => task.status === 'Terminé');
+  
+  // Récupérer les instructions quand currentTask change
+  useEffect(() => {
+    if (currentTask?.id) {
+      fetchTaskInstructions(currentTask.id);
+    } else {
+      setTaskInstructions(null);
+    }
+  }, [currentTask?.id]);
   
   // Prochaine tâche = première tâche en attente (affichage d'une seule tâche à la fois)
   const nextTask = upcomingTasks.length > 0 ? upcomingTasks[0] : null;
@@ -641,6 +675,7 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
           }}
           isProcessingPhoto={isProcessingPhoto}
           isOnBreak={isOnBreak}
+          instructions={taskInstructions}
         />
       ) : (
         <Card>
