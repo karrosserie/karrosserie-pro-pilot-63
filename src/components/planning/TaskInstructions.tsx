@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { CheckCircle2, ChevronDown, ChevronRight, Clock, Bot } from 'lucide-react';
+import { ChevronDown, ChevronRight, Clock, Bot } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface TaskInstruction {
@@ -104,7 +105,7 @@ export const TaskInstructions: React.FC<TaskInstructionsProps> = ({
             )}
 
             {/* Liste des instructions */}
-            <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
               {instructions.instructions.map((instruction) => {
                 const isChecked = checkedSteps.has(instruction.number);
                 
@@ -119,20 +120,12 @@ export const TaskInstructions: React.FC<TaskInstructionsProps> = ({
                     )}
                     onClick={() => handleStepToggle(instruction.number)}
                   >
-                    <div
-                      className={cn(
-                        "w-6 h-6 rounded-full shrink-0 mt-0.5 flex items-center justify-center",
-                        isChecked 
-                          ? "bg-green-600 text-white" 
-                          : "bg-muted text-muted-foreground"
-                      )}
-                    >
-                      {isChecked ? (
-                        <CheckCircle2 className="w-3 h-3" />
-                      ) : (
-                        <span className="text-xs font-medium">{instruction.number}</span>
-                      )}
-                    </div>
+                    <Checkbox
+                      checked={isChecked}
+                      onCheckedChange={() => handleStepToggle(instruction.number)}
+                      className="mt-0.5 shrink-0"
+                      onClick={(e) => e.stopPropagation()}
+                    />
                     
                     <div className="flex-1 min-w-0">
                       <p 
