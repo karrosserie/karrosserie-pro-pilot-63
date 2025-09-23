@@ -146,11 +146,8 @@ export const TaskInstructions: React.FC<TaskInstructionsProps> = ({
 
             {/* Métadonnées */}
             <div className="mt-4 pt-3 border-t border-border">
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <div className="text-xs text-muted-foreground">
                 <span>Type de tâche confirmé: {instructions.task_type_confirmed}</span>
-                <Badge variant="outline" className="text-xs">
-                  {instructions.source}
-                </Badge>
               </div>
             </div>
           </CardContent>
