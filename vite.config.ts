@@ -17,14 +17,16 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      // Correct WebSocket alias for Supabase realtime
+      // Alias ws to our browser-compatible shim
       "ws": path.resolve(__dirname, "./src/utils/ws-shim.js"),
     },
   },
   define: {
+    // Define global for browser compatibility
     global: 'globalThis',
   },
   optimizeDeps: {
+    // Exclude ws from pre-bundling to use our shim
     exclude: ['ws'],
   },
 }));
