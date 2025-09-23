@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useClients } from '@/hooks/use-clients';
 import { Quote } from '@/services/supabase/quotes';
+import ClientDialog from '@/components/client/ClientDialog';
 import { QuoteBasicInfoSection } from './form/QuoteBasicInfoSection';
 import { QuoteAssignmentSection } from './form/QuoteAssignmentSection';
 import { QuoteDetailsSection } from './form/QuoteDetailsSection';
@@ -29,7 +30,8 @@ export const QuoteForm = ({
   isConversionFromReport
 }: QuoteFormProps) => {
   const { toast } = useToast();
-  const { clients, isLoading: isLoadingClients } = useClients();
+  const { clients, isLoading: isLoadingClients, createClient } = useClients();
+  const [isClientDialogOpen, setIsClientDialogOpen] = useState(false);
   
   const {
     formData,
@@ -95,6 +97,34 @@ export const QuoteForm = ({
 
   const clientOptions = clients?.filter(client => !!client) || [];
 
+  const handleNewClientClick = () => {
+    setIsClientDialogOpen(true);
+  };
+
+  const handleNewClientSubmit = async (clientData: any) => {
+    try {
+      const newClient = await createClient.mutateAsync(clientData);
+      if (newClient) {
+        // Sélectionner automatiquement le client créé
+        handleChange('client_id', newClient.id);
+        // Réinitialiser le véhicule
+        handleChange('vehicle_id', '');
+      }
+      setIsClientDialogOpen(false);
+      toast({
+        title: "Client créé",
+        description: "Le client a été créé et sélectionné automatiquement."
+      });
+    } catch (error: any) {
+      console.error('Error creating client:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer le client.",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto">
       <QuoteBasicInfoSection 
@@ -111,6 +141,7 @@ export const QuoteForm = ({
         clientOptions={clientOptions}
         isLoadingClients={isLoadingClients}
         errors={errors}
+        onNewClientClick={handleNewClientClick}
       />
 
       <QuoteRepairsAndPartsSection 
@@ -139,6 +170,15 @@ export const QuoteForm = ({
         isSubmitting={isSubmitting}
         onCancel={onCancel}
         isConversionFromReport={isConversionFromReport}
+      />
+
+      <ClientDialog
+        open={isClientDialogOpen}
+        onOpenChange={setIsClientDialogOpen}
+        title="Nouveau client"
+        description="Créer un nouveau client pour ce devis"
+        onSubmit={handleNewClientSubmit}
+        mode="create"
       />
     </form>
   );

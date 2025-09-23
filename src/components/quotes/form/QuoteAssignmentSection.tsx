@@ -15,6 +15,7 @@ interface QuoteAssignmentSectionProps {
   clientOptions: Client[];
   isLoadingClients: boolean;
   errors?: Record<string, string>;
+  onNewClientClick?: () => void;
 }
 
 export const QuoteAssignmentSection = ({ 
@@ -22,7 +23,8 @@ export const QuoteAssignmentSection = ({
   onChange, 
   clientOptions, 
   isLoadingClients,
-  errors = {}
+  errors = {},
+  onNewClientClick
 }: QuoteAssignmentSectionProps) => {
   const { vehicles, isLoading: isLoadingVehicles } = useVehicles();
   
@@ -82,6 +84,8 @@ export const QuoteAssignmentSection = ({
               placeholder={isLoadingClients ? "Chargement..." : "Sélectionner un client"}
               searchPlaceholder="Rechercher un client..."
               disabled={isLoadingClients}
+              showNewClientOption={true}
+              onNewClientClick={onNewClientClick}
               className={cn(
                 errors.client_id && "border-red-500 focus-visible:ring-red-500"
               )}
