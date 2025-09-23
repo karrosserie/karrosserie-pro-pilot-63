@@ -200,30 +200,110 @@ Deno.serve(async (req) => {
 
     // 5. Envoyer les données à N8N et attendre la réponse avec les instructions
     try {
-      console.log('📡 Appel synchrone de N8N avec GET...');
+      console.log('📡 Tentative POST vers N8N...');
       
-      // Encoder les données comme paramètres de query string
-      const queryParams = new URLSearchParams({
-        data: JSON.stringify(webhookPayload)
-      });
-      
-      const webhookUrlWithParams = `${targetWebhookUrl}?${queryParams.toString()}`;
-      
-      const webhookResponse = await fetch(webhookUrlWithParams, {
-        method: 'GET',
+      // Essayer d'abord avec POST (plus simple pour N8N)
+      const webhookResponse = await fetch(targetWebhookUrl, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        }
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(webhookPayload)
       });
 
       console.log(`📡 Webhook N8N appelé avec statut: ${webhookResponse.status}`);
+      console.log('📋 Headers de réponse:', Object.fromEntries(webhookResponse.headers.entries()));
 
       if (!webhookResponse.ok) {
-        console.error('❌ Erreur webhook N8N:', webhookResponse.statusText);
+        // Si POST échoue, essayer GET en fallback
+        console.log('⚠️ POST échoué, tentative GET...');
+        
+        const queryParams = new URLSearchParams({
+          data: JSON.stringify(webhookPayload)
+        });
+        
+        const webhookUrlWithParams = `${targetWebhookUrl}?${queryParams.toString()}`;
+        console.log('🔗 URL GET (tronquée):', webhookUrlWithParams.substring(0, 200) + '...');
+        
+        const getResponse = await fetch(webhookUrlWithParams, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        });
+
+        console.log(`📡 Webhook GET N8N statut: ${getResponse.status}`);
+
+        if (!getResponse.ok) {
+          // Tenter de lire le corps de la réponse pour plus de détails
+          let errorBody = '';
+          try {
+            errorBody = await getResponse.text();
+            console.error('❌ Corps de l\'erreur N8N:', errorBody);
+          } catch (bodyError) {
+            console.error('❌ Impossible de lire le corps de l\'erreur:', bodyError);
+          }
+
+          console.error('❌ Erreur webhook N8N (GET):', getResponse.statusText);
+          return new Response(
+            JSON.stringify({ 
+              success: false,
+              message: `Webhook N8N a échoué POST(${webhookResponse.status}) et GET(${getResponse.status})`,
+              post_error: webhookResponse.statusText,
+              get_error: getResponse.statusText,
+              error_body: errorBody,
+              payload: webhookPayload 
+            }),
+            { 
+              status: 200,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
+        }
+
+        // Utiliser la réponse GET
+        const responseText = await getResponse.text();
+        console.log('📥 Réponse N8N GET:', responseText);
+        
+        try {
+          const n8nResponse = JSON.parse(responseText);
+          console.log('📥 Réponse N8N parsée (GET):', JSON.stringify(n8nResponse, null, 2));
+          // Continuer avec le traitement...
+        } catch (parseError) {
+          console.error('❌ Erreur parsing réponse GET:', parseError);
+          return new Response(
+            JSON.stringify({ 
+              success: false,
+              message: 'Réponse N8N GET invalide (pas JSON)',
+              response_body: responseText,
+              payload: webhookPayload 
+            }),
+            { 
+              status: 200,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
+        }
+      }
+
+      // 6. Traiter la réponse N8N avec les instructions détaillées (POST réussi)
+      const responseText = await webhookResponse.text();
+      console.log('📥 Réponse N8N POST brute:', responseText);
+
+      let n8nResponse: N8NResponse;
+      try {
+        n8nResponse = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('❌ Erreur parsing réponse POST:', parseError);
+        console.error('📄 Contenu réponse:', responseText);
+        
         return new Response(
           JSON.stringify({ 
             success: false,
-            message: `Webhook N8N a échoué (${webhookResponse.status}): ${webhookResponse.statusText}`,
+            message: 'Réponse N8N POST invalide (pas JSON)',
+            response_body: responseText,
             payload: webhookPayload 
           }),
           { 
@@ -233,9 +313,7 @@ Deno.serve(async (req) => {
         );
       }
 
-      // 6. Traiter la réponse N8N avec les instructions détaillées
-      const n8nResponse: N8NResponse = await webhookResponse.json();
-      console.log('📥 Réponse N8N reçue:', JSON.stringify(n8nResponse, null, 2));
+      console.log('📥 Réponse N8N POST parsée:', JSON.stringify(n8nResponse, null, 2));
 
       if (n8nResponse.instructions && n8nResponse.instructions.length > 0) {
         // Préparer les instructions détaillées
@@ -303,12 +381,20 @@ Deno.serve(async (req) => {
 
     } catch (fetchError) {
       console.error('❌ Erreur lors de l\'appel du webhook:', fetchError);
+      console.error('🔍 Type d\'erreur:', fetchError.name);
+      console.error('💬 Message d\'erreur:', fetchError.message);
+      
       // Ne pas retourner une erreur 500, juste loguer et continuer  
       return new Response(
         JSON.stringify({ 
           success: false,
           message: `Erreur réseau lors de l'appel du webhook N8N: ${fetchError.message}`,
-          payload: webhookPayload
+          error_type: fetchError.name,
+          payload: webhookPayload,
+          debug_info: {
+            webhook_url: targetWebhookUrl,
+            payload_size: JSON.stringify(webhookPayload).length
+          }
         }),
         { 
           status: 200, // Retourner 200 au lieu de 500
