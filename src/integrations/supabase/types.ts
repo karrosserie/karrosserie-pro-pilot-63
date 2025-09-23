@@ -2506,6 +2506,33 @@ export type Database = {
           },
         ]
       }
+      resume_call: {
+        Row: {
+          client_id: string | null
+          company_id: string | null
+          created_at: string
+          id: number
+          phone_number: string | null
+          resume: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          company_id?: string | null
+          created_at?: string
+          id?: number
+          phone_number?: string | null
+          resume?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          company_id?: string | null
+          created_at?: string
+          id?: number
+          phone_number?: string | null
+          resume?: string | null
+        }
+        Relationships: []
+      }
       subscription_plans: {
         Row: {
           billing_period: string
