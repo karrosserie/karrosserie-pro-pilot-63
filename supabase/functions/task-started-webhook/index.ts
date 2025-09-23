@@ -99,73 +99,7 @@ Deno.serve(async (req) => {
 
     console.log(`📋 Tâche récupérée: ${taskData.id}, vehicle_id: ${taskData.vehicle_id}`);
 
-    // 1.5. Récupérer les détails du véhicule et du client si vehicle_id existe
-    let vehicleData = null;
-    if (taskData.vehicle_id) {
-      console.log(`🔍 Tentative de récupération du véhicule avec ID: ${taskData.vehicle_id}`);
-      
-      const { data: vehicle, error: vehicleError } = await supabaseClient
-        .from('vehicles')
-        .select(`
-          id,
-          license_plate,
-          client_id,
-          vin,
-          year,
-          color,
-          brand_id,
-          model_id
-        `)
-        .eq('id', taskData.vehicle_id)
-        .maybeSingle();
-
-      console.log(`🚗 Résultat requête véhicule - Data:`, vehicle);
-      console.log(`🚗 Résultat requête véhicule - Error:`, vehicleError);
-
-      if (!vehicleError && vehicle) {
-        vehicleData = vehicle;
-        console.log(`✅ Véhicule récupéré avec succès: ${vehicle.license_plate}`);
-        
-        // Récupérer les noms de marque et modèle séparément
-        if (vehicle.brand_id) {
-          const { data: brandData } = await supabaseClient
-            .from('car_brands')
-            .select('name')
-            .eq('id', vehicle.brand_id)
-            .maybeSingle();
-          if (brandData) vehicleData.car_brands = brandData;
-        }
-        
-        if (vehicle.model_id) {
-          const { data: modelData } = await supabaseClient
-            .from('car_models')
-            .select('name')
-            .eq('id', vehicle.model_id)
-            .maybeSingle();
-          if (modelData) vehicleData.car_models = modelData;
-        }
-        
-        // Récupérer séparément les données client si client_id existe
-        if (vehicle.client_id) {
-          const { data: clientData, error: clientError } = await supabaseClient
-            .from('clients')
-            .select('id, first_name, last_name, email, phone')
-            .eq('id', vehicle.client_id)
-            .maybeSingle();
-            
-          if (!clientError && clientData) {
-            vehicleData.clients = clientData;
-            console.log(`👤 Données client récupérées:`, clientData);
-          }
-        }
-      } else {
-        console.error(`❌ Erreur lors de la récupération du véhicule ID ${taskData.vehicle_id}:`, vehicleError);
-      }
-    } else {
-      console.log(`⚠️ Aucun vehicle_id trouvé dans la tâche`);
-    }
-
-    // 2. Récupérer le rapport d'expertise lié au véhicule si il existe
+    // 2. Récupérer directement le rapport d'expertise avec le vehicle_id de la tâche
     let expertiseReport: ExpertiseReport | null = null;
     
     if (taskData.vehicle_id) {
@@ -204,21 +138,11 @@ Deno.serve(async (req) => {
         type: taskData.task_type,
         started_at: taskData.real_start_datetime,
         employee_id: taskData.user_id,
-        company_id: taskData.company_id
+        company_id: taskData.company_id,
+        vehicle_id: taskData.vehicle_id
       },
-      vehicle: vehicleData ? {
-        id: vehicleData.id,
-        license_plate: vehicleData.license_plate,
-        brand: vehicleData.car_brands?.name || null,
-        model: vehicleData.car_models?.name || null
-      } : null,
-      client: vehicleData?.clients ? {
-        id: vehicleData.clients.id,
-        first_name: vehicleData.clients.first_name,
-        last_name: vehicleData.clients.last_name,
-        email: vehicleData.clients.email || null,
-        phone: vehicleData.clients.phone || null
-      } : null,
+      vehicle: null, // Non récupéré pour optimiser les performances
+      client: null,  // Non récupéré pour optimiser les performances
       expertise_report: expertiseReport ? {
         id: expertiseReport.id,
         report_number: expertiseReport.report_number,
@@ -230,7 +154,7 @@ Deno.serve(async (req) => {
         parts_data: expertiseReport.parts_data,
         amount: expertiseReport.amount,
         status: expertiseReport.status,
-        document_url: expertiseReport.document_url // Ajout de l'URL du document
+        document_url: expertiseReport.document_url
       } : null
     };
 
