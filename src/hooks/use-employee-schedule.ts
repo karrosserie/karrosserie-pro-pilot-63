@@ -15,6 +15,15 @@ export interface EmployeeSchedule {
   real_end_datetime: string | null;
   paint_brand?: string | null;
   color_code?: string | null;
+  detailed_instructions?: {
+    instructions: Array<{
+      number: number;
+      task: string;
+    }>;
+    received_at: string;
+    task_type_confirmed: string;
+    source: string;
+  } | null;
   created_at: string;
   updated_at: string;
   vehicles?: {
@@ -46,6 +55,7 @@ export const useEmployeeSchedule = (userId?: string) => {
           .from('employee_schedule')
           .select(`
             *,
+            detailed_instructions,
             vehicles (
               license_plate,
               car_brands (name),

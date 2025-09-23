@@ -7,6 +7,7 @@ import { PlanningTache } from '@/hooks/usePlanningManager';
 import { useToast } from '@/hooks/use-toast';
 import { uploadTaskPhoto } from '@/utils/taskPhotoService';
 import { ProblemReportModal } from './ProblemReportModal';
+import { TaskInstructions } from './TaskInstructions';
 
 interface TacheCardProps {
   tache: PlanningTache;
@@ -480,6 +481,15 @@ export const TacheCard: React.FC<TacheCardProps> = ({
                   </Button>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* Instructions IA détaillées */}
+          {tache.detailed_instructions && (
+            <div className="mt-4 pt-4 border-t border-border">
+              <TaskInstructions 
+                instructions={tache.detailed_instructions}
+              />
             </div>
           )}
         </CardContent>

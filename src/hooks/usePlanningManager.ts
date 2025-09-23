@@ -60,6 +60,15 @@ export interface PlanningTache {
   dateAssignation?: string; // Date d'assignation au format YYYY-MM-DD
   jour?: string; // Jour de la semaine
   user_id?: string; // ID utilisateur pour l'association correcte
+  detailed_instructions?: {
+    instructions: Array<{
+      number: number;
+      task: string;
+    }>;
+    received_at: string;
+    task_type_confirmed: string;
+    source: string;
+  } | null;
 }
 
 export interface Notification {

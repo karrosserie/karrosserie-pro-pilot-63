@@ -50,3 +50,6 @@ verify_jwt = false
 
 [functions.task-started-webhook]
 verify_jwt = false
+
+[functions.n8n-response-handler]
+verify_jwt = false

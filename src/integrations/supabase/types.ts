@@ -912,6 +912,7 @@ export type Database = {
           color_code: string | null
           company_id: string
           created_at: string
+          detailed_instructions: Json | null
           end_datetime: string
           id: string
           paint_brand: string | null
@@ -929,6 +930,7 @@ export type Database = {
           color_code?: string | null
           company_id: string
           created_at?: string
+          detailed_instructions?: Json | null
           end_datetime: string
           id?: string
           paint_brand?: string | null
@@ -946,6 +948,7 @@ export type Database = {
           color_code?: string | null
           company_id?: string
           created_at?: string
+          detailed_instructions?: Json | null
           end_datetime?: string
           id?: string
           paint_brand?: string | null
