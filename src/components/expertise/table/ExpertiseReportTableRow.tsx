@@ -103,7 +103,17 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => window.open(report.document_url, '_blank')}
+                  onClick={() => {
+                    if (report.document_url) {
+                      const link = document.createElement('a');
+                      link.href = report.document_url;
+                      link.download = `rapport-expertise-${report.report_number || report.id}.pdf`;
+                      link.target = '_blank';
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }
+                  }}
                   disabled={!report.document_url}
                 >
                   <Download className="h-4 w-4 mr-1" />

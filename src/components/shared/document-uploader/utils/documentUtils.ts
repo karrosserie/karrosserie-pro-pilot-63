@@ -19,6 +19,13 @@ export const isImageFile = (url: string): boolean => {
 
 export const handleDownload = (url: string) => {
   if (url) {
-    window.open(url, '_blank');
+    // Créer un élément temporaire pour forcer le téléchargement
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = getFilename(url);
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 };
