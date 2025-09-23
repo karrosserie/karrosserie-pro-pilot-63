@@ -216,6 +216,7 @@ Deno.serve(async (req) => {
     // 3. Préparer les données pour N8N (payload simplifié)
     const webhookPayload = {
       task_id: taskData.id,
+      task_type: taskData.task_type,
       company_id: taskData.company_id,
       vehicle_id: taskData.vehicle_id
     };
