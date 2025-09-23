@@ -178,7 +178,9 @@ export const WorkshopPlanningInterface = ({
         .filter(s => {
           const scheduleType = getScheduleType(s);
           const matches = scheduleType === step.title && s.status !== 'Terminé';
-          return matches;
+          // Exclure les tâches avec waiting_reason des étapes atelier
+          const notWaiting = !s.waiting_reason;
+          return matches && notWaiting;
         })
         .map(s => ({
           id: s.id,
