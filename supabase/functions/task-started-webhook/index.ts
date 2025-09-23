@@ -81,7 +81,7 @@ Deno.serve(async (req) => {
         user_id,
         company_id,
         real_start_datetime,
-        vehicles!inner (
+        vehicles (
           id,
           license_plate,
           car_brands (name),
@@ -96,7 +96,7 @@ Deno.serve(async (req) => {
         )
       `)
       .eq('id', taskId)
-      .single() as { data: TaskData | null; error: any };
+      .maybeSingle() as { data: TaskData | null; error: any };
 
     if (taskError || !taskData) {
       console.error('❌ Erreur lors de la récupération de la tâche:', taskError);
