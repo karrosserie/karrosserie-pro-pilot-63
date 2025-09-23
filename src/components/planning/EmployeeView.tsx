@@ -172,10 +172,17 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   const upcomingTasks = tasks.filter(task => task.status === 'En attente');
   const completedTasks = tasks.filter(task => task.status === 'Terminé');
   
-  // Récupérer les instructions quand currentTask change
+  // Récupérer les instructions quand currentTask change et les mettre à jour automatiquement
   useEffect(() => {
     if (currentTask?.id) {
       fetchTaskInstructions(currentTask.id);
+      
+      // Poller pour les mises à jour des instructions toutes les 10 secondes
+      const interval = setInterval(() => {
+        fetchTaskInstructions(currentTask.id);
+      }, 10000);
+      
+      return () => clearInterval(interval);
     } else {
       setTaskInstructions(null);
     }
