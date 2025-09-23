@@ -147,20 +147,6 @@ interface TaskData {
   } | null;
 }
 
-interface ExpertiseReport {
-  id: string;
-  report_number?: string | null;
-  expert_name?: string | null;
-  report_date?: string | null;
-  claim_number?: string | null;
-  policy_number?: string | null;
-  repairs_data?: string | null;
-  parts_data?: string | null;
-  amount?: number | null;
-  status?: string | null;
-  document_url?: string | null;
-}
-
 Deno.serve(async (req) => {
   console.log('🚀 DEBUT: Task-started-webhook appelée!', new Date().toISOString());
   console.log('🔍 Method:', req.method);
@@ -227,63 +213,11 @@ Deno.serve(async (req) => {
 
     console.log(`📋 Tâche récupérée: ${taskData.id}, vehicle_id: ${taskData.vehicle_id}`);
 
-    // 2. Récupérer directement le rapport d'expertise avec le vehicle_id de la tâche
-    let expertiseReport: ExpertiseReport | null = null;
-    
-    if (taskData.vehicle_id) {
-      console.log(`📋 Recherche du rapport d'expertise pour vehicle_id: ${taskData.vehicle_id} et company_id: ${taskData.company_id}`);
-      
-      const { data: reportData, error: reportError } = await supabaseClient
-        .from('expertise_reports')
-        .select('*')
-        .eq('vehicle_id', taskData.vehicle_id)
-        .eq('company_id', taskData.company_id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      console.log(`📋 Résultat requête rapport - Data:`, reportData);
-      console.log(`📋 Résultat requête rapport - Error:`, reportError);
-
-      if (reportData && !reportError) {
-        expertiseReport = reportData as ExpertiseReport;
-        console.log(`✅ Rapport d'expertise trouvé: ${reportData.report_number || reportData.id}`);
-      } else if (reportError) {
-        console.error(`❌ Erreur lors de la récupération du rapport d'expertise:`, reportError);
-      } else {
-        console.log(`⚠️ Aucun rapport d'expertise trouvé pour ce véhicule`);
-      }
-    } else {
-      console.log(`⚠️ Pas de vehicle_id disponible pour chercher le rapport d'expertise`);
-    }
-
-    // 3. Préparer les données pour N8N
+    // 3. Préparer les données pour N8N (payload simplifié)
     const webhookPayload = {
-      timestamp: new Date().toISOString(),
-      event_type: 'task_started',
-      task: {
-        id: taskData.id,
-        type: taskData.task_type,
-        started_at: taskData.real_start_datetime,
-        employee_id: taskData.user_id,
-        company_id: taskData.company_id,
-        vehicle_id: taskData.vehicle_id
-      },
-      vehicle: null, // Non récupéré pour optimiser les performances
-      client: null,  // Non récupéré pour optimiser les performances
-      expertise_report: expertiseReport ? {
-        id: expertiseReport.id,
-        report_number: expertiseReport.report_number,
-        expert_name: expertiseReport.expert_name,
-        report_date: expertiseReport.report_date,
-        claim_number: expertiseReport.claim_number,
-        policy_number: expertiseReport.policy_number,
-        repairs_data: expertiseReport.repairs_data,
-        parts_data: expertiseReport.parts_data,
-        amount: expertiseReport.amount,
-        status: expertiseReport.status,
-        document_url: expertiseReport.document_url
-      } : null
+      task_id: taskData.id,
+      company_id: taskData.company_id,
+      vehicle_id: taskData.vehicle_id
     };
 
     console.log('📤 Payload préparé pour N8N:', JSON.stringify(webhookPayload, null, 2));
