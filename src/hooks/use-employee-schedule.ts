@@ -66,6 +66,7 @@ export const useEmployeeSchedule = (userId?: string) => {
           .eq('company_id', companyInfo.id)
           .eq('user_id', userId)
           .neq('status', 'Terminé')  // Exclure les tâches terminées
+          .is('waiting_reason', null)  // Exclure les tâches en attente pour cause (problème client, etc.)
           .order('start_datetime', { ascending: true });
 
         if (error) throw error;
