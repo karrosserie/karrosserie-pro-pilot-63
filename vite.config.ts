@@ -17,6 +17,14 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Correct WebSocket alias for Supabase realtime
+      "ws": path.resolve(__dirname, "./src/utils/ws-shim.js"),
     },
+  },
+  define: {
+    global: 'globalThis',
+  },
+  optimizeDeps: {
+    exclude: ['ws'],
   },
 }));

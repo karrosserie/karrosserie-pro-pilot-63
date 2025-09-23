@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Play, Pause, CheckCircle, Calendar, User, BarChart, Coffee, LogOut, Camera, AlertTriangle } from 'lucide-react';
 import { CurrentTaskDisplay } from '@/components/planning/CurrentTaskDisplay';
-import { useEmployeeSchedule } from '@/hooks/use-employee-schedule';
+import { useEmployeeScheduleRealtime } from '@/hooks/use-employee-schedule-realtime';
 import { useCompany } from '@/hooks/use-company';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -59,7 +59,7 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   const currentUserId = employeeId || user?.id;
   
   // Récupérer les vraies données depuis Supabase
-  const { schedules, isLoading, refetch } = useEmployeeSchedule(currentUserId);
+  const { schedules, isLoading, refetch, realtimeError } = useEmployeeScheduleRealtime(currentUserId);
 
   // Fonction pour récupérer les instructions détaillées pour une tâche
   const fetchTaskInstructions = async (taskId: string) => {
@@ -182,38 +182,10 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   }, [currentTask?.id]);
 
   // Écouter les mises à jour en temps réel des instructions IA depuis N8N
-  useEffect(() => {
-    if (!currentTask?.id) return;
-
-    const channel = supabase
-      .channel('task-instructions-updates')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'employee_schedule',
-          filter: `id=eq.${currentTask.id}`
-        },
-        (payload) => {
-          console.log('📡 Mise à jour des instructions reçue:', payload);
-          // Mettre à jour les instructions si elles ont changé
-          if (payload.new?.detailed_instructions && 
-              payload.new.detailed_instructions !== payload.old?.detailed_instructions) {
-            setTaskInstructions(payload.new.detailed_instructions);
-            toast({
-              title: "Instructions IA mises à jour",
-              description: "Les instructions détaillées ont été reçues de N8N",
-            });
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [currentTask?.id]);
+  // Note: Cette fonctionnalité est maintenant gérée par useEmployeeScheduleRealtime
+  // useEffect(() => {
+  //   ... ancien code realtime retiré car intégré dans le hook
+  // }, [currentTask?.id]);
 
   // Écouter les mises à jour en temps réel des instructions IA depuis N8N
   useEffect(() => {

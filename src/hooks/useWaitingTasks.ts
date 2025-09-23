@@ -34,18 +34,11 @@ export const useWaitingTasks = () => {
             )
           `)
           .eq('company_id', companyInfo.id)
-          .not('waiting_reason', 'is', null) // Récupérer seulement les tâches avec waiting_reason
+          .eq('status', 'En attente') // Récupérer les tâches en attente
           .order('updated_at', { ascending: false });
 
         if (error) throw error;
-        return (data || []) as (EmployeeSchedule & { 
-          waiting_reason: string;
-          profiles?: {
-            id: string;
-            first_name: string;
-            last_name: string;
-          };
-        })[];
+        return (data || []) as any[];
       } catch (error) {
         console.error('Error fetching waiting tasks:', error);
         return [];
@@ -59,8 +52,7 @@ export const useWaitingTasks = () => {
       const { error } = await supabase
         .from('employee_schedule')
         .update({ 
-          waiting_reason: null,
-          status: 'En attente'
+          status: 'En cours'
         })
         .eq('id', taskId);
 
