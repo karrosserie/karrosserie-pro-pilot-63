@@ -200,14 +200,20 @@ Deno.serve(async (req) => {
 
     // 5. Envoyer les données à N8N et attendre la réponse avec les instructions
     try {
-      console.log('📡 Appel synchrone de N8N avec POST...');
+      console.log('📡 Appel synchrone de N8N avec GET...');
       
-      const webhookResponse = await fetch(targetWebhookUrl, {
-        method: 'POST',
+      // Encoder les données comme paramètres de query string
+      const queryParams = new URLSearchParams({
+        data: JSON.stringify(webhookPayload)
+      });
+      
+      const webhookUrlWithParams = `${targetWebhookUrl}?${queryParams.toString()}`;
+      
+      const webhookResponse = await fetch(webhookUrlWithParams, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(webhookPayload)
+        }
       });
 
       console.log(`📡 Webhook N8N appelé avec statut: ${webhookResponse.status}`);
