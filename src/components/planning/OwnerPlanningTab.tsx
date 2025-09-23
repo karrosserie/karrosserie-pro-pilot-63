@@ -126,7 +126,7 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
     }
 
     try {
-      const { error } = await supabase
+      const { data: insertedTask, error } = await supabase
         .from('planning_patron')
         .insert({
           company_id: companyId,
@@ -140,10 +140,62 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
           prenom: newTask.prenom || null,
           mail: newTask.mail || null,
           telephone: newTask.telephone || null
-        });
+        })
+        .select()
+        .single();
 
       if (error) {
         throw error;
+      }
+
+      // Vérifier si le nom de la tâche contient "expertise" ou "expert"
+      const taskName = newTask.name.toLowerCase();
+      if (taskName.includes('expertise') || taskName.includes('expert')) {
+        try {
+          // Préparer les données de la tâche pour le webhook
+          const webhookData = {
+            id: insertedTask.id,
+            name: newTask.name,
+            date: newTask.date,
+            time: newTask.time,
+            duration: parseFloat(newTask.duration),
+            description: newTask.description,
+            nom: newTask.nom,
+            prenom: newTask.prenom,
+            mail: newTask.mail,
+            telephone: newTask.telephone,
+            company_id: companyId,
+            user_id: user.id,
+            created_at: insertedTask.created_at
+          };
+
+          // Construire l'URL avec les paramètres de requête
+          const webhookUrl = new URL('https://n8n.karrosserie.pro/webhook/fbc7725f-ef48-480c-a18e-ae8032799c42');
+          
+          // Ajouter chaque propriété comme paramètre de requête
+          Object.entries(webhookData).forEach(([key, value]) => {
+            if (value !== null && value !== undefined && value !== '') {
+              webhookUrl.searchParams.append(key, String(value));
+            }
+          });
+
+          // Appeler le webhook
+          const webhookResponse = await fetch(webhookUrl.toString(), {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
+
+          if (webhookResponse.ok) {
+            console.log('Webhook appelé avec succès pour la tâche expertise');
+          } else {
+            console.warn('Échec de l\'appel webhook:', webhookResponse.status);
+          }
+        } catch (webhookError) {
+          console.error('Erreur lors de l\'appel du webhook:', webhookError);
+          // Ne pas faire échouer la création de la tâche à cause du webhook
+        }
       }
 
       toast({
