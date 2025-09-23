@@ -28,7 +28,7 @@ export const TaskInstructions: React.FC<TaskInstructionsProps> = ({
   instructions, 
   className 
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const [checkedSteps, setCheckedSteps] = useState<Set<number>>(new Set());
 
   const handleStepToggle = (stepNumber: number) => {
