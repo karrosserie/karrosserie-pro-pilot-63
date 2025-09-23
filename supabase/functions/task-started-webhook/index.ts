@@ -43,6 +43,7 @@ interface ExpertiseReport {
   parts_data?: string | null;
   amount?: number | null;
   status?: string | null;
+  document_url?: string | null;
 }
 
 Deno.serve(async (req) => {
