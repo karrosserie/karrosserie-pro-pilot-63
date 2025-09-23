@@ -107,15 +107,9 @@ Deno.serve(async (req) => {
         .select(`
           id,
           license_plate,
+          client_id,
           car_brands (name),
-          car_models (name),
-          clients (
-            id,
-            first_name,
-            last_name,
-            email,
-            phone
-          )
+          car_models (name)
         `)
         .eq('id', taskData.vehicle_id)
         .maybeSingle();
@@ -123,10 +117,20 @@ Deno.serve(async (req) => {
       if (!vehicleError && vehicle) {
         vehicleData = vehicle;
         console.log(`📊 Données véhicule récupérées:`, vehicleData);
-        console.log(`👤 Données client:`, vehicleData.clients);
-      } else {
-        console.log(`⚠️ Aucun véhicule trouvé pour vehicle_id: ${taskData.vehicle_id}`);
-      }
+        
+        // Récupérer séparément les données client si client_id existe
+        if (vehicle.client_id) {
+          const { data: clientData, error: clientError } = await supabaseClient
+            .from('clients')
+            .select('id, first_name, last_name, email, phone')
+            .eq('id', vehicle.client_id)
+            .maybeSingle();
+            
+          if (!clientError && clientData) {
+            vehicleData.clients = clientData;
+            console.log(`👤 Données client récupérées:`, clientData);
+          }
+        }
     }
 
     // 2. Récupérer le rapport d'expertise lié au véhicule si il existe
