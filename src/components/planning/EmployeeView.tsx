@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Play, Pause, CheckCircle, Calendar, User, BarChart, Coffee, LogOut, Camera, AlertTriangle } from 'lucide-react';
 import { CurrentTaskDisplay } from '@/components/planning/CurrentTaskDisplay';
-import { useEmployeeScheduleRealtime } from '@/hooks/use-employee-schedule-realtime';
+import { useEmployeeSchedule } from '@/hooks/use-employee-schedule';
 import { useCompany } from '@/hooks/use-company';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -58,8 +58,8 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   // Utiliser l'ID de l'utilisateur connecté ou celui passé en prop
   const currentUserId = employeeId || user?.id;
   
-  // Récupérer les vraies données depuis Supabase
-  const { schedules, isLoading, refetch, realtimeError } = useEmployeeScheduleRealtime(currentUserId);
+  // Récupérer les vraies données depuis Supabase (realtime temporairement désactivé)
+  const { schedules, isLoading, refetch } = useEmployeeSchedule(currentUserId);
 
   // Fonction pour récupérer les instructions détaillées pour une tâche
   const fetchTaskInstructions = async (taskId: string) => {

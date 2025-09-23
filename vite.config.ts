@@ -17,14 +17,16 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Force ws to use WebSocket for browser compatibility
+      "ws": path.resolve(__dirname, "./src/utils/ws-browser.js"),
     },
   },
   define: {
     global: 'globalThis',
-    // Define ws as WebSocket for browser compatibility
     'process.env': {},
   },
   optimizeDeps: {
+    exclude: ['ws'],
     include: ['@supabase/supabase-js'],
   },
 }));

@@ -24,7 +24,7 @@ import { toast } from '@/hooks/use-toast';
 import { useCompanyId } from '@/hooks/use-company-id';
 import { useVehicleWorkflow } from '@/hooks/use-vehicle-workflow';
 import { useOptimalPlanning } from '@/hooks/use-optimal-planning';
-import { useEmployeeScheduleRealtime } from '@/hooks/use-employee-schedule-realtime';
+import { useEmployeeSchedule } from '@/hooks/use-employee-schedule';
 import { useWorkshopSchedule } from '@/hooks/use-workshop-schedule';
 
 // Helper function to calculate duration between two timestamps
@@ -147,8 +147,8 @@ const Planning = () => {
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const { teamMembers: employees, updateTeamMember: updateEmployee } = useTeamMembers();
   const { workflowSteps, refetch: refetchWorkflow } = useVehicleWorkflow(companyInfo?.id);
-  const { schedules: employeeSchedules, refetch: refetchEmployeeSchedule } = useEmployeeScheduleRealtime(selectedEmployeeId);
-  const { schedules: planningEmployeeSchedules } = useEmployeeScheduleRealtime(selectedPlanningEmployeeId);
+  const { schedules: employeeSchedules, refetch: refetchEmployeeSchedule } = useEmployeeSchedule(selectedEmployeeId);
+  const { schedules: planningEmployeeSchedules } = useEmployeeSchedule(selectedPlanningEmployeeId);
   const { schedules: workshopSchedules } = useWorkshopSchedule();
   const { calculateOptimalPlanning } = useOptimalPlanning(employees, companyInfo?.id);
 
