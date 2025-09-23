@@ -40,7 +40,11 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
     date: format(new Date(), 'yyyy-MM-dd'),
     time: '09:00',
     duration: '',
-    description: ''
+    description: '',
+    nom: '',
+    prenom: '',
+    mail: '',
+    telephone: ''
   });
   const [moveTask, setMoveTask] = useState({
     date: '',
@@ -122,7 +126,11 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
           date: newTask.date,
           time: newTask.time,
           duration: parseFloat(newTask.duration),
-          description: newTask.description || null
+          description: newTask.description || null,
+          nom: newTask.nom || null,
+          prenom: newTask.prenom || null,
+          mail: newTask.mail || null,
+          telephone: newTask.telephone || null
         });
 
       if (error) {
@@ -140,7 +148,11 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
         date: format(new Date(), 'yyyy-MM-dd'),
         time: '09:00',
         duration: '',
-        description: ''
+        description: '',
+        nom: '',
+        prenom: '',
+        mail: '',
+        telephone: ''
       });
 
       // Rafraîchir la liste des tâches
@@ -236,6 +248,46 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
                         value={newTask.name}
                         onChange={(e) => setNewTask(prev => ({ ...prev, name: e.target.value }))}
                         placeholder="Nom de la tâche"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="task-nom">Nom</Label>
+                        <Input
+                          id="task-nom"
+                          value={newTask.nom}
+                          onChange={(e) => setNewTask(prev => ({ ...prev, nom: e.target.value }))}
+                          placeholder="Nom"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="task-prenom">Prénom</Label>
+                        <Input
+                          id="task-prenom"
+                          value={newTask.prenom}
+                          onChange={(e) => setNewTask(prev => ({ ...prev, prenom: e.target.value }))}
+                          placeholder="Prénom"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="task-mail">Email</Label>
+                      <Input
+                        id="task-mail"
+                        type="email"
+                        value={newTask.mail}
+                        onChange={(e) => setNewTask(prev => ({ ...prev, mail: e.target.value }))}
+                        placeholder="email@exemple.com"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="task-telephone">Numéro de téléphone</Label>
+                      <Input
+                        id="task-telephone"
+                        type="tel"
+                        value={newTask.telephone}
+                        onChange={(e) => setNewTask(prev => ({ ...prev, telephone: e.target.value }))}
+                        placeholder="06 12 34 56 78"
                       />
                     </div>
                     <div className="space-y-2">
