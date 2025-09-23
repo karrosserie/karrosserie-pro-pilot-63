@@ -105,13 +105,9 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
                   size="sm"
                   onClick={() => {
                     if (report.document_url) {
-                      const link = document.createElement('a');
-                      link.href = report.document_url;
-                      link.download = `rapport-expertise-${report.report_number || report.id}.pdf`;
-                      link.target = '_blank';
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
+                      import('@/components/shared/document-uploader/utils/documentUtils').then(({ handleDownload }) => {
+                        handleDownload(report.document_url, `rapport-expertise-${report.report_number || report.id}.pdf`);
+                      });
                     }
                   }}
                   disabled={!report.document_url}

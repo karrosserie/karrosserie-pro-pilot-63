@@ -185,7 +185,13 @@ const VehicleExpertiseReportsTab: React.FC<VehicleExpertiseReportsTabProps> = ({
                             <Button 
                               variant="outline" 
                               size="sm" 
-                              onClick={() => window.open(report.document_url, '_blank')}
+                              onClick={() => {
+                                if (report.document_url) {
+                                  import('@/components/shared/document-uploader/utils/documentUtils').then(({ handleDownload }) => {
+                                    handleDownload(report.document_url, `rapport-expertise-${report.report_number || report.id}.pdf`);
+                                  });
+                                }
+                              }}
                               disabled={!report.document_url}
                               title="Télécharger"
                             >
