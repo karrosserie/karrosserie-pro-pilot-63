@@ -180,6 +180,74 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
       setTaskInstructions(null);
     }
   }, [currentTask?.id]);
+
+  // Écouter les mises à jour en temps réel des instructions IA depuis N8N
+  useEffect(() => {
+    if (!currentTask?.id) return;
+
+    const channel = supabase
+      .channel('task-instructions-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'employee_schedule',
+          filter: `id=eq.${currentTask.id}`
+        },
+        (payload) => {
+          console.log('📡 Mise à jour des instructions reçue:', payload);
+          // Mettre à jour les instructions si elles ont changé
+          if (payload.new?.detailed_instructions && 
+              payload.new.detailed_instructions !== payload.old?.detailed_instructions) {
+            setTaskInstructions(payload.new.detailed_instructions);
+            toast({
+              title: "Instructions IA mises à jour",
+              description: "Les instructions détaillées ont été reçues de N8N",
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentTask?.id]);
+
+  // Écouter les mises à jour en temps réel des instructions IA depuis N8N
+  useEffect(() => {
+    if (!currentTask?.id) return;
+
+    const channel = supabase
+      .channel('task-instructions-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'employee_schedule',
+          filter: `id=eq.${currentTask.id}`
+        },
+        (payload) => {
+          console.log('📡 Mise à jour des instructions reçue:', payload);
+          // Mettre à jour les instructions si elles ont changé
+          if (payload.new?.detailed_instructions && 
+              payload.new.detailed_instructions !== payload.old?.detailed_instructions) {
+            setTaskInstructions(payload.new.detailed_instructions);
+            toast({
+              title: "Instructions IA mises à jour",
+              description: "Les instructions détaillées ont été reçues de N8N",
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentTask?.id]);
   
   // Prochaine tâche = première tâche en attente (affichage d'une seule tâche à la fois)
   const nextTask = upcomingTasks.length > 0 ? upcomingTasks[0] : null;
