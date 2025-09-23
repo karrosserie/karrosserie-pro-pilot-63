@@ -192,14 +192,20 @@ Deno.serve(async (req) => {
     
     console.log('🎯 URL webhook cible:', targetWebhookUrl);
 
-    // 5. Envoyer les données à N8N (même si l'URL retourne 404, on continue pour les logs)
+    // 5. Envoyer les données à N8N (méthode GET avec query parameters)
     try {
-      const webhookResponse = await fetch(targetWebhookUrl, {
-        method: 'POST',
+      // Encoder les données comme paramètres de query string
+      const queryParams = new URLSearchParams({
+        data: JSON.stringify(webhookPayload)
+      });
+      
+      const webhookUrlWithParams = `${targetWebhookUrl}?${queryParams.toString()}`;
+      
+      const webhookResponse = await fetch(webhookUrlWithParams, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(webhookPayload)
+        }
       });
 
       console.log(`📡 Webhook N8N appelé avec statut: ${webhookResponse.status}`);
