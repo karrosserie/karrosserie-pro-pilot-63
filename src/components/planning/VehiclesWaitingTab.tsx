@@ -98,8 +98,8 @@ export const VehiclesWaitingTab = ({
 
       {/* Liste des véhicules */}
       <div className="space-y-4">
-        {waitingVehicles.map((vehicle) => (
-          <div key={vehicle.id} className="bg-white border border-slate-200 rounded-lg p-6">
+        {waitingVehicles.map((vehicle, index) => (
+          <div key={`vehicle-${vehicle.id || index}-${vehicle.licensePlate || index}`} className="bg-white border border-slate-200 rounded-lg p-6">
             {/* En-tête avec marque/modèle et plaque */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">

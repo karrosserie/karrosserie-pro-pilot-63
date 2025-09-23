@@ -13,6 +13,7 @@ import { ProcessConfig } from "./ProcessConfig";
 import { OwnerPlanningTab } from "./OwnerPlanningTab";
 import { useUserRole } from "@/hooks/use-user-role";
 import { useViewManagement } from "@/hooks/use-view-management";
+import { useCompanyWorkflowSteps } from "@/hooks/use-company-workflow-steps";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { isSameWeek, startOfWeek, addDays, parseISO, isValid, parse } from 'date-fns';
@@ -44,6 +45,9 @@ export const WorkshopPlanningInterface = ({
     isOwner,
     isLoading
   } = useUserRole();
+  
+  // Récupérer les étapes de workflow configurées pour cette entreprise
+  const { workflowSteps: companyWorkflowSteps, loading: stepsLoading } = useCompanyWorkflowSteps(companyId);
   
   // Utiliser le hook de gestion des vues qui gère correctement les rôles
   const {
@@ -159,116 +163,59 @@ export const WorkshopPlanningInterface = ({
     return String(raw).trim();
   };
 
-  // Convert real data to workflow steps format from database
-  const workflowSteps = [{
-    id: 'accueil',
-    title: 'Accueil & Préparation du dossier',
-    color: 'bg-blue-600',
-    vehicles: schedules
-      .filter(s => getScheduleType(s) === 'Accueil & Préparation du dossier' && s.status !== 'Terminé')
-      .map(s => ({
-      id: s.id,
-      brand: s.modele?.split(' ')[0] || 'Marque',
-      model: s.modele?.split(' ').slice(1).join(' ') || 'Modèle',
-      licensePlate: s.vehicule || 'N/A',
-      client: s.client || 'Client',
-      price: '0€',
-      duration: s.heure || '0h',
-      description: s.tache || 'Tâche',
-      technician: s.technicien || 'Non assigné',
-      status: mapTaskStatus(s.status)
+  // Convertir les étapes de DB en format workflow steps dynamiquement
+  const workflowSteps = useMemo(() => {
+    if (stepsLoading || !companyWorkflowSteps.length) {
+      return [];
+    }
+
+    console.log('🔄 Building dynamic workflow steps from company configuration:', {
+      companyId,
+      stepsCount: companyWorkflowSteps.length,
+      steps: companyWorkflowSteps.map(s => ({ name: s.name, step_key: s.step_key }))
+    });
+
+    return companyWorkflowSteps.map(step => ({
+      id: step.step_key,
+      title: step.name,
+      color: step.color || 'bg-slate-600', // Utiliser la couleur de la DB ou fallback
+      vehicles: schedules
+        .filter(s => {
+          const scheduleType = getScheduleType(s);
+          const matches = scheduleType === step.name && s.status !== 'Terminé';
+          if (matches) {
+            console.log('✅ Schedule matches step:', {
+              schedule: scheduleType,
+              step: step.name,
+              vehicle: s.vehicule
+            });
+          }
+          return matches;
+        })
+        .map(s => ({
+          id: s.id,
+          brand: s.modele?.split(' ')[0] || 'Marque',
+          model: s.modele?.split(' ').slice(1).join(' ') || 'Modèle',
+          licensePlate: s.vehicule || 'N/A',
+          client: s.client || 'Client',
+          price: '0€',
+          duration: s.heure || '0h',
+          description: s.tache || 'Tâche',
+          technician: s.technicien || 'Non assigné',
+          status: mapTaskStatus(s.status)
+        }))
+    }));
+  }, [companyWorkflowSteps, schedules, stepsLoading, companyId]);
+
+  console.log('📋 Final workflow steps:', {
+    stepsCount: workflowSteps.length,
+    steps: workflowSteps.map(s => ({ 
+      id: s.id, 
+      title: s.title, 
+      vehiclesCount: s.vehicles.length,
+      vehicles: s.vehicles.map(v => v.licensePlate) 
     }))
-  }, {
-    id: 'remplacement',
-    title: 'Remplacement ou débosselage',
-    color: 'bg-orange-500',
-    vehicles: schedules
-      .filter(s => getScheduleType(s) === 'Remplacement ou débosselage' && s.status !== 'Terminé')
-      .map(s => ({
-      id: s.id,
-      brand: s.modele?.split(' ')[0] || 'Marque',
-      model: s.modele?.split(' ').slice(1).join(' ') || 'Modèle',
-      licensePlate: s.vehicule || 'N/A',
-      client: s.client || 'Client',
-      price: '0€',
-      duration: s.heure || '0h',
-      description: s.tache || 'Tâche',
-      technician: s.technicien || 'Non assigné',
-      status: mapTaskStatus(s.status)
-    }))
-  }, {
-    id: 'preparation',
-    title: 'Préparation peinture',
-    color: 'bg-purple-600',
-    vehicles: schedules
-      .filter(s => getScheduleType(s) === 'Préparation peinture' && s.status !== 'Terminé')
-      .map(s => ({
-      id: s.id,
-      brand: s.modele?.split(' ')[0] || 'Marque',
-      model: s.modele?.split(' ').slice(1).join(' ') || 'Modèle',
-      licensePlate: s.vehicule || 'N/A',
-      client: s.client || 'Client',
-      price: '0€',
-      duration: s.heure || '0h',
-      description: s.tache || 'Tâche',
-      technician: s.technicien || 'Non assigné',
-      status: mapTaskStatus(s.status)
-    }))
-  }, {
-    id: 'peinture',
-    title: 'Mise en peinture',
-    color: 'bg-green-600',
-    vehicles: schedules
-      .filter(s => getScheduleType(s) === 'Mise en peinture' && s.status !== 'Terminé')
-      .map(s => ({
-      id: s.id,
-      brand: s.modele?.split(' ')[0] || 'Marque',
-      model: s.modele?.split(' ').slice(1).join(' ') || 'Modèle',
-      licensePlate: s.vehicule || 'N/A',
-      client: s.client || 'Client',
-      price: '0€',
-      duration: s.heure || '0h',
-      description: s.tache || 'Tâche',
-      technician: s.technicien || 'Non assigné',
-      status: mapTaskStatus(s.status)
-    }))
-  }, {
-    id: 'finitions',
-    title: 'Finitions & remontage',
-    color: 'bg-indigo-600',
-    vehicles: schedules
-      .filter(s => getScheduleType(s) === 'Finitions & remontage' && s.status !== 'Terminé')
-      .map(s => ({
-      id: s.id,
-      brand: s.modele?.split(' ')[0] || 'Marque',
-      model: s.modele?.split(' ').slice(1).join(' ') || 'Modèle',
-      licensePlate: s.vehicule || 'N/A',
-      client: s.client || 'Client',
-      price: '0€',
-      duration: s.heure || '0h',
-      description: s.tache || 'Tâche',
-      technician: s.technicien || 'Non assigné',
-      status: mapTaskStatus(s.status)
-    }))
-  }, {
-    id: 'cloture',
-    title: 'Clôture du dossier et livraison',
-    color: 'bg-slate-600',
-    vehicles: schedules
-      .filter(s => getScheduleType(s) === 'Clôture & livraison' && s.status !== 'Terminé')
-      .map(s => ({
-      id: s.id,
-      brand: s.modele?.split(' ')[0] || 'Marque',
-      model: s.modele?.split(' ').slice(1).join(' ') || 'Modèle',
-      licensePlate: s.vehicule || 'N/A',
-      client: s.client || 'Client',
-      price: '0€',
-      duration: s.heure || '0h',
-      description: s.tache || 'Tâche',
-      technician: s.technicien || 'Non assigné',
-      status: mapTaskStatus(s.status)
-    }))
-  }];
+  });
 
   // Helper functions moved to after useEffect hooks but kept here for reference if needed later
 

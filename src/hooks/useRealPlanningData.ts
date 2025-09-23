@@ -230,15 +230,9 @@ export const useRealPlanningData = (companyId: string | null) => {
 
 // Helper functions
 const getTaskName = (taskType: string): string => {
-  const taskNames = {
-    'Accueil & Préparation du dossier': 'Accueil & Préparation',
-    'Remplacement ou débosselage': 'Débosselage',
-    'Préparation peinture': 'Préparation peinture',
-    'Mise en peinture': 'Mise en peinture',
-    'Finitions & remontage': 'Finitions & remontage',
-    'Clôture du dossier et livraison': 'Clôture & livraison'
-  };
-  return taskNames[taskType] || taskType || 'Tâche';
+  // Ne pas hardcoder les étapes, utiliser directement le task_type de la DB
+  // qui vient des workflow_steps configurés pour l'entreprise
+  return taskType || 'Tâche';
 };
 
 const mapTaskStatus = (status: string): 'planifie' | 'en_cours' | 'termine' => {
