@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import DefaultInvoicePreview from '@/components/invoices/templates/DefaultInvoicePreview';
 import AlternativeInvoicePreview from '@/components/invoices/templates/AlternativeInvoicePreview';
 import { useIsMobile } from '@/hooks/use-mobile';
+import N8nWebhookSettings from '@/components/settings/N8nWebhookSettings';
 
 const PreferencesTab = () => {
   const { user } = useAuth();
@@ -599,6 +600,9 @@ const PreferencesTab = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Configuration N8N Webhook */}
+      <N8nWebhookSettings />
 
       <div className="flex justify-end">
         <Button onClick={handleSavePreferences} className="bg-orange-500 hover:bg-orange-600 text-white">

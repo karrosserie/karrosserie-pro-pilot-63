@@ -630,6 +630,7 @@ export type Database = {
           language: string
           late_payment_penalties: string | null
           mise_en_peinture_time: string | null
+          n8n_webhook_url: string | null
           next_credit_ref: string
           next_invoice_ref: string
           next_repair_order_ref: string
@@ -675,6 +676,7 @@ export type Database = {
           language?: string
           late_payment_penalties?: string | null
           mise_en_peinture_time?: string | null
+          n8n_webhook_url?: string | null
           next_credit_ref?: string
           next_invoice_ref?: string
           next_repair_order_ref?: string
@@ -720,6 +722,7 @@ export type Database = {
           language?: string
           late_payment_penalties?: string | null
           mise_en_peinture_time?: string | null
+          n8n_webhook_url?: string | null
           next_credit_ref?: string
           next_invoice_ref?: string
           next_repair_order_ref?: string

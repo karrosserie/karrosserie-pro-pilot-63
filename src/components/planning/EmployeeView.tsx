@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { EmployePointageModal } from '@/components/EmployePointageModal';
 import { ProblemReportModal } from '@/components/planning/ProblemReportModal';
+import { triggerTaskStartedWebhook } from '@/services/webhooks/taskWebhook';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -218,6 +219,9 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
         });
         return;
       }
+
+      // Déclencher le webhook N8N pour la tâche démarrée
+      triggerTaskStartedWebhook({ taskId });
 
       console.log('Tâche démarrée avec succès:', taskId);
       setCurrentTimer(taskId);

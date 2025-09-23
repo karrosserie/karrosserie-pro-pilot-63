@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import StatsCard from '@/components/dashboard/StatsCard';
 import { supabase } from '@/integrations/supabase/client';
+import { triggerTaskStartedWebhook } from '@/services/webhooks/taskWebhook';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompany } from '@/hooks/use-company';
 import { useViewManagement } from '@/hooks/use-view-management';
@@ -338,6 +339,9 @@ const Planning = () => {
         title: "Tâche démarrée",
         description: "La tâche a été démarrée avec succès",
       });
+
+      // Déclencher le webhook N8N pour la tâche démarrée
+      triggerTaskStartedWebhook({ taskId: schedule.id });
 
       // Recharger les données
       if (selectedEmployeeId) {

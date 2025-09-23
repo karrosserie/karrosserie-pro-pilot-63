@@ -47,3 +47,6 @@ verify_jwt = false
 
 [functions.vehicle-status-monitor]
 verify_jwt = false
+
+[functions.task-started-webhook]
+verify_jwt = false
