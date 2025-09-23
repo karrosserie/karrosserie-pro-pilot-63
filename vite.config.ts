@@ -23,8 +23,11 @@ export default defineConfig(({ mode }) => ({
   },
   define: {
     global: "globalThis",
+    // Add process.env fallback for browser compatibility
+    "process.env": {},
   },
   optimizeDeps: {
     exclude: ["ws"],
+    include: ["@supabase/supabase-js"],
   },
 }));

@@ -1,11 +1,10 @@
 // WebSocket shim for browser compatibility with Supabase Realtime
 // This replaces the Node.js 'ws' package with native browser WebSocket
 
-class WebSocketShim extends WebSocket {
-  constructor(url, protocols) {
-    super(url, protocols);
-  }
+if (typeof window !== 'undefined') {
+  // Browser environment - use native WebSocket
+  module.exports = WebSocket;
+} else {
+  // Node.js environment - fallback (shouldn't be reached in browser)
+  module.exports = require('ws');
 }
-
-// Export for compatibility with 'ws' package expectations
-export default WebSocketShim;
