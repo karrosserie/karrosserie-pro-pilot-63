@@ -2,7 +2,9 @@
 import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useClients } from '@/hooks/use-clients';
+import { useVehicles } from '@/hooks/use-vehicles';
 import { Quote } from '@/services/supabase/quotes';
+import VehicleDialog from '@/components/vehicle/VehicleDialog';
 import ClientDialog from '@/components/client/ClientDialog';
 import { QuoteBasicInfoSection } from './form/QuoteBasicInfoSection';
 import { QuoteAssignmentSection } from './form/QuoteAssignmentSection';
@@ -31,7 +33,9 @@ export const QuoteForm = ({
 }: QuoteFormProps) => {
   const { toast } = useToast();
   const { clients, isLoading: isLoadingClients, createClient } = useClients();
+  const { createVehicle } = useVehicles();
   const [isClientDialogOpen, setIsClientDialogOpen] = useState(false);
+  const [isVehicleDialogOpen, setIsVehicleDialogOpen] = useState(false);
   
   const {
     formData,
@@ -125,6 +129,38 @@ export const QuoteForm = ({
     }
   };
 
+  const handleNewVehicleClick = () => {
+    setIsVehicleDialogOpen(true);
+  };
+
+  const handleNewVehicleSubmit = async (vehicleData: any) => {
+    try {
+      // Ajouter le client_id au véhicule
+      const vehicleWithClient = {
+        ...vehicleData,
+        client_id: formData.client_id
+      };
+      
+      const newVehicle = await createVehicle.mutateAsync(vehicleWithClient);
+      if (newVehicle) {
+        // Sélectionner automatiquement le véhicule créé
+        handleChange('vehicle_id', newVehicle.id);
+      }
+      setIsVehicleDialogOpen(false);
+      toast({
+        title: "Véhicule créé",
+        description: "Le véhicule a été créé et sélectionné automatiquement."
+      });
+    } catch (error: any) {
+      console.error('Error creating vehicle:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer le véhicule.",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto">
       <QuoteBasicInfoSection 
@@ -142,6 +178,7 @@ export const QuoteForm = ({
         isLoadingClients={isLoadingClients}
         errors={errors}
         onNewClientClick={handleNewClientClick}
+        onNewVehicleClick={handleNewVehicleClick}
       />
 
       <QuoteRepairsAndPartsSection 
@@ -178,6 +215,15 @@ export const QuoteForm = ({
         title="Nouveau client"
         description="Créer un nouveau client pour ce devis"
         onSubmit={handleNewClientSubmit}
+        mode="create"
+      />
+
+      <VehicleDialog
+        open={isVehicleDialogOpen}
+        onOpenChange={setIsVehicleDialogOpen}
+        title="Nouveau véhicule"
+        description="Créer un nouveau véhicule pour ce client"
+        onSubmit={handleNewVehicleSubmit}
         mode="create"
       />
     </form>

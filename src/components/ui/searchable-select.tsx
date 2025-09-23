@@ -5,7 +5,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
-import { Check, ChevronDown, UserPlus } from 'lucide-react';
+import { Check, ChevronDown, UserPlus, Car } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SearchableSelectProps {
@@ -20,6 +20,8 @@ interface SearchableSelectProps {
   onFreeTextChange?: (text: string) => void;
   onNewClientClick?: () => void;
   showNewClientOption?: boolean;
+  onNewVehicleClick?: () => void;
+  showNewVehicleOption?: boolean;
 }
 
 export const SearchableSelect: React.FC<SearchableSelectProps> = ({
@@ -33,7 +35,9 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   allowFreeText = false,
   onFreeTextChange,
   onNewClientClick,
-  showNewClientOption = false
+  showNewClientOption = false,
+  onNewVehicleClick,
+  showNewVehicleOption = false
 }) => {
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -89,6 +93,13 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
     }
   };
 
+  const handleNewVehicleClick = () => {
+    if (onNewVehicleClick) {
+      onNewVehicleClick();
+      setOpen(false);
+    }
+  };
+
   return (
     <div className="relative">
       <Popover open={open} onOpenChange={setOpen}>
@@ -128,6 +139,20 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                   >
                     <UserPlus className="mr-2 h-4 w-4" />
                     Nouveau client
+                  </CommandItem>
+                </CommandGroup>
+              )}
+              
+              {/* Option "Nouveau véhicule" toujours en haut si activée */}
+              {showNewVehicleOption && (
+                <CommandGroup>
+                  <CommandItem
+                    key="new-vehicle"
+                    onSelect={handleNewVehicleClick}
+                    className="cursor-pointer bg-muted/50 hover:bg-muted font-medium text-primary"
+                  >
+                    <Car className="mr-2 h-4 w-4" />
+                    Nouveau véhicule
                   </CommandItem>
                 </CommandGroup>
               )}

@@ -16,6 +16,7 @@ interface QuoteAssignmentSectionProps {
   isLoadingClients: boolean;
   errors?: Record<string, string>;
   onNewClientClick?: () => void;
+  onNewVehicleClick?: () => void;
 }
 
 export const QuoteAssignmentSection = ({ 
@@ -24,7 +25,8 @@ export const QuoteAssignmentSection = ({
   clientOptions, 
   isLoadingClients,
   errors = {},
-  onNewClientClick
+  onNewClientClick,
+  onNewVehicleClick
 }: QuoteAssignmentSectionProps) => {
   const { vehicles, isLoading: isLoadingVehicles } = useVehicles();
   
@@ -115,6 +117,8 @@ export const QuoteAssignmentSection = ({
               }
               searchPlaceholder="Rechercher un véhicule..."
               disabled={!formData.client_id || isLoadingVehicles}
+              showNewVehicleOption={!!formData.client_id && !isLoadingVehicles}
+              onNewVehicleClick={onNewVehicleClick}
               className={cn(
                 errors.vehicle_id && "border-red-500 focus-visible:ring-red-500"
               )}
