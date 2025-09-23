@@ -162,20 +162,33 @@ interface ExpertiseReport {
 }
 
 Deno.serve(async (req) => {
+  console.log('🚀 DEBUT: Task-started-webhook appelée!', new Date().toISOString());
+  console.log('🔍 Method:', req.method);
+  console.log('🔍 URL:', req.url);
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
+    console.log('✅ OPTIONS request handled');
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    console.log('🔧 Création client Supabase...');
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     );
 
-    const { taskId, webhookUrl }: TaskStartedPayload = await req.json();
+    console.log('📥 Lecture du payload...');
+    const rawBody = await req.text();
+    console.log('📄 Raw body:', rawBody);
+    
+    const { taskId, webhookUrl }: TaskStartedPayload = JSON.parse(rawBody);
+    console.log('📋 taskId reçu:', taskId);
+    console.log('🌐 webhookUrl fourni:', webhookUrl);
 
     if (!taskId) {
+      console.error('❌ TaskId manquant dans le payload');
       return new Response(
         JSON.stringify({ error: 'taskId is required' }),
         { 
@@ -419,6 +432,7 @@ Deno.serve(async (req) => {
       console.log('📥 Réponse N8N POST parsée:', JSON.stringify(n8nResponse, null, 2));
 
       // Traiter les instructions de la réponse POST
+      console.log('🔄 Appel processN8NInstructions avec réponse POST...');
       return await processN8NInstructions(n8nResponse, taskId, taskData, webhookPayload, supabaseClient);
 
     } catch (fetchError) {
@@ -446,9 +460,14 @@ Deno.serve(async (req) => {
     }
 
   } catch (error) {
-    console.error('❌ Erreur générale:', error);
+    console.error('❌ Erreur générale dans task-started-webhook:', error);
+    console.error('🔍 Stack trace:', error.stack);
     return new Response(
-      JSON.stringify({ error: 'Erreur interne du serveur', details: error.message }),
+      JSON.stringify({ 
+        error: 'Erreur interne du serveur', 
+        details: error.message,
+        stack: error.stack 
+      }),
       { 
         status: 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
