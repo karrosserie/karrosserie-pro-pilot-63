@@ -13,7 +13,7 @@ import { ProcessConfig } from "./ProcessConfig";
 import { OwnerPlanningTab } from "./OwnerPlanningTab";
 import { useUserRole } from "@/hooks/use-user-role";
 import { useViewManagement } from "@/hooks/use-view-management";
-import { useCompanyWorkflowSteps } from "@/hooks/use-company-workflow-steps";
+
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { isSameWeek, startOfWeek, addDays, parseISO, isValid, parse } from 'date-fns';
@@ -46,8 +46,7 @@ export const WorkshopPlanningInterface = ({
     isLoading
   } = useUserRole();
   
-  // Récupérer les étapes de workflow configurées pour cette entreprise
-  const { workflowSteps: companyWorkflowSteps, loading: stepsLoading } = useCompanyWorkflowSteps(companyId);
+  // Note: Les étapes d'atelier sont définies statiquement
   
   // Utiliser le hook de gestion des vues qui gère correctement les rôles
   const {
@@ -163,33 +162,22 @@ export const WorkshopPlanningInterface = ({
     return String(raw).trim();
   };
 
-  // Convertir les étapes de DB en format workflow steps dynamiquement
+  // Workflow steps - étapes d'atelier définies statiquement
   const workflowSteps = useMemo(() => {
-    if (stepsLoading || !companyWorkflowSteps.length) {
-      return [];
-    }
+    const steps = [
+      { id: 'accueil', title: 'Accueil & Préparation du dossier', color: 'bg-blue-600' },
+      { id: 'remplacement', title: 'Remplacement ou débosselage', color: 'bg-orange-600' },
+      { id: 'preparation', title: 'Préparation peinture', color: 'bg-yellow-600' },
+      { id: 'peinture', title: 'Mise en peinture', color: 'bg-green-600' },
+      { id: 'cloture', title: 'Clôture & livraison', color: 'bg-purple-600' }
+    ];
 
-    console.log('🔄 Building dynamic workflow steps from company configuration:', {
-      companyId,
-      stepsCount: companyWorkflowSteps.length,
-      steps: companyWorkflowSteps.map(s => ({ name: s.name, step_key: s.step_key }))
-    });
-
-    return companyWorkflowSteps.map(step => ({
-      id: step.step_key,
-      title: step.name,
-      color: step.color || 'bg-slate-600', // Utiliser la couleur de la DB ou fallback
+    return steps.map(step => ({
+      ...step,
       vehicles: schedules
         .filter(s => {
           const scheduleType = getScheduleType(s);
-          const matches = scheduleType === step.name && s.status !== 'Terminé';
-          if (matches) {
-            console.log('✅ Schedule matches step:', {
-              schedule: scheduleType,
-              step: step.name,
-              vehicle: s.vehicule
-            });
-          }
+          const matches = scheduleType === step.title && s.status !== 'Terminé';
           return matches;
         })
         .map(s => ({
@@ -205,7 +193,7 @@ export const WorkshopPlanningInterface = ({
           status: mapTaskStatus(s.status)
         }))
     }));
-  }, [companyWorkflowSteps, schedules, stepsLoading, companyId]);
+  }, [schedules]);
 
   console.log('📋 Final workflow steps:', {
     stepsCount: workflowSteps.length,
