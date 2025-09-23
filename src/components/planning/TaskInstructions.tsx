@@ -112,29 +112,27 @@ export const TaskInstructions: React.FC<TaskInstructionsProps> = ({
                   <div
                     key={instruction.number}
                     className={cn(
-                      "flex items-start gap-3 p-3 rounded-md border transition-all duration-200",
+                      "flex items-start gap-3 p-3 rounded-md border transition-all duration-200 cursor-pointer",
                       isChecked 
-                        ? "bg-muted/50 border-primary/30" 
+                        ? "bg-green-100 border-green-300 dark:bg-green-900/20 dark:border-green-700" 
                         : "bg-background border-border hover:bg-muted/30"
                     )}
+                    onClick={() => handleStepToggle(instruction.number)}
                   >
-                    <Button
-                      variant="ghost"
-                      size="sm"
+                    <div
                       className={cn(
-                        "w-6 h-6 p-0 rounded-full shrink-0 mt-0.5",
+                        "w-6 h-6 rounded-full shrink-0 mt-0.5 flex items-center justify-center",
                         isChecked 
-                          ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                          : "hover:bg-muted"
+                          ? "bg-green-600 text-white" 
+                          : "bg-muted text-muted-foreground"
                       )}
-                      onClick={() => handleStepToggle(instruction.number)}
                     >
                       {isChecked ? (
                         <CheckCircle2 className="w-3 h-3" />
                       ) : (
                         <span className="text-xs font-medium">{instruction.number}</span>
                       )}
-                    </Button>
+                    </div>
                     
                     <div className="flex-1 min-w-0">
                       <p 
