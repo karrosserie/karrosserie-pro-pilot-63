@@ -11,7 +11,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { EmployePointageModal } from '@/components/EmployePointageModal';
 import { ProblemReportModal } from '@/components/planning/ProblemReportModal';
 import { triggerTaskStartedWebhook } from '@/services/webhooks/taskWebhook';
-import { useQueryClient } from '@tanstack/react-query';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -61,46 +60,6 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   
   // Récupérer les vraies données depuis Supabase
   const { schedules, isLoading, refetch } = useEmployeeSchedule(currentUserId);
-  const queryClient = useQueryClient();
-
-  // Listener Realtime pour les mises à jour automatiques des instructions IA
-  useEffect(() => {
-    if (!companyInfo?.id || !currentUserId) return;
-
-    const channel = supabase
-      .channel('employee-schedule-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'employee_schedule',
-          filter: `company_id=eq.${companyInfo.id}`
-        },
-        (payload) => {
-          // Vérifier si c'est une mise à jour des detailed_instructions
-          if (payload.new?.detailed_instructions && 
-              payload.old?.detailed_instructions !== payload.new?.detailed_instructions) {
-            console.log('Instructions IA reçues via Realtime:', payload.new);
-            
-            // Invalider le cache React Query pour déclencher un refetch automatique
-            queryClient.invalidateQueries({ 
-              queryKey: ['employee-schedule', companyInfo.id, currentUserId] 
-            });
-            
-            // Mettre à jour les instructions locales si c'est la tâche courante
-            if (payload.new.user_id === currentUserId) {
-              fetchTaskInstructions(payload.new.id);
-            }
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [companyInfo?.id, currentUserId, queryClient]);
 
   // Fonction pour récupérer les instructions détaillées pour une tâche
   const fetchTaskInstructions = async (taskId: string) => {
