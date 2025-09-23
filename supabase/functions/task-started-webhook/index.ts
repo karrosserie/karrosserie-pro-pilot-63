@@ -108,15 +108,37 @@ Deno.serve(async (req) => {
           id,
           license_plate,
           client_id,
-          car_brands (name),
-          car_models (name)
+          vin,
+          year,
+          color,
+          brand_id,
+          model_id
         `)
         .eq('id', taskData.vehicle_id)
         .maybeSingle();
 
       if (!vehicleError && vehicle) {
         vehicleData = vehicle;
-        console.log(`📊 Données véhicule récupérées:`, vehicleData);
+        console.log(`🚗 Véhicule récupéré: ${vehicle.license_plate}`);
+        
+        // Récupérer les noms de marque et modèle séparément
+        if (vehicle.brand_id) {
+          const { data: brandData } = await supabaseClient
+            .from('car_brands')
+            .select('name')
+            .eq('id', vehicle.brand_id)
+            .maybeSingle();
+          if (brandData) vehicleData.car_brands = brandData;
+        }
+        
+        if (vehicle.model_id) {
+          const { data: modelData } = await supabaseClient
+            .from('car_models')
+            .select('name')
+            .eq('id', vehicle.model_id)
+            .maybeSingle();
+          if (modelData) vehicleData.car_models = modelData;
+        }
         
         // Récupérer séparément les données client si client_id existe
         if (vehicle.client_id) {
