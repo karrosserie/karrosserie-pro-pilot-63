@@ -109,6 +109,10 @@ Deno.serve(async (req) => {
       );
     }
 
+    console.log(`📋 Tâche récupérée: ${taskData.id}, vehicle_id: ${taskData.vehicle_id}`);
+    console.log(`📊 Données véhicule:`, taskData.vehicles);
+    console.log(`👤 Données client:`, taskData.vehicles?.clients);
+
     // 2. Récupérer le rapport d'expertise lié au véhicule si il existe
     let expertiseReport: ExpertiseReport | null = null;
     
@@ -162,7 +166,8 @@ Deno.serve(async (req) => {
         repairs_data: expertiseReport.repairs_data,
         parts_data: expertiseReport.parts_data,
         amount: expertiseReport.amount,
-        status: expertiseReport.status
+        status: expertiseReport.status,
+        document_url: expertiseReport.document_url // Ajout de l'URL du document
       } : null
     };
 
