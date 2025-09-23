@@ -202,6 +202,7 @@ async function findNextAvailableSlot(
       .eq('company_id', companyId)
       .gte('start_datetime', `${startDate}T00:00:00.000Z`)
       .lt('start_datetime', `${endDate}T23:59:59.999Z`)
+      .in('status', ['En attente', 'En cours', 'Terminé']) // Inclure toutes les tâches programmées
       .order('start_datetime', { ascending: true });
 
     if (error) {
@@ -209,40 +210,58 @@ async function findNextAvailableSlot(
       return currentDate;
     }
 
-    // Si pas de tâches ce jour-là, retourner le créneau proposé
+    // Définir les heures de travail (8h-18h)
+    const workStartTime = new Date(currentDate);
+    workStartTime.setHours(8, 0, 0, 0);
+    
+    const workEndTime = new Date(currentDate);
+    workEndTime.setHours(18, 0, 0, 0);
+
+    // Si pas de tâches ce jour-là, commencer à 8h
     if (!existingTasks || existingTasks.length === 0) {
-      console.log(`✅ Jour libre trouvé: ${startDate}`);
-      return currentDate;
-    }
-
-    // Find first available slot in the day
-    let proposedStart = new Date(currentDate);
-    let slotFound = false;
-    
-    for (const existingTask of existingTasks) {
-      const existingStart = new Date(existingTask.start_datetime);
-      const existingEnd = new Date(existingTask.end_datetime);
-      const proposedEnd = new Date(proposedStart.getTime() + durationMs);
-
-      // Check if proposed slot conflicts with existing task
-      if (proposedStart < existingEnd && proposedEnd > existingStart) {
-        // Move proposed start to after the existing task ends
-        proposedStart = new Date(existingEnd.getTime() + 5 * 60 * 1000); // 5 minutes buffer
-      } else {
-        // Créneau trouvé
-        slotFound = true;
-        break;
+      const proposedEnd = new Date(workStartTime.getTime() + durationMs);
+      if (proposedEnd <= workEndTime) {
+        console.log(`✅ Jour libre trouvé: ${startDate} à 8h00`);
+        return workStartTime;
       }
-    }
-    
-    // Vérifier si le créneau proposé est avant la fin de la journée de travail (18h)
-    const endOfWorkDay = new Date(currentDate);
-    endOfWorkDay.setHours(18, 0, 0, 0);
-    const proposedEnd = new Date(proposedStart.getTime() + durationMs);
-    
-    if (proposedEnd <= endOfWorkDay) {
-      console.log(`✅ Créneau libre trouvé le ${startDate} à ${proposedStart.getHours()}:${proposedStart.getMinutes().toString().padStart(2, '0')}`);
-      return proposedStart;
+    } else {
+      // Vérifier d'abord s'il y a de la place avant la première tâche
+      const firstTask = existingTasks[0];
+      const firstTaskStart = new Date(firstTask.start_datetime);
+      const proposedEnd = new Date(workStartTime.getTime() + durationMs);
+      
+      if (proposedEnd <= firstTaskStart && proposedEnd <= workEndTime) {
+        console.log(`✅ Créneau libre trouvé avant première tâche le ${startDate} à 8h00`);
+        return workStartTime;
+      }
+
+      // Chercher un créneau entre les tâches existantes
+      for (let i = 0; i < existingTasks.length; i++) {
+        const currentTask = existingTasks[i];
+        const currentTaskEnd = new Date(currentTask.end_datetime);
+        
+        // Ajouter un buffer de 5 minutes après chaque tâche
+        const proposedStart = new Date(currentTaskEnd.getTime() + 5 * 60 * 1000);
+        const proposedEnd = new Date(proposedStart.getTime() + durationMs);
+        
+        // Vérifier s'il y a assez de place avant la prochaine tâche (ou fin de journée)
+        let hasEnoughSpace = false;
+        
+        if (i < existingTasks.length - 1) {
+          // Il y a une tâche suivante
+          const nextTask = existingTasks[i + 1];
+          const nextTaskStart = new Date(nextTask.start_datetime);
+          hasEnoughSpace = proposedEnd <= nextTaskStart;
+        } else {
+          // C'est la dernière tâche, vérifier contre la fin de journée
+          hasEnoughSpace = proposedEnd <= workEndTime;
+        }
+        
+        if (hasEnoughSpace && proposedStart >= workStartTime) {
+          console.log(`✅ Créneau libre trouvé le ${startDate} à ${proposedStart.getHours()}:${proposedStart.getMinutes().toString().padStart(2, '0')}`);
+          return proposedStart;
+        }
+      }
     }
     
     // Passer au prochain jour de travail

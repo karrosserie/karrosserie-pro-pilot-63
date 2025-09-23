@@ -182,12 +182,13 @@ serve(async (req: Request) => {
 
     console.log(`👤 Selected qualified employee: ${selectedEmployee.user_id} (score: ${selectedEmployee.availability_score || 'N/A'})`);
 
-    // 7. Créer la nouvelle tâche assignée à l'employé qualifié
-    const startTime = new Date();
-    startTime.setHours(startTime.getHours() + 1); // Commencer dans 1 heure
-    
-    const endTime = new Date(startTime);
-    endTime.setHours(endTime.getHours() + 2); // Durée estimée: 2 heures
+    // 7. Trouver le prochain créneau disponible pour l'employé
+    const { startTime, endTime } = await findNextAvailableSlotForEmployee(
+      supabase, 
+      selectedEmployee.user_id, 
+      companyId, 
+      2 * 60 * 60 * 1000 // 2 heures en millisecondes
+    );
     
     const { data: newTask, error: createError } = await supabase
       .from('employee_schedule')
@@ -256,3 +257,115 @@ serve(async (req: Request) => {
     );
   }
 });
+
+// Helper function pour trouver le prochain créneau disponible pour un employé
+async function findNextAvailableSlotForEmployee(
+  supabase: any,
+  userId: string,
+  companyId: string,
+  durationMs: number
+): Promise<{ startTime: Date; endTime: Date }> {
+  let currentDate = new Date();
+  
+  // Commencer par aujourd'hui s'il est encore temps, sinon demain
+  const now = new Date();
+  if (now.getHours() >= 17) { // Si après 17h, commencer demain
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+  currentDate.setHours(8, 0, 0, 0); // Commencer à 8h
+  
+  let maxAttempts = 7;
+  
+  while (maxAttempts > 0) {
+    // Éviter les weekends
+    if (currentDate.getDay() === 0 || currentDate.getDay() === 6) {
+      currentDate.setDate(currentDate.getDate() + 1);
+      continue;
+    }
+    
+    const startDate = currentDate.toISOString().split('T')[0];
+    console.log(`🔍 Recherche créneau pour employé ${userId} le ${startDate}`);
+
+    // Récupérer les tâches existantes pour cet employé ce jour-là
+    const { data: existingTasks, error } = await supabase
+      .from('employee_schedule')
+      .select('start_datetime, end_datetime')
+      .eq('user_id', userId)
+      .eq('company_id', companyId)
+      .gte('start_datetime', `${startDate}T00:00:00.000Z`)
+      .lt('start_datetime', `${startDate}T23:59:59.999Z`)
+      .in('status', ['En attente', 'En cours', 'Terminé'])
+      .order('start_datetime', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching existing tasks:', error);
+      // En cas d'erreur, utiliser l'heure actuelle
+      const fallbackStart = new Date();
+      fallbackStart.setHours(fallbackStart.getHours() + 1);
+      return {
+        startTime: fallbackStart,
+        endTime: new Date(fallbackStart.getTime() + durationMs)
+      };
+    }
+
+    const workStartTime = new Date(currentDate);
+    workStartTime.setHours(8, 0, 0, 0);
+    
+    const workEndTime = new Date(currentDate);
+    workEndTime.setHours(18, 0, 0, 0);
+
+    // Si pas de tâches ce jour-là
+    if (!existingTasks || existingTasks.length === 0) {
+      const proposedEnd = new Date(workStartTime.getTime() + durationMs);
+      if (proposedEnd <= workEndTime) {
+        console.log(`✅ Créneau libre trouvé le ${startDate} à 8h00`);
+        return {
+          startTime: workStartTime,
+          endTime: proposedEnd
+        };
+      }
+    } else {
+      // Chercher un créneau libre
+      let proposedStart = new Date(workStartTime);
+      
+      for (const existingTask of existingTasks) {
+        const existingStart = new Date(existingTask.start_datetime);
+        const existingEnd = new Date(existingTask.end_datetime);
+        const proposedEnd = new Date(proposedStart.getTime() + durationMs);
+
+        // Vérifier s'il y a un conflit
+        if (proposedStart < existingEnd && proposedEnd > existingStart) {
+          // Conflit détecté, déplacer après cette tâche
+          proposedStart = new Date(existingEnd.getTime() + 5 * 60 * 1000); // Buffer de 5 minutes
+        } else if (proposedEnd <= existingStart) {
+          // Créneau trouvé avant cette tâche
+          break;
+        }
+      }
+      
+      const finalProposedEnd = new Date(proposedStart.getTime() + durationMs);
+      
+      if (finalProposedEnd <= workEndTime) {
+        console.log(`✅ Créneau libre trouvé le ${startDate} à ${proposedStart.getHours()}:${proposedStart.getMinutes().toString().padStart(2, '0')}`);
+        return {
+          startTime: proposedStart,
+          endTime: finalProposedEnd
+        };
+      }
+    }
+    
+    // Passer au jour suivant
+    currentDate.setDate(currentDate.getDate() + 1);
+    currentDate.setHours(8, 0, 0, 0);
+    maxAttempts--;
+  }
+  
+  // Fallback si aucun créneau trouvé
+  console.log('⚠️ Aucun créneau libre trouvé, utilisation du fallback');
+  const fallbackStart = new Date();
+  fallbackStart.setHours(fallbackStart.getHours() + 1);
+  return {
+    startTime: fallbackStart,
+    endTime: new Date(fallbackStart.getTime() + durationMs)
+  };
+}
