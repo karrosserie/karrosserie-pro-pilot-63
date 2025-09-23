@@ -169,6 +169,8 @@ Deno.serve(async (req) => {
     let expertiseReport: ExpertiseReport | null = null;
     
     if (taskData.vehicle_id) {
+      console.log(`📋 Recherche du rapport d'expertise pour vehicle_id: ${taskData.vehicle_id} et company_id: ${taskData.company_id}`);
+      
       const { data: reportData, error: reportError } = await supabaseClient
         .from('expertise_reports')
         .select('*')
@@ -178,10 +180,19 @@ Deno.serve(async (req) => {
         .limit(1)
         .maybeSingle();
 
+      console.log(`📋 Résultat requête rapport - Data:`, reportData);
+      console.log(`📋 Résultat requête rapport - Error:`, reportError);
+
       if (reportData && !reportError) {
         expertiseReport = reportData as ExpertiseReport;
-        console.log(`📋 Rapport d'expertise trouvé: ${reportData.report_number}`);
+        console.log(`✅ Rapport d'expertise trouvé: ${reportData.report_number || reportData.id}`);
+      } else if (reportError) {
+        console.error(`❌ Erreur lors de la récupération du rapport d'expertise:`, reportError);
+      } else {
+        console.log(`⚠️ Aucun rapport d'expertise trouvé pour ce véhicule`);
       }
+    } else {
+      console.log(`⚠️ Pas de vehicle_id disponible pour chercher le rapport d'expertise`);
     }
 
     // 3. Préparer les données pour N8N
