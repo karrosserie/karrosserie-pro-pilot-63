@@ -169,6 +169,7 @@ export const WorkshopPlanningInterface = ({
       { id: 'remplacement', title: 'Remplacement ou débosselage', color: 'bg-orange-600' },
       { id: 'preparation', title: 'Préparation peinture', color: 'bg-yellow-600' },
       { id: 'peinture', title: 'Mise en peinture', color: 'bg-green-600' },
+      { id: 'finitions', title: 'Finitions & remontage', color: 'bg-teal-600' },
       { id: 'cloture', title: 'Clôture & livraison', color: 'bg-purple-600' }
     ];
 
