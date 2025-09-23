@@ -3691,6 +3691,7 @@ export type Database = {
         Returns: {
           availability_score: number
           qualifications: Json
+          role_priority: number
           user_id: string
         }[]
       }

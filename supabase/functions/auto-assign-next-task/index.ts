@@ -180,7 +180,7 @@ serve(async (req: Request) => {
       );
     }
 
-    console.log(`👤 Selected qualified employee: ${selectedEmployee.user_id} (score: ${selectedEmployee.availability_score || 'N/A'})`);
+    console.log(`👤 Selected qualified employee: ${selectedEmployee.user_id} (availability: ${selectedEmployee.availability_score || 'N/A'}, role priority: ${selectedEmployee.role_priority || 'N/A'})`);
 
     // 7. Trouver le prochain créneau disponible pour l'employé
     const { startTime, endTime } = await findNextAvailableSlotForEmployee(
