@@ -72,7 +72,7 @@ Deno.serve(async (req) => {
     console.log(`🚀 Traitement de la tâche démarrée: ${taskId}`);
 
     // 1. Récupérer les détails de la tâche avec les informations du véhicule et client
-    const { data: taskData, error: taskError } = await supabase
+    const { data: taskData, error: taskError } = await supabaseClient
       .from('employee_schedule')
       .select(`
         id,
@@ -81,7 +81,7 @@ Deno.serve(async (req) => {
         user_id,
         company_id,
         real_start_datetime,
-        vehicles (
+        vehicles!inner (
           id,
           license_plate,
           car_brands (name),
@@ -113,14 +113,14 @@ Deno.serve(async (req) => {
     let expertiseReport: ExpertiseReport | null = null;
     
     if (taskData.vehicle_id) {
-      const { data: reportData, error: reportError } = await supabase
+      const { data: reportData, error: reportError } = await supabaseClient
         .from('expertise_reports')
         .select('*')
         .eq('vehicle_id', taskData.vehicle_id)
         .eq('company_id', taskData.company_id)
         .order('created_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (reportData && !reportError) {
         expertiseReport = reportData as ExpertiseReport;
@@ -179,11 +179,11 @@ Deno.serve(async (req) => {
       targetWebhookUrl = webhookUrl;
     } else {
       // Sinon, essayer de récupérer depuis les préférences de l'entreprise
-      const { data: preferences } = await supabase
+      const { data: preferences } = await supabaseClient
         .from('company_preferences')
         .select('n8n_webhook_url')
         .eq('company_id', taskData.company_id)
-        .single();
+        .maybeSingle();
       
       if (preferences?.n8n_webhook_url) {
         targetWebhookUrl = preferences.n8n_webhook_url;
@@ -192,7 +192,7 @@ Deno.serve(async (req) => {
     
     console.log('🎯 URL webhook cible:', targetWebhookUrl);
 
-    // 5. Envoyer les données à N8N
+    // 5. Envoyer les données à N8N (même si l'URL retourne 404, on continue pour les logs)
     try {
       const webhookResponse = await fetch(targetWebhookUrl, {
         method: 'POST',
@@ -206,14 +206,15 @@ Deno.serve(async (req) => {
 
       if (!webhookResponse.ok) {
         console.error('❌ Erreur webhook N8N:', webhookResponse.statusText);
+        // Ne pas retourner une erreur 500, juste loguer et continuer
         return new Response(
           JSON.stringify({ 
-            error: 'Erreur lors de l\'appel du webhook N8N',
-            status: webhookResponse.status,
-            payload: webhookPayload
+            success: false,
+            message: `Webhook N8N a échoué (${webhookResponse.status}): ${webhookResponse.statusText}`,
+            payload: webhookPayload 
           }),
           { 
-            status: 500, 
+            status: 200, // Retourner 200 au lieu de 500 pour ne pas casser l'interface
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           }
         );
@@ -221,6 +222,7 @@ Deno.serve(async (req) => {
 
       return new Response(
         JSON.stringify({ 
+          success: true,
           message: 'Webhook N8N déclenché avec succès',
           payload: webhookPayload 
         }),
@@ -232,14 +234,15 @@ Deno.serve(async (req) => {
 
     } catch (fetchError) {
       console.error('❌ Erreur lors de l\'appel du webhook:', fetchError);
+      // Ne pas retourner une erreur 500, juste loguer et continuer  
       return new Response(
         JSON.stringify({ 
-          error: 'Erreur réseau lors de l\'appel du webhook N8N',
-          details: fetchError.message,
+          success: false,
+          message: `Erreur réseau lors de l'appel du webhook N8N: ${fetchError.message}`,
           payload: webhookPayload
         }),
         { 
-          status: 500, 
+          status: 200, // Retourner 200 au lieu de 500
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       );
