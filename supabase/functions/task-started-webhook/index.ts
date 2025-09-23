@@ -102,6 +102,8 @@ Deno.serve(async (req) => {
     // 1.5. Récupérer les détails du véhicule et du client si vehicle_id existe
     let vehicleData = null;
     if (taskData.vehicle_id) {
+      console.log(`🔍 Tentative de récupération du véhicule avec ID: ${taskData.vehicle_id}`);
+      
       const { data: vehicle, error: vehicleError } = await supabaseClient
         .from('vehicles')
         .select(`
@@ -117,9 +119,12 @@ Deno.serve(async (req) => {
         .eq('id', taskData.vehicle_id)
         .maybeSingle();
 
+      console.log(`🚗 Résultat requête véhicule - Data:`, vehicle);
+      console.log(`🚗 Résultat requête véhicule - Error:`, vehicleError);
+
       if (!vehicleError && vehicle) {
         vehicleData = vehicle;
-        console.log(`🚗 Véhicule récupéré: ${vehicle.license_plate}`);
+        console.log(`✅ Véhicule récupéré avec succès: ${vehicle.license_plate}`);
         
         // Récupérer les noms de marque et modèle séparément
         if (vehicle.brand_id) {
@@ -154,8 +159,10 @@ Deno.serve(async (req) => {
           }
         }
       } else {
-        console.error(`❌ Erreur lors de la récupération du véhicule:`, vehicleError);
+        console.error(`❌ Erreur lors de la récupération du véhicule ID ${taskData.vehicle_id}:`, vehicleError);
       }
+    } else {
+      console.log(`⚠️ Aucun vehicle_id trouvé dans la tâche`);
     }
 
     // 2. Récupérer le rapport d'expertise lié au véhicule si il existe
