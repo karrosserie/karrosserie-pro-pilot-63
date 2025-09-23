@@ -71,7 +71,7 @@ Deno.serve(async (req) => {
 
     console.log(`🚀 Traitement de la tâche démarrée: ${taskId}`);
 
-    // 1. Récupérer les détails de la tâche avec les informations du véhicule et client
+    // 1. Récupérer les détails de la tâche
     const { data: taskData, error: taskError } = await supabaseClient
       .from('employee_schedule')
       .select(`
@@ -80,20 +80,7 @@ Deno.serve(async (req) => {
         vehicle_id,
         user_id,
         company_id,
-        real_start_datetime,
-        vehicles (
-          id,
-          license_plate,
-          car_brands (name),
-          car_models (name),
-          clients (
-            id,
-            first_name,
-            last_name,
-            email,
-            phone
-          )
-        )
+        real_start_datetime
       `)
       .eq('id', taskId)
       .maybeSingle() as { data: TaskData | null; error: any };
@@ -110,8 +97,36 @@ Deno.serve(async (req) => {
     }
 
     console.log(`📋 Tâche récupérée: ${taskData.id}, vehicle_id: ${taskData.vehicle_id}`);
-    console.log(`📊 Données véhicule:`, taskData.vehicles);
-    console.log(`👤 Données client:`, taskData.vehicles?.clients);
+
+    // 1.5. Récupérer les détails du véhicule et du client si vehicle_id existe
+    let vehicleData = null;
+    if (taskData.vehicle_id) {
+      const { data: vehicle, error: vehicleError } = await supabaseClient
+        .from('vehicles')
+        .select(`
+          id,
+          license_plate,
+          car_brands (name),
+          car_models (name),
+          clients (
+            id,
+            first_name,
+            last_name,
+            email,
+            phone
+          )
+        `)
+        .eq('id', taskData.vehicle_id)
+        .maybeSingle();
+
+      if (!vehicleError && vehicle) {
+        vehicleData = vehicle;
+        console.log(`📊 Données véhicule récupérées:`, vehicleData);
+        console.log(`👤 Données client:`, vehicleData.clients);
+      } else {
+        console.log(`⚠️ Aucun véhicule trouvé pour vehicle_id: ${taskData.vehicle_id}`);
+      }
+    }
 
     // 2. Récupérer le rapport d'expertise lié au véhicule si il existe
     let expertiseReport: ExpertiseReport | null = null;
@@ -143,18 +158,18 @@ Deno.serve(async (req) => {
         employee_id: taskData.user_id,
         company_id: taskData.company_id
       },
-      vehicle: taskData.vehicles ? {
-        id: taskData.vehicles.id,
-        license_plate: taskData.vehicles.license_plate,
-        brand: taskData.vehicles.car_brands?.name || null,
-        model: taskData.vehicles.car_models?.name || null
+      vehicle: vehicleData ? {
+        id: vehicleData.id,
+        license_plate: vehicleData.license_plate,
+        brand: vehicleData.car_brands?.name || null,
+        model: vehicleData.car_models?.name || null
       } : null,
-      client: taskData.vehicles?.clients ? {
-        id: taskData.vehicles.clients.id,
-        first_name: taskData.vehicles.clients.first_name,
-        last_name: taskData.vehicles.clients.last_name,
-        email: taskData.vehicles.clients.email || null,
-        phone: taskData.vehicles.clients.phone || null
+      client: vehicleData?.clients ? {
+        id: vehicleData.clients.id,
+        first_name: vehicleData.clients.first_name,
+        last_name: vehicleData.clients.last_name,
+        email: vehicleData.clients.email || null,
+        phone: vehicleData.clients.phone || null
       } : null,
       expertise_report: expertiseReport ? {
         id: expertiseReport.id,
