@@ -100,6 +100,15 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
     return weekDays.some(day => isSameDay(scheduleDate, day));
   });
 
+  // Filtrer les tâches du patron depuis employee_schedule pour la semaine actuelle
+  const ownerSchedules = schedules.filter(schedule => {
+    if (!schedule.start_datetime || !user?.id) return false;
+    const scheduleDate = new Date(schedule.start_datetime);
+    const isOwnerTask = schedule.user_id === user.id;
+    const isInWeek = weekDays.some(day => isSameDay(scheduleDate, day));
+    return isOwnerTask && isInWeek;
+  });
+
   // Filtrer les tâches patron pour la semaine actuelle
   const weekPatronTasks = patronTasks.filter(task => {
     const taskDate = new Date(task.date);
@@ -448,33 +457,34 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
 
           {/* Grille du planning hebdomadaire */}
           <div className="grid grid-cols-5 gap-4">
-            {weekDays.map((day, index) => {
-              const daySchedules = weekSchedules.filter(schedule => 
-                isSameDay(new Date(schedule.scheduled_date), day)
-              );
-              
-              const isToday = isSameDay(day, new Date());
-              
-              return (
-                <div key={index} className="space-y-2">
-                  {/* En-tête du jour */}
-                  <div className={`p-3 rounded-lg text-center ${
-                    isToday 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'bg-muted'
-                  }`}>
-                    <div className="font-medium">
-                      {format(day, 'EEEE', { locale: fr })}
-                    </div>
-                    <div className="text-sm">
-                      {format(day, 'dd/MM', { locale: fr })}
-                    </div>
-                  </div>
+             {weekDays.map((day, index) => {
+               // Tâches normales du patron depuis employee_schedule
+               const dayOwnerSchedules = ownerSchedules.filter(schedule => 
+                 isSameDay(new Date(schedule.start_datetime), day)
+               );
+               
+               const isToday = isSameDay(day, new Date());
+               
+               return (
+                 <div key={index} className="space-y-2">
+                   {/* En-tête du jour */}
+                   <div className={`p-3 rounded-lg text-center ${
+                     isToday 
+                       ? 'bg-primary text-primary-foreground' 
+                       : 'bg-muted'
+                   }`}>
+                     <div className="font-medium">
+                       {format(day, 'EEEE', { locale: fr })}
+                     </div>
+                     <div className="text-sm">
+                       {format(day, 'dd/MM', { locale: fr })}
+                     </div>
+                   </div>
 
-                  {/* Tâches du jour */}
-                  <div className="space-y-2 min-h-[200px]">
-                    {/* Tâches normales */}
-                    {daySchedules.map((schedule, idx) => {
+                   {/* Tâches du jour */}
+                   <div className="space-y-2 min-h-[200px]">
+                     {/* Tâches du patron depuis employee_schedule */}
+                     {dayOwnerSchedules.map((schedule, idx) => {
                       const employee = employees.find(emp => emp.user_id === schedule.employee_id);
                       const vehicle = vehicles.find(v => v.id === schedule.vehicle_id);
                       
@@ -537,12 +547,12 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
                         </Card>
                       ))}
 
-                    {/* Aucune tâche */}
-                    {daySchedules.length === 0 && weekPatronTasks.filter(task => isSameDay(new Date(task.date), day)).length === 0 && (
-                      <div className="p-2 text-center text-sm text-muted-foreground border border-dashed rounded">
-                        Aucune tâche
-                      </div>
-                    )}
+                     {/* Aucune tâche */}
+                     {dayOwnerSchedules.length === 0 && weekPatronTasks.filter(task => isSameDay(new Date(task.date), day)).length === 0 && (
+                       <div className="p-2 text-center text-sm text-muted-foreground border border-dashed rounded">
+                         Aucune tâche
+                       </div>
+                     )}
                   </div>
                 </div>
               );
@@ -557,27 +567,27 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
           <CardTitle className="text-lg">Statistiques de la semaine</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-muted rounded-lg">
-              <div className="text-2xl font-bold text-primary">{weekSchedules.length + weekPatronTasks.length}</div>
-              <div className="text-sm text-muted-foreground">Tâches total</div>
-            </div>
-            <div className="text-center p-4 bg-muted rounded-lg">
-              <div className="text-2xl font-bold text-green-600">
-                {weekSchedules.filter(s => s.status === 'completed').length}
-              </div>
-              <div className="text-sm text-muted-foreground">Terminées</div>
-            </div>
-            <div className="text-center p-4 bg-muted rounded-lg">
-              <div className="text-2xl font-bold text-orange-600">
-                {weekSchedules.filter(s => s.status === 'in_progress').length + weekPatronTasks.length}
-              </div>
-              <div className="text-sm text-muted-foreground">En cours/Patron</div>
-            </div>
-            <div className="text-center p-4 bg-muted rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">
-                {weekSchedules.filter(s => s.status === 'pending').length}
-              </div>
+           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+             <div className="text-center p-4 bg-muted rounded-lg">
+               <div className="text-2xl font-bold text-primary">{ownerSchedules.length + weekPatronTasks.length}</div>
+               <div className="text-sm text-muted-foreground">Tâches total</div>
+             </div>
+             <div className="text-center p-4 bg-muted rounded-lg">
+               <div className="text-2xl font-bold text-green-600">
+                 {ownerSchedules.filter(s => s.status === 'Terminé').length}
+               </div>
+               <div className="text-sm text-muted-foreground">Terminées</div>
+             </div>
+             <div className="text-center p-4 bg-muted rounded-lg">
+               <div className="text-2xl font-bold text-orange-600">
+                 {ownerSchedules.filter(s => s.status === 'En cours').length + weekPatronTasks.length}
+               </div>
+               <div className="text-sm text-muted-foreground">En cours/Patron</div>
+             </div>
+             <div className="text-center p-4 bg-muted rounded-lg">
+               <div className="text-2xl font-bold text-blue-600">
+                 {ownerSchedules.filter(s => s.status === 'En attente').length}
+               </div>
               <div className="text-sm text-muted-foreground">En attente</div>
             </div>
           </div>
