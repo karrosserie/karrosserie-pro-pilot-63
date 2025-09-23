@@ -168,32 +168,29 @@ Deno.serve(async (req) => {
 
     console.log('📤 Payload préparé pour N8N:', JSON.stringify(webhookPayload, null, 2));
 
-    // 4. Récupérer l'URL du webhook depuis les préférences de l'entreprise ou utiliser celle fournie
-    let targetWebhookUrl = webhookUrl;
+    // 4. Déterminer l'URL du webhook N8N à utiliser
+    // URL globale par défaut pour toutes les entreprises
+    const globalWebhookUrl = 'https://n8n.karrosserie.pro/webhook/af159b59-5852-42d7-8298-1a3f1bf8cd67';
     
-    if (!targetWebhookUrl) {
+    let targetWebhookUrl = globalWebhookUrl;
+    
+    // Si une URL spécifique est fournie dans le payload, l'utiliser en priorité
+    if (webhookUrl) {
+      targetWebhookUrl = webhookUrl;
+    } else {
+      // Sinon, essayer de récupérer depuis les préférences de l'entreprise
       const { data: preferences } = await supabase
         .from('company_preferences')
         .select('n8n_webhook_url')
         .eq('company_id', taskData.company_id)
         .single();
       
-      targetWebhookUrl = preferences?.n8n_webhook_url;
+      if (preferences?.n8n_webhook_url) {
+        targetWebhookUrl = preferences.n8n_webhook_url;
+      }
     }
-
-    if (!targetWebhookUrl) {
-      console.warn('⚠️ Aucun webhook N8N configuré pour cette entreprise');
-      return new Response(
-        JSON.stringify({ 
-          message: 'Tâche traitée mais aucun webhook configuré',
-          payload: webhookPayload 
-        }),
-        { 
-          status: 200, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
+    
+    console.log('🎯 URL webhook cible:', targetWebhookUrl);
 
     // 5. Envoyer les données à N8N
     try {

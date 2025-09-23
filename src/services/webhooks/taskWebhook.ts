@@ -16,10 +16,13 @@ export const triggerTaskStartedWebhook = async ({
   try {
     console.log('🚀 Déclenchement du webhook pour la tâche:', taskId);
 
+    // URL globale pour toutes les entreprises
+    const globalWebhookUrl = 'https://n8n.karrosserie.pro/webhook/af159b59-5852-42d7-8298-1a3f1bf8cd67';
+
     const { data, error } = await supabase.functions.invoke('task-started-webhook', {
       body: {
         taskId,
-        webhookUrl
+        webhookUrl: globalWebhookUrl // Force l'utilisation de l'URL globale
       }
     });
 
