@@ -1,6 +1,7 @@
 
 import { Invoice } from '@/services/supabase/invoices';
 import { InvoiceRepairItem, InvoicePartItem, InvoiceDiscountItem } from '../types';
+import { safeNumber } from '@/lib/utils';
 
 interface UseInvoiceDataPreparationProps {
   formData: Partial<Invoice>;
@@ -26,12 +27,30 @@ export const useInvoiceDataPreparation = ({
       discounts
     });
 
+    // Normaliser les réparations avant sauvegarde
+    const normalizedRepairs = (repairs || []).map(repair => ({
+      ...repair,
+      quantity: safeNumber(repair.quantity),
+      unitCost: safeNumber(repair.unitCost),
+      discount: safeNumber(repair.discount),
+      vat: safeNumber(repair.vat || 20)
+    }));
+
+    // Normaliser les pièces avant sauvegarde
+    const normalizedParts = (parts || []).map(part => ({
+      ...part,
+      quantity: safeNumber(part.quantity),
+      unitCost: safeNumber(part.unitCost),
+      discount: safeNumber(part.discount),
+      vat: safeNumber(part.vat || 20)
+    }));
+
     // Préparer les données selon le format attendu par la base de données
     const submitData = {
       ...formData,
       claim_number: claimNumber || '',
-      repairs_data: repairs || [],
-      parts_data: parts || [],
+      repairs_data: normalizedRepairs,
+      parts_data: normalizedParts,
       discounts_data: discounts || [],
       // S'assurer que les champs essentiels sont présents
       reference: formData.reference || '',
