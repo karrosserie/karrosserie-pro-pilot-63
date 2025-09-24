@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { useFleetLoanForm } from '@/hooks/use-fleet-loan-form';
 import { useFleetLoanFormValidation } from './form/FleetLoanFormValidation';
+import { useTabValidation } from '@/hooks/fleet-loan-form/use-tab-validation';
 import FleetLoanFormNavigation from './form/FleetLoanFormNavigation';
 import DamageAssessmentTab from './form/DamageAssessmentTab';
 import VehicleDetailsTab from './form/VehicleDetailsTab';
@@ -100,6 +101,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
   } = useFleetLoanForm(vehicle, onSubmit, defaultValues);
 
   const { isFormValid } = useFleetLoanFormValidation(formData);
+  const { validateTabByValue } = useTabValidation();
 
   const tabs = [
     { value: 'client-info', label: 'Informations sur le client' },
@@ -115,6 +117,12 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
 
   const handleNext = () => {
     if (!isLastTab) {
+      // Valider l'onglet actuel avant de passer au suivant
+      const currentTab = tabs[currentTabIndex];
+      if (!validateTabByValue(currentTab.value, formData)) {
+        return; // Arrêter si la validation échoue
+      }
+      
       const nextTab = tabs[currentTabIndex + 1];
       setActiveTab(nextTab.value);
     }
