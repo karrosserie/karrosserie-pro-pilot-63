@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 export default function DocumentUploadFlow() {
   const { token } = useParams<{ token: string }>();
   const [showWorkflow, setShowWorkflow] = useState(false);
+  const [uploadCompleted, setUploadCompleted] = useState(false);
   const [companyName, setCompanyName] = useState("Carrosserie Liguori");
   const [loading, setLoading] = useState(true);
   const [tokenData, setTokenData] = useState<{
@@ -259,10 +260,10 @@ export default function DocumentUploadFlow() {
         // On ne fait pas échouer le processus si l'email ne peut pas être envoyé
       }
       
-      // Mettre à jour l'état pour afficher directement l'écran de confirmation
-      setMissingDocuments([]);
+      // Mettre à jour l'état pour afficher l'écran de confirmation
+      setUploadCompleted(true);
       setShowWorkflow(false);
-      // Maintenant l'écran de confirmation sera affiché
+      setMissingDocuments([]);
       
     } catch (error) {
       console.error("Erreur lors de la sauvegarde des documents:", error);
@@ -290,6 +291,39 @@ export default function DocumentUploadFlow() {
             <FileText className="w-8 h-8 text-white" />
           </div>
           <p className="mt-4 text-muted-foreground">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Écran de confirmation d'upload terminé
+  if (uploadCompleted) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="max-w-lg w-full space-y-8 text-center">
+          <div className="space-y-4">
+            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto shadow-lg animate-scale-in">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-foreground">
+              Documents envoyés avec succès !
+            </h1>
+            <p className="text-muted-foreground">
+              Merci d'avoir téléversé vos documents. {companyName} a été notifiée et traitera votre dossier dans les plus brefs délais.
+            </p>
+          </div>
+          
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <p className="text-green-800 text-sm">
+              ✅ Vos documents ont été reçus et enregistrés dans notre système.
+            </p>
+          </div>
+          
+          <p className="text-muted-foreground text-sm">
+            Vous pouvez maintenant fermer cette page.
+          </p>
         </div>
       </div>
     );
