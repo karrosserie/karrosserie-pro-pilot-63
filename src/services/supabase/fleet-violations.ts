@@ -261,6 +261,18 @@ export const fleetViolationsService = {
       throw new Error('Violation not found');
     }
 
+    // Récupérer les données complètes du véhicule
+    const { data: vehicle, error: vehicleError } = await supabase
+      .from('fleet_vehicles')
+      .select('*')
+      .eq('id', violation.fleet_vehicle_id)
+      .single();
+
+    if (vehicleError) {
+      console.error('Error fetching vehicle data:', vehicleError);
+      throw vehicleError;
+    }
+
     // Chercher les prêts qui correspondent à la période de l'infraction
     const violationDateTime = new Date(`${violation.violation_date}T${violation.violation_time || '12:00:00'}`);
     
@@ -279,8 +291,8 @@ export const fleetViolationsService = {
           prefecture,
           date_of_birth,
           place_of_birth,
-          driver_license_front_url,
-          driver_license_back_url
+          driving_license_front_url,
+          driving_license_back_url
         )
       `)
       .eq('fleet_vehicle_id', violation.fleet_vehicle_id)
@@ -294,7 +306,10 @@ export const fleetViolationsService = {
 
     return reservations && reservations.length > 0 ? {
       violation,
-      reservation: reservations[0],
+      reservation: {
+        ...reservations[0],
+        vehicles: vehicle // Ajouter les données complètes du véhicule
+      },
       conductor: reservations[0].clients
     } : null;
   },
