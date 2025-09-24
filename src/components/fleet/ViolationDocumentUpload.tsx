@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Camera as CapCamera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Capacitor } from '@capacitor/core';
 import { ViolationValidationModal } from './ViolationValidationModal';
+import { AIAnalysisModal } from './AIAnalysisModal';
 
 interface ViolationDocumentUploadProps {
   documentUrl?: string;
@@ -28,6 +29,7 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
   companyId
 }) => {
   const [isUploading, setIsUploading] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showValidationModal, setShowValidationModal] = useState(false);
   const [validationError, setValidationError] = useState<any>(null);
   const [pendingAnalysisData, setPendingAnalysisData] = useState<any>(null);
@@ -81,12 +83,8 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
     if (!companyId) return;
 
     try {
+      setIsAnalyzing(true);
       console.log('Starting document analysis:', { documentUrl, companyId, violationId });
-      
-      toast({
-        title: "Analyse en cours...",
-        description: "Extraction des informations du document en cours."
-      });
 
       const { data, error } = await supabase.functions.invoke('analyze-violation-simple', {
         body: {
@@ -146,6 +144,8 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
         description: "Impossible d'analyser l'image automatiquement. Détails: " + (error as Error).message,
         variant: "destructive"
       });
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
@@ -355,7 +355,7 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
                 type="button"
                 variant="outline"
                 onClick={handleTakePhoto}
-                disabled={isUploading}
+                disabled={isUploading || isAnalyzing}
                 className="flex-1"
               >
                 <Camera className="h-4 w-4 mr-2" />
@@ -368,14 +368,14 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
                   type="file"
                   accept="image/*,application/pdf"
                   onChange={handleInputFileChange}
-                  disabled={isUploading}
+                  disabled={isUploading || isAnalyzing}
                   className="hidden"
                 />
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => document.getElementById('document-upload')?.click()}
-                  disabled={isUploading}
+                  disabled={isUploading || isAnalyzing}
                   className="w-full"
                 >
                   <Upload className="h-4 w-4 mr-2" />
@@ -427,12 +427,18 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
           </div>
         )}
         
-        {isUploading && (
+        {(isUploading || isAnalyzing) && (
           <div className="text-sm text-muted-foreground">
-            Upload en cours...
+            {isAnalyzing ? 'Analyse IA en cours...' : 'Upload en cours...'}
           </div>
         )}
       </div>
+
+      <AIAnalysisModal 
+        open={isAnalyzing}
+        title="Analyse de la contravention en cours"
+        description="Extraction des informations de la photo..."
+      />
     </>
   );
 };
