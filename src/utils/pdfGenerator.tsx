@@ -171,13 +171,13 @@ export const generateDenunciationPDF = async (
     const client = violationData.reservation?.clients;
     if (client) {
       // Permis de conduire recto
-      if (client.driving_license_front_url) {
-        await addImageToPdf(client.driving_license_front_url, 'Permis de conduire - Recto');
+      if (client.driver_license_front_url) {
+        await addImageToPdf(client.driver_license_front_url, 'Permis de conduire - Recto');
       }
       
       // Permis de conduire verso
-      if (client.driving_license_back_url) {
-        await addImageToPdf(client.driving_license_back_url, 'Permis de conduire - Verso');
+      if (client.driver_license_back_url) {
+        await addImageToPdf(client.driver_license_back_url, 'Permis de conduire - Verso');
       }
     }
 

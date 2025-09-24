@@ -291,8 +291,8 @@ export const fleetViolationsService = {
           prefecture,
           date_of_birth,
           place_of_birth,
-          driving_license_front_url,
-          driving_license_back_url
+          driver_license_front_url,
+          driver_license_back_url
         )
       `)
       .eq('fleet_vehicle_id', violation.fleet_vehicle_id)
