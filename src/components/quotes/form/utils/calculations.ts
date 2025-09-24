@@ -1,4 +1,5 @@
 
+import { safeNumber } from '@/lib/utils';
 import { QuoteRepairItem, QuotePartItem, QuoteDiscountItem, GlobalTotals } from '../types';
 
 // Fonction utilitaire pour calculer le total d'une ligne (réparation ou pièce)
@@ -8,10 +9,15 @@ export const calculateLineTotal = (
   discount: number = 0,
   vat: number = 0
 ): number => {
-  const subtotal = Math.round((quantity * unitCost) * 100) / 100;
-  const discountAmount = Math.round((subtotal * (discount / 100)) * 100) / 100;
+  const safeQuantity = safeNumber(quantity);
+  const safeUnitCost = safeNumber(unitCost);
+  const safeDiscount = safeNumber(discount);
+  const safeVat = safeNumber(vat);
+  
+  const subtotal = Math.round((safeQuantity * safeUnitCost) * 100) / 100;
+  const discountAmount = Math.round((subtotal * (safeDiscount / 100)) * 100) / 100;
   const afterDiscount = Math.round((subtotal - discountAmount) * 100) / 100;
-  const vatAmount = Math.round((afterDiscount * (vat / 100)) * 100) / 100;
+  const vatAmount = Math.round((afterDiscount * (safeVat / 100)) * 100) / 100;
   return Math.round((afterDiscount + vatAmount) * 100) / 100;
 };
 
@@ -21,10 +27,10 @@ export const calculateGlobalTotals = (
   discounts: QuoteDiscountItem[]
 ): GlobalTotals => {
   const repairTotals = repairs.reduce((acc, repair) => {
-    const subtotal = Math.round((repair.quantity * repair.unitCost) * 100) / 100;
-    const discountAmount = Math.round((subtotal * (repair.discount / 100)) * 100) / 100;
+    const subtotal = Math.round((safeNumber(repair.quantity) * safeNumber(repair.unitCost)) * 100) / 100;
+    const discountAmount = Math.round((subtotal * (safeNumber(repair.discount) / 100)) * 100) / 100;
     const afterDiscount = Math.round((subtotal - discountAmount) * 100) / 100;
-    const vatAmount = Math.round((afterDiscount * (repair.vat / 100)) * 100) / 100;
+    const vatAmount = Math.round((afterDiscount * (safeNumber(repair.vat) / 100)) * 100) / 100;
     const lineTotal = Math.round((afterDiscount + vatAmount) * 100) / 100;
     
     return {
@@ -36,10 +42,10 @@ export const calculateGlobalTotals = (
   }, { subTotal: 0, totalVat: 0, totalDiscount: 0, total: 0 });
 
   const partTotals = parts.reduce((acc, part) => {
-    const subtotal = Math.round((part.quantity * part.unitCost) * 100) / 100;
-    const discountAmount = Math.round((subtotal * (part.discount / 100)) * 100) / 100;
+    const subtotal = Math.round((safeNumber(part.quantity) * safeNumber(part.unitCost)) * 100) / 100;
+    const discountAmount = Math.round((subtotal * (safeNumber(part.discount) / 100)) * 100) / 100;
     const afterDiscount = Math.round((subtotal - discountAmount) * 100) / 100;
-    const vatAmount = Math.round((afterDiscount * (part.vat / 100)) * 100) / 100;
+    const vatAmount = Math.round((afterDiscount * (safeNumber(part.vat) / 100)) * 100) / 100;
     const lineTotal = Math.round((afterDiscount + vatAmount) * 100) / 100;
     
     return {

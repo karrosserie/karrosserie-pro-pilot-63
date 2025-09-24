@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
+import { safeNumber } from '@/lib/utils';
 
 export type Quote = Database['public']['Tables']['quotes']['Row'] & {
   clients?: {
@@ -311,6 +312,14 @@ export const quotesService = {
     if (expertiseReport.repairs_data) {
       try {
         repairs = JSON.parse(expertiseReport.repairs_data);
+        // Normaliser les valeurs numériques
+        repairs = repairs.map(repair => ({
+          ...repair,
+          quantity: safeNumber(repair.quantity),
+          unitCost: safeNumber(repair.unitCost),
+          discount: safeNumber(repair.discount),
+          vat: safeNumber(repair.vat || 20)
+        }));
       } catch (error) {
         console.error('Error parsing repairs_data:', error);
         repairs = [];
@@ -321,6 +330,14 @@ export const quotesService = {
     if (expertiseReport.parts_data) {
       try {
         parts = JSON.parse(expertiseReport.parts_data);
+        // Normaliser les valeurs numériques
+        parts = parts.map(part => ({
+          ...part,
+          quantity: safeNumber(part.quantity),
+          unitCost: safeNumber(part.unitCost),
+          discount: safeNumber(part.discount),
+          vat: safeNumber(part.vat || 20)
+        }));
       } catch (error) {
         console.error('Error parsing parts_data:', error);
         parts = [];
@@ -334,8 +351,8 @@ export const quotesService = {
       amount: expertiseReport.amount || 0,
       status: 'draft',
       notes: '',
-      repairs_data: expertiseReport.repairs_data || null,
-      parts_data: expertiseReport.parts_data || null,
+      repairs_data: repairs.length > 0 ? JSON.stringify(repairs) : null,
+      parts_data: parts.length > 0 ? JSON.stringify(parts) : null,
       claim_number: expertiseReport.claim_number || '',
       report_number: expertiseReport.report_number || '',
       policy_number: expertiseReport.policy_number || '',

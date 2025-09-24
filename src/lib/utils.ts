@@ -21,3 +21,21 @@ export function formatNumber(number: number | null | undefined, decimals: number
     maximumFractionDigits: decimals
   }).format(number);
 }
+
+export function safeNumber(value: any): number {
+  if (value === null || value === undefined || value === '') return 0;
+  
+  // Si c'est déjà un nombre, le retourner
+  if (typeof value === 'number') return isNaN(value) ? 0 : value;
+  
+  // Si c'est une chaîne, normaliser les virgules en points
+  if (typeof value === 'string') {
+    const normalized = value.replace(',', '.');
+    const parsed = parseFloat(normalized);
+    return isNaN(parsed) ? 0 : parsed;
+  }
+  
+  // Pour tout autre type, essayer de convertir
+  const parsed = parseFloat(String(value).replace(',', '.'));
+  return isNaN(parsed) ? 0 : parsed;
+}
