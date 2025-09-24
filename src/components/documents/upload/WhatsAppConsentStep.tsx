@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, MessageCircle, Check } from "lucide-react";
+import { ArrowLeft, MessageCircle, Check, Loader2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 interface WhatsAppConsentStepProps {
@@ -17,12 +17,17 @@ export default function WhatsAppConsentStep({
   onBack
 }: WhatsAppConsentStepProps) {
   const [consent, setConsent] = useState<boolean | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleNext = (e: React.MouseEvent) => {
+  const handleNext = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (consent !== null) {
+    if (consent !== null && !isLoading) {
+      setIsLoading(true);
+      // Petit délai pour que l'utilisateur voie l'animation
+      await new Promise(resolve => setTimeout(resolve, 800));
       onNext(consent);
+      setIsLoading(false);
     }
   };
 
@@ -130,10 +135,17 @@ export default function WhatsAppConsentStep({
         <Button
           type="button"
           onClick={handleNext}
-          disabled={consent === null}
+          disabled={consent === null || isLoading}
           className="w-full bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white disabled:bg-muted disabled:text-muted-foreground"
         >
-          Terminer
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Finalisation...
+            </>
+          ) : (
+            'Terminer'
+          )}
         </Button>
 
         {/* Info Text */}
