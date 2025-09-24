@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { ImageCropperDialog } from './image-cropper/ImageCropperDialog';
+import { DocumentDetectionResult } from './image-cropper/hooks/useDocumentDetection';
 
 interface ImageCropperProps {
   open: boolean;
@@ -9,6 +10,7 @@ interface ImageCropperProps {
   onCropComplete: (croppedImageBlob: Blob) => void;
   aspectRatio?: number;
   allowHorizontalExpansion?: boolean;
+  detectionResult?: DocumentDetectionResult;
 }
 
 export function ImageCropper(props: ImageCropperProps) {

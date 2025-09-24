@@ -2,11 +2,12 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Scan } from 'lucide-react';
 import { ImageCropperControls } from './ImageCropperControls';
 import { ImageCropperCanvas } from './ImageCropperCanvas';
 import { useImageCropper } from './hooks/useImageCropper';
 import { useImageTransformations } from './hooks/useImageTransformations';
+import { DocumentDetectionResult } from './hooks/useDocumentDetection';
 
 interface ImageCropperDialogProps {
   open: boolean;
@@ -15,6 +16,7 @@ interface ImageCropperDialogProps {
   onCropComplete: (croppedImageBlob: Blob) => void;
   aspectRatio?: number;
   allowHorizontalExpansion?: boolean;
+  detectionResult?: DocumentDetectionResult;
 }
 
 export const ImageCropperDialog: React.FC<ImageCropperDialogProps> = ({
@@ -23,7 +25,8 @@ export const ImageCropperDialog: React.FC<ImageCropperDialogProps> = ({
   imageUrl,
   onCropComplete,
   aspectRatio,
-  allowHorizontalExpansion = false
+  allowHorizontalExpansion = false,
+  detectionResult
 }) => {
   const {
     crop,
@@ -74,14 +77,29 @@ export const ImageCropperDialog: React.FC<ImageCropperDialogProps> = ({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-5xl">
         <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <DialogTitle>Recadrer l'image</DialogTitle>
+          <div className="flex items-center gap-2">
+            <DialogTitle>Recadrer l'image</DialogTitle>
+            {detectionResult && (
+              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                <Scan className="h-4 w-4" />
+                <span>
+                  Détection auto: {Math.round(detectionResult.confidence * 100)}%
+                  {detectionResult.rotation !== 0 && (
+                    <span className="ml-1">
+                      (rotation: {Math.round(detectionResult.rotation)}°)
+                    </span>
+                  )}
+                </span>
+              </div>
+            )}
+          </div>
           <div className="flex gap-2">
             <Button type="button" variant="outline" onClick={handleCancel}>
               Annuler
             </Button>
-            <Button 
+            <Button
               type="button"
-              onClick={handleApply} 
+              onClick={handleApply}
               disabled={isLoading}
               className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
             >

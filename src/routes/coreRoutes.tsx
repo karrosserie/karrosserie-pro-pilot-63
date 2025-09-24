@@ -16,6 +16,7 @@ import Messageries from "@/pages/Messageries";
 import PresencePointages from "@/pages/PresencePointages";
 import CreationDossierJudiciaire from "@/pages/CreationDossierJudiciaire";
 import DepotDossier from "@/pages/DepotDossier";
+import DocumentScannerTest from "@/pages/DocumentScannerTest";
 
 import GestionTemplates from "@/pages/GestionTemplates";
 
@@ -186,6 +187,16 @@ export const coreRoutes = [
       <ProtectedRoute>
         <AppLayout>
           <GestionTemplates />
+        </AppLayout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/document-scanner-test",
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <DocumentScannerTest />
         </AppLayout>
       </ProtectedRoute>
     )

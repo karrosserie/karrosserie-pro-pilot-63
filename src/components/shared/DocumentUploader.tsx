@@ -8,6 +8,7 @@ import { DocumentDisplay } from './document-uploader/DocumentDisplay';
 import { DocumentUploadLoading } from './document-uploader/DocumentUploadLoading';
 import { DocumentAnalysisLoading } from './document-uploader/DocumentAnalysisLoading';
 import { DocumentEmptyState } from './document-uploader/DocumentEmptyState';
+import { DocumentDetectionLoading } from './document-uploader/DocumentDetectionLoading';
 
 interface DocumentUploaderProps {
   documentType: string;
@@ -45,6 +46,9 @@ export function DocumentUploader({
     imageToProcess,
     cropDialogOpen,
     isDriverLicense,
+    isAutoDetectionEnabled,
+    isProcessingDocument,
+    isDetecting,
     handleFileUpload,
     handleCropComplete,
     handleCropCancel
@@ -61,6 +65,10 @@ export function DocumentUploader({
 
   if (isAnalyzing) {
     return <DocumentAnalysisLoading />;
+  }
+
+  if (isProcessingDocument || isDetecting) {
+    return <DocumentDetectionLoading />;
   }
   
   if (currentDocumentUrl) {
@@ -97,6 +105,7 @@ export function DocumentUploader({
           onCropComplete={handleCropComplete}
           aspectRatio={4 / 3}
           allowHorizontalExpansion={isDriverLicense}
+          detectionResult={imageToProcess.detectionResult}
         />
       )}
     </>

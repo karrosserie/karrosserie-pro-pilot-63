@@ -194,6 +194,7 @@ export default function DocumentUploadStep({
             onCropComplete={handleCropComplete}
             aspectRatio={4 / 3}
             allowHorizontalExpansion={isDriverLicense}
+            detectionResult={imageToProcess.detectionResult}
           />
         )}
       </div>
