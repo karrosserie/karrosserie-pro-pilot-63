@@ -68,7 +68,7 @@ export const DenunciationDialog: React.FC<DenunciationDialogProps> = ({
       
       toast({
         title: "Dossier de dénonciation généré",
-        description: "Le dossier complet (courrier, attestation de prêt et photo) a été téléchargé avec succès. Une facture de 15€ TTC sera créée."
+        description: "Le dossier complet (courrier, attestation de prêt et photo) a été téléchargé en un seul PDF. Une facture de 15€ TTC sera créée."
       });
       
       onOpenChange(false);
@@ -306,7 +306,7 @@ export const DenunciationDialog: React.FC<DenunciationDialogProps> = ({
           {/* Actions */}
           <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 space-x-0 sm:space-x-4 pt-4 border-t">
             <div className="text-sm text-muted-foreground">
-              📦 Un dossier complet sera téléchargé avec le courrier, l'attestation de prêt et la photo de la contravention • 💰 Une facture de 15€ TTC sera automatiquement créée pour le client
+              📄 Un PDF complet sera téléchargé avec le courrier, l'attestation de prêt et la photo de la contravention • 💰 Une facture de 15€ TTC sera automatiquement créée pour le client
             </div>
             <div className="flex space-x-3">
               <Button variant="outline" onClick={() => onOpenChange(false)}>
@@ -325,7 +325,7 @@ export const DenunciationDialog: React.FC<DenunciationDialogProps> = ({
                 ) : (
                   <>
                     <Download className="h-4 w-4 mr-2" />
-                    Télécharger le dossier complet
+                    Télécharger le dossier PDF complet
                   </>
                 )}
               </Button>
