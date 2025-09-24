@@ -133,12 +133,17 @@ export default function DocumentUploadStep({
             <label htmlFor="camera-input">
               <Button
                 type="button"
-                className="w-full bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
+                variant={selectedFile ? "ghost" : "default"}
+                className={`w-full ${
+                  selectedFile 
+                    ? "text-muted-foreground hover:text-foreground hover:bg-muted/50" 
+                    : "bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
+                }`}
                 asChild
               >
                 <span className="flex items-center justify-center gap-2 cursor-pointer">
                   <Camera className="w-4 h-4" />
-                  Prendre une photo
+                  {selectedFile ? "Reprendre une photo" : "Prendre une photo"}
                 </span>
               </Button>
             </label>
@@ -156,13 +161,17 @@ export default function DocumentUploadStep({
             <label htmlFor="gallery-input">
               <Button
                 type="button"
-                variant="outline"
-                className="w-full border-karrosserie-orange text-karrosserie-orange hover:bg-karrosserie-orange hover:text-white"
+                variant={selectedFile ? "ghost" : "outline"}
+                className={`w-full ${
+                  selectedFile 
+                    ? "text-muted-foreground hover:text-foreground hover:bg-muted/50" 
+                    : "border-karrosserie-orange text-karrosserie-orange hover:bg-karrosserie-orange hover:text-white"
+                }`}
                 asChild
               >
                 <span className="flex items-center justify-center gap-2 cursor-pointer">
                   <ImageIcon className="w-4 h-4" />
-                  Choisir depuis la galerie
+                  {selectedFile ? "Choisir une autre image" : "Choisir depuis la galerie"}
                 </span>
               </Button>
             </label>
