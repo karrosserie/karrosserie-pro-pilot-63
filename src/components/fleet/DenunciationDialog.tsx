@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import { useCompany } from '@/hooks/use-company';
+import { useAuth } from '@/contexts/AuthContext';
 import SignaturePad from '@/components/shared/SignaturePad';
 import { generateDenunciationPDF } from '@/utils/pdfGenerator';
 
@@ -27,9 +28,14 @@ export const DenunciationDialog: React.FC<DenunciationDialogProps> = ({
 }) => {
   const { toast } = useToast();
   const { companyData } = useCompany();
+  const { profile } = useAuth();
   
   const [signature, setSignature] = useState('');
-  const [signatoryName, setSignatoryName] = useState(companyData?.name || '');
+  const [signatoryName, setSignatoryName] = useState(
+    profile?.first_name && profile?.last_name 
+      ? `${profile.first_name} ${profile.last_name}`
+      : companyData?.name || ''
+  );
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   const handleSignatureChange = (signatureData: string) => {
