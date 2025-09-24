@@ -87,10 +87,10 @@ export const generateDenunciationPDF = async (
     const attestationPages = await combinedPdf.copyPages(attestationPdfDoc, attestationPdfDoc.getPageIndices());
     attestationPages.forEach((page) => combinedPdf.addPage(page));
     
-    // 4. Ajouter la photo de la contravention si disponible
-    if (violationData.violation.document_url) {
+    // 4. Fonction utilitaire pour ajouter une image au PDF
+    const addImageToPdf = async (imageUrl: string, title: string) => {
       try {
-        const response = await fetch(violationData.violation.document_url);
+        const response = await fetch(imageUrl);
         if (response.ok) {
           const imageBlob = await response.blob();
           const imageArrayBuffer = await imageBlob.arrayBuffer();
@@ -137,18 +137,56 @@ export const generateDenunciationPDF = async (
           });
           
           // Ajouter un titre
-          photoPage.drawText('Photo de la contravention', {
+          photoPage.drawText(title, {
             x: 50,
             y: height - 50,
             size: 16,
           });
         }
       } catch (error) {
-        console.warn('Impossible de récupérer ou d\'intégrer la photo de la contravention:', error);
+        console.warn(`Impossible de récupérer ou d'intégrer ${title}:`, error);
+      }
+    };
+
+    // 5. Ajouter les documents du véhicule
+    const vehicle = violationData.reservation?.vehicles;
+    if (vehicle) {
+      // Certificat d'immatriculation recto
+      if (vehicle.registration_front_url) {
+        await addImageToPdf(vehicle.registration_front_url, 'Certificat d\'immatriculation - Recto');
+      }
+      
+      // Certificat d'immatriculation verso
+      if (vehicle.registration_back_url) {
+        await addImageToPdf(vehicle.registration_back_url, 'Certificat d\'immatriculation - Verso');
+      }
+      
+      // Carte d'assurance
+      if (vehicle.insurance_card_url) {
+        await addImageToPdf(vehicle.insurance_card_url, 'Carte d\'assurance');
       }
     }
+
+    // 6. Ajouter les documents du client
+    const client = violationData.reservation?.clients;
+    if (client) {
+      // Permis de conduire recto
+      if (client.driving_license_front_url) {
+        await addImageToPdf(client.driving_license_front_url, 'Permis de conduire - Recto');
+      }
+      
+      // Permis de conduire verso
+      if (client.driving_license_back_url) {
+        await addImageToPdf(client.driving_license_back_url, 'Permis de conduire - Verso');
+      }
+    }
+
+    // 7. Ajouter la photo de la contravention
+    if (violationData.violation.document_url) {
+      await addImageToPdf(violationData.violation.document_url, 'Photo de la contravention');
+    }
     
-    // 5. Générer le PDF final
+    // 8. Générer le PDF final
     const finalPdfBytes = await combinedPdf.save();
     const finalBlob = new Blob([finalPdfBytes], { type: 'application/pdf' });
     
