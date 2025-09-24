@@ -207,9 +207,20 @@ const DenunciationPDF: React.FC<DenunciationPDFProps> = ({
           </Text>
 
           <Text style={styles.paragraph}>
-            Je certifie sur l'honneur l'exactitude des renseignements ci-dessus et joins à ce courrier 
-            une copie du permis de conduire du conducteur désigné.
+            Je certifie sur l'honneur l'exactitude des renseignements ci-dessus et joins à ce courrier :
           </Text>
+          
+          <View style={styles.conductorInfo}>
+            <Text style={styles.paragraph}>
+              • Une copie du permis de conduire du conducteur désigné
+            </Text>
+            <Text style={styles.paragraph}>
+              • L'attestation de prêt signée du véhicule
+            </Text>
+            <Text style={styles.paragraph}>
+              • La photo de la contravention
+            </Text>
+          </View>
         </View>
 
         <View style={styles.signature}>

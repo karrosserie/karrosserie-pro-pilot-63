@@ -61,8 +61,8 @@ export const DenunciationDialog: React.FC<DenunciationDialogProps> = ({
       await generateDenunciationPDF(violationData, companyData, signature, signatoryName);
       
       toast({
-        title: "Dénonciation générée",
-        description: "Le courrier de dénonciation ANTAI a été téléchargé avec succès. Une facture de 15€ TTC sera créée."
+        title: "Dossier de dénonciation généré",
+        description: "Le dossier complet (courrier, attestation de prêt et photo) a été téléchargé avec succès. Une facture de 15€ TTC sera créée."
       });
       
       onOpenChange(false);
@@ -245,9 +245,14 @@ export const DenunciationDialog: React.FC<DenunciationDialogProps> = ({
               </p>
 
               <p>
-                Je certifie sur l'honneur l'exactitude des renseignements ci-dessus et joins à ce courrier 
-                une copie du permis de conduire du conducteur désigné.
+                Je certifie sur l'honneur l'exactitude des renseignements ci-dessus et joins à ce courrier :
               </p>
+              
+              <div className="ml-4 space-y-1">
+                <p>• Une copie du permis de conduire du conducteur désigné</p>
+                <p>• L'attestation de prêt signée du véhicule</p>
+                <p>• La photo de la contravention</p>
+              </div>
 
               <div className="mt-8 text-right">
                 <p>Fait le {format(new Date(), 'dd/MM/yyyy', { locale: fr })}</p>
@@ -295,7 +300,7 @@ export const DenunciationDialog: React.FC<DenunciationDialogProps> = ({
           {/* Actions */}
           <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 space-x-0 sm:space-x-4 pt-4 border-t">
             <div className="text-sm text-muted-foreground">
-              💰 Une facture de 15€ TTC sera automatiquement créée pour le client
+              📦 Un dossier complet sera téléchargé avec le courrier, l'attestation de prêt et la photo de la contravention • 💰 Une facture de 15€ TTC sera automatiquement créée pour le client
             </div>
             <div className="flex space-x-3">
               <Button variant="outline" onClick={() => onOpenChange(false)}>
@@ -314,7 +319,7 @@ export const DenunciationDialog: React.FC<DenunciationDialogProps> = ({
                 ) : (
                   <>
                     <Download className="h-4 w-4 mr-2" />
-                    Télécharger le PDF
+                    Télécharger le dossier complet
                   </>
                 )}
               </Button>
