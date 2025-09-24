@@ -41,25 +41,11 @@ export function useImageCropping({ documentType, onFileUpload }: UseImageCroppin
               const detectionResult = await detectDocument(img, documentType);
               console.log('Document detection result:', detectionResult);
 
-              // Si la détection a une bonne confiance, appliquer directement la correction
-              if (detectionResult.success && detectionResult.confidence > 0.7) {
-                console.log('High confidence detection, applying automatic correction');
-                const correctedBlob = await applyPerspectiveCorrection(img, detectionResult.corners);
-
-                // Créer un nouveau fichier avec l'image corrigée
-                const correctedFile = new File([correctedBlob], file.name, { type: file.type });
-
-                // Upload direct du fichier corrigé
-                setIsProcessingDocument(false);
-                URL.revokeObjectURL(tempUrl);
-                await onFileUpload(correctedFile);
-                return;
-              } else {
-                // Confiance faible, passer au crop manuel avec les coins détectés
-                console.log('Low confidence detection, opening manual crop with detected corners');
-                setImageToProcess({ file, tempUrl, detectionResult });
-                setCropDialogOpen(true);
-              }
+              // Toujours ouvrir le crop manuel avec les résultats de détection
+              // L'utilisateur peut valider ou ajuster le recadrage détecté automatiquement
+              console.log('Document detection completed, opening crop with detected corners for user validation');
+              setImageToProcess({ file, tempUrl, detectionResult });
+              setCropDialogOpen(true);
             } catch (error) {
               console.error('Error during document detection:', error);
               // En cas d'erreur, passer au crop manuel normal

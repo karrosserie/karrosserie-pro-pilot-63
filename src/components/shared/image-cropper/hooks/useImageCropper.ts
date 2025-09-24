@@ -1,8 +1,13 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { Crop, PixelCrop } from 'react-image-crop';
+import { DocumentDetectionResult } from './useDocumentDetection';
 
-export const useImageCropper = (imageUrl: string, onCropComplete: (blob: Blob) => void) => {
+export const useImageCropper = (
+  imageUrl: string,
+  onCropComplete: (blob: Blob) => void,
+  detectionResult?: DocumentDetectionResult
+) => {
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
@@ -13,17 +18,48 @@ export const useImageCropper = (imageUrl: string, onCropComplete: (blob: Blob) =
   const onImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
     const { width, height } = e.currentTarget;
     setImageDimensions({ width, height });
-    
-    const initialCrop: Crop = {
-      unit: '%',
-      x: 10,
-      y: 10,
-      width: 80,
-      height: 80,
-    };
-    
+
+    let initialCrop: Crop;
+
+    // Si nous avons des résultats de détection, les utiliser pour positionner le crop
+    if (detectionResult?.corners) {
+      const corners = detectionResult.corners;
+
+      // Calculer les limites du rectangle englobant les coins détectés
+      const minX = Math.min(corners.topLeft.x, corners.bottomLeft.x);
+      const maxX = Math.max(corners.topRight.x, corners.bottomRight.x);
+      const minY = Math.min(corners.topLeft.y, corners.topRight.y);
+      const maxY = Math.max(corners.bottomLeft.y, corners.bottomRight.y);
+
+      // Convertir en pourcentages pour react-image-crop
+      const cropX = (minX / width) * 100;
+      const cropY = (minY / height) * 100;
+      const cropWidth = ((maxX - minX) / width) * 100;
+      const cropHeight = ((maxY - minY) / height) * 100;
+
+      // S'assurer que les valeurs sont dans les limites valides
+      initialCrop = {
+        unit: '%',
+        x: Math.max(0, Math.min(cropX, 95)),
+        y: Math.max(0, Math.min(cropY, 95)),
+        width: Math.max(5, Math.min(cropWidth, 100 - cropX)),
+        height: Math.max(5, Math.min(cropHeight, 100 - cropY)),
+      };
+
+      console.log('Applied auto-detected crop:', initialCrop);
+    } else {
+      // Crop par défaut si pas de détection
+      initialCrop = {
+        unit: '%',
+        x: 10,
+        y: 10,
+        width: 80,
+        height: 80,
+      };
+    }
+
     setCrop(initialCrop);
-  }, []);
+  }, [detectionResult]);
 
   const getCroppedImage = useCallback((zoom: number, rotation: number) => {
     if (!imageRef.current || !completedCrop) return;

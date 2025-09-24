@@ -254,10 +254,11 @@ export default function DocumentScannerTest() {
               <h4 className="font-medium text-sm mb-2">Instructions de test :</h4>
               <ul className="text-sm text-gray-600 space-y-1 list-disc list-inside">
                 <li>Prenez des photos de documents avec différents angles et perspectives</li>
+                <li>La détection automatique positionnera le recadrage - vous devrez valider</li>
+                <li>Vous pouvez ajuster la zone de recadrage avant de valider</li>
                 <li>Testez avec des documents légèrement pliés ou déformés</li>
-                <li>Vérifiez que la détection automatique redresse et recadre correctement</li>
-                <li>Pour les permis : l'expansion horizontale doit être autorisée</li>
-                <li>Pour les tickets : le contraste doit être amélioré automatiquement</li>
+                <li>Pour les permis : l'expansion horizontale est autorisée</li>
+                <li>Vérifiez que le workflow nécessite toujours votre validation finale</li>
               </ul>
             </div>
           </CardContent>

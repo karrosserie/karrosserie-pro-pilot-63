@@ -39,7 +39,7 @@ export const ImageCropperDialog: React.FC<ImageCropperDialogProps> = ({
     containerRef,
     onImageLoad,
     getCroppedImage
-  } = useImageCropper(imageUrl, onCropComplete);
+  } = useImageCropper(imageUrl, onCropComplete, detectionResult);
 
   const {
     zoom,
@@ -80,13 +80,13 @@ export const ImageCropperDialog: React.FC<ImageCropperDialogProps> = ({
           <div className="flex items-center gap-2">
             <DialogTitle>Recadrer l'image</DialogTitle>
             {detectionResult && (
-              <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                <Scan className="h-4 w-4" />
-                <span>
-                  Détection auto: {Math.round(detectionResult.confidence * 100)}%
+              <div className="flex items-center gap-1 text-sm">
+                <Scan className="h-4 w-4 text-blue-600" />
+                <span className="text-blue-700 font-medium">
+                  Zone détectée automatiquement ({Math.round(detectionResult.confidence * 100)}% confiance)
                   {detectionResult.rotation !== 0 && (
-                    <span className="ml-1">
-                      (rotation: {Math.round(detectionResult.rotation)}°)
+                    <span className="ml-1 text-blue-600">
+                      • Rotation: {Math.round(detectionResult.rotation)}°
                     </span>
                   )}
                 </span>
@@ -135,6 +135,23 @@ export const ImageCropperDialog: React.FC<ImageCropperDialogProps> = ({
           onCropComplete={setCompletedCrop}
           onImageLoad={onImageLoad}
         />
+
+        {detectionResult && (
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-start gap-2">
+              <Scan className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div className="text-sm">
+                <p className="text-blue-900 font-medium mb-1">
+                  Détection automatique appliquée
+                </p>
+                <p className="text-blue-700">
+                  Les contours du document ont été détectés automatiquement.
+                  Vous pouvez ajuster la zone de recadrage si nécessaire ou cliquer sur "Appliquer" pour valider.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
