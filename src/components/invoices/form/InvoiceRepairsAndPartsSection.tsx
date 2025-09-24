@@ -3,8 +3,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Combobox } from '@/components/ui/combobox';
 import { Wrench, Settings, Plus, Trash } from 'lucide-react';
 import { InvoiceRepairItem, InvoicePartItem } from './types';
+import { REPAIR_DESIGNATIONS, PART_DESIGNATIONS } from '@/constants/predefined-values';
 
 interface InvoiceRepairsAndPartsSectionProps {
   repairs: InvoiceRepairItem[];
@@ -187,11 +189,12 @@ export const InvoiceRepairsAndPartsSection = ({
               {/* Repair items */}
               {repairsToShow.map((repair) => (
                 <div key={repair.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
-                  <Input
+                  <Combobox
                     value={repair.description}
-                    onChange={(e) => updateRepair(repair.id, 'description', e.target.value)}
+                    onChange={(value) => updateRepair(repair.id, 'description', value)}
+                    options={REPAIR_DESIGNATIONS}
                     placeholder="Désignation de la réparation"
-                    readOnly={isReadOnly}
+                    disabled={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
                   <Input
@@ -293,11 +296,12 @@ export const InvoiceRepairsAndPartsSection = ({
               {/* Part items */}
               {partsToShow.map((part) => (
                 <div key={part.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
-                  <Input
+                  <Combobox
                     value={part.description}
-                    onChange={(e) => updatePart(part.id, 'description', e.target.value)}
+                    onChange={(value) => updatePart(part.id, 'description', value)}
+                    options={PART_DESIGNATIONS}
                     placeholder="Désignation de la pièce"
-                    readOnly={isReadOnly}
+                    disabled={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
                   <Input

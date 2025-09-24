@@ -2,8 +2,10 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Combobox } from '@/components/ui/combobox';
 import { Settings, Plus, Trash } from 'lucide-react';
 import { PartItem } from './types';
+import { PART_DESIGNATIONS } from '@/constants/predefined-values';
 
 interface PartsSectionProps {
   parts: PartItem[];
@@ -100,11 +102,12 @@ export const PartsSection = ({ parts, onPartsChange, isReadOnly = false }: Parts
             {/* Part items */}
             {parts.map((part) => (
               <div key={part.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
-                <Input
+                <Combobox
                   value={part.description}
-                  onChange={(e) => updatePart(part.id, 'description', e.target.value)}
+                  onChange={(value) => updatePart(part.id, 'description', value)}
+                  options={PART_DESIGNATIONS}
                   placeholder="Désignation de la pièce"
-                  readOnly={isReadOnly}
+                  disabled={isReadOnly}
                   className={isReadOnly ? 'bg-gray-50' : ''}
                 />
                 <Input

@@ -2,8 +2,10 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Combobox } from '@/components/ui/combobox';
 import { Wrench, Plus, Trash } from 'lucide-react';
 import { RepairItem } from './types';
+import { REPAIR_DESIGNATIONS } from '@/constants/predefined-values';
 
 interface RepairsSectionProps {
   repairs: RepairItem[];
@@ -100,11 +102,12 @@ export const RepairsSection = ({ repairs, onRepairsChange, isReadOnly = false }:
             {/* Repair items */}
             {repairs.map((repair) => (
               <div key={repair.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
-                <Input
+                <Combobox
                   value={repair.description}
-                  onChange={(e) => updateRepair(repair.id, 'description', e.target.value)}
+                  onChange={(value) => updateRepair(repair.id, 'description', value)}
+                  options={REPAIR_DESIGNATIONS}
                   placeholder="Désignation de la réparation"
-                  readOnly={isReadOnly}
+                  disabled={isReadOnly}
                   className={isReadOnly ? 'bg-gray-50' : ''}
                 />
                 <Input
