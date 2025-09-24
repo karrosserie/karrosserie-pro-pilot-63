@@ -10,13 +10,15 @@ interface ClientFormProps {
   defaultValues?: any;
   isViewMode?: boolean;
   onCancel: () => void;
+  onFormChange?: () => void;
 }
 
 const ClientForm: React.FC<ClientFormProps> = ({
   onSubmit,
   defaultValues = {},
   isViewMode = false,
-  onCancel
+  onCancel,
+  onFormChange
 }) => {
   const { error } = useNotification();
   const [phoneIsValid, setPhoneIsValid] = useState(true);
@@ -37,10 +39,12 @@ const ClientForm: React.FC<ClientFormProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    onFormChange?.();
   };
 
   const handlePhoneChange = (value: string | undefined) => {
     setFormData(prev => ({ ...prev, phone: value || '' }));
+    onFormChange?.();
   };
 
   const handlePhoneValidationChange = (isValid: boolean) => {
@@ -49,22 +53,27 @@ const ClientForm: React.FC<ClientFormProps> = ({
 
   const handleDriverLicenseFrontUpload = (url: string) => {
     setFormData(prev => ({ ...prev, driverLicenseFrontUrl: url }));
+    onFormChange?.();
   };
 
   const handleDriverLicenseBackUpload = (url: string) => {
     setFormData(prev => ({ ...prev, driverLicenseBackUrl: url }));
+    onFormChange?.();
   };
 
   const handleDriverLicenseFrontDelete = () => {
     setFormData(prev => ({ ...prev, driverLicenseFrontUrl: '' }));
+    onFormChange?.();
   };
 
   const handleDriverLicenseBackDelete = () => {
     setFormData(prev => ({ ...prev, driverLicenseBackUrl: '' }));
+    onFormChange?.();
   };
 
   const handleAutoRelancesToggle = (checked: boolean) => {
     setFormData(prev => ({ ...prev, autoRelancesDisabled: !checked }));
+    onFormChange?.();
   };
 
   const validateForm = () => {

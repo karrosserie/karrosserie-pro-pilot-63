@@ -3,9 +3,11 @@ import React from 'react';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { useFormDialog } from '@/hooks/use-form-dialog';
 import FleetLoanForm, { LoanFormData } from './FleetLoanForm';
 import FleetReturnForm from './FleetReturnForm';
 import { FleetReturnFormData } from './FleetReturnForm.types';
@@ -30,6 +32,10 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
   onSubmit
 }) => {
   const { reservation } = useFleetReservation(loanId || undefined);
+  const { handleOpenChange } = useFormDialog({ 
+    hasUnsavedChanges: mode === 'create' || mode === 'edit' || mode === 'return',
+    onOpenChange: onClose 
+  });
 
   const handleLoanSubmit = (loanData: LoanFormData) => {
     onSubmit(loanData);
@@ -83,7 +89,7 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={mode === 'view' || mode === 'view_return' ? onClose : handleOpenChange}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{getTitle()}</DialogTitle>

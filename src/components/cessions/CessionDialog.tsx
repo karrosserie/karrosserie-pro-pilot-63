@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useFormDialog } from '@/hooks/use-form-dialog';
 import { CessionForm } from './CessionForm';
 import { Cession } from '@/services/supabase/cessions';
 
@@ -25,12 +26,17 @@ export const CessionDialog = ({
   onSubmit,
   isSubmitting = false
 }: CessionDialogProps) => {
+  const { handleOpenChange } = useFormDialog({ 
+    hasUnsavedChanges: true, // Pour les cessions, on protège toujours
+    isSubmitting,
+    onOpenChange 
+  });
   const handleCancel = () => {
     onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>

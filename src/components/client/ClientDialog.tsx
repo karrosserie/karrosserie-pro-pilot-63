@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useFormDialog } from '@/hooks/use-form-dialog';
 import ClientForm from './ClientForm';
 import ClientVehiclesTab from './tabs/ClientVehiclesTab';
 import ClientExpertiseReportsTab from './tabs/ClientExpertiseReportsTab';
@@ -47,6 +48,11 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
   onSubmit,
   mode
 }) => {
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const { handleOpenChange } = useFormDialog({ 
+    hasUnsavedChanges: hasUnsavedChanges && mode !== 'view', 
+    onOpenChange 
+  });
   const { vehicles } = useVehicles();
   const { reports } = useExpertiseReports();
   const { quotes } = useQuotes();
@@ -140,7 +146,7 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
   if (mode === 'view') {
     if (isMobile) {
       return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
           <DialogContent className="w-[95vw] h-[95vh] overflow-hidden p-0 max-w-none">
             <DialogHeader className="px-4 pt-4 pb-2">
               <DialogTitle className="text-lg">{title}</DialogTitle>
@@ -199,7 +205,7 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
     }
 
     return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="max-w-7xl max-h-[90vh] overflow-hidden p-0">
           <DialogHeader className="px-6 pt-6 pb-4">
             <DialogTitle>{title}</DialogTitle>
@@ -224,7 +230,7 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
 
   // Pour les modes create et edit, on garde l'ancien comportement
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className={isMobile ? "w-[95vw] h-[95vh] max-w-none" : "max-w-4xl"}>
         <DialogHeader>
           <DialogTitle className={isMobile ? "text-lg" : ""}>{title}</DialogTitle>
@@ -236,6 +242,7 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
             defaultValues={defaultValues || {}}
             isViewMode={false}
             onCancel={handleCancel}
+            onFormChange={() => setHasUnsavedChanges(true)}
           />
         </div>
       </DialogContent>

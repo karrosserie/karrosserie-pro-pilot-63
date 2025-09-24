@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useFormDialog } from '@/hooks/use-form-dialog';
 import VehicleForm from './VehicleForm';
 
 interface VehicleDialogProps {
@@ -28,6 +29,10 @@ const VehicleDialog: React.FC<VehicleDialogProps> = ({
   onSubmit,
   mode
 }) => {
+  const { handleOpenChange: handleDialogOpenChange } = useFormDialog({ 
+    hasUnsavedChanges: mode === 'create' || mode === 'edit',
+    onOpenChange 
+  });
   const handleCancel = () => {
     onOpenChange(false);
   };
@@ -38,7 +43,7 @@ const VehicleDialog: React.FC<VehicleDialogProps> = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={mode === 'view' ? onOpenChange : handleDialogOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
