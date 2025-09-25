@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, Download, Printer, Mail, Signature, FileCheck, ArrowRight } from 'lucide-react';
+import { MoreVertical, Download, Printer, Mail, Signature, FileCheck, ArrowRight, Send } from 'lucide-react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 
 interface RepairOrderActionsDropdownProps {
@@ -18,6 +18,7 @@ interface RepairOrderActionsDropdownProps {
     onPrint: (order: RepairOrder) => void;
     onSendEmail: (order: RepairOrder) => void;
     onSignOrder?: (order: RepairOrder) => void;
+    onSendForOodriveSignature?: (order: RepairOrder) => void;
     onRequestDocuments?: (order: RepairOrder) => void;
     onConvertToInvoice?: (order: RepairOrder) => void;
   };
@@ -25,6 +26,9 @@ interface RepairOrderActionsDropdownProps {
 
 export const RepairOrderActionsDropdown = ({ order, contextMenuProps }: RepairOrderActionsDropdownProps) => {
   const isAlreadySigned = order.status === 'Signé';
+  const hasClientPhone = order.clients?.phone;
+  const isSignatureInProgress = order.oodrive_contract_id && !order.signed_document_url;
+  const isAlreadySignedOodrive = order.signed_document_url;
 
   return (
     <DropdownMenu>
@@ -51,6 +55,24 @@ export const RepairOrderActionsDropdown = ({ order, contextMenuProps }: RepairOr
           <DropdownMenuItem onClick={() => contextMenuProps?.onSignOrder?.(order)}>
             <Signature className="mr-2 h-4 w-4" />
             Signature du client
+          </DropdownMenuItem>
+        )}
+        {hasClientPhone && !isAlreadySignedOodrive && !isSignatureInProgress && (
+          <DropdownMenuItem onClick={() => contextMenuProps?.onSendForOodriveSignature?.(order)}>
+            <Send className="mr-2 h-4 w-4" />
+            Envoyer pour signature
+          </DropdownMenuItem>
+        )}
+        {isSignatureInProgress && (
+          <DropdownMenuItem disabled>
+            <Send className="mr-2 h-4 w-4" />
+            Signature en cours...
+          </DropdownMenuItem>
+        )}
+        {isAlreadySignedOodrive && (
+          <DropdownMenuItem disabled>
+            <FileCheck className="mr-2 h-4 w-4 text-green-600" />
+            Document signé
           </DropdownMenuItem>
         )}
         <DropdownMenuItem onClick={() => contextMenuProps?.onRequestDocuments?.(order)}>

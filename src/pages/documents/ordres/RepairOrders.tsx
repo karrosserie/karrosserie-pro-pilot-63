@@ -47,8 +47,8 @@ const RepairOrders = () => {
   const [showArchived, setShowArchived] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  
-  const { orders, isLoading, error, deleteOrder, archiveOrder, restoreOrder } = useRepairOrders();
+
+  const { orders, isLoading, error, deleteOrder, archiveOrder, restoreOrder, updateOrder } = useRepairOrders();
   
   const filteredOrders = orders?.filter(order => {
     const searchLower = searchTerm.toLowerCase();
@@ -103,6 +103,88 @@ const RepairOrders = () => {
       }
     }
   }, [orders, searchParams, setSearchParams]);
+
+  // Vérifier le statut de signature des ordres de réparation en attente
+  useEffect(() => {
+    console.log('=== DEBUT DE LA VERIFICATION DES SIGNATURES REPAIR ORDERS ===');
+    console.log('Orders reçus:', orders);
+
+    const checkRepairOrderSignatureStatus = async () => {
+      if (!orders) {
+        console.log('Pas d\'ordres disponibles');
+        return;
+      }
+
+      console.log('Nombre total d\'ordres:', orders.length);
+
+      const ordersWithSignaturePending = orders.filter(
+        order => order.oodrive_contract_id &&
+                 order.document_url &&
+                 !order.signed_document_url
+      );
+
+      console.log('Ordres avec signature en attente trouvés:', ordersWithSignaturePending.length);
+      console.log('Détails des ordres avec signature en attente:', ordersWithSignaturePending.map(o => ({
+        id: o.id,
+        reference: o.reference,
+        oodrive_contract_id: o.oodrive_contract_id
+      })));
+
+      for (const order of ordersWithSignaturePending) {
+        try {
+          console.log(`=== APPEL API POUR ORDRE DE REPARATION ${order.id} ===`);
+          console.log(`Contract ID: ${order.oodrive_contract_id}`);
+
+          const url = `https://n8n.karrosserie.pro/webhook/e6854e25-9a51-4362-b9d2-9a18af911863?contractId=${order.oodrive_contract_id}`;
+          console.log('URL de l\'appel API:', url);
+
+          const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
+
+          console.log('Réponse API statut:', response.status);
+
+          if (response.ok) {
+            const data = await response.json();
+            console.log('Données reçues de l\'API pour repair order:', data);
+
+            // Vérifier si l'entrée unique (client) a signature_status = 'SIGNED'
+            if (Array.isArray(data) && data.length === 1) {
+              const isSigned = data[0].signature_status === 'SIGNED';
+              console.log('La signature est-elle complète?', isSigned);
+
+              if (isSigned) {
+                console.log('Mise à jour du statut de l\'ordre de réparation avec document signé');
+
+                // Pour les ordres de réparation, on met à jour signed_document_url avec l'URL du document signé
+                // L'API devrait retourner l'URL du document signé dans la réponse
+                const signedDocumentUrl = data[0].signed_document_url || order.document_url;
+
+                await updateOrder.mutateAsync({
+                  id: order.id,
+                  data: {
+                    signed_document_url: signedDocumentUrl,
+                    status: 'Signé' // Mettre à jour le statut aussi
+                  }
+                });
+              }
+            } else {
+              console.log('Format de données inattendu pour repair order:', data);
+            }
+          } else {
+            console.error('Erreur API:', response.status, await response.text());
+          }
+        } catch (error) {
+          console.error(`Erreur lors de la vérification du statut pour l'ordre de réparation ${order.id}:`, error);
+        }
+      }
+    };
+
+    checkRepairOrderSignatureStatus();
+  }, [orders, updateOrder]);
 
   const handleCreateOrder = () => {
     setSelectedOrder(null);
@@ -173,6 +255,80 @@ const RepairOrders = () => {
   const handleSignOrder = (order: RepairOrder) => {
     setSelectedOrderForSignature(order);
     setSignatureDialogOpen(true);
+  };
+
+  const handleSendForOodriveSignature = async (order: RepairOrder) => {
+    try {
+      // Vérifier que le client a un numéro de téléphone
+      if (!order.clients?.phone) {
+        toast({
+          title: "Numéro de téléphone manquant",
+          description: "Le client doit avoir un numéro de téléphone pour recevoir la signature électronique.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      toast({
+        title: "Préparation de la signature",
+        description: "Génération du document en cours..."
+      });
+
+      // Importer les services nécessaires
+      const { generateRepairOrderSignaturePDF } = await import('@/services/pdf/repairOrderSignaturePDFService');
+      const { sendRepairOrderForSignature } = await import('@/services/api/repairOrderSignatureService');
+      const { companyService } = await import('@/services/supabase/company');
+      const { clientsService } = await import('@/services/supabase/clients');
+      const { repairOrdersService } = await import('@/services/supabase/repair-orders');
+
+      // Récupérer les données de la société
+      const companyData = await companyService.getCurrentCompany();
+      if (!companyData) {
+        throw new Error('Données de l\'entreprise non trouvées');
+      }
+
+      // Récupérer les données complètes du client
+      const clientData = await clientsService.getById(order.client_id);
+      if (!clientData) {
+        throw new Error('Données du client non trouvées');
+      }
+
+      // Générer le PDF avec la mention [Signature1/]
+      const documentUrl = await generateRepairOrderSignaturePDF(order, companyData, clientData);
+
+      // Envoyer pour signature via Oodrive
+      const signatureResponse = await sendRepairOrderForSignature(
+        order.id,
+        documentUrl,
+        clientData
+      );
+
+      // Mettre à jour l'ordre de réparation avec l'ID du contrat Oodrive
+      await repairOrdersService.update(order.id, {
+        oodrive_contract_id: signatureResponse.contract.contract_id.toString(),
+        document_url: documentUrl
+      });
+
+      // Mettre à jour le client avec l'ID Oodrive si pas encore fait
+      if (!clientData.oodrive_recipient_id && signatureResponse.recipients.length > 0) {
+        await clientsService.update(clientData.id, {
+          oodrive_recipient_id: signatureResponse.recipients[0].id.toString()
+        });
+      }
+
+      toast({
+        title: "Document envoyé pour signature",
+        description: `L'ordre de réparation ${order.reference} a été envoyé au client pour signature électronique.`
+      });
+
+    } catch (error: any) {
+      console.error('Error sending repair order for signature:', error);
+      toast({
+        title: "Erreur",
+        description: `Impossible d'envoyer l'ordre de réparation pour signature: ${error.message}`,
+        variant: "destructive"
+      });
+    }
   };
 
   const handleRequestDocuments = async (order: RepairOrder) => {
@@ -384,6 +540,7 @@ const RepairOrders = () => {
                   onPrint: handlePrint,
                   onSendEmail: handleSendEmail,
                   onSignOrder: handleSignOrder,
+                  onSendForOodriveSignature: handleSendForOodriveSignature,
                   onRequestDocuments: handleRequestDocuments,
                   onConvertToInvoice: handleConvertToInvoice
                 }}
@@ -413,6 +570,7 @@ const RepairOrders = () => {
             onPrint: handlePrint,
             onSendEmail: handleSendEmail,
             onSignOrder: handleSignOrder,
+            onSendForOodriveSignature: handleSendForOodriveSignature,
             onRequestDocuments: handleRequestDocuments,
             onConvertToInvoice: handleConvertToInvoice
           }}

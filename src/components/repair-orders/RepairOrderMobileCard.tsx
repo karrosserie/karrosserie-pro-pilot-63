@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Eye, Pencil, Trash, Download, Printer, Mail, Signature, FileCheck, ArrowRight, Calendar, User, Car, Euro } from 'lucide-react';
+import { Eye, Pencil, Trash, Download, Printer, Mail, Signature, FileCheck, ArrowRight, Calendar, User, Car, Euro, Send } from 'lucide-react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { calculateOrderAmount, formatAmount } from './utils/orderCalculations';
@@ -15,6 +15,7 @@ interface RepairOrderMobileCardProps {
     onPrint: (order: RepairOrder) => void;
     onSendEmail: (order: RepairOrder) => void;
     onSignOrder?: (order: RepairOrder) => void;
+    onSendForOodriveSignature?: (order: RepairOrder) => void;
     onRequestDocuments?: (order: RepairOrder) => void;
     onConvertToInvoice?: (order: RepairOrder) => void;
   };
@@ -27,6 +28,9 @@ const RepairOrderMobileCard: React.FC<RepairOrderMobileCardProps> = ({
   onDeleteOrder,
   contextMenuProps
 }) => {
+  const hasClientPhone = order.clients?.phone;
+  const isSignatureInProgress = order.oodrive_contract_id && !order.signed_document_url;
+  const isAlreadySignedOodrive = order.signed_document_url;
 
   return (
     <div className="card-container p-4 space-y-3">
@@ -102,6 +106,24 @@ const RepairOrderMobileCard: React.FC<RepairOrderMobileCardProps> = ({
           <Button variant="create" size="sm" onClick={() => contextMenuProps.onSignOrder(order)}>
             <Signature className="h-3 w-3 mr-1" />
             Signer
+          </Button>
+        )}
+        {hasClientPhone && !isAlreadySignedOodrive && !isSignatureInProgress && contextMenuProps?.onSendForOodriveSignature && (
+          <Button variant="create" size="sm" onClick={() => contextMenuProps.onSendForOodriveSignature!(order)}>
+            <Send className="h-3 w-3 mr-1" />
+            Signature électronique
+          </Button>
+        )}
+        {isSignatureInProgress && (
+          <Button variant="create" size="sm" disabled>
+            <Send className="h-3 w-3 mr-1" />
+            En cours...
+          </Button>
+        )}
+        {isAlreadySignedOodrive && (
+          <Button variant="validation" size="sm" disabled>
+            <FileCheck className="h-3 w-3 mr-1 text-green-600" />
+            Signé
           </Button>
         )}
         {contextMenuProps?.onRequestDocuments && (

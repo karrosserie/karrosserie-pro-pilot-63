@@ -18,6 +18,7 @@ interface RepairOrdersTableProps {
     onPrint: (order: RepairOrder) => void;
     onSendEmail: (order: RepairOrder) => void;
     onSignOrder?: (order: RepairOrder) => void;
+    onSendForOodriveSignature?: (order: RepairOrder) => void;
     onRequestDocuments?: (order: RepairOrder) => void;
     onConvertToInvoice?: (order: RepairOrder) => void;
   };

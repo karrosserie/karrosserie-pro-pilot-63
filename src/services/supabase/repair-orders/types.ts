@@ -39,6 +39,8 @@ export type RepairOrder = Database['public']['Tables']['repair_orders']['Row'] &
   expert_name?: string | null;
   incident_date?: string | null;
   personal_items?: string | null;
+  oodrive_contract_id?: string | null;
+  signed_document_url?: string | null;
 };
 
 export type NewRepairOrder = Database['public']['Tables']['repair_orders']['Insert'];

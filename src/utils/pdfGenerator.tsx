@@ -43,6 +43,28 @@ export const generateInvoicePDF = async (
   }
 };
 
+export const generateComponentPDF = async (
+  Component: React.ComponentType<any>,
+  props: any,
+  filename?: string
+) => {
+  try {
+    // Créer le document PDF avec le composant et props fournis
+    const doc = <Component {...props} />;
+
+    const blob = await pdf(doc).toBlob();
+
+    // Convertir le blob en buffer pour l'upload
+    const arrayBuffer = await blob.arrayBuffer();
+    const buffer = new Uint8Array(arrayBuffer);
+
+    return buffer;
+  } catch (error) {
+    console.error('Erreur lors de la génération du PDF générique:', error);
+    throw error;
+  }
+};
+
 export const generateDenunciationPDF = async (
   violationData: any,
   companyData: any,
