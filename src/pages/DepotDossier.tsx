@@ -28,6 +28,7 @@ const DepotDossier = () => {
   const [selectedTribunal, setSelectedTribunal] = useState('marseille');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showRecapModal, setShowRecapModal] = useState(false);
   const [depositResult, setDepositResult] = useState({
     number: 'RIP-2025-001234',
     tribunal: 'TJ Marseille',
@@ -99,7 +100,7 @@ const DepotDossier = () => {
     mode: 'Téléprocédure disponible'
   }];
   const handleProceedToDeposit = () => {
-    setShowConfirmModal(true);
+    setShowRecapModal(true);
   };
   const confirmDeposit = async () => {
     setShowConfirmModal(false);
@@ -405,6 +406,118 @@ const DepotDossier = () => {
           </div>
         </div>
       </div>
+
+      {/* Recap Modal */}
+      <Dialog open={showRecapModal} onOpenChange={setShowRecapModal}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              📋 Récapitulatif de la demande
+            </DialogTitle>
+          </DialogHeader>
+          {selectedCase && (
+            <div className="space-y-6">
+              {/* Parties */}
+              <div className="border-b pb-4">
+                <h3 className="font-semibold text-sm text-slate-700 mb-2">👥 PARTIES</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="font-medium text-slate-600">Demandeur :</p>
+                    <div className="text-slate-800 whitespace-pre-line">{selectedCase.demandeur}</div>
+                  </div>
+                  <div>
+                    <p className="font-medium text-slate-600">Défendeur :</p>
+                    <div className="text-slate-800 whitespace-pre-line">{selectedCase.defendeur}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Montant et demandes */}
+              <div className="border-b pb-4">
+                <h3 className="font-semibold text-sm text-slate-700 mb-2">💰 DEMANDES</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="font-medium text-slate-600">Montant du dossier :</span>
+                    <span className="text-slate-800 font-semibold">{selectedCase.montant_dossier}€</span>
+                  </div>
+                  {selectedCase.demandes && (
+                    <div>
+                      <p className="font-medium text-slate-600">Demandes :</p>
+                      <div className="text-slate-800 whitespace-pre-line">{selectedCase.demandes}</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Intérêts et dépens */}
+              <div className="border-b pb-4">
+                <h3 className="font-semibold text-sm text-slate-700 mb-2">⚖️ COMPLÉMENTS</h3>
+                <div className="space-y-2 text-sm">
+                  {selectedCase.interets && (
+                    <div>
+                      <p className="font-medium text-slate-600">✓ Intérêts demandés</p>
+                      {selectedCase.interets_details && (
+                        <div className="text-slate-700 ml-4">{selectedCase.interets_details}</div>
+                      )}
+                    </div>
+                  )}
+                  {selectedCase.depens && (
+                    <div>
+                      <p className="font-medium text-slate-600">✓ Dépens demandés</p>
+                      {selectedCase.depens_details && (
+                        <div className="text-slate-700 ml-4">{selectedCase.depens_details}</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Références légales */}
+              {selectedCase.references_legales && (
+                <div className="border-b pb-4">
+                  <h3 className="font-semibold text-sm text-slate-700 mb-2">📚 RÉFÉRENCES LÉGALES</h3>
+                  <div className="text-sm text-slate-800 whitespace-pre-line">{selectedCase.references_legales}</div>
+                </div>
+              )}
+
+              {/* Chronologie */}
+              {selectedCase.chronologie && (
+                <div className="border-b pb-4">
+                  <h3 className="font-semibold text-sm text-slate-700 mb-2">📅 CHRONOLOGIE</h3>
+                  <div className="text-sm text-slate-800 whitespace-pre-line max-h-32 overflow-y-auto">{selectedCase.chronologie}</div>
+                </div>
+              )}
+
+              {/* Documents */}
+              <div>
+                <h3 className="font-semibold text-sm text-slate-700 mb-2">📎 PIÈCES JOINTES</h3>
+                <div className="grid grid-cols-1 gap-2">
+                  {documents.map((doc, index) => (
+                    <div key={index} className="flex items-center gap-2 p-2 bg-slate-50 rounded text-sm">
+                      <span className="text-lg">{doc.icon}</span>
+                      <div>
+                        <div className="font-medium text-slate-800">{doc.name}</div>
+                        <div className="text-slate-600 text-xs">{doc.description}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="flex gap-2">
+            <Button variant="outline" onClick={() => setShowRecapModal(false)}>
+              Modifier
+            </Button>
+            <Button onClick={() => {
+              setShowRecapModal(false);
+              setShowConfirmModal(true);
+            }} className="bg-red-600 hover:bg-red-700">
+              Confirmer et procéder au dépôt
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Confirmation Modal */}
       <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
