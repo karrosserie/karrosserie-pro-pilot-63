@@ -1,15 +1,16 @@
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
-import { 
-  Car, 
-  FileText, 
-  Calculator, 
-  Wrench, 
-  Receipt, 
-  CreditCard, 
+import {
+  Car,
+  FileText,
+  Calculator,
+  Wrench,
+  Receipt,
+  CreditCard,
   Banknote,
   ClipboardList,
-  Camera
+  Camera,
+  PaintBucket
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -90,7 +91,8 @@ export const getVehicleSidebarItems = (
   vehicleInvoices: any[],
   vehicleCredits: any[],
   vehicleReceipts: any[],
-  totalPhotos: number = 0
+  totalPhotos: number = 0,
+  paintReportsCount: number = 0
 ): SidebarItem[] => [
   {
     id: 'details',
@@ -115,6 +117,12 @@ export const getVehicleSidebarItems = (
     label: 'Ordres de réparation',
     icon: Wrench,
     count: vehicleOrders.length
+  },
+  {
+    id: 'paint-weighing',
+    label: 'Pesées peinture',
+    icon: PaintBucket,
+    count: paintReportsCount
   },
   {
     id: 'invoices',

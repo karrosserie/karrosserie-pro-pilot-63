@@ -10,6 +10,7 @@ import VehicleForm from './VehicleForm';
 import VehicleExpertiseReportsTab from './tabs/VehicleExpertiseReportsTab';
 import VehicleQuotesTab from './tabs/VehicleQuotesTab';
 import VehicleRepairOrdersTab from './tabs/VehicleRepairOrdersTab';
+import VehiclePaintWeighingTab from './tabs/VehiclePaintWeighingTab';
 import VehicleInvoicesTab from './tabs/VehicleInvoicesTab';
 import VehicleCreditsTab from './tabs/VehicleCreditsTab';
 import VehicleReceiptsTab from './tabs/VehicleReceiptsTab';
@@ -24,6 +25,7 @@ import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { getVehiclePhotos } from '@/utils/vehiclePhotoService';
 import { getTaskPhotosByVehicle } from '@/utils/taskPhotoService';
 import { VehicleImagesTab } from './tabs/VehicleImagesTab';
+import { useVehiclePaintMetrics } from '@/hooks/dashboard/use-vehicle-paint-metrics';
 
 
 interface VehicleDetailsDialogProps {
@@ -51,6 +53,9 @@ const VehicleDetailsDialog: React.FC<VehicleDetailsDialogProps> = ({
   const { invoices } = useInvoices();
   const { credits } = useCredits();
   const { receipts } = useReceiptsData();
+
+  // Hook pour les métriques de peinture du véhicule
+  const { vehiclePaintMetrics } = useVehiclePaintMetrics(defaultValues?.id || null);
   
 
   const handleCancel = () => {
@@ -117,7 +122,8 @@ const VehicleDetailsDialog: React.FC<VehicleDetailsDialogProps> = ({
     vehicleInvoices,
     vehicleCredits,
     vehicleReceipts,
-    totalPhotos
+    totalPhotos,
+    vehiclePaintMetrics?.totalReports || 0
   );
 
   // Fonction pour rendre le contenu selon l'onglet actif
@@ -138,6 +144,8 @@ const VehicleDetailsDialog: React.FC<VehicleDetailsDialogProps> = ({
         return <VehicleQuotesTab vehicleId={defaultValues?.id} />;
       case 'repair-orders':
         return <VehicleRepairOrdersTab vehicleId={defaultValues?.id} />;
+      case 'paint-weighing':
+        return <VehiclePaintWeighingTab vehicleId={defaultValues?.id} />;
       case 'invoices':
         return <VehicleInvoicesTab vehicleId={defaultValues?.id} />;
       case 'credits':
