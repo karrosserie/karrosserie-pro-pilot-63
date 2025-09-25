@@ -1,5 +1,8 @@
 project_id = "jukdsypvuehnniskgpfd"
 
+[functions.download-signed-repair-order]
+verify_jwt = true
+
 [functions.send-payment-reminder-webhook]
 verify_jwt = false
 
