@@ -1,3 +1,5 @@
+import { formatToInternational } from '@/utils/phoneValidation';
+
 interface SignatureData {
   firstname: string;
   lastname: string;
@@ -50,9 +52,9 @@ export const sendRepairOrderForSignature = async (
       fullClientData: clientData
     });
 
-    // Préparer les données du client
+    // Préparer les données du client avec formatage automatique
     const clientPhone = clientData?.phone || '';
-    const formattedClientPhone = clientPhone.startsWith('+33') ? clientPhone : `+33${clientPhone.replace(/^0/, '')}`;
+    const formattedClientPhone = formatToInternational(clientPhone);
 
     // Préparer les données du client avec l'ID Oodrive si disponible
     const clientSignatureData: SignatureData = {

@@ -1,4 +1,6 @@
 
+import { formatToInternational } from '@/utils/phoneValidation';
+
 interface SignatureData {
   firstname: string;
   lastname: string;
@@ -65,12 +67,12 @@ export const sendForSignature = async (
     const companyFirstName = companyWords.length >= 2 ? companyWords[0] : 'Société';
     const companyLastName = companyWords.length >= 2 ? companyWords.slice(1).join(' ') : companyName || '';
 
-    // Préparer les données du client
+    // Préparer les données avec formatage automatique des téléphones
     const clientPhone = clientData?.phone || '';
-    const formattedClientPhone = clientPhone.startsWith('+33') ? clientPhone : `+33${clientPhone.replace(/^0/, '')}`;
-    
+    const formattedClientPhone = formatToInternational(clientPhone);
+
     const companyPhone = companyData?.phone || '';
-    const formattedCompanyPhone = companyPhone.startsWith('+33') ? companyPhone : `+33${companyPhone.replace(/^0/, '')}`;
+    const formattedCompanyPhone = formatToInternational(companyPhone);
 
     // Préparer les données de l'entreprise avec l'ID Oodrive si disponible
     const companySignatureData: SignatureData = {

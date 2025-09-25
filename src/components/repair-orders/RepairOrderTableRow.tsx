@@ -2,10 +2,11 @@ import React from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Pencil, Trash, Download, Printer, Mail, Signature, FileCheck, ArrowRight, RotateCcw } from 'lucide-react';
+import { Eye, Pencil, Trash, Download, Printer, Mail, Signature, FileCheck, ArrowRight, RotateCcw, Send } from 'lucide-react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { RepairOrderActionsDropdown } from './RepairOrderActionsDropdown';
 import { calculateOrderAmount, formatAmount } from './utils/orderCalculations';
+import { isValidFrenchMobilePhone } from '@/utils/phoneValidation';
 
 interface RepairOrderTableRowProps {
   order: RepairOrder;
@@ -25,6 +26,10 @@ interface RepairOrderTableRowProps {
 }
 
 export const RepairOrderTableRow = ({ order, onEditOrder, onDeleteOrder, onRestoreOrder, onViewOrder, contextMenuProps }: RepairOrderTableRowProps) => {
+  const hasValidClientPhone = isValidFrenchMobilePhone(order.clients?.phone);
+  const isSignatureInProgress = order.oodrive_contract_id && !order.signed_document_url;
+  const isAlreadySignedOodrive = order.signed_document_url;
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'En cours':
@@ -110,6 +115,24 @@ export const RepairOrderTableRow = ({ order, onEditOrder, onDeleteOrder, onResto
               <Button variant="create" size="sm" onClick={() => contextMenuProps?.onSignOrder?.(order)}>
                 <Signature className="h-4 w-4 mr-1" />
                 Signature du client
+              </Button>
+            )}
+            {hasValidClientPhone && !isAlreadySignedOodrive && !isSignatureInProgress && contextMenuProps?.onSendForOodriveSignature && (
+              <Button variant="create" size="sm" onClick={() => contextMenuProps.onSendForOodriveSignature!(order)}>
+                <Send className="h-4 w-4 mr-1" />
+                Envoyer pour signature
+              </Button>
+            )}
+            {isSignatureInProgress && (
+              <Button variant="create" size="sm" disabled>
+                <Send className="h-4 w-4 mr-1" />
+                Signature en cours...
+              </Button>
+            )}
+            {isAlreadySignedOodrive && (
+              <Button variant="validation" size="sm" disabled>
+                <FileCheck className="h-4 w-4 mr-1 text-green-600" />
+                Document signé
               </Button>
             )}
             <Button variant="create" size="sm" onClick={() => contextMenuProps?.onRequestDocuments?.(order)} className="hidden">

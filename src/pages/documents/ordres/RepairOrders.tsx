@@ -282,7 +282,7 @@ const RepairOrders = () => {
       const { repairOrdersService } = await import('@/services/supabase/repair-orders');
 
       // Récupérer les données de la société
-      const companyData = await companyService.getCurrentCompany();
+      const companyData = await companyService.getCompanyInfo();
       if (!companyData) {
         throw new Error('Données de l\'entreprise non trouvées');
       }

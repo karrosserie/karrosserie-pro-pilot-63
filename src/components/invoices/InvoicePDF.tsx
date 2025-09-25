@@ -13,6 +13,7 @@ interface InvoicePDFProps {
     signature: string | null;
     clientName: string;
     signatureDate: string | null;
+    isForOodrive?: boolean;
   };
   template?: string;
   documentType?: 'invoice' | 'repair_order' | 'credit' | 'quote';
@@ -371,13 +372,21 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
     }
   };
 
-  const formatAmount = (amount: number) => {
-    return `${amount.toFixed(2).replace('.', ',')} €`;
+  const formatAmount = (amount: number | null | undefined) => {
+    if (amount == null || amount === undefined) {
+      return '0,00 €';
+    }
+    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    if (isNaN(numAmount)) {
+      return '0,00 €';
+    }
+    return `${numAmount.toFixed(2).replace('.', ',')} €`;
   };
 
   // Calculer les montants de paiement
   const totalPaidAmount = receipts.reduce((sum, receipt) => sum + receipt.amount, 0);
-  const remainingAmount = invoice.amount - totalPaidAmount;
+  const invoiceAmount = typeof invoice.amount === 'number' ? invoice.amount : 0;
+  const remainingAmount = invoiceAmount - totalPaidAmount;
 
   if (template === 'alternative') {
     return (
@@ -541,8 +550,22 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
                   </Text>
                 </View>
               ) : (
-                <View style={{ height: 75, width: 150, borderWidth: 1, borderColor: '#ccc', alignItems: 'center', justifyContent: 'center' }}>
-                  <Text style={{ fontSize: 9, color: '#666' }}>Signature en attente</Text>
+                <View style={{ height: 75, width: 150, borderWidth: 1, borderColor: '#ccc', position: 'relative' }}>
+                  {signatureData?.isForOodrive ? (
+                    <Text style={{
+                      fontSize: 9,
+                      color: '#666',
+                      position: 'absolute',
+                      top: 2,
+                      left: 2
+                    }}>
+                      [Signature1/]
+                    </Text>
+                  ) : (
+                    <View style={{ alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                      <Text style={{ fontSize: 9, color: '#666' }}>Signature en attente</Text>
+                    </View>
+                  )}
                 </View>
               )}
             </View>
@@ -813,7 +836,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
                  documentType === 'quote' ? 'Montant total' : 'Montant dû'}
               </Text>
               <Text style={defaultStyles.amountDueValue}>
-                {documentType === 'invoice' ? formatAmount(remainingAmount) : clientData?.amountDue || formatAmount(invoice.amount)}
+                {documentType === 'invoice' ? formatAmount(remainingAmount) : clientData?.amountDue || formatAmount(invoiceAmount)}
               </Text>
             </View>
           </View>
@@ -939,8 +962,22 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
                 </Text>
               </View>
             ) : (
-              <View style={{ height: 75, width: 150, borderWidth: 1, borderColor: '#ccc', alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ fontSize: 9, color: '#666' }}>Signature en attente</Text>
+              <View style={{ height: 75, width: 150, borderWidth: 1, borderColor: '#ccc', position: 'relative' }}>
+                {signatureData?.isForOodrive ? (
+                  <Text style={{
+                    fontSize: 9,
+                    color: '#666',
+                    position: 'absolute',
+                    top: 2,
+                    left: 2
+                  }}>
+                    [Signature1/]
+                  </Text>
+                ) : (
+                  <View style={{ alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                    <Text style={{ fontSize: 9, color: '#666' }}>Signature en attente</Text>
+                  </View>
+                )}
               </View>
             )}
           </View>

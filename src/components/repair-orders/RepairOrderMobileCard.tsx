@@ -4,6 +4,7 @@ import { Eye, Pencil, Trash, Download, Printer, Mail, Signature, FileCheck, Arro
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { calculateOrderAmount, formatAmount } from './utils/orderCalculations';
+import { isValidFrenchMobilePhone } from '@/utils/phoneValidation';
 
 interface RepairOrderMobileCardProps {
   order: RepairOrder;
@@ -28,7 +29,7 @@ const RepairOrderMobileCard: React.FC<RepairOrderMobileCardProps> = ({
   onDeleteOrder,
   contextMenuProps
 }) => {
-  const hasClientPhone = order.clients?.phone;
+  const hasValidClientPhone = isValidFrenchMobilePhone(order.clients?.phone);
   const isSignatureInProgress = order.oodrive_contract_id && !order.signed_document_url;
   const isAlreadySignedOodrive = order.signed_document_url;
 
@@ -108,7 +109,7 @@ const RepairOrderMobileCard: React.FC<RepairOrderMobileCardProps> = ({
             Signer
           </Button>
         )}
-        {hasClientPhone && !isAlreadySignedOodrive && !isSignatureInProgress && contextMenuProps?.onSendForOodriveSignature && (
+        {hasValidClientPhone && !isAlreadySignedOodrive && !isSignatureInProgress && contextMenuProps?.onSendForOodriveSignature && (
           <Button variant="create" size="sm" onClick={() => contextMenuProps.onSendForOodriveSignature!(order)}>
             <Send className="h-3 w-3 mr-1" />
             Signature électronique

@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical, Download, Printer, Mail, Signature, FileCheck, ArrowRight, Send } from 'lucide-react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
+import { isValidFrenchMobilePhone } from '@/utils/phoneValidation';
 
 interface RepairOrderActionsDropdownProps {
   order: RepairOrder;
@@ -26,21 +27,21 @@ interface RepairOrderActionsDropdownProps {
 
 export const RepairOrderActionsDropdown = ({ order, contextMenuProps }: RepairOrderActionsDropdownProps) => {
   const isAlreadySigned = order.status === 'Signé';
-  const hasClientPhone = order.clients?.phone;
+  const hasValidClientPhone = isValidFrenchMobilePhone(order.clients?.phone);
   const isSignatureInProgress = order.oodrive_contract_id && !order.signed_document_url;
   const isAlreadySignedOodrive = order.signed_document_url;
 
   // Debug logs
   console.log('RepairOrder Debug:', {
     orderId: order.id,
-    hasClientPhone,
     clientPhone: order.clients?.phone,
+    hasValidClientPhone,
     isAlreadySignedOodrive,
     isSignatureInProgress,
     oodrive_contract_id: order.oodrive_contract_id,
     signed_document_url: order.signed_document_url,
     hasOodriveSignatureAction: !!contextMenuProps?.onSendForOodriveSignature,
-    shouldShowButton: hasClientPhone && !isAlreadySignedOodrive && !isSignatureInProgress && !!contextMenuProps?.onSendForOodriveSignature
+    shouldShowButton: hasValidClientPhone && !isAlreadySignedOodrive && !isSignatureInProgress && !!contextMenuProps?.onSendForOodriveSignature
   });
 
   return (
@@ -70,7 +71,7 @@ export const RepairOrderActionsDropdown = ({ order, contextMenuProps }: RepairOr
             Signature du client
           </DropdownMenuItem>
         )}
-        {hasClientPhone && !isAlreadySignedOodrive && !isSignatureInProgress && (
+        {hasValidClientPhone && !isAlreadySignedOodrive && !isSignatureInProgress && (
           <DropdownMenuItem onClick={() => contextMenuProps?.onSendForOodriveSignature?.(order)}>
             <Send className="mr-2 h-4 w-4" />
             Envoyer pour signature
