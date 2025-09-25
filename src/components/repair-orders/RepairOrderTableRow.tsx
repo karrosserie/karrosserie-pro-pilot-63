@@ -130,7 +130,11 @@ export const RepairOrderTableRow = ({ order, onEditOrder, onDeleteOrder, onResto
               </Button>
             )}
             {isAlreadySignedOodrive && (
-              <Button variant="validation" size="sm" disabled>
+              <Button
+                variant="validation"
+                size="sm"
+                onClick={() => window.open(order.signed_document_url, '_blank')}
+              >
                 <FileCheck className="h-4 w-4 mr-1 text-green-600" />
                 Document signé
               </Button>
