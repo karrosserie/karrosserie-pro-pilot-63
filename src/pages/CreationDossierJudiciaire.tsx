@@ -125,9 +125,32 @@ const CreationDossierJudiciaire = () => {
           client_id: client.id,
           defendeur: addressParts.join('\n'),
         }));
+
+        // Reset invoice selection if it doesn't belong to the current client
+        if (selectedInvoice && invoices) {
+          const currentInvoice = invoices.find(i => i.id === selectedInvoice);
+          if (currentInvoice && currentInvoice.client_id !== selectedClient) {
+            setSelectedInvoice("");
+          }
+        }
       }
     }
-  }, [selectedClient, clients]);
+  }, [selectedClient, clients, selectedInvoice, invoices]);
+
+  // Auto-select client when invoice is selected
+  useEffect(() => {
+    if (selectedInvoice && invoices && !selectedClient) {
+      const invoice = invoices.find(i => i.id === selectedInvoice);
+      if (invoice && invoice.client_id) {
+        setSelectedClient(invoice.client_id);
+      }
+    }
+  }, [selectedInvoice, invoices, selectedClient]);
+
+  // Filter invoices based on selected client
+  const filteredInvoices = selectedClient && invoices 
+    ? invoices.filter(invoice => invoice.client_id === selectedClient)
+    : invoices;
 
   useEffect(() => {
     if (selectedInvoice && invoices) {
@@ -367,7 +390,7 @@ const CreationDossierJudiciaire = () => {
                     <SelectValue placeholder="Choisir une facture..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {invoices?.map((invoice) => (
+                    {filteredInvoices?.map((invoice) => (
                       <SelectItem key={invoice.id} value={invoice.id}>
                         {invoice.reference} - {invoice.amount}€
                       </SelectItem>
