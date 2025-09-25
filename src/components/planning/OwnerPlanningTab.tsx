@@ -148,6 +148,52 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
         throw error;
       }
 
+      // Webhook général pour toutes les nouvelles tâches
+      try {
+        const webhookData = {
+          id: insertedTask.id,
+          name: newTask.name,
+          date: newTask.date,
+          time: newTask.time,
+          duration: parseFloat(newTask.duration),
+          description: newTask.description,
+          nom: newTask.nom,
+          prenom: newTask.prenom,
+          mail: newTask.mail,
+          telephone: newTask.telephone,
+          company_id: companyId,
+          user_id: user.id,
+          created_at: insertedTask.created_at
+        };
+
+        // Construire l'URL avec les paramètres de requête
+        const generalWebhookUrl = new URL('https://n8n.karrosserie.pro/webhook/4959f96b-a0dd-4de3-b9f2-ab835ac71674');
+        
+        // Ajouter chaque propriété comme paramètre de requête
+        Object.entries(webhookData).forEach(([key, value]) => {
+          if (value !== null && value !== undefined && value !== '') {
+            generalWebhookUrl.searchParams.append(key, String(value));
+          }
+        });
+
+        // Appeler le webhook
+        const generalWebhookResponse = await fetch(generalWebhookUrl.toString(), {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+        if (generalWebhookResponse.ok) {
+          console.log('Webhook général appelé avec succès pour la nouvelle tâche');
+        } else {
+          console.warn('Échec de l\'appel webhook général:', generalWebhookResponse.status);
+        }
+      } catch (webhookError) {
+        console.error('Erreur lors de l\'appel du webhook général:', webhookError);
+        // Ne pas faire échouer la création de la tâche à cause du webhook
+      }
+
       // Vérifier si le nom de la tâche contient "expertise" ou "expert"
       const taskName = newTask.name.toLowerCase();
       if (taskName.includes('expertise') || taskName.includes('expert')) {
