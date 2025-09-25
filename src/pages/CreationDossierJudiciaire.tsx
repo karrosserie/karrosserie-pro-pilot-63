@@ -6,6 +6,9 @@ import { useJudicialCases } from "@/hooks/use-judicial-cases";
 import { useClients } from "@/hooks/use-clients";
 import { useInvoices } from "@/hooks/use-invoices";
 import { useCompany } from "@/hooks/use-company";
+import { useRepairOrders } from "@/hooks/use-repair-orders";
+import { useClientRelances } from "@/hooks/use-client-relances";
+import { useInvoiceRelances } from "@/hooks/use-invoice-relances";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -16,6 +19,8 @@ const CreationDossierJudiciaire = () => {
   const { clients } = useClients();
   const { invoices } = useInvoices();
   const { companyData, isLoading: isCompanyLoading } = useCompany();
+  const { orders: repairOrders } = useRepairOrders();
+  const { relances } = useClientRelances();
 
   const steps = [
     { id: 1, label: "Parties", icon: <Users className="w-5 h-5" />, colorClass: "text-blue-700", bgColorClass: "bg-blue-100" },
@@ -150,7 +155,7 @@ const CreationDossierJudiciaire = () => {
 
   // Auto-import supporting documents when both client and invoice are selected
   useEffect(() => {
-    if (selectedClient && selectedInvoice && clients && invoices) {
+    if (selectedClient && selectedInvoice && clients && invoices && repairOrders && relances) {
       const client = clients.find(c => c.id === selectedClient);
       const invoice = invoices.find(i => i.id === selectedInvoice);
       
@@ -165,16 +170,98 @@ const CreationDossierJudiciaire = () => {
           documentsToImport.push(client.driverLicenseBackUrl);
         }
         
-        // For now, we'll add placeholders for other documents that would typically be associated
-        // In a real implementation, you would fetch these from your document storage system
-        // based on the client_id and invoice_id
+        // Find related repair order for this client and invoice
+        const relatedRepairOrders = repairOrders?.filter(order => 
+          order.client_id === selectedClient && 
+          order.invoices?.some(inv => inv.id === selectedInvoice)
+        ) || [];
         
-        if (documentsToImport.length > 0) {
-          setAttachedFiles(documentsToImport);
+        // Add signed repair order document if available
+        relatedRepairOrders.forEach(order => {
+          if (order.signed_document_url && order.signed_document_url.trim()) {
+            documentsToImport.push(order.signed_document_url);
+          }
+        });
+        
+        // Add work photos from repair orders (assuming they might be in repairs_data or parts_data as JSON)
+        relatedRepairOrders.forEach(order => {
+          // Try to extract photo URLs from JSON data fields
+          if (order.repairs_data) {
+            try {
+              const repairsData = typeof order.repairs_data === 'string' ? 
+                JSON.parse(order.repairs_data) : order.repairs_data;
+              if (Array.isArray(repairsData)) {
+                repairsData.forEach((repair: any) => {
+                  if (repair.photos && Array.isArray(repair.photos)) {
+                    documentsToImport.push(...repair.photos);
+                  }
+                });
+              }
+            } catch (e) {
+              console.log('Could not parse repairs_data for photos');
+            }
+          }
+          if (order.parts_data) {
+            try {
+              const partsData = typeof order.parts_data === 'string' ? 
+                JSON.parse(order.parts_data) : order.parts_data;
+              if (Array.isArray(partsData)) {
+                partsData.forEach((part: any) => {
+                  if (part.photos && Array.isArray(part.photos)) {
+                    documentsToImport.push(...part.photos);
+                  }
+                });
+              }
+            } catch (e) {
+              console.log('Could not parse parts_data for photos');
+            }
+          }
+        });
+        
+        // Find payment reminders for this client and invoice
+        const clientRelances = relances?.filter(relance => 
+          relance.client_id === selectedClient && 
+          relance.invoice_id === selectedInvoice
+        ) || [];
+        
+        // Add reminder documents (if they have attached documents in channel_data)
+        clientRelances.forEach(relance => {
+          if (relance.channel_data && relance.channel_data.document_url) {
+            documentsToImport.push(relance.channel_data.document_url);
+          }
+          // For formal letters (courrier_recommande), add specific document types
+          if (relance.channel === 'courrier_recommande' && relance.channel_data) {
+            if (relance.channel_data.lettre_relance_url) {
+              documentsToImport.push(relance.channel_data.lettre_relance_url);
+            }
+            if (relance.channel_data.lettre_mise_en_demeure_url) {
+              documentsToImport.push(relance.channel_data.lettre_mise_en_demeure_url);
+            }
+            if (relance.channel_data.lettre_tribunal_url) {
+              documentsToImport.push(relance.channel_data.lettre_tribunal_url);
+            }
+          }
+        });
+        
+        // Add placeholders for commonly generated legal documents
+        // These would typically be generated by the system and stored somewhere
+        const commonDocuments = [
+          // These are placeholders - in a real system, you'd fetch these from your document generation service
+          // `/documents/lettres/relance_${invoice.reference}.pdf`,
+          // `/documents/lettres/mise_en_demeure_${invoice.reference}.pdf`,
+          // `/documents/lettres/notification_tribunal_${invoice.reference}.pdf`,
+        ];
+        
+        // Only add existing documents (filter out empty strings and placeholders)
+        const validDocuments = [...documentsToImport, ...commonDocuments]
+          .filter(doc => doc && doc.trim() && !doc.startsWith('/documents/lettres/'));
+        
+        if (validDocuments.length > 0) {
+          setAttachedFiles(validDocuments);
         }
       }
     }
-  }, [selectedClient, selectedInvoice, clients, invoices]);
+  }, [selectedClient, selectedInvoice, clients, invoices, repairOrders, relances]);
 
   const nextStep = () => setStep((s) => Math.min(s + 1, steps.length));
   const prevStep = () => setStep((s) => Math.max(s - 1, 1));
