@@ -111,12 +111,6 @@ export const RepairOrderTableRow = ({ order, onEditOrder, onDeleteOrder, onResto
               <Mail className="h-4 w-4 mr-1" />
               Envoyer
             </Button>
-            {order.status !== 'Signé' && (
-              <Button variant="create" size="sm" onClick={() => contextMenuProps?.onSignOrder?.(order)}>
-                <Signature className="h-4 w-4 mr-1" />
-                Signature du client
-              </Button>
-            )}
             {hasValidClientPhone && !isAlreadySignedOodrive && !isSignatureInProgress && contextMenuProps?.onSendForOodriveSignature && (
               <Button variant="create" size="sm" onClick={() => contextMenuProps.onSendForOodriveSignature!(order)}>
                 <Send className="h-4 w-4 mr-1" />
