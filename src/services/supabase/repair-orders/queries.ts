@@ -12,7 +12,9 @@ export const getRepairOrders = async (): Promise<RepairOrder[]> => {
         id,
         first_name,
         last_name,
-        email
+        email,
+        phone,
+        oodrive_recipient_id
       ),
       vehicles(
         id,

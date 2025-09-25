@@ -1,4 +1,5 @@
-import { generateComponentPDF } from '@/utils/pdfGenerator';
+import React from 'react';
+import { pdf } from '@react-pdf/renderer';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import DefaultRepairOrderSignaturePreview from '@/components/repair-orders/templates/DefaultRepairOrderSignaturePreview';
 import { supabase } from '@/integrations/supabase/client';
@@ -104,19 +105,21 @@ export const generateRepairOrderSignaturePDF = async (
     };
 
     // Générer le PDF avec le nouveau template de signature
-    const pdfBuffer = await generateComponentPDF(
-      DefaultRepairOrderSignaturePreview,
-      {
-        companyData,
-        orderData,
-        clientData: formattedClientData,
-        vehicleData,
-        items,
-        totals,
-        signatureData
-      },
-      'RepairOrderSignature'
+    const doc = (
+      <DefaultRepairOrderSignaturePreview
+        companyData={companyData}
+        orderData={orderData}
+        clientData={formattedClientData}
+        vehicleData={vehicleData}
+        items={items}
+        totals={totals}
+        signatureData={signatureData}
+      />
     );
+
+    const blob = await pdf(doc).toBlob();
+    const arrayBuffer = await blob.arrayBuffer();
+    const pdfBuffer = new Uint8Array(arrayBuffer);
 
     // Uploader vers Supabase Storage
     const fileName = `repair_orders/signature/${repairOrder.id}_signature_${Date.now()}.pdf`;
