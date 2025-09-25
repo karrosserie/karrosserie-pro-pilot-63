@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useIsMobile } from '@/hooks/use-mobile';
 import RepairOrderMobileCard from '@/components/repair-orders/RepairOrderMobileCard';
+import { supabase } from '@/integrations/supabase/client';
 
 const RepairOrders = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -157,19 +158,36 @@ const RepairOrders = () => {
               console.log('La signature est-elle complète?', isSigned);
 
               if (isSigned) {
-                console.log('Mise à jour du statut de l\'ordre de réparation avec document signé');
+                console.log('Signature détectée, téléchargement du document signé depuis Oodrive...');
 
-                // Pour les ordres de réparation, on met à jour signed_document_url avec l'URL du document signé
-                // L'API devrait retourner l'URL du document signé dans la réponse
-                const signedDocumentUrl = data[0].signed_document_url || order.document_url;
+                try {
+                  // Appeler la fonction edge pour télécharger le document signé depuis Oodrive
+                  const downloadResponse = await supabase.functions.invoke('download-signed-repair-order', {
+                    body: { repairOrderId: order.id }
+                  });
 
-                await updateOrder.mutateAsync({
-                  id: order.id,
-                  data: {
-                    signed_document_url: signedDocumentUrl,
-                    status: 'Signé' // Mettre à jour le statut aussi
+                  if (downloadResponse.error) {
+                    console.error('Erreur lors du téléchargement du document signé:', downloadResponse.error);
+                    throw new Error(`Téléchargement échoué: ${downloadResponse.error.message}`);
                   }
-                });
+
+                  if (downloadResponse.data.success) {
+                    console.log('Document signé téléchargé avec succès:', downloadResponse.data.documentUrl);
+                    // La fonction edge met déjà à jour l'ordre de réparation
+                    // On n'a pas besoin de faire updateOrder.mutateAsync ici
+                  } else {
+                    throw new Error(downloadResponse.data.error || 'Erreur inconnue');
+                  }
+                } catch (downloadError) {
+                  console.error('Erreur lors du téléchargement:', downloadError);
+                  // En cas d'erreur de téléchargement, on met quand même à jour le statut
+                  await updateOrder.mutateAsync({
+                    id: order.id,
+                    data: {
+                      status: 'Signé'
+                    }
+                  });
+                }
               }
             } else {
               console.log('Format de données inattendu pour repair order:', data);
