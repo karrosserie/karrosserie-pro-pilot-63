@@ -216,6 +216,47 @@ const RepairOrders = () => {
 
   const handleDownload = async (order: RepairOrder) => {
     try {
+      // Si l'ordre a un document signé, le télécharger directement
+      if (order.signed_document_url) {
+        toast({
+          title: "Téléchargement du document signé",
+          description: "Téléchargement en cours..."
+        });
+
+        try {
+          // Télécharger le fichier signé depuis Supabase Storage
+          const response = await fetch(order.signed_document_url);
+          if (!response.ok) {
+            throw new Error(`Erreur HTTP: ${response.status}`);
+          }
+          
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `ordre-reparation-${order.reference}-signe.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+
+          toast({
+            title: "Téléchargement réussi",
+            description: `Le document signé de l'ordre ${order.reference} a été téléchargé.`
+          });
+          return;
+        } catch (downloadError) {
+          console.error('Erreur lors du téléchargement du document signé:', downloadError);
+          toast({
+            title: "Erreur",
+            description: "Impossible de télécharger le document signé. Génération d'un nouveau PDF...",
+            variant: "destructive"
+          });
+          // Continue avec la génération normale si le téléchargement échoue
+        }
+      }
+
+      // Génération normale d'un nouveau PDF
       toast({
         title: "Génération du PDF",
         description: "Génération du PDF en cours..."

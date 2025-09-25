@@ -84,9 +84,9 @@ export const RepairOrderActionsDropdown = ({ order, contextMenuProps }: RepairOr
           </DropdownMenuItem>
         )}
         {isAlreadySignedOodrive && (
-          <DropdownMenuItem disabled>
+          <DropdownMenuItem onClick={() => contextMenuProps?.onDownload?.(order)}>
             <FileCheck className="mr-2 h-4 w-4 text-green-600" />
-            Document signé
+            Télécharger document signé
           </DropdownMenuItem>
         )}
         <DropdownMenuItem onClick={() => contextMenuProps?.onRequestDocuments?.(order)}>

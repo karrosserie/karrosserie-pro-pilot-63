@@ -133,10 +133,10 @@ export const RepairOrderTableRow = ({ order, onEditOrder, onDeleteOrder, onResto
               <Button
                 variant="validation"
                 size="sm"
-                onClick={() => window.open(order.signed_document_url, '_blank')}
+                onClick={() => contextMenuProps?.onDownload?.(order)}
               >
                 <FileCheck className="h-4 w-4 mr-1 text-green-600" />
-                Document signé
+                Télécharger document signé
               </Button>
             )}
             <Button variant="create" size="sm" onClick={() => contextMenuProps?.onRequestDocuments?.(order)} className="hidden">
