@@ -53,7 +53,7 @@ export const generateRepairOrderSignaturePDF = async (
       brand: repairOrder.vehicles?.car_brands?.name || '',
       model: repairOrder.vehicles?.car_models?.name || '',
       licensePlate: repairOrder.vehicles?.license_plate || '',
-      mileage: repairOrder.vehicles?.mileage?.toString() || ''
+      mileage: '' // TODO: Add mileage field to vehicle type if needed
     };
 
     const signatureData = {

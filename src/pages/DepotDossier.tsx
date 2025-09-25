@@ -182,9 +182,23 @@ const DepotDossier = () => {
                       Créé le {new Date(judicialCase.created_at).toLocaleDateString('fr-FR')}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <Button variant="outline" size="sm">
+                  <div className="text-right flex gap-2">
+                    <Button variant="outline" size="sm" onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/contentieux/depot-dossier/${judicialCase.id}`);
+                    }}>
                       Voir le dossier
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant={judicialCase.status === 'deposited' ? 'secondary' : 'default'}
+                      disabled={judicialCase.status === 'deposited'}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/contentieux/depot-dossier/${judicialCase.id}`);
+                      }}
+                    >
+                      {judicialCase.status === 'deposited' ? 'Dépôt effectué' : 'Effectuer le dépôt'}
                     </Button>
                   </div>
                 </div>

@@ -321,9 +321,8 @@ const RepairOrders = () => {
         clientData
       );
 
-      // Mettre à jour l'ordre de réparation avec l'ID du contrat Oodrive
+      // Mettre à jour l'ordre de réparation avec l'URL du document
       await repairOrdersService.update(order.id, {
-        oodrive_contract_id: signatureResponse.contract.contract_id.toString(),
         document_url: documentUrl
       });
 
