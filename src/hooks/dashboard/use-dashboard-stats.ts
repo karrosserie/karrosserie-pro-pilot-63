@@ -6,6 +6,7 @@ import { useInvoices } from '@/hooks/use-invoices';
 import { useQuotes } from '@/hooks/use-quotes';
 import { useAccountingData } from '@/hooks/use-accounting-data';
 import { useReceipts } from '@/hooks/use-receipts';
+import { usePaintMetrics } from './use-paint-metrics';
 import { parseISO, startOfMonth, endOfMonth, subMonths, isWithinInterval } from 'date-fns';
 
 export const useDashboardStats = () => {
@@ -15,9 +16,10 @@ export const useDashboardStats = () => {
   const { quotes, isLoading: quotesLoading } = useQuotes();
   const { receipts } = useReceipts();
   const { transactions } = useAccountingData();
+  const { paintMetrics, isLoading: paintMetricsLoading } = usePaintMetrics();
 
   const { data: dashboardStats, isLoading } = useQuery({
-    queryKey: ['dashboard-stats', vehicles, clients, invoices, quotes, receipts, transactions],
+    queryKey: ['dashboard-stats', vehicles, clients, invoices, quotes, receipts, transactions, paintMetrics],
     queryFn: () => {
       const now = new Date();
       const currentMonthStart = startOfMonth(now);
@@ -161,14 +163,16 @@ export const useDashboardStats = () => {
         carBodyIsPositive: carBodyChange >= 0,
         mechanicRevenue: currentMonthMechanicRevenue,
         mechanicChange: mechanicChangeText,
-        mechanicIsPositive: mechanicChange >= 0
+        mechanicIsPositive: mechanicChange >= 0,
+        // Métriques peinture
+        paintMetrics: paintMetrics || null
       };
     },
-    enabled: !vehiclesLoading && !clientsLoading && !invoicesLoading && !quotesLoading
+    enabled: !vehiclesLoading && !clientsLoading && !invoicesLoading && !quotesLoading && !paintMetricsLoading
   });
 
   return {
     dashboardStats,
-    isLoading: isLoading || vehiclesLoading || clientsLoading
+    isLoading: isLoading || vehiclesLoading || clientsLoading || paintMetricsLoading
   };
 };

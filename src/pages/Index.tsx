@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Car, FileText, Users, CreditCard, Eye, Pencil, Wrench, PaintBucket } from 'lucide-react';
 import StatsCard from '@/components/dashboard/StatsCard';
 import RecentActivity from '@/components/dashboard/RecentActivity';
+import PaintMetricsCards from '@/components/dashboard/PaintMetricsCards';
+import PaintMetricsInfo from '@/components/dashboard/PaintMetricsInfo';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDashboardData } from '@/hooks/use-dashboard-data';
@@ -136,6 +138,13 @@ const Index = () => {
         currency: 'EUR'
       })} change={dashboardStats?.mechanicChange} isPositive={dashboardStats?.mechanicIsPositive} icon={<Wrench className="h-8 w-8 text-gray-600" />} iconBg="bg-gray-100" />
       </div>
+
+      {/* Métriques peinture */}
+      {dashboardStats?.paintMetrics && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
+          <PaintMetricsCards paintMetrics={dashboardStats.paintMetrics} />
+        </div>
+      )}
       
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
         <div className="xl:col-span-2 space-y-4 sm:space-y-6">
@@ -289,6 +298,9 @@ const Index = () => {
           <RecentActivity activities={recentActivity} />
         </div>
       </div>
+
+      {/* Informations détaillées sur les métriques peinture */}
+      <PaintMetricsInfo paintMetrics={dashboardStats?.paintMetrics || null} />
 
       {/* Dialogues pour les raccourcis */}
       <VehicleDialog open={isVehicleDialogOpen} onOpenChange={setIsVehicleDialogOpen} title={vehicleDialogMode === 'create' ? "Nouveau véhicule" : vehicleDialogMode === 'edit' ? "Modifier le véhicule" : "Détails du véhicule"} description={vehicleDialogMode === 'create' ? "Ajoutez un nouveau véhicule au système" : vehicleDialogMode === 'edit' ? "Modifiez les informations du véhicule" : "Consultez les détails du véhicule"} onSubmit={() => setIsVehicleDialogOpen(false)} mode={vehicleDialogMode} defaultValues={selectedVehicle} />
