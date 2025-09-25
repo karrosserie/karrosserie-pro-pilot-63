@@ -148,6 +148,34 @@ const CreationDossierJudiciaire = () => {
     }
   }, [selectedInvoice, invoices]);
 
+  // Auto-import supporting documents when both client and invoice are selected
+  useEffect(() => {
+    if (selectedClient && selectedInvoice && clients && invoices) {
+      const client = clients.find(c => c.id === selectedClient);
+      const invoice = invoices.find(i => i.id === selectedInvoice);
+      
+      if (client && invoice) {
+        const documentsToImport: string[] = [];
+        
+        // Add client's driver license documents if available
+        if (client.driverLicenseFrontUrl && client.driverLicenseFrontUrl.trim()) {
+          documentsToImport.push(client.driverLicenseFrontUrl);
+        }
+        if (client.driverLicenseBackUrl && client.driverLicenseBackUrl.trim()) {
+          documentsToImport.push(client.driverLicenseBackUrl);
+        }
+        
+        // For now, we'll add placeholders for other documents that would typically be associated
+        // In a real implementation, you would fetch these from your document storage system
+        // based on the client_id and invoice_id
+        
+        if (documentsToImport.length > 0) {
+          setAttachedFiles(documentsToImport);
+        }
+      }
+    }
+  }, [selectedClient, selectedInvoice, clients, invoices]);
+
   const nextStep = () => setStep((s) => Math.min(s + 1, steps.length));
   const prevStep = () => setStep((s) => Math.max(s - 1, 1));
   const currentStepConfig = steps.find(s => s.id === step);
