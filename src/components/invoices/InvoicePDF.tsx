@@ -997,7 +997,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
             fontSize: 8,
             color: '#666'
           }} fixed>
-            <Text>[sc_sign1.initials/]</Text>
+            <Text>[sc_sign1.paraphe/]</Text>
           </View>
         )}
 
