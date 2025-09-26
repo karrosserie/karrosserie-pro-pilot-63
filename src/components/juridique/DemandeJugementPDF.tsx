@@ -90,7 +90,7 @@ const DemandeJugementPDF: React.FC<DemandeJugementPDFProps> = ({
         </View>
 
         <View style={styles.header}>
-          <Text style={styles.title}>PROCÉDURE DE JUGEMENT SUR PIÈCE</Text>
+          <Text style={styles.title}>REQUÊTE DE JUGEMENT SUR PIÈCES</Text>
           <Text>Article 1385 et suivants du Code de procédure civile</Text>
         </View>
 
