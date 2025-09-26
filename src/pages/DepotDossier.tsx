@@ -391,27 +391,144 @@ const DepotDossier = () => {
     setIsDepositing(true);
     setProgress(0);
     setCurrentStep(3); // Avancer immédiatement jusqu'à "Envoyé"
-    const loadingSteps = ['Vérification des documents...', 'Connexion au portail du tribunal...', 'Téléchargement des pièces jointes...', 'Validation de la requête...', 'Paiement des frais de greffe...', 'Confirmation du dépôt...'];
     
-    for (let i = 0; i < loadingSteps.length; i++) {
-      setLoadingText(loadingSteps[i]);
-      setProgress((i + 1) / loadingSteps.length * 100);
-      await new Promise(resolve => setTimeout(resolve, 1500));
+    const loadingSteps = [
+      'Génération de la demande de jugement...',
+      'Récupération des documents...',
+      'Fusion des PDFs...',
+      'Finalisation du dossier...',
+      'Téléchargement du dossier complet...'
+    ];
+    
+    try {
+      for (let i = 0; i < loadingSteps.length; i++) {
+        setLoadingText(loadingSteps[i]);
+        setProgress((i + 1) / loadingSteps.length * 100);
+        
+        if (i === 0) {
+          // Étape 1: Générer la demande de jugement
+          console.log('Génération de la demande de jugement...');
+          
+        } else if (i === 1) {
+          // Étape 2: Récupérer tous les documents disponibles
+          console.log('Récupération des documents...');
+          
+        } else if (i === 2) {
+          // Étape 3: Fusionner tous les PDFs
+          console.log('Fusion des PDFs en cours...');
+          
+          // Récupérer les données nécessaires
+          const { data: companyData } = await supabase
+            .from('company_info')
+            .select('*')
+            .eq('id', relatedInvoice?.company_id)
+            .single();
+          
+          // Préparer les données pour la demande de jugement
+          const demandeData = {
+            companyData,
+            clientData: relatedClient,
+            caseData: selectedCase,
+            documents: realDocuments,
+            totalAmount: relatedInvoice?.amount || 0
+          };
+          
+          // Générer le PDF de demande de jugement
+          const { generateReactPDFBlob, mergePDFs, downloadBlob } = await import('@/utils/pdfMerger');
+          const DemandeJugementPDF = (await import('@/components/juridique/DemandeJugementPDF')).default;
+          
+          const demandePDFBlob = await generateReactPDFBlob(
+            <DemandeJugementPDF {...demandeData} />
+          );
+          
+          // Préparer les sources PDF pour la fusion
+          const pdfSources: Array<{ blob?: Blob; url?: string; title: string }> = [
+            { 
+              blob: demandePDFBlob, 
+              title: 'Demande de jugement sur pièce' 
+            }
+          ];
+          
+          // Ajouter tous les documents disponibles
+          for (const doc of realDocuments) {
+            if (doc.hasUrl && doc.url) {
+              if (doc.url.startsWith('blob:')) {
+                // C'est un blob généré, on ne peut pas le re-télécharger
+                // Il faut le régénérer
+                if (doc.type === 'facture' && doc.data && companyData) {
+                  try {
+                    const { generateInvoicePDFBlob } = await import('@/utils/invoicePDFGeneration');
+                    const blob = await generateInvoicePDFBlob(doc.data, companyData);
+                    pdfSources.push({ blob, title: doc.name });
+                  } catch (error) {
+                    console.error('Erreur génération PDF facture:', error);
+                  }
+                } else if (doc.type === 'devis' && doc.data && companyData) {
+                  try {
+                    const { generateQuotePDFBlob } = await import('@/utils/quotePDFGeneration');
+                    const blob = await generateQuotePDFBlob(doc.data, companyData);
+                    pdfSources.push({ blob, title: doc.name });
+                  } catch (error) {
+                    console.error('Erreur génération PDF devis:', error);
+                  }
+                } else if (doc.type === 'repair_order' && doc.data && companyData) {
+                  try {
+                    const { generateRepairOrderPDFBlob } = await import('@/utils/repairOrderPDFGeneration');
+                    const blob = await generateRepairOrderPDFBlob(doc.data, companyData);
+                    pdfSources.push({ blob, title: doc.name });
+                  } catch (error) {
+                    console.error('Erreur génération PDF ordre de réparation:', error);
+                  }
+                }
+              } else {
+                // C'est une URL classique
+                pdfSources.push({ url: doc.url, title: doc.name });
+              }
+            }
+          }
+          
+          console.log('Sources PDF préparées:', pdfSources.length);
+          
+          // Fusionner tous les PDFs
+          const finalPDFBlob = await mergePDFs(pdfSources);
+          
+          // Télécharger le PDF final
+          const filename = `Dossier_Jugement_${selectedCase?.case_number || 'DJ-2025'}_${new Date().toISOString().split('T')[0]}.pdf`;
+          downloadBlob(finalPDFBlob, filename);
+          
+          toast({
+            title: "Dossier généré",
+            description: `Le dossier complet a été téléchargé: ${filename}`,
+          });
+          
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Progresser uniquement jusqu'à l'étape "Envoyé" (étape 3)
+        if (i === 1) setCurrentStep(3); // Étape Envoyé
+      }
+      
+      setIsDepositing(false);
 
-      // Progresser uniquement jusqu'à l'étape "Envoyé" (étape 3)
-      if (i === 1) setCurrentStep(3); // Étape Envoyé
+      // Préparer les données de résultat
+      const today = new Date().toLocaleDateString('fr-FR');
+      setDepositResult({
+        number: 'RIP-2025-001234',
+        tribunal: 'TJ Marseille',
+        date: today
+      });
+      setShowSuccessModal(true);
+      
+    } catch (error) {
+      console.error('Erreur lors de la génération du dossier:', error);
+      setIsDepositing(false);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer le dossier complet.",
+        variant: "destructive"
+      });
     }
-    
-    setIsDepositing(false);
-
-    // Préparer les données de résultat
-    const today = new Date().toLocaleDateString('fr-FR');
-    setDepositResult({
-      number: 'RIP-2025-001234',
-      tribunal: 'TJ Marseille',
-      date: today
-    });
-    setShowSuccessModal(true);
   };
   const handleSuccessModalClose = () => {
     setShowSuccessModal(false);
