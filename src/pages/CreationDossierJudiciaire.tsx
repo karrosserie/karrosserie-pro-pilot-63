@@ -304,42 +304,30 @@ const CreationDossierJudiciaire = () => {
           logicalPieces.push(`Pièce n°${pieceNumber++} : Preuve de l'envoi et de la réception de la mise en demeure`);
         }
         
-        // CRÉER DES PLACEHOLDERS POUR LES PIÈCES LOGIQUES
-        // Ces URLs fictives permettront d'afficher les pièces logiques dans la section "Fichiers joints"
+        // RÉCUPÉRER LES VRAIES URLs DES DOCUMENTS
         const logicalDocuments: string[] = [];
         
-        // 1. Devis (placeholder)
-        if (relatedQuote) {
-          logicalDocuments.push(`placeholder://devis_${relatedQuote.reference}_${invoice.client_id}.pdf`);
-        } else {
-          logicalDocuments.push(`placeholder://devis_${invoice.reference}_${invoice.client_id}.pdf`);
+        // 1. Devis - récupérer l'URL réelle si elle existe  
+        if (relatedQuote && (relatedQuote as any).document_url && (relatedQuote as any).document_url.trim()) {
+          logicalDocuments.push((relatedQuote as any).document_url);
         }
         
-        // 2. Ordre de réparation (placeholder ou réel)
+        // 2. Ordre de réparation - utiliser signed_document_url ou document_url
         if (relatedRepairOrders.length > 0) {
           const firstOrder = relatedRepairOrders[0];
           if (firstOrder.signed_document_url && firstOrder.signed_document_url.trim()) {
-            // Si l'OR signé existe vraiment, on l'utilise
             logicalDocuments.push(firstOrder.signed_document_url);
-          } else {
-            // Sinon placeholder
-            logicalDocuments.push(`placeholder://ordre_reparation_${firstOrder.reference}_${invoice.client_id}.pdf`);
+          } else if ((firstOrder as any).document_url && (firstOrder as any).document_url.trim()) {
+            logicalDocuments.push((firstOrder as any).document_url);
           }
-        } else {
-          logicalDocuments.push(`placeholder://ordre_reparation_${invoice.reference}_${invoice.client_id}.pdf`);
         }
         
-        // 3. Facture (placeholder)
-        logicalDocuments.push(`placeholder://facture_${invoice.reference}_${invoice.client_id}.pdf`);
-        
-        // 4. Bon de sortie (placeholder)
-        logicalDocuments.push(`placeholder://bon_sortie_${invoice.reference}_${invoice.client_id}.pdf`);
-        
-        // 5. Documents de procédure si relances existent (placeholders)
-        if (clientRelances.length > 0) {
-          logicalDocuments.push(`placeholder://mise_en_demeure_${invoice.reference}_${invoice.client_id}.pdf`);
-          logicalDocuments.push(`placeholder://preuve_reception_${invoice.reference}_${invoice.client_id}.pdf`);
+        // 3. Facture - récupérer l'URL réelle
+        if ((invoice as any).document_url && (invoice as any).document_url.trim()) {
+          logicalDocuments.push((invoice as any).document_url);
         }
+        
+        console.log('Documents logiques trouvés:', logicalDocuments);
         
         // Generate pieces list from physical documents
         const validPhysicalDocuments = physicalDocuments.filter(doc => doc && doc.trim());
