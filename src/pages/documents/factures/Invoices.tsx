@@ -511,11 +511,15 @@ const Invoices = () => {
                                <CreditCard className="mr-2 h-4 w-4" />
                                Encaisser
                              </DropdownMenuItem>
-                             <DropdownMenuItem onClick={() => handleAddCredit(invoice)}>
-                               <FileX className="mr-2 h-4 w-4" />
-                               Avoir
-                             </DropdownMenuItem>
-                             <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={() => handleAddCredit(invoice)}>
+                                <FileX className="mr-2 h-4 w-4" />
+                                Avoir
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleRelance(invoice)}>
+                                <Send className="mr-2 h-4 w-4" />
+                                Relance de paiement
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
                              {!showArchived && (
                                <DropdownMenuItem onClick={() => handleDelete(invoice)}>
                                  <FileText className="mr-2 h-4 w-4" />
