@@ -570,8 +570,8 @@ const CreationDossierJudiciaire = () => {
       depens: formData.depens,
       depens_details: formData.depens_details,
       pieces: formData.pieces,
-      client_id: formData.client_id || null,
-      invoice_id: formData.invoice_id || null,
+      client_id: formData.client_id && formData.client_id.trim() !== '' ? formData.client_id : null,
+      invoice_id: formData.invoice_id && formData.invoice_id.trim() !== '' ? formData.invoice_id : null,
       status: 'draft',
     });
 

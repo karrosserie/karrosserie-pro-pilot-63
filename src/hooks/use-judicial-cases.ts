@@ -55,6 +55,24 @@ export const useJudicialCases = () => {
 
   const createCase = async (caseData: Partial<JudicialCase>) => {
     try {
+      // Récupérer le company_id de l'utilisateur actuel
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('Utilisateur non authentifié');
+      }
+
+      const { data: userCompany } = await supabase
+        .from('user_companies')
+        .select('company_id')
+        .eq('user_id', user.id)
+        .eq('active', true)
+        .single();
+
+      if (!userCompany) {
+        throw new Error('Aucune entreprise associée trouvée');
+      }
+
       // Générer une référence unique
       const referenceNumber = `DJ-${new Date().getFullYear()}-${String(cases.length + 1).padStart(3, '0')}`;
       
@@ -63,7 +81,7 @@ export const useJudicialCases = () => {
         .insert({
           ...caseData,
           reference: referenceNumber,
-          company_id: caseData.company_id || '', // Assurer que company_id est présent
+          company_id: userCompany.company_id,
         })
         .select()
         .single();
