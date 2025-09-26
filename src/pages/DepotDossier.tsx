@@ -90,6 +90,9 @@ const DepotDossier = () => {
     const docs = [];
     
     try {
+      console.log('=== FETCH REAL DOCUMENTS DEBUG ===');
+      console.log('relatedInvoice:', relatedInvoice);
+      
       // Récupérer les données de l'entreprise pour la génération PDF
       const { data: companyData } = await supabase
         .from('company_info')
@@ -97,8 +100,11 @@ const DepotDossier = () => {
         .eq('id', relatedInvoice?.company_id)
         .single();
 
+      console.log('Company data fetched:', companyData ? 'Success' : 'Failed');
+
       // Ajouter la facture si elle existe
       if (relatedInvoice) {
+        console.log('Adding invoice document...');
         let factureUrl = relatedInvoice.document_url;
         
         // Si pas d'URL stockée, générer le PDF à la demande
@@ -107,6 +113,7 @@ const DepotDossier = () => {
             const { generateInvoicePDFBlob } = await import('@/utils/invoicePDFGeneration');
             const blob = await generateInvoicePDFBlob(relatedInvoice, companyData);
             factureUrl = URL.createObjectURL(blob);
+            console.log('Invoice PDF blob generated and URL created');
           } catch (error) {
             console.error('Erreur génération PDF facture:', error);
           }
@@ -121,18 +128,24 @@ const DepotDossier = () => {
           hasUrl: !!factureUrl,
           data: relatedInvoice
         });
+        console.log('✅ Invoice document added');
       }
 
       // Récupérer l'ordre de réparation associé à la facture
+      console.log('Checking for repair order, repair_order_id:', relatedInvoice?.repair_order_id);
       if (relatedInvoice?.repair_order_id) {
-        const { data: repairOrder } = await supabase
+        console.log('Fetching repair order...');
+        const { data: repairOrder, error: repairOrderError } = await supabase
           .from('repair_orders')
           .select('*')
           .eq('id', relatedInvoice.repair_order_id)
           .single();
           
+        console.log('Repair order result:', repairOrder ? 'Found' : 'Not found', 'Error:', repairOrderError);
+          
         if (repairOrder) {
           let repairOrderUrl = repairOrder.signed_document_url || repairOrder.document_url;
+          console.log('Repair order URLs - signed:', repairOrder.signed_document_url, 'document:', repairOrder.document_url);
           
           // Si pas d'URL stockée, générer le PDF à la demande
           if (!repairOrderUrl && companyData) {
@@ -140,6 +153,7 @@ const DepotDossier = () => {
               const { generateRepairOrderPDFBlob } = await import('@/utils/repairOrderPDFGeneration');
               const blob = await generateRepairOrderPDFBlob(repairOrder, companyData);
               repairOrderUrl = URL.createObjectURL(blob);
+              console.log('Repair order PDF blob generated and URL created');
             } catch (error) {
               console.error('Erreur génération PDF ordre de réparation:', error);
             }
@@ -154,12 +168,15 @@ const DepotDossier = () => {
             hasUrl: !!repairOrderUrl,
             data: repairOrder
           });
+          console.log('✅ Repair order document added');
         }
       }
 
       // Récupérer le devis associé s'il existe
+      console.log('Checking for quotes - vehicle_id:', relatedInvoice?.vehicle_id, 'client_id:', relatedInvoice?.client_id);
       if (relatedInvoice?.vehicle_id && relatedInvoice?.client_id) {
-        const { data: quotes } = await supabase
+        console.log('Fetching quotes...');
+        const { data: quotes, error: quotesError } = await supabase
           .from('quotes')
           .select('*')
           .eq('vehicle_id', relatedInvoice.vehicle_id)
@@ -168,9 +185,23 @@ const DepotDossier = () => {
           .order('created_at', { ascending: false })
           .limit(1);
           
+        console.log('Quotes result:', quotes ? `Found ${quotes.length} quotes` : 'No quotes found', 'Error:', quotesError);
+        
+        // Aussi essayer sans le filtre 'signed' pour voir tous les devis
+        const { data: allQuotes } = await supabase
+          .from('quotes')
+          .select('*')
+          .eq('vehicle_id', relatedInvoice.vehicle_id)
+          .eq('client_id', relatedInvoice.client_id)
+          .order('created_at', { ascending: false })
+          .limit(5);
+          
+        console.log('All quotes (any status):', allQuotes?.map(q => ({ id: q.id, reference: q.reference, status: q.status })));
+          
         if (quotes && quotes.length > 0) {
           const quote = quotes[0];
           let quoteUrl = quote.document_url;
+          console.log('Quote found - reference:', quote.reference, 'status:', quote.status, 'document_url:', quote.document_url);
           
           // Si pas d'URL stockée, générer le PDF à la demande
           if (!quoteUrl && companyData) {
@@ -178,6 +209,7 @@ const DepotDossier = () => {
               const { generateQuotePDFBlob } = await import('@/utils/quotePDFGeneration');
               const blob = await generateQuotePDFBlob(quote, companyData);
               quoteUrl = URL.createObjectURL(blob);
+              console.log('Quote PDF blob generated and URL created');
             } catch (error) {
               console.error('Erreur génération PDF devis:', error);
             }
@@ -192,12 +224,17 @@ const DepotDossier = () => {
             hasUrl: !!quoteUrl,
             data: quote
           });
+          console.log('✅ Quote document added');
+        } else {
+          console.log('❌ No signed quotes found');
         }
       }
 
       // Ajouter d'autres documents basés sur les pièces du dossier judiciaire
+      console.log('Adding other documents from case pieces...');
       if (selectedCase?.pieces) {
         const pieces = selectedCase.pieces.split('\n').filter(p => p.trim());
+        console.log('Case pieces found:', pieces.length);
         pieces.forEach((piece, index) => {
           // Éviter les doublons avec les documents déjà ajoutés
           if (!piece.includes('Facture') && !piece.includes('Devis') && !piece.includes('Ordre de réparation')) {
@@ -212,7 +249,14 @@ const DepotDossier = () => {
             });
           }
         });
+        console.log('✅ Other documents added');
       }
+
+      console.log('=== FINAL DOCUMENTS LIST ===');
+      console.log('Total documents:', docs.length);
+      docs.forEach((doc, index) => {
+        console.log(`${index + 1}. ${doc.name} (${doc.type}) - hasUrl: ${doc.hasUrl}`);
+      });
 
       setRealDocuments(docs);
     } catch (error) {
