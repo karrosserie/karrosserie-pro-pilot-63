@@ -235,41 +235,10 @@ const DepotDossier = () => {
         description: "Le document s'ouvre dans un nouvel onglet.",
       });
     } else if (doc.data && doc.type) {
-      // Ouvrir immédiatement une fenêtre avec un message de chargement
-      const loadingWindow = window.open('', '_blank');
-      if (!loadingWindow) {
-        toast({
-          title: "Pop-up bloqué",
-          description: "Veuillez autoriser les pop-ups pour prévisualiser les documents.",
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      loadingWindow.document.write(`
-        <html>
-          <head><title>Génération du document...</title></head>
-          <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
-            <h2>Génération du document en cours...</h2>
-            <p>Veuillez patienter pendant la génération du PDF.</p>
-            <div style="margin: 20px 0;">
-              <div style="width: 200px; height: 4px; background: #f0f0f0; margin: 0 auto; border-radius: 2px;">
-                <div id="progress" style="width: 0%; height: 100%; background: #4CAF50; border-radius: 2px; transition: width 0.3s;"></div>
-              </div>
-            </div>
-          </body>
-        </html>
-      `);
-      
-      // Animation de la barre de progression
-      let progress = 0;
-      const progressInterval = setInterval(() => {
-        progress += 10;
-        const progressBar = loadingWindow.document.getElementById('progress');
-        if (progressBar) {
-          progressBar.style.width = `${Math.min(progress, 90)}%`;
-        }
-      }, 200);
+      toast({
+        title: "Génération en cours",
+        description: "Génération du PDF en cours, téléchargement automatique...",
+      });
 
       try {
         // Récupérer les données de l'entreprise
@@ -280,50 +249,47 @@ const DepotDossier = () => {
           .single();
 
         let blob;
+        let filename = '';
+        
         if (doc.type === 'facture') {
           const { generateInvoicePDFBlob } = await import('@/utils/invoicePDFGeneration');
           blob = await generateInvoicePDFBlob(doc.data, companyData);
+          filename = `Facture_${doc.data.reference}.pdf`;
         } else if (doc.type === 'devis') {
           const { generateQuotePDFBlob } = await import('@/utils/quotePDFGeneration');
           blob = await generateQuotePDFBlob(doc.data, companyData);
+          filename = `Devis_${doc.data.reference}.pdf`;
         } else if (doc.type === 'repair_order') {
           const { generateRepairOrderPDFBlob } = await import('@/utils/repairOrderPDFGeneration');
           blob = await generateRepairOrderPDFBlob(doc.data, companyData);
+          filename = `Ordre_reparation_${doc.data.reference}.pdf`;
         }
 
-        clearInterval(progressInterval);
-
         if (blob) {
-          // Créer l'URL du blob et rediriger la fenêtre
-          const blobUrl = URL.createObjectURL(blob);
-          loadingWindow.location.href = blobUrl;
+          // Créer un lien de téléchargement
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = filename;
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
           
           // Nettoyer l'URL après un délai
           setTimeout(() => {
-            URL.revokeObjectURL(blobUrl);
-          }, 10000);
+            URL.revokeObjectURL(url);
+          }, 1000);
 
           toast({
-            title: "Document généré",
-            description: "Le document s'ouvre dans un nouvel onglet.",
+            title: "Document téléchargé",
+            description: "Le PDF a été téléchargé avec succès.",
           });
         } else {
           throw new Error('Impossible de générer le PDF');
         }
       } catch (error) {
-        clearInterval(progressInterval);
         console.error('Erreur génération PDF:', error);
-        loadingWindow.document.write(`
-          <html>
-            <head><title>Erreur</title></head>
-            <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
-              <h2>Erreur lors de la génération</h2>
-              <p>Impossible de générer le document PDF.</p>
-              <button onclick="window.close()">Fermer</button>
-            </body>
-          </html>
-        `);
-        
         toast({
           title: "Erreur de génération",
           description: "Impossible de générer le PDF du document.",
