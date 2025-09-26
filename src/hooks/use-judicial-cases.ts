@@ -55,6 +55,23 @@ export const useJudicialCases = () => {
 
   const createCase = async (caseData: Partial<JudicialCase>) => {
     try {
+      // Validation: vérifier le montant de la facture si une facture est sélectionnée
+      if (caseData.invoice_id) {
+        const { data: invoice, error: invoiceError } = await supabase
+          .from('invoices')
+          .select('amount')
+          .eq('id', caseData.invoice_id)
+          .single();
+
+        if (invoiceError) {
+          throw new Error('Impossible de récupérer les informations de la facture');
+        }
+
+        if (invoice && (invoice.amount || 0) > 10000) {
+          throw new Error('Les factures dépassant 10 000€ ne peuvent pas faire l\'objet d\'une procédure de jugement sur pièce');
+        }
+      }
+
       // Récupérer le company_id de l'utilisateur actuel
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -99,7 +116,7 @@ export const useJudicialCases = () => {
       console.error('Error creating judicial case:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de créer le dossier judiciaire",
+        description: error instanceof Error ? error.message : "Impossible de créer le dossier judiciaire",
         variant: "destructive",
       });
       return null;

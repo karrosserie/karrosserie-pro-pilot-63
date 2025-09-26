@@ -148,10 +148,13 @@ const CreationDossierJudiciaire = () => {
     }
   }, [selectedInvoice, invoices, selectedClient]);
 
-  // Filter invoices based on selected client
+  // Filter invoices based on selected client and max amount (10,000€)
   const filteredInvoices = selectedClient && invoices 
-    ? invoices.filter(invoice => invoice.client_id === selectedClient)
-    : invoices;
+    ? invoices.filter(invoice => 
+        invoice.client_id === selectedClient && 
+        (invoice.amount || 0) <= 10000
+      )
+    : invoices?.filter(invoice => (invoice.amount || 0) <= 10000);
 
   useEffect(() => {
     if (selectedInvoice && invoices) {
@@ -617,6 +620,11 @@ const CreationDossierJudiciaire = () => {
                 <label className="block text-sm font-medium text-foreground mb-2">
                   Sélectionner une facture
                 </label>
+                <div className="mb-2">
+                  <div className="text-xs text-muted-foreground bg-amber-50 border border-amber-200 rounded p-2">
+                    ⚖️ Seules les factures d'un montant inférieur ou égal à 10 000€ peuvent être sélectionnées pour une procédure de jugement sur pièce.
+                  </div>
+                </div>
                 <Select value={selectedInvoice} onValueChange={setSelectedInvoice}>
                   <SelectTrigger>
                     <SelectValue placeholder="Choisir une facture..." />
