@@ -988,6 +988,19 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
           </View>
         )}
 
+        {/* Footer avec initiales pour signature Oodrive - apparaît sur chaque page */}
+        {documentType === 'repair_order' && signatureData?.isForOodrive && (
+          <View style={{ 
+            position: 'absolute', 
+            bottom: 10, 
+            right: 20, 
+            fontSize: 8,
+            color: '#666'
+          }} fixed>
+            <Text>[sc_sign1.initials/]</Text>
+          </View>
+        )}
+
         {/* Section signature client pour les ordres de réparation */}
         {documentType === 'repair_order' && signatureData && (
           <View style={{ marginTop: 30, alignItems: 'center' }}>
