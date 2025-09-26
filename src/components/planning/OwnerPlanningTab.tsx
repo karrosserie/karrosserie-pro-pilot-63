@@ -64,14 +64,30 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
       .from('planning_patron')
       .select('*')
       .eq('company_id', companyId)
-      .order('date', { ascending: true });
+      .order('date', { ascending: true })
+      .order('time', { ascending: true });
 
     if (error) {
       console.error('Erreur lors de la récupération des tâches patron:', error);
       return;
     }
 
-    setPatronTasks(data || []);
+    // Tri supplémentaire côté client pour s'assurer de l'ordre chronologique correct
+    const sortedTasks = (data || []).sort((a, b) => {
+      // D'abord par date
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      if (dateA.getTime() !== dateB.getTime()) {
+        return dateA.getTime() - dateB.getTime();
+      }
+      
+      // Puis par heure pour le même jour
+      const timeA = a.time || '09:00';
+      const timeB = b.time || '09:00';
+      return timeA.localeCompare(timeB);
+    });
+
+    setPatronTasks(sortedTasks);
   };
 
   useEffect(() => {
@@ -615,6 +631,12 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
                     {/* Tâches patron */}
                     {weekPatronTasks
                       .filter(task => isSameDay(new Date(task.date), day))
+                      .sort((a, b) => {
+                        // Tri par heure pour les tâches du même jour
+                        const timeA = a.time || '09:00';
+                        const timeB = b.time || '09:00';
+                        return timeA.localeCompare(timeB);
+                      })
                       .map((task, idx) => (
                         <Card key={`patron-${idx}`} className="p-2 border-l-4 border-l-orange-500 bg-orange-50 group relative">
                           <div className="space-y-1">
