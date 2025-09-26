@@ -262,7 +262,6 @@ const DepotDossier = () => {
         console.log('Company data fetched:', companyData);
 
         let blob;
-        let filename = '';
         
         console.log('Starting PDF generation for type:', doc.type);
         
@@ -270,51 +269,83 @@ const DepotDossier = () => {
           console.log('Generating invoice PDF blob...');
           const { generateInvoicePDFBlob } = await import('@/utils/invoicePDFGeneration');
           blob = await generateInvoicePDFBlob(doc.data, companyData);
-          filename = `Facture_${doc.data.reference}.pdf`;
         } else if (doc.type === 'devis') {
           console.log('Generating quote PDF blob...');
           const { generateQuotePDFBlob } = await import('@/utils/quotePDFGeneration');
           blob = await generateQuotePDFBlob(doc.data, companyData);
-          filename = `Devis_${doc.data.reference}.pdf`;
         } else if (doc.type === 'repair_order') {
           console.log('Generating repair order PDF blob...');
           const { generateRepairOrderPDFBlob } = await import('@/utils/repairOrderPDFGeneration');
           blob = await generateRepairOrderPDFBlob(doc.data, companyData);
-          filename = `Ordre_reparation_${doc.data.reference}.pdf`;
         }
 
         console.log('PDF blob generated:', blob ? 'Success' : 'Failed', 'Size:', blob?.size);
 
         if (blob && blob.size > 0) {
-          // Créer un lien de téléchargement
-          console.log('Creating download link...');
-          const url = URL.createObjectURL(blob);
-          console.log('Blob URL created:', url);
+          // Créer une URL data pour éviter le blocage de Chrome
+          console.log('Creating blob URL...');
+          const blobUrl = URL.createObjectURL(blob);
+          console.log('Blob URL created:', blobUrl);
           
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = filename;
-          link.style.display = 'none';
-          
-          console.log('Adding link to DOM and clicking...');
-          document.body.appendChild(link);
-          
-          // Déclencher le téléchargement
-          link.click();
-          
-          console.log('Removing link from DOM...');
-          document.body.removeChild(link);
-          
-          // Nettoyer l'URL après un délai
-          setTimeout(() => {
-            console.log('Revoking blob URL...');
-            URL.revokeObjectURL(url);
-          }, 1000);
-
-          toast({
-            title: "Document téléchargé",
-            description: "Le PDF a été téléchargé avec succès.",
-          });
+          // Ouvrir dans un nouvel onglet avec une approche plus sûre
+          try {
+            const newWindow = window.open('about:blank', '_blank');
+            if (newWindow) {
+              newWindow.location.href = blobUrl;
+              
+              toast({
+                title: "Document ouvert",
+                description: "Le PDF s'ouvre dans un nouvel onglet.",
+              });
+              
+              // Nettoyer l'URL après un délai plus long
+              setTimeout(() => {
+                console.log('Revoking blob URL...');
+                URL.revokeObjectURL(blobUrl);
+              }, 30000);
+            } else {
+              // Si le popup est bloqué, forcer le téléchargement
+              console.log('Popup blocked, forcing download...');
+              const filename = `${doc.type === 'facture' ? 'Facture' : doc.type === 'devis' ? 'Devis' : 'Ordre_reparation'}_${doc.data.reference}.pdf`;
+              
+              // Utiliser une approche plus directe pour le téléchargement
+              const link = document.createElement('a');
+              link.href = blobUrl;
+              link.download = filename;
+              
+              // Approche alternative pour éviter le blocage
+              link.style.display = 'none';
+              link.target = '_blank';
+              
+              document.body.appendChild(link);
+              
+              // Utiliser un événement utilisateur simulé pour éviter le blocage
+              const event = new MouseEvent('click', {
+                view: window,
+                bubbles: true,
+                cancelable: false
+              });
+              
+              link.dispatchEvent(event);
+              document.body.removeChild(link);
+              
+              toast({
+                title: "Document téléchargé",
+                description: "Le PDF a été téléchargé avec succès.",
+              });
+              
+              setTimeout(() => {
+                URL.revokeObjectURL(blobUrl);
+              }, 5000);
+            }
+          } catch (downloadError) {
+            console.error('Error with download/preview:', downloadError);
+            toast({
+              title: "Erreur d'ouverture",
+              description: "Impossible d'ouvrir ou télécharger le PDF. Vérifiez les paramètres de votre navigateur.",
+              variant: "destructive"
+            });
+          }
         } else {
           console.error('Blob is empty or undefined');
           throw new Error('Le PDF généré est vide');
