@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, FileText, Building2, AlertTriangle, CheckCircle, Clock, Download, Eye } from 'lucide-react';
 import { useJudicialCases } from '@/hooks/use-judicial-cases';
@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import CalendrierProcedure from '@/components/CalendrierProcedure';
 const DepotDossier = () => {
   const navigate = useNavigate();
@@ -81,52 +82,132 @@ const DepotDossier = () => {
     current: currentStep === 5,
     completed: currentStep >= 5
   }];
-  // Générer les documents basés sur les vraies données du dossier
-  const generateDocuments = () => {
+  // État pour les documents réels
+  const [realDocuments, setRealDocuments] = useState([]);
+
+  // Fonction pour récupérer les documents réels
+  const fetchRealDocuments = useCallback(async () => {
     const docs = [];
     
-    if (relatedInvoice) {
-      docs.push({
-        name: `Facture ${relatedInvoice.reference}`,
-        description: `Facture originale • ${new Date(relatedInvoice.date).toLocaleDateString('fr-FR')} • Montant: ${relatedInvoice.amount}€`,
-        icon: "📄",
-        type: "facture"
-      });
-    }
-    
-    if (selectedCase?.pieces) {
-      // Parser les pièces du dossier
-      const pieces = selectedCase.pieces.split('\n').filter(piece => piece.trim());
-      pieces.forEach((piece, index) => {
-        if (piece.includes('Devis')) {
+    try {
+      // Ajouter la facture si elle existe
+      if (relatedInvoice) {
+        docs.push({
+          name: `Facture ${relatedInvoice.reference}`,
+          description: `Facture originale • ${new Date(relatedInvoice.date).toLocaleDateString('fr-FR')} • Montant: ${relatedInvoice.amount}€`,
+          icon: "📄", 
+          type: "facture",
+          url: relatedInvoice.document_url,
+          hasUrl: !!relatedInvoice.document_url
+        });
+      }
+
+      // Récupérer l'ordre de réparation associé à la facture
+      if (relatedInvoice?.repair_order_id) {
+        const { data: repairOrder } = await supabase
+          .from('repair_orders')
+          .select('*')
+          .eq('id', relatedInvoice.repair_order_id)
+          .single();
+          
+        if (repairOrder) {
           docs.push({
-            name: "Devis signé",
-            description: `Document contractuel • ${piece}`,
-            icon: "✍️", 
-            type: "devis"
-          });
-        } else if (piece.includes('réparation')) {
-          docs.push({
-            name: "Ordre de réparation",
-            description: `Document de travaux • ${piece}`,
+            name: `Ordre de réparation ${repairOrder.reference}`,
+            description: `Document de travaux • Pièce n°2 : Ordre de réparation n°${repairOrder.reference}`,
             icon: "🔧",
-            type: "repair_order"
-          });
-        } else {
-          docs.push({
-            name: `Document ${index + 1}`,
-            description: piece,
-            icon: "📎",
-            type: "other"
+            type: "repair_order",
+            url: repairOrder.document_url,
+            hasUrl: !!repairOrder.document_url
           });
         }
+      }
+
+      // Récupérer le devis associé s'il existe
+      if (relatedInvoice?.vehicle_id && relatedInvoice?.client_id) {
+        const { data: quotes } = await supabase
+          .from('quotes')
+          .select('*')
+          .eq('vehicle_id', relatedInvoice.vehicle_id)
+          .eq('client_id', relatedInvoice.client_id)
+          .order('created_at', { ascending: false })
+          .limit(1);
+          
+        if (quotes && quotes.length > 0) {
+          const quote = quotes[0];
+          docs.push({
+            name: `Devis signé`,
+            description: `Document contractuel • Pièce n°1 : Devis n°${quote.reference}`,
+            icon: "✍️", 
+            type: "devis",
+            url: quote.document_url,
+            hasUrl: !!quote.document_url
+          });
+        }
+      }
+
+      // Ajouter d'autres documents basés sur les pièces du dossier judiciaire
+      if (selectedCase?.pieces) {
+        const pieces = selectedCase.pieces.split('\n').filter(p => p.trim());
+        pieces.forEach((piece, index) => {
+          // Éviter les doublons avec les documents déjà ajoutés
+          if (!piece.includes('Facture') && !piece.includes('Devis') && !piece.includes('Ordre de réparation')) {
+            docs.push({
+              name: `Document ${index + 1}`,
+              description: piece,
+              icon: "📎",
+              type: "other",
+              url: null,
+              hasUrl: false
+            });
+          }
+        });
+      }
+
+      setRealDocuments(docs);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des documents:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de récupérer les documents du dossier.",
+        variant: "destructive"
       });
     }
-    
-    return docs;
+  }, [relatedInvoice, selectedCase, supabase, toast]);
+
+  // Fonction pour prévisualiser un document
+  const previewDocument = (doc) => {
+    if (doc.hasUrl && doc.url) {
+      window.open(doc.url, '_blank');
+    } else if (doc.type === 'facture' && relatedInvoice?.id) {
+      // Générer l'URL de prévisualisation de la facture
+      window.open(`/invoices/${relatedInvoice.id}/preview`, '_blank');
+    } else if (doc.type === 'devis') {
+      // Logique pour prévisualiser le devis
+      toast({
+        title: "Prévisualisation",
+        description: "Génération du devis en cours...",
+      });
+    } else if (doc.type === 'repair_order') {
+      // Logique pour prévisualiser l'ordre de réparation
+      toast({
+        title: "Prévisualisation",
+        description: "Génération de l'ordre de réparation en cours...",
+      });
+    } else {
+      toast({
+        title: "Document non disponible",
+        description: "Ce document n'est pas encore disponible pour la prévisualisation.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const documents = generateDocuments();
+  // Récupérer les documents réels au chargement
+  useEffect(() => {
+    if (selectedCase && relatedInvoice) {
+      fetchRealDocuments();
+    }
+  }, [selectedCase, relatedInvoice, fetchRealDocuments]);
   const tribunals = [{
     id: 'marseille',
     name: 'Tribunal Judiciaire de Marseille',
@@ -421,22 +502,41 @@ const DepotDossier = () => {
               </h3>
               <div className="bg-slate-50 p-6 rounded-lg">
                 <div className="space-y-4">
-                  {documents.map((doc, index) => <div key={index} className="flex items-center justify-between bg-white p-4 rounded-md border border-slate-200">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-blue-600 text-white rounded flex items-center justify-center text-sm">
-                          {doc.icon}
+                  {realDocuments.length > 0 ? (
+                    realDocuments.map((doc, index) => (
+                      <div key={index} className="flex items-center justify-between bg-white p-4 rounded-md border border-slate-200">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-blue-600 text-white rounded flex items-center justify-center text-sm">
+                            {doc.icon}
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-sm text-slate-900">{doc.name}</h4>
+                            <p className="text-xs text-slate-600">{doc.description}</p>
+                          </div>
                         </div>
-                        <div>
-                          <h4 className="font-semibold text-sm text-slate-900">{doc.name}</h4>
-                          <p className="text-xs text-slate-600">{doc.description}</p>
+                        <div className="flex gap-2">
+                          <button 
+                            onClick={() => previewDocument(doc)}
+                            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                              doc.hasUrl || doc.type === 'facture' 
+                                ? 'bg-slate-600 text-white hover:bg-slate-700' 
+                                : 'bg-slate-200 text-slate-500 cursor-not-allowed'
+                            }`}
+                            disabled={!doc.hasUrl && doc.type !== 'facture'}
+                          >
+                            Prévisualiser
+                          </button>
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <button className="px-4 py-2 bg-slate-600 text-white text-sm font-medium rounded-md hover:bg-slate-700 transition-colors">
-                          Prévisualiser
-                        </button>
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                        📄
                       </div>
-                    </div>)}
+                      <p className="text-slate-600">Chargement des documents...</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -580,7 +680,7 @@ const DepotDossier = () => {
               <div>
                 <h3 className="font-semibold text-sm text-slate-700 mb-2">📎 PIÈCES JOINTES</h3>
                 <div className="grid grid-cols-1 gap-2">
-                  {documents.map((doc, index) => (
+                  {realDocuments.map((doc, index) => (
                     <div key={index} className="flex items-center gap-2 p-2 bg-slate-50 rounded text-sm">
                       <span className="text-lg">{doc.icon}</span>
                       <div>
