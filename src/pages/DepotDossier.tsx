@@ -225,29 +225,32 @@ const DepotDossier = () => {
     }
   }, [relatedInvoice, selectedCase, toast]);
 
-  // Fonction pour prévisualiser un document directement
+  // Fonction pour télécharger un document directement
   const handlePreviewDocument = useCallback(async (doc) => {
     console.log('handlePreviewDocument called with:', doc);
     
     if (doc.hasUrl && doc.url) {
-      // Ouvrir directement l'URL du document dans un nouvel onglet
-      console.log('Opening existing URL:', doc.url);
-      window.open(doc.url, '_blank');
+      // Télécharger directement l'URL du document existant
+      console.log('Downloading existing URL:', doc.url);
+      const link = document.createElement('a');
+      link.href = doc.url;
+      link.download = `${doc.name}.pdf`;
+      link.click();
+      
       toast({
-        title: "Document ouvert",
-        description: "Le document s'ouvre dans un nouvel onglet.",
+        title: "Téléchargement lancé",
+        description: "Le document se télécharge.",
       });
     } else if (doc.data && doc.type) {
-      console.log('Generating PDF for type:', doc.type, 'with data:', doc.data);
+      console.log('Generating PDF for download, type:', doc.type);
       
       toast({
         title: "Génération en cours",
-        description: "Génération du PDF en cours...",
+        description: "Génération et téléchargement du PDF...",
       });
 
       try {
         // Récupérer les données de l'entreprise
-        console.log('Fetching company data for company_id:', doc.data.company_id);
         const { data: companyData, error: companyError } = await supabase
           .from('company_info')
           .select('*')
@@ -258,111 +261,60 @@ const DepotDossier = () => {
           console.error('Error fetching company data:', companyError);
           throw companyError;
         }
-        
-        console.log('Company data fetched:', companyData);
 
         let blob;
-        
-        console.log('Starting PDF generation for type:', doc.type);
+        let filename = '';
         
         if (doc.type === 'facture') {
-          console.log('Generating invoice PDF blob...');
           const { generateInvoicePDFBlob } = await import('@/utils/invoicePDFGeneration');
           blob = await generateInvoicePDFBlob(doc.data, companyData);
+          filename = `Facture_${doc.data.reference}.pdf`;
         } else if (doc.type === 'devis') {
-          console.log('Generating quote PDF blob...');
           const { generateQuotePDFBlob } = await import('@/utils/quotePDFGeneration');
           blob = await generateQuotePDFBlob(doc.data, companyData);
+          filename = `Devis_${doc.data.reference}.pdf`;
         } else if (doc.type === 'repair_order') {
-          console.log('Generating repair order PDF blob...');
           const { generateRepairOrderPDFBlob } = await import('@/utils/repairOrderPDFGeneration');
           blob = await generateRepairOrderPDFBlob(doc.data, companyData);
+          filename = `Ordre_reparation_${doc.data.reference}.pdf`;
         }
 
-        console.log('PDF blob generated:', blob ? 'Success' : 'Failed', 'Size:', blob?.size);
-
         if (blob && blob.size > 0) {
-          // Créer une URL data pour éviter le blocage de Chrome
-          console.log('Creating blob URL...');
-          const blobUrl = URL.createObjectURL(blob);
-          console.log('Blob URL created:', blobUrl);
+          // Créer un lien de téléchargement simple
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = filename;
           
-          // Ouvrir dans un nouvel onglet avec une approche plus sûre
-          try {
-            const newWindow = window.open('about:blank', '_blank');
-            if (newWindow) {
-              newWindow.location.href = blobUrl;
-              
-              toast({
-                title: "Document ouvert",
-                description: "Le PDF s'ouvre dans un nouvel onglet.",
-              });
-              
-              // Nettoyer l'URL après un délai plus long
-              setTimeout(() => {
-                console.log('Revoking blob URL...');
-                URL.revokeObjectURL(blobUrl);
-              }, 30000);
-            } else {
-              // Si le popup est bloqué, forcer le téléchargement
-              console.log('Popup blocked, forcing download...');
-              const filename = `${doc.type === 'facture' ? 'Facture' : doc.type === 'devis' ? 'Devis' : 'Ordre_reparation'}_${doc.data.reference}.pdf`;
-              
-              // Utiliser une approche plus directe pour le téléchargement
-              const link = document.createElement('a');
-              link.href = blobUrl;
-              link.download = filename;
-              
-              // Approche alternative pour éviter le blocage
-              link.style.display = 'none';
-              link.target = '_blank';
-              
-              document.body.appendChild(link);
-              
-              // Utiliser un événement utilisateur simulé pour éviter le blocage
-              const event = new MouseEvent('click', {
-                view: window,
-                bubbles: true,
-                cancelable: false
-              });
-              
-              link.dispatchEvent(event);
-              document.body.removeChild(link);
-              
-              toast({
-                title: "Document téléchargé",
-                description: "Le PDF a été téléchargé avec succès.",
-              });
-              
-              setTimeout(() => {
-                URL.revokeObjectURL(blobUrl);
-              }, 5000);
-            }
-          } catch (downloadError) {
-            console.error('Error with download/preview:', downloadError);
-            toast({
-              title: "Erreur d'ouverture",
-              description: "Impossible d'ouvrir ou télécharger le PDF. Vérifiez les paramètres de votre navigateur.",
-              variant: "destructive"
-            });
-          }
+          // Téléchargement immédiat
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          // Nettoyer l'URL
+          setTimeout(() => {
+            URL.revokeObjectURL(url);
+          }, 1000);
+
+          toast({
+            title: "Document téléchargé",
+            description: `${filename} a été téléchargé avec succès.`,
+          });
         } else {
-          console.error('Blob is empty or undefined');
           throw new Error('Le PDF généré est vide');
         }
       } catch (error) {
         console.error('Erreur génération PDF:', error);
         toast({
-          title: "Erreur de génération",
-          description: `Impossible de générer le PDF: ${error.message}`,
+          title: "Erreur de téléchargement",
+          description: `Impossible de télécharger le PDF: ${error.message}`,
           variant: "destructive"
         });
       }
     } else {
-      console.log('No URL or data available for document:', doc);
       toast({
         title: "Document non disponible",
-        description: "Ce document n'est pas encore disponible pour la prévisualisation.",
+        description: "Ce document n'est pas disponible pour le téléchargement.",
         variant: "destructive"
       });
     }
