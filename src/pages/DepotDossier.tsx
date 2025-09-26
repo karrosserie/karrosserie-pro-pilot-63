@@ -172,10 +172,10 @@ const DepotDossier = () => {
         variant: "destructive"
       });
     }
-  }, [relatedInvoice, selectedCase, supabase, toast]);
+  }, [relatedInvoice, selectedCase, toast]);
 
   // Fonction pour prévisualiser un document
-  const previewDocument = (doc) => {
+  const previewDocument = useCallback((doc) => {
     if (doc.hasUrl && doc.url) {
       window.open(doc.url, '_blank');
     } else if (doc.type === 'facture' && relatedInvoice?.id) {
@@ -200,7 +200,7 @@ const DepotDossier = () => {
         variant: "destructive"
       });
     }
-  };
+  }, [relatedInvoice, toast]);
 
   // Récupérer les documents réels au chargement
   useEffect(() => {
