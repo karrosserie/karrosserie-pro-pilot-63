@@ -90,15 +90,35 @@ const DepotDossier = () => {
     const docs = [];
     
     try {
+      // Récupérer les données de l'entreprise pour la génération PDF
+      const { data: companyData } = await supabase
+        .from('company_info')
+        .select('*')
+        .eq('id', relatedInvoice?.company_id)
+        .single();
+
       // Ajouter la facture si elle existe
       if (relatedInvoice) {
+        let factureUrl = relatedInvoice.document_url;
+        
+        // Si pas d'URL stockée, générer le PDF à la demande
+        if (!factureUrl && companyData) {
+          try {
+            const { generateInvoicePDFBlob } = await import('@/utils/invoicePDFGeneration');
+            const blob = await generateInvoicePDFBlob(relatedInvoice, companyData);
+            factureUrl = URL.createObjectURL(blob);
+          } catch (error) {
+            console.error('Erreur génération PDF facture:', error);
+          }
+        }
+
         docs.push({
           name: `Facture ${relatedInvoice.reference}`,
           description: `Facture originale • ${new Date(relatedInvoice.date).toLocaleDateString('fr-FR')} • Montant: ${relatedInvoice.amount}€`,
           icon: "📄", 
           type: "facture",
-          url: relatedInvoice.document_url,
-          hasUrl: !!relatedInvoice.document_url,
+          url: factureUrl,
+          hasUrl: !!factureUrl,
           data: relatedInvoice
         });
       }
@@ -112,13 +132,26 @@ const DepotDossier = () => {
           .single();
           
         if (repairOrder) {
+          let repairOrderUrl = repairOrder.signed_document_url || repairOrder.document_url;
+          
+          // Si pas d'URL stockée, générer le PDF à la demande
+          if (!repairOrderUrl && companyData) {
+            try {
+              const { generateRepairOrderPDFBlob } = await import('@/utils/repairOrderPDFGeneration');
+              const blob = await generateRepairOrderPDFBlob(repairOrder, companyData);
+              repairOrderUrl = URL.createObjectURL(blob);
+            } catch (error) {
+              console.error('Erreur génération PDF ordre de réparation:', error);
+            }
+          }
+
           docs.push({
             name: `Ordre de réparation ${repairOrder.reference}`,
             description: `Document de travaux • Pièce n°2 : Ordre de réparation n°${repairOrder.reference}`,
             icon: "🔧",
             type: "repair_order",
-            url: repairOrder.document_url,
-            hasUrl: !!repairOrder.document_url,
+            url: repairOrderUrl,
+            hasUrl: !!repairOrderUrl,
             data: repairOrder
           });
         }
@@ -131,18 +164,32 @@ const DepotDossier = () => {
           .select('*')
           .eq('vehicle_id', relatedInvoice.vehicle_id)
           .eq('client_id', relatedInvoice.client_id)
+          .eq('status', 'signed')
           .order('created_at', { ascending: false })
           .limit(1);
           
         if (quotes && quotes.length > 0) {
           const quote = quotes[0];
+          let quoteUrl = quote.document_url;
+          
+          // Si pas d'URL stockée, générer le PDF à la demande
+          if (!quoteUrl && companyData) {
+            try {
+              const { generateQuotePDFBlob } = await import('@/utils/quotePDFGeneration');
+              const blob = await generateQuotePDFBlob(quote, companyData);
+              quoteUrl = URL.createObjectURL(blob);
+            } catch (error) {
+              console.error('Erreur génération PDF devis:', error);
+            }
+          }
+
           docs.push({
             name: `Devis signé`,
             description: `Document contractuel • Pièce n°1 : Devis n°${quote.reference}`,
             icon: "✍️", 
             type: "devis",
-            url: quote.document_url,
-            hasUrl: !!quote.document_url,
+            url: quoteUrl,
+            hasUrl: !!quoteUrl,
             data: quote
           });
         }
@@ -183,15 +230,10 @@ const DepotDossier = () => {
     if (doc.hasUrl && doc.url) {
       // Ouvrir directement l'URL du document dans un nouvel onglet
       window.open(doc.url, '_blank');
-    } else if (doc.type === 'facture' && doc.data) {
-      // Ouvrir la page des factures avec le paramètre preview
-      navigate(`/documents/factures?preview=${doc.data.id}`);
-    } else if (doc.type === 'devis' && doc.data) {
-      // Ouvrir la page des devis avec le paramètre preview
-      navigate(`/documents/devis?preview=${doc.data.id}`);
-    } else if (doc.type === 'repair_order' && doc.data) {
-      // Ouvrir la page des ordres de réparation avec le paramètre preview
-      navigate(`/documents/ordres?preview=${doc.data.id}`);
+      toast({
+        title: "Document ouvert",
+        description: "Le document s'ouvre dans un nouvel onglet.",
+      });
     } else {
       toast({
         title: "Document non disponible",
@@ -199,7 +241,7 @@ const DepotDossier = () => {
         variant: "destructive"
       });
     }
-  }, [navigate, toast]);
+  }, [toast]);
 
   // Récupérer les documents réels au chargement
   useEffect(() => {

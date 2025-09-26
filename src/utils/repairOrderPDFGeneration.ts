@@ -222,6 +222,40 @@ export const prepareRepairOrderDataForPDF = async (repairOrder: RepairOrder, com
   }
 };
 
+export const generateRepairOrderPDFBlob = async (repairOrder: RepairOrder, companyData: any) => {
+  try {
+    const data = await prepareRepairOrderDataForPDF(repairOrder, companyData);
+    
+    // Adapter l'ordre de réparation au format Invoice pour le PDF
+    const invoiceData = {
+      ...data.repairOrder,
+      amount: data.totals.total,
+      date: data.repairOrder.created_at,
+      due_date: data.repairOrder.created_at,
+      repairs_data: Array.isArray(data.repairOrder.repairs_data) ? data.repairOrder.repairs_data : [],
+      parts_data: Array.isArray(data.repairOrder.parts_data) ? data.repairOrder.parts_data : []
+    } as any;
+
+    const doc = InvoicePDF({ 
+      invoice: invoiceData, 
+      companyData: data.companyData, 
+      receipts: [],
+      clientData: data.clientData,
+      vehicleData: data.vehicleData,
+      signatureData: data.signatureData,
+      template: data.template,
+      documentType: 'repair_order'
+    });
+    
+    // Générer et retourner le blob PDF
+    const asPdf = pdf(doc);
+    return await asPdf.toBlob();
+  } catch (error) {
+    console.error('Erreur lors de la génération du blob PDF ordre de réparation:', error);
+    throw error;
+  }
+};
+
 export const generateRepairOrderPDFWithTemplate = async (repairOrder: RepairOrder, companyData: any) => {
   try {
     const data = await prepareRepairOrderDataForPDF(repairOrder, companyData);
