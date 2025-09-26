@@ -227,57 +227,87 @@ const DepotDossier = () => {
 
   // Fonction pour prévisualiser un document directement
   const handlePreviewDocument = useCallback(async (doc) => {
+    console.log('handlePreviewDocument called with:', doc);
+    
     if (doc.hasUrl && doc.url) {
       // Ouvrir directement l'URL du document dans un nouvel onglet
+      console.log('Opening existing URL:', doc.url);
       window.open(doc.url, '_blank');
       toast({
         title: "Document ouvert",
         description: "Le document s'ouvre dans un nouvel onglet.",
       });
     } else if (doc.data && doc.type) {
+      console.log('Generating PDF for type:', doc.type, 'with data:', doc.data);
+      
       toast({
         title: "Génération en cours",
-        description: "Génération du PDF en cours, téléchargement automatique...",
+        description: "Génération du PDF en cours...",
       });
 
       try {
         // Récupérer les données de l'entreprise
-        const { data: companyData } = await supabase
+        console.log('Fetching company data for company_id:', doc.data.company_id);
+        const { data: companyData, error: companyError } = await supabase
           .from('company_info')
           .select('*')
           .eq('id', doc.data.company_id)
           .single();
 
+        if (companyError) {
+          console.error('Error fetching company data:', companyError);
+          throw companyError;
+        }
+        
+        console.log('Company data fetched:', companyData);
+
         let blob;
         let filename = '';
         
+        console.log('Starting PDF generation for type:', doc.type);
+        
         if (doc.type === 'facture') {
+          console.log('Generating invoice PDF blob...');
           const { generateInvoicePDFBlob } = await import('@/utils/invoicePDFGeneration');
           blob = await generateInvoicePDFBlob(doc.data, companyData);
           filename = `Facture_${doc.data.reference}.pdf`;
         } else if (doc.type === 'devis') {
+          console.log('Generating quote PDF blob...');
           const { generateQuotePDFBlob } = await import('@/utils/quotePDFGeneration');
           blob = await generateQuotePDFBlob(doc.data, companyData);
           filename = `Devis_${doc.data.reference}.pdf`;
         } else if (doc.type === 'repair_order') {
+          console.log('Generating repair order PDF blob...');
           const { generateRepairOrderPDFBlob } = await import('@/utils/repairOrderPDFGeneration');
           blob = await generateRepairOrderPDFBlob(doc.data, companyData);
           filename = `Ordre_reparation_${doc.data.reference}.pdf`;
         }
 
-        if (blob) {
+        console.log('PDF blob generated:', blob ? 'Success' : 'Failed', 'Size:', blob?.size);
+
+        if (blob && blob.size > 0) {
           // Créer un lien de téléchargement
+          console.log('Creating download link...');
           const url = URL.createObjectURL(blob);
+          console.log('Blob URL created:', url);
+          
           const link = document.createElement('a');
           link.href = url;
           link.download = filename;
           link.style.display = 'none';
+          
+          console.log('Adding link to DOM and clicking...');
           document.body.appendChild(link);
+          
+          // Déclencher le téléchargement
           link.click();
+          
+          console.log('Removing link from DOM...');
           document.body.removeChild(link);
           
           // Nettoyer l'URL après un délai
           setTimeout(() => {
+            console.log('Revoking blob URL...');
             URL.revokeObjectURL(url);
           }, 1000);
 
@@ -286,17 +316,19 @@ const DepotDossier = () => {
             description: "Le PDF a été téléchargé avec succès.",
           });
         } else {
-          throw new Error('Impossible de générer le PDF');
+          console.error('Blob is empty or undefined');
+          throw new Error('Le PDF généré est vide');
         }
       } catch (error) {
         console.error('Erreur génération PDF:', error);
         toast({
           title: "Erreur de génération",
-          description: "Impossible de générer le PDF du document.",
+          description: `Impossible de générer le PDF: ${error.message}`,
           variant: "destructive"
         });
       }
     } else {
+      console.log('No URL or data available for document:', doc);
       toast({
         title: "Document non disponible",
         description: "Ce document n'est pas encore disponible pour la prévisualisation.",
