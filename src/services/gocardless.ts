@@ -55,16 +55,69 @@ export class GoCardlessService {
       customerData
     });
     
+    // Enregistrer le client dans notre base de données
+    if (result.customer) {
+      const { error } = await supabase
+        .from('gocardless_customers')
+        .insert({
+          company_id: companyId,
+          gocardless_customer_id: result.customer.id,
+          given_name: customerData.given_name,
+          family_name: customerData.family_name,
+          email: customerData.email,
+          phone_number: customerData.phone_number,
+          address_line1: customerData.address_line1,
+          city: customerData.city,
+          postal_code: customerData.postal_code,
+          country_code: customerData.country_code,
+        });
+
+      if (error) {
+        console.error('Erreur sauvegarde client GoCardless:', error);
+        throw error;
+      }
+    }
+    
     return result.customer;
   }
 
-  async createMandate(customerId: string, bankAccount: GoCardlessBankAccount) {
+  async createMandate(companyId: string, customerId: string, bankAccount: GoCardlessBankAccount) {
     console.log('Création du mandat SEPA pour le client:', customerId);
     
     const result = await this.callEdgeFunction('create_mandate', {
       customerId,
       bankAccount
     });
+    
+    // Enregistrer le mandat dans notre base de données
+    if (result.mandate) {
+      // Récupérer l'ID de notre customer local
+      const { data: localCustomer } = await supabase
+        .from('gocardless_customers')
+        .select('id')
+        .eq('gocardless_customer_id', customerId)
+        .single();
+
+      if (localCustomer) {
+        const { error } = await supabase
+          .from('gocardless_mandates')
+          .insert({
+            company_id: companyId,
+            gocardless_customer_id: localCustomer.id,
+            gocardless_mandate_id: result.mandate.id,
+            scheme: result.mandate.scheme,
+            reference: result.mandate.reference,
+            status: result.mandate.status,
+            iban: bankAccount.iban,
+            account_holder_name: bankAccount.account_holder_name,
+          });
+
+        if (error) {
+          console.error('Erreur sauvegarde mandat GoCardless:', error);
+          throw error;
+        }
+      }
+    }
     
     return {
       mandate: result.mandate,
@@ -73,10 +126,12 @@ export class GoCardlessService {
   }
 
   async createPayment(
+    companyId: string,
     mandateId: string, 
     amount: number, 
     currency: string = 'EUR', 
     description: string,
+    subscriptionId?: string,
     metadata?: Record<string, string>
   ) {
     console.log('Création du paiement SEPA:', { mandateId, amount, currency, description });
@@ -88,6 +143,38 @@ export class GoCardlessService {
       description,
       metadata
     });
+    
+    // Enregistrer le paiement dans notre base de données
+    if (result.payment) {
+      // Récupérer l'ID de notre mandat local
+      const { data: localMandate } = await supabase
+        .from('gocardless_mandates')
+        .select('id')
+        .eq('gocardless_mandate_id', mandateId)
+        .single();
+
+      if (localMandate) {
+        const { error } = await supabase
+          .from('gocardless_payments')
+          .insert({
+            company_id: companyId,
+            subscription_id: subscriptionId || null,
+            gocardless_mandate_id: localMandate.id,
+            gocardless_payment_id: result.payment.id,
+            amount_cents: Math.round(amount * 100),
+            currency: currency.toUpperCase(),
+            description,
+            status: result.payment.status,
+            charge_date: result.payment.charge_date,
+            metadata: metadata || {},
+          });
+
+        if (error) {
+          console.error('Erreur sauvegarde paiement GoCardless:', error);
+          throw error;
+        }
+      }
+    }
     
     return result.payment;
   }
@@ -119,24 +206,34 @@ export class GoCardlessService {
     amount: number,
     planName: string
   ) {
-    // Récupérer les informations de l'entreprise
+    // Récupérer le mandat actif de l'entreprise
+    const { data: mandate } = await supabase
+      .from('gocardless_mandates')
+      .select('gocardless_mandate_id, company_id')
+      .eq('company_id', companyId)
+      .eq('status', 'active')
+      .single();
+
+    if (!mandate) {
+      throw new Error('Aucun mandat SEPA actif configuré pour cette entreprise');
+    }
+
+    // Récupérer le nom de l'entreprise
     const { data: company } = await supabase
       .from('company_info')
-      .select('gocardless_mandate_id, name')
+      .select('name')
       .eq('id', companyId)
       .single();
 
-    if (!company?.gocardless_mandate_id) {
-      throw new Error('Aucun mandat SEPA configuré pour cette entreprise');
-    }
-
-    const description = `Abonnement ${planName} - ${company.name}`;
+    const description = `Abonnement ${planName} - ${company?.name || 'Carrosserie'}`;
     
     const payment = await this.createPayment(
-      company.gocardless_mandate_id,
+      companyId,
+      mandate.gocardless_mandate_id,
       amount,
       'EUR',
       description,
+      subscriptionId,
       {
         subscription_id: subscriptionId,
         company_id: companyId,
@@ -144,7 +241,17 @@ export class GoCardlessService {
       }
     );
 
-    // Enregistrer le paiement dans la base de données si nécessaire
+    // Mettre à jour l'abonnement avec les infos de paiement
+    await supabase
+      .from('company_subscriptions')
+      .update({
+        payment_method: 'sepa_direct_debit',
+        last_payment_date: new Date().toISOString(),
+        last_payment_status: 'pending',
+        auto_billing_enabled: true
+      })
+      .eq('id', subscriptionId);
+
     console.log('Paiement d\'abonnement créé:', payment.id);
     
     return payment;

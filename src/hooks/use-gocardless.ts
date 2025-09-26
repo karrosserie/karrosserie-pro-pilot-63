@@ -45,25 +45,10 @@ export const useGoCardless = () => {
       customerId: string; 
       bankAccount: GoCardlessBankAccount;
     }) => {
-      const result = await gocardlessService.createMandate(customerId, bankAccount);
-      
-      // Sauvegarder l'ID du mandat dans company_info
       if (!effectiveCompanyId) throw new Error('No company selected');
       
-      const { error } = await supabase
-        .from('company_info')
-        .update({ 
-          gocardless_mandate_id: result.mandate.id,
-          gocardless_mandate_status: result.mandate.status,
-          sepa_enabled: true
-        })
-        .eq('id', effectiveCompanyId);
-
-      if (error) {
-        console.error('Erreur sauvegarde mandat:', error);
-        throw error;
-      }
-
+      const result = await gocardlessService.createMandate(effectiveCompanyId, customerId, bankAccount);
+      
       return result;
     },
     onSuccess: () => {
@@ -82,16 +67,40 @@ export const useGoCardless = () => {
     },
   });
 
-  // Query pour récupérer le statut du mandat
-  const mandateId = (effectiveCompanyData as any)?.gocardless_mandate_id;
-  const { data: mandateStatus, isLoading: mandateLoading } = useQuery({
-    queryKey: ['mandate-status', mandateId],
-    queryFn: () => 
-      mandateId 
-        ? gocardlessService.getMandateStatus(mandateId)
-        : null,
-    enabled: !!mandateId,
+  // Query pour récupérer le mandat local
+  const { data: localMandate, isLoading: mandateLoading } = useQuery({
+    queryKey: ['local-mandate', effectiveCompanyId],
+    queryFn: async () => {
+      if (!effectiveCompanyId) return null;
+      
+      const { data } = await supabase
+        .from('gocardless_mandates')
+        .select('*')
+        .eq('company_id', effectiveCompanyId)
+        .maybeSingle();
+      
+      return data;
+    },
+    enabled: !!effectiveCompanyId,
     refetchInterval: 30000, // Vérifier le statut toutes les 30 secondes
+  });
+
+  // Query pour récupérer l'historique des paiements
+  const { data: paymentHistory, isLoading: paymentsLoading } = useQuery({
+    queryKey: ['gocardless-payments', effectiveCompanyId],
+    queryFn: async () => {
+      if (!effectiveCompanyId) return [];
+      
+      const { data } = await supabase
+        .from('gocardless_payments')
+        .select('*')
+        .eq('company_id', effectiveCompanyId)
+        .order('created_at', { ascending: false })
+        .limit(20);
+      
+      return data || [];
+    },
+    enabled: !!effectiveCompanyId,
   });
 
   // Mutation pour annuler un mandat
@@ -99,16 +108,16 @@ export const useGoCardless = () => {
     mutationFn: async (mandateId: string) => {
       const result = await gocardlessService.cancelMandate(mandateId);
       
-      // Mettre à jour le statut dans company_info
+      // Mettre à jour le statut dans notre base de données
       if (!effectiveCompanyId) throw new Error('No company selected');
       
       const { error } = await supabase
-        .from('company_info')
+        .from('gocardless_mandates')
         .update({ 
-          gocardless_mandate_status: result.status,
-          sepa_enabled: false
+          status: result.status,
+          cancelled_at: new Date().toISOString()
         })
-        .eq('id', effectiveCompanyId);
+        .eq('gocardless_mandate_id', mandateId);
 
       if (error) {
         console.error('Erreur mise à jour statut mandat:', error);
@@ -196,11 +205,13 @@ export const useGoCardless = () => {
     effectiveCompanyId,
     
     // Mandate info
-    mandateStatus,
+    mandateStatus: localMandate,
     mandateLoading,
-    hasMandateConfigured: !!(effectiveCompanyData as any)?.gocardless_mandate_id,
-    isMandateActive: mandateStatus?.status === 'active',
-    isSepaEnabled: (effectiveCompanyData as any)?.sepa_enabled || false,
+    paymentHistory,
+    paymentsLoading,
+    hasMandateConfigured: !!localMandate,
+    isMandateActive: localMandate?.status === 'active',
+    isSepaEnabled: localMandate?.status === 'active',
     
     // Mutations
     createCustomer: createCustomerMutation.mutate,

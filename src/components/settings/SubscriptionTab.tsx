@@ -57,6 +57,8 @@ const SubscriptionTab: React.FC = () => {
     isSepaEnabled,
     mandateStatus,
     mandateLoading,
+    paymentHistory,
+    paymentsLoading,
     cancelMandate,
     isCancellingMandate,
   } = useGoCardless();
@@ -286,7 +288,7 @@ const SubscriptionTab: React.FC = () => {
                     </p>
                   </div>
                 </div>
-                <Badge variant={isMandateActive ? "secondary" : "secondary"}>
+                <Badge variant="secondary">
                   {mandateStatus?.status || 'Inconnu'}
                 </Badge>
               </div>
@@ -301,11 +303,40 @@ const SubscriptionTab: React.FC = () => {
                 </div>
               )}
 
+              {/* Historique des paiements */}
+              {paymentHistory && paymentHistory.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="font-medium">Historique des prélèvements</h4>
+                  <div className="space-y-2 max-h-40 overflow-y-auto">
+                    {paymentHistory.slice(0, 5).map((payment: any) => (
+                      <div key={payment.id} className="flex justify-between items-center p-2 bg-muted/50 rounded">
+                        <div>
+                          <p className="text-sm font-medium">{payment.description}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(payment.charge_date).toLocaleDateString('fr-FR')}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-bold">{(payment.amount_cents / 100).toFixed(2)}€</p>
+                          <Badge variant={
+                            payment.status === 'paid_out' ? 'secondary' :
+                            payment.status === 'confirmed' ? 'secondary' :
+                            payment.status === 'failed' ? 'destructive' : 'outline'
+                          }>
+                            {payment.status}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="flex justify-end">
                 <Button 
                   variant="destructive" 
                   size="sm"
-                  onClick={() => mandateStatus?.id && cancelMandate(mandateStatus.id)}
+                  onClick={() => mandateStatus?.gocardless_mandate_id && cancelMandate(mandateStatus.gocardless_mandate_id)}
                   disabled={isCancellingMandate}
                 >
                   {isCancellingMandate ? (

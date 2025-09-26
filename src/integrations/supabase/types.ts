@@ -828,11 +828,17 @@ export type Database = {
       }
       company_subscriptions: {
         Row: {
+          auto_billing_enabled: boolean | null
           company_id: string
           created_at: string
           end_date: string | null
           id: string
+          last_payment_date: string | null
+          last_payment_status: string | null
           next_billing_date: string | null
+          next_payment_attempt: string | null
+          payment_failures_count: number | null
+          payment_method: string | null
           start_date: string
           status: string
           subscription_plan_id: string
@@ -841,11 +847,17 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          auto_billing_enabled?: boolean | null
           company_id: string
           created_at?: string
           end_date?: string | null
           id?: string
+          last_payment_date?: string | null
+          last_payment_status?: string | null
           next_billing_date?: string | null
+          next_payment_attempt?: string | null
+          payment_failures_count?: number | null
+          payment_method?: string | null
           start_date?: string
           status?: string
           subscription_plan_id: string
@@ -854,11 +866,17 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          auto_billing_enabled?: boolean | null
           company_id?: string
           created_at?: string
           end_date?: string | null
           id?: string
+          last_payment_date?: string | null
+          last_payment_status?: string | null
           next_billing_date?: string | null
+          next_payment_attempt?: string | null
+          payment_failures_count?: number | null
+          payment_method?: string | null
           start_date?: string
           status?: string
           subscription_plan_id?: string
@@ -1689,6 +1707,210 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      gocardless_customers: {
+        Row: {
+          address_line1: string
+          city: string
+          company_id: string
+          country_code: string
+          created_at: string
+          email: string
+          family_name: string
+          given_name: string
+          gocardless_customer_id: string
+          id: string
+          phone_number: string | null
+          postal_code: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          address_line1: string
+          city: string
+          company_id: string
+          country_code?: string
+          created_at?: string
+          email: string
+          family_name: string
+          given_name: string
+          gocardless_customer_id: string
+          id?: string
+          phone_number?: string | null
+          postal_code: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          address_line1?: string
+          city?: string
+          company_id?: string
+          country_code?: string
+          created_at?: string
+          email?: string
+          family_name?: string
+          given_name?: string
+          gocardless_customer_id?: string
+          id?: string
+          phone_number?: string | null
+          postal_code?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gocardless_customers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gocardless_mandates: {
+        Row: {
+          account_holder_name: string
+          cancelled_at: string | null
+          company_id: string
+          created_at: string
+          expires_at: string | null
+          gocardless_customer_id: string
+          gocardless_mandate_id: string
+          iban: string
+          id: string
+          reference: string
+          scheme: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          account_holder_name: string
+          cancelled_at?: string | null
+          company_id: string
+          created_at?: string
+          expires_at?: string | null
+          gocardless_customer_id: string
+          gocardless_mandate_id: string
+          iban: string
+          id?: string
+          reference: string
+          scheme?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          account_holder_name?: string
+          cancelled_at?: string | null
+          company_id?: string
+          created_at?: string
+          expires_at?: string | null
+          gocardless_customer_id?: string
+          gocardless_mandate_id?: string
+          iban?: string
+          id?: string
+          reference?: string
+          scheme?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gocardless_mandates_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gocardless_mandates_gocardless_customer_id_fkey"
+            columns: ["gocardless_customer_id"]
+            isOneToOne: false
+            referencedRelation: "gocardless_customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gocardless_payments: {
+        Row: {
+          amount_cents: number
+          charge_date: string
+          company_id: string
+          confirmed_at: string | null
+          created_at: string
+          currency: string
+          description: string
+          failed_at: string | null
+          failure_reason: string | null
+          gocardless_mandate_id: string
+          gocardless_payment_id: string
+          id: string
+          metadata: Json | null
+          paid_out_at: string | null
+          status: string
+          subscription_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_cents: number
+          charge_date: string
+          company_id: string
+          confirmed_at?: string | null
+          created_at?: string
+          currency?: string
+          description: string
+          failed_at?: string | null
+          failure_reason?: string | null
+          gocardless_mandate_id: string
+          gocardless_payment_id: string
+          id?: string
+          metadata?: Json | null
+          paid_out_at?: string | null
+          status?: string
+          subscription_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          charge_date?: string
+          company_id?: string
+          confirmed_at?: string | null
+          created_at?: string
+          currency?: string
+          description?: string
+          failed_at?: string | null
+          failure_reason?: string | null
+          gocardless_mandate_id?: string
+          gocardless_payment_id?: string
+          id?: string
+          metadata?: Json | null
+          paid_out_at?: string | null
+          status?: string
+          subscription_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gocardless_payments_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gocardless_payments_gocardless_mandate_id_fkey"
+            columns: ["gocardless_mandate_id"]
+            isOneToOne: false
+            referencedRelation: "gocardless_mandates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gocardless_payments_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "company_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       imports: {
         Row: {
