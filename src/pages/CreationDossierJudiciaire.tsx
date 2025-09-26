@@ -415,7 +415,7 @@ const CreationDossierJudiciaire = () => {
           
           // Mettre à jour les pièces jointes avec les nouveaux documents
           setAttachedFiles(foundUrls);
-          setDossierData(prev => ({
+          setFormData(prev => ({
             ...prev,
             pieces: foundDocs.join('\n')
           }));
