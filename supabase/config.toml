@@ -1,5 +1,8 @@
 project_id = "jukdsypvuehnniskgpfd"
 
+[functions.gocardless-payments]
+verify_jwt = true
+
 [functions.download-signed-repair-order]
 verify_jwt = true
 
