@@ -496,10 +496,82 @@ const DepotDossier = () => {
           const filename = `Dossier_Jugement_${selectedCase?.case_number || 'DJ-2025'}_${new Date().toISOString().split('T')[0]}.pdf`;
           downloadBlob(finalPDFBlob, filename);
           
-          toast({
-            title: "Dossier généré",
-            description: `Le dossier complet a été téléchargé: ${filename}`,
-          });
+          // Upload du PDF vers le webhook pour envoi courrier
+          try {
+            // Upload vers Supabase Storage pour obtenir une URL publique
+            const storageFilename = `judicial-cases/${selectedCase.id}/${filename}`;
+            const { data: uploadData, error: uploadError } = await supabase.storage
+              .from('documents')
+              .upload(storageFilename, finalPDFBlob, {
+                contentType: 'application/pdf',
+                upsert: true
+              });
+
+            if (uploadError) {
+              console.error('Erreur upload storage:', uploadError);
+              throw uploadError;
+            }
+
+            // Obtenir l'URL publique
+            const { data: { publicUrl } } = supabase.storage
+              .from('documents')
+              .getPublicUrl(storageFilename);
+
+            console.log('PDF uploaded, public URL:', publicUrl);
+
+            // Préparer les données pour le webhook
+            const webhookData = {
+              civility: '',
+              lastName: '',
+              firstName: '',
+              address: '6 Rue Joseph Autran',
+              zipCode: '13006',
+              city: 'MARSEILLE',
+              company: 'TRIBUNAL JUDICIAIRE DE MARSEILLE',
+              phone: '',
+              email: '',
+              filepath: publicUrl,
+              title: `Requête de jugement sur pièces - ${selectedCase?.case_number || 'Dossier'}`,
+              author: companyData?.name || '',
+              subject: '',
+              description: '',
+              papier: '',
+              papier_delai: '',
+              papier_rectoverso: '',
+              papier_couleur: '',
+              papier_enveloppe: ''
+            };
+
+            console.log('Sending judicial case to webhook:', webhookData);
+
+            // Appeler le webhook N8N (même que pour les cessions)
+            const webhookResponse = await fetch('https://n8n.karrosserie.pro/webhook/5f39c262-4fa4-477b-8635-f04c9bb61308', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(webhookData)
+            });
+
+            if (!webhookResponse.ok) {
+              const errorText = await webhookResponse.text();
+              console.error('Webhook error response:', errorText);
+              throw new Error(`Erreur lors de l'envoi du courrier: ${webhookResponse.status} ${webhookResponse.statusText}`);
+            }
+
+            console.log('Judicial case sent to tribunal via webhook successfully');
+            
+            toast({
+              title: "Dossier généré et envoyé",
+              description: `Le dossier complet a été téléchargé et envoyé au tribunal: ${filename}`,
+            });
+          } catch (error) {
+            console.error('Erreur envoi webhook:', error);
+            toast({
+              title: "Dossier généré",
+              description: `Le dossier complet a été téléchargé: ${filename}. Erreur d'envoi au tribunal.`,
+            });
+          }
           
         }
         
