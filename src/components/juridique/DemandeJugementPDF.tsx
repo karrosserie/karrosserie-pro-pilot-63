@@ -90,8 +90,8 @@ const DemandeJugementPDF: React.FC<DemandeJugementPDFProps> = ({
         </View>
 
         <View style={styles.header}>
-          <Text style={styles.title}>REQUÊTE EN INJONCTION DE PAYER</Text>
-          <Text>Article 1405 et suivants du Code de procédure civile</Text>
+          <Text style={styles.title}>PROCÉDURE DE JUGEMENT SUR PIÈCE</Text>
+          <Text>Article 1385 et suivants du Code de procédure civile</Text>
         </View>
 
         <View style={styles.section}>
@@ -123,7 +123,7 @@ const DemandeJugementPDF: React.FC<DemandeJugementPDFProps> = ({
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>III - CRÉANCE</Text>
           <Text style={styles.paragraph}>
-            Le demandeur sollicite du Tribunal une ordonnance portant injonction de payer 
+            Le demandeur sollicite du Tribunal un jugement sur pièces 
             à l'encontre du débiteur susvisé, en paiement de la somme de <Text style={styles.bold}>{totalAmount.toFixed(2)}€</Text> 
             (euros), correspondant aux prestations non réglées détaillées ci-après.
           </Text>
@@ -169,7 +169,7 @@ const DemandeJugementPDF: React.FC<DemandeJugementPDFProps> = ({
             Par ces motifs, le demandeur sollicite de Monsieur le Juge :
           </Text>
           <Text style={styles.paragraph}>
-            - De bien vouloir rendre une ordonnance portant injonction de payer à l'encontre 
+            - De bien vouloir rendre un jugement sur pièces à l'encontre 
             du débiteur susvisé ;
           </Text>
           <Text style={styles.paragraph}>
