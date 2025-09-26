@@ -944,6 +944,50 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
           </View>
         )}
 
+        {/* Section clause de litige pour Oodrive */}
+        {documentType === 'repair_order' && signatureData?.isForOodrive && (
+          <View style={{ marginTop: 25, marginBottom: 20, padding: 10, borderWidth: 1, borderColor: '#ccc' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10 }}>
+              <View style={{ 
+                width: 12, 
+                height: 12, 
+                borderWidth: 1, 
+                borderColor: '#000', 
+                marginRight: 8, 
+                marginTop: 2,
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <Text style={{ fontSize: 6, color: '#666' }}>[Checkbox1/]</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 8, lineHeight: 1.4, fontWeight: 'bold' }}>
+                  Option de procédure sans audience (Article 828 et 861-1 du Code de procédure civile)
+                </Text>
+              </View>
+            </View>
+            
+            <Text style={{ fontSize: 8, lineHeight: 1.4, marginBottom: 8, textAlign: 'justify' }}>
+              Je déclare expressément donner mon accord pour que tout litige éventuel relatif au présent ordre de réparation, 
+              dont le montant n'excéderait pas 10 000 €, soit jugé sans audience, exclusivement sur la base des écritures et 
+              pièces communiquées par les parties :
+            </Text>
+            
+            <Text style={{ fontSize: 8, lineHeight: 1.4, marginBottom: 4 }}>
+              • par le Tribunal judiciaire compétent, conformément à l'article 828 du Code de procédure civile,
+            </Text>
+            
+            <Text style={{ fontSize: 8, lineHeight: 1.4, marginBottom: 8 }}>
+              • ou par le Tribunal de commerce compétent, conformément à l'article 861-1 du Code de procédure civile, 
+              si le litige relève de sa compétence.
+            </Text>
+            
+            <Text style={{ fontSize: 8, lineHeight: 1.4, fontStyle: 'italic' }}>
+              Je reconnais avoir été pleinement informé(e) de la portée de cette option et de ses conséquences procédurales.
+            </Text>
+          </View>
+        )}
+
         {/* Section signature client pour les ordres de réparation */}
         {documentType === 'repair_order' && signatureData && (
           <View style={{ marginTop: 30, alignItems: 'center' }}>
