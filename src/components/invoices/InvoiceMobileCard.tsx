@@ -131,46 +131,46 @@ const InvoiceMobileCard: React.FC<InvoiceMobileCardProps> = ({
       {/* Actions */}
       <div className="flex flex-wrap gap-1.5 pt-3 border-t">
         {/* Primary Actions */}
-        <Button variant="view" size="sm" onClick={() => onViewInvoice(invoice)} className="w-24">
+        <Button variant="view" size="sm" onClick={() => onViewInvoice(invoice)} className="w-28 truncate">
           <Eye className="h-3 w-3 mr-1" />
           Voir
         </Button>
-        <Button variant="edit" size="sm" onClick={() => onEditInvoice(invoice)} className="w-24">
+        <Button variant="edit" size="sm" onClick={() => onEditInvoice(invoice)} className="w-28 truncate">
           <Pencil className="h-3 w-3 mr-1" />
           Modifier
         </Button>
         
         {/* Secondary Actions */}
-        <Button variant="download" size="sm" onClick={() => onDownload(invoice)} className="w-28">
+        <Button variant="download" size="sm" onClick={() => onDownload(invoice)} className="w-28 truncate">
           <Download className="h-3 w-3 mr-1" />
           Télécharger
         </Button>
-        <Button variant="print" size="sm" onClick={() => onPrint(invoice)} className="w-24">
+        <Button variant="print" size="sm" onClick={() => onPrint(invoice)} className="w-28 truncate">
           <Printer className="h-3 w-3 mr-1" />
           Imprimer
         </Button>
-        <Button variant="send" size="sm" onClick={() => onSendEmail(invoice)} className="w-24">
+        <Button variant="send" size="sm" onClick={() => onSendEmail(invoice)} className="w-28 truncate">
           <Mail className="h-3 w-3 mr-1" />
           E-mail
         </Button>
         
         {/* Invoice Specific Actions */}
-        <Button variant="payment" size="sm" onClick={() => onAddPayment(invoice)} className="w-24">
+        <Button variant="payment" size="sm" onClick={() => onAddPayment(invoice)} className="w-28 truncate">
           <CreditCard className="h-3 w-3 mr-1" />
           Paiement
         </Button>
-        <Button variant="create" size="sm" onClick={() => onAddCredit(invoice)} className="w-24">
+        <Button variant="create" size="sm" onClick={() => onAddCredit(invoice)} className="w-28 truncate">
           <FileX className="h-3 w-3 mr-1" />
           Avoir
         </Button>
-        <Button variant="send" size="sm" onClick={() => onRelance(invoice)} className="w-24">
+        <Button variant="send" size="sm" onClick={() => onRelance(invoice)} className="w-28 truncate">
           <Send className="h-3 w-3 mr-1" />
           Relance
         </Button>
         
         {/* Conditional Actions */}
         {showArchived && onRestoreInvoice && (
-          <Button variant="edit" size="sm" onClick={() => onRestoreInvoice(invoice)} className="w-24">
+          <Button variant="edit" size="sm" onClick={() => onRestoreInvoice(invoice)} className="w-28 truncate">
             <FileX className="h-3 w-3 mr-1" />
             Restaurer
           </Button>
@@ -178,7 +178,7 @@ const InvoiceMobileCard: React.FC<InvoiceMobileCardProps> = ({
         
         {/* Destructive Action */}
         {onDeleteInvoice && (
-          <Button variant="delete" size="sm" onClick={() => onDeleteInvoice(invoice)} className="w-24">
+          <Button variant="delete" size="sm" onClick={() => onDeleteInvoice(invoice)} className="w-28 truncate">
             <Trash className="h-3 w-3 mr-1" />
             {showArchived ? 'Supprimer' : 'Archiver'}
           </Button>

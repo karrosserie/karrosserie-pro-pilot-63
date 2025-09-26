@@ -94,31 +94,31 @@ const CreditMobileCard: React.FC<CreditMobileCardProps> = ({
       {/* Actions */}
       <div className="flex flex-wrap gap-1.5 pt-3 border-t">
         {/* Primary Actions */}
-        <Button variant="view" size="sm" onClick={() => onViewCredit(credit)} className="w-24">
+        <Button variant="view" size="sm" onClick={() => onViewCredit(credit)} className="w-28 truncate">
           <Eye className="h-3 w-3 mr-1" />
           Voir
         </Button>
-        <Button variant="edit" size="sm" onClick={() => onEditCredit(credit)} className="w-24">
+        <Button variant="edit" size="sm" onClick={() => onEditCredit(credit)} className="w-28 truncate">
           <Pencil className="h-3 w-3 mr-1" />
           Modifier
         </Button>
         
         {/* Secondary Actions */}
-        <Button variant="download" size="sm" onClick={() => onDownload(credit)} className="w-28">
+        <Button variant="download" size="sm" onClick={() => onDownload(credit)} className="w-28 truncate">
           <Download className="h-3 w-3 mr-1" />
           Télécharger
         </Button>
-        <Button variant="print" size="sm" onClick={() => onPrint(credit)} className="w-24">
+        <Button variant="print" size="sm" onClick={() => onPrint(credit)} className="w-28 truncate">
           <Printer className="h-3 w-3 mr-1" />
           Imprimer
         </Button>
-        <Button variant="send" size="sm" onClick={() => onSendEmail(credit)} className="w-24">
+        <Button variant="send" size="sm" onClick={() => onSendEmail(credit)} className="w-28 truncate">
           <Mail className="h-3 w-3 mr-1" />
           E-mail
         </Button>
         
         {/* Destructive Action */}
-        <Button variant="secondary" size="sm" onClick={() => onArchive(credit)} className="w-24">
+        <Button variant="secondary" size="sm" onClick={() => onArchive(credit)} className="w-28 truncate">
           <Archive className="h-3 w-3 mr-1" />
           Archiver
         </Button>

@@ -124,45 +124,45 @@ const QuoteMobileCard: React.FC<QuoteMobileCardProps> = ({
       {/* Actions */}
       <div className="flex flex-wrap gap-1.5 pt-3 border-t">
         {/* Primary Actions */}
-        <Button variant="view" size="sm" onClick={() => onViewQuote(quote)} className="w-24">
+        <Button variant="view" size="sm" onClick={() => onViewQuote(quote)} className="w-28 truncate">
           <Eye className="h-3 w-3 mr-1" />
           Voir
         </Button>
-        <Button variant="edit" size="sm" onClick={() => onEditQuote(quote)} className="w-24">
+        <Button variant="edit" size="sm" onClick={() => onEditQuote(quote)} className="w-28 truncate">
           <Pencil className="h-3 w-3 mr-1" />
           Modifier
         </Button>
         
         {/* Secondary Actions */}
-        <Button variant="download" size="sm" onClick={() => onDownload(quote)} className="w-28">
+        <Button variant="download" size="sm" onClick={() => onDownload(quote)} className="w-28 truncate">
           <Download className="h-3 w-3 mr-1" />
           Télécharger
         </Button>
-        <Button variant="print" size="sm" onClick={() => onPrint(quote)} className="w-24">
+        <Button variant="print" size="sm" onClick={() => onPrint(quote)} className="w-28 truncate">
           <Printer className="h-3 w-3 mr-1" />
           Imprimer
         </Button>
-        <Button variant="send" size="sm" onClick={() => onSendEmail(quote)} className="w-24">
+        <Button variant="send" size="sm" onClick={() => onSendEmail(quote)} className="w-28 truncate">
           <Mail className="h-3 w-3 mr-1" />
           E-mail
         </Button>
         
         {/* Conditional Actions */}
         {onRequestDocuments && (
-          <Button variant="create" size="sm" onClick={() => onRequestDocuments(quote)} className="w-28">
+          <Button variant="create" size="sm" onClick={() => onRequestDocuments(quote)} className="w-28 truncate">
             <FileCheck className="h-3 w-3 mr-1" />
             Justificatifs
           </Button>
         )}
         {onConvertToRepairOrder && (
-          <Button variant="validation" size="sm" onClick={() => onConvertToRepairOrder(quote)} className="w-24">
+          <Button variant="validation" size="sm" onClick={() => onConvertToRepairOrder(quote)} className="w-28 truncate">
             <ArrowRight className="h-3 w-3 mr-1" />
             Convertir
           </Button>
         )}
         
         {/* Destructive Action */}
-        <Button variant="delete" size="sm" onClick={() => onDeleteQuote(quote.id)} className="w-24">
+        <Button variant="delete" size="sm" onClick={() => onDeleteQuote(quote.id)} className="w-28 truncate">
           <Trash className="h-3 w-3 mr-1" />
           Supprimer
         </Button>
