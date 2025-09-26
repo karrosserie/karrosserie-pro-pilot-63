@@ -1031,8 +1031,17 @@ const DepotDossier = () => {
               <button onClick={() => navigate('/contentieux/depot-dossier')} className="px-4 py-2 bg-slate-600 text-white text-sm font-medium rounded-md hover:bg-slate-700 transition-colors">
                 ← Précédent
               </button>
-              <button onClick={handleProceedToDeposit} disabled={isDepositing} className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors disabled:opacity-50">
-                {isDepositing ? 'Dépôt en cours...' : 'Procéder au dépôt →'}
+              <button 
+                onClick={handleProceedToDeposit} 
+                disabled={isDepositing || selectedCase?.status === 'deposited'} 
+                className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {selectedCase?.status === 'deposited' 
+                  ? 'Dépôt déjà effectué ✓' 
+                  : isDepositing 
+                    ? 'Dépôt en cours...' 
+                    : 'Procéder au dépôt →'
+                }
               </button>
             </div>
           </div>
