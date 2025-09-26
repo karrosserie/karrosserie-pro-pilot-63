@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, FileText, Building2, AlertTriangle, CheckCircle, Clock, Download, Eye } from 'lucide-react';
 import { useJudicialCases } from '@/hooks/use-judicial-cases';
+import { useClients } from '@/hooks/use-clients';
+import { useInvoices } from '@/hooks/use-invoices';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,17 +12,14 @@ import { useToast } from '@/hooks/use-toast';
 import CalendrierProcedure from '@/components/CalendrierProcedure';
 const DepotDossier = () => {
   const navigate = useNavigate();
-  const {
-    id
-  } = useParams();
-  const {
-    cases,
-    loading
-  } = useJudicialCases();
-  const {
-    toast
-  } = useToast();
+  const { id } = useParams();
+  const { cases, loading } = useJudicialCases();
+  const { clients } = useClients();
+  const { invoices } = useInvoices();
+  const { toast } = useToast();
   const [selectedCase, setSelectedCase] = useState(null);
+  const [relatedClient, setRelatedClient] = useState(null);
+  const [relatedInvoice, setRelatedInvoice] = useState(null);
   const [currentStep, setCurrentStep] = useState(2);
   const [isDepositing, setIsDepositing] = useState(false);
   const [loadingText, setLoadingText] = useState('');
@@ -38,8 +37,20 @@ const DepotDossier = () => {
     if (id && cases) {
       const foundCase = cases.find(c => c.id === id);
       setSelectedCase(foundCase);
+      
+      // Récupérer les données du client associé
+      if (foundCase?.client_id && clients) {
+        const client = clients.find(c => c.id === foundCase.client_id);
+        setRelatedClient(client);
+      }
+      
+      // Récupérer les données de la facture associée
+      if (foundCase?.invoice_id && invoices) {
+        const invoice = invoices.find(i => i.id === foundCase.invoice_id);
+        setRelatedInvoice(invoice);
+      }
     }
-  }, [id, cases]);
+  }, [id, cases, clients, invoices]);
   const steps = [{
     id: 1,
     label: "Dossier généré",
@@ -70,27 +81,52 @@ const DepotDossier = () => {
     current: currentStep === 5,
     completed: currentStep >= 5
   }];
-  const documents = [{
-    name: "Facture FAC-2024-002",
-    description: "Facture originale • 15/11/2024 • 125 Ko",
-    icon: "📄",
-    type: "facture"
-  }, {
-    name: "Devis signé",
-    description: "Preuve d'accord contractuel • 02/11/2024 • 89 Ko",
-    icon: "✍️",
-    type: "devis"
-  }, {
-    name: "Mise en demeure avec AR",
-    description: "LRE du 03/01/2025 • Accusé réception • 234 Ko",
-    icon: "📮",
-    type: "mise_en_demeure"
-  }, {
-    name: "Historique des relances",
-    description: "5 relances automatiques • Emails, SMS • 156 Ko",
-    icon: "📧",
-    type: "relances"
-  }];
+  // Générer les documents basés sur les vraies données du dossier
+  const generateDocuments = () => {
+    const docs = [];
+    
+    if (relatedInvoice) {
+      docs.push({
+        name: `Facture ${relatedInvoice.reference}`,
+        description: `Facture originale • ${new Date(relatedInvoice.date).toLocaleDateString('fr-FR')} • Montant: ${relatedInvoice.amount}€`,
+        icon: "📄",
+        type: "facture"
+      });
+    }
+    
+    if (selectedCase?.pieces) {
+      // Parser les pièces du dossier
+      const pieces = selectedCase.pieces.split('\n').filter(piece => piece.trim());
+      pieces.forEach((piece, index) => {
+        if (piece.includes('Devis')) {
+          docs.push({
+            name: "Devis signé",
+            description: `Document contractuel • ${piece}`,
+            icon: "✍️", 
+            type: "devis"
+          });
+        } else if (piece.includes('réparation')) {
+          docs.push({
+            name: "Ordre de réparation",
+            description: `Document de travaux • ${piece}`,
+            icon: "🔧",
+            type: "repair_order"
+          });
+        } else {
+          docs.push({
+            name: `Document ${index + 1}`,
+            description: piece,
+            icon: "📎",
+            type: "other"
+          });
+        }
+      });
+    }
+    
+    return docs;
+  };
+
+  const documents = generateDocuments();
   const tribunals = [{
     id: 'marseille',
     name: 'Tribunal Judiciaire de Marseille',
@@ -275,7 +311,9 @@ const DepotDossier = () => {
           <div className="p-8 border-b border-slate-200 bg-slate-50">
             <h2 className="text-2xl font-bold text-slate-900 mb-2">Requête au tribunal de jugement sur pièces</h2>
             <p className="text-slate-600 text-base">
-              {selectedCase.defendeur?.split('\n')[0]} - Facture {selectedCase.reference} - {selectedCase.montant_dossier || '8 200,00'} €
+              {relatedClient ? `${relatedClient.first_name} ${relatedClient.last_name}` : selectedCase.defendeur?.split('\n')[0]} • 
+              Facture {relatedInvoice?.reference || selectedCase.reference} • 
+              {relatedInvoice?.amount || selectedCase.montant_dossier || '0,00'} €
             </p>
           </div>
 
@@ -299,29 +337,79 @@ const DepotDossier = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block font-medium mb-2 text-slate-900">Débiteur</label>
-                  <input type="text" value={selectedCase.defendeur?.split('\n')[0] || "Entreprise Martin SARL"} readOnly className="w-full p-3 border border-slate-300 rounded-md bg-slate-50 text-sm" />
+                  <input 
+                    type="text" 
+                    value={relatedClient ? `${relatedClient.first_name} ${relatedClient.last_name}` : selectedCase.defendeur?.split('\n')[0] || "Non renseigné"} 
+                    readOnly 
+                    className="w-full p-3 border border-slate-300 rounded-md bg-slate-50 text-sm" 
+                  />
                 </div>
                 <div>
-                  <label className="block font-medium mb-2 text-slate-900">SIRET</label>
-                  <input type="text" value="12345678901234" readOnly className="w-full p-3 border border-slate-300 rounded-md bg-slate-50 text-sm" />
+                  <label className="block font-medium mb-2 text-slate-900">Adresse</label>
+                  <input 
+                    type="text" 
+                    value={relatedClient ? `${relatedClient.address || ''} ${relatedClient.postal_code || ''} ${relatedClient.city || ''}`.trim() : "Non renseignée"} 
+                    readOnly 
+                    className="w-full p-3 border border-slate-300 rounded-md bg-slate-50 text-sm" 
+                  />
+                </div>
+                <div>
+                  <label className="block font-medium mb-2 text-slate-900">Email</label>
+                  <input 
+                    type="text" 
+                    value={relatedClient?.email || "Non renseigné"} 
+                    readOnly 
+                    className="w-full p-3 border border-slate-300 rounded-md bg-slate-50 text-sm" 
+                  />
+                </div>
+                <div>
+                  <label className="block font-medium mb-2 text-slate-900">Téléphone</label>
+                  <input 
+                    type="text" 
+                    value={relatedClient?.phone || "Non renseigné"} 
+                    readOnly 
+                    className="w-full p-3 border border-slate-300 rounded-md bg-slate-50 text-sm" 
+                  />
                 </div>
                 <div>
                   <label className="block font-medium mb-2 text-slate-900">Montant principal</label>
-                  <input type="text" value={`${selectedCase.montant_dossier || '8 200,00'} €`} readOnly className="w-full p-3 border border-slate-300 rounded-md bg-slate-50 text-sm" />
+                  <input 
+                    type="text" 
+                    value={`${relatedInvoice?.amount || selectedCase.montant_dossier || '0,00'} €`} 
+                    readOnly 
+                    className="w-full p-3 border border-slate-300 rounded-md bg-slate-50 text-sm" 
+                  />
                 </div>
                 <div>
                   <label className="block font-medium mb-2 text-slate-900">Pénalités de retard</label>
-                  <input type="text" value="287,00 €" readOnly className="w-full p-3 border border-slate-300 rounded-md bg-slate-50 text-sm" />
+                  <input 
+                    type="text" 
+                    value={selectedCase.interets ? `${Math.round((relatedInvoice?.amount || selectedCase.montant_dossier || 0) * 0.035)} €` : "0,00 €"} 
+                    readOnly 
+                    className="w-full p-3 border border-slate-300 rounded-md bg-slate-50 text-sm" 
+                  />
                 </div>
                 <div>
                   <label className="block font-medium mb-2 text-slate-900">Indemnité forfaitaire</label>
-                  <input type="text" value="40,00 €" readOnly className="w-full p-3 border border-slate-300 rounded-md bg-slate-50 text-sm" />
+                  <input 
+                    type="text" 
+                    value="40,00 €" 
+                    readOnly 
+                    className="w-full p-3 border border-slate-300 rounded-md bg-slate-50 text-sm" 
+                  />
                 </div>
                 <div>
                   <label className="block font-medium mb-2 text-slate-900">Total réclamé</label>
-                  <input type="text" value={`${(parseFloat(selectedCase.montant_dossier || '8200') + 287 + 40).toLocaleString('fr-FR', {
-                  minimumFractionDigits: 2
-                })} €`} readOnly className="w-full p-3 border border-slate-300 rounded-md bg-slate-50 text-sm font-semibold" />
+                  <input 
+                    type="text" 
+                    value={`${(
+                      (relatedInvoice?.amount || selectedCase.montant_dossier || 0) + 
+                      (selectedCase.interets ? Math.round((relatedInvoice?.amount || selectedCase.montant_dossier || 0) * 0.035) : 0) + 
+                      40
+                    ).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €`} 
+                    readOnly 
+                    className="w-full p-3 border border-slate-300 rounded-md bg-slate-50 text-sm font-semibold" 
+                  />
                 </div>
               </div>
             </div>
