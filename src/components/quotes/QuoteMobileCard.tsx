@@ -124,45 +124,45 @@ const QuoteMobileCard: React.FC<QuoteMobileCardProps> = ({
       {/* Actions */}
       <div className="flex flex-wrap gap-1.5 pt-3 border-t">
         {/* Primary Actions */}
-        <Button variant="view" size="sm" onClick={() => onViewQuote(quote)} className="flex-1 min-w-[80px]">
+        <Button variant="view" size="sm" onClick={() => onViewQuote(quote)} className="w-24">
           <Eye className="h-3 w-3 mr-1" />
           Voir
         </Button>
-        <Button variant="edit" size="sm" onClick={() => onEditQuote(quote)} className="flex-1 min-w-[80px]">
+        <Button variant="edit" size="sm" onClick={() => onEditQuote(quote)} className="w-24">
           <Pencil className="h-3 w-3 mr-1" />
           Modifier
         </Button>
         
         {/* Secondary Actions */}
-        <Button variant="download" size="sm" onClick={() => onDownload(quote)} className="min-w-[100px]">
+        <Button variant="download" size="sm" onClick={() => onDownload(quote)} className="w-28">
           <Download className="h-3 w-3 mr-1" />
           Télécharger
         </Button>
-        <Button variant="print" size="sm" onClick={() => onPrint(quote)} className="min-w-[90px]">
+        <Button variant="print" size="sm" onClick={() => onPrint(quote)} className="w-24">
           <Printer className="h-3 w-3 mr-1" />
           Imprimer
         </Button>
-        <Button variant="send" size="sm" onClick={() => onSendEmail(quote)} className="min-w-[80px]">
+        <Button variant="send" size="sm" onClick={() => onSendEmail(quote)} className="w-24">
           <Mail className="h-3 w-3 mr-1" />
           E-mail
         </Button>
         
         {/* Conditional Actions */}
         {onRequestDocuments && (
-          <Button variant="create" size="sm" onClick={() => onRequestDocuments(quote)} className="min-w-[100px]">
+          <Button variant="create" size="sm" onClick={() => onRequestDocuments(quote)} className="w-28">
             <FileCheck className="h-3 w-3 mr-1" />
             Justificatifs
           </Button>
         )}
         {onConvertToRepairOrder && (
-          <Button variant="validation" size="sm" onClick={() => onConvertToRepairOrder(quote)} className="min-w-[90px]">
+          <Button variant="validation" size="sm" onClick={() => onConvertToRepairOrder(quote)} className="w-24">
             <ArrowRight className="h-3 w-3 mr-1" />
             Convertir
           </Button>
         )}
         
         {/* Destructive Action */}
-        <Button variant="delete" size="sm" onClick={() => onDeleteQuote(quote.id)} className="min-w-[90px]">
+        <Button variant="delete" size="sm" onClick={() => onDeleteQuote(quote.id)} className="w-24">
           <Trash className="h-3 w-3 mr-1" />
           Supprimer
         </Button>

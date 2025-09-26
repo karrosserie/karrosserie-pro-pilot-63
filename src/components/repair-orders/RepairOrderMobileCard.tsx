@@ -78,30 +78,30 @@ const RepairOrderMobileCard: React.FC<RepairOrderMobileCardProps> = ({
       {/* Actions */}
       <div className="flex flex-wrap gap-1.5 pt-3 border-t">
         {/* Primary Actions */}
-        <Button variant="view" size="sm" onClick={() => onViewOrder(order)} className="flex-1 min-w-[80px]">
+        <Button variant="view" size="sm" onClick={() => onViewOrder(order)} className="w-24">
           <Eye className="h-3 w-3 mr-1" />
           Voir
         </Button>
-        <Button variant="edit" size="sm" onClick={() => onEditOrder(order)} className="flex-1 min-w-[80px]">
+        <Button variant="edit" size="sm" onClick={() => onEditOrder(order)} className="w-24">
           <Pencil className="h-3 w-3 mr-1" />
           Modifier
         </Button>
         
         {/* Secondary Actions */}
         {contextMenuProps?.onDownload && (
-          <Button variant="download" size="sm" onClick={() => contextMenuProps.onDownload(order)} className="min-w-[100px]">
+          <Button variant="download" size="sm" onClick={() => contextMenuProps.onDownload(order)} className="w-28">
             <Download className="h-3 w-3 mr-1" />
             Télécharger
           </Button>
         )}
         {contextMenuProps?.onPrint && (
-          <Button variant="print" size="sm" onClick={() => contextMenuProps.onPrint(order)} className="min-w-[90px]">
+          <Button variant="print" size="sm" onClick={() => contextMenuProps.onPrint(order)} className="w-24">
             <Printer className="h-3 w-3 mr-1" />
             Imprimer
           </Button>
         )}
         {contextMenuProps?.onSendEmail && (
-          <Button variant="send" size="sm" onClick={() => contextMenuProps.onSendEmail(order)} className="min-w-[80px]">
+          <Button variant="send" size="sm" onClick={() => contextMenuProps.onSendEmail(order)} className="w-24">
             <Mail className="h-3 w-3 mr-1" />
             E-mail
           </Button>
@@ -109,25 +109,25 @@ const RepairOrderMobileCard: React.FC<RepairOrderMobileCardProps> = ({
         
         {/* Signature Actions */}
         {contextMenuProps?.onSignOrder && (
-          <Button variant="create" size="sm" onClick={() => contextMenuProps.onSignOrder(order)} className="min-w-[80px]">
+          <Button variant="create" size="sm" onClick={() => contextMenuProps.onSignOrder(order)} className="w-24">
             <Signature className="h-3 w-3 mr-1" />
             Signer
           </Button>
         )}
         {hasValidClientPhone && !isAlreadySignedOodrive && !isSignatureInProgress && contextMenuProps?.onSendForOodriveSignature && (
-          <Button variant="create" size="sm" onClick={() => contextMenuProps.onSendForOodriveSignature!(order)} className="min-w-[140px]">
+          <Button variant="create" size="sm" onClick={() => contextMenuProps.onSendForOodriveSignature!(order)} className="w-36">
             <Send className="h-3 w-3 mr-1" />
             Signature électronique
           </Button>
         )}
         {isSignatureInProgress && (
-          <Button variant="create" size="sm" disabled className="min-w-[100px]">
+          <Button variant="create" size="sm" disabled className="w-28">
             <Send className="h-3 w-3 mr-1" />
             En cours...
           </Button>
         )}
         {isAlreadySignedOodrive && (
-          <Button variant="validation" size="sm" disabled className="min-w-[80px]">
+          <Button variant="validation" size="sm" disabled className="w-24">
             <FileCheck className="h-3 w-3 mr-1 text-green-600" />
             Signé
           </Button>
@@ -135,20 +135,20 @@ const RepairOrderMobileCard: React.FC<RepairOrderMobileCardProps> = ({
         
         {/* Additional Actions */}
         {contextMenuProps?.onRequestDocuments && (
-          <Button variant="create" size="sm" onClick={() => contextMenuProps.onRequestDocuments!(order)} className="min-w-[100px]">
+          <Button variant="create" size="sm" onClick={() => contextMenuProps.onRequestDocuments!(order)} className="w-28">
             <FileCheck className="h-3 w-3 mr-1" />
             Justificatifs
           </Button>
         )}
         {contextMenuProps?.onConvertToInvoice && (
-          <Button variant="validation" size="sm" onClick={() => contextMenuProps.onConvertToInvoice(order)} className="min-w-[90px]">
+          <Button variant="validation" size="sm" onClick={() => contextMenuProps.onConvertToInvoice(order)} className="w-24">
             <ArrowRight className="h-3 w-3 mr-1" />
             Facturer
           </Button>
         )}
         
         {/* Destructive Action */}
-        <Button variant="delete" size="sm" onClick={() => onDeleteOrder(order)} className="min-w-[90px]">
+        <Button variant="delete" size="sm" onClick={() => onDeleteOrder(order)} className="w-24">
           <Trash className="h-3 w-3 mr-1" />
           Supprimer
         </Button>
