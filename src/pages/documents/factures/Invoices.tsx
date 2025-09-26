@@ -262,7 +262,6 @@ const Invoices = () => {
       const success = await sendRelance({
         invoice,
         channel,
-        tone: 'professional',
         message: `Relance n°${relanceNumber} pour la facture ${invoice.reference}`,
         relanceNumber,
       });

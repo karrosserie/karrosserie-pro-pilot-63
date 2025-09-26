@@ -134,7 +134,6 @@ Karrosserie Pro`,
       const success = await sendRelance({
         invoice: selectedInvoice,
         channel: selectedActionType,
-        tone: getToneFromActionType(selectedActionType),
         message: generatedMessage,
         subject: messageData.subject,
         relanceNumber: "1",

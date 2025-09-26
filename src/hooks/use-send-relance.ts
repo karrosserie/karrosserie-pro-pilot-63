@@ -147,7 +147,6 @@ export const useSendRelance = () => {
   const sendRelance = async (params: {
     invoice: any;
     channel: string;
-    tone: string;
     message: string;
     subject?: string;
     relanceNumber: string;
@@ -162,18 +161,10 @@ export const useSendRelance = () => {
         'recommande': 'courrier_recommande'
       };
 
-      const toneMap: { [key: string]: ToneType } = {
-        'amical': 'amical',
-        'ferme': 'ferme',
-        'serieux': 'serieux',
-        'menacant': 'menacant'
-      };
-
       const mappedChannel = channelMap[params.channel];
-      const mappedTone = toneMap[params.tone];
 
-      if (!mappedChannel || !mappedTone) {
-        throw new Error(`Type de canal ou ton non supporté: ${params.channel}, ${params.tone}`);
+      if (!mappedChannel) {
+        throw new Error(`Type de canal non supporté: ${params.channel}`);
       }
 
       // Vérifier la limite quotidienne
@@ -199,7 +190,7 @@ export const useSendRelance = () => {
         clientId: params.invoice.client_id,
         invoiceId: params.invoice.id,
         channel: mappedChannel,
-        tone: mappedTone,
+        tone: 'amical', // Ton par défaut
         message: params.message,
         subject: params.subject,
       });
