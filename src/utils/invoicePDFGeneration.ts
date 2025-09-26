@@ -172,6 +172,44 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
   }
 };
 
+export const generateInvoicePDFBlob = async (invoice: Invoice, companyData: any) => {
+  try {
+    const data = await prepareInvoiceDataForPDF(invoice, companyData);
+    
+    // Adapter les données pour le composant PDF
+    const pdfData = {
+      ...data.clientData,
+      number: data.invoiceData.number,
+      billingDate: data.invoiceData.billingDate,
+      dueDate: data.invoiceData.dueDate,
+      claimNumber: data.invoiceData.claimNumber,
+      vehicle: data.invoiceData.vehicle,
+      licensePlate: data.invoiceData.licensePlate,
+      mileage: data.invoiceData.mileage,
+      notes: invoice.notes || '',
+      items: data.items,
+      totals: data.totals,
+      amountDue: `${data.remainingAmount.toFixed(2).replace('.', ',')} €`
+    };
+    
+    const doc = InvoicePDF({ 
+      invoice, 
+      companyData: data.companyData, 
+      receipts: data.receipts,
+      clientData: pdfData,
+      vehicleData: null,
+      template: data.template
+    });
+    
+    // Générer et retourner le blob PDF
+    const asPdf = pdf(doc);
+    return await asPdf.toBlob();
+  } catch (error) {
+    console.error('Erreur lors de la génération du blob PDF:', error);
+    throw error;
+  }
+};
+
 export const generateInvoicePDFWithTemplate = async (invoice: Invoice, companyData: any) => {
   try {
     const data = await prepareInvoiceDataForPDF(invoice, companyData);

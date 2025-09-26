@@ -177,239 +177,259 @@ const CreationDossierJudiciaire = () => {
     }
   }, [selectedInvoice, invoices]);
 
+  // Helper function to generate documents async
+  const generateDocuments = async (client: any, invoice: any) => {
+    console.log('Génération des pièces pour facture:', invoice.reference);
+    
+    // PIÈCES LOGIQUES - Toujours présentes si facture sélectionnée
+    // COLLECTE RIGOUREUSE DES DOCUMENTS EXISTANTS UNIQUEMENT
+    console.log('=== DÉBUT COLLECTE DOCUMENTS ===');
+    
+    const existingDocuments: Array<{url: string; type: string; description: string; reference?: string; date?: string}> = [];
+    let pieceNumber = 1;
+    
+    // 1. Devis lié - Générer le PDF à la demande
+    const relatedQuote = quotes?.find(quote => 
+      quote.client_id === selectedClient && 
+      quote.vehicle_id === invoice.vehicle_id
+    );
+    
+    console.log('Quote trouvé:', relatedQuote);
+    if (relatedQuote) {
+      try {
+        const { generateQuotePDFBlob } = await import('@/utils/quotePDFGeneration');
+        const blob = await generateQuotePDFBlob(relatedQuote, companyData);
+        const fileUrl = URL.createObjectURL(blob);
+        
+        existingDocuments.push({
+          url: fileUrl,
+          type: 'quote',
+          description: 'Devis signé',
+          reference: relatedQuote.reference,
+          date: relatedQuote.valid_until || invoice.date
+        });
+        console.log('✅ Devis PDF généré:', relatedQuote.reference);
+      } catch (error) {
+        console.error('❌ Erreur génération PDF devis:', error);
+      }
+    } else {
+      console.log('❌ Pas de devis trouvé');
+    }
+    
+    // 2. Ordre de réparation - SEULEMENT s'il a un document signé
+    const relatedRepairOrders = repairOrders?.filter(order => 
+      order.client_id === selectedClient && 
+      order.invoices?.some(inv => inv.id === selectedInvoice)
+    ) || [];
+    
+    console.log('Repair orders trouvés:', relatedRepairOrders.length);
+    relatedRepairOrders.forEach(order => {
+      if (order.signed_document_url && order.signed_document_url.trim()) {
+        existingDocuments.push({
+          url: order.signed_document_url,
+          type: 'repair_order',
+          description: 'Ordre de réparation signé',
+          reference: order.reference
+        });
+        console.log('✅ OR signé ajouté:', order.reference);
+      } else if ((order as any).document_url && (order as any).document_url.trim()) {
+        existingDocuments.push({
+          url: (order as any).document_url,
+          type: 'repair_order',
+          description: 'Ordre de réparation',
+          reference: order.reference
+        });
+        console.log('✅ OR ajouté:', order.reference);
+      } else {
+        console.log('❌ OR sans document:', order.reference);
+      }
+    });
+    
+    // 3. Facture - Générer le PDF à la demande
+    console.log('Invoice data:', invoice);
+    try {
+      const { generateInvoicePDFBlob } = await import('@/utils/invoicePDFGeneration');
+      const blob = await generateInvoicePDFBlob(invoice, companyData);
+      const fileUrl = URL.createObjectURL(blob);
+      
+      existingDocuments.push({
+        url: fileUrl,
+        type: 'invoice',
+        description: 'Facture impayée',
+        reference: invoice.reference,
+        date: invoice.date
+      });
+      console.log('✅ Facture PDF générée:', invoice.reference);
+    } catch (error) {
+      console.error('❌ Erreur génération PDF facture:', error);
+    }
+    
+    // 4. Documents physiques existants
+    const physicalDocuments: string[] = [];
+    
+    // Permis de conduire client
+    if (client.driverLicenseFrontUrl && client.driverLicenseFrontUrl.trim()) {
+      physicalDocuments.push(client.driverLicenseFrontUrl);
+      existingDocuments.push({
+        url: client.driverLicenseFrontUrl,
+        type: 'driver_license',
+        description: 'Permis de conduire (recto)'
+      });
+    }
+    if (client.driverLicenseBackUrl && client.driverLicenseBackUrl.trim()) {
+      physicalDocuments.push(client.driverLicenseBackUrl);
+      existingDocuments.push({
+        url: client.driverLicenseBackUrl,
+        type: 'driver_license',
+        description: 'Permis de conduire (verso)'
+      });
+    }
+    
+    // Photos des travaux des repair orders
+    relatedRepairOrders.forEach(order => {
+      if (order.repairs_data) {
+        try {
+          const repairsData = typeof order.repairs_data === 'string' ? 
+            JSON.parse(order.repairs_data) : order.repairs_data;
+          if (Array.isArray(repairsData)) {
+            repairsData.forEach((repair: any) => {
+              if (repair.photos && Array.isArray(repair.photos)) {
+                repair.photos.forEach((photoUrl: string) => {
+                  if (photoUrl && photoUrl.trim()) {
+                    physicalDocuments.push(photoUrl);
+                    existingDocuments.push({
+                      url: photoUrl,
+                      type: 'work_photo',
+                      description: 'Photo de véhicule/travaux'
+                    });
+                  }
+                });
+              }
+            });
+          }
+        } catch (e) {
+          console.log('Could not parse repairs_data for photos');
+        }
+      }
+      if (order.parts_data) {
+        try {
+          const partsData = typeof order.parts_data === 'string' ? 
+            JSON.parse(order.parts_data) : order.parts_data;
+          if (Array.isArray(partsData)) {
+            partsData.forEach((part: any) => {
+              if (part.photos && Array.isArray(part.photos)) {
+                part.photos.forEach((photoUrl: string) => {
+                  if (photoUrl && photoUrl.trim()) {
+                    physicalDocuments.push(photoUrl);
+                    existingDocuments.push({
+                      url: photoUrl,
+                      type: 'work_photo',
+                      description: 'Photo de véhicule/travaux'
+                    });
+                  }
+                });
+              }
+            });
+          }
+        } catch (e) {
+          console.log('Could not parse parts_data for photos');
+        }
+      }
+    });
+    
+    // Documents de relances
+    const clientRelances = relances?.filter(relance => 
+      relance.client_id === selectedClient && 
+      relance.invoice_id === selectedInvoice
+    ) || [];
+    
+    clientRelances.forEach(relance => {
+      if (relance.channel_data) {
+        // Document principal de la relance
+        if (relance.channel_data.document_url && relance.channel_data.document_url.trim()) {
+          physicalDocuments.push(relance.channel_data.document_url);
+          existingDocuments.push({
+            url: relance.channel_data.document_url,
+            type: 'reminder',
+            description: 'Document de relance'
+          });
+        }
+        
+        // Pièces jointes de la relance
+        if (relance.channel_data.attachments && Array.isArray(relance.channel_data.attachments)) {
+          relance.channel_data.attachments.forEach((attachment: any) => {
+            if (attachment.url && attachment.url.trim()) {
+              physicalDocuments.push(attachment.url);
+              existingDocuments.push({
+                url: attachment.url,
+                type: 'reminder_attachment',
+                description: attachment.name || 'Pièce jointe de relance'
+              });
+            }
+          });
+        }
+      }
+    });
+    
+    return existingDocuments;
+  };
+
   // Auto-import supporting documents when both client and invoice are selected
   useEffect(() => {
-    if (selectedClient && selectedInvoice && clients && invoices && quotes) {
+    if (selectedClient && selectedInvoice && clients && invoices && quotes && companyData) {
       const client = clients.find(c => c.id === selectedClient);
       const invoice = invoices.find(i => i.id === selectedInvoice);
       
       if (client && invoice) {
-        console.log('Génération des pièces pour facture:', invoice.reference);
-        
-        // PIÈCES LOGIQUES - Toujours présentes si facture sélectionnée
-        // COLLECTE RIGOUREUSE DES DOCUMENTS EXISTANTS UNIQUEMENT
-        console.log('=== DÉBUT COLLECTE DOCUMENTS ===');
-        
-        const existingDocuments: Array<{url: string; type: string; description: string; reference?: string; date?: string}> = [];
-        let pieceNumber = 1;
-        
-        // 1. Devis - SEULEMENT s'il a un document_url
-        const relatedQuote = quotes?.find(quote => 
-          quote.client_id === selectedClient && 
-          quote.vehicle_id === invoice.vehicle_id
-        );
-        
-        console.log('Quote trouvé:', relatedQuote);
-        if (relatedQuote && (relatedQuote as any).document_url && (relatedQuote as any).document_url.trim()) {
-          existingDocuments.push({
-            url: (relatedQuote as any).document_url,
-            type: 'quote',
-            description: 'Devis signé',
-            reference: relatedQuote.reference,
-            date: relatedQuote.valid_until || invoice.date
-          });
-          console.log('✅ Devis ajouté:', relatedQuote.reference);
-        } else {
-          console.log('❌ Pas de devis avec document_url');
-        }
-        
-        // 2. Ordre de réparation - SEULEMENT s'il a un document signé
-        const relatedRepairOrders = repairOrders?.filter(order => 
-          order.client_id === selectedClient && 
-          order.invoices?.some(inv => inv.id === selectedInvoice)
-        ) || [];
-        
-        console.log('Repair orders trouvés:', relatedRepairOrders.length);
-        relatedRepairOrders.forEach(order => {
-          if (order.signed_document_url && order.signed_document_url.trim()) {
-            existingDocuments.push({
-              url: order.signed_document_url,
-              type: 'repair_order',
-              description: 'Ordre de réparation signé',
-              reference: order.reference
-            });
-            console.log('✅ OR signé ajouté:', order.reference);
-          } else if ((order as any).document_url && (order as any).document_url.trim()) {
-            existingDocuments.push({
-              url: (order as any).document_url,
-              type: 'repair_order',
-              description: 'Ordre de réparation',
-              reference: order.reference
-            });
-            console.log('✅ OR ajouté:', order.reference);
-          } else {
-            console.log('❌ OR sans document:', order.reference);
-          }
-        });
-        
-        // 3. Facture - SEULEMENT si elle a un document_url
-        console.log('Invoice data:', invoice);
-        if ((invoice as any).document_url && (invoice as any).document_url.trim()) {
-          existingDocuments.push({
-            url: (invoice as any).document_url,
-            type: 'invoice',
-            description: 'Facture impayée',
-            reference: invoice.reference,
-            date: invoice.date
-          });
-          console.log('✅ Facture ajoutée:', invoice.reference);
-        } else {
-          console.log('❌ Facture sans document_url');
-        }
-        
-        // 4. Documents physiques existants
-        const physicalDocuments: string[] = [];
-        
-        // Permis de conduire client
-        if (client.driverLicenseFrontUrl && client.driverLicenseFrontUrl.trim()) {
-          physicalDocuments.push(client.driverLicenseFrontUrl);
-          existingDocuments.push({
-            url: client.driverLicenseFrontUrl,
-            type: 'driver_license',
-            description: 'Permis de conduire (recto)'
-          });
-        }
-        if (client.driverLicenseBackUrl && client.driverLicenseBackUrl.trim()) {
-          physicalDocuments.push(client.driverLicenseBackUrl);
-          existingDocuments.push({
-            url: client.driverLicenseBackUrl,
-            type: 'driver_license',
-            description: 'Permis de conduire (verso)'
-          });
-        }
-        
-        // Photos des travaux des repair orders
-        relatedRepairOrders.forEach(order => {
-          if (order.repairs_data) {
-            try {
-              const repairsData = typeof order.repairs_data === 'string' ? 
-                JSON.parse(order.repairs_data) : order.repairs_data;
-              if (Array.isArray(repairsData)) {
-                repairsData.forEach((repair: any) => {
-                  if (repair.photos && Array.isArray(repair.photos)) {
-                    repair.photos.forEach((photoUrl: string) => {
-                      if (photoUrl && photoUrl.trim()) {
-                        physicalDocuments.push(photoUrl);
-                        existingDocuments.push({
-                          url: photoUrl,
-                          type: 'work_photo',
-                          description: 'Photo de véhicule/travaux'
-                        });
-                      }
-                    });
-                  }
-                });
-              }
-            } catch (e) {
-              console.log('Could not parse repairs_data for photos');
-            }
-          }
-          if (order.parts_data) {
-            try {
-              const partsData = typeof order.parts_data === 'string' ? 
-                JSON.parse(order.parts_data) : order.parts_data;
-              if (Array.isArray(partsData)) {
-                partsData.forEach((part: any) => {
-                  if (part.photos && Array.isArray(part.photos)) {
-                    part.photos.forEach((photoUrl: string) => {
-                      if (photoUrl && photoUrl.trim()) {
-                        physicalDocuments.push(photoUrl);
-                        existingDocuments.push({
-                          url: photoUrl,
-                          type: 'work_photo',
-                          description: 'Photo de véhicule/travaux'
-                        });
-                      }
-                    });
-                  }
-                });
-              }
-            } catch (e) {
-              console.log('Could not parse parts_data for photos');
-            }
-          }
-        });
-        
-        // Documents de relances
-        const clientRelances = relances?.filter(relance => 
-          relance.client_id === selectedClient && 
-          relance.invoice_id === selectedInvoice
-        ) || [];
-        
-        clientRelances.forEach(relance => {
-          if (relance.channel_data) {
-            // Document principal de la relance
-            if (relance.channel_data.document_url && relance.channel_data.document_url.trim()) {
-              physicalDocuments.push(relance.channel_data.document_url);
-              existingDocuments.push({
-                url: relance.channel_data.document_url,
-                type: 'reminder',
-                description: 'Document de relance'
-              });
+        generateDocuments(client, invoice).then(existingDocuments => {
+          
+          // Mise à jour des pièces du dossier avec les documents trouvés et générés
+          const foundDocs = existingDocuments.map((doc, index) => {
+            // Déterminer la description en fonction du type
+            let description = doc.description;
+            
+            switch (doc.type) {
+              case 'quote':
+                description = `Devis n°${doc.reference}`;
+                break;
+              case 'invoice':
+                description = `Facture n°${doc.reference} impayée du ${doc.date}`;
+                break;
+              case 'repair_order':
+                description = `Ordre de réparation n°${doc.reference}`;
+                break;
+              default:
+                description = doc.description;
             }
             
-            // Documents spécifiques au courrier recommandé
-            if (relance.channel === 'courrier_recommande') {
-              if (relance.channel_data.lettre_relance_url && relance.channel_data.lettre_relance_url.trim()) {
-                physicalDocuments.push(relance.channel_data.lettre_relance_url);
-                existingDocuments.push({
-                  url: relance.channel_data.lettre_relance_url,
-                  type: 'reminder_letter',
-                  description: 'Lettre de relance'
-                });
-              }
-              if (relance.channel_data.lettre_mise_en_demeure_url && relance.channel_data.lettre_mise_en_demeure_url.trim()) {
-                physicalDocuments.push(relance.channel_data.lettre_mise_en_demeure_url);
-                existingDocuments.push({
-                  url: relance.channel_data.lettre_mise_en_demeure_url,
-                  type: 'formal_notice',
-                  description: 'Mise en demeure'
-                });
-              }
-              if (relance.channel_data.lettre_tribunal_url && relance.channel_data.lettre_tribunal_url.trim()) {
-                physicalDocuments.push(relance.channel_data.lettre_tribunal_url);
-                existingDocuments.push({
-                  url: relance.channel_data.lettre_tribunal_url,
-                  type: 'court_letter',
-                  description: 'Lettre tribunal'
-                });
-              }
-            }
-          }
-        });
-        
-        // GÉNÉRATION DE LA LISTE DES PIÈCES JUSTIFICATIVES - SEULEMENT LES DOCUMENTS EXISTANTS
-        const piecesList = existingDocuments.map((doc, index) => {
-          const pieceNum = index + 1;
-          let fullDescription = doc.description;
+            return `Pièce n°${index + 1} : ${description}`;
+          });
           
-          if (doc.reference) {
-            fullDescription += ` n°${doc.reference}`;
-          }
-          if (doc.date) {
-            fullDescription += ` du ${doc.date}`;
-          }
+          const foundUrls = existingDocuments.map(doc => doc.url);
           
-          return `Pièce n°${pieceNum} : ${fullDescription}`;
+          console.log('=== DOCUMENTS TRAITÉS ===');
+          console.log('Nombre de documents:', existingDocuments.length);
+          console.log('URLs:', foundUrls);
+          console.log('Descriptions:', foundDocs);
+          console.log('========================');
+          
+          // Mettre à jour les pièces jointes avec les nouveaux documents
+          setAttachedFiles(foundUrls);
+          setDossierData(prev => ({
+            ...prev,
+            pieces: foundDocs.join('\n')
+          }));
+        }).catch(error => {
+          console.error('Erreur lors de la génération des documents:', error);
         });
-        
-        console.log('=== RÉSULTAT FINAL ===');
-        console.log('Documents existants trouvés:', existingDocuments.length);
-        console.log('Liste des pièces:', piecesList);
-        console.log('URLs pour fichiers joints:', existingDocuments.map(d => d.url));
-        
-        // Update pieces field with ONLY existing documents
-        const completeList = piecesList.join('\n');
-        setFormData(prev => ({
-          ...prev,
-          pieces: completeList
-        }));
-        
-        // Set attached files to ONLY existing document URLs
-        setAttachedFiles(existingDocuments.map(doc => doc.url));
       }
     }
-  }, [selectedClient, selectedInvoice, clients, invoices, quotes, repairOrders, relances]);
+  }, [selectedClient, selectedInvoice, clients, invoices, quotes, companyData, repairOrders, relances]);
+
+  // Fonction pour supprimer un fichier attaché
+  const removeAttachedFile = (index: number) => {
+    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+  };
 
   const nextStep = () => setStep((s) => Math.min(s + 1, steps.length));
   const prevStep = () => setStep((s) => Math.max(s - 1, 1));

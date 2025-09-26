@@ -215,6 +215,28 @@ export const prepareQuoteDataForPDF = async (quote: Quote, companyData: any) => 
   }
 };
 
+export const generateQuotePDFBlob = async (quote: Quote, companyData: any) => {
+  try {
+    const data = await prepareQuoteDataForPDF(quote, companyData);
+    
+    const doc = InvoicePDF({ 
+      invoice: data.quote as any,
+      companyData: data.companyData, 
+      receipts: [],
+      clientData: data.clientData,
+      vehicleData: data.vehicleData,
+      template: data.template
+    });
+    
+    // Générer et retourner le blob PDF
+    const asPdf = pdf(doc);
+    return await asPdf.toBlob();
+  } catch (error) {
+    console.error('Erreur lors de la génération du blob PDF devis:', error);
+    throw error;
+  }
+};
+
 export const generateQuotePDFWithTemplate = async (quote: Quote, companyData: any) => {
   try {
     const data = await prepareQuoteDataForPDF(quote, companyData);
