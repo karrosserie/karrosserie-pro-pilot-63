@@ -176,19 +176,9 @@ const DepotDossier = () => {
       console.log('Checking for quotes - vehicle_id:', relatedInvoice?.vehicle_id, 'client_id:', relatedInvoice?.client_id);
       if (relatedInvoice?.vehicle_id && relatedInvoice?.client_id) {
         console.log('Fetching quotes...');
-        const { data: quotes, error: quotesError } = await supabase
-          .from('quotes')
-          .select('*')
-          .eq('vehicle_id', relatedInvoice.vehicle_id)
-          .eq('client_id', relatedInvoice.client_id)
-          .eq('status', 'signed')
-          .order('created_at', { ascending: false })
-          .limit(1);
-          
-        console.log('Quotes result:', quotes ? `Found ${quotes.length} quotes` : 'No quotes found', 'Error:', quotesError);
         
-        // Aussi essayer sans le filtre 'signed' pour voir tous les devis
-        const { data: allQuotes } = await supabase
+        // Recherche comme dans CreationDossierJudiciaire - sans filtre de statut strict
+        const { data: quotes, error: quotesError } = await supabase
           .from('quotes')
           .select('*')
           .eq('vehicle_id', relatedInvoice.vehicle_id)
@@ -196,18 +186,33 @@ const DepotDossier = () => {
           .order('created_at', { ascending: false })
           .limit(5);
           
-        console.log('All quotes (any status):', allQuotes?.map(q => ({ id: q.id, reference: q.reference, status: q.status })));
+        console.log('Quotes result:', quotes ? `Found ${quotes.length} quotes` : 'No quotes found', 'Error:', quotesError);
+        console.log('All quotes found:', quotes?.map(q => ({ id: q.id, reference: q.reference, status: q.status, created_at: q.created_at })));
           
+        // Prendre le devis le plus récent qui existe (priorité aux signés)
+        let selectedQuote = null;
         if (quotes && quotes.length > 0) {
-          const quote = quotes[0];
-          let quoteUrl = quote.document_url;
-          console.log('Quote found - reference:', quote.reference, 'status:', quote.status, 'document_url:', quote.document_url);
+          // D'abord chercher un devis signé
+          const signedQuote = quotes.find(q => q.status === 'signed');
+          if (signedQuote) {
+            selectedQuote = signedQuote;
+            console.log('Found signed quote:', selectedQuote.reference);
+          } else {
+            // Sinon prendre le plus récent
+            selectedQuote = quotes[0];
+            console.log('Using most recent quote (status:', selectedQuote.status, '):', selectedQuote.reference);
+          }
+        }
+          
+        if (selectedQuote) {
+          let quoteUrl = selectedQuote.document_url;
+          console.log('Quote found - reference:', selectedQuote.reference, 'status:', selectedQuote.status, 'document_url:', selectedQuote.document_url);
           
           // Si pas d'URL stockée, générer le PDF à la demande
           if (!quoteUrl && companyData) {
             try {
               const { generateQuotePDFBlob } = await import('@/utils/quotePDFGeneration');
-              const blob = await generateQuotePDFBlob(quote, companyData);
+              const blob = await generateQuotePDFBlob(selectedQuote, companyData);
               quoteUrl = URL.createObjectURL(blob);
               console.log('Quote PDF blob generated and URL created');
             } catch (error) {
@@ -216,17 +221,17 @@ const DepotDossier = () => {
           }
 
           docs.push({
-            name: `Devis signé`,
-            description: `Document contractuel • Pièce n°1 : Devis n°${quote.reference}`,
+            name: selectedQuote.status === 'signed' ? `Devis signé` : `Devis ${selectedQuote.reference}`,
+            description: `Document contractuel • Pièce n°1 : Devis n°${selectedQuote.reference} (${selectedQuote.status})`,
             icon: "✍️", 
             type: "devis",
             url: quoteUrl,
             hasUrl: !!quoteUrl,
-            data: quote
+            data: selectedQuote
           });
           console.log('✅ Quote document added');
         } else {
-          console.log('❌ No signed quotes found');
+          console.log('❌ No quotes found for this client/vehicle');
         }
       }
 
