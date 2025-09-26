@@ -15,23 +15,76 @@ interface InvoiceEmailRequest {
   documentType?: string;
 }
 
-// Configuration email simple sans nodemailer
-async function sendEmail(to: string, subject: string, htmlBody: string, fileBase64: string, filename: string, fromEmail: string, contentType: string): Promise<{ success: boolean; messageId?: string; message: string; }> {
+// Fonction pour envoyer l'email avec nodemailer
+const sendEmail = async (to: string, subject: string, htmlBody: string, fileBase64: string, filename: string, fromEmail: string, contentType: string) => {
   try {
-    // Pour cette démo, on simule l'envoi d'email
-    // En production, vous pourriez utiliser un service comme SendGrid, Mailgun, etc.
-    console.log('Email simulation:', { to, subject, filename, contentType });
+    console.log('🚀 Début de sendEmail');
     
+    const smtpHost = Deno.env.get('SMTP_HOST');
+    const smtpPort = parseInt(Deno.env.get('SMTP_PORT') || '587');
+    const smtpUser = Deno.env.get('SMTP_USER');
+    const smtpPassword = Deno.env.get('SMTP_PASSWORD');
+
+    console.log('📧 Configuration email:', {
+      host: smtpHost,
+      port: smtpPort,
+      user: smtpUser,
+      from: fromEmail,
+      to: to
+    });
+
+    if (!smtpHost || !smtpUser || !smtpPassword || !fromEmail) {
+      throw new Error('Configuration SMTP manquante');
+    }
+
+    console.log('📩 Tentative d\'envoi email via nodemailer npm');
+    
+    const nodemailer = await import("npm:nodemailer@6.9.13");
+    
+    const transporter = nodemailer.createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: false,
+      auth: {
+        user: smtpUser,
+        pass: smtpPassword,
+      },
+      tls: {
+        rejectUnauthorized: false
+      }
+    });
+
+    console.log('📤 Envoi de l\'email avec pièce jointe...');
+    
+    // Convertir le base64 en buffer pour la pièce jointe
+    const fileBuffer = Uint8Array.from(atob(fileBase64), c => c.charCodeAt(0));
+    
+    const info = await transporter.sendMail({
+      from: fromEmail,
+      to: to,
+      subject: subject,
+      html: htmlBody,
+      attachments: [
+        {
+          filename: filename,
+          content: fileBuffer,
+          contentType: contentType
+        }
+      ]
+    });
+    
+    console.log('✅ Email envoyé avec succès:', info.messageId);
     return { 
       success: true, 
-      messageId: `sim-${Date.now()}`, 
-      message: 'Email simulé avec succès (remplacer par un vrai service SMTP)' 
+      messageId: info.messageId,
+      message: 'Email envoyé avec succès'
     };
-  } catch (error: any) {
-    console.error('Erreur lors de l\'envoi de l\'email:', error);
-    return { success: false, message: `Erreur: ${error?.message || error}` };
+    
+  } catch (error) {
+    console.error('❌ Erreur dans sendEmail:', error);
+    throw error;
   }
-}
+};
 
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
@@ -128,8 +181,8 @@ const handler = async (req: Request): Promise<Response> => {
     
     console.log("=== TENTATIVE D'ENVOI VIA SMTP ===");
 
-    // Envoyer l'email avec simulation
-    const emailResult = await sendEmail(to, subject, htmlBody, pdfBase64, filename, fromEmail || 'noreply@example.com', contentType);
+    // Envoyer l'email réellement avec nodemailer
+    const emailResult = await sendEmail(to, subject, htmlBody, pdfBase64, filename, fromEmail, contentType);
     console.log('Résultat de l\'envoi email:', emailResult);
 
     return new Response(JSON.stringify({ 
