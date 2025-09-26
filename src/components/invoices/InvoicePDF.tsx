@@ -958,7 +958,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-                <Text style={{ fontSize: 6, color: '#666' }}>[Checkbox1/]</Text>
+                <Text style={{ fontSize: 6, color: '#666' }}>[sc_sign1.paraphe/]</Text>
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={{ fontSize: 8, lineHeight: 1.4, fontWeight: 'bold' }}>

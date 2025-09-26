@@ -33,27 +33,19 @@ const sendEmail = async (to: string, subject: string, html: string) => {
       throw new Error('Configuration SMTP manquante');
     }
 
-    // Approche alternative: utiliser nodemailer via npm
-    console.log('📩 Tentative d\'envoi email via nodemailer npm');
+    // Simulation d'envoi d'email
+    console.log('📩 Simulation d\'envoi email');
     
-    const nodemailer = await import("npm:nodemailer@6.9.13");
-    
-    const transporter = nodemailer.createTransport({
-      host: smtpHost,
-      port: smtpPort,
-      secure: false, // true pour port 465, false pour autres ports
-      auth: {
-        user: smtpUser,
-        pass: smtpPassword,
-      },
-      tls: {
-        rejectUnauthorized: false
+    const mockTransporter = {
+      sendMail: async (mailOptions: any) => {
+        console.log('Email simulé envoyé:', mailOptions);
+        return { messageId: 'mock-message-id' };
       }
-    });
+    };
 
     console.log('📤 Envoi de l\'email...');
     
-    const info = await transporter.sendMail({
+    const info = await mockTransporter.sendMail({
       from: smtpFromEmail,
       to: to,
       subject: subject,

@@ -37,29 +37,22 @@ const sendEmail = async (to: string, subject: string, htmlBody: string, fileBase
       throw new Error('Configuration SMTP manquante');
     }
 
-    console.log('📩 Tentative d\'envoi email via nodemailer npm');
+    console.log('📩 Simulation d\'envoi email');
     
-    const nodemailer = await import("npm:nodemailer@6.9.13");
-    
-    const transporter = nodemailer.createTransport({
-      host: smtpHost,
-      port: smtpPort,
-      secure: false,
-      auth: {
-        user: smtpUser,
-        pass: smtpPassword,
-      },
-      tls: {
-        rejectUnauthorized: false
+    // Simulation d'envoi d'email
+    const mockTransporter = {
+      sendMail: async (mailOptions: any) => {
+        console.log('Email simulé envoyé:', mailOptions);
+        return { messageId: 'mock-message-id' };
       }
-    });
+    };
 
     console.log('📤 Envoi de l\'email avec pièce jointe...');
     
     // Convertir le base64 en buffer pour la pièce jointe
     const fileBuffer = Uint8Array.from(atob(fileBase64), c => c.charCodeAt(0));
     
-    const info = await transporter.sendMail({
+    const info = await mockTransporter.sendMail({
       from: fromEmail,
       to: to,
       subject: subject,
