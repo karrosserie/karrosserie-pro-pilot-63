@@ -92,20 +92,13 @@ const DepotDossier = () => {
     try {
       // Ajouter la facture si elle existe
       if (relatedInvoice) {
-        // Générer l'URL de la facture via l'API ou le storage
-        let factureUrl = relatedInvoice.document_url;
-        if (!factureUrl) {
-          // Si pas d'URL stockée, générer l'URL de prévisualisation PDF
-          factureUrl = `/api/invoices/${relatedInvoice.id}/pdf`;
-        }
-        
         docs.push({
           name: `Facture ${relatedInvoice.reference}`,
           description: `Facture originale • ${new Date(relatedInvoice.date).toLocaleDateString('fr-FR')} • Montant: ${relatedInvoice.amount}€`,
           icon: "📄", 
           type: "facture",
-          url: factureUrl,
-          hasUrl: true,
+          url: relatedInvoice.document_url,
+          hasUrl: !!relatedInvoice.document_url,
           data: relatedInvoice
         });
       }
@@ -119,19 +112,13 @@ const DepotDossier = () => {
           .single();
           
         if (repairOrder) {
-          let repairOrderUrl = repairOrder.document_url;
-          if (!repairOrderUrl) {
-            // Générer l'URL de prévisualisation pour l'ordre de réparation
-            repairOrderUrl = `/api/repair-orders/${repairOrder.id}/pdf`;
-          }
-          
           docs.push({
             name: `Ordre de réparation ${repairOrder.reference}`,
             description: `Document de travaux • Pièce n°2 : Ordre de réparation n°${repairOrder.reference}`,
             icon: "🔧",
             type: "repair_order",
-            url: repairOrderUrl,
-            hasUrl: true,
+            url: repairOrder.document_url,
+            hasUrl: !!repairOrder.document_url,
             data: repairOrder
           });
         }
@@ -149,19 +136,13 @@ const DepotDossier = () => {
           
         if (quotes && quotes.length > 0) {
           const quote = quotes[0];
-          let quoteUrl = quote.document_url;
-          if (!quoteUrl) {
-            // Générer l'URL de prévisualisation pour le devis
-            quoteUrl = `/api/quotes/${quote.id}/pdf`;
-          }
-          
           docs.push({
             name: `Devis signé`,
             description: `Document contractuel • Pièce n°1 : Devis n°${quote.reference}`,
             icon: "✍️", 
             type: "devis",
-            url: quoteUrl,
-            hasUrl: true,
+            url: quote.document_url,
+            hasUrl: !!quote.document_url,
             data: quote
           });
         }
@@ -203,33 +184,14 @@ const DepotDossier = () => {
       // Ouvrir directement l'URL du document dans un nouvel onglet
       window.open(doc.url, '_blank');
     } else if (doc.type === 'facture' && doc.data) {
-      // Générer et ouvrir directement le PDF de la facture
-      const factureUrl = `data:text/html,<html><body><h1>Prévisualisation Facture ${doc.data.reference}</h1><p>Génération en cours...</p></body></html>`;
-      window.open(factureUrl, '_blank');
-      
-      // Ici, vous pourriez appeler une API pour générer le PDF réel
-      toast({
-        title: "Document ouvert",
-        description: "La facture s'ouvre dans un nouvel onglet.",
-      });
+      // Ouvrir la page des factures avec le paramètre preview
+      navigate(`/documents/factures?preview=${doc.data.id}`);
     } else if (doc.type === 'devis' && doc.data) {
-      // Générer et ouvrir directement le PDF du devis
-      const devisUrl = `data:text/html,<html><body><h1>Prévisualisation Devis ${doc.data.reference}</h1><p>Génération en cours...</p></body></html>`;
-      window.open(devisUrl, '_blank');
-      
-      toast({
-        title: "Document ouvert",
-        description: "Le devis s'ouvre dans un nouvel onglet.",
-      });
+      // Ouvrir la page des devis avec le paramètre preview
+      navigate(`/documents/devis?preview=${doc.data.id}`);
     } else if (doc.type === 'repair_order' && doc.data) {
-      // Générer et ouvrir directement le PDF de l'ordre de réparation
-      const orderUrl = `data:text/html,<html><body><h1>Prévisualisation Ordre de Réparation ${doc.data.reference}</h1><p>Génération en cours...</p></body></html>`;
-      window.open(orderUrl, '_blank');
-      
-      toast({
-        title: "Document ouvert",
-        description: "L'ordre de réparation s'ouvre dans un nouvel onglet.",
-      });
+      // Ouvrir la page des ordres de réparation avec le paramètre preview
+      navigate(`/documents/ordres?preview=${doc.data.id}`);
     } else {
       toast({
         title: "Document non disponible",
@@ -237,7 +199,7 @@ const DepotDossier = () => {
         variant: "destructive"
       });
     }
-  }, [toast]);
+  }, [navigate, toast]);
 
   // Récupérer les documents réels au chargement
   useEffect(() => {
