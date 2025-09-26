@@ -281,6 +281,13 @@ const CreationDossierJudiciaire = () => {
         
         if (validDocuments.length > 0) {
           setAttachedFiles(validDocuments);
+          
+          // Also update the pieces field with the imported documents
+          const piecesList = generatePiecesList(validDocuments);
+          setFormData(prev => ({
+            ...prev,
+            pieces: piecesList
+          }));
         }
       }
     }
@@ -306,16 +313,73 @@ const CreationDossierJudiciaire = () => {
     }));
   };
 
+  // Generate pieces list from attached files
+  const generatePiecesList = (files: string[]) => {
+    const validFiles = files.filter(file => file && file.trim());
+    if (validFiles.length === 0) return '';
+    
+    return validFiles.map((file, index) => {
+      const fileName = file.split('/').pop() || `document_${index + 1}`;
+      const pieceNumber = index + 1;
+      
+      // Try to identify document type from filename or path
+      let description = '';
+      if (fileName.toLowerCase().includes('devis') || fileName.toLowerCase().includes('quote')) {
+        description = 'Devis signé';
+      } else if (fileName.toLowerCase().includes('facture') || fileName.toLowerCase().includes('invoice')) {
+        description = 'Facture';
+      } else if (fileName.toLowerCase().includes('permis') || fileName.toLowerCase().includes('license')) {
+        description = 'Permis de conduire';
+      } else if (fileName.toLowerCase().includes('relance') || fileName.toLowerCase().includes('reminder')) {
+        description = 'Lettre de relance';
+      } else if (fileName.toLowerCase().includes('demeure') || fileName.toLowerCase().includes('mise_en_demeure')) {
+        description = 'Mise en demeure';
+      } else if (fileName.toLowerCase().includes('ordre') || fileName.toLowerCase().includes('repair')) {
+        description = 'Ordre de réparation signé';
+      } else if (fileName.toLowerCase().includes('photo') || fileName.toLowerCase().includes('image')) {
+        description = 'Photo de véhicule/travaux';
+      } else {
+        description = 'Document justificatif';
+      }
+      
+      return `Pièce n°${pieceNumber} : ${description} (${fileName})`;
+    }).join('\n');
+  };
+
   const handleFileAdd = (url: string) => {
-    setAttachedFiles(prev => [...prev, url]);
+    const newFiles = [...attachedFiles, url];
+    setAttachedFiles(newFiles);
+    
+    // Update pieces field with new list
+    const newPiecesList = generatePiecesList(newFiles);
+    setFormData(prev => ({
+      ...prev,
+      pieces: newPiecesList
+    }));
   };
 
   const handleFileRemove = (index: number) => {
-    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+    const newFiles = attachedFiles.filter((_, i) => i !== index);
+    setAttachedFiles(newFiles);
+    
+    // Update pieces field with new list
+    const newPiecesList = generatePiecesList(newFiles);
+    setFormData(prev => ({
+      ...prev,
+      pieces: newPiecesList
+    }));
   };
 
   const handleFileUpdate = (index: number, url: string) => {
-    setAttachedFiles(prev => prev.map((file, i) => (i === index ? url : file)));
+    const newFiles = attachedFiles.map((file, i) => (i === index ? url : file));
+    setAttachedFiles(newFiles);
+    
+    // Update pieces field with new list
+    const newPiecesList = generatePiecesList(newFiles);
+    setFormData(prev => ({
+      ...prev,
+      pieces: newPiecesList
+    }));
   };
 
   const addNewFileSlot = () => {
@@ -673,42 +737,65 @@ const CreationDossierJudiciaire = () => {
               </div>
 
               <div className="space-y-4">
-                {attachedFiles.length === 0 && (
-                  <DocumentUploader
-                    documentType="judicial-document"
-                    documentId="new-case-0"
-                    currentDocumentUrl=""
-                    onUploadComplete={(url) => handleFileAdd(url)}
-                    isViewMode={false}
+                {/* Editable pieces list */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">
+                    Liste des pièces justificatives
+                  </label>
+                  <textarea
+                    name="pieces"
+                    value={formData.pieces}
+                    onChange={handleChange}
+                    className="w-full border border-input rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-shadow bg-background hover:bg-muted/50"
+                    rows={8}
+                    placeholder="Liste des pièces jointes au dossier..."
                   />
-                )}
+                  <p className="text-xs text-muted-foreground">
+                    Cette liste sera automatiquement mise à jour quand vous ajoutez ou supprimez des fichiers ci-dessous.
+                  </p>
+                </div>
                 
-                {attachedFiles.map((fileUrl, index) => (
-                  <div key={index} className="relative">
-                    <div className="flex items-start gap-2">
-                      <div className="flex-1">
-                        <DocumentUploader
-                          documentType="judicial-document"
-                          documentId={`new-case-${index}`}
-                          currentDocumentUrl={fileUrl}
-                          onUploadComplete={(url) => handleFileUpdate(index, url)}
-                          isViewMode={false}
-                        />
+                {/* File uploaders */}
+                <div className="space-y-4">
+                  <h4 className="text-sm font-medium text-foreground">Fichiers joints</h4>
+                  
+                  {attachedFiles.length === 0 && (
+                    <DocumentUploader
+                      documentType="judicial-document"
+                      documentId="new-case-0"
+                      currentDocumentUrl=""
+                      onUploadComplete={(url) => handleFileAdd(url)}
+                      isViewMode={false}
+                    />
+                  )}
+                  
+                  {attachedFiles.map((fileUrl, index) => (
+                    <div key={index} className="relative">
+                      <div className="flex items-start gap-2">
+                        <div className="flex-1">
+                          <DocumentUploader
+                            documentType="judicial-document"
+                            documentId={`new-case-${index}`}
+                            currentDocumentUrl={fileUrl}
+                            onUploadComplete={(url) => handleFileUpdate(index, url)}
+                            isViewMode={false}
+                          />
+                        </div>
+                        {attachedFiles.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleFileRemove(index)}
+                            className="text-red-500 hover:text-red-600"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
-                      {attachedFiles.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleFileRemove(index)}
-                          className="text-red-500 hover:text-red-600"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      )}
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </div>
