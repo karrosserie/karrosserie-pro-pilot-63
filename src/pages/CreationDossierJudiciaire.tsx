@@ -304,6 +304,43 @@ const CreationDossierJudiciaire = () => {
           logicalPieces.push(`Pièce n°${pieceNumber++} : Preuve de l'envoi et de la réception de la mise en demeure`);
         }
         
+        // CRÉER DES PLACEHOLDERS POUR LES PIÈCES LOGIQUES
+        // Ces URLs fictives permettront d'afficher les pièces logiques dans la section "Fichiers joints"
+        const logicalDocuments: string[] = [];
+        
+        // 1. Devis (placeholder)
+        if (relatedQuote) {
+          logicalDocuments.push(`placeholder://devis_${relatedQuote.reference}_${invoice.client_id}.pdf`);
+        } else {
+          logicalDocuments.push(`placeholder://devis_${invoice.reference}_${invoice.client_id}.pdf`);
+        }
+        
+        // 2. Ordre de réparation (placeholder ou réel)
+        if (relatedRepairOrders.length > 0) {
+          const firstOrder = relatedRepairOrders[0];
+          if (firstOrder.signed_document_url && firstOrder.signed_document_url.trim()) {
+            // Si l'OR signé existe vraiment, on l'utilise
+            logicalDocuments.push(firstOrder.signed_document_url);
+          } else {
+            // Sinon placeholder
+            logicalDocuments.push(`placeholder://ordre_reparation_${firstOrder.reference}_${invoice.client_id}.pdf`);
+          }
+        } else {
+          logicalDocuments.push(`placeholder://ordre_reparation_${invoice.reference}_${invoice.client_id}.pdf`);
+        }
+        
+        // 3. Facture (placeholder)
+        logicalDocuments.push(`placeholder://facture_${invoice.reference}_${invoice.client_id}.pdf`);
+        
+        // 4. Bon de sortie (placeholder)
+        logicalDocuments.push(`placeholder://bon_sortie_${invoice.reference}_${invoice.client_id}.pdf`);
+        
+        // 5. Documents de procédure si relances existent (placeholders)
+        if (clientRelances.length > 0) {
+          logicalDocuments.push(`placeholder://mise_en_demeure_${invoice.reference}_${invoice.client_id}.pdf`);
+          logicalDocuments.push(`placeholder://preuve_reception_${invoice.reference}_${invoice.client_id}.pdf`);
+        }
+        
         // Generate pieces list from physical documents
         const validPhysicalDocuments = physicalDocuments.filter(doc => doc && doc.trim());
         const physicalPiecesList = validPhysicalDocuments.map((file, index) => {
@@ -330,8 +367,13 @@ const CreationDossierJudiciaire = () => {
         const allPieces = [...logicalPieces, ...physicalPiecesList];
         const completeList = allPieces.join('\n');
         
+        // COMBINE LOGICAL PLACEHOLDERS AND PHYSICAL DOCUMENTS FOR FILE UPLOADERS
+        const allDocuments = [...logicalDocuments, ...validPhysicalDocuments];
+        
         console.log('Pièces logiques:', logicalPieces);
+        console.log('Documents logiques (placeholders):', logicalDocuments);
         console.log('Documents physiques trouvés:', validPhysicalDocuments);
+        console.log('Tous les documents pour uploaders:', allDocuments);
         console.log('Liste complète:', completeList);
         
         // Update pieces field with complete list
@@ -340,8 +382,8 @@ const CreationDossierJudiciaire = () => {
           pieces: completeList
         }));
         
-        // Set attached files for upload management
-        setAttachedFiles(validPhysicalDocuments);
+        // Set attached files to include both logical placeholders and physical documents
+        setAttachedFiles(allDocuments);
       }
     }
   }, [selectedClient, selectedInvoice, clients, invoices, quotes, repairOrders, relances]);
