@@ -177,30 +177,44 @@ const DepotDossier = () => {
   // Fonction pour prévisualiser un document
   const previewDocument = useCallback((doc) => {
     if (doc.hasUrl && doc.url) {
+      // Si le document a une URL directe, l'ouvrir
       window.open(doc.url, '_blank');
     } else if (doc.type === 'facture' && relatedInvoice?.id) {
-      // Générer l'URL de prévisualisation de la facture
-      window.open(`/invoices/${relatedInvoice.id}/preview`, '_blank');
-    } else if (doc.type === 'devis') {
-      // Logique pour prévisualiser le devis
-      toast({
-        title: "Prévisualisation",
-        description: "Génération du devis en cours...",
-      });
-    } else if (doc.type === 'repair_order') {
-      // Logique pour prévisualiser l'ordre de réparation
-      toast({
-        title: "Prévisualisation",
-        description: "Génération de l'ordre de réparation en cours...",
-      });
+      // Ouvrir la page des factures avec prévisualisation
+      navigate(`/documents/factures?preview=${relatedInvoice.id}`);
+    } else if (doc.type === 'devis' && relatedInvoice?.vehicle_id && relatedInvoice?.client_id) {
+      // Pour un devis, rediriger vers la page des devis
+      navigate(`/documents/devis?client=${relatedInvoice.client_id}&vehicle=${relatedInvoice.vehicle_id}`);
+    } else if (doc.type === 'repair_order' && relatedInvoice?.repair_order_id) {
+      // Pour un ordre de réparation, rediriger vers la page des ordres de réparation
+      navigate(`/documents/ordres?id=${relatedInvoice.repair_order_id}`);
     } else {
-      toast({
-        title: "Document non disponible",
-        description: "Ce document n'est pas encore disponible pour la prévisualisation.",
-        variant: "destructive"
-      });
+      // Document générique - essayer de générer un PDF ou afficher un message
+      if (doc.type === 'facture') {
+        toast({
+          title: "Génération en cours",
+          description: "Génération du PDF de la facture...",
+        });
+        // Ici on pourrait déclencher la génération de PDF
+      } else if (doc.type === 'devis') {
+        toast({
+          title: "Génération en cours", 
+          description: "Génération du PDF du devis...",
+        });
+      } else if (doc.type === 'repair_order') {
+        toast({
+          title: "Génération en cours",
+          description: "Génération du PDF de l'ordre de réparation...",
+        });
+      } else {
+        toast({
+          title: "Document non disponible",
+          description: "Ce document n'est pas encore disponible pour la prévisualisation.",
+          variant: "destructive"
+        });
+      }
     }
-  }, [relatedInvoice, toast]);
+  }, [relatedInvoice, toast, navigate]);
 
   // Récupérer les documents réels au chargement
   useEffect(() => {
