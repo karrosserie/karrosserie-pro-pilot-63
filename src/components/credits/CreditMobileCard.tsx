@@ -92,28 +92,33 @@ const CreditMobileCard: React.FC<CreditMobileCardProps> = ({
       </div>
 
       {/* Actions */}
-      <div className="flex flex-wrap gap-2 pt-2 border-t">
-        <Button variant="view" size="sm" onClick={() => onViewCredit(credit)}>
+      <div className="flex flex-wrap gap-1.5 pt-3 border-t">
+        {/* Primary Actions */}
+        <Button variant="view" size="sm" onClick={() => onViewCredit(credit)} className="flex-1 min-w-[80px]">
           <Eye className="h-3 w-3 mr-1" />
           Voir
         </Button>
-        <Button variant="edit" size="sm" onClick={() => onEditCredit(credit)}>
+        <Button variant="edit" size="sm" onClick={() => onEditCredit(credit)} className="flex-1 min-w-[80px]">
           <Pencil className="h-3 w-3 mr-1" />
           Modifier
         </Button>
-        <Button variant="download" size="sm" onClick={() => onDownload(credit)}>
+        
+        {/* Secondary Actions */}
+        <Button variant="download" size="sm" onClick={() => onDownload(credit)} className="min-w-[100px]">
           <Download className="h-3 w-3 mr-1" />
           Télécharger
         </Button>
-        <Button variant="print" size="sm" onClick={() => onPrint(credit)}>
+        <Button variant="print" size="sm" onClick={() => onPrint(credit)} className="min-w-[90px]">
           <Printer className="h-3 w-3 mr-1" />
           Imprimer
         </Button>
-        <Button variant="send" size="sm" onClick={() => onSendEmail(credit)}>
+        <Button variant="send" size="sm" onClick={() => onSendEmail(credit)} className="min-w-[80px]">
           <Mail className="h-3 w-3 mr-1" />
-          Envoyer
+          E-mail
         </Button>
-        <Button variant="secondary" size="sm" onClick={() => onArchive(credit)}>
+        
+        {/* Destructive Action */}
+        <Button variant="secondary" size="sm" onClick={() => onArchive(credit)} className="min-w-[90px]">
           <Archive className="h-3 w-3 mr-1" />
           Archiver
         </Button>

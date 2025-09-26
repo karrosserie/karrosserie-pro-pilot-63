@@ -129,47 +129,56 @@ const InvoiceMobileCard: React.FC<InvoiceMobileCardProps> = ({
       </div>
 
       {/* Actions */}
-      <div className="flex flex-wrap gap-2 pt-2 border-t">
-        <Button variant="view" size="sm" onClick={() => onViewInvoice(invoice)}>
+      <div className="flex flex-wrap gap-1.5 pt-3 border-t">
+        {/* Primary Actions */}
+        <Button variant="view" size="sm" onClick={() => onViewInvoice(invoice)} className="flex-1 min-w-[80px]">
           <Eye className="h-3 w-3 mr-1" />
           Voir
         </Button>
-        <Button variant="edit" size="sm" onClick={() => onEditInvoice(invoice)}>
+        <Button variant="edit" size="sm" onClick={() => onEditInvoice(invoice)} className="flex-1 min-w-[80px]">
           <Pencil className="h-3 w-3 mr-1" />
           Modifier
         </Button>
-        <Button variant="download" size="sm" onClick={() => onDownload(invoice)}>
+        
+        {/* Secondary Actions */}
+        <Button variant="download" size="sm" onClick={() => onDownload(invoice)} className="min-w-[100px]">
           <Download className="h-3 w-3 mr-1" />
           Télécharger
         </Button>
-        <Button variant="print" size="sm" onClick={() => onPrint(invoice)}>
+        <Button variant="print" size="sm" onClick={() => onPrint(invoice)} className="min-w-[90px]">
           <Printer className="h-3 w-3 mr-1" />
           Imprimer
         </Button>
-        <Button variant="send" size="sm" onClick={() => onSendEmail(invoice)}>
+        <Button variant="send" size="sm" onClick={() => onSendEmail(invoice)} className="min-w-[80px]">
           <Mail className="h-3 w-3 mr-1" />
-          Envoyer
+          E-mail
         </Button>
-        <Button variant="payment" size="sm" onClick={() => onAddPayment(invoice)}>
+        
+        {/* Invoice Specific Actions */}
+        <Button variant="payment" size="sm" onClick={() => onAddPayment(invoice)} className="min-w-[90px]">
           <CreditCard className="h-3 w-3 mr-1" />
           Paiement
         </Button>
-        <Button variant="create" size="sm" onClick={() => onAddCredit(invoice)}>
+        <Button variant="create" size="sm" onClick={() => onAddCredit(invoice)} className="min-w-[80px]">
           <FileX className="h-3 w-3 mr-1" />
           Avoir
         </Button>
-        <Button variant="send" size="sm" onClick={() => onRelance(invoice)}>
+        <Button variant="send" size="sm" onClick={() => onRelance(invoice)} className="min-w-[80px]">
           <Send className="h-3 w-3 mr-1" />
           Relance
         </Button>
+        
+        {/* Conditional Actions */}
         {showArchived && onRestoreInvoice && (
-          <Button variant="edit" size="sm" onClick={() => onRestoreInvoice(invoice)}>
+          <Button variant="edit" size="sm" onClick={() => onRestoreInvoice(invoice)} className="min-w-[90px]">
             <FileX className="h-3 w-3 mr-1" />
             Restaurer
           </Button>
         )}
+        
+        {/* Destructive Action */}
         {onDeleteInvoice && (
-          <Button variant="delete" size="sm" onClick={() => onDeleteInvoice(invoice)}>
+          <Button variant="delete" size="sm" onClick={() => onDeleteInvoice(invoice)} className="min-w-[90px]">
             <Trash className="h-3 w-3 mr-1" />
             {showArchived ? 'Supprimer' : 'Archiver'}
           </Button>
