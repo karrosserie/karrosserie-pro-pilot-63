@@ -8,7 +8,7 @@ import { useInvoices } from "@/hooks/use-invoices";
 import { useCompany } from "@/hooks/use-company";
 import { useRepairOrders } from "@/hooks/use-repair-orders";
 import { useClientRelances } from "@/hooks/use-client-relances";
-import { useInvoiceRelances } from "@/hooks/use-invoice-relances";
+import { useQuotes } from "@/hooks/use-quotes";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -20,6 +20,7 @@ const CreationDossierJudiciaire = () => {
   const { invoices } = useInvoices();
   const { companyData, isLoading: isCompanyLoading } = useCompany();
   const { orders: repairOrders } = useRepairOrders();
+  const { quotes } = useQuotes();
   const { relances } = useClientRelances();
 
   const steps = [
@@ -178,37 +179,69 @@ const CreationDossierJudiciaire = () => {
 
   // Auto-import supporting documents when both client and invoice are selected
   useEffect(() => {
-    if (selectedClient && selectedInvoice && clients && invoices && repairOrders && relances) {
+    if (selectedClient && selectedInvoice && clients && invoices && quotes) {
       const client = clients.find(c => c.id === selectedClient);
       const invoice = invoices.find(i => i.id === selectedInvoice);
       
       if (client && invoice) {
-        const documentsToImport: string[] = [];
+        console.log('Génération des pièces pour facture:', invoice.reference);
         
-        // Add client's driver license documents if available
-        if (client.driverLicenseFrontUrl && client.driverLicenseFrontUrl.trim()) {
-          documentsToImport.push(client.driverLicenseFrontUrl);
-        }
-        if (client.driverLicenseBackUrl && client.driverLicenseBackUrl.trim()) {
-          documentsToImport.push(client.driverLicenseBackUrl);
+        // PIÈCES LOGIQUES - Toujours présentes si facture sélectionnée
+        const logicalPieces: string[] = [];
+        let pieceNumber = 1;
+        
+        // 1. Devis signé - chercher le quote correspondant à cette facture
+        const relatedQuote = quotes?.find(quote => 
+          quote.client_id === selectedClient && 
+          quote.vehicle_id === invoice.vehicle_id
+        );
+        
+        if (relatedQuote) {
+          logicalPieces.push(`Pièce n°${pieceNumber++} : Devis n°${relatedQuote.reference} signé du ${relatedQuote.valid_until || invoice.date || new Date().toLocaleDateString('fr-FR')}`);
+        } else {
+          logicalPieces.push(`Pièce n°${pieceNumber++} : Devis signé du ${invoice.date || new Date().toLocaleDateString('fr-FR')}`);
         }
         
-        // Find related repair order for this client and invoice
+        // 2. Ordre de réparation (logiquement existant)
         const relatedRepairOrders = repairOrders?.filter(order => 
           order.client_id === selectedClient && 
           order.invoices?.some(inv => inv.id === selectedInvoice)
         ) || [];
         
+        if (relatedRepairOrders.length > 0) {
+          const firstOrder = relatedRepairOrders[0];
+          logicalPieces.push(`Pièce n°${pieceNumber++} : Ordre de réparation n°${firstOrder.reference} signé`);
+        } else {
+          // Même s'il n'y a pas d'OR trouvé, on suppose qu'il existe logiquement
+          logicalPieces.push(`Pièce n°${pieceNumber++} : Ordre de réparation signé`);
+        }
+        
+        // 3. Facture impayée (toujours présente)
+        logicalPieces.push(`Pièce n°${pieceNumber++} : Facture impayée n°${invoice.reference} du ${invoice.date || new Date().toLocaleDateString('fr-FR')}`);
+        
+        // 4. Bon de sortie du véhicule (logiquement existant)
+        logicalPieces.push(`Pièce n°${pieceNumber++} : Bon de sortie du véhicule signé`);
+        
+        // PIÈCES PHYSIQUES - Seulement si trouvées
+        const physicalDocuments: string[] = [];
+        
+        // Add client's driver license documents if available
+        if (client.driverLicenseFrontUrl && client.driverLicenseFrontUrl.trim()) {
+          physicalDocuments.push(client.driverLicenseFrontUrl);
+        }
+        if (client.driverLicenseBackUrl && client.driverLicenseBackUrl.trim()) {
+          physicalDocuments.push(client.driverLicenseBackUrl);
+        }
+        
         // Add signed repair order document if available
         relatedRepairOrders.forEach(order => {
           if (order.signed_document_url && order.signed_document_url.trim()) {
-            documentsToImport.push(order.signed_document_url);
+            physicalDocuments.push(order.signed_document_url);
           }
         });
         
-        // Add work photos from repair orders (assuming they might be in repairs_data or parts_data as JSON)
+        // Add work photos from repair orders
         relatedRepairOrders.forEach(order => {
-          // Try to extract photo URLs from JSON data fields
           if (order.repairs_data) {
             try {
               const repairsData = typeof order.repairs_data === 'string' ? 
@@ -216,7 +249,7 @@ const CreationDossierJudiciaire = () => {
               if (Array.isArray(repairsData)) {
                 repairsData.forEach((repair: any) => {
                   if (repair.photos && Array.isArray(repair.photos)) {
-                    documentsToImport.push(...repair.photos);
+                    physicalDocuments.push(...repair.photos);
                   }
                 });
               }
@@ -231,7 +264,7 @@ const CreationDossierJudiciaire = () => {
               if (Array.isArray(partsData)) {
                 partsData.forEach((part: any) => {
                   if (part.photos && Array.isArray(part.photos)) {
-                    documentsToImport.push(...part.photos);
+                    physicalDocuments.push(...part.photos);
                   }
                 });
               }
@@ -247,62 +280,71 @@ const CreationDossierJudiciaire = () => {
           relance.invoice_id === selectedInvoice
         ) || [];
         
-        // Add reminder documents (if they have attached documents in channel_data)
+        // Add reminder documents
         clientRelances.forEach(relance => {
           if (relance.channel_data && relance.channel_data.document_url) {
-            documentsToImport.push(relance.channel_data.document_url);
+            physicalDocuments.push(relance.channel_data.document_url);
           }
-          // For formal letters (courrier_recommande), add specific document types
           if (relance.channel === 'courrier_recommande' && relance.channel_data) {
             if (relance.channel_data.lettre_relance_url) {
-              documentsToImport.push(relance.channel_data.lettre_relance_url);
+              physicalDocuments.push(relance.channel_data.lettre_relance_url);
             }
             if (relance.channel_data.lettre_mise_en_demeure_url) {
-              documentsToImport.push(relance.channel_data.lettre_mise_en_demeure_url);
+              physicalDocuments.push(relance.channel_data.lettre_mise_en_demeure_url);
             }
             if (relance.channel_data.lettre_tribunal_url) {
-              documentsToImport.push(relance.channel_data.lettre_tribunal_url);
+              physicalDocuments.push(relance.channel_data.lettre_tribunal_url);
             }
           }
         });
         
-        // Add placeholders for commonly generated legal documents
-        // These would typically be generated by the system and stored somewhere
-        const commonDocuments = [
-          // These are placeholders - in a real system, you'd fetch these from your document generation service
-          // `/documents/lettres/relance_${invoice.reference}.pdf`,
-          // `/documents/lettres/mise_en_demeure_${invoice.reference}.pdf`,
-          // `/documents/lettres/notification_tribunal_${invoice.reference}.pdf`,
-        ];
-        
-        // Only add existing documents (filter out empty strings and placeholders)
-        const validDocuments = [...documentsToImport, ...commonDocuments]
-          .filter(doc => doc && doc.trim() && !doc.startsWith('/documents/lettres/'));
-        
-        if (validDocuments.length > 0) {
-          console.log('Documents réellement trouvés et importés:', validDocuments);
-          setAttachedFiles(validDocuments);
-          
-          // Only update the pieces field with actually found documents
-          const piecesList = generatePiecesList(validDocuments);
-          if (piecesList) {
-            setFormData(prev => ({
-              ...prev,
-              pieces: piecesList
-            }));
-          }
-        } else {
-          console.log('Aucun document trouvé pour ce client/facture');
-          // Clear pieces if no documents are found
-          setAttachedFiles([]);
-          setFormData(prev => ({
-            ...prev,
-            pieces: ''
-          }));
+        // Si des relances existent, ajouter logiquement les documents de procédure
+        if (clientRelances.length > 0) {
+          logicalPieces.push(`Pièce n°${pieceNumber++} : Copie de la mise en demeure envoyée`);
+          logicalPieces.push(`Pièce n°${pieceNumber++} : Preuve de l'envoi et de la réception de la mise en demeure`);
         }
+        
+        // Generate pieces list from physical documents
+        const validPhysicalDocuments = physicalDocuments.filter(doc => doc && doc.trim());
+        const physicalPiecesList = validPhysicalDocuments.map((file, index) => {
+          const fileName = file.split('/').pop() || `document_${index + 1}`;
+          const currentPieceNumber = pieceNumber + index;
+          
+          let description = '';
+          if (fileName.toLowerCase().includes('permis') || fileName.toLowerCase().includes('license') || fileName.toLowerCase().includes('driving')) {
+            description = 'Permis de conduire';
+          } else if (fileName.toLowerCase().includes('relance') || fileName.toLowerCase().includes('reminder')) {
+            description = 'Lettre de relance';
+          } else if (fileName.toLowerCase().includes('demeure') || fileName.toLowerCase().includes('mise_en_demeure')) {
+            description = 'Mise en demeure';
+          } else if (fileName.toLowerCase().includes('photo') || fileName.toLowerCase().includes('image') || fileName.toLowerCase().includes('jpg') || fileName.toLowerCase().includes('png')) {
+            description = 'Photo de véhicule/travaux';
+          } else {
+            description = 'Document justificatif';
+          }
+          
+          return `Pièce n°${currentPieceNumber} : ${description} (${fileName})`;
+        });
+        
+        // Combine logical and physical pieces
+        const allPieces = [...logicalPieces, ...physicalPiecesList];
+        const completeList = allPieces.join('\n');
+        
+        console.log('Pièces logiques:', logicalPieces);
+        console.log('Documents physiques trouvés:', validPhysicalDocuments);
+        console.log('Liste complète:', completeList);
+        
+        // Update pieces field with complete list
+        setFormData(prev => ({
+          ...prev,
+          pieces: completeList
+        }));
+        
+        // Set attached files for upload management
+        setAttachedFiles(validPhysicalDocuments);
       }
     }
-  }, [selectedClient, selectedInvoice, clients, invoices, repairOrders, relances]);
+  }, [selectedClient, selectedInvoice, clients, invoices, quotes, repairOrders, relances]);
 
   const nextStep = () => setStep((s) => Math.min(s + 1, steps.length));
   const prevStep = () => setStep((s) => Math.max(s - 1, 1));
