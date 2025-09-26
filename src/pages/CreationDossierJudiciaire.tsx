@@ -216,13 +216,38 @@ const CreationDossierJudiciaire = () => {
       console.log('❌ Pas de devis trouvé');
     }
     
-    // 2. Ordre de réparation - SEULEMENT s'il a un document signé
-    const relatedRepairOrders = repairOrders?.filter(order => 
+    // 2. Ordre de réparation - Logique de recherche améliorée
+    console.log('=== RECHERCHE ORDRES DE RÉPARATION ===');
+    console.log('Tous les ordres disponibles:', repairOrders?.length || 0);
+    console.log('Client sélectionné:', selectedClient);
+    console.log('Facture sélectionnée:', selectedInvoice);
+    
+    // Premier essai : filtrage strict avec relation facture
+    let relatedRepairOrders = repairOrders?.filter(order => 
       order.client_id === selectedClient && 
       order.invoices?.some(inv => inv.id === selectedInvoice)
     ) || [];
     
-    console.log('Repair orders trouvés:', relatedRepairOrders.length);
+    console.log('Ordres trouvés avec relation facture:', relatedRepairOrders.length);
+    
+    // Si aucun trouvé, essayer un filtrage plus large par client + véhicule
+    if (relatedRepairOrders.length === 0 && invoice.vehicle_id) {
+      relatedRepairOrders = repairOrders?.filter(order => 
+        order.client_id === selectedClient && 
+        order.vehicle_id === invoice.vehicle_id
+      ) || [];
+      console.log('Ordres trouvés par client + véhicule:', relatedRepairOrders.length);
+    }
+    
+    // Si toujours aucun, essayer juste par client
+    if (relatedRepairOrders.length === 0) {
+      relatedRepairOrders = repairOrders?.filter(order => 
+        order.client_id === selectedClient
+      ) || [];
+      console.log('Ordres trouvés par client seul:', relatedRepairOrders.length);
+    }
+    
+    console.log('Ordres finalement sélectionnés:', relatedRepairOrders.length);
     relatedRepairOrders.forEach(order => {
       if (order.signed_document_url && order.signed_document_url.trim()) {
         existingDocuments.push({
