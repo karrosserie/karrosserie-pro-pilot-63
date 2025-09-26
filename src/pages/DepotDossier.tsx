@@ -628,6 +628,27 @@ const DepotDossier = () => {
 
             console.log('Judicial case sent to tribunal via webhook successfully');
             
+            // Mettre à jour le statut du dossier judiciaire en base
+            try {
+              const { error: updateError } = await supabase
+                .from('judicial_cases')
+                .update({
+                  status: 'deposited',
+                  updated_at: new Date().toISOString()
+                })
+                .eq('id', selectedCase.id);
+
+              if (updateError) {
+                console.error('Erreur mise à jour statut dossier:', updateError);
+                throw updateError;
+              }
+
+              console.log('Statut du dossier mis à jour: deposited');
+            } catch (statusError) {
+              console.error('Erreur lors de la mise à jour du statut:', statusError);
+              // Non-bloquant, on continue
+            }
+            
             toast({
               title: "Dossier généré et envoyé",
               description: `Le dossier complet a été téléchargé et envoyé au tribunal: ${filename}`,
