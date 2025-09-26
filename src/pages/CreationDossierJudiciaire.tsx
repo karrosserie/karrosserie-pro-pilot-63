@@ -170,7 +170,7 @@ const CreationDossierJudiciaire = () => {
           interets_details: `Les intérêts de retard sont demandés à compter du ${invoice.date || new Date().toLocaleDateString('fr-FR')} (date d'émission de la facture), conformément aux conditions générales de vente.`,
           depens: true,
           depens_details: "Remboursement des frais de la mise en demeure par LRAR et des frais de procédure.",
-          pieces: `Pièce n°1 : Devis signé du ${invoice.date || new Date().toLocaleDateString('fr-FR')}.\nPièce n°2 : Facture impayée n°${invoice.reference} du ${invoice.date || new Date().toLocaleDateString('fr-FR')}.\nPièce n°3 : Bon de sortie du véhicule signé.\nPièce n°4 : Copie de la mise en demeure envoyée.\nPièce n°5 : Preuve de l'envoi et de la réception de la mise en demeure.`,
+          // Ne pas préremplir le champ pieces - il sera rempli automatiquement quand les documents sont trouvés
         }));
       }
     }
@@ -280,13 +280,24 @@ const CreationDossierJudiciaire = () => {
           .filter(doc => doc && doc.trim() && !doc.startsWith('/documents/lettres/'));
         
         if (validDocuments.length > 0) {
+          console.log('Documents réellement trouvés et importés:', validDocuments);
           setAttachedFiles(validDocuments);
           
-          // Also update the pieces field with the imported documents
+          // Only update the pieces field with actually found documents
           const piecesList = generatePiecesList(validDocuments);
+          if (piecesList) {
+            setFormData(prev => ({
+              ...prev,
+              pieces: piecesList
+            }));
+          }
+        } else {
+          console.log('Aucun document trouvé pour ce client/facture');
+          // Clear pieces if no documents are found
+          setAttachedFiles([]);
           setFormData(prev => ({
             ...prev,
-            pieces: piecesList
+            pieces: ''
           }));
         }
       }
@@ -313,7 +324,7 @@ const CreationDossierJudiciaire = () => {
     }));
   };
 
-  // Generate pieces list from attached files
+  // Generate pieces list from attached files - only for actually found documents
   const generatePiecesList = (files: string[]) => {
     const validFiles = files.filter(file => file && file.trim());
     if (validFiles.length === 0) return '';
@@ -328,16 +339,20 @@ const CreationDossierJudiciaire = () => {
         description = 'Devis signé';
       } else if (fileName.toLowerCase().includes('facture') || fileName.toLowerCase().includes('invoice')) {
         description = 'Facture';
-      } else if (fileName.toLowerCase().includes('permis') || fileName.toLowerCase().includes('license')) {
+      } else if (fileName.toLowerCase().includes('permis') || fileName.toLowerCase().includes('license') || fileName.toLowerCase().includes('driving')) {
         description = 'Permis de conduire';
       } else if (fileName.toLowerCase().includes('relance') || fileName.toLowerCase().includes('reminder')) {
         description = 'Lettre de relance';
       } else if (fileName.toLowerCase().includes('demeure') || fileName.toLowerCase().includes('mise_en_demeure')) {
         description = 'Mise en demeure';
-      } else if (fileName.toLowerCase().includes('ordre') || fileName.toLowerCase().includes('repair')) {
+      } else if (fileName.toLowerCase().includes('ordre') || fileName.toLowerCase().includes('repair') || fileName.toLowerCase().includes('reparation')) {
         description = 'Ordre de réparation signé';
-      } else if (fileName.toLowerCase().includes('photo') || fileName.toLowerCase().includes('image')) {
+      } else if (fileName.toLowerCase().includes('photo') || fileName.toLowerCase().includes('image') || fileName.toLowerCase().includes('jpg') || fileName.toLowerCase().includes('png')) {
         description = 'Photo de véhicule/travaux';
+      } else if (fileName.toLowerCase().includes('bon') && fileName.toLowerCase().includes('sortie')) {
+        description = 'Bon de sortie du véhicule';
+      } else if (fileName.toLowerCase().includes('preuve') || fileName.toLowerCase().includes('reception')) {
+        description = 'Preuve de réception';
       } else {
         description = 'Document justificatif';
       }
