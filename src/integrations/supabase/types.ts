@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      bad_user_after_call: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          id: number
+          module: string | null
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          id?: number
+          module?: string | null
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          id?: number
+          module?: string | null
+        }
+        Relationships: []
+      }
       bank_accounts: {
         Row: {
           balance: number | null
@@ -233,6 +254,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      campaign_assets: {
+        Row: {
+          asset_type: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          file_path: string
+          file_size: number | null
+          id: string
+          last_used_at: string | null
+          mime_type: string | null
+          name: string
+          tags: string[] | null
+          updated_at: string
+          usage_count: number | null
+        }
+        Insert: {
+          asset_type: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          file_path: string
+          file_size?: number | null
+          id?: string
+          last_used_at?: string | null
+          mime_type?: string | null
+          name: string
+          tags?: string[] | null
+          updated_at?: string
+          usage_count?: number | null
+        }
+        Update: {
+          asset_type?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          last_used_at?: string | null
+          mime_type?: string | null
+          name?: string
+          tags?: string[] | null
+          updated_at?: string
+          usage_count?: number | null
+        }
+        Relationships: []
       }
       car_brands: {
         Row: {
@@ -547,6 +616,9 @@ export type Database = {
           city: string
           created_at: string
           email: string
+          gocardless_customer_id: string | null
+          gocardless_mandate_id: string | null
+          gocardless_mandate_status: string | null
           id: string
           latitude: number | null
           location_radius: number | null
@@ -556,6 +628,7 @@ export type Database = {
           notifications: Json
           oodrive_recipient_id: string | null
           phone: string
+          sepa_enabled: boolean | null
           siren: string
           siret: string
           tva: string
@@ -567,6 +640,9 @@ export type Database = {
           city?: string
           created_at?: string
           email?: string
+          gocardless_customer_id?: string | null
+          gocardless_mandate_id?: string | null
+          gocardless_mandate_status?: string | null
           id?: string
           latitude?: number | null
           location_radius?: number | null
@@ -576,6 +652,7 @@ export type Database = {
           notifications?: Json
           oodrive_recipient_id?: string | null
           phone?: string
+          sepa_enabled?: boolean | null
           siren?: string
           siret?: string
           tva?: string
@@ -587,6 +664,9 @@ export type Database = {
           city?: string
           created_at?: string
           email?: string
+          gocardless_customer_id?: string | null
+          gocardless_mandate_id?: string | null
+          gocardless_mandate_status?: string | null
           id?: string
           latitude?: number | null
           location_radius?: number | null
@@ -596,6 +676,7 @@ export type Database = {
           notifications?: Json
           oodrive_recipient_id?: string | null
           phone?: string
+          sepa_enabled?: boolean | null
           siren?: string
           siret?: string
           tva?: string
@@ -1116,6 +1197,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      expert_relance: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          date_rdv: string | null
+          heure_rdv: string | null
+          id: number
+          mail_expert: string | null
+          nom_expert: string | null
+          phone_expert: string | null
+          poll_id: string | null
+          prenom_expert: string | null
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          date_rdv?: string | null
+          heure_rdv?: string | null
+          id?: number
+          mail_expert?: string | null
+          nom_expert?: string | null
+          phone_expert?: string | null
+          poll_id?: string | null
+          prenom_expert?: string | null
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          date_rdv?: string | null
+          heure_rdv?: string | null
+          id?: number
+          mail_expert?: string | null
+          nom_expert?: string | null
+          phone_expert?: string | null
+          poll_id?: string | null
+          prenom_expert?: string | null
+        }
+        Relationships: []
       }
       expertise_reports: {
         Row: {
@@ -2390,6 +2510,7 @@ export type Database = {
           id: string
           incident_date: string | null
           notes: string | null
+          oodrive_contract_id: string | null
           operator_name: string | null
           order_date: string | null
           parts_data: Json | null
@@ -2402,6 +2523,7 @@ export type Database = {
           report_date: string | null
           report_number: string | null
           signature_date: string | null
+          signed_document_url: string | null
           start_date: string | null
           status: string | null
           total_surface_m2: number | null
@@ -2427,6 +2549,7 @@ export type Database = {
           id?: string
           incident_date?: string | null
           notes?: string | null
+          oodrive_contract_id?: string | null
           operator_name?: string | null
           order_date?: string | null
           parts_data?: Json | null
@@ -2439,6 +2562,7 @@ export type Database = {
           report_date?: string | null
           report_number?: string | null
           signature_date?: string | null
+          signed_document_url?: string | null
           start_date?: string | null
           status?: string | null
           total_surface_m2?: number | null
@@ -2464,6 +2588,7 @@ export type Database = {
           id?: string
           incident_date?: string | null
           notes?: string | null
+          oodrive_contract_id?: string | null
           operator_name?: string | null
           order_date?: string | null
           parts_data?: Json | null
@@ -2476,6 +2601,7 @@ export type Database = {
           report_date?: string | null
           report_number?: string | null
           signature_date?: string | null
+          signed_document_url?: string | null
           start_date?: string | null
           status?: string | null
           total_surface_m2?: number | null
@@ -3910,7 +4036,7 @@ export type Database = {
         | "Finitions & remontage"
         | "Clôture & livraison"
         | "Absence"
-      task_status: "En attente" | "En cours" | "Terminé"
+      task_status: "En attente" | "En cours" | "Terminé" | "En pause"
     }
     CompositeTypes: {
       http_header: {
@@ -4082,7 +4208,7 @@ export const Constants = {
         "Clôture & livraison",
         "Absence",
       ],
-      task_status: ["En attente", "En cours", "Terminé"],
+      task_status: ["En attente", "En cours", "Terminé", "En pause"],
     },
   },
 } as const

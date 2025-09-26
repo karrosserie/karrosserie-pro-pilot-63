@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -17,12 +16,24 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { CheckIcon, CreditCardIcon, PackageIcon, PlusIcon } from 'lucide-react';
+import { 
+  CheckIcon, 
+  CreditCardIcon, 
+  PackageIcon, 
+  PlusIcon,
+  Building2,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  Ban
+} from 'lucide-react';
 import { useSubscription } from '@/hooks/use-subscription';
+import { useGoCardless } from '@/hooks/use-gocardless';
 import { formatDate } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useIsMobile } from '@/hooks/use-mobile';
 import PricingPage from '@/components/pricing/PricingPage';
+import { SepaSetupDialog } from './SepaSetupDialog';
 
 const SubscriptionTab: React.FC = () => {
   const {
@@ -39,6 +50,17 @@ const SubscriptionTab: React.FC = () => {
     isCreatingSubscription,
     isAddingTokens,
   } = useSubscription();
+
+  const {
+    hasMandateConfigured,
+    isMandateActive,
+    isSepaEnabled,
+    mandateStatus,
+    mandateLoading,
+    cancelMandate,
+    isCancellingMandate,
+  } = useGoCardless();
+
   const isMobile = useIsMobile();
 
   if (isLoading) {
@@ -215,6 +237,95 @@ const SubscriptionTab: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* Configuration SEPA avec GoCardless */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Building2 className="mr-2 h-5 w-5" />
+            Prélèvement SEPA automatique
+          </CardTitle>
+          <CardDescription>
+            Automatisez le paiement de vos abonnements avec le prélèvement SEPA via GoCardless.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {!hasMandateConfigured ? (
+            <div className="flex flex-col space-y-4">
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <h4 className="font-medium text-blue-900 mb-2">Avantages du prélèvement SEPA</h4>
+                <ul className="text-sm text-blue-800 space-y-1">
+                  <li>• Paiements automatiques de vos abonnements</li>
+                  <li>• Plus de risque d'oubli ou de retard</li>
+                  <li>• Processus sécurisé via GoCardless</li>
+                  <li>• Possibilité d'annulation à tout moment</li>
+                </ul>
+              </div>
+              <SepaSetupDialog />
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className={`p-2 rounded-full ${
+                    isMandateActive ? 'bg-green-100' : 'bg-yellow-100'
+                  }`}>
+                    {isMandateActive ? (
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <AlertCircle className="h-4 w-4 text-yellow-600" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-medium">
+                      Mandat SEPA {isMandateActive ? 'actif' : 'en cours de configuration'}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {mandateLoading ? 'Vérification du statut...' : 
+                       isMandateActive ? 'Prélèvements automatiques activés' : 
+                       'En attente de validation bancaire'}
+                    </p>
+                  </div>
+                </div>
+                <Badge variant={isMandateActive ? "secondary" : "secondary"}>
+                  {mandateStatus?.status || 'Inconnu'}
+                </Badge>
+              </div>
+
+              {isMandateActive && (
+                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                  <h4 className="font-medium text-green-900 mb-2">Prélèvement SEPA configuré</h4>
+                  <p className="text-sm text-green-800">
+                    Vos abonnements seront automatiquement prélevés sur votre compte bancaire. 
+                    Vous recevrez une notification avant chaque prélèvement.
+                  </p>
+                </div>
+              )}
+
+              <div className="flex justify-end">
+                <Button 
+                  variant="destructive" 
+                  size="sm"
+                  onClick={() => mandateStatus?.id && cancelMandate(mandateStatus.id)}
+                  disabled={isCancellingMandate}
+                >
+                  {isCancellingMandate ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Annulation...
+                    </>
+                  ) : (
+                    <>
+                      <Ban className="mr-2 h-4 w-4" />
+                      Annuler le mandat
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Pricing Page Button */}
       <div className="flex justify-center">
         <Dialog>
@@ -235,7 +346,6 @@ const SubscriptionTab: React.FC = () => {
           </DialogContent>
         </Dialog>
       </div>
-
 
       {/* Token Packages (always visible for easy access) */}
       <Card>
