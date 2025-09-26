@@ -519,15 +519,82 @@ const DepotDossier = () => {
 
             console.log('PDF uploaded, public URL:', publicUrl);
 
+            // Fonction pour trouver le tribunal le plus proche
+            const findNearestTribunal = (clientPostalCode: string, clientCity: string) => {
+              const tribunals = [
+                {
+                  name: 'TRIBUNAL JUDICIAIRE DE MARSEILLE',
+                  address: '6 Rue Joseph Autran',
+                  zipCode: '13006',
+                  city: 'MARSEILLE',
+                  postalCodes: ['13001', '13002', '13003', '13004', '13005', '13006', '13007', '13008', '13009', '13010', '13011', '13012', '13013', '13014', '13015', '13016']
+                },
+                {
+                  name: 'TRIBUNAL JUDICIAIRE D\'AIX-EN-PROVENCE',
+                  address: 'Place Verdun',
+                  zipCode: '13100',
+                  city: 'AIX-EN-PROVENCE',
+                  postalCodes: ['13100', '13090', '13080', '13120', '13540', '13080']
+                },
+                {
+                  name: 'TRIBUNAL JUDICIAIRE DE TOULON',
+                  address: 'Place Gabriel Péri',
+                  zipCode: '83000',
+                  city: 'TOULON',
+                  postalCodes: ['83000', '83100', '83200', '83300', '83400', '83500', '83600', '83700', '83800', '83900']
+                },
+                {
+                  name: 'TRIBUNAL JUDICIAIRE DE NICE',
+                  address: '1 Place du Palais',
+                  zipCode: '06300',
+                  city: 'NICE',
+                  postalCodes: ['06000', '06100', '06200', '06300', '06400', '06500', '06600', '06700', '06800', '06900']
+                },
+                {
+                  name: 'TRIBUNAL JUDICIAIRE D\'AVIGNON',
+                  address: '2 Boulevard Limbert',
+                  zipCode: '84000',
+                  city: 'AVIGNON',
+                  postalCodes: ['84000', '84100', '84200', '84300', '84400', '84500', '84600', '84700', '84800', '84900']
+                }
+              ];
+
+              // Chercher d'abord par code postal exact
+              for (const tribunal of tribunals) {
+                if (tribunal.postalCodes.includes(clientPostalCode)) {
+                  return tribunal;
+                }
+              }
+
+              // Si pas trouvé par code postal, chercher par département (2 premiers chiffres)
+              const departement = clientPostalCode.substring(0, 2);
+              for (const tribunal of tribunals) {
+                if (tribunal.postalCodes.some(code => code.startsWith(departement))) {
+                  return tribunal;
+                }
+              }
+
+              // Par défaut, retourner Marseille
+              return tribunals[0];
+            };
+
+            // Déterminer le tribunal approprié
+            const clientPostalCode = relatedClient?.postal_code || '13006';
+            const clientCity = relatedClient?.city || 'MARSEILLE';
+            const nearestTribunal = findNearestTribunal(clientPostalCode, clientCity);
+
+            console.log('Client address:', clientPostalCode, clientCity);
+            console.log('Selected tribunal:', nearestTribunal.name);
+
             // Préparer les données pour le webhook
             const webhookData = {
               civility: '',
               lastName: '',
               firstName: '',
-              address: '6 Rue Joseph Autran',
-              zipCode: '13006',
-              city: 'MARSEILLE',
-              company: 'TRIBUNAL JUDICIAIRE DE MARSEILLE',
+              address: nearestTribunal.address,
+              zipCode: nearestTribunal.zipCode,
+              city: nearestTribunal.city,
+              company: nearestTribunal.name,
               phone: '',
               email: '',
               filepath: publicUrl,
