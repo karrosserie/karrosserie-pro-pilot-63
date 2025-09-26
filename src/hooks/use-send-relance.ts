@@ -37,25 +37,60 @@ export const useSendRelance = () => {
   };
 
   const sendWebhook = async (params: {
-    invoiceId: string;
-    clientId: string;
-    carrosserieId: string;
-    relanceType: string;
-    relanceText: string;
+    invoice: any;
+    channel: string;
+    relanceNumber: string;
   }) => {
     try {
-      const response = await fetch('https://n8n.karrosserie.pro/webhook/karrosserie-relance-manuelle', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          invoice_id: params.invoiceId,
-          client_id: params.clientId,
-          carrosserie_id: params.carrosserieId,
-          relance_type: params.relanceType,
-          relance_text: params.relanceText,
-        }),
+      // Récupérer les informations du client
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('*')
+        .eq('id', params.invoice.client_id)
+        .single();
+
+      if (clientError) {
+        throw new Error('Impossible de récupérer les informations du client');
+      }
+
+      // Construire les paramètres pour le webhook GET
+      const webhookParams = new URLSearchParams({
+        // Informations du client
+        client_id: params.invoice.client_id,
+        client_first_name: clientData.first_name || '',
+        client_last_name: clientData.last_name || '',
+        client_email: clientData.email || '',
+        client_phone: clientData.phone || '',
+        client_address: clientData.address || '',
+        client_postal_code: clientData.postal_code || '',
+        client_city: clientData.city || '',
+        
+        // Informations de la facture
+        invoice_id: params.invoice.id,
+        invoice_reference: params.invoice.reference,
+        invoice_amount: params.invoice.amount.toString(),
+        invoice_due_date: params.invoice.due_date || '',
+        invoice_status: params.invoice.status,
+        
+        // Informations de la compagnie
+        company_id: companyData?.id || '',
+        company_name: companyData?.name || '',
+        company_email: companyData?.email || '',
+        company_phone: companyData?.phone || '',
+        company_address: companyData?.address || '',
+        company_zipcode: companyData?.zipcode || '',
+        company_city: companyData?.city || '',
+        
+        // Informations de la relance
+        relance_number: params.relanceNumber,
+        channel: params.channel,
+        timestamp: new Date().toISOString()
+      });
+
+      const webhookUrl = `https://n8n.karrosserie.pro/webhook/15461cdf-61d9-49ab-8b76-1dc4e4a5a19c?${webhookParams.toString()}`;
+
+      const response = await fetch(webhookUrl, {
+        method: 'GET',
       });
 
       if (!response.ok) {
@@ -115,6 +150,7 @@ export const useSendRelance = () => {
     tone: string;
     message: string;
     subject?: string;
+    relanceNumber: string;
   }) => {
     try {
       // Mapper les types d'action vers les canaux de la base de données
@@ -141,7 +177,7 @@ export const useSendRelance = () => {
       }
 
       // Vérifier la limite quotidienne
-      const canSend = await checkDailyLimit(params.invoice.clientId, mappedChannel);
+      const canSend = await checkDailyLimit(params.invoice.client_id, mappedChannel);
       if (!canSend) {
         toast({
           title: "Limite atteinte",
@@ -153,16 +189,14 @@ export const useSendRelance = () => {
 
       // Envoyer le webhook
       await sendWebhook({
-        invoiceId: params.invoice.id,
-        clientId: params.invoice.clientId,
-        carrosserieId: companyData?.id || '',
-        relanceType: params.channel,
-        relanceText: params.message,
+        invoice: params.invoice,
+        channel: params.channel,
+        relanceNumber: params.relanceNumber,
       });
 
       // Enregistrer dans l'historique
       await recordRelance({
-        clientId: params.invoice.clientId,
+        clientId: params.invoice.client_id,
         invoiceId: params.invoice.id,
         channel: mappedChannel,
         tone: mappedTone,
@@ -172,7 +206,7 @@ export const useSendRelance = () => {
 
       toast({
         title: "Relance envoyée",
-        description: `Relance ${params.channel} envoyée avec succès à ${params.invoice.client}`,
+        description: `Relance ${params.channel} envoyée avec succès`,
       });
 
       return true;

@@ -137,6 +137,7 @@ Karrosserie Pro`,
         tone: getToneFromActionType(selectedActionType),
         message: generatedMessage,
         subject: messageData.subject,
+        relanceNumber: "1",
       });
 
       if (success) {

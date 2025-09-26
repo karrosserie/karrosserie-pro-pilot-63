@@ -264,6 +264,7 @@ const Invoices = () => {
         channel,
         tone: 'professional',
         message: `Relance n°${relanceNumber} pour la facture ${invoice.reference}`,
+        relanceNumber,
       });
 
       if (success) {
