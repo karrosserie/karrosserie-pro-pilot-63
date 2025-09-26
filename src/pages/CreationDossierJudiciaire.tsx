@@ -216,38 +216,39 @@ const CreationDossierJudiciaire = () => {
       console.log('❌ Pas de devis trouvé');
     }
     
-    // 2. Ordre de réparation - Logique de recherche améliorée
+    // 2. Ordre de réparation - Recherche simplifiée et débogage
     console.log('=== RECHERCHE ORDRES DE RÉPARATION ===');
     console.log('Tous les ordres disponibles:', repairOrders?.length || 0);
     console.log('Client sélectionné:', selectedClient);
     console.log('Facture sélectionnée:', selectedInvoice);
+    console.log('Vehicle ID de la facture:', invoice.vehicle_id);
     
-    // Premier essai : filtrage strict avec relation facture
-    let relatedRepairOrders = repairOrders?.filter(order => 
-      order.client_id === selectedClient && 
-      order.invoices?.some(inv => inv.id === selectedInvoice)
-    ) || [];
-    
-    console.log('Ordres trouvés avec relation facture:', relatedRepairOrders.length);
-    
-    // Si aucun trouvé, essayer un filtrage plus large par client + véhicule
-    if (relatedRepairOrders.length === 0 && invoice.vehicle_id) {
-      relatedRepairOrders = repairOrders?.filter(order => 
-        order.client_id === selectedClient && 
-        order.vehicle_id === invoice.vehicle_id
-      ) || [];
-      console.log('Ordres trouvés par client + véhicule:', relatedRepairOrders.length);
+    if (repairOrders && repairOrders.length > 0) {
+      console.log('Premier ordre exemple:', {
+        id: repairOrders[0].id,
+        client_id: repairOrders[0].client_id,
+        vehicle_id: repairOrders[0].vehicle_id,
+        reference: repairOrders[0].reference,
+        invoices: repairOrders[0].invoices
+      });
     }
     
-    // Si toujours aucun, essayer juste par client
-    if (relatedRepairOrders.length === 0) {
-      relatedRepairOrders = repairOrders?.filter(order => 
-        order.client_id === selectedClient
-      ) || [];
-      console.log('Ordres trouvés par client seul:', relatedRepairOrders.length);
-    }
+    // Recherche directe par client_id d'abord
+    const relatedRepairOrders = repairOrders?.filter(order => {
+      console.log(`Ordre ${order.reference}:`, {
+        client_id: order.client_id,
+        match_client: order.client_id === selectedClient,
+        vehicle_id: order.vehicle_id,
+        match_vehicle: order.vehicle_id === invoice.vehicle_id,
+        invoices: order.invoices,
+        signed_document_url: order.signed_document_url,
+        document_url: (order as any).document_url
+      });
+      
+      return order.client_id === selectedClient;
+    }) || [];
     
-    console.log('Ordres finalement sélectionnés:', relatedRepairOrders.length);
+    console.log('Ordres trouvés pour ce client:', relatedRepairOrders.length);
     relatedRepairOrders.forEach(order => {
       if (order.signed_document_url && order.signed_document_url.trim()) {
         existingDocuments.push({
