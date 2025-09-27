@@ -285,7 +285,7 @@ export const FleetViolationForm: React.FC<FleetViolationFormProps> = ({
             </div>
             
             <div>
-              <Label htmlFor="violation_time">Heure (optionnel)</Label>
+              <Label htmlFor="violation_time">Heure</Label>
               <Input
                 id="violation_time"
                 type="time"

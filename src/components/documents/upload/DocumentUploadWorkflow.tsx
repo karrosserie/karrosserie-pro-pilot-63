@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import DocumentUploadStep from "./DocumentUploadStep";
 import WhatsAppConsentStep from "./WhatsAppConsentStep";
+import DocumentSkipInfoStep from "./DocumentSkipInfoStep";
 
 const ALL_DOCUMENT_STEPS = [
   {
@@ -34,17 +35,19 @@ interface DocumentUploadWorkflowProps {
   onBack: () => void;
   onComplete: (documents: { [key: string]: File }, whatsappConsent: boolean) => void;
   missingDocuments: string[];
+  availableDocuments: string[];
   tokenData: {
     client_id: string | null;
     vehicule_id: string | null;
   } | null;
 }
 
-export default function DocumentUploadWorkflow({ 
-  onBack, 
-  onComplete, 
-  missingDocuments, 
-  tokenData 
+export default function DocumentUploadWorkflow({
+  onBack,
+  onComplete,
+  missingDocuments,
+  availableDocuments,
+  tokenData
 }: DocumentUploadWorkflowProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [documents, setDocuments] = useState<{ [key: string]: File }>({});
@@ -55,10 +58,35 @@ export default function DocumentUploadWorkflow({
     return ALL_DOCUMENT_STEPS.filter(step => missingDocuments.includes(step.key));
   }, [missingDocuments]);
 
-  // Calculer le nombre total d'étapes (documents + WhatsApp)
-  const totalSteps = documentSteps.length + 1;
+  // Calculer le nombre total d'étapes (info skip + documents + WhatsApp)
+  const hasSkippedDocuments = availableDocuments.length > 0;
+  const totalSteps = documentSteps.length + 1 + (hasSkippedDocuments ? 1 : 0);
 
-  // Si aucun document n'est manquant, afficher directement l'étape WhatsApp
+  // Si aucun document n'est manquant, mais qu'il y a des documents disponibles, afficher l'info puis WhatsApp
+  if (documentSteps.length === 0 && hasSkippedDocuments) {
+    if (currentStep === 0) {
+      return (
+        <DocumentSkipInfoStep
+          step={1}
+          totalSteps={2}
+          availableDocuments={availableDocuments}
+          onNext={() => setCurrentStep(1)}
+          onBack={onBack}
+        />
+      );
+    } else {
+      return (
+        <WhatsAppConsentStep
+          step={2}
+          totalSteps={2}
+          onNext={(consent) => onComplete({}, consent)}
+          onBack={() => setCurrentStep(0)}
+        />
+      );
+    }
+  }
+
+  // Si aucun document n'est manquant et aucun document disponible, afficher directement l'étape WhatsApp
   if (documentSteps.length === 0) {
     return (
       <WhatsAppConsentStep
@@ -71,11 +99,12 @@ export default function DocumentUploadWorkflow({
   }
 
   const handleNext = (file: File) => {
-    const stepKey = documentSteps[currentStep].key;
+    const adjustedStep = hasSkippedDocuments ? currentStep - 1 : currentStep;
+    const stepKey = documentSteps[adjustedStep].key;
     const updatedDocuments = { ...documents, [stepKey]: file };
     setDocuments(updatedDocuments);
 
-    if (currentStep < documentSteps.length - 1) {
+    if (adjustedStep < documentSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
       // Tous les documents sont uploadés, passer à l'étape WhatsApp
@@ -101,8 +130,24 @@ export default function DocumentUploadWorkflow({
     console.log("Image uploaded:", file.name);
   };
 
+  // Étape d'information sur les documents sautés (première étape si il y en a)
+  if (hasSkippedDocuments && currentStep === 0) {
+    return (
+      <DocumentSkipInfoStep
+        step={1}
+        totalSteps={totalSteps}
+        availableDocuments={availableDocuments}
+        onNext={() => setCurrentStep(1)}
+        onBack={onBack}
+      />
+    );
+  }
+
+  // Calculer l'étape ajustée pour les documents
+  const adjustedStep = hasSkippedDocuments ? currentStep - 1 : currentStep;
+
   // Vérifier si nous sommes à l'étape WhatsApp (après tous les documents)
-  if (currentStep >= documentSteps.length) {
+  if (adjustedStep >= documentSteps.length) {
     return (
       <WhatsAppConsentStep
         step={currentStep + 1}
@@ -118,9 +163,9 @@ export default function DocumentUploadWorkflow({
       key={currentStep}
       step={currentStep + 1}
       totalSteps={totalSteps}
-      title={documentSteps[currentStep].title}
-      description={documentSteps[currentStep].description}
-      documentType={documentSteps[currentStep].documentType}
+      title={documentSteps[adjustedStep].title}
+      description={documentSteps[adjustedStep].description}
+      documentType={documentSteps[adjustedStep].documentType}
       onNext={handleNext}
       onBack={handleBack}
       onImageUpload={handleImageUpload}

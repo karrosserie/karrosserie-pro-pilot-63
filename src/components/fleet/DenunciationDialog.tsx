@@ -8,6 +8,8 @@ import { fr } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import { useCompany } from '@/hooks/use-company';
 import { useAuth } from '@/contexts/AuthContext';
+import { useInvoices } from '@/hooks/use-invoices';
+import { useCompanyId } from '@/hooks/use-company-id';
 import SignaturePad from '@/components/shared/SignaturePad';
 import { generateDenunciationPDF } from '@/utils/pdfGenerator';
 
@@ -29,6 +31,8 @@ export const DenunciationDialog: React.FC<DenunciationDialogProps> = ({
   const { toast } = useToast();
   const { companyData } = useCompany();
   const { profile } = useAuth();
+  const { createInvoice } = useInvoices();
+  const companyId = useCompanyId();
   
   const [signature, setSignature] = useState('');
   const [signatoryName, setSignatoryName] = useState(
@@ -40,6 +44,56 @@ export const DenunciationDialog: React.FC<DenunciationDialogProps> = ({
 
   const handleSignatureChange = (signatureData: string) => {
     setSignature(signatureData);
+  };
+
+  const createDenunciationInvoice = async (violation: any, reservation: any) => {
+    if (!companyId?.companyId || !violation) return;
+
+    try {
+      // Générer une référence unique pour la facture
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      const time = String(today.getHours()).padStart(2, '0') + String(today.getMinutes()).padStart(2, '0');
+      const reference = `DENON-${year}${month}${day}-${time}`;
+
+      // Préparer les données de la facture
+      const invoiceData = {
+        reference,
+        client_id: reservation?.client_id || null,
+        vehicle_id: violation?.fleet_vehicle_id || null,
+        status: 'draft',
+        date: today.toISOString().split('T')[0],
+        due_date: new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 jours
+        notes: `Frais de dossier pour dénonciation conducteur - Contravention du ${format(new Date(violation.violation_date), 'dd/MM/yyyy', { locale: fr })} - Véhicule ${violation.license_plate}`,
+        amount: 15.00,
+        paid_amount: 0,
+        repairs_data: JSON.stringify([{
+          id: '1',
+          label: 'Frais de dossier pour dénonciation conducteur',
+          description: `Traitement administratif et envoi du dossier de dénonciation à l'ANTAI pour la contravention du ${format(new Date(violation.violation_date), 'dd/MM/yyyy', { locale: fr })}`,
+          unitPrice: 15.00,
+          quantity: 1,
+          discount: 0,
+          vat: 20
+        }]),
+        parts_data: JSON.stringify([]),
+        discounts_data: JSON.stringify([])
+      };
+
+      await createInvoice.mutateAsync(invoiceData);
+
+      return true;
+    } catch (error) {
+      console.error('Erreur lors de la création de la facture:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer la facture pour les frais de dossier.",
+        variant: "destructive"
+      });
+      return false;
+    }
   };
 
   const handleGeneratePDF = async () => {
@@ -62,15 +116,27 @@ export const DenunciationDialog: React.FC<DenunciationDialogProps> = ({
     }
 
     setIsGeneratingPDF(true);
-    
+
     try {
+      // Générer le PDF de dénonciation
       await generateDenunciationPDF(violationData, companyData, signature, signatoryName);
-      
-      toast({
-        title: "Dossier de dénonciation généré",
-        description: "Le dossier complet (courrier, attestation de prêt et photo) a été téléchargé en un seul PDF. Une facture de 15€ TTC sera créée."
-      });
-      
+
+      // Créer automatiquement la facture pour les frais de dossier
+      const invoiceCreated = await createDenunciationInvoice(violationData.violation, violationData.reservation);
+
+      if (invoiceCreated) {
+        toast({
+          title: "Dossier de dénonciation généré",
+          description: "Le dossier complet a été téléchargé et une facture de 15€ TTC a été créée pour les frais de dossier."
+        });
+      } else {
+        toast({
+          title: "Dossier de dénonciation généré",
+          description: "Le dossier complet a été téléchargé. Attention: la facture de frais de dossier n'a pas pu être créée automatiquement.",
+          variant: "destructive"
+        });
+      }
+
       onOpenChange(false);
     } catch (error) {
       console.error('Erreur génération PDF:', error);

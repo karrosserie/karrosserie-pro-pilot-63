@@ -17,6 +17,7 @@ export default function DocumentUploadFlow() {
     company_id: string | null;
   } | null>(null);
   const [missingDocuments, setMissingDocuments] = useState<string[]>([]);
+  const [availableDocuments, setAvailableDocuments] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchTokenDataAndCheckDocuments = async () => {
@@ -60,8 +61,9 @@ export default function DocumentUploadFlow() {
 
         setCompanyName(companyData.name);
 
-        // Vérifier les documents manquants
+        // Vérifier les documents manquants et disponibles
         const missing: string[] = [];
+        const available: string[] = [];
 
         // Vérifier les documents du client (permis de conduire)
         if (tokenResult.client_id) {
@@ -74,9 +76,13 @@ export default function DocumentUploadFlow() {
           if (!clientError && clientData) {
             if (!clientData.driver_license_front_url) {
               missing.push('driver_license_front');
+            } else {
+              available.push('driver_license_front');
             }
             if (!clientData.driver_license_back_url) {
               missing.push('driver_license_back');
+            } else {
+              available.push('driver_license_back');
             }
           } else {
             // Si erreur ou pas de client, on considère que les deux documents manquent
@@ -95,9 +101,13 @@ export default function DocumentUploadFlow() {
           if (!vehicleError && vehicleData) {
             if (!vehicleData.registration_document_front_url) {
               missing.push('registration_front');
+            } else {
+              available.push('registration_front');
             }
             if (!vehicleData.registration_document_back_url) {
               missing.push('registration_back');
+            } else {
+              available.push('registration_back');
             }
           } else {
             // Si erreur ou pas de véhicule, on considère que les deux documents manquent
@@ -106,6 +116,7 @@ export default function DocumentUploadFlow() {
         }
 
         setMissingDocuments(missing);
+        setAvailableDocuments(available);
       } catch (error) {
         console.error('Erreur:', error);
       } finally {
@@ -264,6 +275,7 @@ export default function DocumentUploadFlow() {
       setUploadCompleted(true);
       setShowWorkflow(false);
       setMissingDocuments([]);
+      setAvailableDocuments([]);
       
     } catch (error) {
       console.error("Erreur lors de la sauvegarde des documents:", error);
@@ -278,6 +290,7 @@ export default function DocumentUploadFlow() {
         onBack={handleBackToStart}
         onComplete={handleComplete}
         missingDocuments={missingDocuments}
+        availableDocuments={availableDocuments}
         tokenData={tokenData}
       />
     );
@@ -364,6 +377,35 @@ export default function DocumentUploadFlow() {
           }
         </p>
 
+        {/* Available documents message */}
+        {availableDocuments.length > 0 && missingDocuments.length > 0 && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-left">
+            <h3 className="font-semibold text-green-800 mb-2">
+              ✅ Documents déjà enregistrés :
+            </h3>
+            <div className="space-y-1">
+              {(() => {
+                const hasDriverLicense = availableDocuments.includes('driver_license_front') && availableDocuments.includes('driver_license_back');
+                const hasRegistration = availableDocuments.includes('registration_front') && availableDocuments.includes('registration_back');
+
+                return (
+                  <>
+                    {hasDriverLicense && (
+                      <p className="text-green-700 text-sm">• Permis de conduire</p>
+                    )}
+                    {hasRegistration && (
+                      <p className="text-green-700 text-sm">• Carte grise</p>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+            <p className="text-green-600 text-sm mt-2 italic">
+              Ces documents seront automatiquement ignorés lors de l'upload.
+            </p>
+          </div>
+        )}
+
         {/* Document list - Only show if there are missing documents */}
         {missingDocuments.length > 0 && (
           <div className="space-y-4 text-left">
@@ -375,7 +417,7 @@ export default function DocumentUploadFlow() {
                 const needsDriverLicense = missingDocuments.includes('driver_license_front') || missingDocuments.includes('driver_license_back');
                 const needsRegistration = missingDocuments.includes('registration_front') || missingDocuments.includes('registration_back');
                 let counter = 0;
-                
+
                 return (
                   <>
                     {needsDriverLicense && (
