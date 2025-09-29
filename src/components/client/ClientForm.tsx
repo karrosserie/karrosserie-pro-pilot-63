@@ -72,7 +72,12 @@ const ClientForm: React.FC<ClientFormProps> = ({
   };
 
   const handleAutoRelancesToggle = (checked: boolean) => {
-    setFormData(prev => ({ ...prev, autoRelancesDisabled: !checked }));
+    console.log('🔧 AutoRelances Toggle - checked:', checked);
+    console.log('🔧 AutoRelances Toggle - before update:', formData.autoRelancesDisabled);
+    const newValue = !checked;
+    console.log('🔧 AutoRelances Toggle - setting autoRelancesDisabled to:', newValue);
+    setFormData(prev => ({ ...prev, autoRelancesDisabled: newValue }));
+    console.log('🔧 AutoRelances Toggle - after update, formData will have autoRelancesDisabled:', newValue);
     onFormChange?.();
   };
 

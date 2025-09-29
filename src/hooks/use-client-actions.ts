@@ -99,8 +99,11 @@ export const useClientActions = () => {
   };
 
   const handleClientSubmit = (data: any) => {
+    console.log('🚀 handleClientSubmit - Full data received:', data);
+    console.log('🚀 handleClientSubmit - autoRelancesDisabled value:', data.autoRelancesDisabled);
+    
     if (dialogMode === 'create') {
-      createClient.mutate({
+      const clientData = {
         firstName: data.firstName, 
         lastName: data.lastName,
         email: data.email,
@@ -113,23 +116,27 @@ export const useClientActions = () => {
         driverLicenseBackUrl: data.driverLicenseBackUrl,
         autoRelancesDisabled: data.autoRelancesDisabled,
         company_id: companyId
-      });
+      };
+      console.log('🚀 Creating client with data:', clientData);
+      createClient.mutate(clientData);
     } else if (dialogMode === 'edit' && selectedClient) {
+      const updateData = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        city: data.city,
+        zipCode: data.zipCode,
+        company: data.company,
+        driverLicenseFrontUrl: data.driverLicenseFrontUrl,
+        driverLicenseBackUrl: data.driverLicenseBackUrl,
+        autoRelancesDisabled: data.autoRelancesDisabled
+      };
+      console.log('🚀 Updating client with id:', selectedClient.id, 'and data:', updateData);
       updateClient.mutate({
         id: selectedClient.id, 
-        data: {
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-          phone: data.phone,
-          address: data.address,
-          city: data.city,
-          zipCode: data.zipCode,
-          company: data.company,
-          driverLicenseFrontUrl: data.driverLicenseFrontUrl,
-          driverLicenseBackUrl: data.driverLicenseBackUrl,
-          autoRelancesDisabled: data.autoRelancesDisabled
-        }
+        data: updateData
       });
     }
   };

@@ -110,8 +110,7 @@ export function useClients() {
     error,
     createClient,
     updateClient,
-    deleteClient,
-    refetch: () => queryClient.invalidateQueries({ queryKey: ['clients'] })
+    deleteClient
   };
 }
 

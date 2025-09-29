@@ -16,7 +16,7 @@ import { ErrorMessage } from '@/components/ui/error-message';
 import { Client } from '@/services/supabase/clients';
 
 const ClientsPage = () => {
-  const { clients, isLoading, error, refetch } = useClients();
+  const { clients, isLoading, error } = useClients();
   const [searchTerm, setSearchTerm] = useState('');
   
   // Vehicle dialog state
@@ -142,7 +142,6 @@ const ClientsPage = () => {
         onDeleteClient={handleDeleteClient}
         onCreateVehicle={handleCreateVehicle}
         onRequestDocuments={handleRequestDocuments}
-        onClientUpdate={refetch}
       />
 
       <ClientDialogs

@@ -121,7 +121,8 @@ export const clientsService = {
       oodrive_recipient_id: client.oodrive_recipient_id || null
     };
 
-    console.log('Updating client with data:', clientData);
+    console.log('📝 Client Service - Updating client with data:', clientData);
+    console.log('📝 Client Service - auto_relances_disabled value:', clientData.auto_relances_disabled);
 
     const { data, error } = await supabase
       .from('clients')
