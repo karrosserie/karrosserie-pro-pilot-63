@@ -9,6 +9,14 @@ export interface AuthSignUpData {
   email: string;
   password: string;
   isTeamMember?: boolean;
+  // Company information
+  siren?: string;
+  companyName?: string;
+  legalForm?: string;
+  siret?: string;
+  vatNumber?: string;
+  address?: string;
+  nafCode?: string;
 }
 
 export interface AuthError {
@@ -43,7 +51,21 @@ export const authService = {
   /**
    * Sign up with email and password
    */
-  signUp: async ({ email, password, firstName, lastName, phoneNumber, isTeamMember = false }: AuthSignUpData) => {
+  signUp: async ({ 
+    email, 
+    password, 
+    firstName, 
+    lastName, 
+    phoneNumber, 
+    isTeamMember = false,
+    siren,
+    companyName,
+    legalForm,
+    siret,
+    vatNumber,
+    address,
+    nafCode
+  }: AuthSignUpData) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -53,6 +75,14 @@ export const authService = {
           last_name: lastName,
           phone_number: phoneNumber,
           is_team_member: isTeamMember.toString(),
+          // Company data
+          company_siren: siren,
+          company_name: companyName,
+          company_legal_form: legalForm,
+          company_siret: siret,
+          company_vat_number: vatNumber,
+          company_address: address,
+          company_naf_code: nafCode,
         },
         emailRedirectTo: `${window.location.origin}/auth`,
       },

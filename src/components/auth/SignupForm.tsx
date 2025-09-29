@@ -83,7 +83,25 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
     setIsLoading(true);
 
     try {
-      await signUp(data.email, data.password, data.firstName, data.lastName, data.phoneNumber);
+      const companyData = {
+        siren: data.siren,
+        companyName: data.companyName,
+        legalForm: data.legalForm,
+        siret: data.siret,
+        vatNumber: data.vatNumber,
+        address: data.address,
+        nafCode: data.nafCode,
+      };
+      
+      await signUp(
+        data.email, 
+        data.password, 
+        data.firstName, 
+        data.lastName, 
+        data.phoneNumber,
+        false, // isTeamMember
+        companyData
+      );
       // Le message de succès est maintenant géré dans useAuthState
       onToggleMode(); // Retour vers le formulaire de connexion
     } catch (error: any) {
