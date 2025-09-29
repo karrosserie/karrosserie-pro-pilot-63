@@ -148,19 +148,15 @@ Deno.serve(async (req) => {
 
     console.log(`📋 Found ${existingTasks?.length || 0} existing tasks for employee`);
 
-    // Check if there's an available slot at the requested time
+    // EMERGENCY PRIORITY: Always use the exact requested time, never adapt
     const taskDuration = 60 * 60 * 1000; // 1 hour in milliseconds
-    let finalEmergencyStart = emergencyStart;
+    let finalEmergencyStart = emergencyStart; // ALWAYS use the exact requested time
+    
+    console.log(`🚨 EMERGENCY PRIORITY: Vehicle will be placed at EXACT requested time: ${finalEmergencyStart.toLocaleString()}`);
+    console.log(`🔄 Any conflicting tasks will be shifted automatically`);
     
     if (existingTasks && existingTasks.length > 0) {
-      // Try to find a gap at the requested time
-      const availableSlot = findAvailableSlotForEmergency(existingTasks, emergencyStart, emergencyEnd);
-      if (availableSlot) {
-        finalEmergencyStart = availableSlot;
-        console.log(`✅ Found available slot at requested time: ${finalEmergencyStart.toLocaleString()}`);
-      } else {
-        console.log(`⚠️ No slot available at requested time, conflicts will be shifted`);
-      }
+      console.log(`📋 Found ${existingTasks.length} existing tasks - checking for conflicts to shift`);
     } else {
       console.log(`✅ No existing tasks, emergency can be scheduled at requested time`);
     }
@@ -419,74 +415,4 @@ function getNextWorkingDay(date: Date): Date {
   
   console.log(`📅 Next working day: ${nextDay.toLocaleString()}`);
   return nextDay;
-}
-
-/**
- * Trouve un créneau disponible pour une tâche d'urgence
- */
-function findAvailableSlotForEmergency(
-  existingTasks: any[], 
-  requestedStart: Date, 
-  requestedEnd: Date
-): Date | null {
-  console.log(`🔍 Checking if emergency slot is available: ${requestedStart.toLocaleString()} - ${requestedEnd.toLocaleString()}`);
-  
-  const taskDuration = requestedEnd.getTime() - requestedStart.getTime();
-  
-  // Vérifier s'il y a un conflit direct à l'heure demandée
-  const hasDirectConflict = existingTasks.some(task => {
-    const taskStart = new Date(task.start_datetime);
-    const taskEnd = task.real_end_datetime ? 
-      new Date(task.real_end_datetime) : 
-      new Date(task.end_datetime);
-    
-    return (taskStart < requestedEnd && taskEnd > requestedStart);
-  });
-  
-  if (!hasDirectConflict) {
-    console.log(`✅ No conflict at requested time, can use original slot`);
-    return requestedStart;
-  }
-  
-  // Chercher un créneau libre dans la même journée
-  const dayStart = new Date(requestedStart);
-  dayStart.setHours(WORKING_HOURS.START, 0, 0, 0);
-  
-  const dayEnd = new Date(requestedStart);
-  dayEnd.setHours(WORKING_HOURS.END, 0, 0, 0);
-  
-  // Trier les tâches par heure de début
-  const sortedTasks = existingTasks.sort((a, b) => 
-    new Date(a.start_datetime).getTime() - new Date(b.start_datetime).getTime()
-  );
-  
-  let checkTime = dayStart;
-  
-  for (const task of sortedTasks) {
-    const taskStart = new Date(task.start_datetime);
-    
-    // Vérifier s'il y a assez de place avant cette tâche
-    if (taskStart.getTime() - checkTime.getTime() >= taskDuration) {
-      const availableEnd = new Date(checkTime.getTime() + taskDuration);
-      if (availableEnd <= dayEnd) {
-        console.log(`✅ Found alternative slot: ${checkTime.toLocaleString()}`);
-        return checkTime;
-      }
-    }
-    
-    // Passer après cette tâche
-    const taskEnd = task.real_end_datetime ? 
-      new Date(task.real_end_datetime) : 
-      new Date(task.end_datetime);
-    checkTime = new Date(Math.max(checkTime.getTime(), taskEnd.getTime()));
-  }
-  
-  // Vérifier s'il reste de la place à la fin de la journée
-  if (dayEnd.getTime() - checkTime.getTime() >= taskDuration) {
-    console.log(`✅ Found slot at end of day: ${checkTime.toLocaleString()}`);
-    return checkTime;
-  }
-  
-  console.log(`❌ No available slot found in the same day`);
-  return null;
 }
