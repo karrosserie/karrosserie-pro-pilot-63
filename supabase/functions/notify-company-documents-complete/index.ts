@@ -113,6 +113,13 @@ const handler = async (req: Request): Promise<Response> => {
             
             <p>Vous pouvez maintenant consulter ces documents dans votre interface de gestion pour poursuivre le traitement du dossier.</p>
             
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="https://demo.karrosserie.pro/documents/upload?client=${clientId}&company=${companyId}" 
+                 style="background-color: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                📄 Consulter les documents
+              </a>
+            </div>
+            
             <p style="margin-top: 30px;">
               <em>Cette notification automatique vous informe de la réception complète des justificatifs demandés.</em>
             </p>
