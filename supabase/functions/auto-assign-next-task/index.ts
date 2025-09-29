@@ -85,6 +85,37 @@ serve(async (req: Request) => {
     
     if (!nextTaskType) {
       console.log('✅ Task workflow completed, no next step needed');
+      
+      // Si c'est l'étape finale (Clôture & livraison), marquer le véhicule comme terminé
+      if (completedTask.task_type === 'Clôture & livraison') {
+        console.log('🏁 Marking vehicle as completed for final step');
+        
+        const { error: vehicleUpdateError } = await supabase
+          .from('vehicles')
+          .update({ status: 'Terminé' })
+          .eq('id', completedTask.vehicle_id)
+          .eq('company_id', companyId);
+          
+        if (vehicleUpdateError) {
+          console.error('❌ Error updating vehicle status:', vehicleUpdateError);
+          return new Response(
+            JSON.stringify({ error: 'Failed to update vehicle status' }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        
+        console.log('✅ Vehicle marked as completed');
+        
+        return new Response(
+          JSON.stringify({ 
+            success: true, 
+            message: 'Workflow completed and vehicle marked as finished',
+            vehicleStatus: 'Terminé'
+          }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
       return new Response(
         JSON.stringify({ success: true, message: 'Workflow completed' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
