@@ -70,14 +70,14 @@ serve(async (req) => {
       throw new Error('Token expired');
     }
 
-    console.log('iframe-supabase-proxy: Token validated for user:', payload.user?.id);
+    console.log('iframe-supabase-proxy: Token validated for user:', (payload as any).user?.id);
 
     // Create Supabase client with service role
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Get company ID from token for security filtering
-    const companyId = payload.company?.id;
-    const userId = payload.user?.id;
+    const companyId = (payload as any).company?.id;
+    const userId = (payload as any).user?.id;
     const userRole = payload.role;
 
     if (!companyId || !userId) {
@@ -209,11 +209,11 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('iframe-supabase-proxy: Error:', error.message);
+    console.error('iframe-supabase-proxy: Error:', error instanceof Error ? error.message : String(error));
     
     const errorResponse = {
       success: false,
-      error: error.message || 'Internal server error'
+      error: error instanceof Error ? error.message : 'Internal server error'
     };
 
     return new Response(

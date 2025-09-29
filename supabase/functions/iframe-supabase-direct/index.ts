@@ -96,11 +96,11 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('iframe-supabase-direct: Error:', error.message);
+    console.error('iframe-supabase-direct: Error:', error instanceof Error ? error.message : String(error));
     
     const errorResponse = {
       success: false,
-      error: error.message || 'Internal server error'
+      error: error instanceof Error ? error.message : 'Internal server error'
     };
 
     return new Response(

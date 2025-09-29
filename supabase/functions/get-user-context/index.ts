@@ -131,14 +131,14 @@ serve(async (req) => {
         )
       } catch (tokenError) {
         console.error('get-user-context: Invalid iframe token:', {
-          message: tokenError.message,
-          name: tokenError.name,
-          stack: tokenError.stack
+          message: tokenError instanceof Error ? tokenError.message : String(tokenError),
+          name: tokenError instanceof Error ? tokenError.name : 'UnknownError',
+          stack: tokenError instanceof Error ? tokenError.stack : undefined
         })
         return new Response(
           JSON.stringify({ 
             error: 'Invalid or expired iframe token',
-            details: tokenError.message 
+            details: tokenError instanceof Error ? tokenError.message : String(tokenError)
           }),
           { 
             status: 401, 
