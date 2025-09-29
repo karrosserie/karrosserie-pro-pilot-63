@@ -1,18 +1,15 @@
-import React from 'react';
-import { Control } from 'react-hook-form';
+import React, { useState } from 'react';
+import { Control, useWatch } from 'react-hook-form';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { SignupFormValues } from './signup-schema';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface CompanyFormFieldsProps {
   control: Control<SignupFormValues>;
+  setValue: (name: keyof SignupFormValues, value: any) => void;
 }
 
 const legalForms = [
@@ -20,7 +17,52 @@ const legalForms = [
   "SEP", "SELARL", "SELASU", "SELCA", "Auto-entrepreneur", "EI", "EIRL"
 ];
 
-const CompanyFormFields = ({ control }: CompanyFormFieldsProps) => {
+const CompanyFormFields = ({ control, setValue }: CompanyFormFieldsProps) => {
+  const [isLoadingSiren, setIsLoadingSiren] = useState(false);
+  
+  const sirenValue = useWatch({
+    control,
+    name: 'siren'
+  });
+
+  const handleSirenSearch = async (siren: string) => {
+    if (siren.length !== 9) return;
+    
+    setIsLoadingSiren(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('insee-sirene', {
+        body: { siren }
+      });
+
+      if (error) {
+        console.error('Erreur API INSEE:', error);
+        toast.error('Erreur lors de la recherche des informations entreprise');
+        return;
+      }
+
+      if (data.success && data.data) {
+        const companyData = data.data;
+        
+        // Auto-remplir les champs avec les données récupérées
+        setValue('companyName', companyData.companyName || '');
+        setValue('siret', companyData.siret || '');
+        setValue('nafCode', companyData.nafCode || '');
+        
+        // Construire l'adresse complète
+        const fullAddress = `${companyData.address}, ${companyData.postalCode} ${companyData.city}`.trim();
+        setValue('address', fullAddress);
+        
+        toast.success('Informations entreprise récupérées automatiquement');
+      } else {
+        toast.error(data.error || 'Aucune information trouvée pour ce SIREN');
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'appel API:', error);
+      toast.error('Erreur lors de la recherche des informations entreprise');
+    } finally {
+      setIsLoadingSiren(false);
+    }
+  };
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-4">
@@ -42,12 +84,18 @@ const CompanyFormFields = ({ control }: CompanyFormFieldsProps) => {
           <FormItem className="space-y-2">
             <FormLabel>SIREN (9 chiffres) *</FormLabel>
             <FormControl>
-              <Input
-                type="text"
-                placeholder="123456789"
-                maxLength={9}
-                {...field}
-              />
+            <Input 
+              placeholder="123456789"
+              {...field}
+              onChange={(e) => {
+                field.onChange(e);
+                const value = e.target.value;
+                if (value.length === 9 && /^\d{9}$/.test(value)) {
+                  handleSirenSearch(value);
+                }
+              }}
+              disabled={isLoadingSiren}
+            />
             </FormControl>
             <p className="text-sm text-muted-foreground">
               Le SIREN sera vérifié automatiquement via l'API Sirene

@@ -110,6 +110,7 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
               control={form.control}
               onPrevious={handlePrevious}
               isLoading={isLoading}
+              setValue={form.setValue}
             />
           )}
 
