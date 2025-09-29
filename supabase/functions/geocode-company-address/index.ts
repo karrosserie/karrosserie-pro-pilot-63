@@ -50,10 +50,11 @@ serve(async (req) => {
     // Nettoyer et encoder l'adresse pour l'URL
     const encodedAddress = encodeURIComponent(address.trim());
     
-    // Appel à l'API LocationIQ en mode forward geocoding
-    const geocodeUrl = `https://eu1.locationiq.com/v1/search.php?key=${locationIqApiKey}&q=${encodedAddress}&format=json&countrycodes=fr&limit=1`;
+    // Appel à l'API LocationIQ en mode forward geocoding (format officiel)
+    const geocodeUrl = `https://us1.locationiq.com/v1/search?key=${locationIqApiKey}&q=${encodedAddress}&format=json&countrycodes=fr&limit=1`;
     
     console.log(`Géocodage de l'adresse: ${address}`);
+    console.log(`URL API LocationIQ: ${geocodeUrl.replace(locationIqApiKey, 'HIDDEN_KEY')}`);
     
     const response = await fetch(geocodeUrl);
     
