@@ -359,7 +359,10 @@ async function findNextAvailableSlotForEmployee(
     // Sinon on garde l'heure calculée dans currentDate
     
     const workEndTime = new Date(currentDate);
-    workEndTime.setHours(18, 0, 0, 0);
+    workEndTime.setHours(18, 20, 0, 0); // Fermeture à 18h20 maximum
+    
+    // Vérifier que la tâche peut se terminer avant la fermeture
+    const latestPossibleStart = new Date(workEndTime.getTime() - durationMs);
     
     // Période de pause repas
     const lunchStartTime = new Date(currentDate);
@@ -375,11 +378,25 @@ async function findNextAvailableSlotForEmployee(
       let proposedStart = new Date(workStartTime);
       let proposedEnd = new Date(proposedStart.getTime() + durationMs);
       
+      // Vérifier si la tâche peut se terminer avant la fermeture
+      if (proposedEnd > workEndTime) {
+        console.log(`⚠️ Tâche trop tardive pour le ${startDate}, programmée pour le jour suivant`);
+        currentDate.setDate(currentDate.getDate() + 1);
+        continue;
+      }
+      
       // Vérifier si le créneau entre en conflit avec la pause repas
       if (proposedStart < lunchEndTime && proposedEnd > lunchStartTime) {
         // Si le créneau proposé chevauche avec la pause, le décaler après la pause
         proposedStart = new Date(lunchEndTime);
         proposedEnd = new Date(proposedStart.getTime() + durationMs);
+        
+        // Re-vérifier si la nouvelle heure de fin dépasse la fermeture
+        if (proposedEnd > workEndTime) {
+          console.log(`⚠️ Tâche après pause trop tardive pour le ${startDate}, programmée pour le jour suivant`);
+          currentDate.setDate(currentDate.getDate() + 1);
+          continue;
+        }
       }
       
       if (proposedEnd <= workEndTime) {
@@ -458,7 +475,7 @@ async function findNextAvailableSlotForEmployee(
           }
         }
         
-        // Vérifier si le créneau proposé rentre dans l'espace disponible
+        // Vérifier si le créneau proposé rentre dans l'espace disponible et ne dépasse pas la fermeture
         if (proposedEnd <= nextSlotStart && proposedStart >= workStartTime && proposedEnd <= workEndTime) {
           console.log(`✅ Créneau libre trouvé entre les tâches: ${proposedStart.getHours()}:${proposedStart.getMinutes().toString().padStart(2, '0')}`);
           return {
@@ -481,6 +498,7 @@ async function findNextAvailableSlotForEmployee(
           proposedEnd = new Date(proposedStart.getTime() + durationMs);
         }
         
+        // Vérifier si la tâche peut se terminer avant la fermeture
         if (proposedStart >= workStartTime && proposedEnd <= workEndTime) {
           console.log(`✅ Créneau libre trouvé après la dernière tâche: ${proposedStart.getHours()}:${proposedStart.getMinutes().toString().padStart(2, '0')}`);
           return {
