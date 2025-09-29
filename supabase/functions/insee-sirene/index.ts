@@ -85,20 +85,14 @@ serve(async (req) => {
       selectedEtablissement = data.etablissements[0];
     }
 
-    // Extraction des informations
+    // Extraction des informations selon la structure INSEE
     const uniteLegale = selectedEtablissement.uniteLegale;
     const adresseEtablissement = selectedEtablissement.adresseEtablissement;
-    const periodesUniteLegale = uniteLegale?.periodesUniteLegale?.[0];
 
-    // Construire le nom de l'entreprise
-    let companyName = '';
-    if (periodesUniteLegale?.denominationUniteLegale) {
-      companyName = periodesUniteLegale.denominationUniteLegale;
-    } else if (periodesUniteLegale?.prenom1UniteLegale || periodesUniteLegale?.nomUniteLegale) {
-      const prenom = periodesUniteLegale.prenom1UniteLegale || '';
-      const nom = periodesUniteLegale.nomUniteLegale || '';
-      companyName = `${prenom} ${nom}`.trim();
-    }
+    // Construire le nom de l'entreprise (raison sociale)
+    const companyName = uniteLegale?.denominationUniteLegale || 
+                       uniteLegale?.nomUniteLegale || 
+                       selectedEtablissement?.denominationUsuelleEtablissement || '';
 
     // Construire l'adresse complète
     const numeroVoie = adresseEtablissement?.numeroVoieEtablissement || '';
@@ -110,8 +104,8 @@ serve(async (req) => {
       siren: uniteLegale?.siren || siren,
       siret: selectedEtablissement?.siret,
       companyName: companyName,
-      legalForm: periodesUniteLegale?.categorieJuridiqueUniteLegale,
-      nafCode: periodesUniteLegale?.activitePrincipaleUniteLegale,
+      legalForm: uniteLegale?.categorieJuridiqueUniteLegale,
+      nafCode: uniteLegale?.activitePrincipaleUniteLegale || selectedEtablissement?.activitePrincipaleEtablissement,
       address: address,
       city: adresseEtablissement?.libelleCommuneEtablissement,
       postalCode: adresseEtablissement?.codePostalEtablissement,
