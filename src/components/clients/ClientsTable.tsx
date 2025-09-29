@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { 
   Table, 
   TableBody, 
@@ -19,6 +20,8 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { ClientMobileCard } from './ClientMobileCard';
 import { useClientVehicleCheck } from '@/hooks/use-client-vehicle-check';
 import { RequestDocumentsButton } from './RequestDocumentsButton';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface ClientsTableProps {
   clients: Client[];
@@ -27,6 +30,7 @@ interface ClientsTableProps {
   onDeleteClient: (client: Client) => void;
   onCreateVehicle?: (client: Client) => void;
   onRequestDocuments?: (client: Client) => void;
+  onClientUpdate?: () => void;
 }
 
 const ClientsTable: React.FC<ClientsTableProps> = ({
@@ -35,10 +39,46 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
   onEditClient,
   onDeleteClient,
   onCreateVehicle,
-  onRequestDocuments
+  onRequestDocuments,
+  onClientUpdate
 }) => {
   const { sortedData: sortedClients, sortConfig, handleSort } = useTableSorting(clients, 'last_name');
   const isMobile = useIsMobile();
+  const { toast } = useToast();
+
+  const handleToggleAutoRelances = async (clientId: string, currentDisabled: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('clients')
+        .update({ auto_relances_disabled: !currentDisabled })
+        .eq('id', clientId);
+
+      if (error) {
+        console.error('Error toggling auto relances:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de modifier les relances automatiques",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      toast({
+        title: "Succès",
+        description: !currentDisabled ? "Relances automatiques désactivées" : "Relances automatiques activées",
+      });
+
+      // Trigger client list refresh
+      onClientUpdate?.();
+    } catch (error) {
+      console.error('Error in handleToggleAutoRelances:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue",
+        variant: "destructive"
+      });
+    }
+  };
   
   if (isMobile) {
     return (
@@ -53,6 +93,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
               onDeleteClient={onDeleteClient}
               onCreateVehicle={onCreateVehicle}
               onRequestDocuments={onRequestDocuments}
+              onClientUpdate={onClientUpdate}
             />
           ))
         ) : (
@@ -86,6 +127,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
               Ville
             </SortableTableHeader>
             <TableHead>Permis de conduire</TableHead>
+            <TableHead>Relances auto</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -112,9 +154,20 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                         className={hasCompleteLicense ? "bg-green-100 text-green-800 hover:bg-green-100" : "bg-amber-100 text-amber-800 hover:bg-amber-100"}
                       />
                     </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          checked={!clientData.auto_relances_disabled}
+                          onCheckedChange={() => handleToggleAutoRelances(client.id, clientData.auto_relances_disabled || false)}
+                        />
+                        <span className="text-sm text-gray-600">
+                          {clientData.auto_relances_disabled ? 'Désactivées' : 'Activées'}
+                        </span>
+                      </div>
+                    </TableCell>
                   </TableRow>
                   <TableRow className="border-t-0">
-                    <TableCell colSpan={5} className="py-3 border-t-0">
+                    <TableCell colSpan={6} className="py-3 border-t-0">
                       <div className="flex flex-wrap gap-2 justify-end px-4">
                         <Button variant="view" size="sm" onClick={() => onViewClient(client)}>
                           <Eye className="h-4 w-4 mr-1" />
@@ -146,7 +199,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
             })
           ) : (
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-4">
+              <TableCell colSpan={6} className="text-center py-4">
                 <div className="flex flex-col items-center justify-center py-8">
                   <UserPlus className="h-10 w-10 text-gray-400 mb-2" />
                   <h3 className="font-medium text-gray-900">Aucun résultat</h3>

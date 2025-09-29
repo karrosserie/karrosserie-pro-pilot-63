@@ -1,9 +1,12 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Eye, Pencil, Trash, FileText, Receipt, CreditCard, User, Mail, Phone, MapPin, Send, Car } from 'lucide-react';
 import { Client } from '@/services/supabase/clients';
 import { RequestDocumentsButton } from './RequestDocumentsButton';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface ClientMobileCardProps {
   client: Client;
@@ -15,6 +18,7 @@ interface ClientMobileCardProps {
   onCreateCredit?: (client: Client) => void;
   onCreateVehicle?: (client: Client) => void;
   onRequestDocuments?: (client: Client) => void;
+  onClientUpdate?: () => void;
 }
 
 export const ClientMobileCard = ({ 
@@ -26,12 +30,49 @@ export const ClientMobileCard = ({
   onCreateInvoice,
   onCreateCredit,
   onCreateVehicle,
-  onRequestDocuments
+  onRequestDocuments,
+  onClientUpdate
 }: ClientMobileCardProps) => {
   const clientData = client as any;
   const hasFrontLicense = clientData.driver_license_front_url;
   const hasBackLicense = clientData.driver_license_back_url;
   const hasCompleteLicense = hasFrontLicense && hasBackLicense;
+  const { toast } = useToast();
+
+  const handleToggleAutoRelances = async () => {
+    try {
+      const currentDisabled = clientData.auto_relances_disabled || false;
+      const { error } = await supabase
+        .from('clients')
+        .update({ auto_relances_disabled: !currentDisabled })
+        .eq('id', client.id);
+
+      if (error) {
+        console.error('Error toggling auto relances:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de modifier les relances automatiques",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      toast({
+        title: "Succès",
+        description: !currentDisabled ? "Relances automatiques désactivées" : "Relances automatiques activées",
+      });
+
+      // Trigger client list refresh
+      onClientUpdate?.();
+    } catch (error) {
+      console.error('Error in handleToggleAutoRelances:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue",
+        variant: "destructive"
+      });
+    }
+  };
 
   return (
     <div className="bg-card border rounded-lg p-4 space-y-3">
@@ -73,6 +114,19 @@ export const ClientMobileCard = ({
             <span>{client.city}</span>
           </div>
         )}
+      </div>
+
+      <div className="flex items-center justify-between py-2 border-t border-b">
+        <span className="text-sm font-medium text-card-foreground">Relances automatiques</span>
+        <div className="flex items-center space-x-2">
+          <Switch
+            checked={!clientData.auto_relances_disabled}
+            onCheckedChange={handleToggleAutoRelances}
+          />
+          <span className="text-sm text-muted-foreground">
+            {clientData.auto_relances_disabled ? 'Désactivées' : 'Activées'}
+          </span>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2 pt-2">
