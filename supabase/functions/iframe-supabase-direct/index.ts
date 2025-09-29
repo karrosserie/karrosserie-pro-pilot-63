@@ -59,7 +59,7 @@ serve(async (req) => {
       throw new Error('Token expired');
     }
 
-    console.log('iframe-supabase-direct: Token validated for user:', payload.user?.id);
+    console.log('iframe-supabase-direct: Token validated for user:', (payload as any).user?.id);
 
     // Extract Supabase token from JWT payload
     const supabaseToken = payload.supabaseToken;
