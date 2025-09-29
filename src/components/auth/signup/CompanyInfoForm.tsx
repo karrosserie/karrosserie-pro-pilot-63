@@ -7,11 +7,12 @@ import CompanyFormFields from './CompanyFormFields';
 interface CompanyInfoFormProps {
   control: Control<SignupFormValues>;
   onPrevious: () => void;
+  onNext: () => void;
   isLoading: boolean;
   setValue: UseFormSetValue<SignupFormValues>;
 }
 
-const CompanyInfoForm = ({ control, onPrevious, isLoading, setValue }: CompanyInfoFormProps) => {
+const CompanyInfoForm = ({ control, onPrevious, onNext, isLoading, setValue }: CompanyInfoFormProps) => {
   return (
     <div className="space-y-4">
       <CompanyFormFields control={control} setValue={setValue} />
@@ -26,11 +27,12 @@ const CompanyInfoForm = ({ control, onPrevious, isLoading, setValue }: CompanyIn
           Précédent
         </Button>
         <Button 
-          type="submit" 
+          type="button" 
+          onClick={onNext}
           disabled={isLoading}
           className="flex-1"
         >
-          {isLoading ? "Inscription..." : "S'inscrire"}
+          Continuer
         </Button>
       </div>
     </div>

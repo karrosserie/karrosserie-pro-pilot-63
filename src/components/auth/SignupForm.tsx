@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { signupSchema, SignupFormValues } from './signup/signup-schema';
 import PersonalInfoForm from './signup/PersonalInfoForm';
 import CompanyInfoForm from './signup/CompanyInfoForm';
+import AddressConfirmation from './signup/AddressConfirmation';
 
 interface SignupFormProps {
   onToggleMode: () => void;
@@ -17,7 +18,7 @@ interface SignupFormProps {
 
 const SignupForm = ({ onToggleMode }: SignupFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [currentStep, setCurrentStep] = useState<'personal' | 'company'>('personal');
+  const [currentStep, setCurrentStep] = useState<'personal' | 'company' | 'confirm'>('personal');
   
   const { signUp } = useAuth();
 
@@ -52,7 +53,21 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
   };
 
   const handlePrevious = () => {
-    setCurrentStep('personal');
+    if (currentStep === 'confirm') {
+      setCurrentStep('company');
+    } else {
+      setCurrentStep('personal');
+    }
+  };
+
+  const handleCompanyNext = async () => {
+    // Validate company info fields before proceeding
+    const companyFields = ['siren', 'companyName', 'legalForm', 'siret', 'vatNumber', 'address', 'nafCode'];
+    const isCompanyInfoValid = await form.trigger(companyFields as any);
+    
+    if (isCompanyInfoValid) {
+      setCurrentStep('confirm');
+    }
   };
 
   const isPersonalInfoValid = () => {
@@ -87,30 +102,47 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
           <span style={{ color: 'rgb(85, 85, 85)' }}>Pro</span>
         </h1>
         <p className="text-gray-600 mt-2">
-          {currentStep === 'personal' ? 'Créez votre compte' : 'Informations de votre entreprise'}
+          {currentStep === 'personal' && 'Créez votre compte'}
+          {currentStep === 'company' && 'Informations de votre entreprise'}
+          {currentStep === 'confirm' && 'Confirmation des informations'}
         </p>
         {/* Progress indicator */}
         <div className="flex items-center justify-center mt-4 space-x-2">
           <div className={`w-3 h-3 rounded-full ${currentStep === 'personal' ? 'bg-karrosserie-orange' : 'bg-gray-300'}`} />
           <div className="w-8 h-px bg-gray-300" />
           <div className={`w-3 h-3 rounded-full ${currentStep === 'company' ? 'bg-karrosserie-orange' : 'bg-gray-300'}`} />
+          <div className="w-8 h-px bg-gray-300" />
+          <div className={`w-3 h-3 rounded-full ${currentStep === 'confirm' ? 'bg-karrosserie-orange' : 'bg-gray-300'}`} />
         </div>
       </div>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          {currentStep === 'personal' ? (
+          {currentStep === 'personal' && (
             <PersonalInfoForm 
               control={form.control}
               onNext={handleNext}
               isValid={isPersonalInfoValid()}
             />
-          ) : (
+          )}
+          
+          {currentStep === 'company' && (
             <CompanyInfoForm 
               control={form.control}
               onPrevious={handlePrevious}
+              onNext={handleCompanyNext}
               isLoading={isLoading}
               setValue={form.setValue}
+            />
+          )}
+          
+          {currentStep === 'confirm' && (
+            <AddressConfirmation
+              companyName={form.getValues('companyName')}
+              address={form.getValues('address')}
+              onConfirm={() => form.handleSubmit(onSubmit)()}
+              onBack={handlePrevious}
+              isLoading={isLoading}
             />
           )}
 
