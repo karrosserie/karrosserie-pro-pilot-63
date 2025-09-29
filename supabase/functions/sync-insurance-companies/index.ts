@@ -126,63 +126,43 @@ Deno.serve(async (req) => {
         }
       } catch (error) {
         console.error(`Error processing line ${i + 2}:`, error);
-        errors.push(`Line ${i + 2}: ${error.message}`);
+        errors.push(`Line ${i + 2}: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
 
     console.log(`Parsed ${processedCompanies.length} companies from CSV`);
 
     // Update database
-    let updatedCount = 0;
     let insertedCount = 0;
-
+    let updatedCount = 0;
+    
     for (const company of processedCompanies) {
       try {
         // Check if company already exists
-        const { data: existingCompany, error: selectError } = await supabase
+        const { data: existingCompany } = await supabase
           .from('insurance_companies')
-          .select('id, name, address, address2, zipcode, city, phone, email')
+          .select('id')
           .eq('name', company.name)
           .single();
 
-        if (selectError && selectError.code !== 'PGRST116') {
-          console.error('Error checking existing company:', selectError);
-          errors.push(`Error checking ${company.name}: ${selectError.message}`);
-          continue;
-        }
-
         if (existingCompany) {
-          // Check if any fields need updating
-          const needsUpdate = 
-            existingCompany.address !== company.address ||
-            existingCompany.address2 !== company.address2 ||
-            existingCompany.zipcode !== company.zipcode ||
-            existingCompany.city !== company.city ||
-            existingCompany.phone !== company.phone ||
-            existingCompany.email !== company.email;
+          // Update existing company
+          const { error: updateError } = await supabase
+            .from('insurance_companies')
+            .update({
+              address: company.address,
+              phone: company.phone,
+              email: company.email,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', existingCompany.id);
 
-          if (needsUpdate) {
-            // Update existing company
-            const { error: updateError } = await supabase
-              .from('insurance_companies')
-              .update({
-                address: company.address,
-                address2: company.address2,
-                zipcode: company.zipcode,
-                city: company.city,
-                phone: company.phone,
-                email: company.email,
-                updated_at: new Date().toISOString()
-              })
-              .eq('id', existingCompany.id);
-
-            if (updateError) {
-              console.error('Error updating company:', updateError);
-              errors.push(`Error updating ${company.name}: ${updateError.message}`);
-            } else {
-              updatedCount++;
-              console.log(`Updated company: ${company.name}`);
-            }
+          if (updateError) {
+            console.error(`Error updating company ${company.name}:`, updateError);
+            errors.push(`Error updating ${company.name}: ${updateError.message}`);
+          } else {
+            updatedCount++;
+            console.log(`Updated existing company: ${company.name}`);
           }
         } else {
           // Insert new company
@@ -191,15 +171,12 @@ Deno.serve(async (req) => {
             .insert({
               name: company.name,
               address: company.address,
-              address2: company.address2,
-              zipcode: company.zipcode,
-              city: company.city,
               phone: company.phone,
               email: company.email
             });
 
           if (insertError) {
-            console.error('Error inserting company:', insertError);
+            console.error(`Error inserting company ${company.name}:`, insertError);
             errors.push(`Error inserting ${company.name}: ${insertError.message}`);
           } else {
             insertedCount++;
@@ -208,23 +185,19 @@ Deno.serve(async (req) => {
         }
       } catch (error) {
         console.error(`Error processing company ${company.name}:`, error);
-        errors.push(`Error processing ${company.name}: ${error.message}`);
+        errors.push(`Error processing ${company.name}: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
 
     const result = {
       success: true,
-      message: `Sync completed: ${insertedCount} inserted, ${updatedCount} updated`,
-      stats: {
-        totalProcessed: processedCompanies.length,
-        inserted: insertedCount,
-        updated: updatedCount,
-        errors: errors.length
-      },
+      message: `Synchronization completed. Inserted: ${insertedCount}, Updated: ${updatedCount}`,
+      inserted: insertedCount,
+      updated: updatedCount,
       errors: errors.length > 0 ? errors : undefined
     };
 
-    console.log('Sync completed:', result);
+    console.log('Sync result:', result);
 
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -235,7 +208,7 @@ Deno.serve(async (req) => {
     console.error('Error in sync function:', error);
     return new Response(JSON.stringify({ 
       success: false, 
-      error: error.message 
+      error: error instanceof Error ? error.message : String(error)
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,

@@ -73,10 +73,10 @@ serve(async (req) => {
     }
 
     // Logique de sélection : priorité au siège, puis actif, puis premier disponible
-    let selectedEtablissement = data.etablissements.find(etab => etab.etablissementSiege === true);
+    let selectedEtablissement = data.etablissements.find((etab: any) => etab.etablissementSiege === true);
     
     if (!selectedEtablissement) {
-      selectedEtablissement = data.etablissements.find(etab => 
+      selectedEtablissement = data.etablissements.find((etab: any) =>
         etab.etatAdministratifEtablissement === 'A'
       );
     }

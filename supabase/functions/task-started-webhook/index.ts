@@ -372,15 +372,15 @@ Deno.serve(async (req) => {
 
     } catch (fetchError) {
       console.error('❌ Erreur lors de l\'appel du webhook:', fetchError);
-      console.error('🔍 Type d\'erreur:', fetchError.name);
-      console.error('💬 Message d\'erreur:', fetchError.message);
+      console.error('🔍 Type d\'erreur:', (fetchError as any)?.name);
+      console.error('💬 Message d\'erreur:', fetchError instanceof Error ? fetchError.message : String(fetchError));
       
       // Ne pas retourner une erreur 500, juste loguer et continuer  
       return new Response(
         JSON.stringify({ 
           success: false,
-          message: `Erreur réseau lors de l'appel du webhook N8N: ${fetchError.message}`,
-          error_type: fetchError.name,
+          message: `Erreur réseau lors de l'appel du webhook N8N: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`,
+          error_type: (fetchError as any)?.name,
           payload: webhookPayload,
           debug_info: {
             webhook_url: targetWebhookUrl,
@@ -396,12 +396,12 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('❌ Erreur générale dans task-started-webhook:', error);
-    console.error('🔍 Stack trace:', error.stack);
+    console.error('🔍 Stack trace:', (error as any)?.stack);
     return new Response(
       JSON.stringify({ 
         error: 'Erreur interne du serveur', 
-        details: error.message,
-        stack: error.stack 
+        details: error instanceof Error ? error.message : String(error),
+        stack: (error as any)?.stack
       }),
       { 
         status: 500, 

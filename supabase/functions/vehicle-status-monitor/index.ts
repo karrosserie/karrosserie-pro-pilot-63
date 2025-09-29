@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
       // Le véhicule passe en attente - créer une alerte
       const vehicle = repairOrder.vehicles
       const vehicleName = vehicle 
-        ? `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate}`
+        ? `${(vehicle as any).car_brands?.name || 'Marque inconnue'} ${(vehicle as any).car_models?.name || 'Modèle inconnu'} - ${(vehicle as any).license_plate}`
         : 'Véhicule inconnu'
 
       // Vérifier si une alerte existe déjà pour ce repair order spécifique
@@ -138,7 +138,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Error in vehicle status monitor:', error)
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ success: false, error: error instanceof Error ? error.message : String(error) }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     )
   }

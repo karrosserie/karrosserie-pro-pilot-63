@@ -88,7 +88,7 @@ serve(async (req: Request) => {
       
       // Si c'est l'étape finale (Clôture & livraison), marquer le véhicule comme terminé
       console.log(`🔍 Checking if task is final step: "${completedTask.task_type}"`);
-      if (completedTask.task_type === 'Clôture & livraison' || completedTask.task_type.includes('Clôture') && completedTask.task_type.includes('livraison')) {
+      if (completedTask.task_type === 'Clôture & livraison' || (completedTask.task_type.includes('Clôture') && completedTask.task_type.includes('livraison'))) {
         console.log('🏁 Marking vehicle as completed for final step');
         
         const { error: vehicleUpdateError } = await supabase

@@ -20,7 +20,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<{ s
     };
   } catch (error) {
     console.error('Erreur lors de l\'envoi de l\'email:', error);
-    return { success: false, message: `Erreur: ${error.message}` };
+    return { success: false, message: `Erreur: ${error instanceof Error ? error.message : String(error)}` };
   }
 }
 

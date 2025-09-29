@@ -127,7 +127,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('❌ Error in reschedule-overdue-tasks function:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error instanceof Error ? error.message : String(error) }),
       { 
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -260,7 +260,7 @@ async function insertTaskAndShiftSchedule(
 
   } catch (error) {
     console.error('Error in insertTaskAndShiftSchedule:', error)
-    return { success: false, message: `Unexpected error: ${error.message}` }
+    return { success: false, message: `Unexpected error: ${error instanceof Error ? error.message : String(error)}` }
   }
 }
 
