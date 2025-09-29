@@ -51,7 +51,19 @@ export const usePlanningTasks = (companyId: string | null) => {
       Object.entries(planningData).forEach(([dayKey, dayTasks]) => {
         console.log(`📅 Processing day: ${dayKey}, tasks: ${dayTasks.length}`);
         
-        dayTasks.forEach(task => {
+        // Trier les tâches pour prioriser les véhicules d'urgence
+        const sortedTasks = dayTasks.sort((a, b) => {
+          // Si même heure, priorité aux tâches "Accueil & Préparation du dossier" (véhicules d'urgence)
+          if (a.heure === b.heure) {
+            const aIsUrgent = a.tache === 'Accueil & Préparation du dossier';
+            const bIsUrgent = b.tache === 'Accueil & Préparation du dossier';
+            if (aIsUrgent && !bIsUrgent) return -1;
+            if (!aIsUrgent && bIsUrgent) return 1;
+          }
+          return 0;
+        });
+        
+        sortedTasks.forEach(task => {
           // Debug: Log vehicle association for debugging
           if (task.tache === 'Débosselage') {
             console.log('🔍 Débosselage Task-Vehicle Association:', {

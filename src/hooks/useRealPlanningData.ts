@@ -89,7 +89,8 @@ export const useRealPlanningData = (companyId: string | null) => {
         .eq('company_id', companyId)
         .neq('status', 'Terminé') // Exclure les tâches terminées pour éviter les doublons
         .is('waiting_reason', null) // Filtrer les tâches en attente avec raison
-        .order('start_datetime', { ascending: true });
+        .order('start_datetime', { ascending: true })
+        .order('task_type', { ascending: false }); // Priorité aux tâches d'urgence (Accueil & Préparation du dossier)
 
       console.log('📦 Query result:', {
         dataLength: data?.length || 0,
