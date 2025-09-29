@@ -111,6 +111,7 @@ export const useClientActions = () => {
         company: data.company,
         driverLicenseFrontUrl: data.driverLicenseFrontUrl,
         driverLicenseBackUrl: data.driverLicenseBackUrl,
+        autoRelancesDisabled: data.autoRelancesDisabled,
         company_id: companyId
       });
     } else if (dialogMode === 'edit' && selectedClient) {
@@ -126,7 +127,8 @@ export const useClientActions = () => {
           zipCode: data.zipCode,
           company: data.company,
           driverLicenseFrontUrl: data.driverLicenseFrontUrl,
-          driverLicenseBackUrl: data.driverLicenseBackUrl
+          driverLicenseBackUrl: data.driverLicenseBackUrl,
+          autoRelancesDisabled: data.autoRelancesDisabled
         }
       });
     }

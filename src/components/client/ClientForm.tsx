@@ -33,7 +33,7 @@ const ClientForm: React.FC<ClientFormProps> = ({
     company: defaultValues?.company || '',
     driverLicenseFrontUrl: defaultValues?.driverLicenseFrontUrl || '',
     driverLicenseBackUrl: defaultValues?.driverLicenseBackUrl || '',
-    autoRelancesDisabled: defaultValues?.autoRelancesDisabled || false
+    autoRelancesDisabled: defaultValues?.autoRelancesDisabled ?? false
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
