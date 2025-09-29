@@ -109,15 +109,26 @@ class TrackingService {
     };
 
     try {
-      await supabase
+      // Vérifier si une session avec ce session_id existe déjà
+      const { data: existingSession } = await supabase
         .from('user_sessions')
-        .insert({
-          user_id: this.userId,
-          company_id: this.companyId,
-          session_id: this.sessionId,
-          user_agent: navigator.userAgent,
-          device_info: deviceInfo,
-        });
+        .select('id')
+        .eq('session_id', this.sessionId)
+        .single();
+
+      if (!existingSession) {
+        await supabase
+          .from('user_sessions')
+          .insert({
+            user_id: this.userId,
+            company_id: this.companyId,
+            session_id: this.sessionId,
+            user_agent: navigator.userAgent,
+            device_info: deviceInfo,
+          });
+      } else {
+        console.log('Session déjà existante, pas de création nécessaire');
+      }
     } catch (error) {
       console.error('Erreur lors de la création de la session:', error);
     }

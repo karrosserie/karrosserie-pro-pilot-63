@@ -22,34 +22,32 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Sending token alert for company ${company_id}: ${tokens_remaining} tokens remaining (threshold: ${threshold})`);
 
-    // Call the webhook
-    const webhookResponse = await fetch('https://n8n.karrosserie.pro/webhook/jetons-alert', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        id: company_id,
-        tokens_remaining,
-        threshold
-      }),
-    });
-
-    if (!webhookResponse.ok) {
-      console.error('Webhook call failed:', webhookResponse.status, webhookResponse.statusText);
-      return new Response(
-        JSON.stringify({ 
-          error: 'Webhook call failed',
-          status: webhookResponse.status 
+    // Try to call the webhook (optional, don't fail if it doesn't work)
+    try {
+      const webhookResponse = await fetch('https://n8n.karrosserie.pro/webhook/jetons-alert', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: company_id,
+          tokens_remaining,
+          threshold
         }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        }
-      );
+      });
+
+      if (!webhookResponse.ok) {
+        console.error('Webhook call failed:', webhookResponse.status, webhookResponse.statusText);
+        // Don't fail the function, just log the error
+      } else {
+        console.log('Token alert webhook sent successfully');
+      }
+    } catch (webhookError) {
+      console.error('Error calling webhook:', webhookError);
+      // Don't fail the function, just log the error
     }
 
-    console.log('Token alert webhook sent successfully');
+    console.log('Token alert processing completed');
 
     return new Response(
       JSON.stringify({ 
