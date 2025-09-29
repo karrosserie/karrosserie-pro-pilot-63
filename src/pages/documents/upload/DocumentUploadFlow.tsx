@@ -163,9 +163,6 @@ export default function DocumentUploadFlow() {
           whatsapp_consent?: boolean;
         } = {};
 
-        // Toujours mettre à jour le consentement WhatsApp, même sans documents
-        clientUpdates.whatsapp_consent = whatsappConsent;
-
         if (documents.driver_license_front) {
           const frontFilePath = `${tokenData.client_id}/driver-license/front_${Date.now()}.jpg`;
           
@@ -173,10 +170,7 @@ export default function DocumentUploadFlow() {
             .from('documents')
             .upload(frontFilePath, documents.driver_license_front);
           
-          if (uploadError) {
-            console.error("Erreur upload permis recto:", uploadError);
-            throw uploadError;
-          }
+          if (uploadError) throw uploadError;
           
           const { data: frontUrl } = supabase.storage
             .from('documents')
@@ -192,10 +186,7 @@ export default function DocumentUploadFlow() {
             .from('documents')
             .upload(backFilePath, documents.driver_license_back);
           
-          if (uploadError) {
-            console.error("Erreur upload permis verso:", uploadError);
-            throw uploadError;
-          }
+          if (uploadError) throw uploadError;
           
           const { data: backUrl } = supabase.storage
             .from('documents')
@@ -204,13 +195,15 @@ export default function DocumentUploadFlow() {
           clientUpdates.driver_license_back_url = backUrl.publicUrl;
         }
 
-        // Mise à jour client avec gestion d'erreur
-        const clientUpdatePromise = supabase
-          .from('clients')
-          .update(clientUpdates)
-          .eq('id', tokenData.client_id);
-        
-        updatePromises.push(clientUpdatePromise);
+        // Ajouter le consentement WhatsApp aux mises à jour client
+        clientUpdates.whatsapp_consent = whatsappConsent;
+
+        updatePromises.push(
+          supabase
+            .from('clients')
+            .update(clientUpdates)
+            .eq('id', tokenData.client_id)
+        );
       }
 
       // Upload et mise à jour des documents du véhicule
@@ -224,10 +217,7 @@ export default function DocumentUploadFlow() {
             .from('documents')
             .upload(frontFilePath, documents.registration_front);
           
-          if (uploadError) {
-            console.error("Erreur upload carte grise recto:", uploadError);
-            throw uploadError;
-          }
+          if (uploadError) throw uploadError;
           
           const { data: frontUrl } = supabase.storage
             .from('documents')
@@ -243,10 +233,7 @@ export default function DocumentUploadFlow() {
             .from('documents')
             .upload(backFilePath, documents.registration_back);
           
-          if (uploadError) {
-            console.error("Erreur upload carte grise verso:", uploadError);
-            throw uploadError;
-          }
+          if (uploadError) throw uploadError;
           
           const { data: backUrl } = supabase.storage
             .from('documents')
@@ -265,17 +252,10 @@ export default function DocumentUploadFlow() {
         }
       }
 
-      // Exécuter toutes les mises à jour avec gestion d'erreur
-      const results = await Promise.allSettled(updatePromises);
-      
-      // Vérifier si toutes les mises à jour ont réussi
-      const failedUpdates = results.filter(result => result.status === 'rejected');
-      if (failedUpdates.length > 0) {
-        console.error("Erreurs lors des mises à jour:", failedUpdates);
-        throw new Error("Échec de la sauvegarde de certaines données");
-      }
+      // Exécuter toutes les mises à jour
+      await Promise.all(updatePromises);
 
-      console.log("Documents et consentement WhatsApp sauvegardés avec succès");
+      console.log("Documents sauvegardés avec succès");
       
       // Notifier la carrosserie que le client a terminé l'upload de ses documents
       try {
