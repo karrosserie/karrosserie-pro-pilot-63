@@ -35,7 +35,7 @@ export const useWaitingVehicles = (companyId: string | null) => {
       setLoading(true);
       console.log('🔍 Fetching waiting vehicles for company:', companyId);
       
-      // Récupérer tous les véhicules avec leurs jointures
+      // Récupérer tous les véhicules avec leurs jointures (EXCLURE les véhicules terminés)
       const { data: vehicles, error: vehiclesError } = await supabase
         .from('vehicles')
         .select(`
@@ -43,6 +43,7 @@ export const useWaitingVehicles = (companyId: string | null) => {
           license_plate,
           color,
           created_at,
+          status,
           car_brands:brand_id (name),
           car_models:model_id (name),
           clients:client_id (
@@ -51,7 +52,8 @@ export const useWaitingVehicles = (companyId: string | null) => {
             last_name
           )
         `)
-        .eq('company_id', companyId);
+        .eq('company_id', companyId)
+        .neq('status', 'Terminé');
 
       if (vehiclesError) {
         console.error('❌ Error fetching vehicles:', vehiclesError);
@@ -77,7 +79,7 @@ export const useWaitingVehicles = (companyId: string | null) => {
       // Approche simplifiée: récupérer directement tous les véhicules en attente avec leurs raisons
       console.log('🔍 Fetching vehicles with waiting reasons for company:', companyId);
       
-      // 1. Récupérer tous les véhicules avec waiting_reason
+      // 1. Récupérer tous les véhicules avec waiting_reason (EXCLURE les véhicules terminés)
       const { data: vehiclesWithReasons, error: reasonsError } = await supabase
         .from('employee_schedule')
         .select(`
@@ -89,6 +91,7 @@ export const useWaitingVehicles = (companyId: string | null) => {
             license_plate,
             color,
             created_at,
+            status,
             car_brands:brand_id (name),
             car_models:model_id (name),
             clients:client_id (
@@ -100,7 +103,8 @@ export const useWaitingVehicles = (companyId: string | null) => {
         `)
         .eq('company_id', companyId)
         .not('waiting_reason', 'is', null)
-        .eq('status', 'En attente');
+        .eq('status', 'En attente')
+        .neq('vehicles.status', 'Terminé');
 
       if (reasonsError) {
         console.error('❌ Error fetching vehicles with waiting reasons:', reasonsError);
