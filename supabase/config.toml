@@ -1,5 +1,8 @@
 project_id = "jukdsypvuehnniskgpfd"
 
+[functions.geocode-company-address]
+verify_jwt = false
+
 [functions.gocardless-payments]
 verify_jwt = true
 
