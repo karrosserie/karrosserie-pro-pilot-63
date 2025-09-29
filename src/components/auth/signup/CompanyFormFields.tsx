@@ -44,13 +44,39 @@ const CompanyFormFields = ({ control, setValue }: CompanyFormFieldsProps) => {
         const companyData = data.data;
         
         // Auto-remplir les champs avec les données récupérées
-        setValue('companyName', companyData.companyName || '');
-        setValue('siret', companyData.siret || '');
-        setValue('nafCode', companyData.nafCode || '');
+        if (companyData.companyName) {
+          setValue('companyName', companyData.companyName);
+        }
+        if (companyData.siret) {
+          setValue('siret', companyData.siret);
+        }
+        if (companyData.nafCode) {
+          setValue('nafCode', companyData.nafCode);
+        }
+        if (companyData.legalForm) {
+          setValue('legalForm', companyData.legalForm);
+        }
         
         // Construire l'adresse complète
-        const fullAddress = `${companyData.address}, ${companyData.postalCode} ${companyData.city}`.trim();
-        setValue('address', fullAddress);
+        let fullAddress = '';
+        if (companyData.address) {
+          fullAddress = companyData.address;
+          if (companyData.postalCode && companyData.city) {
+            fullAddress += `, ${companyData.postalCode} ${companyData.city}`;
+          }
+        } else if (companyData.postalCode && companyData.city) {
+          fullAddress = `${companyData.postalCode} ${companyData.city}`;
+        }
+        
+        if (fullAddress) {
+          setValue('address', fullAddress);
+        }
+        
+        // Créer un numéro de TVA automatique basé sur le SIREN
+        if (companyData.siren && !companyData.vatNumber) {
+          const tvaNumber = `FR${(12 + 3 * (parseInt(companyData.siren) % 97)) % 97}${companyData.siren}`;
+          setValue('vatNumber', tvaNumber);
+        }
         
         toast.success('Informations entreprise récupérées automatiquement');
       } else {

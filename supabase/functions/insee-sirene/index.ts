@@ -88,16 +88,31 @@ serve(async (req) => {
     // Extraction des informations
     const uniteLegale = selectedEtablissement.uniteLegale;
     const adresseEtablissement = selectedEtablissement.adresseEtablissement;
-    const periodesUniteLegale = uniteLegale.periodesUniteLegale?.[0];
+    const periodesUniteLegale = uniteLegale?.periodesUniteLegale?.[0];
+
+    // Construire le nom de l'entreprise
+    let companyName = '';
+    if (periodesUniteLegale?.denominationUniteLegale) {
+      companyName = periodesUniteLegale.denominationUniteLegale;
+    } else if (periodesUniteLegale?.prenom1UniteLegale || periodesUniteLegale?.nomUniteLegale) {
+      const prenom = periodesUniteLegale.prenom1UniteLegale || '';
+      const nom = periodesUniteLegale.nomUniteLegale || '';
+      companyName = `${prenom} ${nom}`.trim();
+    }
+
+    // Construire l'adresse complète
+    const numeroVoie = adresseEtablissement?.numeroVoieEtablissement || '';
+    const typeVoie = adresseEtablissement?.typeVoieEtablissement || '';
+    const libelleVoie = adresseEtablissement?.libelleVoieEtablissement || '';
+    const address = `${numeroVoie} ${typeVoie} ${libelleVoie}`.trim();
 
     const companyInfo = {
-      siren: uniteLegale.siren,
-      siret: selectedEtablissement.siret,
-      companyName: periodesUniteLegale?.denominationUniteLegale || 
-                   `${periodesUniteLegale?.prenom1UniteLegale || ''} ${periodesUniteLegale?.nomUniteLegale || ''}`.trim(),
+      siren: uniteLegale?.siren || siren,
+      siret: selectedEtablissement?.siret,
+      companyName: companyName,
       legalForm: periodesUniteLegale?.categorieJuridiqueUniteLegale,
       nafCode: periodesUniteLegale?.activitePrincipaleUniteLegale,
-      address: `${adresseEtablissement?.numeroVoieEtablissement || ''} ${adresseEtablissement?.typeVoieEtablissement || ''} ${adresseEtablissement?.libelleVoieEtablissement || ''}`.trim(),
+      address: address,
       city: adresseEtablissement?.libelleCommuneEtablissement,
       postalCode: adresseEtablissement?.codePostalEtablissement,
     };
