@@ -19,6 +19,7 @@ const legalForms = [
 
 const CompanyFormFields = ({ control, setValue }: CompanyFormFieldsProps) => {
   const [isLoadingSiren, setIsLoadingSiren] = useState(false);
+  const [autoFilledFields, setAutoFilledFields] = useState<Set<string>>(new Set());
   
   const sirenValue = useWatch({
     control,
@@ -42,19 +43,24 @@ const CompanyFormFields = ({ control, setValue }: CompanyFormFieldsProps) => {
 
       if (data.success && data.data) {
         const companyData = data.data;
+        const newAutoFilledFields = new Set<string>();
         
         // Auto-remplir les champs avec les données récupérées
         if (companyData.companyName) {
           setValue('companyName', companyData.companyName);
+          newAutoFilledFields.add('companyName');
         }
         if (companyData.siret) {
           setValue('siret', companyData.siret);
+          newAutoFilledFields.add('siret');
         }
         if (companyData.nafCode) {
           setValue('nafCode', companyData.nafCode);
+          newAutoFilledFields.add('nafCode');
         }
         if (companyData.legalForm) {
           setValue('legalForm', companyData.legalForm);
+          newAutoFilledFields.add('legalForm');
         }
         
         // Construire l'adresse complète
@@ -70,14 +76,17 @@ const CompanyFormFields = ({ control, setValue }: CompanyFormFieldsProps) => {
         
         if (fullAddress) {
           setValue('address', fullAddress);
+          newAutoFilledFields.add('address');
         }
         
         // Créer un numéro de TVA automatique basé sur le SIREN
         if (companyData.siren && !companyData.vatNumber) {
           const tvaNumber = `FR${(12 + 3 * (parseInt(companyData.siren) % 97)) % 97}${companyData.siren}`;
           setValue('vatNumber', tvaNumber);
+          newAutoFilledFields.add('vatNumber');
         }
         
+        setAutoFilledFields(newAutoFilledFields);
         toast.success('Informations entreprise récupérées automatiquement');
       } else {
         toast.error(data.error || 'Aucune information trouvée pour ce SIREN');
@@ -144,12 +153,15 @@ const CompanyFormFields = ({ control, setValue }: CompanyFormFieldsProps) => {
               <Input
                 type="text"
                 placeholder="Nom de votre entreprise"
+                className={autoFilledFields.has('companyName') ? 'bg-green-50 border-green-200' : ''}
                 {...field}
               />
             </FormControl>
-            <p className="text-sm text-red-600">
-              La raison sociale est requise
-            </p>
+            {!autoFilledFields.has('companyName') && (
+              <p className="text-sm text-red-600">
+                La raison sociale est requise
+              </p>
+            )}
             <FormMessage />
           </FormItem>
         )}
@@ -163,7 +175,7 @@ const CompanyFormFields = ({ control, setValue }: CompanyFormFieldsProps) => {
             <FormLabel>Forme juridique *</FormLabel>
             <Select onValueChange={field.onChange} value={field.value}>
               <FormControl>
-                <SelectTrigger>
+                <SelectTrigger className={autoFilledFields.has('legalForm') ? 'bg-green-50 border-green-200' : ''}>
                   <SelectValue placeholder="Sélectionnez la forme juridique" />
                 </SelectTrigger>
               </FormControl>
@@ -175,9 +187,11 @@ const CompanyFormFields = ({ control, setValue }: CompanyFormFieldsProps) => {
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-sm text-red-600">
-              La forme juridique est requise
-            </p>
+            {!autoFilledFields.has('legalForm') && (
+              <p className="text-sm text-red-600">
+                La forme juridique est requise
+              </p>
+            )}
             <FormMessage />
           </FormItem>
         )}
@@ -194,12 +208,15 @@ const CompanyFormFields = ({ control, setValue }: CompanyFormFieldsProps) => {
                 type="text"
                 placeholder="12345678901234"
                 maxLength={14}
+                className={autoFilledFields.has('siret') ? 'bg-green-50 border-green-200' : ''}
                 {...field}
               />
             </FormControl>
-            <p className="text-sm text-red-600">
-              Le SIRET doit contenir exactement 14 chiffres
-            </p>
+            {!autoFilledFields.has('siret') && (
+              <p className="text-sm text-red-600">
+                Le SIRET doit contenir exactement 14 chiffres
+              </p>
+            )}
             <FormMessage />
           </FormItem>
         )}
@@ -215,12 +232,15 @@ const CompanyFormFields = ({ control, setValue }: CompanyFormFieldsProps) => {
               <Input
                 type="text"
                 placeholder="FR1234567890"
+                className={autoFilledFields.has('vatNumber') ? 'bg-green-50 border-green-200' : ''}
                 {...field}
               />
             </FormControl>
-            <p className="text-sm text-red-600">
-              Le numéro de TVA est requis
-            </p>
+            {!autoFilledFields.has('vatNumber') && (
+              <p className="text-sm text-red-600">
+                Le numéro de TVA est requis
+              </p>
+            )}
             <FormMessage />
           </FormItem>
         )}
@@ -236,15 +256,18 @@ const CompanyFormFields = ({ control, setValue }: CompanyFormFieldsProps) => {
               <Input
                 type="text"
                 placeholder="123 Rue de la République, 75001 Paris"
+                className={autoFilledFields.has('address') ? 'bg-green-50 border-green-200' : ''}
                 {...field}
               />
             </FormControl>
             <p className="text-sm text-muted-foreground">
               Autocomplétion Google Places disponible (à implémenter)
             </p>
-            <p className="text-sm text-red-600">
-              L'adresse complète est requise
-            </p>
+            {!autoFilledFields.has('address') && (
+              <p className="text-sm text-red-600">
+                L'adresse complète est requise
+              </p>
+            )}
             <FormMessage />
           </FormItem>
         )}
@@ -260,15 +283,18 @@ const CompanyFormFields = ({ control, setValue }: CompanyFormFieldsProps) => {
               <Input
                 type="text"
                 placeholder="Ex: 6201Z"
+                className={autoFilledFields.has('nafCode') ? 'bg-green-50 border-green-200' : ''}
                 {...field}
               />
             </FormControl>
             <p className="text-sm text-muted-foreground">
               Code d'activité principale de votre entreprise
             </p>
-            <p className="text-sm text-red-600">
-              Le code NAF est requis
-            </p>
+            {!autoFilledFields.has('nafCode') && (
+              <p className="text-sm text-red-600">
+                Le code NAF est requis
+              </p>
+            )}
             <FormMessage />
           </FormItem>
         )}
