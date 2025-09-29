@@ -286,20 +286,19 @@ async function findNextAvailableSlotForEmployee(
     const startDate = currentDate.toISOString().split('T')[0];
     console.log(`🔍 Recherche créneau pour employé ${userId} le ${startDate}`);
 
-    // Récupérer les tâches existantes pour cet employé ce jour-là
+    // Récupérer TOUTES les tâches existantes pour cet employé ce jour-là (pas seulement celles qui commencent ce jour-là)
     const { data: existingTasks, error } = await supabase
       .from('employee_schedule')
       .select('start_datetime, end_datetime')
       .eq('user_id', userId)
       .eq('company_id', companyId)
-      .gte('start_datetime', `${startDate}T00:00:00.000Z`)
-      .lt('start_datetime', `${startDate}T23:59:59.999Z`)
-      .in('status', ['En attente', 'En cours', 'Terminé'])
+      .or(`and(start_datetime.gte.${startDate}T00:00:00.000Z,start_datetime.lt.${startDate}T23:59:59.999Z),and(end_datetime.gte.${startDate}T00:00:00.000Z,end_datetime.lt.${startDate}T23:59:59.999Z),and(start_datetime.lt.${startDate}T00:00:00.000Z,end_datetime.gt.${startDate}T23:59:59.999Z)`)
+      .neq('status', 'Terminé') // Exclure seulement les tâches terminées
       .order('start_datetime', { ascending: true });
 
     if (error) {
       console.error('Error fetching existing tasks:', error);
-      // En cas d'erreur, utiliser l'heure actuelle
+      // En cas d'erreur, utiliser l'heure actuelle + 1 heure comme fallback sécurisé
       const fallbackStart = new Date();
       fallbackStart.setHours(fallbackStart.getHours() + 1);
       return {
@@ -314,43 +313,88 @@ async function findNextAvailableSlotForEmployee(
     const workEndTime = new Date(currentDate);
     workEndTime.setHours(18, 0, 0, 0);
 
-    // Si pas de tâches ce jour-là
+    console.log(`📅 Vérification des créneaux pour le ${startDate}, tâches existantes: ${existingTasks?.length || 0}`);
+
+    // Si pas de tâches ce jour-là, commencer à 8h
     if (!existingTasks || existingTasks.length === 0) {
       const proposedEnd = new Date(workStartTime.getTime() + durationMs);
       if (proposedEnd <= workEndTime) {
-        console.log(`✅ Créneau libre trouvé le ${startDate} à 8h00`);
+        console.log(`✅ Aucune tâche existante, créneau libre à 8h00 le ${startDate}`);
         return {
           startTime: workStartTime,
           endTime: proposedEnd
         };
       }
     } else {
-      // Chercher un créneau libre
-      let proposedStart = new Date(workStartTime);
-      
-      for (const existingTask of existingTasks) {
-        const existingStart = new Date(existingTask.start_datetime);
-        const existingEnd = new Date(existingTask.end_datetime);
-        const proposedEnd = new Date(proposedStart.getTime() + durationMs);
+      // Créer une liste de tous les créneaux occupés
+      const busySlots = existingTasks
+        .map((task: any) => ({
+          start: new Date(task.start_datetime),
+          end: new Date(task.end_datetime)
+        }))
+        .filter((slot: { start: Date; end: Date }) => {
+          // Filtrer les créneaux qui intersectent avec notre journée de travail
+          const dayStart = new Date(currentDate);
+          dayStart.setHours(0, 0, 0, 0);
+          const dayEnd = new Date(currentDate);
+          dayEnd.setHours(23, 59, 59, 999);
+          
+          return slot.start < dayEnd && slot.end > dayStart;
+        })
+        .sort((a: { start: Date; end: Date }, b: { start: Date; end: Date }) => a.start.getTime() - b.start.getTime());
 
-        // Vérifier s'il y a un conflit
-        if (proposedStart < existingEnd && proposedEnd > existingStart) {
-          // Conflit détecté, déplacer après cette tâche
-          proposedStart = new Date(existingEnd.getTime() + 5 * 60 * 1000); // Buffer de 5 minutes
-        } else if (proposedEnd <= existingStart) {
-          // Créneau trouvé avant cette tâche
-          break;
+      console.log(`🔍 Créneaux occupés détectés: ${busySlots.length}`);
+      
+      // Chercher un créneau libre en parcourant la journée
+      let proposedStart = new Date(workStartTime);
+      let foundSlot = false;
+
+      // Vérifier si on peut placer la tâche avant la première tâche existante
+      if (busySlots.length > 0) {
+        const firstBusySlot = busySlots[0];
+        const proposedEnd = new Date(proposedStart.getTime() + durationMs);
+        
+        if (proposedEnd <= firstBusySlot.start) {
+          console.log(`✅ Créneau libre trouvé avant la première tâche: ${proposedStart.getHours()}:${proposedStart.getMinutes().toString().padStart(2, '0')}`);
+          return {
+            startTime: proposedStart,
+            endTime: proposedEnd
+          };
         }
       }
-      
-      const finalProposedEnd = new Date(proposedStart.getTime() + durationMs);
-      
-      if (finalProposedEnd <= workEndTime) {
-        console.log(`✅ Créneau libre trouvé le ${startDate} à ${proposedStart.getHours()}:${proposedStart.getMinutes().toString().padStart(2, '0')}`);
-        return {
-          startTime: proposedStart,
-          endTime: finalProposedEnd
-        };
+
+      // Chercher un créneau entre les tâches existantes
+      for (let i = 0; i < busySlots.length - 1; i++) {
+        const currentSlotEnd = busySlots[i].end;
+        const nextSlotStart = busySlots[i + 1].start;
+        
+        // Ajouter un buffer de 5 minutes après la fin de la tâche précédente
+        proposedStart = new Date(currentSlotEnd.getTime() + 5 * 60 * 1000);
+        const proposedEnd = new Date(proposedStart.getTime() + durationMs);
+        
+        // Vérifier si le créneau proposé rentre dans l'espace disponible
+        if (proposedEnd <= nextSlotStart && proposedStart >= workStartTime && proposedEnd <= workEndTime) {
+          console.log(`✅ Créneau libre trouvé entre les tâches: ${proposedStart.getHours()}:${proposedStart.getMinutes().toString().padStart(2, '0')}`);
+          return {
+            startTime: proposedStart,
+            endTime: proposedEnd
+          };
+        }
+      }
+
+      // Chercher un créneau après la dernière tâche
+      if (busySlots.length > 0) {
+        const lastBusySlot = busySlots[busySlots.length - 1];
+        proposedStart = new Date(lastBusySlot.end.getTime() + 5 * 60 * 1000);
+        const proposedEnd = new Date(proposedStart.getTime() + durationMs);
+        
+        if (proposedStart >= workStartTime && proposedEnd <= workEndTime) {
+          console.log(`✅ Créneau libre trouvé après la dernière tâche: ${proposedStart.getHours()}:${proposedStart.getMinutes().toString().padStart(2, '0')}`);
+          return {
+            startTime: proposedStart,
+            endTime: proposedEnd
+          };
+        }
       }
     }
     
