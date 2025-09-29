@@ -72,6 +72,7 @@ const ClientDialogs: React.FC<ClientDialogsProps> = ({
           company: (selectedClient as any).company || '',
           driverLicenseFrontUrl: (selectedClient as any).driver_license_front_url || '',
           driverLicenseBackUrl: (selectedClient as any).driver_license_back_url || '',
+          autoRelancesDisabled: (selectedClient as any).auto_relances_disabled ?? false,
         } : {}}
         onSubmit={onClientSubmit}
         mode={dialogMode}
