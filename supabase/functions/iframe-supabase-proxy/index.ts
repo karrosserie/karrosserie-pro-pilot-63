@@ -152,17 +152,22 @@ serve(async (req) => {
         if (!table || !filter) throw new Error('Table and filter are required for delete action');
         
         let deleteQuery = supabase
-          .from(table);
+          .from(table)
+          .delete();
 
         // Apply company filtering for security
-        deleteQuery = deleteQuery.eq('company_id', companyId);
+        if (companyId) {
+          deleteQuery = deleteQuery.eq('company_id', companyId);
+        }
 
         // Apply additional filters
         Object.keys(filter).forEach(key => {
-          deleteQuery = deleteQuery.eq(key, filter[key]);
+          if (filter[key] !== undefined) {
+            deleteQuery = deleteQuery.eq(key, filter[key]);
+          }
         });
 
-        const { data: deleteResult, error: deleteError } = await deleteQuery.delete().select();
+        const { data: deleteResult, error: deleteError } = await deleteQuery.select();
         if (deleteError) throw deleteError;
         result = deleteResult;
         break;

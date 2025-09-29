@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
 
     // Process each company's tasks
     for (const [companyId, companyTasks] of Object.entries(tasksByCompany)) {
-      console.log(`🏢 Processing ${companyTasks.length} tasks for company ${companyId}`);
+      console.log(`🏢 Processing ${(companyTasks as any[]).length} tasks for company ${companyId}`);
       
       // Get next working day start time (8:00 AM), start with today if it's a working day
       const nextWorkingDay = getNextWorkingDay(today, true); // true = include today
@@ -97,7 +97,7 @@ Deno.serve(async (req) => {
       let currentTime = new Date(nextWorkingDay);
 
       // Process tasks in chronological order
-      for (const task of companyTasks) {
+      for (const task of (companyTasks as any[])) {
         try {
           // Calculate task duration
           const originalStart = new Date(task.start_datetime);

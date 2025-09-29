@@ -71,7 +71,7 @@ Deno.serve(async (req) => {
         JSON.stringify({ 
           success: false, 
           error: 'Invalid JSON payload',
-          details: parseError.message
+          details: parseError instanceof Error ? parseError.message : String(parseError)
         }),
         { 
           status: 400, 
@@ -218,7 +218,7 @@ Deno.serve(async (req) => {
       JSON.stringify({
         success: false,
         error: 'Internal server error',
-        details: error.message
+        details: error instanceof Error ? error.message : String(error)
       }),
       {
         status: 500,
