@@ -105,6 +105,46 @@ export const useAuthActions = (setLoading: (loading: boolean) => void) => {
         throw new Error("L'inscription a échoué. Veuillez réessayer.");
       }
       
+      // Géocoder l'adresse de l'entreprise après création réussie
+      if (!isTeamMember && companyData?.address) {
+        try {
+          console.log('Appel de la fonction geocode-company-address avec adresse:', companyData.address);
+          
+          const { data: geocodeResult, error: geocodeError } = await supabase.functions.invoke('geocode-company-address', {
+            body: { address: companyData.address }
+          });
+
+          if (geocodeError) {
+            console.error('Erreur géocodage:', geocodeError);
+          } else if (geocodeResult?.success) {
+            console.log('Géocodage réussi:', geocodeResult);
+            
+            // Mettre à jour les coordonnées de l'entreprise
+            const { data: companies, error: fetchError } = await supabase
+              .from('user_companies')
+              .select('company_id')
+              .eq('user_id', newUser.id)
+              .eq('active', true);
+
+            if (!fetchError && companies && companies.length > 0) {
+              const companyId = companies[0].company_id;
+              
+              await supabase
+                .from('company_info')
+                .update({
+                  latitude: geocodeResult.latitude,
+                  longitude: geocodeResult.longitude
+                })
+                .eq('id', companyId);
+                
+              console.log('Coordonnées mises à jour pour l\'entreprise:', companyId);
+            }
+          }
+        } catch (error) {
+          console.error('Erreur lors du géocodage:', error);
+        }
+      }
+
       // Success message after signup
       toast({
         title: "Compte créé avec succès",
