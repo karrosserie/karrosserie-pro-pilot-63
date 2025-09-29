@@ -312,16 +312,32 @@ async function findNextAvailableSlotForEmployee(
     
     const workEndTime = new Date(currentDate);
     workEndTime.setHours(18, 0, 0, 0);
+    
+    // Période de pause repas
+    const lunchStartTime = new Date(currentDate);
+    lunchStartTime.setHours(12, 0, 0, 0);
+    
+    const lunchEndTime = new Date(currentDate);
+    lunchEndTime.setHours(14, 0, 0, 0);
 
     console.log(`📅 Vérification des créneaux pour le ${startDate}, tâches existantes: ${existingTasks?.length || 0}`);
 
-    // Si pas de tâches ce jour-là, commencer à 8h
+    // Si pas de tâches ce jour-là, chercher le premier créneau libre (en évitant la pause repas)
     if (!existingTasks || existingTasks.length === 0) {
-      const proposedEnd = new Date(workStartTime.getTime() + durationMs);
+      let proposedStart = new Date(workStartTime);
+      let proposedEnd = new Date(proposedStart.getTime() + durationMs);
+      
+      // Vérifier si le créneau entre en conflit avec la pause repas
+      if (proposedStart < lunchEndTime && proposedEnd > lunchStartTime) {
+        // Si le créneau proposé chevauche avec la pause, le décaler après la pause
+        proposedStart = new Date(lunchEndTime);
+        proposedEnd = new Date(proposedStart.getTime() + durationMs);
+      }
+      
       if (proposedEnd <= workEndTime) {
-        console.log(`✅ Aucune tâche existante, créneau libre à 8h00 le ${startDate}`);
+        console.log(`✅ Aucune tâche existante, créneau libre à ${proposedStart.getHours()}:${proposedStart.getMinutes().toString().padStart(2, '0')} le ${startDate}`);
         return {
-          startTime: workStartTime,
+          startTime: proposedStart,
           endTime: proposedEnd
         };
       }
@@ -352,9 +368,16 @@ async function findNextAvailableSlotForEmployee(
       // Vérifier si on peut placer la tâche avant la première tâche existante
       if (busySlots.length > 0) {
         const firstBusySlot = busySlots[0];
-        const proposedEnd = new Date(proposedStart.getTime() + durationMs);
+        let proposedEnd = new Date(proposedStart.getTime() + durationMs);
         
-        if (proposedEnd <= firstBusySlot.start) {
+        // Vérifier si le créneau proposé chevauche avec la pause repas
+        if (proposedStart < lunchEndTime && proposedEnd > lunchStartTime) {
+          // Si le créneau chevauche avec la pause, essayer après la pause
+          proposedStart = new Date(lunchEndTime);
+          proposedEnd = new Date(proposedStart.getTime() + durationMs);
+        }
+        
+        if (proposedEnd <= firstBusySlot.start && proposedStart >= workStartTime && proposedEnd <= workEndTime) {
           console.log(`✅ Créneau libre trouvé avant la première tâche: ${proposedStart.getHours()}:${proposedStart.getMinutes().toString().padStart(2, '0')}`);
           return {
             startTime: proposedStart,
@@ -370,7 +393,21 @@ async function findNextAvailableSlotForEmployee(
         
         // Ajouter un buffer de 5 minutes après la fin de la tâche précédente
         proposedStart = new Date(currentSlotEnd.getTime() + 5 * 60 * 1000);
-        const proposedEnd = new Date(proposedStart.getTime() + durationMs);
+        let proposedEnd = new Date(proposedStart.getTime() + durationMs);
+        
+        // Vérifier si le créneau proposé chevauche avec la pause repas
+        if (proposedStart < lunchEndTime && proposedEnd > lunchStartTime) {
+          // Si le créneau chevauche avec la pause, essayer après la pause
+          if (currentSlotEnd <= lunchStartTime) {
+            // La tâche précédente se termine avant la pause, commencer après la pause
+            proposedStart = new Date(lunchEndTime.getTime() + 5 * 60 * 1000);
+            proposedEnd = new Date(proposedStart.getTime() + durationMs);
+          } else {
+            // La tâche précédente se termine pendant ou après la pause, continuer normalement
+            proposedStart = new Date(currentSlotEnd.getTime() + 5 * 60 * 1000);
+            proposedEnd = new Date(proposedStart.getTime() + durationMs);
+          }
+        }
         
         // Vérifier si le créneau proposé rentre dans l'espace disponible
         if (proposedEnd <= nextSlotStart && proposedStart >= workStartTime && proposedEnd <= workEndTime) {
@@ -386,7 +423,14 @@ async function findNextAvailableSlotForEmployee(
       if (busySlots.length > 0) {
         const lastBusySlot = busySlots[busySlots.length - 1];
         proposedStart = new Date(lastBusySlot.end.getTime() + 5 * 60 * 1000);
-        const proposedEnd = new Date(proposedStart.getTime() + durationMs);
+        let proposedEnd = new Date(proposedStart.getTime() + durationMs);
+        
+        // Vérifier si le créneau proposé chevauche avec la pause repas
+        if (proposedStart < lunchEndTime && proposedEnd > lunchStartTime) {
+          // Si le créneau chevauche avec la pause, essayer après la pause
+          proposedStart = new Date(lunchEndTime.getTime() + 5 * 60 * 1000);
+          proposedEnd = new Date(proposedStart.getTime() + durationMs);
+        }
         
         if (proposedStart >= workStartTime && proposedEnd <= workEndTime) {
           console.log(`✅ Créneau libre trouvé après la dernière tâche: ${proposedStart.getHours()}:${proposedStart.getMinutes().toString().padStart(2, '0')}`);
