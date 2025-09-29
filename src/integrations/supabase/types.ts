@@ -4191,6 +4191,10 @@ export type Database = {
         Args: { "": unknown[] }
         Returns: number
       }
+      test_geocoding: {
+        Args: { address_param: string }
+        Returns: Json
+      }
       text_to_bytea: {
         Args: { data: string }
         Returns: string
