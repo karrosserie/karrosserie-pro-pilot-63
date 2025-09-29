@@ -298,14 +298,25 @@ async function findNextAvailableSlotForEmployee(
   companyId: string,
   durationMs: number
 ): Promise<{ startTime: Date; endTime: Date }> {
+  const now = new Date();
   let currentDate = new Date();
   
-  // Commencer par aujourd'hui s'il est encore temps, sinon demain
-  const now = new Date();
-  if (now.getHours() >= 17) { // Si après 17h, commencer demain
+  // Si on est en cours de journée, utiliser l'heure actuelle + 30 minutes comme minimum
+  // Si on est après 17h, commencer demain à 8h
+  if (now.getHours() >= 17) {
     currentDate.setDate(currentDate.getDate() + 1);
+    currentDate.setHours(8, 0, 0, 0);
+  } else {
+    // Utiliser l'heure actuelle arrondie à la prochaine demi-heure
+    const minutes = now.getMinutes();
+    let nextSlot = new Date(now);
+    if (minutes < 30) {
+      nextSlot.setMinutes(30, 0, 0);
+    } else {
+      nextSlot.setHours(nextSlot.getHours() + 1, 0, 0, 0);
+    }
+    currentDate = nextSlot;
   }
-  currentDate.setHours(8, 0, 0, 0); // Commencer à 8h
   
   let maxAttempts = 7;
   
@@ -340,8 +351,12 @@ async function findNextAvailableSlotForEmployee(
       };
     }
 
+    // Pour le jour actuel, utiliser l'heure calculée plus tôt, sinon 8h
     const workStartTime = new Date(currentDate);
-    workStartTime.setHours(8, 0, 0, 0);
+    if (currentDate.toDateString() !== new Date().toDateString()) {
+      workStartTime.setHours(8, 0, 0, 0); // Jour futur = 8h
+    }
+    // Sinon on garde l'heure calculée dans currentDate
     
     const workEndTime = new Date(currentDate);
     workEndTime.setHours(18, 0, 0, 0);
@@ -395,7 +410,8 @@ async function findNextAvailableSlotForEmployee(
       console.log(`🔍 Créneaux occupés détectés: ${busySlots.length}`);
       
       // Chercher un créneau libre en parcourant la journée
-      let proposedStart = new Date(workStartTime);
+      // S'assurer que proposedStart n'est pas dans le passé
+      let proposedStart = new Date(Math.max(workStartTime.getTime(), currentDate.getTime()));
       let foundSlot = false;
 
       // Vérifier si on peut placer la tâche avant la première tâche existante
