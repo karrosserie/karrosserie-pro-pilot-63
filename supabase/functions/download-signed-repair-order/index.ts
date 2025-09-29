@@ -125,9 +125,9 @@ Deno.serve(async (req) => {
       }
     );
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erreur dans download-signed-repair-order:', error);
-
+    
     return new Response(
       JSON.stringify({
         success: false,

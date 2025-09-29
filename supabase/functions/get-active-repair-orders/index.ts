@@ -116,7 +116,7 @@ Deno.serve(async (req) => {
     console.log(`Found ${repairOrders?.length || 0} active repair orders for company ${companyId}`)
 
     // Transform the data to have a cleaner structure
-    const enrichedOrders = repairOrders?.map(order => ({
+    const enrichedOrders = repairOrders?.map((order: any) => ({
       // Repair Order data
       id: order.id,
       reference: order.reference,

@@ -77,7 +77,7 @@ serve(async (req) => {
       throw new Error('Failed to fetch user company')
     }
 
-    console.log('generate-iframe-token: Company fetched:', userCompany?.company_info?.name, 'Role:', userCompany?.role)
+    console.log('generate-iframe-token: Company fetched:', (userCompany?.company_info as any)?.name, 'Role:', userCompany?.role)
 
     // Create token payload with 30 minutes expiration
     const now = Math.floor(Date.now() / 1000)
@@ -108,16 +108,16 @@ serve(async (req) => {
         phone_number: payload.user.phone_number
       },
       company: {
-        id: payload.company?.id,
-        name: payload.company?.name,
-        email: payload.company?.email,
-        phone: payload.company?.phone,
-        address: payload.company?.address,
-        city: payload.company?.city,
-        zipcode: payload.company?.zipcode,
-        siren: payload.company?.siren,
-        siret: payload.company?.siret,
-        logo_url: payload.company?.logo_url
+        id: (payload.company as any)?.id,
+        name: (payload.company as any)?.name,
+        email: (payload.company as any)?.email,
+        phone: (payload.company as any)?.phone,
+        address: (payload.company as any)?.address,
+        city: (payload.company as any)?.city,
+        zipcode: (payload.company as any)?.zipcode,
+        siren: (payload.company as any)?.siren,
+        siret: (payload.company as any)?.siret,
+        logo_url: (payload.company as any)?.logo_url
       },
       role: payload.role,
       iat: payload.iat,
@@ -157,7 +157,7 @@ serve(async (req) => {
       },
     )
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('generate-iframe-token: Error:', error.message, error.stack)
     
     const errorResponse = {

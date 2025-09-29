@@ -113,7 +113,7 @@ Deno.serve(async (req) => {
       }
     );
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erreur dans download-signed-contract:', error);
     
     return new Response(

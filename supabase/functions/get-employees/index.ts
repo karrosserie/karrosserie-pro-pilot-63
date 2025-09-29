@@ -101,11 +101,11 @@ serve(async (req) => {
       }
     )
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Error in get-employees function:', error)
     return new Response(
       JSON.stringify({ 
-        error: error.message 
+        error: error.message || 'Unknown error'
       }),
       { 
         status: 500,

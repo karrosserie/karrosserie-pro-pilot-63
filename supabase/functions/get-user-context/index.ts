@@ -45,7 +45,7 @@ serve(async (req) => {
       )
 
       try {
-        const payload = await verify(iframeToken, key)
+        const payload: any = await verify(iframeToken, key)
         console.log('get-user-context: Token decoded successfully', { 
           userId: payload.user?.id,
           role: payload.role,
@@ -68,7 +68,7 @@ serve(async (req) => {
         console.log('get-user-context: Token validation successful for user:', payload.user?.id)
 
         // Build role permissions from the stored role
-        const userRole = payload.role
+        const userRole = payload.role as string
         const rolePermissions = {
           isOwner: userRole === 'Propriétaire',
           isCarrossier: userRole === 'carrossier',
@@ -274,18 +274,18 @@ serve(async (req) => {
         }
       },
       company: {
-        id: effectiveCompanyData?.id || '',
-        name: effectiveCompanyData?.name || '',
-        email: effectiveCompanyData?.email || '',
-        address: effectiveCompanyData?.address || '',
-        city: effectiveCompanyData?.city || '',
-        zipcode: effectiveCompanyData?.zipcode || '',
-        phone: effectiveCompanyData?.phone || '',
-        siret: effectiveCompanyData?.siret || '',
-        siren: effectiveCompanyData?.siren || '',
-        tva: effectiveCompanyData?.tva || '',
-        logoUrl: effectiveCompanyData?.logo_url || '',
-        notifications: effectiveCompanyData?.notifications || { email: true, push: true, sms: false }
+        id: (effectiveCompanyData as any)?.id || '',
+        name: (effectiveCompanyData as any)?.name || '',
+        email: (effectiveCompanyData as any)?.email || '',
+        address: (effectiveCompanyData as any)?.address || '',
+        city: (effectiveCompanyData as any)?.city || '',
+        zipcode: (effectiveCompanyData as any)?.zipcode || '',
+        phone: (effectiveCompanyData as any)?.phone || '',
+        siret: (effectiveCompanyData as any)?.siret || '',
+        siren: (effectiveCompanyData as any)?.siren || '',
+        tva: (effectiveCompanyData as any)?.tva || '',
+        logoUrl: (effectiveCompanyData as any)?.logo_url || '',
+        notifications: (effectiveCompanyData as any)?.notifications || { email: true, push: true, sms: false }
       },
       role: {
         current: userCompany.role,
@@ -308,7 +308,7 @@ serve(async (req) => {
       }
     )
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('get-user-context: Unexpected error:', {
       message: error.message,
       name: error.name,
@@ -317,7 +317,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         error: 'Internal server error',
-        details: error.message 
+        details: error.message
       }),
       { 
         status: 500, 
