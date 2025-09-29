@@ -106,6 +106,7 @@ serve(async (req: Request) => {
         }
         
         console.log('✅ Vehicle marked as completed');
+        console.log('🚗 vehicule termine son status passe a terminé dans la table vehicles');
         
         return new Response(
           JSON.stringify({ 
