@@ -1,0 +1,206 @@
+import React from 'react';
+import { Control } from 'react-hook-form';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { SignupFormValues } from './signup-schema';
+
+interface CompanyFormFieldsProps {
+  control: Control<SignupFormValues>;
+}
+
+const legalForms = [
+  "SARL", "SAS", "SASU", "EURL", "SA", "SNC", "SCS", "SCA", 
+  "SEP", "SELARL", "SELASU", "SELCA", "Auto-entrepreneur", "EI", "EIRL"
+];
+
+const CompanyFormFields = ({ control }: CompanyFormFieldsProps) => {
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="w-8 h-8 bg-muted rounded flex items-center justify-center">
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold">Entreprise</h3>
+          <p className="text-sm text-muted-foreground">Saisissez votre SIREN pour auto-remplir automatiquement les informations</p>
+        </div>
+      </div>
+
+      <FormField
+        control={control}
+        name="siren"
+        render={({ field }) => (
+          <FormItem className="space-y-2">
+            <FormLabel>SIREN (9 chiffres) *</FormLabel>
+            <FormControl>
+              <Input
+                type="text"
+                placeholder="123456789"
+                maxLength={9}
+                {...field}
+              />
+            </FormControl>
+            <p className="text-sm text-muted-foreground">
+              Le SIREN sera vérifié automatiquement via l'API Sirene
+            </p>
+            <p className="text-sm text-red-600">
+              Le SIREN doit contenir exactement 9 chiffres
+            </p>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name="companyName"
+        render={({ field }) => (
+          <FormItem className="space-y-2">
+            <FormLabel>Raison sociale *</FormLabel>
+            <FormControl>
+              <Input
+                type="text"
+                placeholder="Nom de votre entreprise"
+                {...field}
+              />
+            </FormControl>
+            <p className="text-sm text-red-600">
+              La raison sociale est requise
+            </p>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name="legalForm"
+        render={({ field }) => (
+          <FormItem className="space-y-2">
+            <FormLabel>Forme juridique *</FormLabel>
+            <Select onValueChange={field.onChange} value={field.value}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionnez la forme juridique" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                {legalForms.map((form) => (
+                  <SelectItem key={form} value={form}>
+                    {form}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-sm text-red-600">
+              La forme juridique est requise
+            </p>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name="siret"
+        render={({ field }) => (
+          <FormItem className="space-y-2">
+            <FormLabel>SIRET (14 chiffres) *</FormLabel>
+            <FormControl>
+              <Input
+                type="text"
+                placeholder="12345678901234"
+                maxLength={14}
+                {...field}
+              />
+            </FormControl>
+            <p className="text-sm text-red-600">
+              Le SIRET doit contenir exactement 14 chiffres
+            </p>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name="vatNumber"
+        render={({ field }) => (
+          <FormItem className="space-y-2">
+            <FormLabel>N° TVA intracommunautaire *</FormLabel>
+            <FormControl>
+              <Input
+                type="text"
+                placeholder="FR1234567890"
+                {...field}
+              />
+            </FormControl>
+            <p className="text-sm text-red-600">
+              Le numéro de TVA est requis
+            </p>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name="address"
+        render={({ field }) => (
+          <FormItem className="space-y-2">
+            <FormLabel>Adresse complète *</FormLabel>
+            <FormControl>
+              <Input
+                type="text"
+                placeholder="123 Rue de la République, 75001 Paris"
+                {...field}
+              />
+            </FormControl>
+            <p className="text-sm text-muted-foreground">
+              Autocomplétion Google Places disponible (à implémenter)
+            </p>
+            <p className="text-sm text-red-600">
+              L'adresse complète est requise
+            </p>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name="nafCode"
+        render={({ field }) => (
+          <FormItem className="space-y-2">
+            <FormLabel>Code NAF *</FormLabel>
+            <FormControl>
+              <Input
+                type="text"
+                placeholder="Ex: 6201Z"
+                {...field}
+              />
+            </FormControl>
+            <p className="text-sm text-muted-foreground">
+              Code d'activité principale de votre entreprise
+            </p>
+            <p className="text-sm text-red-600">
+              Le code NAF est requis
+            </p>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </div>
+  );
+};
+
+export default CompanyFormFields;

@@ -29,6 +29,13 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
       phoneNumber: "",
       password: "",
       confirmPassword: "",
+      siren: "",
+      companyName: "",
+      legalForm: "",
+      siret: "",
+      vatNumber: "",
+      address: "",
+      nafCode: "",
     },
   });
 

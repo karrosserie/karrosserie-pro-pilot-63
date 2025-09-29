@@ -11,7 +11,15 @@ export const signupSchema = z.object({
     return isValidPhoneNumber(phone);
   }, "Veuillez entrer un numéro de téléphone valide"),
   password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
-  confirmPassword: z.string()
+  confirmPassword: z.string(),
+  // Company information fields
+  siren: z.string().min(9, "Le SIREN doit contenir exactement 9 chiffres").max(9, "Le SIREN doit contenir exactement 9 chiffres"),
+  companyName: z.string().min(2, "La raison sociale est requise"),
+  legalForm: z.string().min(1, "La forme juridique est requise"),
+  siret: z.string().min(14, "Le SIRET doit contenir exactement 14 chiffres").max(14, "Le SIRET doit contenir exactement 14 chiffres"),
+  vatNumber: z.string().min(1, "Le numéro de TVA est requis"),
+  address: z.string().min(1, "L'adresse complète est requise"),
+  nafCode: z.string().min(1, "Le code NAF est requis"),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Les mots de passe ne correspondent pas",
   path: ["confirmPassword"],
