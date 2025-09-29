@@ -19,15 +19,29 @@ export default function WhatsAppConsentStep({
   const [consent, setConsent] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleNext = async (e: React.MouseEvent) => {
+  const handleNext = async (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    console.log("[MOBILE DEBUG] WhatsApp consent step - handleNext called");
+    console.log("[MOBILE DEBUG] Consent value:", consent);
+    console.log("[MOBILE DEBUG] Is loading:", isLoading);
+    
     if (consent !== null && !isLoading) {
       setIsLoading(true);
-      // Petit délai pour que l'utilisateur voie l'animation
-      await new Promise(resolve => setTimeout(resolve, 800));
-      onNext(consent);
-      setIsLoading(false);
+      console.log("[MOBILE DEBUG] Starting consent submission...");
+      
+      try {
+        // Petit délai pour que l'utilisateur voie l'animation
+        await new Promise(resolve => setTimeout(resolve, 500));
+        console.log("[MOBILE DEBUG] Calling onNext with consent:", consent);
+        onNext(consent);
+      } catch (error) {
+        console.error("[MOBILE DEBUG] Error in handleNext:", error);
+        setIsLoading(false);
+      }
+    } else {
+      console.log("[MOBILE DEBUG] Cannot proceed - consent is null or already loading");
     }
   };
 
@@ -76,7 +90,15 @@ export default function WhatsAppConsentStep({
         <div className="space-y-4 mb-8">
           <button
             type="button"
-            onClick={() => setConsent(true)}
+            onClick={() => {
+              console.log("[MOBILE DEBUG] Setting consent to true");
+              setConsent(true);
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              console.log("[MOBILE DEBUG] Touch: Setting consent to true");
+              setConsent(true);
+            }}
             className={`w-full p-4 rounded-lg border-2 transition-all ${
               consent === true
                 ? 'border-karrosserie-orange bg-karrosserie-orange/10'
@@ -104,7 +126,15 @@ export default function WhatsAppConsentStep({
 
           <button
             type="button"
-            onClick={() => setConsent(false)}
+            onClick={() => {
+              console.log("[MOBILE DEBUG] Setting consent to false");
+              setConsent(false);
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              console.log("[MOBILE DEBUG] Touch: Setting consent to false");
+              setConsent(false);
+            }}
             className={`w-full p-4 rounded-lg border-2 transition-all ${
               consent === false
                 ? 'border-karrosserie-orange bg-karrosserie-orange/10'

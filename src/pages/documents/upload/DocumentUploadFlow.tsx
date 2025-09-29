@@ -142,67 +142,95 @@ export default function DocumentUploadFlow() {
   };
 
   const handleComplete = async (documents: { [key: string]: File }, whatsappConsent: boolean) => {
-    console.log("Documents uploaded:", documents);
-    console.log("WhatsApp consent:", whatsappConsent);
+    console.log("[MOBILE DEBUG] Documents uploaded:", documents);
+    console.log("[MOBILE DEBUG] WhatsApp consent:", whatsappConsent);
+    console.log("[MOBILE DEBUG] Token data:", tokenData);
     
     if (!tokenData) {
-      console.error("Token data not available");
+      console.error("[MOBILE DEBUG] Token data not available");
       return;
     }
 
     try {
       setLoading(true);
 
+      // Toujours sauvegarder le consentement WhatsApp même sans documents
       const updatePromises = [];
 
-      // Upload et mise à jour des documents du permis de conduire
+      // Forcer la mise à jour du consentement WhatsApp pour le client
       if (tokenData.client_id) {
         const clientUpdates: { 
           driver_license_front_url?: string; 
           driver_license_back_url?: string;
-          whatsapp_consent?: boolean;
-        } = {};
+          whatsapp_consent: boolean; // Toujours inclure
+        } = {
+          whatsapp_consent: whatsappConsent
+        };
 
+        // Upload des documents du permis si présents
         if (documents.driver_license_front) {
-          const frontFilePath = `${tokenData.client_id}/driver-license/front_${Date.now()}.jpg`;
-          
-          const { error: uploadError } = await supabase.storage
-            .from('documents')
-            .upload(frontFilePath, documents.driver_license_front);
-          
-          if (uploadError) throw uploadError;
-          
-          const { data: frontUrl } = supabase.storage
-            .from('documents')
-            .getPublicUrl(frontFilePath);
-          
-          clientUpdates.driver_license_front_url = frontUrl.publicUrl;
+          try {
+            const frontFilePath = `${tokenData.client_id}/driver-license/front_${Date.now()}.jpg`;
+            console.log("[MOBILE DEBUG] Uploading front license to:", frontFilePath);
+            
+            const { error: uploadError } = await supabase.storage
+              .from('documents')
+              .upload(frontFilePath, documents.driver_license_front);
+            
+            if (uploadError) {
+              console.error("[MOBILE DEBUG] Front license upload error:", uploadError);
+              throw uploadError;
+            }
+            
+            const { data: frontUrl } = supabase.storage
+              .from('documents')
+              .getPublicUrl(frontFilePath);
+            
+            clientUpdates.driver_license_front_url = frontUrl.publicUrl;
+            console.log("[MOBILE DEBUG] Front license URL:", frontUrl.publicUrl);
+          } catch (error) {
+            console.error("[MOBILE DEBUG] Front license upload failed:", error);
+            throw error;
+          }
         }
 
         if (documents.driver_license_back) {
-          const backFilePath = `${tokenData.client_id}/driver-license/back_${Date.now()}.jpg`;
-          
-          const { error: uploadError } = await supabase.storage
-            .from('documents')
-            .upload(backFilePath, documents.driver_license_back);
-          
-          if (uploadError) throw uploadError;
-          
-          const { data: backUrl } = supabase.storage
-            .from('documents')
-            .getPublicUrl(backFilePath);
-          
-          clientUpdates.driver_license_back_url = backUrl.publicUrl;
+          try {
+            const backFilePath = `${tokenData.client_id}/driver-license/back_${Date.now()}.jpg`;
+            console.log("[MOBILE DEBUG] Uploading back license to:", backFilePath);
+            
+            const { error: uploadError } = await supabase.storage
+              .from('documents')
+              .upload(backFilePath, documents.driver_license_back);
+            
+            if (uploadError) {
+              console.error("[MOBILE DEBUG] Back license upload error:", uploadError);
+              throw uploadError;
+            }
+            
+            const { data: backUrl } = supabase.storage
+              .from('documents')
+              .getPublicUrl(backFilePath);
+            
+            clientUpdates.driver_license_back_url = backUrl.publicUrl;
+            console.log("[MOBILE DEBUG] Back license URL:", backUrl.publicUrl);
+          } catch (error) {
+            console.error("[MOBILE DEBUG] Back license upload failed:", error);
+            throw error;
+          }
         }
 
-        // Ajouter le consentement WhatsApp aux mises à jour client
-        clientUpdates.whatsapp_consent = whatsappConsent;
-
+        console.log("[MOBILE DEBUG] Client updates:", clientUpdates);
+        
         updatePromises.push(
           supabase
             .from('clients')
             .update(clientUpdates)
             .eq('id', tokenData.client_id)
+            .then(result => {
+              console.log("[MOBILE DEBUG] Client update result:", result);
+              return result;
+            })
         );
       }
 
@@ -211,74 +239,113 @@ export default function DocumentUploadFlow() {
         const vehicleUpdates: { registration_document_front_url?: string; registration_document_back_url?: string } = {};
 
         if (documents.registration_front) {
-          const frontFilePath = `${tokenData.vehicule_id}/registration/front_${Date.now()}.jpg`;
-          
-          const { error: uploadError } = await supabase.storage
-            .from('documents')
-            .upload(frontFilePath, documents.registration_front);
-          
-          if (uploadError) throw uploadError;
-          
-          const { data: frontUrl } = supabase.storage
-            .from('documents')
-            .getPublicUrl(frontFilePath);
-          
-          vehicleUpdates.registration_document_front_url = frontUrl.publicUrl;
+          try {
+            const frontFilePath = `${tokenData.vehicule_id}/registration/front_${Date.now()}.jpg`;
+            console.log("[MOBILE DEBUG] Uploading front registration to:", frontFilePath);
+            
+            const { error: uploadError } = await supabase.storage
+              .from('documents')
+              .upload(frontFilePath, documents.registration_front);
+            
+            if (uploadError) {
+              console.error("[MOBILE DEBUG] Front registration upload error:", uploadError);
+              throw uploadError;
+            }
+            
+            const { data: frontUrl } = supabase.storage
+              .from('documents')
+              .getPublicUrl(frontFilePath);
+            
+            vehicleUpdates.registration_document_front_url = frontUrl.publicUrl;
+            console.log("[MOBILE DEBUG] Front registration URL:", frontUrl.publicUrl);
+          } catch (error) {
+            console.error("[MOBILE DEBUG] Front registration upload failed:", error);
+            throw error;
+          }
         }
 
         if (documents.registration_back) {
-          const backFilePath = `${tokenData.vehicule_id}/registration/back_${Date.now()}.jpg`;
-          
-          const { error: uploadError } = await supabase.storage
-            .from('documents')
-            .upload(backFilePath, documents.registration_back);
-          
-          if (uploadError) throw uploadError;
-          
-          const { data: backUrl } = supabase.storage
-            .from('documents')
-            .getPublicUrl(backFilePath);
-          
-          vehicleUpdates.registration_document_back_url = backUrl.publicUrl;
+          try {
+            const backFilePath = `${tokenData.vehicule_id}/registration/back_${Date.now()}.jpg`;
+            console.log("[MOBILE DEBUG] Uploading back registration to:", backFilePath);
+            
+            const { error: uploadError } = await supabase.storage
+              .from('documents')
+              .upload(backFilePath, documents.registration_back);
+            
+            if (uploadError) {
+              console.error("[MOBILE DEBUG] Back registration upload error:", uploadError);
+              throw uploadError;
+            }
+            
+            const { data: backUrl } = supabase.storage
+              .from('documents')
+              .getPublicUrl(backFilePath);
+            
+            vehicleUpdates.registration_document_back_url = backUrl.publicUrl;
+            console.log("[MOBILE DEBUG] Back registration URL:", backUrl.publicUrl);
+          } catch (error) {
+            console.error("[MOBILE DEBUG] Back registration upload failed:", error);
+            throw error;
+          }
         }
 
         if (Object.keys(vehicleUpdates).length > 0) {
+          console.log("[MOBILE DEBUG] Vehicle updates:", vehicleUpdates);
+          
           updatePromises.push(
             supabase
               .from('vehicles')
               .update(vehicleUpdates)
               .eq('id', tokenData.vehicule_id)
+              .then(result => {
+                console.log("[MOBILE DEBUG] Vehicle update result:", result);
+                return result;
+              })
           );
         }
       }
 
-      // Exécuter toutes les mises à jour
-      await Promise.all(updatePromises);
+      console.log("[MOBILE DEBUG] Executing", updatePromises.length, "update promises");
+      
+      // Exécuter toutes les mises à jour avec gestion d'erreur individuelle
+      const results = await Promise.allSettled(updatePromises);
+      
+      // Vérifier si toutes les mises à jour ont réussi
+      const failedUpdates = results.filter(result => result.status === 'rejected');
+      if (failedUpdates.length > 0) {
+        console.error("[MOBILE DEBUG] Some updates failed:", failedUpdates);
+        throw new Error(`${failedUpdates.length} mise(s) à jour ont échoué`);
+      }
 
-      console.log("Documents sauvegardés avec succès");
+      console.log("[MOBILE DEBUG] All updates successful, results:", results);
       
       // Notifier la carrosserie que le client a terminé l'upload de ses documents
       try {
+        console.log("[MOBILE DEBUG] Sending notification to company");
         await supabase.functions.invoke('notify-company-documents-complete', {
           body: {
             clientId: tokenData.client_id,
             companyId: tokenData.company_id
           }
         });
-        console.log("Notification envoyée à la carrosserie");
+        console.log("[MOBILE DEBUG] Notification sent successfully");
       } catch (emailError) {
-        console.error("Erreur lors de l'envoi de la notification:", emailError);
+        console.error("[MOBILE DEBUG] Email notification error:", emailError);
         // On ne fait pas échouer le processus si l'email ne peut pas être envoyé
       }
       
       // Mettre à jour l'état pour afficher l'écran de confirmation
+      console.log("[MOBILE DEBUG] Setting upload completed state");
       setUploadCompleted(true);
       setShowWorkflow(false);
       setMissingDocuments([]);
       setAvailableDocuments([]);
       
     } catch (error) {
-      console.error("Erreur lors de la sauvegarde des documents:", error);
+      console.error("[MOBILE DEBUG] Critical error during save:", error);
+      // Afficher l'erreur à l'utilisateur sur mobile
+      alert(`Erreur lors de la sauvegarde: ${error.message || error}`);
     } finally {
       setLoading(false);
     }
