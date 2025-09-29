@@ -129,7 +129,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
         </PopoverTrigger>
         <PopoverContent className="w-[--radix-popover-trigger-width] p-0 z-[120] bg-background border rounded-md shadow-md" align="start" sideOffset={4}>
           <Command>
-            <ScrollArea className="max-h-[200px]">
+            <ScrollArea className="max-h-[300px]">
               <CommandList>
                 {/* Option "Nouveau client" toujours en haut si activée */}
                 {showNewClientOption && (
