@@ -24,10 +24,14 @@ export default function WhatsAppConsentStep({
     e.stopPropagation();
     if (consent !== null && !isLoading) {
       setIsLoading(true);
-      // Petit délai pour que l'utilisateur voie l'animation
-      await new Promise(resolve => setTimeout(resolve, 800));
-      onNext(consent);
-      setIsLoading(false);
+      try {
+        // Petit délai pour que l'utilisateur voie l'animation
+        await new Promise(resolve => setTimeout(resolve, 800));
+        onNext(consent);
+      } catch (error) {
+        console.error("Erreur lors de la finalisation:", error);
+        setIsLoading(false);
+      }
     }
   };
 
