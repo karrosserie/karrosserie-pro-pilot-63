@@ -91,6 +91,17 @@ export const PlanVehicleModal = ({
         return;
       }
 
+      // Remettre waiting_reason à NULL lors de la planification
+      const { error: updateError } = await supabase
+        .from('vehicles')
+        .update({ waiting_reason: null } as any)
+        .eq('id', vehicle.id);
+
+      if (updateError) {
+        console.error('Erreur lors de la mise à jour du véhicule:', updateError);
+        // Ne pas bloquer la planification si cette mise à jour échoue
+      }
+
       console.log('Tâche planifiée avec succès:', data);
       toast.success(`Véhicule ${vehicle.licensePlate} planifié avec succès`);
       
