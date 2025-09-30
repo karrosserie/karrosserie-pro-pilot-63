@@ -702,6 +702,7 @@ export type Database = {
           cloture_livraison_time: string | null
           company_details: string | null
           company_id: string
+          controle_technique_securite_time: string | null
           created_at: string
           currency: string
           finitions_remontage_time: string | null
@@ -748,6 +749,7 @@ export type Database = {
           cloture_livraison_time?: string | null
           company_details?: string | null
           company_id: string
+          controle_technique_securite_time?: string | null
           created_at?: string
           currency?: string
           finitions_remontage_time?: string | null
@@ -794,6 +796,7 @@ export type Database = {
           cloture_livraison_time?: string | null
           company_details?: string | null
           company_id?: string
+          controle_technique_securite_time?: string | null
           created_at?: string
           currency?: string
           finitions_remontage_time?: string | null
@@ -4041,6 +4044,45 @@ export type Database = {
           qualifications: Json
           role_priority: number
           user_id: string
+        }[]
+      }
+      get_companies_with_users: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          created_at: string
+          days_since_creation: number
+          email: string
+          id: string
+          name: string
+          phone: string
+          total_users: number
+        }[]
+      }
+      get_company_activities: {
+        Args: { p_company_id: string; p_days?: number }
+        Returns: {
+          activity_count: number
+          company_id: string
+          event_type: string
+          page_path: string
+          unique_users: number
+        }[]
+      }
+      get_company_business_metrics: {
+        Args: { p_company_id: string; p_days?: number }
+        Returns: {
+          avg_amount: number
+          count: number
+          entity_type: string
+        }[]
+      }
+      get_company_sessions: {
+        Args: { p_company_id: string; p_days?: number }
+        Returns: {
+          active_users: number
+          avg_session_duration_minutes: number
+          company_id: string
+          total_sessions: number
         }[]
       }
       get_current_user_role: {
