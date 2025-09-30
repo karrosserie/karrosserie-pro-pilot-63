@@ -3668,6 +3668,7 @@ export type Database = {
           vehicle_images: Json | null
           vehicle_specification_id: string | null
           vin: string | null
+          waiting_reason: string | null
           work_items: Json | null
           year: number | null
         }
@@ -3696,6 +3697,7 @@ export type Database = {
           vehicle_images?: Json | null
           vehicle_specification_id?: string | null
           vin?: string | null
+          waiting_reason?: string | null
           work_items?: Json | null
           year?: number | null
         }
@@ -3724,6 +3726,7 @@ export type Database = {
           vehicle_images?: Json | null
           vehicle_specification_id?: string | null
           vin?: string | null
+          waiting_reason?: string | null
           work_items?: Json | null
           year?: number | null
         }
