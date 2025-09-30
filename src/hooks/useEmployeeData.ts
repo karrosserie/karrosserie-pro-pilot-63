@@ -24,6 +24,7 @@ export interface QualificationOption {
 export const STANDARD_QUALIFICATIONS: QualificationOption[] = [
   { id: 'accueil', name: 'Accueil & Préparation du dossier', color: 'bg-primary/10 text-primary' },
   { id: 'remplacement', name: 'Remplacement ou débosselage', color: 'bg-success/10 text-success' },
+  { id: 'controle', name: 'Contrôle technique de sécurité', color: 'bg-blue-500/10 text-blue-700' },
   { id: 'preparation', name: 'Préparation peinture', color: 'bg-warning/10 text-warning' },
   { id: 'peinture', name: 'Mise en peinture', color: 'bg-destructive/10 text-destructive' },
   { id: 'finitions', name: 'Finitions & remontage', color: 'bg-accent/20 text-accent-foreground' },
