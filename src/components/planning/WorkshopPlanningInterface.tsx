@@ -167,6 +167,7 @@ export const WorkshopPlanningInterface = ({
     const steps = [
       { id: 'accueil', title: 'Accueil & Préparation du dossier', color: 'bg-blue-600' },
       { id: 'remplacement', title: 'Remplacement ou débosselage', color: 'bg-orange-600' },
+      { id: 'controle', title: 'Contrôle technique de sécurité', color: 'bg-amber-600' },
       { id: 'preparation', title: 'Préparation peinture', color: 'bg-yellow-600' },
       { id: 'peinture', title: 'Mise en peinture', color: 'bg-green-600' },
       { id: 'finitions', title: 'Finitions & remontage', color: 'bg-teal-600' },

@@ -25,6 +25,7 @@ interface AddVehicleToWorkshopFormProps {
 const WORKFLOW_STEPS = [
   { key: 'accueil_preparation', qualification: 'Accueil & Préparation du dossier', defaultDuration: '01:00', task_type: 'accueil_preparation' },
   { key: 'remplacement_debosselage', qualification: 'Remplacement ou débosselage', defaultDuration: '02:30', task_type: 'remplacement_debosselage' },
+  { key: 'controle_technique_securite', qualification: 'Contrôle technique de sécurité', defaultDuration: '01:30', task_type: 'controle_technique_securite' },
   { key: 'preparation_peinture', qualification: 'Préparation peinture', defaultDuration: '02:30', task_type: 'preparation_peinture' },
   { key: 'mise_en_peinture', qualification: 'Mise en peinture', defaultDuration: '05:00', task_type: 'mise_en_peinture' },
   { key: 'finitions_remontage', qualification: 'Finitions & remontage', defaultDuration: '02:00', task_type: 'finitions_remontage' },

@@ -35,6 +35,7 @@ interface PlanVehicleModalProps {
 const TASK_TYPES = [
   { value: 'Accueil & Préparation du dossier', label: 'Accueil & Préparation du dossier', duration: 1 },
   { value: 'Remplacement ou débosselage', label: 'Remplacement ou débosselage', duration: 2.5 },
+  { value: 'Contrôle technique de sécurité', label: 'Contrôle technique de sécurité', duration: 1.5 },
   { value: 'Préparation peinture', label: 'Préparation peinture', duration: 2.5 },
   { value: 'Mise en peinture', label: 'Mise en peinture', duration: 5 },
   { value: 'Finitions & remontage', label: 'Finitions & remontage', duration: 2 },

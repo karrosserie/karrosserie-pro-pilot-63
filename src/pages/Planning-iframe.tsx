@@ -45,6 +45,7 @@ const calculateDuration = (startDateTime: string, endDateTime: string): string =
 interface ExtendedPlanningData {
   accueil_preparation: { employeeId: string; duration: string; startDateTime?: Date; endDateTime?: Date };
   remplacement_debosselage: { employeeId: string; duration: string; startDateTime?: Date; endDateTime?: Date };
+  controle_technique_securite: { employeeId: string; duration: string; startDateTime?: Date; endDateTime?: Date };
   preparation_peinture: { employeeId: string; duration: string; startDateTime?: Date; endDateTime?: Date };
   mise_en_peinture: { employeeId: string; duration: string; startDateTime?: Date; endDateTime?: Date };
   finitions_remontage: { employeeId: string; duration: string; startDateTime?: Date; endDateTime?: Date };
@@ -87,6 +88,7 @@ const Planning = () => {
   const [planningData, setPlanningData] = useState<ExtendedPlanningData>({
     accueil_preparation: { duration: "", employeeId: "" },
     remplacement_debosselage: { duration: "", employeeId: "" },
+    controle_technique_securite: { duration: "", employeeId: "" },
     preparation_peinture: { duration: "", employeeId: "" },
     mise_en_peinture: { duration: "", employeeId: "" },
     finitions_remontage: { duration: "", employeeId: "" },
@@ -94,7 +96,8 @@ const Planning = () => {
   });
   const [configData, setConfigData] = useState({
     accueil: "01:00",
-    debosselage: "02:30", 
+    debosselage: "02:30",
+    controle: "01:30", 
     preparation: "02:30",
     peinture: "05:00",
     finitions: "02:00",
@@ -161,7 +164,7 @@ const Planning = () => {
     if (!employees || employees.length === 0) return;
     
     const optimalPlanning = await calculateOptimalPlanning();
-    const stepKeys = ['accueil_preparation', 'remplacement_debosselage', 'preparation_peinture', 'mise_en_peinture', 'finitions_remontage', 'cloture_livraison'];
+    const stepKeys = ['accueil_preparation', 'remplacement_debosselage', 'controle_technique_securite', 'preparation_peinture', 'mise_en_peinture', 'finitions_remontage', 'cloture_livraison'];
     
     setTimeout(() => {
       setPlanningData(prev => {
@@ -201,7 +204,8 @@ const Planning = () => {
     // Find the best available technician for this step
     const stepNames = [
       'Accueil & Préparation du dossier',
-      'Remplacement ou débosselage', 
+      'Remplacement ou débosselage',
+      'Contrôle technique de sécurité', 
       'Préparation peinture',
       'Mise en peinture',
       'Finitions & remontage',
@@ -274,6 +278,8 @@ const Planning = () => {
           setConfigData({
             accueil: data.accueil_preparation_time?.slice(0, 5) || "01:00",
             debosselage: data.remplacement_debosselage_time?.slice(0, 5) || "02:30",
+            // @ts-ignore - Le type sera mis à jour après le redémarrage de Supabase
+            controle: data.controle_technique_securite_time?.slice(0, 5) || "01:30",
             preparation: data.preparation_peinture_time?.slice(0, 5) || "02:30",
             peinture: data.mise_en_peinture_time?.slice(0, 5) || "05:00",
             finitions: data.finitions_remontage_time?.slice(0, 5) || "02:00",
@@ -374,6 +380,7 @@ const Planning = () => {
       setPlanningData({
         accueil_preparation: { duration: configData.accueil, employeeId: "" },
         remplacement_debosselage: { duration: configData.debosselage, employeeId: "" },
+        controle_technique_securite: { duration: configData.controle, employeeId: "" },
         preparation_peinture: { duration: configData.preparation, employeeId: "" },
         mise_en_peinture: { duration: configData.peinture, employeeId: "" },
         finitions_remontage: { duration: configData.finitions, employeeId: "" },
@@ -598,6 +605,11 @@ const Planning = () => {
           'Remplacement ou débosselage': {
             title: "Remplacement ou débosselage",
             color: "border-l-green-500",
+            vehicles: []
+          },
+          'Contrôle technique de sécurité': {
+            title: "Contrôle technique de sécurité",
+            color: "border-l-amber-500",
             vehicles: []
           },
           'Préparation peinture': {
@@ -1952,7 +1964,8 @@ const Planning = () => {
                 <div className="max-h-40 overflow-y-auto border rounded-md p-3 space-y-2">
                   {[
                     "Accueil & Préparation du dossier",
-                    "Remplacement ou débosselage", 
+                    "Remplacement ou débosselage",
+                    "Contrôle technique de sécurité", 
                     "Préparation peinture",
                     "Mise en peinture",
                     "Finitions & remontage",
@@ -2236,6 +2249,18 @@ const Planning = () => {
                    type="time"
                    value={configData.debosselage}
                    onChange={(e) => setConfigData(prev => ({ ...prev, debosselage: e.target.value }))}
+                   className="w-24"
+                 />
+               </div>
+
+               {/* Contrôle technique de sécurité */}
+               <div className="space-y-2">
+                 <Label htmlFor="controle">Contrôle technique de sécurité</Label>
+                 <Input
+                   id="controle"
+                   type="time"
+                   value={configData.controle}
+                   onChange={(e) => setConfigData(prev => ({ ...prev, controle: e.target.value }))}
                    className="w-24"
                  />
                </div>
