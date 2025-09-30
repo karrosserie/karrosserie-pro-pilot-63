@@ -75,6 +75,24 @@ export const ProcessConfig = () => {
       ]
     },
     {
+      id: 'controle',
+      name: 'CONTRÔLE TECHNIQUE DE SÉCURITÉ',
+      types: [
+        {
+          name: 'Contrôle standard',
+          description: 'Vérification sécurité, géométrie',
+          duration: '1-2 heures',
+          color: 'text-yellow-600'
+        },
+        {
+          name: 'Contrôle approfondi',
+          description: 'Contrôle complet après structure',
+          duration: '2-3 heures',
+          color: 'text-yellow-600'
+        }
+      ]
+    },
+    {
       id: 'preparation',
       name: 'PRÉPARATION PEINTURE',
       types: [
@@ -232,7 +250,7 @@ export const ProcessConfig = () => {
       <Card className="shadow-lg">
         <CardHeader className="pb-4">
           <Tabs defaultValue="accueil" className="w-full">
-            <TabsList className="grid w-full grid-cols-6 h-auto p-2 bg-slate-50">
+            <TabsList className="grid w-full grid-cols-7 h-auto p-2 bg-slate-50">
               {processSteps.map((step) => (
                 <TabsTrigger 
                   key={step.id}

@@ -59,7 +59,8 @@ serve(async (req: Request) => {
       const workflow = {
         // Workflow basé sur les vrais types de tâches dans la DB
         'Accueil & Préparation du dossier': 'Remplacement ou débosselage',
-        'Remplacement ou débosselage': 'Préparation peinture',
+        'Remplacement ou débosselage': 'Contrôle technique de sécurité',
+        'Contrôle technique de sécurité': 'Préparation peinture',
         'Préparation peinture': 'Mise en peinture',
         'Mise en peinture': 'Finitions & remontage',
         'Finitions & remontage': 'Clôture & livraison',
