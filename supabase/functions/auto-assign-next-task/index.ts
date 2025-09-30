@@ -215,7 +215,66 @@ serve(async (req: Request) => {
 
     console.log(`👤 Selected qualified employee: ${selectedEmployee.user_id} (availability: ${selectedEmployee.availability_score || 'N/A'}, role priority: ${selectedEmployee.role_priority || 'N/A'})`);
 
-    // 7. Trouver le prochain créneau disponible pour l'employé
+    // Vérifier si c'est la dernière étape du workflow
+    const isLastStep = nextTaskType === 'Clôture & livraison';
+
+    if (isLastStep) {
+      console.log('🎯 Dernière étape détectée - Préparation de 4 créneaux pour le webhook');
+      
+      // Trouver 4 créneaux disponibles sur 2 jours différents (matin et soir)
+      const availableSlots = await findMultipleAvailableSlots(
+        supabase,
+        selectedEmployee.user_id,
+        companyId,
+        2 * 60 * 60 * 1000 // 2 heures par créneau
+      );
+
+      // Appeler le webhook N8N avec les créneaux proposés
+      const webhookUrl = 'https://n8n.karrosserie.pro/webhook/5690cd1a-90c8-4dff-af89-4a723a7f5495';
+      const webhookData = {
+        vehicle_id: completedTask.vehicle_id,
+        employee_id: selectedEmployee.user_id,
+        slots: availableSlots
+      };
+
+      console.log('📞 Appel du webhook avec les données:', JSON.stringify(webhookData));
+
+      try {
+        // Construire l'URL avec les paramètres en query string pour GET
+        const queryParams = new URLSearchParams({
+          vehicle_id: webhookData.vehicle_id,
+          employee_id: webhookData.employee_id,
+          slots: JSON.stringify(webhookData.slots)
+        });
+
+        const fullWebhookUrl = `${webhookUrl}?${queryParams.toString()}`;
+        
+        const webhookResponse = await fetch(fullWebhookUrl, {
+          method: 'GET'
+        });
+
+        if (!webhookResponse.ok) {
+          console.error('❌ Webhook call failed:', await webhookResponse.text());
+        } else {
+          console.log('✅ Webhook appelé avec succès');
+        }
+      } catch (webhookError) {
+        console.error('❌ Error calling webhook:', webhookError);
+      }
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: 'Créneaux proposés envoyés au webhook pour confirmation',
+          nextTaskType,
+          assignedEmployeeId: selectedEmployee.user_id,
+          proposedSlots: availableSlots
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Pour les autres étapes, assigner automatiquement comme avant
     const { startTime, endTime } = await findNextAvailableSlotForEmployee(
       supabase, 
       selectedEmployee.user_id, 
@@ -290,6 +349,112 @@ serve(async (req: Request) => {
     );
   }
 });
+
+// Helper function pour trouver 4 créneaux disponibles (2 jours, matin et soir)
+async function findMultipleAvailableSlots(
+  supabase: any,
+  userId: string,
+  companyId: string,
+  durationMs: number
+): Promise<Array<{ start: string; end: string; period: string; day: number }>> {
+  const slots: Array<{ start: string; end: string; period: string; day: number }> = [];
+  let currentDate = new Date();
+  let daysProcessed = 0;
+  
+  // Arrondir à la prochaine demi-heure
+  const minutes = currentDate.getMinutes();
+  if (minutes < 30) {
+    currentDate.setMinutes(30, 0, 0);
+  } else {
+    currentDate.setHours(currentDate.getHours() + 1, 0, 0, 0);
+  }
+  
+  // Trouver des créneaux sur 2 jours différents (1 matin + 1 soir par jour)
+  while (slots.length < 4 && daysProcessed < 7) {
+    // Éviter les weekends
+    if (currentDate.getDay() === 0 || currentDate.getDay() === 6) {
+      currentDate.setDate(currentDate.getDate() + 1);
+      currentDate.setHours(8, 0, 0, 0);
+      continue;
+    }
+    
+    const startDate = currentDate.toISOString().split('T')[0];
+    
+    // Récupérer les tâches existantes pour ce jour
+    const { data: existingTasks } = await supabase
+      .from('employee_schedule')
+      .select('start_datetime, end_datetime')
+      .eq('user_id', userId)
+      .eq('company_id', companyId)
+      .gte('start_datetime', `${startDate}T00:00:00.000Z`)
+      .lte('start_datetime', `${startDate}T23:59:59.999Z`)
+      .neq('status', 'Terminé')
+      .order('start_datetime', { ascending: true });
+    
+    // Chercher un créneau matin (8h-12h) et soir (14h-18h)
+    const morningSlot = findSlotInPeriod(currentDate, existingTasks || [], 8, 12, durationMs);
+    const eveningSlot = findSlotInPeriod(currentDate, existingTasks || [], 14, 18, durationMs);
+    
+    if (morningSlot) {
+      slots.push({
+        start: morningSlot.start.toISOString(),
+        end: morningSlot.end.toISOString(),
+        period: 'matin',
+        day: daysProcessed + 1
+      });
+    }
+    
+    if (eveningSlot) {
+      slots.push({
+        start: eveningSlot.start.toISOString(),
+        end: eveningSlot.end.toISOString(),
+        period: 'soir',
+        day: daysProcessed + 1
+      });
+    }
+    
+    currentDate.setDate(currentDate.getDate() + 1);
+    currentDate.setHours(8, 0, 0, 0);
+    daysProcessed++;
+  }
+  
+  return slots.slice(0, 4); // S'assurer qu'on retourne max 4 créneaux
+}
+
+// Helper pour trouver un créneau dans une période spécifique
+function findSlotInPeriod(
+  date: Date,
+  existingTasks: Array<{ start_datetime: string; end_datetime: string }>,
+  periodStart: number,
+  periodEnd: number,
+  durationMs: number
+): { start: Date; end: Date } | null {
+  const proposedStart = new Date(date);
+  proposedStart.setHours(periodStart, 0, 0, 0);
+  
+  const periodEndTime = new Date(date);
+  periodEndTime.setHours(periodEnd, 0, 0, 0);
+  
+  const proposedEnd = new Date(proposedStart.getTime() + durationMs);
+  
+  // Vérifier que le créneau reste dans la période
+  if (proposedEnd > periodEndTime) {
+    return null;
+  }
+  
+  // Vérifier qu'il n'y a pas de conflit avec les tâches existantes
+  for (const task of existingTasks) {
+    const taskStart = new Date(task.start_datetime);
+    const taskEnd = new Date(task.end_datetime);
+    
+    // Vérifier si le créneau proposé chevauche une tâche existante
+    if (proposedStart < taskEnd && proposedEnd > taskStart) {
+      return null;
+    }
+  }
+  
+  return { start: proposedStart, end: proposedEnd };
+}
 
 // Helper function pour trouver le prochain créneau disponible pour un employé
 async function findNextAvailableSlotForEmployee(
