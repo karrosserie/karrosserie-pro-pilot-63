@@ -4304,6 +4304,7 @@ export type Database = {
         | "Finitions & remontage"
         | "Clôture & livraison"
         | "Absence"
+        | "Contrôle technique de sécurité"
       task_status: "En attente" | "En cours" | "Terminé" | "En pause"
     }
     CompositeTypes: {
@@ -4475,6 +4476,7 @@ export const Constants = {
         "Finitions & remontage",
         "Clôture & livraison",
         "Absence",
+        "Contrôle technique de sécurité",
       ],
       task_status: ["En attente", "En cours", "Terminé", "En pause"],
     },
