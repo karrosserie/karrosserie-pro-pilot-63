@@ -70,6 +70,19 @@ export const PlanVehicleModal = ({
       const startDateTime = new Date(`${selectedDate}T${selectedTime}:00`);
       const endDateTime = new Date(startDateTime.getTime() + (taskType?.duration || 1) * 60 * 60 * 1000);
 
+      // D'abord, nettoyer toutes les anciennes tâches en attente avec waiting_reason pour ce véhicule
+      const { error: cleanupError } = await supabase
+        .from('employee_schedule')
+        .delete()
+        .eq('vehicle_id', vehicle.id)
+        .eq('status', 'En attente')
+        .not('waiting_reason', 'is', null);
+
+      if (cleanupError) {
+        console.error('Erreur lors du nettoyage des anciennes tâches:', cleanupError);
+        // Ne pas bloquer la planification
+      }
+
       // Créer la tâche dans employee_schedule
       const { data, error } = await supabase
         .from('employee_schedule')
@@ -91,7 +104,7 @@ export const PlanVehicleModal = ({
         return;
       }
 
-      // Remettre waiting_reason à NULL lors de la planification
+      // Remettre waiting_reason à NULL dans la table vehicles (au cas où)
       const { error: updateError } = await supabase
         .from('vehicles')
         .update({ waiting_reason: null } as any)
