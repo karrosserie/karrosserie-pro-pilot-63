@@ -579,7 +579,7 @@ const CreationDossierJudiciaire = () => {
     });
 
     if (result) {
-      navigate('/contentieux');
+      navigate('/contentieux/depot-dossier');
     }
   };
 
