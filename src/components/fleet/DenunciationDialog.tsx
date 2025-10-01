@@ -62,11 +62,11 @@ export const DenunciationDialog: React.FC<DenunciationDialogProps> = ({
       const invoiceData = {
         reference,
         client_id: reservation?.client_id || null,
-        vehicle_id: violation?.fleet_vehicle_id || null,
+        vehicle_id: null, // Véhicule de flotte - pas de lien direct dans la table vehicles
         status: 'draft',
         date: today.toISOString().split('T')[0],
         due_date: new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 jours
-        notes: `Frais de dossier pour dénonciation conducteur - Contravention du ${format(new Date(violation.violation_date), 'dd/MM/yyyy', { locale: fr })} - Véhicule ${violation.license_plate}`,
+        notes: `Frais de dossier pour dénonciation conducteur - VÉHICULE DE FLOTTE - Contravention du ${format(new Date(violation.violation_date), 'dd/MM/yyyy', { locale: fr })} - Véhicule: ${violation.license_plate}${violation.fleet_vehicles?.car_brands?.name ? ` - ${violation.fleet_vehicles.car_brands.name}` : ''}${violation.fleet_vehicles?.car_models?.name ? ` ${violation.fleet_vehicles.car_models.name}` : ''}`,
         amount: 15.00,
         paid_amount: 0,
         repairs_data: JSON.stringify([{
