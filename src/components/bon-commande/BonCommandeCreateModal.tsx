@@ -165,12 +165,11 @@ export default function BonCommandeCreateModal({ open, onOpenChange }: BonComman
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="client">Client (optionnel)</Label>
-            <Select value={selectedClientId} onValueChange={setSelectedClientId}>
+            <Select value={selectedClientId || undefined} onValueChange={setSelectedClientId}>
               <SelectTrigger id="client">
-                <SelectValue placeholder="Sélectionner un client" />
+                <SelectValue placeholder="Sélectionner un client (optionnel)" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Aucun client</SelectItem>
                 {clients.map((client) => (
                   <SelectItem key={client.id} value={client.id}>
                     {client.first_name} {client.last_name}
@@ -182,12 +181,11 @@ export default function BonCommandeCreateModal({ open, onOpenChange }: BonComman
 
           <div className="space-y-2">
             <Label htmlFor="quote">Devis associé (optionnel)</Label>
-            <Select value={selectedQuoteId} onValueChange={setSelectedQuoteId}>
+            <Select value={selectedQuoteId || undefined} onValueChange={setSelectedQuoteId}>
               <SelectTrigger id="quote">
-                <SelectValue placeholder="Sélectionner un devis" />
+                <SelectValue placeholder="Sélectionner un devis (optionnel)" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Aucun devis</SelectItem>
                 {quotes.map((quote) => (
                   <SelectItem key={quote.id} value={quote.id}>
                     {quote.reference}
