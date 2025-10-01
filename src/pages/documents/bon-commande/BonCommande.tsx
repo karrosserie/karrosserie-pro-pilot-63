@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import BonLivraisonModal from '@/components/bon-commande/BonLivraisonModal';
+import BonCommandeCreateModal from '@/components/bon-commande/BonCommandeCreateModal';
 
 interface BonCommandeItem {
   id: string;
@@ -44,6 +45,7 @@ export default function BonCommande() {
   const [bonCommandes, setBonCommandes] = useState<BonCommandeItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [livraisonModalOpen, setLivraisonModalOpen] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedBonCommande, setSelectedBonCommande] = useState<BonCommandeItem | null>(null);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const { companyId } = useCompanyId();
@@ -204,7 +206,7 @@ export default function BonCommande() {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Bon de commande</h1>
           <p className="text-gray-600 mt-1">Gérez vos commandes de pièces et matériaux</p>
         </div>
-        <Button className="flex items-center gap-2">
+        <Button className="flex items-center gap-2" onClick={() => setCreateModalOpen(true)}>
           <Plus className="w-4 h-4" />
           Nouveau bon de commande
         </Button>
@@ -396,6 +398,17 @@ export default function BonCommande() {
           )}
         </CardContent>
       </Card>
+
+      {/* Modal pour créer un bon de commande */}
+      <BonCommandeCreateModal
+        open={createModalOpen}
+        onOpenChange={(open) => {
+          setCreateModalOpen(open);
+          if (!open) {
+            fetchBonCommandes();
+          }
+        }}
+      />
 
       {/* Modal pour créer un bon de livraison */}
       {selectedBonCommande && (
