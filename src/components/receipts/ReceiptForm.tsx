@@ -10,6 +10,7 @@ import { InvoiceSelect } from './form/InvoiceSelect';
 import { Receipt } from './form/types';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { useAccounts } from '@/hooks/use-accounts';
+import { useInvoices } from '@/hooks/use-invoices';
 import { receiptsService } from '@/services/supabase/receipts';
 
 interface ReceiptFormProps {
@@ -23,6 +24,7 @@ interface ReceiptFormProps {
 export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting, preselectedInvoice }: ReceiptFormProps) => {
   const { receipts } = useReceiptsData();
   const { accounts, isLoading: accountsLoading } = useAccounts();
+  const { invoices } = useInvoices();
   
   console.log('ReceiptForm - Accounts loaded:', accounts);
   console.log('ReceiptForm - Accounts loading state:', accountsLoading);
@@ -106,6 +108,18 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting, presele
       ...prev,
       [field]: value
     }));
+
+    // Si on change la facture, mettre à jour automatiquement le montant
+    if (field === 'invoice' && value && invoices) {
+      const selectedInvoice = invoices.find(inv => inv.id === value);
+      if (selectedInvoice && selectedInvoice.amount) {
+        setFormData(prev => ({
+          ...prev,
+          invoice: value,
+          amount: selectedInvoice.amount
+        }));
+      }
+    }
   };
 
   return (
