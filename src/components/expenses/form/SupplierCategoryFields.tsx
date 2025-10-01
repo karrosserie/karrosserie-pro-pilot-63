@@ -3,6 +3,7 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AmountInput } from '@/components/ui/amount-input';
 import { Expense } from './types';
 
 interface SupplierCategoryFieldsProps {
@@ -37,13 +38,10 @@ export const SupplierCategoryFields = ({ formData, onChange }: SupplierCategoryF
 
       <div>
         <Label htmlFor="vat_amount" required>Montant TVA</Label>
-        <Input
+        <AmountInput
           id="vat_amount"
-          type="number"
-          step="0.01"
           value={formData.vat_amount}
-          onChange={(e) => onChange('vat_amount', e.target.value)}
-          placeholder="0,00"
+          onChange={(value) => onChange('vat_amount', value)}
           required
           readOnly={!hasProofUploaded}
           className={!hasProofUploaded ? 'bg-gray-100 cursor-not-allowed' : ''}
@@ -52,13 +50,10 @@ export const SupplierCategoryFields = ({ formData, onChange }: SupplierCategoryF
 
       <div>
         <Label htmlFor="total_amount" required>Montant TTC</Label>
-        <Input
+        <AmountInput
           id="total_amount"
-          type="number"
-          step="0.01"
           value={formData.total_amount}
-          onChange={(e) => onChange('total_amount', e.target.value)}
-          placeholder="0,00"
+          onChange={(value) => onChange('total_amount', value)}
           required
           readOnly={!hasProofUploaded}
           className={!hasProofUploaded ? 'bg-gray-100 cursor-not-allowed' : ''}

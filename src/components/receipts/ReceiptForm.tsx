@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AmountInput } from '@/components/ui/amount-input';
 import { InvoiceSelect } from './form/InvoiceSelect';
 import { Receipt } from './form/types';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
@@ -161,13 +162,10 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting, presele
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="amount">Montant (€) <span className="text-red-500">*</span></Label>
-          <Input
+          <AmountInput
             id="amount"
-            type="number"
-            step="0.01"
-            min="0"
             value={formData.amount}
-            onChange={(e) => handleFieldChange('amount', parseFloat(e.target.value) || 0)}
+            onChange={(value) => handleFieldChange('amount', value)}
             required
           />
         </div>

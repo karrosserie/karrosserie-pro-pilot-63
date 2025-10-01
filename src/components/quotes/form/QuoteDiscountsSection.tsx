@@ -3,6 +3,7 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AmountInput } from '@/components/ui/amount-input';
 import { Percent, Plus, Trash } from 'lucide-react';
 import { QuoteDiscountItem } from './types';
 
@@ -71,12 +72,9 @@ export const QuoteDiscountsSection = ({ discounts, onDiscountsChange, isReadOnly
                 readOnly={isReadOnly}
                 className={isReadOnly ? 'bg-gray-50' : ''}
               />
-              <Input
-                type="number"
+              <AmountInput
                 value={discount.amount}
-                onChange={(e) => updateDiscount(discount.id, 'amount', parseFloat(e.target.value) || 0)}
-                min="0"
-                step="0.01"
+                onChange={(value) => updateDiscount(discount.id, 'amount', value)}
                 readOnly={isReadOnly}
                 className={isReadOnly ? 'bg-gray-50' : ''}
               />

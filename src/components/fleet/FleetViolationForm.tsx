@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AmountInput } from '@/components/ui/amount-input';
 import { useFleetVehicles } from '@/hooks/use-fleet-vehicles';
 import { useFleetViolations } from '@/hooks/use-fleet-violations';
 import { useCompanyId } from '@/hooks/use-company-id';
@@ -328,12 +329,10 @@ export const FleetViolationForm: React.FC<FleetViolationFormProps> = ({
           <div className="grid grid-cols-3 gap-4">
             <div>
               <Label htmlFor="fine_amount">Montant de l'amende (€)</Label>
-              <Input
+              <AmountInput
                 id="fine_amount"
-                type="number"
-                step="0.01"
                 value={formData.fine_amount}
-                onChange={(e) => handleInputChange('fine_amount', parseFloat(e.target.value) || 0)}
+                onChange={(value) => handleInputChange('fine_amount', value)}
                 required
               />
             </div>

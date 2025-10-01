@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { AmountInput } from '@/components/ui/amount-input';
 import { Receipt } from './types';
 
 interface PaymentMethodFieldsProps {
@@ -14,14 +15,11 @@ export const PaymentMethodFields = ({ formData, onChange }: PaymentMethodFieldsP
         <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">
           Montant <span className="text-red-500">*</span>
         </label>
-        <input
+        <AmountInput
           id="amount"
-          type="number"
-          step="0.01"
           value={formData.amount}
-          onChange={(e) => onChange('amount', e.target.value)}
-          placeholder="0,00"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-karrosserie-orange focus:border-transparent"
+          onChange={(value) => onChange('amount', value)}
+          className="w-full"
           required
         />
       </div>
