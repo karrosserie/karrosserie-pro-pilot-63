@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AmountInput } from '@/components/ui/amount-input';
 import { Package, Plus, Trash } from 'lucide-react';
 import { CreditItem } from './types';
 
@@ -69,23 +70,15 @@ export const CreditItemsSection = ({
                   readOnly={readOnly}
                   className={readOnly ? "bg-gray-50 cursor-not-allowed" : ""}
                 />
-                <Input
-                  type="number"
+                <AmountInput
                   value={item.unit_price}
-                  onChange={(e) => !readOnly && onUpdateItem(item.id, 'unit_price', parseFloat(e.target.value) || 0)}
-                  min="0"
-                  step="0.01"
-                  placeholder="0.00"
+                  onChange={(value) => !readOnly && onUpdateItem(item.id, 'unit_price', value)}
                   readOnly={readOnly}
                   className={readOnly ? "bg-gray-50 cursor-not-allowed" : ""}
                 />
-                <Input
-                  type="number"
+                <AmountInput
                   value={item.discount}
-                  onChange={(e) => !readOnly && onUpdateItem(item.id, 'discount', parseFloat(e.target.value) || 0)}
-                  min="0"
-                  max="100"
-                  step="0.1"
+                  onChange={(value) => !readOnly && onUpdateItem(item.id, 'discount', value)}
                   readOnly={readOnly}
                   className={readOnly ? "bg-gray-50 cursor-not-allowed" : ""}
                 />

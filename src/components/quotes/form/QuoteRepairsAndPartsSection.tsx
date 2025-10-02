@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Combobox } from '@/components/ui/combobox';
+import { AmountInput } from '@/components/ui/amount-input';
 import { Wrench, Settings, Plus, Trash } from 'lucide-react';
 import { QuoteRepairItem, QuotePartItem } from './types';
 import { calculateLineTotal } from './utils/calculations';
@@ -287,22 +288,15 @@ export const QuoteRepairsAndPartsSection = ({
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
-                  <Input
-                    type="number"
+                  <AmountInput
                     value={repair.unitCost}
-                    onChange={(e) => updateRepair(repair.id, 'unitCost', parseFloat(e.target.value) || 0)}
-                    min="0"
-                    step="0.01"
+                    onChange={(value) => updateRepair(repair.id, 'unitCost', value)}
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
-                  <Input
-                    type="number"
+                  <AmountInput
                     value={repair.discount}
-                    onChange={(e) => updateRepair(repair.id, 'discount', parseFloat(e.target.value) || 0)}
-                    min="0"
-                    max="100"
-                    step="0.01"
+                    onChange={(value) => updateRepair(repair.id, 'discount', value)}
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
@@ -315,12 +309,9 @@ export const QuoteRepairsAndPartsSection = ({
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
-                  <Input
-                    type="number"
+                  <AmountInput
                     value={isNaN(Number(repair.total)) ? 0 : Number(repair.total)}
-                    onChange={(e) => updateRepair(repair.id, 'total', parseFloat(e.target.value) || 0)}
-                    min="0"
-                    step="0.01"
+                    onChange={(value) => updateRepair(repair.id, 'total', value)}
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
@@ -389,22 +380,15 @@ export const QuoteRepairsAndPartsSection = ({
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
-                  <Input
-                    type="number"
+                  <AmountInput
                     value={part.unitCost}
-                    onChange={(e) => updatePart(part.id, 'unitCost', parseFloat(e.target.value) || 0)}
-                    min="0"
-                    step="0.01"
+                    onChange={(value) => updatePart(part.id, 'unitCost', value)}
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
-                  <Input
-                    type="number"
+                  <AmountInput
                     value={part.discount}
-                    onChange={(e) => updatePart(part.id, 'discount', parseFloat(e.target.value) || 0)}
-                    min="0"
-                    max="100"
-                    step="0.01"
+                    onChange={(value) => updatePart(part.id, 'discount', value)}
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
@@ -417,12 +401,9 @@ export const QuoteRepairsAndPartsSection = ({
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
-                  <Input
-                    type="number"
+                  <AmountInput
                     value={isNaN(Number(part.total)) ? 0 : Number(part.total)}
-                    onChange={(e) => updatePart(part.id, 'total', parseFloat(e.target.value) || 0)}
-                    min="0"
-                    step="0.01"
+                    onChange={(value) => updatePart(part.id, 'total', value)}
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />

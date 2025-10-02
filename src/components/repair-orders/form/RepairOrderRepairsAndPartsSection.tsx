@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Combobox } from '@/components/ui/combobox';
+import { AmountInput } from '@/components/ui/amount-input';
 import { Wrench, Settings, Plus, Trash } from 'lucide-react';
 import { RepairOrderRepairItem, RepairOrderPartItem } from './types';
 import { REPAIR_DESIGNATIONS, PART_DESIGNATIONS } from '@/constants/predefined-values';
@@ -214,17 +215,15 @@ export const RepairOrderRepairsAndPartsSection = ({
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
-                  <Input
-                    type="text"
-                    value={formatForDisplay(repair.unitCost)}
-                    onChange={(e) => updateRepair(repair.id, 'unitCost', parseFromDisplay(e.target.value))}
+                  <AmountInput
+                    value={repair.unitCost}
+                    onChange={(value) => updateRepair(repair.id, 'unitCost', value)}
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
-                  <Input
-                    type="text"
-                    value={formatForDisplay(repair.discount)}
-                    onChange={(e) => updateRepair(repair.id, 'discount', parseFromDisplay(e.target.value))}
+                  <AmountInput
+                    value={repair.discount}
+                    onChange={(value) => updateRepair(repair.id, 'discount', value)}
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
@@ -312,17 +311,15 @@ export const RepairOrderRepairsAndPartsSection = ({
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
-                  <Input
-                    type="text"
-                    value={formatForDisplay(part.unitCost)}
-                    onChange={(e) => updatePart(part.id, 'unitCost', parseFromDisplay(e.target.value))}
+                  <AmountInput
+                    value={part.unitCost}
+                    onChange={(value) => updatePart(part.id, 'unitCost', value)}
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
-                  <Input
-                    type="text"
-                    value={formatForDisplay(part.discount)}
-                    onChange={(e) => updatePart(part.id, 'discount', parseFromDisplay(e.target.value))}
+                  <AmountInput
+                    value={part.discount}
+                    onChange={(value) => updatePart(part.id, 'discount', value)}
                     readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
