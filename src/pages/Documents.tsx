@@ -39,29 +39,33 @@ const DocumentItem = ({
   onEdit: () => void;
 }) => {
   return (
-    <div className="flex items-start p-4 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow bg-white">
-      <div className="bg-gray-100 p-3 rounded-lg mr-4">
+    <div className="flex items-start p-3 sm:p-4 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow bg-white">
+      <div className="bg-gray-100 p-2 sm:p-3 rounded-lg mr-2 sm:mr-4 flex-shrink-0">
         {icon}
       </div>
       
-      <div className="flex-1">
-        <div className="flex justify-between items-start">
-          <h3 className="font-medium text-gray-800">{title}</h3>
+      <div className="flex-1 min-w-0">
+        <div className="flex justify-between items-start gap-2">
+          <h3 className="font-medium text-gray-800 text-sm sm:text-base truncate">{title}</h3>
         </div>
         
-        <p className="text-sm text-gray-600 mt-1">
-          Client: {customer} | Véhicule: {vehicle}
+        <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">
+          <span className="hidden sm:inline">Client: {customer} | Véhicule: {vehicle}</span>
+          <span className="sm:hidden">
+            {customer}<br/>
+            {vehicle}
+          </span>
         </p>
         
-        <p className="text-xs text-gray-400 mt-2">{date}</p>
+        <p className="text-xs text-gray-400 mt-1 sm:mt-2">{date}</p>
       </div>
       
-      <div className="ml-4 flex space-x-2">
-        <Button variant="view" size="icon" onClick={onView}>
-          <Eye className="h-4 w-4" />
+      <div className="ml-2 sm:ml-4 flex gap-1 sm:gap-2 flex-shrink-0">
+        <Button variant="view" size="icon" onClick={onView} className="h-8 w-8 sm:h-10 sm:w-10">
+          <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
         </Button>
-        <Button variant="edit" size="icon" onClick={onEdit}>
-          <Pencil className="h-4 w-4" />
+        <Button variant="edit" size="icon" onClick={onEdit} className="h-8 w-8 sm:h-10 sm:w-10">
+          <Pencil className="h-3 w-3 sm:h-4 sm:w-4" />
         </Button>
       </div>
     </div>

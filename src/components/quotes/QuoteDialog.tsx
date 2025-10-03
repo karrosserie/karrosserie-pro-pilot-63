@@ -87,9 +87,9 @@ const QuoteDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={!isSubmitting ? onOpenChange : undefined}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto p-3 sm:p-6">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-base sm:text-lg">
             {isEditing 
               ? "Modifier le devis" 
               : isConversionFromReport 
@@ -97,7 +97,7 @@ const QuoteDialog = ({
                 : "Créer un nouveau devis"
             }
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-xs sm:text-sm">
             {isEditing
               ? "Modifiez les détails du devis."
               : isConversionFromReport

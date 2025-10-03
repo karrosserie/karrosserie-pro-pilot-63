@@ -80,13 +80,13 @@ const QuoteMobileCard: React.FC<QuoteMobileCardProps> = ({
   };
 
   return (
-    <div className="card-container p-4 space-y-3">
+    <div className="card-container p-3 sm:p-4 space-y-3 animate-fade-in">
       {/* Header */}
-      <div className="flex justify-between items-start">
-        <div>
-          <h3 className="font-medium text-gray-900">{quote.reference}</h3>
-          <p className="text-sm text-gray-500">
-            <Calendar className="h-4 w-4 inline mr-1" />
+      <div className="flex flex-col xs:flex-row xs:justify-between xs:items-start gap-2">
+        <div className="min-w-0 flex-1">
+          <h3 className="font-medium text-gray-900 text-sm sm:text-base truncate">{quote.reference}</h3>
+          <p className="text-xs sm:text-sm text-gray-500">
+            <Calendar className="h-3 w-3 sm:h-4 sm:w-4 inline mr-1" />
             {new Date(quote.created_at).toLocaleDateString('fr-FR')}
           </p>
         </div>
@@ -95,9 +95,9 @@ const QuoteMobileCard: React.FC<QuoteMobileCardProps> = ({
 
       {/* Client and Vehicle Info */}
       <div className="space-y-2">
-        <div className="flex items-center text-sm">
-          <User className="h-4 w-4 mr-2 text-gray-400" />
-          <span>
+        <div className="flex items-center text-xs sm:text-sm">
+          <User className="h-3 w-3 sm:h-4 sm:w-4 mr-2 text-gray-400 flex-shrink-0" />
+          <span className="truncate">
             {quote.clients 
               ? `${quote.clients.first_name} ${quote.clients.last_name}` 
               : '-'
@@ -105,9 +105,9 @@ const QuoteMobileCard: React.FC<QuoteMobileCardProps> = ({
           </span>
         </div>
         
-        <div className="flex items-center text-sm">
-          <Car className="h-4 w-4 mr-2 text-gray-400" />
-          <span>
+        <div className="flex items-center text-xs sm:text-sm">
+          <Car className="h-3 w-3 sm:h-4 sm:w-4 mr-2 text-gray-400 flex-shrink-0" />
+          <span className="truncate">
             {quote.vehicles 
               ? `${quote.vehicles.car_brands?.name || 'Marque inconnue'} ${quote.vehicles.car_models?.name || 'Modèle inconnu'} - ${quote.vehicles.license_plate}`
               : '-'
@@ -115,54 +115,61 @@ const QuoteMobileCard: React.FC<QuoteMobileCardProps> = ({
           </span>
         </div>
 
-        <div className="flex items-center text-sm font-medium">
-          <Euro className="h-4 w-4 mr-2 text-gray-400" />
+        <div className="flex items-center text-xs sm:text-sm font-medium">
+          <Euro className="h-3 w-3 sm:h-4 sm:w-4 mr-2 text-gray-400 flex-shrink-0" />
           <span>{formatAmount(calculateQuoteAmount(quote))}</span>
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex flex-wrap gap-1.5 pt-3 border-t">
+      <div className="grid grid-cols-2 xs:flex xs:flex-wrap gap-1.5 pt-3 border-t">
         {/* Primary Actions */}
-        <Button variant="view" size="sm" onClick={() => onViewQuote(quote)} className="w-28 truncate">
+        <Button variant="view" size="sm" onClick={() => onViewQuote(quote)} className="text-xs h-8 justify-center">
           <Eye className="h-3 w-3 mr-1" />
-          Voir
+          <span className="hidden xs:inline">Voir</span>
+          <span className="xs:hidden">Vue</span>
         </Button>
-        <Button variant="edit" size="sm" onClick={() => onEditQuote(quote)} className="w-28 truncate">
+        <Button variant="edit" size="sm" onClick={() => onEditQuote(quote)} className="text-xs h-8 justify-center">
           <Pencil className="h-3 w-3 mr-1" />
-          Modifier
+          <span className="hidden xs:inline">Modifier</span>
+          <span className="xs:hidden">Edit</span>
         </Button>
         
         {/* Secondary Actions */}
-        <Button variant="download" size="sm" onClick={() => onDownload(quote)} className="w-28 truncate">
+        <Button variant="download" size="sm" onClick={() => onDownload(quote)} className="text-xs h-8 justify-center">
           <Download className="h-3 w-3 mr-1" />
-          Télécharger
+          <span className="hidden xs:inline">Télécharger</span>
+          <span className="xs:hidden">DL</span>
         </Button>
-        <Button variant="print" size="sm" onClick={() => onPrint(quote)} className="w-28 truncate">
+        <Button variant="print" size="sm" onClick={() => onPrint(quote)} className="text-xs h-8 justify-center">
           <Printer className="h-3 w-3 mr-1" />
-          Imprimer
+          <span className="hidden sm:inline">Imprimer</span>
+          <span className="sm:hidden">Print</span>
         </Button>
-        <Button variant="send" size="sm" onClick={() => onSendEmail(quote)} className="w-28 truncate">
+        <Button variant="send" size="sm" onClick={() => onSendEmail(quote)} className="text-xs h-8 justify-center">
           <Mail className="h-3 w-3 mr-1" />
-          E-mail
+          <span className="hidden xs:inline">E-mail</span>
+          <span className="xs:hidden">Mail</span>
         </Button>
         
         {/* Conditional Actions */}
         {onRequestDocuments && (
-          <Button variant="create" size="sm" onClick={() => onRequestDocuments(quote)} className="w-28 truncate">
+          <Button variant="create" size="sm" onClick={() => onRequestDocuments(quote)} className="text-xs h-8 justify-center">
             <FileCheck className="h-3 w-3 mr-1" />
-            Justificatifs
+            <span className="hidden sm:inline">Justificatifs</span>
+            <span className="sm:hidden">Docs</span>
           </Button>
         )}
         {onConvertToRepairOrder && (
-          <Button variant="validation" size="sm" onClick={() => onConvertToRepairOrder(quote)} className="w-28 truncate">
+          <Button variant="validation" size="sm" onClick={() => onConvertToRepairOrder(quote)} className="text-xs h-8 justify-center">
             <ArrowRight className="h-3 w-3 mr-1" />
-            Convertir
+            <span className="hidden xs:inline">Convertir</span>
+            <span className="xs:hidden">Conv.</span>
           </Button>
         )}
         
         {/* Destructive Action */}
-        <Button variant="delete" size="sm" onClick={() => onDeleteQuote(quote.id)} className="w-28 truncate">
+        <Button variant="delete" size="sm" onClick={() => onDeleteQuote(quote.id)} className="text-xs h-8 justify-center col-span-2 xs:col-span-1">
           <Trash className="h-3 w-3 mr-1" />
           Supprimer
         </Button>

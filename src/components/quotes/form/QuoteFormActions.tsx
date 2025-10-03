@@ -25,12 +25,13 @@ export const QuoteFormActions = ({ quote, isSubmitting, onCancel, isConversionFr
   return (
     <>
       <Separator />
-      <div className="flex justify-end space-x-2 pt-4">
+      <div className="flex flex-col xs:flex-row justify-end gap-2 pt-3 sm:pt-4">
         <Button 
           type="button" 
           variant="outline" 
           onClick={onCancel}
           disabled={isSubmitting}
+          className="w-full xs:w-auto"
         >
           Annuler
         </Button>
@@ -38,6 +39,7 @@ export const QuoteFormActions = ({ quote, isSubmitting, onCancel, isConversionFr
           type="submit"
           disabled={isSubmitting}
           variant="validation"
+          className="w-full xs:w-auto"
         >
           {getButtonText()}
         </Button>
