@@ -546,8 +546,8 @@ const TeamTab = () => {
                   )}
                 />
                 
-                {/* Qualifications - shown only for carrossier roles */}
-                {(addForm.watch('role') === 'carrossier' || addForm.watch('role') === 'carrossier-vehicule de courtoisie') && (
+                {/* Qualifications - shown for all roles */}
+                {addForm.watch('role') && (
                   <FormField
                     control={addForm.control}
                     name="qualifications"
@@ -563,7 +563,10 @@ const TeamTab = () => {
                       return (
                         <FormItem>
                           <div className="flex items-center justify-between">
-                            <FormLabel>Qualifications * (sélectionnez une ou plusieurs)</FormLabel>
+                            <FormLabel>
+                              Qualifications {(addForm.watch('role') === 'carrossier' || addForm.watch('role') === 'carrossier-vehicule de courtoisie') ? '* ' : ''}
+                              (sélectionnez une ou plusieurs)
+                            </FormLabel>
                             {field.value && field.value.length > 0 && (
                               <span className="text-sm text-muted-foreground">
                                 {field.value.length} qualification(s) sélectionnée(s)
@@ -832,8 +835,8 @@ const TeamTab = () => {
                 />
                )}
                
-               {/* Qualifications - shown only for carrossier roles */}
-               {editingMember?.role !== 'Propriétaire' && (editForm.watch('role') === 'carrossier' || editForm.watch('role') === 'carrossier-vehicule de courtoisie') && (
+               {/* Qualifications - shown for all roles except Propriétaire */}
+               {editingMember?.role !== 'Propriétaire' && editForm.watch('role') && (
                  <FormField
                    control={editForm.control}
                    name="qualifications"
@@ -848,14 +851,17 @@ const TeamTab = () => {
                      
                      return (
                        <FormItem>
-                         <div className="flex items-center justify-between">
-                           <FormLabel>Qualifications * (sélectionnez une ou plusieurs)</FormLabel>
-                           {field.value && field.value.length > 0 && (
-                             <span className="text-sm text-muted-foreground">
-                               {field.value.length} qualification(s) sélectionnée(s)
-                             </span>
-                           )}
-                         </div>
+                          <div className="flex items-center justify-between">
+                            <FormLabel>
+                              Qualifications {(editForm.watch('role') === 'carrossier' || editForm.watch('role') === 'carrossier-vehicule de courtoisie') ? '* ' : ''}
+                              (sélectionnez une ou plusieurs)
+                            </FormLabel>
+                            {field.value && field.value.length > 0 && (
+                              <span className="text-sm text-muted-foreground">
+                                {field.value.length} qualification(s) sélectionnée(s)
+                              </span>
+                            )}
+                          </div>
                          <FormControl>
                            <div className="space-y-2 max-h-60 overflow-y-auto border rounded-lg p-3">
                              {STANDARD_QUALIFICATIONS.map((qualification) => (
