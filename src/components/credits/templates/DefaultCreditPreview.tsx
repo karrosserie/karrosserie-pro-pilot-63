@@ -77,8 +77,8 @@ const DefaultCreditPreview = ({ companyData, creditData, clientData, items, tota
   };
 
   return (
-    <div className="bg-white p-4 rounded shadow-sm w-full flex flex-col" style={{ minHeight: '100vh', height: 'auto', backgroundColor: 'white' }}>
-      <DefaultCreditHeader 
+    <div className="bg-white p-2 sm:p-4 rounded shadow-sm w-full flex flex-col" style={{ minHeight: '100vh', height: 'auto', backgroundColor: 'white' }}>
+      <DefaultCreditHeader
         companyData={companyData}
         creditData={defaultCreditData}
         clientData={defaultClientData}

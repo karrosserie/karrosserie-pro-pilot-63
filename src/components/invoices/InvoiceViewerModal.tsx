@@ -308,49 +308,49 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
+        <DialogContent className="max-w-4xl w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto p-0">
           {/* Barre d'actions en haut */}
-          <div className="p-4 pr-16 border-b bg-background">
-            <h2 className="text-lg font-semibold mb-3">Aperçu de la facture n°{currentInvoice.reference}</h2>
-            <div className="flex items-center gap-2 flex-wrap">
-              <Button variant="outline" size="sm" onClick={handleEdit}>
-                <Pencil className="h-4 w-4 mr-1" />
-                Modifier
+          <div className="p-3 sm:p-4 pr-12 sm:pr-16 border-b bg-background">
+            <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3">Aperçu de la facture n°{currentInvoice.reference}</h2>
+            <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+              <Button variant="outline" size="sm" onClick={handleEdit} className="text-xs sm:text-sm h-8 sm:h-9">
+                <Pencil className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                <span className="hidden xs:inline ml-1">Modifier</span>
               </Button>
 
-              <Button variant="outline" size="sm" onClick={handleDownload}>
-                <Download className="h-4 w-4 mr-1" />
-                Télécharger
+              <Button variant="outline" size="sm" onClick={handleDownload} className="text-xs sm:text-sm h-8 sm:h-9">
+                <Download className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                <span className="hidden xs:inline ml-1">Télécharger</span>
               </Button>
 
-              <Button variant="outline" size="sm" onClick={handlePrint}>
-                <Printer className="h-4 w-4 mr-1" />
-                Imprimer
+              <Button variant="outline" size="sm" onClick={handlePrint} className="text-xs sm:text-sm h-8 sm:h-9">
+                <Printer className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                <span className="hidden xs:inline ml-1">Imprimer</span>
               </Button>
 
-              <Button variant="outline" size="sm" onClick={handleSendEmail}>
-                <Mail className="h-4 w-4 mr-1" />
-                Envoyer
+              <Button variant="outline" size="sm" onClick={handleSendEmail} className="text-xs sm:text-sm h-8 sm:h-9">
+                <Mail className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                <span className="hidden xs:inline ml-1">Envoyer</span>
               </Button>
 
-              <Button variant="outline" size="sm" onClick={handleCreateReceipt}>
-                <CreditCard className="h-4 w-4 mr-1" />
-                Créer un paiement
+              <Button variant="outline" size="sm" onClick={handleCreateReceipt} className="text-xs sm:text-sm h-8 sm:h-9">
+                <CreditCard className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                <span className="hidden sm:inline ml-1">Paiement</span>
               </Button>
 
-              <Button variant="outline" size="sm" onClick={handleCreateCredit}>
-                <FileX className="h-4 w-4 mr-1" />
-                Créer un avoir
+              <Button variant="outline" size="sm" onClick={handleCreateCredit} className="text-xs sm:text-sm h-8 sm:h-9">
+                <FileX className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                <span className="hidden sm:inline ml-1">Avoir</span>
               </Button>
 
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700" 
+                className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700 text-xs sm:text-sm h-8 sm:h-9" 
                 onClick={handleDelete}
               >
-                <Trash className="h-4 w-4 mr-1" />
-                Supprimer
+                <Trash className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                <span className="hidden xs:inline ml-1">Supprimer</span>
               </Button>
             </div>
           </div>

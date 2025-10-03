@@ -54,8 +54,8 @@ const DefaultInvoicePreview = ({ companyData, invoiceData, clientData, items, to
   const totalsToUse = totals || {};
 
   return (
-    <div className="bg-white p-4 rounded shadow-sm w-full flex flex-col" style={{ minHeight: '100vh', height: 'auto', backgroundColor: 'white' }}>
-      <DefaultInvoiceHeader 
+    <div className="bg-white p-2 sm:p-4 rounded shadow-sm w-full flex flex-col" style={{ minHeight: '100vh', height: 'auto', backgroundColor: 'white' }}>
+      <DefaultInvoiceHeader
         companyData={companyData}
         invoiceData={invoiceDataToUse}
         clientData={clientDataToUse}

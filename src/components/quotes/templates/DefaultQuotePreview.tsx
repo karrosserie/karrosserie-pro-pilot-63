@@ -45,8 +45,8 @@ interface DefaultQuotePreviewProps {
 const DefaultQuotePreview = ({ companyData, quoteData, clientData, items, totals }: DefaultQuotePreviewProps) => {
 
   return (
-    <div className="bg-white p-4 rounded shadow-sm w-full flex flex-col" style={{ minHeight: '100vh', height: 'auto', backgroundColor: 'white' }}>
-      <DefaultQuoteHeader 
+    <div className="bg-white p-2 sm:p-4 rounded shadow-sm w-full flex flex-col" style={{ minHeight: '100vh', height: 'auto', backgroundColor: 'white' }}>
+      <DefaultQuoteHeader
         companyData={companyData}
         quoteData={quoteData}
         clientData={clientData}

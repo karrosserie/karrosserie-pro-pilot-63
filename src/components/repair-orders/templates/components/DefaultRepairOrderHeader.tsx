@@ -27,10 +27,10 @@ interface DefaultRepairOrderHeaderProps {
 
 const DefaultRepairOrderHeader = ({ companyData, orderData, clientData, vehicleData }: DefaultRepairOrderHeaderProps) => {
   return (
-    <div className="grid grid-cols-3 gap-6 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6">
       {/* Colonne 1 - Entreprise */}
       <div>
-        <h1 className="text-2xl font-bold text-white px-3 py-1 text-center mb-3" style={{backgroundColor: 'rgba(64,67,72,255)'}}>ORDRE DE RÉPARATION</h1>
+        <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white px-2 sm:px-3 py-1 text-center mb-2 sm:mb-3" style={{backgroundColor: 'rgba(64,67,72,255)'}}>ORDRE DE RÉPARATION</h1>
         {companyData.logo_url ? (
           <div className="flex items-center justify-start mb-3" style={{maxWidth: '120px'}}>
             <img src={companyData.logo_url} alt="Logo entreprise" className="max-w-full h-auto object-contain" />
@@ -40,12 +40,12 @@ const DefaultRepairOrderHeader = ({ companyData, orderData, clientData, vehicleD
             <span className="text-white font-bold text-base">LOGO</span>
           </div>
         )}
-        <p className="text-gray-600 font-bold mb-2">{companyData.name || ''}</p>
-        <div className="text-base text-gray-600 space-y-1">
+        <p className="text-gray-600 font-bold mb-1 sm:mb-2 text-sm sm:text-base">{companyData.name || ''}</p>
+        <div className="text-xs sm:text-sm md:text-base text-gray-600 space-y-0.5 sm:space-y-1">
           <p>{companyData.address || ''}</p>
           <p>{companyData.zipcode || ''} {companyData.city || ''}</p>
-          <p>Téléphone : {companyData.phone || ''}</p>
-          <p>E-mail : {companyData.email || ''}</p>
+          <p>Tél : {companyData.phone || ''}</p>
+          <p className="break-all">Email : {companyData.email || ''}</p>
           <p>SIRET : {companyData.siret || ''}</p>
           <p>N° TVA : {companyData.tva || ''}</p>
         </div>
@@ -53,8 +53,8 @@ const DefaultRepairOrderHeader = ({ companyData, orderData, clientData, vehicleD
 
       {/* Colonne 2 - Détails de l'ordre de réparation */}
       <div>
-        <h3 className="text-lg font-semibold mb-3 text-gray-800">Détails de l'ordre de réparation</h3>
-        <div className="text-base space-y-1">
+        <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800">Détails de l'ordre de réparation</h3>
+        <div className="text-xs sm:text-sm md:text-base space-y-0.5 sm:space-y-1">
           <div className="flex justify-between">
             <span className="font-medium">Ordre de réparation</span>
             <span>{orderData.number}</span>
@@ -86,16 +86,16 @@ const DefaultRepairOrderHeader = ({ companyData, orderData, clientData, vehicleD
         </div>
         
         {/* Encadré Montant total */}
-        <div className="bg-blue-600 text-white p-2 text-center mt-3">
-          <p className="text-base mb-1">Montant total</p>
-          <p className="text-lg font-bold">{orderData.amountDue}</p>
+        <div className="bg-blue-600 text-white p-1.5 sm:p-2 text-center mt-2 sm:mt-3">
+          <p className="text-xs sm:text-sm md:text-base mb-0.5 sm:mb-1">Montant total</p>
+          <p className="text-base sm:text-lg font-bold">{orderData.amountDue}</p>
         </div>
       </div>
 
       {/* Colonne 3 - Ordre de réparation pour */}
       <div>
-        <h3 className="text-lg font-semibold mb-3 text-gray-800">Ordre de réparation pour</h3>
-        <div className="text-base space-y-1">
+        <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800">Ordre de réparation pour</h3>
+        <div className="text-xs sm:text-sm md:text-base space-y-0.5 sm:space-y-1">
           <p className="font-medium">{clientData.name}</p>
           <p>{clientData.address}</p>
           <p>{clientData.city}</p>

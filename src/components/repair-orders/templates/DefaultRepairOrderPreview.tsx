@@ -53,8 +53,8 @@ interface DefaultRepairOrderPreviewProps {
 const DefaultRepairOrderPreview = ({ companyData, orderData, clientData, vehicleData, items, totals, signatureData }: DefaultRepairOrderPreviewProps) => {
 
   return (
-    <div className="bg-white p-4 rounded shadow-sm w-full flex flex-col" style={{ minHeight: '100vh', height: 'auto', backgroundColor: 'white' }}>
-      <DefaultRepairOrderHeader 
+    <div className="bg-white p-2 sm:p-4 rounded shadow-sm w-full flex flex-col" style={{ minHeight: '100vh', height: 'auto', backgroundColor: 'white' }}>
+      <DefaultRepairOrderHeader
         companyData={companyData}
         orderData={orderData}
         clientData={clientData}
