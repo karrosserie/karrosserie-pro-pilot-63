@@ -3,11 +3,13 @@ import { TestWebhookButton } from '@/components/test-webhook-button';
 
 const Index = () => {
   return (
-    <div>
-      <div className="p-4">
+    <div className="min-h-screen">
+      <div className="p-2 sm:p-4">
         <TestWebhookButton />
       </div>
-      <CarrosseriePlanning />
+      <div className="px-2 sm:px-4">
+        <CarrosseriePlanning />
+      </div>
     </div>
   );
 };

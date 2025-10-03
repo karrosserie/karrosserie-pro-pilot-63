@@ -99,42 +99,42 @@ export const VehicleCard = ({ vehicle, onPlan }: VehicleCardProps) => {
 
   return (
     <>
-      <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
-        <div className="flex items-start justify-between mb-3">
-          <div>
-            <h4 className="font-semibold text-base text-slate-900">{vehicle.brand} {vehicle.model}</h4>
-            <p className="text-sm text-slate-600">{vehicle.licensePlate}</p>
-            <p className="text-xs text-slate-500 mt-1">{vehicle.description}</p>
+      <div className="bg-white p-3 sm:p-4 rounded-lg border border-slate-200 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
+          <div className="flex-1 min-w-0">
+            <h4 className="font-semibold text-sm sm:text-base text-slate-900 line-clamp-1">{vehicle.brand} {vehicle.model}</h4>
+            <p className="text-xs sm:text-sm text-slate-600">{vehicle.licensePlate}</p>
+            <p className="text-xs text-slate-500 mt-1 line-clamp-2">{vehicle.description}</p>
           </div>
-          <div className="text-right">
-            <div className="font-semibold text-lg text-slate-900">{vehicle.price}</div>
+          <div className="text-left sm:text-right flex-shrink-0">
+            <div className="font-semibold text-base sm:text-lg text-slate-900">{vehicle.price}</div>
             <div className="text-xs text-slate-500">{vehicle.duration}</div>
           </div>
         </div>
         
-        <div className="flex items-center justify-between">
-          <div className="text-xs text-slate-500">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+          <div className="text-xs text-slate-500 truncate">
             {vehicle.technician || 'À planifier'}
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1 self-end sm:self-auto">
             <Button
               onClick={() => setShowPhotosViewer(true)}
               size="sm"
               variant="ghost"
-              className="p-2"
+              className="p-2 h-8 w-8"
               title="Voir les photos"
             >
-              <Image className="h-4 w-4" />
+              <Image className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
             <Button
               onClick={handleCameraClick}
               size="sm"
               variant="outline"
-              className="p-2"
+              className="p-2 h-8 w-8"
               title="Prendre une photo"
               disabled={isProcessing}
             >
-              <Camera className="h-4 w-4" />
+              <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
           </div>
         </div>

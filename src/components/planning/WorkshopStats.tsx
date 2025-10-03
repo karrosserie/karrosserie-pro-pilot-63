@@ -14,26 +14,26 @@ export const WorkshopStats = ({
   totalRevenue 
 }: WorkshopStatsProps) => {
   return (
-    <div className="bg-slate-50 p-6 rounded-lg mb-6">
-      <h1 className="text-xl font-bold mb-4">Étapes atelier</h1>
-      <p className="text-muted-foreground text-sm mb-4">Parcours complet avec synchronisation planning automatique</p>
+    <div className="bg-slate-50 p-4 sm:p-6 rounded-lg mb-4 sm:mb-6">
+      <h1 className="text-lg sm:text-xl font-bold mb-2 sm:mb-4">Étapes atelier</h1>
+      <p className="text-muted-foreground text-xs sm:text-sm mb-3 sm:mb-4">Parcours complet avec synchronisation planning automatique</p>
       
-      <div className="grid grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         <div className="text-center">
-          <div className="text-2xl font-bold text-blue-600">{totalVehicles}</div>
-          <div className="text-sm text-muted-foreground">VÉHICULES</div>
+          <div className="text-xl sm:text-2xl font-bold text-blue-600">{totalVehicles}</div>
+          <div className="text-xs sm:text-sm text-muted-foreground">VÉHICULES</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-gray-600">{completedVehicles}</div>
-          <div className="text-sm text-muted-foreground">TERMINÉS</div>
+          <div className="text-xl sm:text-2xl font-bold text-gray-600">{completedVehicles}</div>
+          <div className="text-xs sm:text-sm text-muted-foreground">TERMINÉS</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-blue-600">{waitingVehicles}</div>
-          <div className="text-sm text-muted-foreground">EN ATTENTE</div>
+          <div className="text-xl sm:text-2xl font-bold text-blue-600">{waitingVehicles}</div>
+          <div className="text-xs sm:text-sm text-muted-foreground">EN ATTENTE</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-orange-600">{totalRevenue.toLocaleString('fr-FR')}€</div>
-          <div className="text-sm text-muted-foreground">CA EN COURS</div>
+          <div className="text-xl sm:text-2xl font-bold text-orange-600">{totalRevenue.toLocaleString('fr-FR')}€</div>
+          <div className="text-xs sm:text-sm text-muted-foreground">CA EN COURS</div>
         </div>
       </div>
     </div>

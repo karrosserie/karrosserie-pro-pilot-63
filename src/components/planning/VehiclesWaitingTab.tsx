@@ -79,58 +79,58 @@ export const VehiclesWaitingTab = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 p-2 sm:p-0">
       {/* Header avec badge rouge */}
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
         <div className="flex items-center gap-2">
-          <AlertTriangle className="w-6 h-6 text-orange-500" />
-          <h2 className="text-xl font-bold">Véhicules en Attente</h2>
-          <Badge className="bg-red-500 text-white font-medium px-3 py-1">
-            {blockedCount} véhicule{blockedCount > 1 ? 's' : ''} bloqué{blockedCount > 1 ? 's' : ''}
-          </Badge>
+          <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500 flex-shrink-0" />
+          <h2 className="text-lg sm:text-xl font-bold">Véhicules en Attente</h2>
         </div>
+        <Badge className="bg-red-500 text-white font-medium px-2 sm:px-3 py-1 text-xs sm:text-sm self-start">
+          {blockedCount} véhicule{blockedCount > 1 ? 's' : ''} bloqué{blockedCount > 1 ? 's' : ''}
+        </Badge>
       </div>
 
       {/* Sous-titre */}
-      <div className="text-sm text-muted-foreground mb-6">
+      <div className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6">
         {blockedCount} véhicule{blockedCount > 1 ? 's' : ''} bloqué{blockedCount > 1 ? 's' : ''} dans les étapes atelier
       </div>
 
       {/* Liste des véhicules */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {waitingVehicles.map((vehicle, index) => (
-          <div key={`vehicle-${vehicle.id || index}-${vehicle.licensePlate || index}`} className="bg-white border border-slate-200 rounded-lg p-6">
+          <div key={`vehicle-${vehicle.id || index}-${vehicle.licensePlate || index}`} className="bg-white border border-slate-200 rounded-lg p-3 sm:p-6">
             {/* En-tête avec marque/modèle et plaque */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg font-semibold text-slate-900">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-3 sm:mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 min-w-0">
+                <h3 className="text-base sm:text-lg font-semibold text-slate-900 line-clamp-1">
                   {vehicle.brand} {vehicle.model}
                 </h3>
-                <span className="text-sm font-medium text-slate-600 bg-slate-100 px-2 py-1 rounded">
+                <span className="text-xs sm:text-sm font-medium text-slate-600 bg-slate-100 px-2 py-1 rounded self-start">
                   {vehicle.licensePlate}
                 </span>
                 {vehicle.urgent && (
-                  <Badge className="bg-red-500 text-white text-xs">Urgent</Badge>
+                  <Badge className="bg-red-500 text-white text-xs self-start">Urgent</Badge>
                 )}
               </div>
               <div className="flex gap-2">
                 <Button 
                   size="sm" 
                   variant="default" 
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className="bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm h-8 sm:h-9"
                   onClick={() => handlePlanVehicle(vehicle)}
                 >
-                  <Calendar className="w-4 h-4 mr-1" />
+                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                   Planifier
                 </Button>
               </div>
             </div>
 
             {/* Informations en colonnes */}
-            <div className="grid grid-cols-4 gap-6 mb-4 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-3 sm:mb-4 text-xs sm:text-sm">
               <div>
                 <span className="text-slate-500">Client :</span>
-                <div className="font-medium text-slate-900">{vehicle.client}</div>
+                <div className="font-medium text-slate-900 line-clamp-1">{vehicle.client}</div>
               </div>
               <div>
                 <span className="text-slate-500">Prix :</span>
@@ -138,7 +138,7 @@ export const VehiclesWaitingTab = ({
               </div>
               <div>
                 <span className="text-slate-500">Étape bloquée :</span>
-                <div className="font-medium text-blue-600">{vehicle.blockedStage}</div>
+                <div className="font-medium text-blue-600 line-clamp-1">{vehicle.blockedStage}</div>
               </div>
               <div>
                 <span className="text-slate-500">En attente depuis :</span>

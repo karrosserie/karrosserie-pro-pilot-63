@@ -68,34 +68,34 @@ export const PlanningEmploye: React.FC<PlanningEmployeProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 p-2 sm:p-0">
       {/* Header with employee info and pointage */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+        <CardHeader className="p-3 sm:p-6">
+          <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              Planning de {employe.nom}
+              <User className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+              <span className="text-base sm:text-lg">Planning de {employe.nom}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Badge variant={aPointe ? 'default' : 'destructive'}>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant={aPointe ? 'default' : 'destructive'} className="text-xs">
                 {aPointe ? 'Pointé' : 'Non pointé'}
               </Badge>
               {aPointe && (
-                <Badge variant={enPause ? 'destructive' : 'secondary'}>
+                <Badge variant={enPause ? 'destructive' : 'secondary'} className="text-xs">
                   {enPause ? 'En pause' : 'Actif'}
                 </Badge>
               )}
             </div>
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="flex gap-2">
+        <CardContent className="p-3 sm:p-6">
+          <div className="flex flex-col xs:flex-row gap-2">
             <Button
               variant={aPointe ? 'destructive' : 'default'}
               size="sm"
               onClick={handlePointage}
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2 w-full xs:w-auto"
             >
               <Clock className="h-4 w-4" />
               {aPointe ? 'Dépointer' : 'Pointer'}
@@ -106,7 +106,7 @@ export const PlanningEmploye: React.FC<PlanningEmployeProps> = ({
                 variant={enPause ? 'default' : 'outline'}
                 size="sm"
                 onClick={handlePause}
-                className="flex items-center gap-2"
+                className="flex items-center justify-center gap-2 w-full xs:w-auto"
               >
                 {enPause ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
                 {enPause ? 'Reprendre' : 'Pause'}
@@ -126,7 +126,7 @@ export const PlanningEmploye: React.FC<PlanningEmployeProps> = ({
       />
 
       {/* Tasks Sections */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         <TachesSection
           titre="Tâches à faire"
           icon={<AlertTriangle className="h-4 w-4" />}
