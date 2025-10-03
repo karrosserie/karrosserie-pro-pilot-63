@@ -415,7 +415,7 @@ const Quotes = () => {
                 quote={quote}
                 onViewQuote={handleViewQuote}
                 onEditQuote={handleEditQuote}
-                onDeleteQuote={showArchived ? handleDeleteQuote : handleArchiveQuote}
+                onArchiveQuote={showArchived ? handleDeleteQuote : handleArchiveQuote}
                 onDownload={handleDownload}
                 onPrint={handlePrint}
                 onSendEmail={handleSendEmail}

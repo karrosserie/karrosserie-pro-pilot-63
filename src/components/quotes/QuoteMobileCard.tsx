@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Eye, Pencil, Trash, Download, Printer, Mail, FileCheck, ArrowRight, Calendar, User, Car, Euro } from 'lucide-react';
+import { Eye, Pencil, Archive, Download, Printer, Mail, FileCheck, ArrowRight, Calendar, User, Car, Euro } from 'lucide-react';
 import { Quote } from '@/services/supabase/quotes';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { calculateGlobalTotals } from '@/components/quotes/form/utils/calculations';
@@ -9,7 +9,7 @@ interface QuoteMobileCardProps {
   quote: Quote;
   onViewQuote: (quote: Quote) => void;
   onEditQuote: (quote: Quote) => void;
-  onDeleteQuote: (id: string) => void;
+  onArchiveQuote: (id: string) => void;
   onDownload: (quote: Quote) => void;
   onPrint: (quote: Quote) => void;
   onSendEmail: (quote: Quote) => void;
@@ -21,7 +21,7 @@ const QuoteMobileCard: React.FC<QuoteMobileCardProps> = ({
   quote,
   onViewQuote,
   onEditQuote,
-  onDeleteQuote,
+  onArchiveQuote,
   onDownload,
   onPrint,
   onSendEmail,
@@ -169,9 +169,9 @@ const QuoteMobileCard: React.FC<QuoteMobileCardProps> = ({
         )}
         
         {/* Destructive Action */}
-        <Button variant="delete" size="sm" onClick={() => onDeleteQuote(quote.id)} className="text-xs h-8 justify-center col-span-2 xs:col-span-1">
-          <Trash className="h-3 w-3 mr-1" />
-          Supprimer
+        <Button variant="secondary" size="sm" onClick={() => onArchiveQuote(quote.id)} className="text-xs h-8 justify-center col-span-2 xs:col-span-1">
+          <Archive className="h-3 w-3 mr-1" />
+          Archiver
         </Button>
       </div>
     </div>

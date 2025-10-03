@@ -593,7 +593,7 @@ const RepairOrders = () => {
                 order={order}
                 onViewOrder={handleViewOrder}
                 onEditOrder={handleEditOrder}
-                onDeleteOrder={showArchived ? handleDeleteOrder : handleArchiveOrder}
+                onArchiveOrder={showArchived ? handleDeleteOrder : handleArchiveOrder}
                 contextMenuProps={{
                   onDownload: handleDownload,
                   onPrint: handlePrint,

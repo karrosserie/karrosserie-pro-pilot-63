@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Eye, Pencil, Trash, Download, Printer, Mail, Signature, FileCheck, ArrowRight, Calendar, User, Car, Euro, Send } from 'lucide-react';
+import { Eye, Pencil, Archive, Download, Printer, Mail, Signature, FileCheck, ArrowRight, Calendar, User, Car, Euro, Send } from 'lucide-react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { calculateOrderAmount, formatAmount } from './utils/orderCalculations';
@@ -10,7 +10,7 @@ interface RepairOrderMobileCardProps {
   order: RepairOrder;
   onViewOrder: (order: RepairOrder) => void;
   onEditOrder: (order: RepairOrder) => void;
-  onDeleteOrder: (order: RepairOrder) => void;
+  onArchiveOrder: (order: RepairOrder) => void;
   contextMenuProps?: {
     onDownload: (order: RepairOrder) => void;
     onPrint: (order: RepairOrder) => void;
@@ -26,7 +26,7 @@ const RepairOrderMobileCard: React.FC<RepairOrderMobileCardProps> = ({
   order,
   onViewOrder,
   onEditOrder,
-  onDeleteOrder,
+  onArchiveOrder,
   contextMenuProps
 }) => {
   const hasValidClientPhone = isValidFrenchMobilePhone(order.clients?.phone);
@@ -148,9 +148,9 @@ const RepairOrderMobileCard: React.FC<RepairOrderMobileCardProps> = ({
         )}
         
         {/* Destructive Action */}
-        <Button variant="delete" size="sm" onClick={() => onDeleteOrder(order)} className="w-28 truncate">
-          <Trash className="h-3 w-3 mr-1" />
-          Supprimer
+        <Button variant="secondary" size="sm" onClick={() => onArchiveOrder(order)} className="w-28 truncate">
+          <Archive className="h-3 w-3 mr-1" />
+          Archiver
         </Button>
       </div>
     </div>
