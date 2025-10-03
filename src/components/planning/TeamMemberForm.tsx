@@ -20,7 +20,8 @@ const roles = [
   'Carrossier',
   'Carrossier-Véhicule de courtoisie', 
   'Responsable',
-  'Responsable administratif'
+  'Responsable administratif',
+  'Propriétaire'
 ];
 
 interface UserProfile {
@@ -49,13 +50,8 @@ export const TeamMemberForm: React.FC<TeamMemberFormProps> = ({
     }
   }, [teamMember]);
 
-  // Reset qualifications when role changes to non-carrossier role
-  useEffect(() => {
-    const shouldShow = formData.role === 'Carrossier' || formData.role === 'Carrossier-Véhicule de courtoisie';
-    if (!shouldShow && formData.qualifications.length > 0) {
-      setFormData(prev => ({ ...prev, qualifications: [] }));
-    }
-  }, [formData.role]);
+  // Qualifications are now available for all roles
+  // No need to reset qualifications when role changes
 
   const fetchAvailableUsers = async () => {
     try {
@@ -87,8 +83,8 @@ export const TeamMemberForm: React.FC<TeamMemberFormProps> = ({
     }));
   };
 
-  // Check if qualifications should be shown based on role
-  const shouldShowQualifications = formData.role === 'Carrossier' || formData.role === 'Carrossier-Véhicule de courtoisie';
+  // Qualifications are now available for all roles
+  const shouldShowQualifications = formData.role !== '';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
