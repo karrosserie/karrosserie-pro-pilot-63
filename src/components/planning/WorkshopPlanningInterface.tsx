@@ -316,42 +316,44 @@ export const WorkshopPlanningInterface = ({
       {/* Navigation Tabs - Only show for manager view - Mobile responsive */}
       {currentView === 'manager' && <Tabs defaultValue="workshop" className="w-full">
         <div className="flex flex-col gap-4 sm:gap-6">
-          {/* Tabs avec scroll horizontal sur mobile */}
+          {/* Tabs avec scroll horizontal sur mobile - ScrollBar visible */}
           <div className="relative">
-            <TabsList className="w-full flex justify-start overflow-x-auto no-scrollbar h-12 sm:h-11 bg-muted/60 p-1.5 rounded-xl">
+            <TabsList className="w-full flex justify-start overflow-x-auto custom-scrollbar h-auto sm:h-11 bg-muted/60 p-1.5 rounded-xl pb-3 sm:pb-1.5">
               <TabsTrigger value="workshop" className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 lg:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm whitespace-nowrap flex-shrink-0">
-                <Wrench className="w-4 h-4" />
-                <span className="hidden xs:inline sm:hidden lg:inline">Étapes atelier</span>
-                <span className="xs:hidden sm:inline lg:hidden">Étapes</span>
+                <Wrench className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Étapes atelier</span>
+                <span className="sm:hidden">Étapes</span>
               </TabsTrigger>
               <TabsTrigger value="waiting" className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 lg:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm whitespace-nowrap flex-shrink-0">
-                <Clock className="w-4 h-4" />
-                <span className="hidden xs:inline sm:hidden lg:inline">En attente</span>
-                <span className="xs:hidden sm:inline lg:hidden">Attente</span>
+                <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">En attente</span>
+                <span className="sm:hidden">Attente</span>
               </TabsTrigger>
               <TabsTrigger value="planning" className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 lg:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm whitespace-nowrap flex-shrink-0">
-                <BarChart className="w-4 h-4" />
-                <span className="hidden xs:inline sm:hidden lg:inline">Planning</span>
-                <span className="xs:hidden sm:inline lg:hidden">Plan</span>
+                <BarChart className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Planning</span>
+                <span className="sm:hidden">Plan</span>
               </TabsTrigger>
               <TabsTrigger value="employee-planning" className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 lg:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm whitespace-nowrap flex-shrink-0">
-                <Users className="w-4 h-4" />
-                <span className="hidden xs:inline sm:hidden lg:inline">Employés</span>
-                <span className="xs:hidden sm:inline lg:hidden">Equipe</span>
+                <Users className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Employés</span>
+                <span className="sm:hidden">Équipe</span>
               </TabsTrigger>
               <TabsTrigger value="process" className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 lg:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm whitespace-nowrap flex-shrink-0">
-                <Cog className="w-4 h-4" />
-                <span className="hidden xs:inline sm:hidden lg:inline">Process</span>
-                <span className="xs:hidden sm:inline lg:hidden">Config</span>
+                <Cog className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Process</span>
+                <span className="sm:hidden">Config</span>
               </TabsTrigger>
               {isOwner && (
                 <TabsTrigger value="planning-patron" className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 lg:px-4 py-2.5 text-xs sm:text-sm rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm whitespace-nowrap flex-shrink-0">
-                  <Crown className="w-4 h-4" />
-                  <span className="hidden xs:inline sm:hidden lg:inline">Planning Patron</span>
-                  <span className="xs:hidden sm:inline lg:hidden">Patron</span>
+                  <Crown className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Planning Patron</span>
+                  <span className="sm:hidden">Patron</span>
                 </TabsTrigger>
               )}
             </TabsList>
+            {/* Indicateur de scroll sur mobile/tablette */}
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-muted/60 to-transparent pointer-events-none rounded-r-xl lg:hidden"></div>
           </div>
           
           {/* Button séparé sur mobile */}
