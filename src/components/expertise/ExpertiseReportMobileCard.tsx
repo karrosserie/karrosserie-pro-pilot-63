@@ -41,22 +41,22 @@ const ExpertiseReportMobileCard: React.FC<ExpertiseReportMobileCardProps> = ({
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
+    <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4 space-y-3 animate-fade-in">
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <div className="flex items-center space-x-2">
-          <div className="bg-blue-100 p-2 rounded-lg">
-            <FileText className="h-4 w-4 text-blue-600" />
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center space-x-2 min-w-0 flex-1">
+          <div className="bg-blue-100 p-1.5 sm:p-2 rounded-lg flex-shrink-0">
+            <FileText className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
           </div>
-          <div>
-            <h3 className="font-medium text-gray-900 text-sm">
+          <div className="min-w-0 flex-1">
+            <h3 className="font-medium text-gray-900 text-xs sm:text-sm truncate">
               {report.report_number || "Non défini"}
             </h3>
             <Badge variant="outline" className="text-xs mt-1">Expertise</Badge>
           </div>
         </div>
-        <div className="text-right">
-          <p className="text-sm font-medium text-gray-900">
+        <div className="text-right flex-shrink-0">
+          <p className="text-xs sm:text-sm font-medium text-gray-900 whitespace-nowrap">
             {formatAmount(report.amount)}
           </p>
         </div>
@@ -65,8 +65,8 @@ const ExpertiseReportMobileCard: React.FC<ExpertiseReportMobileCardProps> = ({
       {/* Details */}
       <div className="space-y-2 text-xs text-gray-600">
         <div className="flex items-center space-x-2">
-          <Calendar className="h-3 w-3" />
-          <span>
+          <Calendar className="h-3 w-3 flex-shrink-0" />
+          <span className="truncate">
             {report.report_date 
               ? new Date(report.report_date).toLocaleDateString('fr-FR')
               : "Non définie"
@@ -75,19 +75,19 @@ const ExpertiseReportMobileCard: React.FC<ExpertiseReportMobileCardProps> = ({
         </div>
 
         <div className="flex items-center space-x-2">
-          <User className="h-3 w-3" />
-          <span>{getClientDisplay()}</span>
+          <User className="h-3 w-3 flex-shrink-0" />
+          <span className="truncate">{getClientDisplay()}</span>
         </div>
 
         <div className="flex items-center space-x-2">
-          <Car className="h-3 w-3" />
+          <Car className="h-3 w-3 flex-shrink-0" />
           <span className="truncate">{getVehicleDisplay()}</span>
         </div>
 
         {report.expert_name && (
           <div className="flex items-center space-x-2">
-            <User className="h-3 w-3" />
-            <span>Expert: {report.expert_name}</span>
+            <User className="h-3 w-3 flex-shrink-0" />
+            <span className="truncate">Expert: {report.expert_name}</span>
           </div>
         )}
       </div>
@@ -98,19 +98,21 @@ const ExpertiseReportMobileCard: React.FC<ExpertiseReportMobileCardProps> = ({
           variant="ghost"
           size="sm"
           onClick={() => onEditReport(report)}
-          className="text-xs"
+          className="text-xs h-8 px-2 sm:px-3"
         >
           <Pencil className="h-3 w-3 mr-1" />
-          Modifier
+          <span className="hidden xs:inline">Modifier</span>
+          <span className="xs:hidden">Edit</span>
         </Button>
         <Button
           variant="ghost"
           size="sm"
-          className="text-red-500 hover:text-red-700 text-xs"
+          className="text-red-500 hover:text-red-700 text-xs h-8 px-2 sm:px-3"
           onClick={() => onDeleteReport(report.id)}
         >
           <Trash className="h-3 w-3 mr-1" />
-          Suppr.
+          <span className="hidden xs:inline">Supprimer</span>
+          <span className="xs:hidden">Suppr.</span>
         </Button>
       </div>
     </div>

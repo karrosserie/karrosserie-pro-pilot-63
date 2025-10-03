@@ -160,7 +160,7 @@ const ExpertiseReports = () => {
   };
   
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
       <ExpertiseReportHeader 
         title="Rapports d'expertise"
         description="Consultez et gérez les rapports d'expertise automobile."
@@ -195,17 +195,17 @@ const ExpertiseReports = () => {
 
       {/* Import Rapport Dialog */}
       <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-lg">Importer un rapport d'expertise</DialogTitle>
-            <DialogDescription className="text-sm">
+            <DialogTitle className="text-base sm:text-lg">Importer un rapport d'expertise</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">
               Importez un rapport d'expertise au format PDF.
             </DialogDescription>
           </DialogHeader>
           <ExpertiseReportUploader 
             onSuccess={() => setImportDialogOpen(false)}
             onCancel={() => setImportDialogOpen(false)}
-            className="mt-4"
+            className="mt-3 sm:mt-4"
           />
         </DialogContent>
       </Dialog>

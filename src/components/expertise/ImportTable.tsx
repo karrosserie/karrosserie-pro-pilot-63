@@ -94,51 +94,80 @@ const ImportTable: React.FC<ImportTableProps> = ({ imports, isLoading }) => {
 
   return (
     <div className="card-container">
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold">Rapports en cours d'analyse</h3>
-        <p className="text-sm text-muted-foreground mt-1">
+      <div className="mb-3 sm:mb-4">
+        <h3 className="text-base sm:text-lg font-semibold">Rapports en cours d'analyse</h3>
+        <p className="text-xs sm:text-sm text-muted-foreground mt-1">
           Les rapports d'expertise en cours d'analyse par notre IA s'affichent ici et nous vous notifierons par un signal sonore dès qu'il sera disponible
         </p>
       </div>
       
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Document</TableHead>
-            <TableHead>Statut</TableHead>
-            <TableHead>Date d'import</TableHead>
-            <TableHead>Temps restant estimé</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {imports.map((importItem) => (
-            <TableRow key={importItem.id}>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-muted-foreground" />
-                  <div className="font-medium truncate max-w-[200px]" title={importItem.document || 'Fichier inconnu'}>
-                    {importItem.document || 'Fichier inconnu'}
-                  </div>
+      {/* Version mobile: cartes */}
+      <div className="block md:hidden space-y-3">
+        {imports.map((importItem) => (
+          <div key={importItem.id} className="bg-white border border-gray-200 rounded-lg p-3 space-y-2">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <div className="font-medium text-sm truncate" title={importItem.document || 'Fichier inconnu'}>
+                  {importItem.document || 'Fichier inconnu'}
                 </div>
-              </TableCell>
-              <TableCell>
-                {getStatusBadge(importItem.status)}
-              </TableCell>
-              <TableCell>
-                {format(new Date(importItem.created_at), 'dd/MM/yyyy HH:mm', { locale: fr })}
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">
-                    {formatSecondsToTime(calculateRemainingTime(importItem.created_at))}
-                  </span>
-                </div>
-              </TableCell>
+              </div>
+              {getStatusBadge(importItem.status)}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {format(new Date(importItem.created_at), 'dd/MM/yyyy HH:mm', { locale: fr })}
+            </div>
+            <div className="flex items-center gap-2 pt-2 border-t">
+              <Clock className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm font-medium">
+                Temps restant: {formatSecondsToTime(calculateRemainingTime(importItem.created_at))}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      {/* Version tablette/desktop: tableau */}
+      <div className="hidden md:block overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="min-w-[200px]">Document</TableHead>
+              <TableHead className="min-w-[140px]">Statut</TableHead>
+              <TableHead className="min-w-[140px]">Date d'import</TableHead>
+              <TableHead className="min-w-[180px]">Temps restant estimé</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {imports.map((importItem) => (
+              <TableRow key={importItem.id}>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                    <div className="font-medium truncate max-w-[250px]" title={importItem.document || 'Fichier inconnu'}>
+                      {importItem.document || 'Fichier inconnu'}
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  {getStatusBadge(importItem.status)}
+                </TableCell>
+                <TableCell className="whitespace-nowrap">
+                  {format(new Date(importItem.created_at), 'dd/MM/yyyy HH:mm', { locale: fr })}
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">
+                      {formatSecondsToTime(calculateRemainingTime(importItem.created_at))}
+                    </span>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 };

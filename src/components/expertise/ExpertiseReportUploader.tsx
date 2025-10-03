@@ -193,12 +193,12 @@ export const ExpertiseReportUploader = ({
       */}
       
       {selectedFile ? (
-        <div className="flex flex-col items-center space-y-4">
-          <div className="flex items-center justify-center w-full p-4 border-2 border-gray-300 border-solid rounded-md">
-            <FileText className="w-8 h-8 mr-3 text-blue-600" />
-            <div className="flex-1">
-              <p className="font-medium">{selectedFile.name}</p>
-              <p className="text-sm text-gray-500">
+        <div className="flex flex-col items-center space-y-3 sm:space-y-4">
+          <div className="flex items-center justify-center w-full p-3 sm:p-4 border-2 border-gray-300 border-solid rounded-md">
+            <FileText className="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3 text-blue-600 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-sm sm:text-base truncate">{selectedFile.name}</p>
+              <p className="text-xs sm:text-sm text-gray-500">
                 {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
               </p>
             </div>
@@ -207,23 +207,25 @@ export const ExpertiseReportUploader = ({
               size="icon" 
               onClick={() => setSelectedFile(null)}
               disabled={isUploading}
+              className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10"
             >
               <X className="w-4 h-4" />
             </Button>
           </div>
           
-          <div className="flex space-x-2">
+          <div className="flex flex-col xs:flex-row gap-2 w-full xs:w-auto">
             <Button 
               variant="outline" 
               onClick={onCancel}
               disabled={isUploading}
+              className="w-full xs:w-auto"
             >
               Annuler
             </Button>
             <Button 
               onClick={uploadExpertiseReport}
               disabled={isUploading}
-              className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
+              className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white w-full xs:w-auto"
             >
               Importer
             </Button>
@@ -231,16 +233,16 @@ export const ExpertiseReportUploader = ({
         </div>
       ) : (
         <div 
-          className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
+          className="flex flex-col items-center justify-center p-4 sm:p-6 border-2 border-dashed border-gray-300 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
           onDragOver={handleDragOver}
           onDrop={handleDrop}
           onClick={() => document.getElementById('file-upload')?.click()}
         >
-          <Upload className="w-12 h-12 mb-3 text-gray-400" />
-          <p className="mb-2 text-sm font-medium text-gray-700">
+          <Upload className="w-10 h-10 sm:w-12 sm:h-12 mb-2 sm:mb-3 text-gray-400" />
+          <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-medium text-gray-700 text-center">
             Cliquez ou glissez-déposez un fichier
           </p>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 text-center">
             PDF, JPEG, PNG jusqu'à 10MB
           </p>
           <input 
