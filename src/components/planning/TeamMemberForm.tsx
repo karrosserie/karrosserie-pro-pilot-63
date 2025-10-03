@@ -171,7 +171,10 @@ export const TeamMemberForm: React.FC<TeamMemberFormProps> = ({
       {shouldShowQualifications && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <Label>Qualifications * (sélectionnez une ou plusieurs)</Label>
+            <Label>
+              Qualifications {(formData.role === 'Carrossier' || formData.role === 'Carrossier-Véhicule de courtoisie') ? '* ' : ''}
+              (sélectionnez une ou plusieurs)
+            </Label>
             {formData.qualifications.length > 0 && (
               <span className="text-sm text-muted-foreground">
                 {formData.qualifications.length} qualification(s) sélectionnée(s)
