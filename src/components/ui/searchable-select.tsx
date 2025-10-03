@@ -133,11 +133,26 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
     setOpen(newOpen);
   };
 
+  const handleInputFocus = () => {
+    if (!open) {
+      setOpen(true);
+    }
+  };
+
+  const handleChevronClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setOpen(!open);
+    if (!open) {
+      inputRef.current?.focus();
+    }
+  };
+
   return (
     <div className="relative">
-      <Popover open={open} onOpenChange={handleOpenChange}>
+      <Popover open={open} onOpenChange={handleOpenChange} modal={false}>
         <PopoverTrigger asChild>
-          <div className="relative">
+          <div className="relative w-full">
             <Input
               ref={inputRef}
               type="text"
@@ -151,11 +166,13 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
               placeholder={allowFreeText ? "Saisir ou sélectionner un client..." : placeholder}
               disabled={disabled}
               className={cn("pr-8", className)}
-              onFocus={() => setOpen(true)}
+              onFocus={handleInputFocus}
+              onClick={handleInputFocus}
             />
             <ChevronDown 
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 opacity-50 cursor-pointer"
-              onClick={() => setOpen(!open)}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 opacity-50 cursor-pointer pointer-events-auto"
+              onClick={handleChevronClick}
+              onMouseDown={(e) => e.preventDefault()}
             />
           </div>
         </PopoverTrigger>
