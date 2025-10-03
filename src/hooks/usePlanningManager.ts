@@ -95,12 +95,20 @@ export const usePlanningManager = () => {
     const tempsRequis = parseFloat(vehicule.temps.replace('h', ''));
     const qualification = vehicule.qualificationRequise || vehicule.etape;
     
-    // Trouver les employés qualifiés et ayant le bon rôle
+    // Trouver les employés qualifiés - tous rôles inclus avec priorisation automatique
     const employesQualifies = employes.filter(emp => 
       emp.actif && 
-      emp.qualifications.includes(qualification) &&
-      (emp.role === 'carrossier' || emp.role === 'carrossier-vehicule de courtoisie')
-    );
+      emp.qualifications.includes(qualification)
+    ).sort((a, b) => {
+      // Priorisation par rôle : Carrossier > Responsable > Propriétaire
+      const priorite = {
+        'Carrossier': 100,
+        'Carrossier-Véhicule de courtoisie': 90,
+        'Responsable': 50,
+        'Propriétaire': 30
+      };
+      return (priorite[b.role] || 0) - (priorite[a.role] || 0);
+    });
 
     if (employesQualifies.length === 0) {
       console.warn(`Aucun employé qualifié pour ${qualification}`);
