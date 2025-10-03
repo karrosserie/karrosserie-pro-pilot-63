@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      articles: {
+        Row: {
+          article: string | null
+          created_at: string
+          haastag: string | null
+          id: number
+        }
+        Insert: {
+          article?: string | null
+          created_at?: string
+          haastag?: string | null
+          id?: number
+        }
+        Update: {
+          article?: string | null
+          created_at?: string
+          haastag?: string | null
+          id?: number
+        }
+        Relationships: []
+      }
       bad_user_after_call: {
         Row: {
           company_id: string | null
@@ -303,6 +324,120 @@ export type Database = {
         }
         Relationships: []
       }
+      campaign_interactions: {
+        Row: {
+          campaign_log_id: string
+          created_at: string
+          id: string
+          interaction_data: Json | null
+          interaction_type: string
+        }
+        Insert: {
+          campaign_log_id: string
+          created_at?: string
+          id?: string
+          interaction_data?: Json | null
+          interaction_type: string
+        }
+        Update: {
+          campaign_log_id?: string
+          created_at?: string
+          id?: string
+          interaction_data?: Json | null
+          interaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_interactions_campaign_log_id_fkey"
+            columns: ["campaign_log_id"]
+            isOneToOne: false
+            referencedRelation: "campaign_logs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaign_logs: {
+        Row: {
+          anomaly_type: string | null
+          campaign_type: string
+          channels: string[] | null
+          clicked_at: string | null
+          company_id: string
+          company_metrics: Json | null
+          content: Json | null
+          created_at: string
+          delivered_at: string | null
+          external_campaign_id: string | null
+          id: string
+          opened_at: string | null
+          sent_at: string | null
+          severity: string | null
+          status: string | null
+          tracking_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          anomaly_type?: string | null
+          campaign_type?: string
+          channels?: string[] | null
+          clicked_at?: string | null
+          company_id: string
+          company_metrics?: Json | null
+          content?: Json | null
+          created_at?: string
+          delivered_at?: string | null
+          external_campaign_id?: string | null
+          id?: string
+          opened_at?: string | null
+          sent_at?: string | null
+          severity?: string | null
+          status?: string | null
+          tracking_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          anomaly_type?: string | null
+          campaign_type?: string
+          channels?: string[] | null
+          clicked_at?: string | null
+          company_id?: string
+          company_metrics?: Json | null
+          content?: Json | null
+          created_at?: string
+          delivered_at?: string | null
+          external_campaign_id?: string | null
+          id?: string
+          opened_at?: string | null
+          sent_at?: string | null
+          severity?: string | null
+          status?: string | null
+          tracking_url?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_logs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "campaign_logs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "campaign_logs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       car_brands: {
         Row: {
           created_at: string
@@ -514,6 +649,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "clients"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_client_relances_company_id"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "fk_client_relances_company_id"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
           },
           {
             foreignKeyName: "fk_client_relances_company_id"
@@ -1065,6 +1214,20 @@ export type Database = {
           waiting_reason?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "employee_schedule_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "employee_schedule_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
           {
             foreignKeyName: "employee_schedule_company_id_fkey"
             columns: ["company_id"]
@@ -1765,6 +1928,20 @@ export type Database = {
             foreignKeyName: "gocardless_customers_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: true
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "gocardless_customers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "gocardless_customers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
@@ -1817,6 +1994,20 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "gocardless_mandates_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "gocardless_mandates_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
           {
             foreignKeyName: "gocardless_mandates_company_id_fkey"
             columns: ["company_id"]
@@ -1892,6 +2083,20 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "gocardless_payments_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "gocardless_payments_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
           {
             foreignKeyName: "gocardless_payments_company_id_fkey"
             columns: ["company_id"]
@@ -2101,6 +2306,91 @@ export type Database = {
           },
         ]
       }
+      "job scrap": {
+        Row: {
+          created_at: string
+          execution_count: number
+          heshtags: string | null
+          id: number
+          limite: string | null
+          pays: string | null
+          reseau: string | null
+        }
+        Insert: {
+          created_at?: string
+          execution_count?: number
+          heshtags?: string | null
+          id?: number
+          limite?: string | null
+          pays?: string | null
+          reseau?: string | null
+        }
+        Update: {
+          created_at?: string
+          execution_count?: number
+          heshtags?: string | null
+          id?: number
+          limite?: string | null
+          pays?: string | null
+          reseau?: string | null
+        }
+        Relationships: []
+      }
+      job_message: {
+        Row: {
+          article_id: number | null
+          asset_id: string | null
+          created_at: string
+          execution_count: number
+          id: string
+          job_scrap_id: number
+          reseau: string
+          updated_at: string
+        }
+        Insert: {
+          article_id?: number | null
+          asset_id?: string | null
+          created_at?: string
+          execution_count?: number
+          id?: string
+          job_scrap_id: number
+          reseau: string
+          updated_at?: string
+        }
+        Update: {
+          article_id?: number | null
+          asset_id?: string | null
+          created_at?: string
+          execution_count?: number
+          id?: string
+          job_scrap_id?: number
+          reseau?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_message_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_message_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "campaign_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_message_job_scrap_id_fkey"
+            columns: ["job_scrap_id"]
+            isOneToOne: false
+            referencedRelation: "job scrap"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       judicial_cases: {
         Row: {
           chronologie: string | null
@@ -2175,6 +2465,131 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      message_erp: {
+        Row: {
+          agent_type: Database["public"]["Enums"]["agent_type"]
+          canal: Database["public"]["Enums"]["communication_channel_type"]
+          corps_message: string
+          created_at: string
+          id: string
+          is_read: boolean
+          metadata: Json | null
+          processed: boolean
+          read_at: string | null
+          resolved: boolean | null
+          sender_id: string | null
+          ticket_erp_id: string
+        }
+        Insert: {
+          agent_type: Database["public"]["Enums"]["agent_type"]
+          canal: Database["public"]["Enums"]["communication_channel_type"]
+          corps_message: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          metadata?: Json | null
+          processed?: boolean
+          read_at?: string | null
+          resolved?: boolean | null
+          sender_id?: string | null
+          ticket_erp_id: string
+        }
+        Update: {
+          agent_type?: Database["public"]["Enums"]["agent_type"]
+          canal?: Database["public"]["Enums"]["communication_channel_type"]
+          corps_message?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          metadata?: Json | null
+          processed?: boolean
+          read_at?: string | null
+          resolved?: boolean | null
+          sender_id?: string | null
+          ticket_erp_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_erp_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "message_erp_ticket_erp_id_fkey"
+            columns: ["ticket_erp_id"]
+            isOneToOne: false
+            referencedRelation: "ticket_erp"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      message_mobile_client: {
+        Row: {
+          client_id: string | null
+          company_id: string | null
+          created_at: string
+          employé_id: string | null
+          horaire: Json | null
+          "horaire selectionné": string | null
+          id: number
+          message: string | null
+          vehicule_id: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          company_id?: string | null
+          created_at?: string
+          employé_id?: string | null
+          horaire?: Json | null
+          "horaire selectionné"?: string | null
+          id?: number
+          message?: string | null
+          vehicule_id?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          company_id?: string | null
+          created_at?: string
+          employé_id?: string | null
+          horaire?: Json | null
+          "horaire selectionné"?: string | null
+          id?: number
+          message?: string | null
+          vehicule_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_message_mobile_client_client"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_message_mobile_client_company"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "fk_message_mobile_client_company"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "fk_message_mobile_client_company"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       messageries: {
         Row: {
@@ -2257,6 +2672,27 @@ export type Database = {
         }
         Relationships: []
       }
+      open_mail: {
+        Row: {
+          created_at: string
+          id: number
+          is_open: boolean | null
+          mail_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          is_open?: boolean | null
+          mail_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          is_open?: boolean | null
+          mail_id?: string | null
+        }
+        Relationships: []
+      }
       page_visit_durations: {
         Row: {
           company_id: string | null
@@ -2298,6 +2734,20 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "page_visit_durations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "page_visit_durations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
           {
             foreignKeyName: "page_visit_durations_company_id_fkey"
             columns: ["company_id"]
@@ -2884,6 +3334,53 @@ export type Database = {
         }
         Relationships: []
       }
+      scrapped_profiles: {
+        Row: {
+          completed_registration: boolean
+          created_at: string
+          execution_number: number
+          id: string
+          job_scrap_id: number
+          name: string
+          profile_url: string | null
+          social_network: string | null
+          updated_at: string
+          visited_demo_site: boolean
+        }
+        Insert: {
+          completed_registration?: boolean
+          created_at?: string
+          execution_number?: number
+          id?: string
+          job_scrap_id: number
+          name: string
+          profile_url?: string | null
+          social_network?: string | null
+          updated_at?: string
+          visited_demo_site?: boolean
+        }
+        Update: {
+          completed_registration?: boolean
+          created_at?: string
+          execution_number?: number
+          id?: string
+          job_scrap_id?: number
+          name?: string
+          profile_url?: string | null
+          social_network?: string | null
+          updated_at?: string
+          visited_demo_site?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scrapped_profiles_job_scrap_id_fkey"
+            columns: ["job_scrap_id"]
+            isOneToOne: false
+            referencedRelation: "job scrap"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscription_plans: {
         Row: {
           billing_period: string
@@ -3090,6 +3587,67 @@ export type Database = {
         }
         Relationships: []
       }
+      ticket_erp: {
+        Row: {
+          company_id: string
+          created_at: string
+          description: string
+          id: string
+          module_type: string
+          priority: Database["public"]["Enums"]["ticket_priority_type"]
+          resolved_at: string | null
+          status: Database["public"]["Enums"]["ticket_status_type"]
+          trigger_cause: Database["public"]["Enums"]["trigger_cause_type"]
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          description: string
+          id?: string
+          module_type: string
+          priority?: Database["public"]["Enums"]["ticket_priority_type"]
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["ticket_status_type"]
+          trigger_cause: Database["public"]["Enums"]["trigger_cause_type"]
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+          module_type?: string
+          priority?: Database["public"]["Enums"]["ticket_priority_type"]
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["ticket_status_type"]
+          trigger_cause?: Database["public"]["Enums"]["trigger_cause_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_erp_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "ticket_erp_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "ticket_erp_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       token_packages: {
         Row: {
           created_at: string
@@ -3236,6 +3794,20 @@ export type Database = {
             foreignKeyName: "user_activity_logs_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "user_activity_logs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "user_activity_logs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
@@ -3273,6 +3845,20 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "user_companies_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "user_companies_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
           {
             foreignKeyName: "user_companies_company_id_fkey"
             columns: ["company_id"]
@@ -3339,6 +3925,20 @@ export type Database = {
             foreignKeyName: "user_errors_abandons_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "user_errors_abandons_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "user_errors_abandons_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
@@ -3398,6 +3998,20 @@ export type Database = {
             foreignKeyName: "user_funnel_progress_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "user_funnel_progress_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "user_funnel_progress_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
@@ -3450,6 +4064,20 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "user_sessions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "user_sessions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
           {
             foreignKeyName: "user_sessions_company_id_fkey"
             columns: ["company_id"]
@@ -3801,6 +4429,20 @@ export type Database = {
             foreignKeyName: "webhook_configurations_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "webhook_configurations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "webhook_configurations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
@@ -4021,7 +4663,42 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      company_business_metrics_30d: {
+        Row: {
+          acceptance_rate: number | null
+          accepted_count: number | null
+          avg_amount: number | null
+          company_id: string | null
+          completion_rate: number | null
+          count: number | null
+          entity_type: string | null
+          payment_rate: number | null
+          total_amount: number | null
+        }
+        Relationships: []
+      }
+      company_business_summary: {
+        Row: {
+          business_usage_score: number | null
+          company_id: string | null
+          company_name: string | null
+          created_at: string | null
+          days_since_creation: number | null
+          email: string | null
+          is_new_company: boolean | null
+          low_cessions_usage: boolean | null
+          low_clients_usage: boolean | null
+          low_fleet_usage: boolean | null
+          low_invoices_usage: boolean | null
+          low_quotes_usage: boolean | null
+          low_repair_orders_usage: boolean | null
+          metrics_by_type: Json | null
+          phone: string | null
+          total_operations: number | null
+          total_revenue: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       binary_quantize: {
@@ -4036,6 +4713,18 @@ export type Database = {
         Args: { repair_order_id: string }
         Returns: number
       }
+      create_campaign_log: {
+        Args: {
+          p_anomaly_type?: string
+          p_campaign_type?: string
+          p_channels?: string[]
+          p_company_id: string
+          p_company_metrics?: Json
+          p_content?: Json
+          p_severity?: string
+        }
+        Returns: string
+      }
       current_setting: {
         Args: { setting_name: string }
         Returns: string
@@ -4047,6 +4736,19 @@ export type Database = {
           qualifications: Json
           role_priority: number
           user_id: string
+        }[]
+      }
+      get_campaign_stats: {
+        Args: { p_company_id?: string; p_days?: number }
+        Returns: {
+          campaigns_clicked: number
+          campaigns_converted: number
+          campaigns_opened: number
+          campaigns_sent: number
+          click_rate: number
+          conversion_rate: number
+          open_rate: number
+          total_campaigns: number
         }[]
       }
       get_companies_with_users: {
@@ -4086,6 +4788,17 @@ export type Database = {
           avg_session_duration_minutes: number
           company_id: string
           total_sessions: number
+        }[]
+      }
+      get_company_usage_score: {
+        Args: { p_company_id: string; p_days?: number }
+        Returns: {
+          activity_metrics: Json
+          business_metrics: Json
+          company_id: string
+          global_score: number
+          module_scores: Json
+          recommendations: string[]
         }[]
       }
       get_current_user_role: {
@@ -4216,6 +4929,18 @@ export type Database = {
           similarity: number
         }[]
       }
+      record_campaign_interaction: {
+        Args: {
+          p_campaign_id: string
+          p_interaction_data?: Json
+          p_interaction_type: string
+        }
+        Returns: string
+      }
+      refresh_company_business_metrics: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       set_config: {
         Args: {
           is_local?: boolean
@@ -4243,6 +4968,15 @@ export type Database = {
       text_to_bytea: {
         Args: { data: string }
         Returns: string
+      }
+      update_campaign_status: {
+        Args: {
+          p_campaign_id: string
+          p_external_campaign_id?: string
+          p_status: string
+          p_tracking_url?: string
+        }
+        Returns: boolean
       }
       urlencode: {
         Args: { data: Json } | { string: string } | { string: string }
@@ -4282,6 +5016,13 @@ export type Database = {
       }
     }
     Enums: {
+      agent_type: "sav" | "marketing" | "system" | "client"
+      communication_channel_type:
+        | "email"
+        | "sms"
+        | "whatsapp"
+        | "phone"
+        | "internal"
       relance_channel:
         | "phone"
         | "email"
@@ -4309,6 +5050,12 @@ export type Database = {
         | "Absence"
         | "Contrôle technique de sécurité"
       task_status: "En attente" | "En cours" | "Terminé" | "En pause"
+      ticket_priority_type: "basse" | "normale" | "haute" | "critique"
+      ticket_status_type: "ouvert" | "en_cours" | "resolu" | "ferme"
+      trigger_cause_type:
+        | "mauvaise_utilisation"
+        | "sous_utilisation"
+        | "opportunite"
     }
     CompositeTypes: {
       http_header: {
@@ -4452,6 +5199,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      agent_type: ["sav", "marketing", "system", "client"],
+      communication_channel_type: [
+        "email",
+        "sms",
+        "whatsapp",
+        "phone",
+        "internal",
+      ],
       relance_channel: [
         "phone",
         "email",
@@ -4482,6 +5237,13 @@ export const Constants = {
         "Contrôle technique de sécurité",
       ],
       task_status: ["En attente", "En cours", "Terminé", "En pause"],
+      ticket_priority_type: ["basse", "normale", "haute", "critique"],
+      ticket_status_type: ["ouvert", "en_cours", "resolu", "ferme"],
+      trigger_cause_type: [
+        "mauvaise_utilisation",
+        "sous_utilisation",
+        "opportunite",
+      ],
     },
   },
 } as const
