@@ -43,6 +43,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Find the selected option
   const selectedOption = options.find(option => option.value === value);
@@ -72,6 +73,10 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   };
 
   const handleSelectOption = (optionValue: string) => {
+    if (blurTimeoutRef.current) {
+      clearTimeout(blurTimeoutRef.current);
+    }
+    
     const selectedOpt = options.find(opt => opt.value === optionValue);
     if (selectedOpt) {
       setInputValue(selectedOpt.label);
@@ -81,13 +86,20 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   };
 
   const handleInputBlur = () => {
-    if (!allowFreeText) {
-      const exact = options.find(opt => opt.label.toLowerCase() === inputValue.toLowerCase());
-      if (exact) onValueChange(exact.value);
-    }
+    // Délai pour permettre au clic sur une option de se terminer avant de fermer
+    blurTimeoutRef.current = setTimeout(() => {
+      if (!allowFreeText) {
+        const exact = options.find(opt => opt.label.toLowerCase() === inputValue.toLowerCase());
+        if (exact) onValueChange(exact.value);
+      }
+    }, 200);
   };
 
   const handleNewClientClick = () => {
+    if (blurTimeoutRef.current) {
+      clearTimeout(blurTimeoutRef.current);
+    }
+    
     if (onNewClientClick) {
       onNewClientClick();
       setOpen(false);
@@ -95,15 +107,35 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   };
 
   const handleNewVehicleClick = () => {
+    if (blurTimeoutRef.current) {
+      clearTimeout(blurTimeoutRef.current);
+    }
+    
     if (onNewVehicleClick) {
       onNewVehicleClick();
       setOpen(false);
     }
   };
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (blurTimeoutRef.current) {
+        clearTimeout(blurTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen && blurTimeoutRef.current) {
+      clearTimeout(blurTimeoutRef.current);
+    }
+    setOpen(newOpen);
+  };
+
   return (
     <div className="relative">
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <div className="relative">
             <Input
