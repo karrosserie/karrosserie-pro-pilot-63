@@ -835,8 +835,8 @@ const TeamTab = () => {
                 />
                )}
                
-               {/* Qualifications - shown for all roles except Propriétaire */}
-               {editingMember?.role !== 'Propriétaire' && editForm.watch('role') && (
+               {/* Qualifications - shown for all roles */}
+               {editForm.watch('role') && (
                  <FormField
                    control={editForm.control}
                    name="qualifications"
