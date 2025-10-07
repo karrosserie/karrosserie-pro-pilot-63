@@ -77,6 +77,28 @@ const Cessions = () => {
                   id: cession.id,
                   data: { status: 'signee' }
                 });
+                
+                // Déclencher automatiquement l'envoi du courrier électronique
+                console.log('Déclenchement automatique de l\'envoi du courrier électronique');
+                
+                const { error: sendError } = await supabase.functions.invoke('send-cession-registered-mail', {
+                  body: { cessionId: cession.id }
+                });
+                
+                if (sendError) {
+                  console.error('Erreur lors de l\'envoi automatique du courrier:', sendError);
+                  toast({
+                    title: "Erreur",
+                    description: "La cession a été signée mais l'envoi du courrier a échoué. Vous pouvez le renvoyer manuellement.",
+                    variant: "destructive"
+                  });
+                } else {
+                  console.log('Courrier électronique envoyé automatiquement avec succès');
+                  toast({
+                    title: "Succès",
+                    description: "La cession a été signée et le courrier a été envoyé automatiquement à l'assurance.",
+                  });
+                }
               }
             } else {
               console.log('Format de données inattendu:', data);
