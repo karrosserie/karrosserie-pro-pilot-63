@@ -2651,6 +2651,61 @@ export type Database = {
         }
         Relationships: []
       }
+      migration_errors: {
+        Row: {
+          company_id: string
+          created_at: string
+          error_details: Json | null
+          error_message: string
+          error_type: Database["public"]["Enums"]["migration_error_type"]
+          id: string
+          resolved: boolean | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          error_details?: Json | null
+          error_message: string
+          error_type: Database["public"]["Enums"]["migration_error_type"]
+          id?: string
+          resolved?: boolean | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          error_details?: Json | null
+          error_message?: string
+          error_type?: Database["public"]["Enums"]["migration_error_type"]
+          id?: string
+          resolved?: boolean | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "migration_errors_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "migration_errors_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "migration_errors_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       n8n_chat_histories: {
         Row: {
           created_at: string
@@ -5023,6 +5078,13 @@ export type Database = {
         | "whatsapp"
         | "phone"
         | "internal"
+      migration_error_type:
+        | "invalid_phone_number"
+        | "invalid_email"
+        | "invalid_siren"
+        | "geocoding_failed"
+        | "insee_api_error"
+        | "other"
       relance_channel:
         | "phone"
         | "email"
@@ -5206,6 +5268,14 @@ export const Constants = {
         "whatsapp",
         "phone",
         "internal",
+      ],
+      migration_error_type: [
+        "invalid_phone_number",
+        "invalid_email",
+        "invalid_siren",
+        "geocoding_failed",
+        "insee_api_error",
+        "other",
       ],
       relance_channel: [
         "phone",
