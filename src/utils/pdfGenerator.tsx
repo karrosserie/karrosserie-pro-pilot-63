@@ -210,7 +210,7 @@ export const generateDenunciationPDF = async (
     
     // 8. Générer le PDF final
     const finalPdfBytes = await combinedPdf.save();
-    const finalBlob = new Blob([finalPdfBytes], { type: 'application/pdf' });
+    const finalBlob = new Blob([new Uint8Array(finalPdfBytes)], { type: 'application/pdf' });
     
     // Créer un nom de fichier unique
     const filename = `Dossier_Denonciation_Complet_${violationData.violation.reference_number}_${new Date().toISOString().split('T')[0]}.pdf`;

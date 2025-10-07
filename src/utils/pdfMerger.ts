@@ -41,7 +41,7 @@ export const mergePDFs = async (pdfSources: Array<{ blob?: Blob; url?: string; t
   }
   
   const finalPdfBytes = await mergedPdf.save();
-  return new Blob([finalPdfBytes], { type: 'application/pdf' });
+  return new Blob([new Uint8Array(finalPdfBytes)], { type: 'application/pdf' });
 };
 
 /**

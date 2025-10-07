@@ -132,7 +132,7 @@ export const generateAndUploadCessionPDF = async (
         
         // Sauvegarder le PDF fusionné
         const mergedPdfBytes = await cessionPdfDoc.save();
-        finalPdfBlob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+        finalPdfBlob = new Blob([new Uint8Array(mergedPdfBytes)], { type: 'application/pdf' });
         
         console.log('PDF fusionné avec succès, taille finale:', finalPdfBlob.size, 'bytes');
       } catch (error) {
