@@ -1,5 +1,8 @@
 project_id = "jukdsypvuehnniskgpfd"
 
+[functions.register-demo-company]
+verify_jwt = false
+
 [functions.geocode-company-address]
 verify_jwt = false
 
