@@ -2748,6 +2748,39 @@ export type Database = {
         }
         Relationships: []
       }
+      otp_codes: {
+        Row: {
+          attempts: number
+          code: string
+          created_at: string
+          expires_at: string
+          id: string
+          telephone: string
+          used: boolean
+          used_at: string | null
+        }
+        Insert: {
+          attempts?: number
+          code: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          telephone: string
+          used?: boolean
+          used_at?: string | null
+        }
+        Update: {
+          attempts?: number
+          code?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          telephone?: string
+          used?: boolean
+          used_at?: string | null
+        }
+        Relationships: []
+      }
       page_visit_durations: {
         Row: {
           company_id: string | null
@@ -4767,6 +4800,10 @@ export type Database = {
       calculate_repair_order_surface: {
         Args: { repair_order_id: string }
         Returns: number
+      }
+      cleanup_expired_otp_codes: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       create_campaign_log: {
         Args: {
