@@ -149,7 +149,9 @@ serve(async (req) => {
       }
     );
 
-    // 3. Valider le numéro de téléphone avec Numverify
+    // 3. Valider le numéro de téléphone avec Numverify (non bloquant)
+    let phoneValidationError: { message: string; details: any } | null = null;
+    
     if (phoneNumber) {
       console.log('📞 Validation du numéro de téléphone avec Numverify:', phoneNumber);
       
@@ -171,34 +173,27 @@ serve(async (req) => {
             console.log('📞 Réponse Numverify:', phoneData);
 
             if (!phoneData.valid) {
-              console.error('❌ Numéro de téléphone invalide selon Numverify:', phoneData);
+              console.warn('⚠️ Numéro de téléphone invalide selon Numverify (non bloquant):', phoneData);
               
-              // Créer une entrée dans migration_errors (nous devons d'abord créer une company temporaire ou la créer après)
-              // Pour l'instant, on retourne juste l'erreur
-              return new Response(
-                JSON.stringify({ 
-                  success: false, 
-                  error: 'Le numéro de téléphone fourni est invalide',
-                  code: 'INVALID_PHONE_NUMBER',
-                  details: {
-                    number: phoneNumber,
-                    country: phoneData.country_name || 'inconnu',
-                    carrier: phoneData.carrier || 'inconnu'
-                  }
-                }),
-                { 
-                  status: 400, 
-                  headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+              // Stocker l'erreur pour la logger après la création de la company
+              phoneValidationError = {
+                message: `Numéro de téléphone invalide: ${phoneNumber}`,
+                details: {
+                  number: phoneNumber,
+                  country: phoneData.country_name || 'inconnu',
+                  carrier: phoneData.carrier || 'inconnu',
+                  line_type: phoneData.line_type || 'inconnu',
+                  valid: phoneData.valid
                 }
-              );
+              };
+            } else {
+              console.log('✅ Numéro de téléphone valide:', {
+                country: phoneData.country_name,
+                format: phoneData.international_format,
+                carrier: phoneData.carrier,
+                lineType: phoneData.line_type
+              });
             }
-            
-            console.log('✅ Numéro de téléphone valide:', {
-              country: phoneData.country_name,
-              format: phoneData.international_format,
-              carrier: phoneData.carrier,
-              lineType: phoneData.line_type
-            });
           } else {
             console.warn('⚠️ Erreur API Numverify (non bloquant):', numverifyResponse.status);
           }
@@ -296,7 +291,32 @@ serve(async (req) => {
 
     console.log('✅ Entreprise créée par trigger:', companyData.company_id);
 
-    // 9. Générer un lien de connexion automatique
+    // 9. Logger l'erreur de validation du téléphone si nécessaire
+    if (phoneValidationError) {
+      console.log('📝 Logging erreur de validation du téléphone dans migration_errors...');
+      
+      try {
+        const { error: migrationErrorInsert } = await supabaseAdmin
+          .from('migration_errors')
+          .insert({
+            company_id: companyData.company_id,
+            error_type: 'invalid_phone_number',
+            error_message: phoneValidationError.message,
+            error_details: phoneValidationError.details,
+            resolved: false
+          });
+
+        if (migrationErrorInsert) {
+          console.error('⚠️ Erreur lors de l\'insertion dans migration_errors:', migrationErrorInsert);
+        } else {
+          console.log('✅ Erreur de validation du téléphone loggée dans migration_errors');
+        }
+      } catch (migrationLogError) {
+        console.error('⚠️ Erreur lors du logging dans migration_errors (non bloquant):', migrationLogError);
+      }
+    }
+
+    // 10. Générer un lien de connexion automatique
     console.log('🔗 Génération du lien de connexion...');
     
     const { data: sessionData, error: sessionError } = 
@@ -312,7 +332,7 @@ serve(async (req) => {
     const loginLink = sessionData?.properties?.action_link || null;
     console.log('✅ Lien de connexion généré');
 
-    // 10. Logger l'inscription réussie
+    // 11. Logger l'inscription réussie
     console.log('🎉 Inscription démo réussie:', {
       userId: userData.user.id,
       email: userData.user.email,
