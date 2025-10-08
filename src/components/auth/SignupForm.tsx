@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import {
   Form,
 } from "@/components/ui/form";
@@ -19,6 +20,7 @@ interface SignupFormProps {
 const SignupForm = ({ onToggleMode }: SignupFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState<'personal' | 'company' | 'confirm'>('personal');
+  const { toast } = useToast();
   
   const { signUp } = useAuth();
 
@@ -48,6 +50,33 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
     const isPersonalInfoValid = await form.trigger(personalFields as any);
     
     if (isPersonalInfoValid) {
+      // Valider le numéro de téléphone avec Numverify
+      const phoneNumber = form.getValues('phoneNumber');
+      
+      try {
+        const { data, error } = await supabase.functions.invoke('validate-phone-number', {
+          body: { phoneNumber }
+        });
+
+        if (error) {
+          console.error('Erreur lors de la validation du numéro:', error);
+        } else if (data && !data.valid) {
+          // Afficher un toast d'avertissement si le numéro n'est pas attribué
+          const reason = !data.details?.hasCarrier 
+            ? "Ce numéro n'est pas attribué à un opérateur" 
+            : "Ce numéro de téléphone n'est pas valide";
+          
+          toast({
+            title: "Numéro de téléphone non attribué",
+            description: reason,
+            variant: "destructive"
+          });
+        }
+      } catch (error) {
+        console.error('Erreur lors de la validation du numéro:', error);
+        // Ne pas bloquer l'inscription en cas d'erreur de validation
+      }
+      
       setCurrentStep('company');
     }
   };
