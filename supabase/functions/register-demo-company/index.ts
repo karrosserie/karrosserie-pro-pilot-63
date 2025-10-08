@@ -137,7 +137,7 @@ serve(async (req) => {
 
     console.log('✅ SIREN validé:', inseeData.data.companyName);
 
-    // 2. Créer le client Supabase Admin
+    // 2. Créer le client Supabase Admin (nécessaire pour migration_errors si validation échoue)
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
@@ -149,7 +149,66 @@ serve(async (req) => {
       }
     );
 
-    // 3. Vérifier si l'email existe déjà
+    // 3. Valider le numéro de téléphone avec Numverify
+    if (phoneNumber) {
+      console.log('📞 Validation du numéro de téléphone avec Numverify:', phoneNumber);
+      
+      try {
+        const numverifyApiKey = Deno.env.get('NUMVERIFY_API_KEY');
+        
+        if (!numverifyApiKey) {
+          console.warn('⚠️ NUMVERIFY_API_KEY non configurée, validation du téléphone ignorée');
+        } else {
+          // Nettoyer le numéro (enlever espaces et caractères spéciaux)
+          const cleanPhone = phoneNumber.replace(/[\s\-\(\)]/g, '');
+          
+          const numverifyResponse = await fetch(
+            `http://apilayer.net/api/validate?access_key=${numverifyApiKey}&number=${cleanPhone}&country_code=&format=1`
+          );
+
+          if (numverifyResponse.ok) {
+            const phoneData = await numverifyResponse.json();
+            console.log('📞 Réponse Numverify:', phoneData);
+
+            if (!phoneData.valid) {
+              console.error('❌ Numéro de téléphone invalide selon Numverify:', phoneData);
+              
+              // Créer une entrée dans migration_errors (nous devons d'abord créer une company temporaire ou la créer après)
+              // Pour l'instant, on retourne juste l'erreur
+              return new Response(
+                JSON.stringify({ 
+                  success: false, 
+                  error: 'Le numéro de téléphone fourni est invalide',
+                  code: 'INVALID_PHONE_NUMBER',
+                  details: {
+                    number: phoneNumber,
+                    country: phoneData.country_name || 'inconnu',
+                    carrier: phoneData.carrier || 'inconnu'
+                  }
+                }),
+                { 
+                  status: 400, 
+                  headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+                }
+              );
+            }
+            
+            console.log('✅ Numéro de téléphone valide:', {
+              country: phoneData.country_name,
+              format: phoneData.international_format,
+              carrier: phoneData.carrier,
+              lineType: phoneData.line_type
+            });
+          } else {
+            console.warn('⚠️ Erreur API Numverify (non bloquant):', numverifyResponse.status);
+          }
+        }
+      } catch (numverifyError) {
+        console.error('⚠️ Erreur lors de la validation Numverify (non bloquant):', numverifyError);
+      }
+    }
+
+    // 4. Vérifier si l'email existe déjà
     const { data: existingUser } = await supabaseAdmin.auth.admin.listUsers();
     const emailExists = existingUser?.users.some(u => u.email === email);
     
@@ -168,10 +227,10 @@ serve(async (req) => {
       );
     }
 
-    // 4. Construire l'adresse complète pour la géolocalisation
+    // 5. Construire l'adresse complète pour la géolocalisation
     const fullAddress = `${inseeData.data.address}, ${inseeData.data.postalCode} ${inseeData.data.city}`;
 
-    // 5. Créer l'utilisateur avec auto-confirmation
+    // 6. Créer l'utilisateur avec auto-confirmation
     console.log('👤 Création de l\'utilisateur:', email);
     
     const { data: userData, error: userError } = await supabaseAdmin.auth.admin.createUser({
@@ -209,11 +268,11 @@ serve(async (req) => {
 
     console.log('✅ Utilisateur créé:', userData.user.id);
 
-    // 6. Attendre que le trigger handle_new_user se termine
+    // 7. Attendre que le trigger handle_new_user se termine
     console.log('⏳ Attente du trigger handle_new_user...');
     await new Promise(resolve => setTimeout(resolve, 3000));
 
-    // 7. Récupérer la company_id créée par le trigger
+    // 8. Récupérer la company_id créée par le trigger
     const { data: companyData, error: companyError } = await supabaseAdmin
       .from('user_companies')
       .select('company_id')
@@ -237,7 +296,7 @@ serve(async (req) => {
 
     console.log('✅ Entreprise créée par trigger:', companyData.company_id);
 
-    // 8. Générer un lien de connexion automatique
+    // 9. Générer un lien de connexion automatique
     console.log('🔗 Génération du lien de connexion...');
     
     const { data: sessionData, error: sessionError } = 
@@ -253,7 +312,7 @@ serve(async (req) => {
     const loginLink = sessionData?.properties?.action_link || null;
     console.log('✅ Lien de connexion généré');
 
-    // 9. Logger l'inscription réussie
+    // 10. Logger l'inscription réussie
     console.log('🎉 Inscription démo réussie:', {
       userId: userData.user.id,
       email: userData.user.email,
