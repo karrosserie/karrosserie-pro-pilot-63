@@ -172,22 +172,30 @@ serve(async (req) => {
             const phoneData = await numverifyResponse.json();
             console.log('📞 Réponse Numverify:', phoneData);
 
-            if (!phoneData.valid) {
-              console.warn('⚠️ Numéro de téléphone invalide selon Numverify (non bloquant):', phoneData);
+            // Vérifier si le numéro est invalide OU si aucun opérateur n'est attribué
+            const hasNoCarrier = !phoneData.carrier || phoneData.carrier.trim() === '';
+            
+            if (!phoneData.valid || hasNoCarrier) {
+              const reason = !phoneData.valid 
+                ? 'Numéro invalide' 
+                : 'Aucun opérateur attribué';
+              
+              console.warn(`⚠️ ${reason} selon Numverify (non bloquant):`, phoneData);
               
               // Stocker l'erreur pour la logger après la création de la company
               phoneValidationError = {
-                message: `Numéro de téléphone invalide: ${phoneNumber}`,
+                message: `Numéro de téléphone invalide: ${phoneNumber} - ${reason}`,
                 details: {
                   number: phoneNumber,
                   country: phoneData.country_name || 'inconnu',
-                  carrier: phoneData.carrier || 'inconnu',
+                  carrier: phoneData.carrier || 'aucun',
                   line_type: phoneData.line_type || 'inconnu',
-                  valid: phoneData.valid
+                  valid: phoneData.valid,
+                  reason: reason
                 }
               };
             } else {
-              console.log('✅ Numéro de téléphone valide:', {
+              console.log('✅ Numéro de téléphone valide avec opérateur:', {
                 country: phoneData.country_name,
                 format: phoneData.international_format,
                 carrier: phoneData.carrier,
