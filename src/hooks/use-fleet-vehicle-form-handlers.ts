@@ -92,10 +92,16 @@ export function useFleetVehicleFormHandlers({
           data: submissionData
         });
       } else if (mode === 'create') {
-        await createVehicle.mutateAsync({
+        const createdVehicle = await createVehicle.mutateAsync({
           ...submissionData,
           company_id: companyId
         });
+        
+        // Onboarding : Véhicule de courtoisie ajouté
+        if (createdVehicle?.id) {
+          const { onboardingService } = await import('@/services/onboarding/OnboardingService');
+          onboardingService.updateOnboardingStep('tunnel3', 'fleetVehicleAdded', { vehicleId: createdVehicle.id });
+        }
       }
       onSuccess();
     } catch (error) {

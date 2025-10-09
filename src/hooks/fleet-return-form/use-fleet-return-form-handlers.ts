@@ -102,6 +102,12 @@ export const useFleetReturnFormHandlers = (
       const result = await createReturn.mutateAsync(returnData);
       console.log('Fleet return created successfully:', result);
       
+      // Onboarding : Retour de véhicule effectué
+      if (result?.id) {
+        const { onboardingService } = await import('@/services/onboarding/OnboardingService');
+        onboardingService.updateOnboardingStep('tunnel3', 'vehicleReturnCompleted', { returnId: result.id });
+      }
+      
       // Call the parent onSubmit callback
       onSubmit(formData);
     } catch (error) {

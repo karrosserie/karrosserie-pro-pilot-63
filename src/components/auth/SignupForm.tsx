@@ -122,7 +122,7 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
         nafCode: data.nafCode,
       };
       
-      await signUp(
+      const { user } = await signUp(
         data.email, 
         data.password, 
         data.firstName, 
@@ -131,6 +131,14 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
         false, // isTeamMember
         companyData
       );
+      
+      // Initialiser et compléter l'onboarding : profil complété
+      if (user) {
+        const { onboardingService } = await import('@/services/onboarding/OnboardingService');
+        onboardingService.initOnboardingState(user.id);
+        onboardingService.updateOnboardingStep('tunnel1', 'profileCompleted', { userId: user.id });
+      }
+      
       // Le message de succès est maintenant géré dans useAuthState
       onToggleMode(); // Retour vers le formulaire de connexion
     } catch (error: any) {

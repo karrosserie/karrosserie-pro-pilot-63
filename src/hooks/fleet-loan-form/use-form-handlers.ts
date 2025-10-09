@@ -179,7 +179,13 @@ export const useFleetLoanFormHandlers = (
         });
       } else {
         // Create new reservation - toast is handled by the mutation
-        await createReservation.mutateAsync(reservationData);
+        const result = await createReservation.mutateAsync(reservationData);
+        
+        // Onboarding : Prêt de véhicule effectué
+        if (result?.id) {
+          const { onboardingService } = await import('@/services/onboarding/OnboardingService');
+          onboardingService.updateOnboardingStep('tunnel3', 'vehicleLoanCreated', { reservationId: result.id });
+        }
       }
       
       // Call the onSubmit callback without any additional toast

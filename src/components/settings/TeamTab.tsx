@@ -230,6 +230,13 @@ const TeamTab = () => {
         });
       } else {
         console.log('Member added successfully, closing dialog and refreshing...');
+        
+        // Onboarding : Employé ajouté
+        const { onboardingService } = await import('@/services/onboarding/OnboardingService');
+        const state = onboardingService.getOnboardingState();
+        const currentCount = (state?.tunnel1.employeesAdded.employeesCount || 0) + 1;
+        onboardingService.updateOnboardingStep('tunnel1', 'employeesAdded', { employeesCount: currentCount });
+        
         setIsAddDialogOpen(false);
         addForm.reset();
         fetchTeamMembers();

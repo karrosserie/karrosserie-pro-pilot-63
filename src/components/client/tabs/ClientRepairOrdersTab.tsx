@@ -176,7 +176,7 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
     }
   };
 
-  const handleConvertToInvoice = (order: RepairOrder) => {
+  const handleConvertToInvoice = async (order: RepairOrder) => {
     const today = new Date().toISOString().split('T')[0];
     
     const prefilledData: Partial<Invoice> = {
@@ -200,6 +200,10 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
       parts_data: order.parts_data ? (typeof order.parts_data === 'string' ? order.parts_data : JSON.stringify(order.parts_data)) : undefined,
       discounts_data: order.discounts_data ? (typeof order.discounts_data === 'string' ? order.discounts_data : JSON.stringify(order.discounts_data)) : undefined,
     };
+
+    // Onboarding : Ordre converti en facture
+    const { onboardingService } = await import('@/services/onboarding/OnboardingService');
+    onboardingService.updateOnboardingStep('tunnel2', 'orderToInvoice', { invoiceId: order.id });
 
     setPrefilledInvoice(prefilledData);
     setInvoiceDialogOpen(true);

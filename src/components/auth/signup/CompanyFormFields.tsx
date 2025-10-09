@@ -88,6 +88,10 @@ const CompanyFormFields = ({ control, setValue }: CompanyFormFieldsProps) => {
         
         setAutoFilledFields(newAutoFilledFields);
         toast.success('Informations entreprise récupérées automatiquement');
+        
+        // Onboarding : SIREN validé
+        const { onboardingService } = await import('@/services/onboarding/OnboardingService');
+        onboardingService.updateOnboardingStep('tunnel1', 'companySirenCompleted', { siren: companyData.siren });
       } else {
         toast.error(data.error || 'Aucune information trouvée pour ce SIREN');
       }

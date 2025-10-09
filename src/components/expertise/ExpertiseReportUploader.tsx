@@ -109,6 +109,12 @@ export const ExpertiseReportUploader = ({
       });
 
       console.log('Expertise report created:', newReport);
+      
+      // Onboarding : Rapport importé
+      if (newReport?.id) {
+        const { onboardingService } = await import('@/services/onboarding/OnboardingService');
+        onboardingService.updateOnboardingStep('tunnel2', 'reportImported', { reportId: newReport.id });
+      }
 
       // 5. Créer une entrée dans la table imports avec le status "En cours d'analyse"
       const { data: importData, error: importError } = await supabase

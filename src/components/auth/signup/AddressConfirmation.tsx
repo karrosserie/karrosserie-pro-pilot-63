@@ -73,7 +73,12 @@ const AddressConfirmation = ({ companyName, address, onConfirm, onBack, isLoadin
         </Button>
         <Button 
           type="button" 
-          onClick={onConfirm}
+          onClick={async () => {
+            // Onboarding : Adresse validée
+            const { onboardingService } = await import('@/services/onboarding/OnboardingService');
+            onboardingService.updateOnboardingStep('tunnel1', 'addressValidated', { address });
+            onConfirm();
+          }}
           className="flex-1"
           disabled={isLoading}
         >

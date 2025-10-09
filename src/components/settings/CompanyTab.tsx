@@ -49,6 +49,10 @@ const CompanyTab: React.FC = () => {
         await companyService.updateCompanyInfo(undefined, updatedCompanyData);
         await reloadCompanyData();
         
+        // Onboarding : Logo ajouté
+        const { onboardingService } = await import('@/services/onboarding/OnboardingService');
+        onboardingService.updateOnboardingStep('tunnel1', 'logoAdded', { logoUrl });
+        
         toast({
           title: "Logo téléchargé",
           description: "Votre logo a été téléchargé et sauvegardé avec succès.",
@@ -97,6 +101,11 @@ const CompanyTab: React.FC = () => {
         // Sauvegarder directement les données mises à jour
         await companyService.updateCompanyInfo(undefined, updatedCompanyData);
         await reloadCompanyData();
+        
+        // Onboarding : Logo généré et ajouté
+        const { onboardingService } = await import('@/services/onboarding/OnboardingService');
+        onboardingService.updateOnboardingStep('tunnel1', 'logoAdded', { logoUrl });
+        
         toast({
           title: "Logo généré avec succès!",
           description: "Votre logo a été généré et sauvegardé automatiquement.",
