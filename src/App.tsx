@@ -7,6 +7,7 @@ import { ConfirmationProvider } from "@/hooks/use-confirmation";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { BrowserRouter } from "react-router-dom";
 import AppRouter from "@/components/router/AppRouter";
+import { OnboardingAgentMessagePopup } from "@/components/onboarding/OnboardingAgentMessagePopup";
 
 const queryClient = new QueryClient();
 
@@ -18,6 +19,7 @@ const App = () => (
           <ConfirmationProvider>
             <Toaster />
             <Sonner />
+            <OnboardingAgentMessagePopup />
             <AppRouter />
           </ConfirmationProvider>
         </AuthProvider>
