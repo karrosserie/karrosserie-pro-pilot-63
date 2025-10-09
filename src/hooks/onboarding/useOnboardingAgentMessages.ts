@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useCompanyId } from '@/hooks/use-company-id';
+import { onboardingService } from '@/services/onboarding/OnboardingService';
 
 interface OnboardingAgentMessage {
   id: number;
@@ -18,19 +18,22 @@ interface OnboardingAgentMessage {
 }
 
 export function useOnboardingAgentMessages() {
-  const { companyId } = useCompanyId();
   const queryClient = useQueryClient();
+
+  // Récupérer l'ID d'onboarding depuis le localStorage
+  const onboardingState = onboardingService.getOnboardingState();
+  const onboardingId = onboardingState?.id;
 
   // Query pour récupérer le message le plus récent non lu
   const { data: unreadMessage, isLoading } = useQuery({
-    queryKey: ['onboarding-agent-messages', companyId],
+    queryKey: ['onboarding-agent-messages', onboardingId],
     queryFn: async () => {
-      if (!companyId) return null;
+      if (!onboardingId) return null;
 
       const { data, error } = await supabase
         .from('ai_messages_history')
         .select('*')
-        .eq('session_id', companyId)
+        .eq('session_id', onboardingId)
         .eq('read', false)
         .order('created_at', { ascending: false })
         .limit(1)
@@ -51,7 +54,7 @@ export function useOnboardingAgentMessages() {
 
       return null;
     },
-    enabled: !!companyId,
+    enabled: !!onboardingId,
     refetchInterval: 30000, // Polling toutes les 30 secondes
   });
 
@@ -67,7 +70,7 @@ export function useOnboardingAgentMessages() {
     },
     onSuccess: () => {
       // Invalider la query pour rafraîchir les données
-      queryClient.invalidateQueries({ queryKey: ['onboarding-agent-messages', companyId] });
+      queryClient.invalidateQueries({ queryKey: ['onboarding-agent-messages', onboardingId] });
     },
   });
 
