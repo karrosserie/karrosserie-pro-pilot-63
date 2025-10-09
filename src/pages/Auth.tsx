@@ -20,12 +20,16 @@ const Auth = () => {
   // Déterminer le mode basé sur l'URL
   useEffect(() => {
     const path = window.location.pathname;
+    const mode = searchParams.get('mode');
+    
     if (path.includes('/auth/reset-password')) {
       setAuthMode('reset-password');
+    } else if (mode === 'signup') {
+      setAuthMode('signup');
     } else {
       setAuthMode('login');
     }
-  }, []);
+  }, [searchParams]);
 
   // Vérifiez les paramètres d'URL pour les messages de redirection
   useEffect(() => {
