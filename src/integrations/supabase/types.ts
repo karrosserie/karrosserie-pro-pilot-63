@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_messages_history: {
+        Row: {
+          created_at: string
+          id: number
+          message: Json | null
+          read: boolean
+          session_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          message?: Json | null
+          read?: boolean
+          session_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          message?: Json | null
+          read?: boolean
+          session_id?: string | null
+        }
+        Relationships: []
+      }
       articles: {
         Row: {
           article: string | null
