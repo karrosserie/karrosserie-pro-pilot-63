@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -21,17 +22,24 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState<'personal' | 'company' | 'confirm'>('personal');
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   
   const { signUp } = useAuth();
+
+  // Lire les paramètres URL pour pré-remplir les champs
+  const urlFirstName = searchParams.get("firstName") || "";
+  const urlLastName = searchParams.get("lastName") || "";
+  const urlEmail = searchParams.get("email") || "";
+  const urlPhoneNumber = searchParams.get("phoneNumber") || "";
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     mode: 'onChange',
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      phoneNumber: "",
+      firstName: urlFirstName,
+      lastName: urlLastName,
+      email: urlEmail,
+      phoneNumber: urlPhoneNumber,
       password: "",
       confirmPassword: "",
       siren: "",
@@ -43,6 +51,14 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
       nafCode: "",
     },
   });
+
+  // Mettre à jour les valeurs si les paramètres URL changent
+  useEffect(() => {
+    if (urlFirstName) form.setValue("firstName", urlFirstName);
+    if (urlLastName) form.setValue("lastName", urlLastName);
+    if (urlEmail) form.setValue("email", urlEmail);
+    if (urlPhoneNumber) form.setValue("phoneNumber", urlPhoneNumber);
+  }, [urlFirstName, urlLastName, urlEmail, urlPhoneNumber, form]);
 
   const handleNext = async () => {
     // Validate personal info fields before proceeding
