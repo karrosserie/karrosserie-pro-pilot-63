@@ -75,7 +75,7 @@ class OnboardingService {
   }
 
   /**
-   * Sauvegarde l'état d'onboarding dans localStorage
+   * Sauvegarde l'état d'onboarding dans localStorage et envoie au webhook
    */
   private saveState(state: OnboardingState): void {
     try {
@@ -84,8 +84,46 @@ class OnboardingService {
       
       // Déclencher un événement personnalisé pour notifier les hooks
       window.dispatchEvent(new CustomEvent('onboarding-updated', { detail: state }));
+      
+      // Envoyer l'état au webhook n8n de manière asynchrone (ne pas bloquer)
+      this.sendToWebhook(state).catch(error => {
+        console.error('[Onboarding] Error sending to webhook:', error);
+      });
     } catch (error) {
       console.error('Error saving onboarding state:', error);
+    }
+  }
+
+  /**
+   * Envoie l'état d'onboarding au webhook n8n
+   */
+  private async sendToWebhook(state: OnboardingState): Promise<void> {
+    try {
+      const webhookUrl = 'https://n8n.karrosserie.pro/webhook/e0f06fb8-c636-4592-8697-7515418689ef';
+      
+      const payload = {
+        onboardingState: state,
+        company_id: state.companyId
+      };
+
+      console.log('[Onboarding] Sending state to webhook:', webhookUrl);
+
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Webhook request failed with status ${response.status}`);
+      }
+
+      console.log('[Onboarding] Successfully sent state to webhook');
+    } catch (error) {
+      console.error('[Onboarding] Failed to send to webhook:', error);
+      // Ne pas propager l'erreur pour ne pas bloquer le flux principal
     }
   }
 
