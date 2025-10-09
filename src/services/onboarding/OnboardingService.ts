@@ -7,6 +7,7 @@ import {
   Tunnel2Steps,
   Tunnel3Steps,
 } from '@/types/onboarding';
+import { v4 as uuidv4 } from 'uuid';
 
 const ONBOARDING_KEY = 'onboarding_state';
 const ONBOARDING_VERSION = '1.0.0';
@@ -17,6 +18,7 @@ class OnboardingService {
    */
   initOnboardingState(userId: string, companyId?: string): OnboardingState {
     const initialState: OnboardingState = {
+      id: uuidv4(), // Générer un ID unique pour suivre l'onboarding
       version: ONBOARDING_VERSION,
       userId,
       companyId,
@@ -103,6 +105,7 @@ class OnboardingService {
       
       const payload = {
         onboardingState: state,
+        onboarding_id: state.id, // ID unique pour suivre dans n8n
         company_id: state.companyId
       };
 

@@ -111,6 +111,7 @@ export interface Tunnel3Steps {
 
 // État global d'onboarding
 export interface OnboardingState {
+  id: string; // ID unique pour suivre l'onboarding avant connexion
   version: string;
   userId?: string;
   companyId?: string;
