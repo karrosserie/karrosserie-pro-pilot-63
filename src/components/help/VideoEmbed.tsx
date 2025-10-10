@@ -13,7 +13,7 @@ export const VideoEmbed: React.FC<VideoEmbedProps> = ({
   className = "" 
 }) => {
   const { data: { publicUrl } } = supabase.storage
-    .from('campaign_assets')
+    .from('campaign-assets')
     .getPublicUrl(filePath);
 
   return (
