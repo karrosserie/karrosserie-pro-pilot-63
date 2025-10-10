@@ -57,7 +57,22 @@ serve(async (req) => {
   }
 
   try {
-    const { action, ...params } = await req.json();
+    // Log la requête pour débugger
+    console.log('Requête reçue:', req.method, req.url);
+    
+    const contentType = req.headers.get('content-type');
+    console.log('Content-Type:', contentType);
+    
+    // Vérifier si le body est vide
+    const bodyText = await req.text();
+    console.log('Body reçu:', bodyText);
+    
+    if (!bodyText || bodyText.trim() === '') {
+      throw new Error('Body de la requête vide');
+    }
+    
+    const body = JSON.parse(bodyText);
+    const { action, ...params } = body;
     
     console.log(`GoCardless action: ${action}`, params);
 
