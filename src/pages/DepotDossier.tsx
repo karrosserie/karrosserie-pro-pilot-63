@@ -238,7 +238,7 @@ const DepotDossier = () => {
       // Récupérer les photos du véhicule si disponibles
       console.log('Checking for vehicle photos, vehicle_id:', relatedInvoice?.vehicle_id);
       if (relatedInvoice?.vehicle_id) {
-        console.log('Fetching vehicle photos...');
+        console.log('Fetching vehicle photos from vehicle_photos table...');
         const { data: vehiclePhotos, error: photosError } = await supabase
           .from('vehicle_photos')
           .select('*')
@@ -250,7 +250,7 @@ const DepotDossier = () => {
         if (vehiclePhotos && vehiclePhotos.length > 0) {
           vehiclePhotos.forEach((photo, index) => {
             docs.push({
-              name: `Photo véhicule ${index + 1} - ${photo.photo_type}`,
+              name: `Photo véhicule ${index + 1}`,
               description: photo.description || `Photo du véhicule • ${new Date(photo.created_at).toLocaleDateString('fr-FR')}`,
               icon: "📸",
               type: "vehicle_photo",
@@ -260,6 +260,32 @@ const DepotDossier = () => {
             });
           });
           console.log(`✅ ${vehiclePhotos.length} vehicle photos added`);
+        }
+
+        // Récupérer les photos des tâches d'atelier (task_photos)
+        console.log('Fetching task photos from task_photos table...');
+        const { data: taskPhotos, error: taskPhotosError } = await supabase
+          .from('task_photos')
+          .select('*')
+          .eq('vehicle_id', relatedInvoice.vehicle_id)
+          .order('created_at', { ascending: false });
+          
+        console.log('Task photos result:', taskPhotos ? `Found ${taskPhotos.length} photos` : 'No photos found', 'Error:', taskPhotosError);
+        
+        if (taskPhotos && taskPhotos.length > 0) {
+          taskPhotos.forEach((photo, index) => {
+            const photoTypeLabel = photo.photo_type === 'start' ? 'Début de tâche' : 'Fin de tâche';
+            docs.push({
+              name: `Photo atelier ${index + 1} - ${photoTypeLabel}`,
+              description: `Photo des étapes d'atelier • ${photoTypeLabel} • ${new Date(photo.created_at).toLocaleDateString('fr-FR')}`,
+              icon: "📸",
+              type: "task_photo",
+              url: photo.file_url,
+              hasUrl: !!photo.file_url,
+              data: photo
+            });
+          });
+          console.log(`✅ ${taskPhotos.length} task photos added`);
         }
       }
 
@@ -317,9 +343,9 @@ const DepotDossier = () => {
     }
 
     try {
-      // Pour les photos de véhicule, ouvrir directement l'image
-      if (doc.type === 'vehicle_photo' && doc.url) {
-        console.log('📸 [Preview] Opening vehicle photo in new tab...');
+      // Pour les photos de véhicule et les photos d'atelier, ouvrir directement l'image
+      if ((doc.type === 'vehicle_photo' || doc.type === 'task_photo') && doc.url) {
+        console.log(`📸 [Preview] Opening ${doc.type} in new tab...`);
         window.open(doc.url, '_blank');
         console.log('✅ [Preview] Photo opened successfully');
         return;
