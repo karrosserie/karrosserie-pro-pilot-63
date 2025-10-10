@@ -302,31 +302,53 @@ const DepotDossier = () => {
     }
   }, [relatedInvoice, selectedCase, toast]);
 
-  // Fonction pour télécharger un document directement
+  // Fonction pour prévisualiser un document
   const handlePreviewDocument = useCallback(async (doc) => {
-    console.log('handlePreviewDocument called with:', doc);
+    console.log('👁️ [Preview] Opening document:', doc.name, 'Type:', doc.type, 'URL:', doc.url);
     
-    if (doc.hasUrl && doc.url) {
-      // Télécharger directement l'URL du document existant
-      console.log('Downloading existing URL:', doc.url);
-      const link = document.createElement('a');
-      link.href = doc.url;
-      link.download = `${doc.name}.pdf`;
-      link.click();
-      
+    if (!doc.url && !doc.data) {
+      console.error('❌ [Preview] Document non disponible');
       toast({
-        title: "Téléchargement lancé",
-        description: "Le document se télécharge.",
+        title: "Document non disponible",
+        description: "Ce document n'a ni URL ni données.",
+        variant: "destructive"
       });
-    } else if (doc.data && doc.type) {
-      console.log('Generating PDF for download, type:', doc.type);
-      
-      toast({
-        title: "Génération en cours",
-        description: "Génération et téléchargement du PDF...",
-      });
+      return;
+    }
 
-      try {
+    try {
+      // Pour les photos de véhicule, ouvrir directement l'image
+      if (doc.type === 'vehicle_photo' && doc.url) {
+        console.log('📸 [Preview] Opening vehicle photo in new tab...');
+        window.open(doc.url, '_blank');
+        console.log('✅ [Preview] Photo opened successfully');
+        return;
+      }
+      
+      // Pour les documents avec URL (PDFs existants)
+      if (doc.hasUrl && doc.url) {
+        console.log('📄 [Preview] Opening PDF from URL in new tab...');
+        // Télécharger et ouvrir dans un nouvel onglet
+        const response = await fetch(doc.url);
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        window.open(blobUrl, '_blank');
+        
+        // Nettoyer l'URL après un délai
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+        console.log('✅ [Preview] PDF opened successfully');
+        return;
+      }
+      
+      // Pour les documents à générer (factures, devis, OR)
+      if (doc.data && doc.type) {
+        console.log('📄 [Preview] Generating PDF for preview, type:', doc.type);
+        
+        toast({
+          title: "Génération en cours",
+          description: "Génération du PDF pour prévisualisation...",
+        });
+
         // Récupérer les données de l'entreprise
         const { data: companyData, error: companyError } = await supabase
           .from('company_info')
@@ -335,63 +357,50 @@ const DepotDossier = () => {
           .single();
 
         if (companyError) {
-          console.error('Error fetching company data:', companyError);
+          console.error('❌ [Preview] Error fetching company data:', companyError);
           throw companyError;
         }
 
         let blob;
-        let filename = '';
         
         if (doc.type === 'facture') {
           const { generateInvoicePDFBlob } = await import('@/utils/invoicePDFGeneration');
           blob = await generateInvoicePDFBlob(doc.data, companyData);
-          filename = `Facture_${doc.data.reference}.pdf`;
         } else if (doc.type === 'devis') {
           const { generateQuotePDFBlob } = await import('@/utils/quotePDFGeneration');
           blob = await generateQuotePDFBlob(doc.data, companyData);
-          filename = `Devis_${doc.data.reference}.pdf`;
         } else if (doc.type === 'repair_order') {
           const { generateRepairOrderPDFBlob } = await import('@/utils/repairOrderPDFGeneration');
           blob = await generateRepairOrderPDFBlob(doc.data, companyData);
-          filename = `Ordre_reparation_${doc.data.reference}.pdf`;
         }
 
         if (blob && blob.size > 0) {
-          // Créer un lien de téléchargement simple
+          // Ouvrir dans un nouvel onglet
           const url = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = filename;
+          window.open(url, '_blank');
           
-          // Téléchargement immédiat
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          
-          // Nettoyer l'URL
+          // Nettoyer l'URL après un délai
           setTimeout(() => {
             URL.revokeObjectURL(url);
           }, 1000);
 
-          toast({
-            title: "Document téléchargé",
-            description: `${filename} a été téléchargé avec succès.`,
-          });
+          console.log('✅ [Preview] PDF generated and opened successfully');
         } else {
           throw new Error('Le PDF généré est vide');
         }
-      } catch (error) {
-        console.error('Erreur génération PDF:', error);
+      } else {
+        console.warn('⚠️ [Preview] Unknown document type:', doc.type);
         toast({
-          title: "Erreur de téléchargement",
-          description: `Impossible de télécharger le PDF: ${error.message}`,
+          title: "Type de document non pris en charge",
+          description: "Impossible d'ouvrir ce type de document.",
           variant: "destructive"
         });
       }
-    } else {
+    } catch (error) {
+      console.error('❌ [Preview] Erreur lors de la prévisualisation:', error);
       toast({
-        title: "Document non disponible",
-        description: "Ce document n'est pas disponible pour le téléchargement.",
+        title: "Erreur de prévisualisation",
+        description: `Impossible d'ouvrir le document: ${error.message}`,
         variant: "destructive"
       });
     }
