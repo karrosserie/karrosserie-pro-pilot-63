@@ -7,6 +7,7 @@ import InvoicePDF from '@/components/invoices/InvoicePDF';
 import DenunciationPDF from '@/components/fleet/DenunciationPDF';
 import AttestationPDF from '@/components/fleet/AttestationPDF';
 import { getCurrentPosition } from '@/utils/geolocation';
+import { supabase } from '@/integrations/supabase/client';
 
 export const generateInvoicePDF = async (
   invoice: Invoice, 
@@ -112,61 +113,90 @@ export const generateDenunciationPDF = async (
     // 4. Fonction utilitaire pour ajouter une image au PDF
     const addImageToPdf = async (imageUrl: string, title: string) => {
       try {
-        const response = await fetch(imageUrl);
-        if (response.ok) {
-          const imageBlob = await response.blob();
-          const imageArrayBuffer = await imageBlob.arrayBuffer();
-          
-          let image;
-          const contentType = response.headers.get('content-type') || '';
-          
-          if (contentType.includes('jpeg') || contentType.includes('jpg')) {
-            image = await combinedPdf.embedJpg(imageArrayBuffer);
-          } else if (contentType.includes('png')) {
-            image = await combinedPdf.embedPng(imageArrayBuffer);
-          } else {
-            // Essayer JPEG par défaut
-            image = await combinedPdf.embedJpg(imageArrayBuffer);
-          }
-          
-          // Créer une nouvelle page pour la photo
-          const photoPage = combinedPdf.addPage();
-          const { width, height } = photoPage.getSize();
-          
-          // Calculer les dimensions pour ajuster l'image
-          const imageWidth = image.width;
-          const imageHeight = image.height;
-          const aspectRatio = imageWidth / imageHeight;
-          
-          let scaledWidth = width - 100; // Marge de 50 de chaque côté
-          let scaledHeight = scaledWidth / aspectRatio;
-          
-          // Si l'image est trop haute, ajuster par la hauteur
-          if (scaledHeight > height - 100) {
-            scaledHeight = height - 100;
-            scaledWidth = scaledHeight * aspectRatio;
-          }
-          
-          // Centrer l'image sur la page
-          const x = (width - scaledWidth) / 2;
-          const y = (height - scaledHeight) / 2;
-          
-          photoPage.drawImage(image, {
-            x,
-            y,
-            width: scaledWidth,
-            height: scaledHeight,
-          });
-          
-          // Ajouter un titre
-          photoPage.drawText(title, {
-            x: 50,
-            y: height - 50,
-            size: 16,
-          });
+        console.log(`📥 Tentative de récupération de l'image: ${title} depuis ${imageUrl}`);
+        
+        // Extraire le bucket et le path depuis l'URL Supabase
+        const urlParts = imageUrl.split('/storage/v1/object/public/');
+        if (urlParts.length !== 2) {
+          console.error(`❌ Format d'URL invalide pour ${title}: ${imageUrl}`);
+          return;
         }
+        
+        const [bucket, ...pathParts] = urlParts[1].split('/');
+        const filePath = pathParts.join('/');
+        
+        console.log(`📦 Bucket: ${bucket}, Path: ${filePath}`);
+        
+        // Télécharger l'image depuis Supabase Storage
+        const { data, error } = await supabase.storage
+          .from(bucket)
+          .download(filePath);
+        
+        if (error) {
+          console.error(`❌ Erreur Supabase pour ${title}:`, error);
+          return;
+        }
+        
+        if (!data) {
+          console.error(`❌ Aucune données reçues pour ${title}`);
+          return;
+        }
+        
+        const imageArrayBuffer = await data.arrayBuffer();
+        console.log(`✅ Image téléchargée: ${title}, taille: ${imageArrayBuffer.byteLength} bytes`);
+        
+        let image;
+        const contentType = data.type || '';
+        
+        if (contentType.includes('jpeg') || contentType.includes('jpg') || filePath.match(/\.(jpg|jpeg)$/i)) {
+          image = await combinedPdf.embedJpg(imageArrayBuffer);
+        } else if (contentType.includes('png') || filePath.match(/\.png$/i)) {
+          image = await combinedPdf.embedPng(imageArrayBuffer);
+        } else {
+          // Essayer JPEG par défaut
+          console.log(`⚠️ Type de contenu inconnu (${contentType}), essai avec JPEG`);
+          image = await combinedPdf.embedJpg(imageArrayBuffer);
+        }
+        
+        // Créer une nouvelle page pour la photo
+        const photoPage = combinedPdf.addPage();
+        const { width, height } = photoPage.getSize();
+        
+        // Calculer les dimensions pour ajuster l'image
+        const imageWidth = image.width;
+        const imageHeight = image.height;
+        const aspectRatio = imageWidth / imageHeight;
+        
+        let scaledWidth = width - 100; // Marge de 50 de chaque côté
+        let scaledHeight = scaledWidth / aspectRatio;
+        
+        // Si l'image est trop haute, ajuster par la hauteur
+        if (scaledHeight > height - 100) {
+          scaledHeight = height - 100;
+          scaledWidth = scaledHeight * aspectRatio;
+        }
+        
+        // Centrer l'image sur la page
+        const x = (width - scaledWidth) / 2;
+        const y = (height - scaledHeight) / 2;
+        
+        photoPage.drawImage(image, {
+          x,
+          y,
+          width: scaledWidth,
+          height: scaledHeight,
+        });
+        
+        // Ajouter un titre
+        photoPage.drawText(title, {
+          x: 50,
+          y: height - 50,
+          size: 16,
+        });
+        
+        console.log(`✅ Image ${title} intégrée au PDF avec succès`);
       } catch (error) {
-        console.warn(`Impossible de récupérer ou d'intégrer ${title}:`, error);
+        console.error(`❌ Erreur lors de l'intégration de ${title}:`, error);
       }
     };
 
