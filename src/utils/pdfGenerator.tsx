@@ -115,48 +115,88 @@ export const generateDenunciationPDF = async (
       try {
         console.log(`📥 Tentative de récupération de l'image: ${title} depuis ${imageUrl}`);
         
-        // Extraire le bucket et le path depuis l'URL Supabase
-        const urlParts = imageUrl.split('/storage/v1/object/public/');
-        if (urlParts.length !== 2) {
-          console.error(`❌ Format d'URL invalide pour ${title}: ${imageUrl}`);
-          return;
+        // Vérifier si l'URL contient le domaine Supabase complet ou si c'est un chemin relatif
+        let fullUrl = imageUrl;
+        if (!imageUrl.startsWith('http')) {
+          fullUrl = `https://jukdsypvuehnniskgpfd.supabase.co${imageUrl}`;
         }
         
-        const [bucket, ...pathParts] = urlParts[1].split('/');
+        console.log(`🔗 URL complète: ${fullUrl}`);
+        
+        // Extraire le bucket et le path depuis l'URL Supabase
+        const urlParts = fullUrl.split('/storage/v1/object/public/');
+        if (urlParts.length !== 2) {
+          console.error(`❌ Format d'URL invalide pour ${title}: ${fullUrl}`);
+          console.error(`   URL parts:`, urlParts);
+          return false;
+        }
+        
+        const pathAfterPublic = urlParts[1];
+        const [bucket, ...pathParts] = pathAfterPublic.split('/');
         const filePath = pathParts.join('/');
         
-        console.log(`📦 Bucket: ${bucket}, Path: ${filePath}`);
+        console.log(`📦 Bucket: "${bucket}", Path: "${filePath}"`);
         
         // Télécharger l'image depuis Supabase Storage
+        console.log(`⬇️ Téléchargement depuis Supabase Storage...`);
         const { data, error } = await supabase.storage
           .from(bucket)
           .download(filePath);
         
         if (error) {
           console.error(`❌ Erreur Supabase pour ${title}:`, error);
-          return;
+          console.error(`   Bucket: "${bucket}", Path: "${filePath}"`);
+          return false;
         }
         
         if (!data) {
           console.error(`❌ Aucune données reçues pour ${title}`);
-          return;
+          return false;
         }
+        
+        console.log(`✅ Blob reçu - Type: ${data.type}, Taille: ${data.size} bytes`);
         
         const imageArrayBuffer = await data.arrayBuffer();
         console.log(`✅ Image téléchargée: ${title}, taille: ${imageArrayBuffer.byteLength} bytes`);
         
+        // Déterminer le type d'image et l'embarquer
         let image;
         const contentType = data.type || '';
+        const isJpeg = contentType.includes('jpeg') || contentType.includes('jpg') || filePath.match(/\.(jpg|jpeg)$/i);
+        const isPng = contentType.includes('png') || filePath.match(/\.png$/i);
         
-        if (contentType.includes('jpeg') || contentType.includes('jpg') || filePath.match(/\.(jpg|jpeg)$/i)) {
-          image = await combinedPdf.embedJpg(imageArrayBuffer);
-        } else if (contentType.includes('png') || filePath.match(/\.png$/i)) {
-          image = await combinedPdf.embedPng(imageArrayBuffer);
-        } else {
-          // Essayer JPEG par défaut
-          console.log(`⚠️ Type de contenu inconnu (${contentType}), essai avec JPEG`);
-          image = await combinedPdf.embedJpg(imageArrayBuffer);
+        console.log(`🎨 Type de contenu: "${contentType}", JPEG: ${isJpeg}, PNG: ${isPng}`);
+        
+        try {
+          if (isPng) {
+            console.log(`   Tentative d'embedding PNG...`);
+            image = await combinedPdf.embedPng(imageArrayBuffer);
+          } else if (isJpeg) {
+            console.log(`   Tentative d'embedding JPEG...`);
+            image = await combinedPdf.embedJpg(imageArrayBuffer);
+          } else {
+            // Essayer JPEG par défaut
+            console.log(`⚠️ Type inconnu, essai avec JPEG...`);
+            image = await combinedPdf.embedJpg(imageArrayBuffer);
+          }
+        } catch (embedError) {
+          console.error(`❌ Erreur lors de l'embedding de l'image:`, embedError);
+          // Essayer l'autre format
+          try {
+            if (isPng) {
+              console.log(`   Nouvelle tentative avec JPEG...`);
+              image = await combinedPdf.embedJpg(imageArrayBuffer);
+            } else {
+              console.log(`   Nouvelle tentative avec PNG...`);
+              image = await combinedPdf.embedPng(imageArrayBuffer);
+            }
+          } catch (secondError) {
+            console.error(`❌ Impossible d'embedder l'image dans aucun format:`, secondError);
+            return false;
+          }
         }
+        
+        console.log(`✅ Image embarquée - Dimensions: ${image.width}x${image.height}`);
         
         // Créer une nouvelle page pour la photo
         const photoPage = combinedPdf.addPage();
@@ -180,6 +220,8 @@ export const generateDenunciationPDF = async (
         const x = (width - scaledWidth) / 2;
         const y = (height - scaledHeight) / 2;
         
+        console.log(`📐 Position: (${x}, ${y}), Taille: ${scaledWidth}x${scaledHeight}`);
+        
         photoPage.drawImage(image, {
           x,
           y,
@@ -195,8 +237,14 @@ export const generateDenunciationPDF = async (
         });
         
         console.log(`✅ Image ${title} intégrée au PDF avec succès`);
+        return true;
       } catch (error) {
         console.error(`❌ Erreur lors de l'intégration de ${title}:`, error);
+        if (error instanceof Error) {
+          console.error(`   Message: ${error.message}`);
+          console.error(`   Stack:`, error.stack);
+        }
+        return false;
       }
     };
 
