@@ -32,9 +32,9 @@ export const uploadVehiclePhoto = async (
     const fileName = `vehicle_${vehicleId}_${timestamp}.jpg`;
     const filePath = `${companyId}/vehicles/${vehicleId}/${fileName}`;
 
-    // Upload de l'image vers Supabase Storage
+    // Upload de l'image vers Supabase Storage (bucket documents)
     const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('employee-tasks')
+      .from('documents')
       .upload(filePath, photoBlob, {
         contentType: 'image/jpeg',
         upsert: false
@@ -47,7 +47,7 @@ export const uploadVehiclePhoto = async (
 
     // Obtenir l'URL publique
     const { data: { publicUrl } } = supabase.storage
-      .from('employee-tasks')
+      .from('documents')
       .getPublicUrl(filePath);
 
     // Sauvegarder en base de données
@@ -66,7 +66,7 @@ export const uploadVehiclePhoto = async (
     if (dbError) {
       console.error('Erreur sauvegarde DB:', dbError);
       // Supprimer le fichier si l'insertion DB échoue
-      await supabase.storage.from('employee-tasks').remove([filePath]);
+      await supabase.storage.from('documents').remove([filePath]);
       return { success: false, error: 'Erreur lors de la sauvegarde' };
     }
 

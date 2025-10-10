@@ -235,6 +235,34 @@ const DepotDossier = () => {
         }
       }
 
+      // Récupérer les photos du véhicule si disponibles
+      console.log('Checking for vehicle photos, vehicle_id:', relatedInvoice?.vehicle_id);
+      if (relatedInvoice?.vehicle_id) {
+        console.log('Fetching vehicle photos...');
+        const { data: vehiclePhotos, error: photosError } = await supabase
+          .from('vehicle_photos')
+          .select('*')
+          .eq('vehicle_id', relatedInvoice.vehicle_id)
+          .order('created_at', { ascending: false });
+          
+        console.log('Vehicle photos result:', vehiclePhotos ? `Found ${vehiclePhotos.length} photos` : 'No photos found', 'Error:', photosError);
+        
+        if (vehiclePhotos && vehiclePhotos.length > 0) {
+          vehiclePhotos.forEach((photo, index) => {
+            docs.push({
+              name: `Photo véhicule ${index + 1} - ${photo.photo_type}`,
+              description: photo.description || `Photo du véhicule • ${new Date(photo.created_at).toLocaleDateString('fr-FR')}`,
+              icon: "📸",
+              type: "vehicle_photo",
+              url: photo.file_url,
+              hasUrl: !!photo.file_url,
+              data: photo
+            });
+          });
+          console.log(`✅ ${vehiclePhotos.length} vehicle photos added`);
+        }
+      }
+
       // Ajouter d'autres documents basés sur les pièces du dossier judiciaire
       console.log('Adding other documents from case pieces...');
       if (selectedCase?.pieces) {
