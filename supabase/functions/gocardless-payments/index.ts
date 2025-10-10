@@ -88,7 +88,7 @@ serve(async (req) => {
       case 'cancel_mandate':
         return await cancelMandate(params.mandateId);
       case 'webhook':
-        return await handleWebhook(req);
+        return await handleWebhook(body, req);
       default:
         throw new Error(`Action non supportée: ${action}`);
     }
@@ -306,15 +306,14 @@ async function cancelMandate(mandateId: string) {
   );
 }
 
-async function handleWebhook(req: Request) {
-  const body = await req.text();
+async function handleWebhook(bodyData: any, req: Request) {
   const signature = req.headers.get('webhook-signature');
   
-  console.log('Webhook GoCardless reçu:', { signature, body });
+  console.log('Webhook GoCardless reçu:', { signature, bodyData });
 
   // Ici vous pourriez vérifier la signature du webhook si nécessaire
   
-  const events = JSON.parse(body).events;
+  const events = bodyData.events;
   
   for (const event of events) {
     console.log('Traitement de l\'événement:', event);
