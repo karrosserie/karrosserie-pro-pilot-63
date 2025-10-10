@@ -329,8 +329,73 @@ async function handlePaymentEvent(event: any) {
   
   console.log(`Événement de paiement: ${action} pour ${paymentId}`);
   
-  // Mettre à jour le statut du paiement dans la base de données
-  // selon l'action (confirmed, paid_out, failed, etc.)
+  // Mapper les actions GoCardless vers les statuts de la base
+  let newStatus = 'pending_submission';
+  
+  switch(action) {
+    case 'created':
+      newStatus = 'pending_submission';
+      break;
+    case 'submitted':
+      newStatus = 'submitted';
+      break;
+    case 'confirmed':
+      newStatus = 'confirmed';
+      break;
+    case 'paid_out':
+      newStatus = 'paid_out';
+      break;
+    case 'failed':
+      newStatus = 'failed';
+      break;
+    case 'cancelled':
+      newStatus = 'cancelled';
+      break;
+    case 'charged_back':
+      newStatus = 'charged_back';
+      break;
+  }
+  
+  // Mettre à jour le paiement dans la base de données
+  const { error } = await supabase
+    .from('gocardless_payments')
+    .update({ 
+      status: newStatus, 
+      updated_at: new Date().toISOString() 
+    })
+    .eq('gocardless_payment_id', paymentId);
+  
+  if (error) {
+    console.error('Erreur mise à jour paiement:', error);
+  } else {
+    console.log(`Paiement ${paymentId} mis à jour: ${newStatus}`);
+  }
+  
+  // Si le paiement est confirmé, mettre à jour l'abonnement
+  if (action === 'paid_out') {
+    // Récupérer le paiement pour avoir le subscription_id
+    const { data: payment } = await supabase
+      .from('gocardless_payments')
+      .select('subscription_id')
+      .eq('gocardless_payment_id', paymentId)
+      .single();
+    
+    if (payment?.subscription_id) {
+      const { error: subError } = await supabase
+        .from('company_subscriptions')
+        .update({ 
+          last_payment_date: new Date().toISOString(),
+          last_payment_status: 'success'
+        })
+        .eq('id', payment.subscription_id);
+        
+      if (subError) {
+        console.error('Erreur mise à jour abonnement:', subError);
+      } else {
+        console.log(`Abonnement ${payment.subscription_id} mis à jour`);
+      }
+    }
+  }
 }
 
 async function handleMandateEvent(event: any) {
@@ -339,6 +404,56 @@ async function handleMandateEvent(event: any) {
   
   console.log(`Événement de mandat: ${action} pour ${mandateId}`);
   
-  // Mettre à jour le statut du mandat dans la base de données
-  // selon l'action (active, cancelled, expired, etc.)
+  // Mapper les actions GoCardless vers les statuts de la base
+  let newStatus = 'pending_submission';
+  
+  switch(action) {
+    case 'created':
+      newStatus = 'pending_submission';
+      break;
+    case 'submitted':
+      newStatus = 'submitted';
+      break;
+    case 'active':
+      newStatus = 'active';
+      break;
+    case 'cancelled':
+      newStatus = 'cancelled';
+      break;
+    case 'failed':
+      newStatus = 'failed';
+      break;
+    case 'expired':
+      newStatus = 'expired';
+      break;
+  }
+  
+  // Mettre à jour le mandat dans la base de données
+  const { error: mandateError } = await supabase
+    .from('gocardless_mandates')
+    .update({ 
+      status: newStatus, 
+      updated_at: new Date().toISOString() 
+    })
+    .eq('gocardless_mandate_id', mandateId);
+  
+  if (mandateError) {
+    console.error('Erreur mise à jour mandat:', mandateError);
+  } else {
+    console.log(`Mandat ${mandateId} mis à jour: ${newStatus}`);
+  }
+  
+  // Mettre à jour aussi le statut dans company_info si c'est le mandat principal
+  if (action === 'active' || action === 'cancelled' || action === 'failed') {
+    const { error: companyError } = await supabase
+      .from('company_info')
+      .update({ 
+        gocardless_mandate_status: newStatus 
+      })
+      .eq('gocardless_mandate_id', mandateId);
+      
+    if (companyError) {
+      console.error('Erreur mise à jour company_info:', companyError);
+    }
+  }
 }
