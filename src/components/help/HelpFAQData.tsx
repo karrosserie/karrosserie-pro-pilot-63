@@ -1,5 +1,7 @@
 import React from 'react';
-import { Rocket, Users, Car, Wrench, FileText, CreditCard, Truck, ClipboardList, DollarSign, Wallet } from 'lucide-react';
+import { Rocket, Users, Car, Wrench, FileText, CreditCard, Truck, ClipboardList, DollarSign, Wallet, UserCog, ShoppingCart, Scale } from 'lucide-react';
+import { VideoEmbed } from './VideoEmbed';
+import { videoMappings } from './videoMappings';
 
 export interface FAQItem {
   question: string;
@@ -23,6 +25,7 @@ export const faqSections: FAQSection[] = [
         question: "Comment me connecter à l'application ?",
         answer: (
           <div className="space-y-3">
+            <VideoEmbed filePath={videoMappings['inscription']} title="Vidéo : Inscription et connexion" />
             <p>Pour vous connecter à l'application :</p>
             <ol className="list-decimal list-inside space-y-2 ml-4">
               <li>Cliquez sur le bouton "Se connecter" sur la page d'accueil</li>
@@ -107,6 +110,7 @@ export const faqSections: FAQSection[] = [
         question: "Comment créer un nouveau client ?",
         answer: (
           <div className="space-y-3">
+            <VideoEmbed filePath={videoMappings['ajout-client']} title="Vidéo : Ajout d'un client" />
             <p>Pour créer un nouveau client dans l'application :</p>
             <ol className="list-decimal list-inside space-y-2 ml-4">
               <li>Accédez à la section "Clients" via le menu latéral</li>
@@ -227,6 +231,7 @@ export const faqSections: FAQSection[] = [
         question: "Comment ajouter un véhicule ?",
         answer: (
           <div className="space-y-3">
+            <VideoEmbed filePath={videoMappings['ajout-vehicule']} title="Vidéo : Ajout d'un véhicule" />
             <p>Pour ajouter un nouveau véhicule :</p>
             <ol className="list-decimal list-inside space-y-2 ml-4">
               <li>Accédez à la section "Véhicules"</li>
@@ -360,7 +365,12 @@ export const faqSections: FAQSection[] = [
       },
       {
         question: "Comment gérer les avoirs ?",
-        answer: "Dans 'Documents' > 'Avoirs', créez un avoir pour annuler tout ou partie d'une facture. Sélectionnez la facture concernée (seules les factures payées peuvent faire l'objet d'un avoir), indiquez le montant à créditer et la raison du remboursement (défaut, annulation, geste commercial). L'avoir est numéroté automatiquement et vient en déduction du chiffre d'affaires. Il peut être envoyé au client et impacte automatiquement les statistiques comptables."
+        answer: (
+          <div className="space-y-3">
+            <VideoEmbed filePath={videoMappings['avoir']} title="Vidéo : Gestion des avoirs" />
+            <p>Dans 'Documents' &gt; 'Avoirs', créez un avoir pour annuler tout ou partie d'une facture. Sélectionnez la facture concernée (seules les factures payées peuvent faire l'objet d'un avoir), indiquez le montant à créditer et la raison du remboursement (défaut, annulation, geste commercial). L'avoir est numéroté automatiquement et vient en déduction du chiffre d'affaires. Il peut être envoyé au client et impacte automatiquement les statistiques comptables.</p>
+          </div>
+        )
       }
     ]
   },
@@ -375,7 +385,12 @@ export const faqSections: FAQSection[] = [
       },
       {
         question: "Comment créer une cession de créance ?",
-        answer: "Dans 'Cession de créance', cliquez sur 'Nouvelle cession'. Sélectionnez un ordre de réparation existant (statut 'Terminé' requis), les informations client/véhicule/montant sont automatiquement récupérées. Renseignez les détails de l'assurance : compagnie, numéro de sinistre, expert. Générez les documents légaux nécessaires (lettre de cession, bordereau). Le client doit signer la cession pour qu'elle soit valide juridiquement."
+        answer: (
+          <div className="space-y-3">
+            <VideoEmbed filePath={videoMappings['cession-creance']} title="Vidéo : Cession de créance" />
+            <p>Dans 'Cession de créance', cliquez sur 'Nouvelle cession'. Sélectionnez un ordre de réparation existant (statut 'Terminé' requis), les informations client/véhicule/montant sont automatiquement récupérées. Renseignez les détails de l'assurance : compagnie, numéro de sinistre, expert. Générez les documents légaux nécessaires (lettre de cession, bordereau). Le client doit signer la cession pour qu'elle soit valide juridiquement.</p>
+          </div>
+        )
       },
       {
         question: "Quels sont les statuts d'une cession ?",
@@ -394,11 +409,21 @@ export const faqSections: FAQSection[] = [
     items: [
       {
         question: "Comment gérer ma flotte de véhicules de courtoisie ?",
-        answer: "Dans 'Véhicules de courtoisie', ajoutez vos véhicules de prêt avec leurs caractéristiques complètes : marque, modèle, immatriculation, année, kilométrage, état général. Définissez les tarifs de location si applicable, les conditions d'utilisation, les restrictions (âge minimum du conducteur, permis requis). Vous pouvez suivre leur disponibilité en temps réel, planifier leur maintenance et gérer les contrats de prêt avec états des lieux détaillés."
+        answer: (
+          <div className="space-y-3">
+            <VideoEmbed filePath={videoMappings['ajout-vehicule-courtoisie']} title="Vidéo : Ajout d'un véhicule de courtoisie" />
+            <p>Dans 'Véhicules de courtoisie', ajoutez vos véhicules de prêt avec leurs caractéristiques complètes : marque, modèle, immatriculation, année, kilométrage, état général. Définissez les tarifs de location si applicable, les conditions d'utilisation, les restrictions (âge minimum du conducteur, permis requis). Vous pouvez suivre leur disponibilité en temps réel, planifier leur maintenance et gérer les contrats de prêt avec états des lieux détaillés.</p>
+          </div>
+        )
       },
       {
         question: "Comment faire une réservation de véhicule ?",
-        answer: "Créez une nouvelle réservation en sélectionnant le client concerné, le véhicule disponible sur la période souhaitée et les dates de prêt (début/fin). Le système vérifie automatiquement les disponibilités et les conflits. Définissez les conditions particulières (franchise, utilisation autorisée). Le contrat de prêt se génère automatiquement avec état des lieux d'entrée à compléter lors de la remise des clés. Signature électronique possible."
+        answer: (
+          <div className="space-y-3">
+            <VideoEmbed filePath={videoMappings['pret-vehicule']} title="Vidéo : Prêt de véhicule" />
+            <p>Créez une nouvelle réservation en sélectionnant le client concerné, le véhicule disponible sur la période souhaitée et les dates de prêt (début/fin). Le système vérifie automatiquement les disponibilités et les conflits. Définissez les conditions particulières (franchise, utilisation autorisée). Le contrat de prêt se génère automatiquement avec état des lieux d'entrée à compléter lors de la remise des clés. Signature électronique possible.</p>
+          </div>
+        )
       },
       {
         question: "Comment gérer les retours de véhicules ?",
@@ -413,7 +438,12 @@ export const faqSections: FAQSection[] = [
     items: [
       {
         question: "Comment importer un rapport d'expertise ?",
-        answer: "Dans 'Documents' > 'Rapports d'expertise', utilisez l'outil d'import pour télécharger les rapports PDF envoyés par les experts. L'application utilise la reconnaissance optique (OCR) pour extraire automatiquement les informations principales : numéro de sinistre, montant des dommages, détail des réparations, expert signataire. Les données extraites sont associées automatiquement aux véhicules et clients concernés si ils existent dans votre base."
+        answer: (
+          <div className="space-y-3">
+            <VideoEmbed filePath={videoMappings['import-expertise']} title="Vidéo : Import d'un rapport d'expertise" />
+            <p>Dans 'Documents' &gt; 'Rapports d'expertise', utilisez l'outil d'import pour télécharger les rapports PDF envoyés par les experts. L'application utilise la reconnaissance optique (OCR) pour extraire automatiquement les informations principales : numéro de sinistre, montant des dommages, détail des réparations, expert signataire. Les données extraites sont associées automatiquement aux véhicules et clients concernés si ils existent dans votre base.</p>
+          </div>
+        )
       },
       {
         question: "Comment traiter un rapport d'expertise ?",
@@ -432,15 +462,30 @@ export const faqSections: FAQSection[] = [
     items: [
       {
         question: "Comment enregistrer un encaissement ?",
-        answer: "Dans 'Paiements' > 'Encaissements', créez un nouveau reçu en sélectionnant la facture concernée dans la liste des factures impayées. Choisissez le mode de paiement (espèces, carte bancaire, virement, chèque, prélèvement) et saisissez le montant encaissé. Pour les paiements partiels, le solde restant dû s'affiche automatiquement. Ajoutez une référence (numéro de chèque, transaction CB) et des notes si nécessaire. Le reçu PDF est généré automatiquement."
+        answer: (
+          <div className="space-y-3">
+            <VideoEmbed filePath={videoMappings['ajout-encaissement']} title="Vidéo : Ajout d'un encaissement" />
+            <p>Dans 'Paiements' &gt; 'Encaissements', créez un nouveau reçu en sélectionnant la facture concernée dans la liste des factures impayées. Choisissez le mode de paiement (espèces, carte bancaire, virement, chèque, prélèvement) et saisissez le montant encaissé. Pour les paiements partiels, le solde restant dû s'affiche automatiquement. Ajoutez une référence (numéro de chèque, transaction CB) et des notes si nécessaire. Le reçu PDF est généré automatiquement.</p>
+          </div>
+        )
       },
       {
         question: "Comment gérer les dépenses ?",
-        answer: "Dans 'Paiements' > 'Dépenses', enregistrez tous vos achats : pièces détachées, prestations externes (sous-traitance, expertise), frais généraux (électricité, assurance, téléphone). Associez chaque dépense à un fournisseur, une catégorie comptable et un projet/véhicule si applicable. Scannez les factures fournisseurs pour joindre les justificatifs. La TVA déductible est calculée automatiquement selon les taux en vigueur."
+        answer: (
+          <div className="space-y-3">
+            <VideoEmbed filePath={videoMappings['ajout-depense']} title="Vidéo : Ajout d'une dépense" />
+            <p>Dans 'Paiements' &gt; 'Dépenses', enregistrez tous vos achats : pièces détachées, prestations externes (sous-traitance, expertise), frais généraux (électricité, assurance, téléphone). Associez chaque dépense à un fournisseur, une catégorie comptable et un projet/véhicule si applicable. Scannez les factures fournisseurs pour joindre les justificatifs. La TVA déductible est calculée automatiquement selon les taux en vigueur.</p>
+          </div>
+        )
       },
       {
         question: "Comment consulter ma comptabilité ?",
-        answer: "Le module 'Comptabilité' offre une vue d'ensemble complète : chiffre d'affaires mensuel/annuel, dépenses par catégorie, marges brutes et nettes, évolution de la trésorerie. Tableaux de bord interactifs avec graphiques en temps réel. Utilisez les filtres de période (mois, trimestre, année) pour analyser vos performances. Comparaison avec les périodes précédentes et objectifs. Indicateurs clés : délai moyen de paiement, factures en retard, top clients."
+        answer: (
+          <div className="space-y-3">
+            <VideoEmbed filePath={videoMappings['comptabilite']} title="Vidéo : Module de comptabilité" />
+            <p>Le module 'Comptabilité' offre une vue d'ensemble complète : chiffre d'affaires mensuel/annuel, dépenses par catégorie, marges brutes et nettes, évolution de la trésorerie. Tableaux de bord interactifs avec graphiques en temps réel. Utilisez les filtres de période (mois, trimestre, année) pour analyser vos performances. Comparaison avec les périodes précédentes et objectifs. Indicateurs clés : délai moyen de paiement, factures en retard, top clients.</p>
+          </div>
+        )
       },
       {
         question: "Comment exporter mes données comptables ?",
@@ -521,7 +566,12 @@ export const faqSections: FAQSection[] = [
     items: [
       {
         question: "Comment créer un nouveau compte bancaire ?",
-        answer: "Accédez à la section 'Paiements' > 'Gestion des comptes' et cliquez sur 'Nouveau compte'. Remplissez les informations bancaires : nom du compte, banque, IBAN, BIC, type de compte (Courant, Épargne, Professionnel), et solde initial. Toutes ces informations sont nécessaires pour le suivi comptable."
+        answer: (
+          <div className="space-y-3">
+            <VideoEmbed filePath={videoMappings['ajout-compte']} title="Vidéo : Ajout d'un compte bancaire" />
+            <p>Accédez à la section 'Paiements' &gt; 'Gestion des comptes' et cliquez sur 'Nouveau compte'. Remplissez les informations bancaires : nom du compte, banque, IBAN, BIC, type de compte (Courant, Épargne, Professionnel), et solde initial. Toutes ces informations sont nécessaires pour le suivi comptable.</p>
+          </div>
+        )
       },
       {
         question: "Comment modifier un compte bancaire ?",
@@ -550,6 +600,157 @@ export const faqSections: FAQSection[] = [
       {
         question: "Comment rechercher un compte ?",
         answer: "Utilisez la barre de recherche en haut de la page de gestion des comptes. Vous pouvez rechercher par nom de compte, banque, IBAN, ou BIC. La recherche filtre automatiquement la liste et affiche les résultats correspondants en temps réel."
+      }
+    ]
+  },
+  {
+    id: "relances",
+    title: "Relances de paiement",
+    icon: <CreditCard className="h-5 w-5" />,
+    items: [
+      {
+        question: "Comment gérer les relances de paiement ?",
+        answer: (
+          <div className="space-y-3">
+            <VideoEmbed filePath={videoMappings['relance-paiement']} title="Vidéo : Relances de paiement" />
+            <p>Le module de relances vous permet de suivre et automatiser les rappels de paiement pour les factures impayées. Configurez des cycles de relances personnalisés selon vos besoins : rappel amiable, mise en demeure, contentieux. Les relances peuvent être envoyées par email, SMS, WhatsApp ou courrier selon les préférences du client et la gravité du retard.</p>
+            <div className="mt-4">
+              <p className="font-medium">Fonctionnalités :</p>
+              <ul className="list-disc list-inside space-y-1 ml-4 mt-2">
+                <li>Relances automatiques basées sur les délais de paiement</li>
+                <li>Personnalisation des messages et de la tonalité</li>
+                <li>Suivi des réponses clients</li>
+                <li>Historique complet des relances envoyées</li>
+                <li>Escalade automatique vers contentieux si nécessaire</li>
+              </ul>
+            </div>
+          </div>
+        )
+      }
+    ]
+  },
+  {
+    id: "employees",
+    title: "Gestion des employés",
+    icon: <UserCog className="h-5 w-5" />,
+    items: [
+      {
+        question: "Comment ajouter un employé ?",
+        answer: (
+          <div className="space-y-3">
+            <VideoEmbed filePath={videoMappings['ajout-employe']} title="Vidéo : Ajout d'un employé" />
+            <p>Pour ajouter un nouvel employé dans l'application :</p>
+            <ol className="list-decimal list-inside space-y-2 ml-4">
+              <li>Accédez à la section "Équipe" ou "Employés"</li>
+              <li>Cliquez sur "+ Nouvel employé"</li>
+              <li>Remplissez les informations personnelles : nom, prénom, email, téléphone</li>
+              <li>Définissez le rôle et les permissions d'accès</li>
+              <li>Configurez les informations contractuelles si nécessaire</li>
+              <li>Sauvegardez pour finaliser l'ajout</li>
+            </ol>
+            <p className="text-sm text-gray-600 mt-3">L'employé recevra automatiquement un email d'invitation pour créer son compte et accéder à l'application.</p>
+          </div>
+        )
+      },
+      {
+        question: "Comment gérer le planning des employés ?",
+        answer: (
+          <div className="space-y-3">
+            <VideoEmbed filePath={videoMappings['planning-employe']} title="Vidéo : Planning employé" />
+            <p>Le planning employés permet de visualiser et organiser les interventions de votre équipe :</p>
+            <ul className="list-disc list-inside space-y-2 ml-4">
+              <li>Vue calendrier par jour, semaine ou mois</li>
+              <li>Affectation des tâches aux employés disponibles</li>
+              <li>Gestion des congés et absences</li>
+              <li>Suivi du temps passé sur chaque intervention</li>
+              <li>Optimisation de la charge de travail</li>
+            </ul>
+          </div>
+        )
+      },
+      {
+        question: "Comment assigner une tâche à un employé ?",
+        answer: (
+          <div className="space-y-3">
+            <VideoEmbed filePath={videoMappings['tache-employe']} title="Vidéo : Tâche employé" />
+            <p>L'assignation de tâches permet de répartir efficacement le travail :</p>
+            <ol className="list-decimal list-inside space-y-2 ml-4">
+              <li>Sélectionnez l'ordre de réparation ou le véhicule concerné</li>
+              <li>Choisissez le type de tâche (accueil, préparation, peinture, finition, etc.)</li>
+              <li>Assignez à l'employé disponible selon ses compétences</li>
+              <li>Définissez les dates et heures prévisionnelles</li>
+              <li>L'employé reçoit une notification de la nouvelle tâche</li>
+            </ol>
+            <p className="text-sm text-gray-600 mt-3">Les employés peuvent mettre à jour le statut de leurs tâches en temps réel depuis leur interface.</p>
+          </div>
+        )
+      }
+    ]
+  },
+  {
+    id: "purchases",
+    title: "Achats et fournisseurs",
+    icon: <ShoppingCart className="h-5 w-5" />,
+    items: [
+      {
+        question: "Comment créer un bon de commande ?",
+        answer: (
+          <div className="space-y-3">
+            <VideoEmbed filePath={videoMappings['bon-commande']} title="Vidéo : Bon de commande" />
+            <p>Le bon de commande vous permet de commander des pièces et fournitures auprès de vos fournisseurs :</p>
+            <ol className="list-decimal list-inside space-y-2 ml-4">
+              <li>Accédez à la section "Achats" ou "Bons de commande"</li>
+              <li>Créez un nouveau bon de commande</li>
+              <li>Sélectionnez le fournisseur dans votre liste</li>
+              <li>Ajoutez les articles : références, quantités, prix unitaires</li>
+              <li>Vérifiez les montants HT, TVA et TTC</li>
+              <li>Envoyez le bon de commande par email au fournisseur</li>
+            </ol>
+            <div className="mt-4">
+              <p className="font-medium">Suivi des commandes :</p>
+              <ul className="list-disc list-inside space-y-1 ml-4 mt-2">
+                <li>Statut de la commande (en attente, expédiée, reçue)</li>
+                <li>Date de livraison prévue et réelle</li>
+                <li>Gestion des bons de livraison</li>
+                <li>Rapprochement avec les factures fournisseurs</li>
+              </ul>
+            </div>
+          </div>
+        )
+      }
+    ]
+  },
+  {
+    id: "litigation",
+    title: "Contentieux et litiges",
+    icon: <Scale className="h-5 w-5" />,
+    items: [
+      {
+        question: "Comment gérer un contentieux ?",
+        answer: (
+          <div className="space-y-3">
+            <VideoEmbed filePath={videoMappings['contentieux-tribunal']} title="Vidéo : Contentieux et tribunal" />
+            <p>Le module contentieux vous aide à gérer les litiges et procédures judiciaires :</p>
+            <div className="mt-4">
+              <p className="font-medium">Création d'un dossier contentieux :</p>
+              <ol className="list-decimal list-inside space-y-2 ml-4 mt-2">
+                <li>Sélectionnez la facture ou le dossier en litige</li>
+                <li>Rassemblez tous les documents nécessaires (factures, relances, échanges)</li>
+                <li>Générez automatiquement le dossier judiciaire avec les pièces justificatives</li>
+                <li>Suivez l'avancement de la procédure (mise en demeure, tribunal, jugement)</li>
+              </ol>
+            </div>
+            <div className="mt-4">
+              <p className="font-medium">Documents générés automatiquement :</p>
+              <ul className="list-disc list-inside space-y-1 ml-4 mt-2">
+                <li>Lettre de mise en demeure</li>
+                <li>Assignation en justice</li>
+                <li>Récapitulatif chronologique des événements</li>
+                <li>Compilation de toutes les pièces justificatives</li>
+              </ul>
+            </div>
+          </div>
+        )
       }
     ]
   }
