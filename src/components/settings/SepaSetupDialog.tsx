@@ -10,7 +10,11 @@ import { useSubscription } from '@/hooks/use-subscription';
 import { CreditCard, Building2, MapPin, Mail, Phone, User, Package } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
-export const SepaSetupDialog = () => {
+interface SepaSetupDialogProps {
+  isChangingPlan?: boolean;
+}
+
+export const SepaSetupDialog: React.FC<SepaSetupDialogProps> = ({ isChangingPlan = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [mandateResult, setMandateResult] = useState<any>(null);
@@ -109,9 +113,9 @@ export const SepaSetupDialog = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button className="w-full" variant={isChangingPlan ? "outline" : "default"}>
           <CreditCard className="mr-2 h-4 w-4" />
-          Configurer le prélèvement SEPA
+          {isChangingPlan ? 'Changer d\'abonnement' : 'Configurer le prélèvement SEPA'}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl">

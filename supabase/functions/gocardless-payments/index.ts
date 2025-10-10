@@ -368,12 +368,13 @@ async function createGoCardlessSubscription(params: CreateSubscriptionParams) {
 
   console.log('Subscription GoCardless créée:', subscription.id);
 
-  // Mettre à jour company_subscriptions avec l'ID GoCardless
+  // Mettre à jour company_subscriptions avec l'ID GoCardless et le subscription_plan_id
   if (companySubscriptionId) {
     const { error: updateError } = await supabase
       .from('company_subscriptions')
       .update({ 
         gocardless_subscription_id: subscription.id,
+        subscription_plan_id: subscriptionPlanId,
         payment_method: 'gocardless_sepa',
         auto_billing_enabled: true,
         updated_at: new Date().toISOString()
@@ -383,7 +384,7 @@ async function createGoCardlessSubscription(params: CreateSubscriptionParams) {
     if (updateError) {
       console.error('Erreur mise à jour company_subscriptions:', updateError);
     } else {
-      console.log('company_subscriptions mis à jour avec gocardless_subscription_id');
+      console.log('company_subscriptions mis à jour avec gocardless_subscription_id et subscription_plan_id');
     }
   }
 

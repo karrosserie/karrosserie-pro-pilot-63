@@ -244,10 +244,10 @@ const SubscriptionTab: React.FC = () => {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Building2 className="mr-2 h-5 w-5" />
-            Prélèvement SEPA automatique
+            Abonnement
           </CardTitle>
           <CardDescription>
-            Automatisez le paiement de vos abonnements avec le prélèvement SEPA via GoCardless.
+            Gérez votre abonnement et configurez le prélèvement SEPA via GoCardless.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -333,24 +333,7 @@ const SubscriptionTab: React.FC = () => {
               )}
 
               <div className="flex justify-end">
-                <Button 
-                  variant="destructive" 
-                  size="sm"
-                  onClick={() => mandateStatus?.gocardless_mandate_id && cancelMandate(mandateStatus.gocardless_mandate_id)}
-                  disabled={isCancellingMandate}
-                >
-                  {isCancellingMandate ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Annulation...
-                    </>
-                  ) : (
-                    <>
-                      <Ban className="mr-2 h-4 w-4" />
-                      Annuler le mandat
-                    </>
-                  )}
-                </Button>
+                <SepaSetupDialog isChangingPlan />
               </div>
             </div>
           )}
