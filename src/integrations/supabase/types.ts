@@ -783,6 +783,70 @@ export type Database = {
         }
         Relationships: []
       }
+      company_contract_documents: {
+        Row: {
+          company_id: string
+          created_at: string
+          description: string | null
+          document_type: string
+          file_name: string
+          file_path: string
+          file_size: number | null
+          file_type: string | null
+          id: string
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          description?: string | null
+          document_type?: string
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          description?: string | null
+          document_type?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_contract_documents_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "company_contract_documents_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "company_contract_documents_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_info: {
         Row: {
           address: string
@@ -1008,6 +1072,7 @@ export type Database = {
           company_id: string
           created_at: string
           end_date: string | null
+          gocardless_subscription_id: string | null
           id: string
           last_payment_date: string | null
           last_payment_status: string | null
@@ -1027,6 +1092,7 @@ export type Database = {
           company_id: string
           created_at?: string
           end_date?: string | null
+          gocardless_subscription_id?: string | null
           id?: string
           last_payment_date?: string | null
           last_payment_status?: string | null
@@ -1046,6 +1112,7 @@ export type Database = {
           company_id?: string
           created_at?: string
           end_date?: string | null
+          gocardless_subscription_id?: string | null
           id?: string
           last_payment_date?: string | null
           last_payment_status?: string | null

@@ -177,6 +177,63 @@ export const useGoCardless = () => {
     },
   });
 
+  // Mutation pour créer une subscription GoCardless récurrente
+  const createSubscriptionMutation = useMutation({
+    mutationFn: async ({ 
+      mandateId,
+      subscriptionPlanId,
+      companySubscriptionId
+    }: {
+      mandateId: string;
+      subscriptionPlanId: string;
+      companySubscriptionId: string;
+    }) => {
+      if (!effectiveCompanyId) throw new Error('No company selected');
+      return gocardlessService.createSubscription(
+        effectiveCompanyId,
+        mandateId,
+        subscriptionPlanId,
+        companySubscriptionId
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['company-subscription'] });
+      queryClient.invalidateQueries({ queryKey: ['local-mandate'] });
+      toast({
+        title: "Abonnement activé",
+        description: "Votre abonnement récurrent a été configuré avec succès.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Mutation pour annuler une subscription GoCardless
+  const cancelSubscriptionMutation = useMutation({
+    mutationFn: async (gocardlessSubscriptionId: string) => {
+      return gocardlessService.cancelSubscription(gocardlessSubscriptionId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['company-subscription'] });
+      toast({
+        title: "Abonnement annulé",
+        description: "L'abonnement GoCardless a été annulé.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+
   // Helper function to setup GoCardless for a company
   const setupGoCardlessForCompany = async (
     customerData: GoCardlessCustomer,
@@ -192,7 +249,10 @@ export const useGoCardless = () => {
         bankAccount
       });
       
-      return result;
+      return {
+        ...result,
+        mandateId: result.mandate.id
+      };
     } catch (error) {
       console.error('Erreur configuration GoCardless:', error);
       throw error;
@@ -218,6 +278,8 @@ export const useGoCardless = () => {
     createMandate: createMandateMutation.mutate,
     cancelMandate: cancelMandateMutation.mutate,
     createSubscriptionPayment: createSubscriptionPaymentMutation.mutate,
+    createSubscription: createSubscriptionMutation.mutate,
+    cancelSubscription: cancelSubscriptionMutation.mutate,
     setupGoCardlessForCompany,
     
     // Mutation states
@@ -225,5 +287,7 @@ export const useGoCardless = () => {
     isCreatingMandate: createMandateMutation.isPending,
     isCancellingMandate: cancelMandateMutation.isPending,
     isCreatingPayment: createSubscriptionPaymentMutation.isPending,
+    isCreatingSubscription: createSubscriptionMutation.isPending,
+    isCancellingSubscription: cancelSubscriptionMutation.isPending,
   };
 };

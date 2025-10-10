@@ -256,6 +256,48 @@ export class GoCardlessService {
     
     return payment;
   }
+
+  // Créer une subscription GoCardless récurrente
+  async createSubscription(
+    companyId: string,
+    mandateId: string,
+    subscriptionPlanId: string,
+    companySubscriptionId: string
+  ) {
+    // Récupérer les détails du plan
+    const { data: plan } = await supabase
+      .from('subscription_plans')
+      .select('*')
+      .eq('id', subscriptionPlanId)
+      .single();
+
+    if (!plan) throw new Error('Plan d\'abonnement introuvable');
+
+    const intervalUnit = plan.billing_period === 'monthly' ? 'monthly' : 'yearly';
+
+    const result = await this.callEdgeFunction('create_subscription', {
+      mandateId,
+      amount: plan.price,
+      currency: 'EUR',
+      name: `${plan.name} - Abonnement`,
+      interval_unit: intervalUnit,
+      day_of_month: 1,
+      metadata: {
+        company_id: companyId,
+        subscription_plan_id: subscriptionPlanId
+      },
+      companySubscriptionId
+    });
+
+    return result.subscription;
+  }
+
+  // Annuler une subscription GoCardless
+  async cancelSubscription(gocardlessSubscriptionId: string) {
+    return await this.callEdgeFunction('cancel_subscription', {
+      subscriptionId: gocardlessSubscriptionId
+    });
+  }
 }
 
 export const gocardlessService = new GoCardlessService();

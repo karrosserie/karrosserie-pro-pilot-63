@@ -51,6 +51,17 @@ interface CreatePaymentParams {
   metadata?: Record<string, string>;
 }
 
+interface CreateSubscriptionParams {
+  mandateId: string;
+  amount: number;
+  currency: string;
+  name: string;
+  interval_unit: 'monthly' | 'yearly';
+  day_of_month?: number;
+  metadata?: Record<string, string>;
+  companySubscriptionId?: string;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -87,6 +98,10 @@ serve(async (req) => {
         return await getMandateStatus(params.mandateId);
       case 'cancel_mandate':
         return await cancelMandate(params.mandateId);
+      case 'create_subscription':
+        return await createGoCardlessSubscription(params);
+      case 'cancel_subscription':
+        return await cancelGoCardlessSubscription(params.subscriptionId);
       case 'webhook':
         return await handleWebhook(body, req);
       default:
@@ -306,6 +321,118 @@ async function cancelMandate(mandateId: string) {
   );
 }
 
+async function createGoCardlessSubscription(params: CreateSubscriptionParams) {
+  const { 
+    mandateId, 
+    amount, 
+    currency, 
+    name, 
+    interval_unit, 
+    day_of_month,
+    metadata,
+    companySubscriptionId 
+  } = params;
+
+  console.log('Création de la subscription GoCardless:', { mandateId, amount, name, interval_unit });
+
+  const response = await fetch(`${GOCARDLESS_ENDPOINT_URL}/subscriptions`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${GOCARDLESS_ACCESS_TOKEN}`,
+      'Content-Type': 'application/json',
+      'GoCardless-Version': '2015-07-06',
+    },
+    body: JSON.stringify({
+      subscriptions: {
+        amount: Math.round(amount * 100), // Convertir en centimes
+        currency: currency.toUpperCase(),
+        name,
+        interval_unit,
+        day_of_month: day_of_month || 1,
+        metadata: metadata || {},
+        links: {
+          mandate: mandateId
+        }
+      }
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    console.error('Erreur GoCardless:', error);
+    throw new Error(`Erreur GoCardless: ${error}`);
+  }
+
+  const result = await response.json();
+  const subscription = result.subscriptions;
+
+  console.log('Subscription GoCardless créée:', subscription.id);
+
+  // Mettre à jour company_subscriptions avec l'ID GoCardless
+  if (companySubscriptionId) {
+    const { error: updateError } = await supabase
+      .from('company_subscriptions')
+      .update({ 
+        gocardless_subscription_id: subscription.id,
+        payment_method: 'gocardless_sepa',
+        auto_billing_enabled: true,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', companySubscriptionId);
+
+    if (updateError) {
+      console.error('Erreur mise à jour company_subscriptions:', updateError);
+    } else {
+      console.log('company_subscriptions mis à jour avec gocardless_subscription_id');
+    }
+  }
+
+  return new Response(
+    JSON.stringify({ 
+      success: true, 
+      subscription: {
+        id: subscription.id,
+        status: subscription.status,
+        amount_cents: subscription.amount,
+        currency: subscription.currency,
+        interval_unit: subscription.interval_unit,
+        start_date: subscription.start_date
+      }
+    }),
+    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  );
+}
+
+async function cancelGoCardlessSubscription(subscriptionId: string) {
+  console.log('Annulation de la subscription GoCardless:', subscriptionId);
+
+  const response = await fetch(`${GOCARDLESS_ENDPOINT_URL}/subscriptions/${subscriptionId}/actions/cancel`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${GOCARDLESS_ACCESS_TOKEN}`,
+      'Content-Type': 'application/json',
+      'GoCardless-Version': '2015-07-06',
+    },
+    body: JSON.stringify({
+      data: {}
+    })
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    console.error('Erreur annulation subscription:', error);
+    throw new Error(`Erreur annulation subscription: ${error}`);
+  }
+
+  const result = await response.json();
+  console.log('Subscription annulée:', result.subscriptions.id);
+
+  return new Response(
+    JSON.stringify({ success: true, subscription: result.subscriptions }),
+    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  );
+}
+
 async function handleWebhook(bodyData: any, req: Request) {
   const signature = req.headers.get('webhook-signature');
   
@@ -325,6 +452,9 @@ async function handleWebhook(bodyData: any, req: Request) {
         break;
       case 'mandates':
         await handleMandateEvent(event);
+        break;
+      case 'subscriptions':
+        await handleSubscriptionEvent(event);
         break;
       default:
         console.log('Type d\'événement non géré:', event.resource_type);
@@ -469,5 +599,49 @@ async function handleMandateEvent(event: any) {
     if (companyError) {
       console.error('Erreur mise à jour company_info:', companyError);
     }
+  }
+}
+
+async function handleSubscriptionEvent(event: any) {
+  const subscriptionId = event.links.subscription;
+  const action = event.action;
+  
+  console.log(`Événement de subscription: ${action} pour ${subscriptionId}`);
+  
+  try {
+    let updateData: any = { updated_at: new Date().toISOString() };
+    
+    switch(action) {
+      case 'created':
+        updateData.status = 'active';
+        updateData.auto_billing_enabled = true;
+        break;
+      case 'cancelled':
+        updateData.status = 'cancelled';
+        updateData.auto_billing_enabled = false;
+        break;
+      case 'finished':
+        updateData.status = 'expired';
+        updateData.auto_billing_enabled = false;
+        break;
+      case 'payment_created':
+        console.log('Paiement créé pour la subscription:', subscriptionId);
+        // On ne met pas à jour le statut, juste log
+        return;
+    }
+    
+    // Mettre à jour company_subscriptions
+    const { error } = await supabase
+      .from('company_subscriptions')
+      .update(updateData)
+      .eq('gocardless_subscription_id', subscriptionId);
+    
+    if (error) {
+      console.error('Erreur mise à jour subscription:', error);
+    } else {
+      console.log(`Subscription ${subscriptionId} mise à jour:`, updateData);
+    }
+  } catch (error) {
+    console.error('Erreur traitement événement subscription:', error);
   }
 }

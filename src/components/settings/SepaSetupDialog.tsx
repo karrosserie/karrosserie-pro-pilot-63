@@ -6,11 +6,15 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useGoCardless } from '@/hooks/use-gocardless';
-import { CreditCard, Building2, MapPin, Mail, Phone, User } from 'lucide-react';
+import { useSubscription } from '@/hooks/use-subscription';
+import { CreditCard, Building2, MapPin, Mail, Phone, User, Package } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 export const SepaSetupDialog = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState(1);
+  const [mandateResult, setMandateResult] = useState<any>(null);
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [customerData, setCustomerData] = useState({
     given_name: '',
     family_name: '',
@@ -29,9 +33,16 @@ export const SepaSetupDialog = () => {
   const {
     companyData,
     setupGoCardlessForCompany,
+    createSubscription,
     isCreatingCustomer,
     isCreatingMandate,
+    isCreatingSubscription,
   } = useGoCardless();
+
+  const {
+    subscriptionPlans,
+    companySubscription,
+  } = useSubscription();
 
   const handleNext = () => {
     if (step === 1) {
@@ -51,10 +62,29 @@ export const SepaSetupDialog = () => {
 
   const handleSubmit = async () => {
     try {
-      await setupGoCardlessForCompany(customerData, bankData);
+      const result = await setupGoCardlessForCompany(customerData, bankData);
+      setMandateResult(result);
+      setStep(3); // Passer à l'étape de sélection du plan
+    } catch (error) {
+      console.error('Erreur configuration SEPA:', error);
+    }
+  };
+
+  const handlePlanSelection = async () => {
+    if (!selectedPlanId || !mandateResult || !companySubscription) return;
+    
+    try {
+      await createSubscription({
+        mandateId: mandateResult.mandateId,
+        subscriptionPlanId: selectedPlanId,
+        companySubscriptionId: companySubscription.id,
+      });
+      
+      // Fermer et réinitialiser
       setIsOpen(false);
       setStep(1);
-      // Réinitialiser les formulaires
+      setMandateResult(null);
+      setSelectedPlanId(null);
       setCustomerData({
         given_name: '',
         family_name: '',
@@ -70,11 +100,11 @@ export const SepaSetupDialog = () => {
         account_holder_name: ''
       });
     } catch (error) {
-      console.error('Erreur configuration SEPA:', error);
+      console.error('Erreur activation abonnement:', error);
     }
   };
 
-  const isLoading = isCreatingCustomer || isCreatingMandate;
+  const isLoading = isCreatingCustomer || isCreatingMandate || isCreatingSubscription;
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -251,6 +281,75 @@ export const SepaSetupDialog = () => {
                   disabled={isLoading || !bankData.iban || !bankData.account_holder_name}
                 >
                   {isLoading ? "Configuration..." : "Configurer le prélèvement"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {step === 3 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Package className="mr-2 h-5 w-5" />
+                Choisissez votre plan d'abonnement
+              </CardTitle>
+              <CardDescription>
+                Sélectionnez le plan qui correspond le mieux à vos besoins. Le prélèvement sera automatique.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4">
+                {subscriptionPlans?.filter(plan => plan.is_active && plan.price > 0).map((plan) => (
+                  <div
+                    key={plan.id}
+                    className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                      selectedPlanId === plan.id
+                        ? 'border-primary bg-primary/5 ring-2 ring-primary'
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                    onClick={() => setSelectedPlanId(plan.id)}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h3 className="font-semibold text-lg">{plan.name}</h3>
+                        <p className="text-sm text-muted-foreground">{plan.description}</p>
+                      </div>
+                      {selectedPlanId === plan.id && (
+                        <Badge variant="default">Sélectionné</Badge>
+                      )}
+                    </div>
+                    <div className="flex items-baseline gap-1 mt-3">
+                      <span className="text-2xl font-bold">{plan.price}€</span>
+                      <span className="text-muted-foreground">
+                        / {plan.billing_period === 'monthly' ? 'mois' : 'an'}
+                      </span>
+                    </div>
+                    <div className="text-sm text-muted-foreground mt-2">
+                      {plan.tokens_included} jetons inclus
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <h4 className="font-medium text-blue-900 mb-2">Information sur le prélèvement</h4>
+                <p className="text-sm text-blue-800">
+                  Le montant de l'abonnement sélectionné sera automatiquement prélevé sur votre compte bancaire 
+                  selon la périodicité choisie. Le premier prélèvement interviendra après validation du mandat 
+                  par votre banque (sous 3-5 jours ouvrés).
+                </p>
+              </div>
+
+              <div className="flex justify-between">
+                <Button variant="outline" onClick={() => setStep(2)}>
+                  Retour
+                </Button>
+                <Button 
+                  onClick={handlePlanSelection}
+                  disabled={!selectedPlanId || isCreatingSubscription}
+                >
+                  {isCreatingSubscription ? "Activation..." : "Activer l'abonnement"}
                 </Button>
               </div>
             </CardContent>
