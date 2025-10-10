@@ -442,10 +442,11 @@ const DepotDossier = () => {
           );
           
           // Préparer les sources PDF pour la fusion
-          const pdfSources: Array<{ blob?: Blob; url?: string; title: string }> = [
+          const pdfSources: Array<{ blob?: Blob; url?: string; title: string; type?: 'pdf' | 'image' }> = [
             { 
               blob: demandePDFBlob, 
-              title: 'Demande de jugement sur pièce' 
+              title: 'Demande de jugement sur pièce',
+              type: 'pdf'
             }
           ];
           
@@ -459,7 +460,7 @@ const DepotDossier = () => {
                   try {
                     const { generateInvoicePDFBlob } = await import('@/utils/invoicePDFGeneration');
                     const blob = await generateInvoicePDFBlob(doc.data, companyData);
-                    pdfSources.push({ blob, title: doc.name });
+                    pdfSources.push({ blob, title: doc.name, type: 'pdf' });
                   } catch (error) {
                     console.error('Erreur génération PDF facture:', error);
                   }
@@ -467,7 +468,7 @@ const DepotDossier = () => {
                   try {
                     const { generateQuotePDFBlob } = await import('@/utils/quotePDFGeneration');
                     const blob = await generateQuotePDFBlob(doc.data, companyData);
-                    pdfSources.push({ blob, title: doc.name });
+                    pdfSources.push({ blob, title: doc.name, type: 'pdf' });
                   } catch (error) {
                     console.error('Erreur génération PDF devis:', error);
                   }
@@ -475,14 +476,19 @@ const DepotDossier = () => {
                   try {
                     const { generateRepairOrderPDFBlob } = await import('@/utils/repairOrderPDFGeneration');
                     const blob = await generateRepairOrderPDFBlob(doc.data, companyData);
-                    pdfSources.push({ blob, title: doc.name });
+                    pdfSources.push({ blob, title: doc.name, type: 'pdf' });
                   } catch (error) {
                     console.error('Erreur génération PDF ordre de réparation:', error);
                   }
                 }
               } else {
-                // C'est une URL classique
-                pdfSources.push({ url: doc.url, title: doc.name });
+                // Détecter si c'est une image ou un PDF
+                const isImage = /\.(jpg|jpeg|png|webp)$/i.test(doc.url);
+                pdfSources.push({ 
+                  url: doc.url, 
+                  title: doc.name,
+                  type: isImage ? 'image' : 'pdf'
+                });
               }
             }
           }
