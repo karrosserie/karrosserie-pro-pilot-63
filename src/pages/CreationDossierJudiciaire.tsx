@@ -12,6 +12,7 @@ import { useQuotes } from "@/hooks/use-quotes";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from '@/integrations/supabase/client';
 
 const CreationDossierJudiciaire = () => {
   const navigate = useNavigate();
@@ -219,40 +220,18 @@ const CreationDossierJudiciaire = () => {
       console.log('❌ Pas de devis trouvé');
     }
     
-    // 2. Ordre de réparation - Recherche simplifiée et débogage
+    // 2. Ordre de réparation - Recherche par client_id
     console.log('=== RECHERCHE ORDRES DE RÉPARATION ===');
-    console.log('Tous les ordres disponibles:', repairOrders?.length || 0);
     console.log('Client sélectionné:', selectedClient);
-    console.log('Facture sélectionnée:', selectedInvoice);
-    console.log('Vehicle ID de la facture:', invoice.vehicle_id);
+    console.log('Véhicule de la facture:', invoice.vehicle_id);
     
-    if (repairOrders && repairOrders.length > 0) {
-      console.log('Premier ordre exemple:', {
-        id: repairOrders[0].id,
-        client_id: repairOrders[0].client_id,
-        vehicle_id: repairOrders[0].vehicle_id,
-        reference: repairOrders[0].reference,
-        invoices: repairOrders[0].invoices
-      });
-    }
-    
-    // Recherche directe par client_id d'abord
-    const relatedRepairOrders = repairOrders?.filter(order => {
-      console.log(`Ordre ${order.reference}:`, {
-        client_id: order.client_id,
-        match_client: order.client_id === selectedClient,
-        vehicle_id: order.vehicle_id,
-        match_vehicle: order.vehicle_id === invoice.vehicle_id,
-        invoices: order.invoices,
-        signed_document_url: order.signed_document_url,
-        document_url: (order as any).document_url
-      });
-      
-      return order.client_id === selectedClient;
-    }) || [];
+    const relatedRepairOrders = repairOrders?.filter(order => 
+      order.client_id === selectedClient
+    ) || [];
     
     console.log('Ordres trouvés pour ce client:', relatedRepairOrders.length);
-    relatedRepairOrders.forEach(order => {
+    
+    for (const order of relatedRepairOrders) {
       if (order.signed_document_url && order.signed_document_url.trim()) {
         existingDocuments.push({
           url: order.signed_document_url,
@@ -261,18 +240,27 @@ const CreationDossierJudiciaire = () => {
           reference: order.reference
         });
         console.log('✅ OR signé ajouté:', order.reference);
-      } else if ((order as any).document_url && (order as any).document_url.trim()) {
-        existingDocuments.push({
-          url: (order as any).document_url,
-          type: 'repair_order',
-          description: 'Ordre de réparation',
-          reference: order.reference
-        });
-        console.log('✅ OR ajouté:', order.reference);
-      } else {
-        console.log('❌ OR sans document:', order.reference);
       }
-    });
+      
+      // Générer le PDF de l'ordre de réparation si pas de document signé
+      if (!order.signed_document_url || !order.signed_document_url.trim()) {
+        try {
+          const { generateRepairOrderPDFBlob } = await import('@/utils/repairOrderPDFGeneration');
+          const blob = await generateRepairOrderPDFBlob(order, companyData);
+          const fileUrl = URL.createObjectURL(blob);
+          
+          existingDocuments.push({
+            url: fileUrl,
+            type: 'repair_order',
+            description: 'Ordre de réparation',
+            reference: order.reference
+          });
+          console.log('✅ OR PDF généré:', order.reference);
+        } catch (error) {
+          console.error('❌ Erreur génération PDF OR:', error);
+        }
+      }
+    }
     
     // 3. Facture - Générer le PDF à la demande
     console.log('Invoice data:', invoice);
@@ -314,7 +302,65 @@ const CreationDossierJudiciaire = () => {
       });
     }
     
-    // Photos des travaux des repair orders
+    // 5. Photos du véhicule depuis les tables vehicle_photos et task_photos
+    console.log('=== RECHERCHE PHOTOS DU VÉHICULE ===');
+    console.log('Vehicle ID:', invoice.vehicle_id);
+    
+    if (invoice.vehicle_id) {
+      try {
+        // Photos du véhicule
+        const { data: vehiclePhotos, error: vehiclePhotosError } = await supabase
+          .from('vehicle_photos')
+          .select('file_url, file_name, description, photo_type')
+          .eq('vehicle_id', invoice.vehicle_id);
+        
+        if (vehiclePhotosError) {
+          console.error('❌ Erreur récupération photos véhicule:', vehiclePhotosError);
+        } else if (vehiclePhotos && vehiclePhotos.length > 0) {
+          console.log('✅ Photos véhicule trouvées:', vehiclePhotos.length);
+          vehiclePhotos.forEach(photo => {
+            if (photo.file_url && photo.file_url.trim()) {
+              physicalDocuments.push(photo.file_url);
+              existingDocuments.push({
+                url: photo.file_url,
+                type: 'vehicle_photo',
+                description: photo.description || 'Photo du véhicule'
+              });
+            }
+          });
+        } else {
+          console.log('❌ Aucune photo véhicule trouvée');
+        }
+        
+        // Photos des tâches liées au véhicule
+        const { data: taskPhotos, error: taskPhotosError } = await supabase
+          .from('task_photos')
+          .select('file_url, file_name, photo_type')
+          .eq('vehicle_id', invoice.vehicle_id);
+        
+        if (taskPhotosError) {
+          console.error('❌ Erreur récupération photos tâches:', taskPhotosError);
+        } else if (taskPhotos && taskPhotos.length > 0) {
+          console.log('✅ Photos tâches trouvées:', taskPhotos.length);
+          taskPhotos.forEach(photo => {
+            if (photo.file_url && photo.file_url.trim()) {
+              physicalDocuments.push(photo.file_url);
+              existingDocuments.push({
+                url: photo.file_url,
+                type: 'task_photo',
+                description: `Photo de travaux (${photo.photo_type || 'tâche'})`
+              });
+            }
+          });
+        } else {
+          console.log('❌ Aucune photo tâche trouvée');
+        }
+      } catch (error) {
+        console.error('❌ Erreur lors de la récupération des photos:', error);
+      }
+    }
+    
+    // Photos des travaux des repair orders (dans repairs_data et parts_data)
     relatedRepairOrders.forEach(order => {
       if (order.repairs_data) {
         try {
@@ -329,7 +375,7 @@ const CreationDossierJudiciaire = () => {
                     existingDocuments.push({
                       url: photoUrl,
                       type: 'work_photo',
-                      description: 'Photo de véhicule/travaux'
+                      description: 'Photo de réparation'
                     });
                   }
                 });
@@ -353,7 +399,7 @@ const CreationDossierJudiciaire = () => {
                     existingDocuments.push({
                       url: photoUrl,
                       type: 'work_photo',
-                      description: 'Photo de véhicule/travaux'
+                      description: 'Photo de pièce'
                     });
                   }
                 });
