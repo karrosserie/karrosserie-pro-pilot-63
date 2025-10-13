@@ -17,6 +17,16 @@ export const supabase = createClient<Database>(
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: true
+    },
+    realtime: {
+      params: {
+        eventsPerSecond: 10
+      }
+    },
+    global: {
+      headers: {
+        'X-Client-Info': 'supabase-js-web'
+      }
     }
   }
 );
