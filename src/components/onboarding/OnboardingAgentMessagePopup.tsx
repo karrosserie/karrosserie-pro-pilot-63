@@ -13,15 +13,25 @@ import { useOnboardingAgentMessages } from '@/hooks/onboarding/useOnboardingAgen
 export function OnboardingAgentMessagePopup() {
   const { unreadMessage, markAsRead, isMarkingAsRead } = useOnboardingAgentMessages();
   const [open, setOpen] = useState(false);
+  const [lastDisplayedMessageId, setLastDisplayedMessageId] = useState<number | null>(null);
 
   // Ouvrir automatiquement la popup quand un nouveau message non lu arrive
   useEffect(() => {
-    if (unreadMessage && !open) {
+    console.log('🎯 [Popup] useEffect triggered', {
+      unreadMessage: unreadMessage?.id,
+      lastDisplayedMessageId,
+      open
+    });
+
+    if (unreadMessage && unreadMessage.id !== lastDisplayedMessageId) {
+      console.log('✅ [Popup] Opening popup for new message:', unreadMessage.id);
       setOpen(true);
+      setLastDisplayedMessageId(unreadMessage.id);
     }
-  }, [unreadMessage, open]);
+  }, [unreadMessage]);
 
   const handleClose = () => {
+    console.log('🚪 [Popup] Closing popup, marking message as read:', unreadMessage?.id);
     if (unreadMessage) {
       markAsRead(unreadMessage.id);
     }

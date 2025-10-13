@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { onboardingService } from '@/services/onboarding/OnboardingService';
 
@@ -55,8 +56,47 @@ export function useOnboardingAgentMessages() {
       return null;
     },
     enabled: !!onboardingId,
-    refetchInterval: 30000, // Polling toutes les 30 secondes
   });
+
+  // Setup Realtime subscription pour les nouveaux messages
+  useEffect(() => {
+    if (!onboardingId) return;
+
+    console.log('🔌 [Realtime] Setting up subscription for session:', onboardingId);
+    
+    const channel = supabase
+      .channel('onboarding-messages')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'ai_messages_history',
+          filter: `session_id=eq.${onboardingId}`
+        },
+        (payload) => {
+          console.log('📨 [Realtime] New message received:', payload);
+          
+          const newMessage = payload.new as any;
+          if (newMessage.message?.type === 'ai' && !newMessage.read) {
+            console.log('✅ [Realtime] Valid AI message detected, invalidating query...');
+            queryClient.invalidateQueries({ 
+              queryKey: ['onboarding-agent-messages', onboardingId] 
+            });
+          } else {
+            console.log('⚠️ [Realtime] Message skipped (not AI or already read)');
+          }
+        }
+      )
+      .subscribe((status) => {
+        console.log('🔌 [Realtime] Subscription status:', status);
+      });
+
+    return () => {
+      console.log('🔌 [Realtime] Cleaning up subscription...');
+      supabase.removeChannel(channel);
+    };
+  }, [onboardingId, queryClient]);
 
   // Mutation pour marquer le message comme lu
   const markAsReadMutation = useMutation({
