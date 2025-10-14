@@ -46,6 +46,7 @@ export const AccountsHeader = ({
             <Button 
               className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 flex-1 sm:flex-none"
               onClick={onCreateAccount}
+              data-action="create-account"
             >
               <Plus className="h-4 w-4 mr-2" />
               <span className="sm:inline">Nouveau compte</span>

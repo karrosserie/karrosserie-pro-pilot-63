@@ -353,17 +353,42 @@ function getFeatureActions(
         icon: <Play className="h-4 w-4 text-primary" />,
         onClick: () => {
           setShowFallbackModal(false);
-          // Naviguer vers la page de comptabilité qui contient la liste des comptes
-          navigate('/payments/accounting');
+          navigate('/payments/management');
+          // Activer l'onglet comptes et ouvrir le dialog de création
+          setTimeout(() => {
+            // Cliquer sur la carte "Comptes actifs" pour activer l'onglet
+            const accountsCard = Array.from(document.querySelectorAll('.cursor-pointer')).find(
+              el => el.textContent?.includes('Comptes actifs')
+            ) as HTMLElement;
+            if (accountsCard) {
+              accountsCard.click();
+              // Attendre que l'onglet soit activé puis cliquer sur le bouton d'ajout
+              setTimeout(() => {
+                const addButton = document.querySelector('[data-action="create-account"]') as HTMLButtonElement;
+                if (addButton) {
+                  addButton.click();
+                }
+              }, 500);
+            }
+          }, 1000);
         }
       },
       {
-        title: 'Explorer la comptabilité',
-        description: 'Découvrez toutes les fonctionnalités comptables',
+        title: 'Voir mes comptes',
+        description: 'Consultez la liste de vos comptes bancaires',
         icon: <BookOpen className="h-4 w-4 text-primary" />,
         onClick: () => {
           setShowFallbackModal(false);
-          navigate('/payments/accounting');
+          navigate('/payments/management');
+          // Activer l'onglet comptes
+          setTimeout(() => {
+            const accountsCard = Array.from(document.querySelectorAll('.cursor-pointer')).find(
+              el => el.textContent?.includes('Comptes actifs')
+            ) as HTMLElement;
+            if (accountsCard) {
+              accountsCard.click();
+            }
+          }, 1000);
         }
       }
     ],
