@@ -171,7 +171,7 @@ export const WELCOME_FEATURES: WelcomeFeature[] = [
   },
   {
     id: 'ai-secretary',
-    title: 'Secrétariat IA',
+    title: 'Tour de contrôle',
     description: 'Votre assistant intelligent pour automatiser les tâches',
     icon: 'Bot',
     route: '/ai-assistant',
