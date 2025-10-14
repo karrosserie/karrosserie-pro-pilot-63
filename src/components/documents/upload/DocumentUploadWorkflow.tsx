@@ -51,6 +51,7 @@ export default function DocumentUploadWorkflow({
 }: DocumentUploadWorkflowProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [documents, setDocuments] = useState<{ [key: string]: File }>({});
+  const [documentBlobs, setDocumentBlobs] = useState<{ [key: string]: Blob }>({});
   const [whatsappConsent, setWhatsappConsent] = useState<boolean | null>(null);
 
   // Filtrer les étapes selon les documents manquants
@@ -98,11 +99,25 @@ export default function DocumentUploadWorkflow({
     );
   }
 
-  const handleNext = (file: File) => {
+  const handleNext = async (file: File) => {
     const adjustedStep = hasSkippedDocuments ? currentStep - 1 : currentStep;
     const stepKey = documentSteps[adjustedStep].key;
+    
+    // Convertir immédiatement le File en Blob pour éviter les problèmes de validité sur mobile
+    const blob = await file.arrayBuffer().then(buffer => new Blob([buffer], { type: file.type }));
+    
     const updatedDocuments = { ...documents, [stepKey]: file };
+    const updatedBlobs = { ...documentBlobs, [stepKey]: blob };
+    
     setDocuments(updatedDocuments);
+    setDocumentBlobs(updatedBlobs);
+    
+    console.log(`[UPLOAD DEBUG] File saved for ${stepKey}:`, { 
+      name: file.name, 
+      size: file.size, 
+      type: file.type,
+      blobSize: blob.size 
+    });
 
     if (adjustedStep < documentSteps.length - 1) {
       setCurrentStep(currentStep + 1);
@@ -114,7 +129,18 @@ export default function DocumentUploadWorkflow({
 
   const handleWhatsAppConsent = (consent: boolean) => {
     setWhatsappConsent(consent);
-    onComplete(documents, consent);
+    
+    // Recréer les File objects à partir des Blobs pour garantir leur validité
+    const validDocuments: { [key: string]: File } = {};
+    Object.keys(documentBlobs).forEach(key => {
+      const originalFile = documents[key];
+      validDocuments[key] = new File([documentBlobs[key]], originalFile.name, { 
+        type: originalFile.type 
+      });
+    });
+    
+    console.log('[UPLOAD DEBUG] Final documents to upload:', Object.keys(validDocuments));
+    onComplete(validDocuments, consent);
   };
 
   const handleBack = () => {
