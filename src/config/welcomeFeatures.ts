@@ -6,7 +6,7 @@ export const WELCOME_FEATURES: WelcomeFeature[] = [
     title: 'Relances automatiques impayés',
     description: 'Automatisez vos relances clients en cas de factures impayées',
     icon: 'AlertCircle',
-    route: '/documents/factures',
+    route: '/settings?tab=relance-ia',
     tourSteps: [
       {
         target: '.invoice-list',
