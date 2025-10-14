@@ -28,6 +28,11 @@ export default function Welcome() {
     // Définir la fonctionnalité en cours
     setCurrentFeature(featureId, 0);
     
+    // Pour painting, ne pas naviguer immédiatement - le modal s'affichera
+    if (featureId === 'painting') {
+      return;
+    }
+    
     // Naviguer vers la route de la fonctionnalité
     // Vérifier si c'est une URL externe
     if (feature.route.startsWith('http')) {
