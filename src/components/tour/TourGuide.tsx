@@ -358,7 +358,7 @@ function getFeatureActions(
         icon: <Play className="h-4 w-4 text-primary" />,
         onClick: () => {
           setShowFallbackModal(false);
-          navigate('/settings');
+          navigate('/settings?tab=relance-ia');
         }
       },
       {
@@ -367,7 +367,7 @@ function getFeatureActions(
         icon: <BookOpen className="h-4 w-4 text-primary" />,
         onClick: () => {
           setShowFallbackModal(false);
-          navigate('/settings');
+          navigate('/settings?tab=relance-ia');
         }
       }
     ],
