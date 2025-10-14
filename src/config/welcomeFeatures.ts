@@ -6,7 +6,7 @@ export const WELCOME_FEATURES: WelcomeFeature[] = [
     title: 'Relances automatiques impayés',
     description: 'Automatisez vos relances clients en cas de factures impayées',
     icon: 'AlertCircle',
-    route: '/accounting/invoices',
+    route: '/documents/factures',
     tourSteps: [
       {
         target: '.invoice-list',
@@ -27,7 +27,7 @@ export const WELCOME_FEATURES: WelcomeFeature[] = [
     title: 'Comptabilité et gestion bancaire',
     description: 'Gérez votre comptabilité et connectez vos comptes bancaires',
     icon: 'Calculator',
-    route: '/accounting',
+    route: '/payments/accounting',
     tourSteps: [
       {
         target: '.bank-accounts-section',
@@ -69,7 +69,7 @@ export const WELCOME_FEATURES: WelcomeFeature[] = [
     title: 'Gestion peinture',
     description: 'Module complet pour gérer vos opérations de peinture',
     icon: 'Palette',
-    route: '/painting',
+    route: '/planning',
     tourSteps: [
       {
         target: '.painting-dashboard',
