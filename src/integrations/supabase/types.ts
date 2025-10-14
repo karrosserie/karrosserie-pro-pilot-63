@@ -857,6 +857,7 @@ export type Database = {
           gocardless_mandate_id: string | null
           gocardless_mandate_status: string | null
           id: string
+          is_merged: boolean | null
           latitude: number | null
           location_radius: number | null
           logo_url: string | null
@@ -881,6 +882,7 @@ export type Database = {
           gocardless_mandate_id?: string | null
           gocardless_mandate_status?: string | null
           id?: string
+          is_merged?: boolean | null
           latitude?: number | null
           location_radius?: number | null
           logo_url?: string | null
@@ -905,6 +907,7 @@ export type Database = {
           gocardless_mandate_id?: string | null
           gocardless_mandate_status?: string | null
           id?: string
+          is_merged?: boolean | null
           latitude?: number | null
           location_radius?: number | null
           logo_url?: string | null
@@ -4892,6 +4895,10 @@ export type Database = {
         Args: { repair_order_id: string }
         Returns: number
       }
+      check_token_for_upload: {
+        Args: { file_path: string }
+        Returns: boolean
+      }
       cleanup_expired_otp_codes: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -5101,7 +5108,7 @@ export type Database = {
       }
       l2_normalize: {
         Args: { "": string } | { "": unknown } | { "": unknown }
-        Returns: string
+        Returns: unknown
       }
       match_documents: {
         Args: { filter?: Json; match_count: number; query_embedding: string }
