@@ -103,7 +103,13 @@ export function TourGuide() {
       
       // Naviguer vers la fonctionnalité suivante
       setCurrentFeature(nextFeature.id, 0);
-      navigate(nextFeature.route);
+      
+      // Vérifier si c'est une URL externe
+      if (nextFeature.route.startsWith('http')) {
+        window.open(nextFeature.route, '_blank');
+      } else {
+        navigate(nextFeature.route);
+      }
     } else {
       // C'était la dernière fonctionnalité
       handleCloseFallbackModal();
@@ -126,7 +132,13 @@ export function TourGuide() {
       
       // Naviguer vers la fonctionnalité précédente
       setCurrentFeature(previousFeature.id, 0);
-      navigate(previousFeature.route);
+      
+      // Vérifier si c'est une URL externe
+      if (previousFeature.route.startsWith('http')) {
+        window.open(previousFeature.route, '_blank');
+      } else {
+        navigate(previousFeature.route);
+      }
     }
   };
 
@@ -444,7 +456,7 @@ function getFeatureActions(
         icon: <Play className="h-4 w-4 text-primary" />,
         onClick: () => {
           setShowFallbackModal(false);
-          navigate('/painting');
+          window.open('https://paint.karrosserie.pro/', '_blank');
         }
       },
       {
@@ -453,7 +465,7 @@ function getFeatureActions(
         icon: <BookOpen className="h-4 w-4 text-primary" />,
         onClick: () => {
           setShowFallbackModal(false);
-          navigate('/painting');
+          window.open('https://paint.karrosserie.pro/', '_blank');
         }
       }
     ],

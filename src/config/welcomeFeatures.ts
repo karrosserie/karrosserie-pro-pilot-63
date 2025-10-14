@@ -69,7 +69,7 @@ export const WELCOME_FEATURES: WelcomeFeature[] = [
     title: 'Gestion peinture',
     description: 'Module complet pour gérer vos opérations de peinture',
     icon: 'Palette',
-    route: '/planning',
+    route: 'https://paint.karrosserie.pro/',
     tourSteps: [
       {
         target: '.painting-dashboard',

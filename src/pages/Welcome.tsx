@@ -26,7 +26,12 @@ export default function Welcome() {
     setCurrentFeature(featureId, 0);
     
     // Naviguer vers la route de la fonctionnalité
-    navigate(feature.route);
+    // Vérifier si c'est une URL externe
+    if (feature.route.startsWith('http')) {
+      window.open(feature.route, '_blank');
+    } else {
+      navigate(feature.route);
+    }
   };
 
   const handleSkipWelcome = () => {
