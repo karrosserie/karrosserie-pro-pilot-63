@@ -196,15 +196,33 @@ export const WELCOME_FEATURES: WelcomeFeature[] = [
     tourSteps: [
       {
         target: '.mission-control-header',
-        title: 'Tableau de bord Mission Control',
-        content: 'Votre centre de contrôle intelligent qui surveille et analyse toutes les activités de votre atelier.',
+        title: 'Centre de contrôle intelligent',
+        content: 'Mission Control est votre tour de contrôle IA qui surveille en permanence toutes les activités de votre atelier. Il analyse les données en temps réel pour détecter les problèmes et vous alerter instantanément.',
         placement: 'bottom'
       },
       {
         target: '.alert-cards-container',
-        title: 'Alertes intelligentes',
-        content: 'L\'IA détecte automatiquement les problèmes (retards, véhicules en attente, messages urgents) et vous propose des actions concrètes.',
+        title: 'Système d\'alertes intelligentes',
+        content: 'L\'IA identifie automatiquement les situations critiques : retards employés, véhicules bloqués trop longtemps, messages clients urgents, factures impayées. Chaque alerte inclut des actions concrètes pour résoudre le problème.',
         placement: 'top'
+      },
+      {
+        target: '.priority-indicator',
+        title: 'Priorisation automatique',
+        content: 'Les alertes sont classées par priorité (critique, haute, moyenne, faible) pour vous permettre de traiter d\'abord ce qui est le plus urgent. Les alertes critiques nécessitent une action immédiate.',
+        placement: 'right'
+      },
+      {
+        target: '.action-buttons',
+        title: 'Actions rapides intégrées',
+        content: 'Pour chaque problème détecté, l\'IA vous propose des actions directes : appeler un client, envoyer un SMS, créer une relance, assigner une tâche. Tout se fait en un clic depuis le tableau de bord.',
+        placement: 'left'
+      },
+      {
+        target: '.analytics-section',
+        title: 'Analyse et recommandations',
+        content: 'Mission Control analyse les tendances de votre atelier et vous fournit des recommandations pour optimiser vos processus : réduction des temps d\'attente, amélioration de la productivité, anticipation des problèmes récurrents.',
+        placement: 'bottom'
       }
     ]
   }

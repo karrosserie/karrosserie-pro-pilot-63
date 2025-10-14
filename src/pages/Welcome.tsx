@@ -28,8 +28,8 @@ export default function Welcome() {
     // Définir la fonctionnalité en cours
     setCurrentFeature(featureId, 0);
     
-    // Pour painting et planning, ne pas naviguer immédiatement - le modal s'affichera
-    if (featureId === 'painting' || featureId === 'planning') {
+    // Pour painting, planning et ai-secretary, ne pas naviguer immédiatement - le modal s'affichera
+    if (featureId === 'painting' || featureId === 'planning' || featureId === 'ai-secretary') {
       return;
     }
     

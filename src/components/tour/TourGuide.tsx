@@ -23,8 +23,8 @@ export function TourGuide() {
       if (feature) {
         setCurrentFeatureData(feature);
         
-        // Pour painting et planning, toujours afficher le modal
-        if (feature.id === 'painting' || feature.id === 'planning') {
+        // Pour painting, planning et ai-secretary, toujours afficher le modal
+        if (feature.id === 'painting' || feature.id === 'planning' || feature.id === 'ai-secretary') {
           setSteps([]); // Vider les steps pour éviter les erreurs de react-joyride
           setRun(false); // S'assurer que le tour ne démarre pas
           setShowFallbackModal(true);
