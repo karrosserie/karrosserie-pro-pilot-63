@@ -25,6 +25,8 @@ export function TourGuide() {
         
         // Pour painting et planning, toujours afficher le modal
         if (feature.id === 'painting' || feature.id === 'planning') {
+          setSteps([]); // Vider les steps pour éviter les erreurs de react-joyride
+          setRun(false); // S'assurer que le tour ne démarre pas
           setShowFallbackModal(true);
           return;
         }
