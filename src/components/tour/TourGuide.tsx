@@ -353,28 +353,21 @@ function getFeatureActions(
   }>> = {
     'auto-reminders': [
       {
-        title: 'Activer les relances automatiques',
-        description: 'Configurez vos premières règles de relance',
+        title: 'Configurer les relances automatiques',
+        description: 'Accédez aux paramètres de relance IA',
         icon: <Play className="h-4 w-4 text-primary" />,
         onClick: () => {
           setShowFallbackModal(false);
-          navigate('/accounting/invoices');
-          // Après navigation, essayer d'ouvrir les paramètres de relance
-          setTimeout(() => {
-            const settingsButton = document.querySelector('[data-action="configure-reminders"]') as HTMLButtonElement;
-            if (settingsButton) {
-              settingsButton.click();
-            }
-          }, 1000);
+          navigate('/settings');
         }
       },
       {
-        title: 'Consulter mes factures',
-        description: 'Voir la liste complète de vos factures',
+        title: 'Voir mes paramètres',
+        description: 'Gérez tous vos paramètres de relance',
         icon: <BookOpen className="h-4 w-4 text-primary" />,
         onClick: () => {
           setShowFallbackModal(false);
-          navigate('/accounting/invoices');
+          navigate('/settings');
         }
       }
     ],
