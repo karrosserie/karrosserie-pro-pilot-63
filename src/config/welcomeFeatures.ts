@@ -157,14 +157,32 @@ export const WELCOME_FEATURES: WelcomeFeature[] = [
     tourSteps: [
       {
         target: '.workshop-planning-interface',
-        title: 'Interface de planning',
-        content: 'Visualisez et gérez toutes vos tâches atelier en un seul endroit. Interface modernisée avec onglets pour faciliter la navigation.',
+        title: 'Vue d\'ensemble du planning',
+        content: 'Interface complètement repensée pour visualiser toutes les tâches de l\'atelier en un coup d\'œil. Vous pouvez désormais suivre l\'avancement de chaque véhicule à travers les différentes étapes.',
         placement: 'top'
       },
       {
         target: '[role="tablist"]',
         title: 'Navigation par onglets',
-        content: 'Accédez rapidement aux différentes vues : Étapes atelier, Planning détaillé, Véhicules en attente, Planning Patron.',
+        content: 'Quatre vues différentes pour s\'adapter à vos besoins : Étapes atelier (workflow), Planning détaillé (par employé), Véhicules en attente, et Planning Patron (vue globale).',
+        placement: 'bottom'
+      },
+      {
+        target: '.employee-task-card',
+        title: 'Gestion des tâches',
+        content: 'Assignez rapidement des tâches aux employés par simple glisser-déposer. Suivez le temps passé et les qualifications requises pour chaque intervention.',
+        placement: 'right'
+      },
+      {
+        target: '.workflow-step',
+        title: 'Suivi du workflow',
+        content: 'Visualisez instantanément les véhicules à chaque étape du processus : accueil, réparation, peinture, finitions, et livraison. Identifiez les goulots d\'étranglement en temps réel.',
+        placement: 'left'
+      },
+      {
+        target: '.planning-filters',
+        title: 'Filtres et recherche',
+        content: 'Filtrez par date, employé, client ou véhicule pour trouver rapidement l\'information dont vous avez besoin. Gagnez du temps dans la gestion quotidienne.',
         placement: 'bottom'
       }
     ]

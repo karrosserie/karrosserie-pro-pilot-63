@@ -23,8 +23,8 @@ export function TourGuide() {
       if (feature) {
         setCurrentFeatureData(feature);
         
-        // Pour la fonctionnalité painting, toujours afficher le modal
-        if (feature.id === 'painting') {
+        // Pour painting et planning, toujours afficher le modal
+        if (feature.id === 'painting' || feature.id === 'planning') {
           setShowFallbackModal(true);
           return;
         }
