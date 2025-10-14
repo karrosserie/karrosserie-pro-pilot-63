@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import MissionControlDashboard from '@/components/mission-control/MissionControlDashboard';
 import GlobalSearch from '@/components/shared/GlobalSearch';
@@ -22,8 +21,10 @@ const AIAssistant = () => {
   ]);
 
   return (
-    <div className="min-h-screen">
-      <MissionControlDashboard />
+    <div className="min-h-screen mission-control-container">
+      <div className="mission-control-header">
+        <MissionControlDashboard />
+      </div>
 
       {/* Recherche globale */}
       <GlobalSearch 

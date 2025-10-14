@@ -156,15 +156,15 @@ export const WELCOME_FEATURES: WelcomeFeature[] = [
     route: '/planning',
     tourSteps: [
       {
-        target: '.planning-view',
-        title: 'Vue planning',
-        content: 'Nouvelle interface plus claire et intuitive',
+        target: '.workshop-planning-interface',
+        title: 'Interface de planning',
+        content: 'Visualisez et gérez toutes vos tâches atelier en un seul endroit. Interface modernisée avec onglets pour faciliter la navigation.',
         placement: 'top'
       },
       {
-        target: '.drag-drop-zone',
-        title: 'Glisser-déposer',
-        content: 'Déplacez facilement vos rendez-vous par glisser-déposer',
+        target: '[role="tablist"]',
+        title: 'Navigation par onglets',
+        content: 'Accédez rapidement aux différentes vues : Étapes atelier, Planning détaillé, Véhicules en attente, Planning Patron.',
         placement: 'bottom'
       }
     ]
@@ -177,16 +177,16 @@ export const WELCOME_FEATURES: WelcomeFeature[] = [
     route: '/ai-assistant',
     tourSteps: [
       {
-        target: '.ai-chat',
-        title: 'Chat IA',
-        content: 'Posez vos questions à l\'assistant IA',
-        placement: 'left'
+        target: '.mission-control-header',
+        title: 'Tableau de bord Mission Control',
+        content: 'Votre centre de contrôle intelligent qui surveille et analyse toutes les activités de votre atelier.',
+        placement: 'bottom'
       },
       {
-        target: '.ai-suggestions',
-        title: 'Suggestions intelligentes',
-        content: 'Recevez des suggestions basées sur vos données',
-        placement: 'right'
+        target: '.alert-cards-container',
+        title: 'Alertes intelligentes',
+        content: 'L\'IA détecte automatiquement les problèmes (retards, véhicules en attente, messages urgents) et vous propose des actions concrètes.',
+        placement: 'top'
       }
     ]
   }
