@@ -349,18 +349,12 @@ function getFeatureActions(
     'accounting': [
       {
         title: 'Ajouter mon premier compte',
-        description: 'Ouvrez le formulaire pour connecter un compte bancaire',
+        description: 'Accédez à la gestion des comptes bancaires',
         icon: <Play className="h-4 w-4 text-primary" />,
         onClick: () => {
           setShowFallbackModal(false);
-          navigate('/accounting');
-          // Essayer de cliquer sur le bouton d'ajout de compte
-          setTimeout(() => {
-            const addButton = document.querySelector('.add-bank-button, [data-action="add-bank"]') as HTMLButtonElement;
-            if (addButton) {
-              addButton.click();
-            }
-          }, 1000);
+          // Naviguer vers la page de comptabilité qui contient la liste des comptes
+          navigate('/payments/accounting');
         }
       },
       {
@@ -369,24 +363,18 @@ function getFeatureActions(
         icon: <BookOpen className="h-4 w-4 text-primary" />,
         onClick: () => {
           setShowFallbackModal(false);
-          navigate('/accounting');
+          navigate('/payments/accounting');
         }
       }
     ],
     'expertise-import': [
       {
         title: 'Importer mon premier rapport',
-        description: 'Lancez l\'import d\'un rapport d\'expertise',
+        description: 'Accédez à la page des rapports d\'expertise',
         icon: <Play className="h-4 w-4 text-primary" />,
         onClick: () => {
           setShowFallbackModal(false);
           navigate('/documents/expertise');
-          setTimeout(() => {
-            const importButton = document.querySelector('.import-expertise-button, [data-action="import-expertise"]') as HTMLButtonElement;
-            if (importButton) {
-              importButton.click();
-            }
-          }, 1000);
         }
       },
       {
@@ -401,18 +389,12 @@ function getFeatureActions(
     ],
     'painting': [
       {
-        title: 'Créer une opération peinture',
-        description: 'Commencez votre première opération',
+        title: 'Accéder au module peinture',
+        description: 'Découvrez les fonctionnalités de gestion peinture',
         icon: <Play className="h-4 w-4 text-primary" />,
         onClick: () => {
           setShowFallbackModal(false);
           navigate('/painting');
-          setTimeout(() => {
-            const createButton = document.querySelector('[data-action="create-painting"]') as HTMLButtonElement;
-            if (createButton) {
-              createButton.click();
-            }
-          }, 1000);
         }
       },
       {
@@ -427,18 +409,12 @@ function getFeatureActions(
     ],
     'registered-mail': [
       {
-        title: 'Envoyer mon premier recommandé',
-        description: 'Créez et envoyez une lettre recommandée',
+        title: 'Gérer les cessions de créance',
+        description: 'Accédez à vos cessions et envoyez des recommandés',
         icon: <Play className="h-4 w-4 text-primary" />,
         onClick: () => {
           setShowFallbackModal(false);
           navigate('/cessions');
-          setTimeout(() => {
-            const sendButton = document.querySelector('.send-registered-mail-button, [data-action="send-mail"]') as HTMLButtonElement;
-            if (sendButton) {
-              sendButton.click();
-            }
-          }, 1000);
         }
       },
       {
@@ -453,22 +429,16 @@ function getFeatureActions(
     ],
     'loan-vehicle-pv': [
       {
-        title: 'Ajouter mon premier PV',
-        description: 'Documentez une infraction sur un véhicule de prêt',
+        title: 'Gérer les véhicules de prêt',
+        description: 'Accédez à la gestion de votre flotte',
         icon: <Play className="h-4 w-4 text-primary" />,
         onClick: () => {
           setShowFallbackModal(false);
           navigate('/fleet');
-          setTimeout(() => {
-            const addButton = document.querySelector('.add-pv-button, [data-action="add-pv"]') as HTMLButtonElement;
-            if (addButton) {
-              addButton.click();
-            }
-          }, 1000);
         }
       },
       {
-        title: 'Gérer mes véhicules de prêt',
+        title: 'Voir ma flotte',
         description: 'Consultez tous vos véhicules',
         icon: <BookOpen className="h-4 w-4 text-primary" />,
         onClick: () => {
@@ -479,49 +449,37 @@ function getFeatureActions(
     ],
     'litigation': [
       {
-        title: 'Créer mon premier dossier',
-        description: 'Ouvrez un nouveau dossier de contentieux',
+        title: 'Créer un dossier contentieux',
+        description: 'Accédez à la création de dossier',
         icon: <Play className="h-4 w-4 text-primary" />,
         onClick: () => {
           setShowFallbackModal(false);
           navigate('/contentieux/creation-dossier');
-          setTimeout(() => {
-            const createButton = document.querySelector('.create-case-button, [data-action="create-case"]') as HTMLButtonElement;
-            if (createButton) {
-              createButton.click();
-            }
-          }, 1000);
         }
       },
       {
         title: 'Voir mes dossiers',
-        description: 'Tableau de bord de tous vos contentieux',
+        description: 'Consultez vos dossiers de contentieux',
         icon: <BookOpen className="h-4 w-4 text-primary" />,
         onClick: () => {
           setShowFallbackModal(false);
-          navigate('/contentieux');
+          navigate('/contentieux/creation-dossier');
         }
       }
     ],
     'planning': [
       {
-        title: 'Planifier un véhicule',
-        description: 'Ajoutez une tâche au planning',
+        title: 'Explorer le nouveau planning',
+        description: 'Découvrez l\'interface modernisée',
         icon: <Play className="h-4 w-4 text-primary" />,
         onClick: () => {
           setShowFallbackModal(false);
           navigate('/planning');
-          setTimeout(() => {
-            const waitingTab = document.querySelector('[value="waiting"]') as HTMLButtonElement;
-            if (waitingTab) {
-              waitingTab.click();
-            }
-          }, 1000);
         }
       },
       {
-        title: 'Explorer le planning',
-        description: 'Découvrez toutes les vues disponibles',
+        title: 'Voir les véhicules en attente',
+        description: 'Accédez aux véhicules à planifier',
         icon: <BookOpen className="h-4 w-4 text-primary" />,
         onClick: () => {
           setShowFallbackModal(false);
@@ -531,8 +489,8 @@ function getFeatureActions(
     ],
     'ai-secretary': [
       {
-        title: 'Voir les alertes actives',
-        description: 'Consultez ce que l\'IA a détecté',
+        title: 'Découvrir Mission Control',
+        description: 'Consultez le tableau de bord intelligent',
         icon: <Play className="h-4 w-4 text-primary" />,
         onClick: () => {
           setShowFallbackModal(false);
