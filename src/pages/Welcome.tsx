@@ -12,7 +12,7 @@ import * as LucideIcons from 'lucide-react';
 export default function Welcome() {
   const navigate = useNavigate();
   const { profile } = useAuth();
-  const { markWelcomeAsSeen, setCurrentFeature, completedFeatures } = useWelcomeTour();
+  const { markWelcomeAsSeen, setCurrentFeature, markFeatureCompleted, completedFeatures } = useWelcomeTour();
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
 
   const handleStartTour = (featureId: string) => {
@@ -21,6 +21,9 @@ export default function Welcome() {
 
     // Marquer la bienvenue comme vue
     markWelcomeAsSeen();
+    
+    // Marquer la fonctionnalité comme effectuée
+    markFeatureCompleted(featureId);
     
     // Définir la fonctionnalité en cours
     setCurrentFeature(featureId, 0);
