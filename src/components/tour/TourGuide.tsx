@@ -85,6 +85,60 @@ export function TourGuide() {
     }
   };
 
+  const handleNextFeature = () => {
+    if (!currentFeature) return;
+    
+    // Trouver l'index de la fonctionnalité actuelle
+    const currentIndex = WELCOME_FEATURES.findIndex(f => f.id === currentFeature.id);
+    
+    // S'il y a une fonctionnalité suivante
+    if (currentIndex !== -1 && currentIndex < WELCOME_FEATURES.length - 1) {
+      const nextFeature = WELCOME_FEATURES[currentIndex + 1];
+      
+      // Marquer l'actuelle comme complétée
+      markFeatureCompleted(currentFeature.id);
+      
+      // Fermer le modal
+      setShowFallbackModal(false);
+      
+      // Naviguer vers la fonctionnalité suivante
+      setCurrentFeature(nextFeature.id, 0);
+      navigate(nextFeature.route);
+    } else {
+      // C'était la dernière fonctionnalité
+      handleCloseFallbackModal();
+      navigate('/');
+    }
+  };
+
+  const handlePreviousFeature = () => {
+    if (!currentFeature) return;
+    
+    // Trouver l'index de la fonctionnalité actuelle
+    const currentIndex = WELCOME_FEATURES.findIndex(f => f.id === currentFeature.id);
+    
+    // S'il y a une fonctionnalité précédente
+    if (currentIndex > 0) {
+      const previousFeature = WELCOME_FEATURES[currentIndex - 1];
+      
+      // Fermer le modal
+      setShowFallbackModal(false);
+      
+      // Naviguer vers la fonctionnalité précédente
+      setCurrentFeature(previousFeature.id, 0);
+      navigate(previousFeature.route);
+    }
+  };
+
+  const getCurrentFeatureIndex = () => {
+    if (!currentFeature) return { current: 0, total: 0 };
+    const currentIndex = WELCOME_FEATURES.findIndex(f => f.id === currentFeature.id);
+    return {
+      current: currentIndex + 1,
+      total: WELCOME_FEATURES.length
+    };
+  };
+
   return (
     <>
       {run && steps.length > 0 && (
@@ -122,10 +176,15 @@ export function TourGuide() {
       <Dialog open={showFallbackModal} onOpenChange={setShowFallbackModal}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-2xl">
-              <AlertCircle className="h-6 w-6 text-primary" />
-              {currentFeature?.title}
-            </DialogTitle>
+            <div className="flex items-center justify-between mb-2">
+              <DialogTitle className="flex items-center gap-2 text-2xl">
+                <AlertCircle className="h-6 w-6 text-primary" />
+                {currentFeature?.title}
+              </DialogTitle>
+              <div className="text-sm text-muted-foreground">
+                {getCurrentFeatureIndex().current} / {getCurrentFeatureIndex().total}
+              </div>
+            </div>
             <DialogDescription className="text-base">
               {currentFeature?.description}
             </DialogDescription>
@@ -174,11 +233,11 @@ export function TourGuide() {
             <div className="space-y-3">
               <h4 className="font-semibold flex items-center gap-2">
                 <Play className="h-5 w-5 text-primary" />
-                Prochaines étapes recommandées
+                Actions à réaliser
               </h4>
               <div className="grid gap-3">
-                {getFeatureActions(currentFeature?.id).map((action, index) => (
-                  <Card key={index} className="hover:shadow-md transition-shadow cursor-pointer" onClick={action.onClick}>
+                {getFeatureActions(currentFeature?.id, navigate, setShowFallbackModal).map((action, index) => (
+                  <Card key={index} className="hover:shadow-md transition-shadow cursor-pointer border-2 hover:border-primary/50" onClick={action.onClick}>
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -199,19 +258,44 @@ export function TourGuide() {
             </div>
           </div>
 
-          <DialogFooter className="flex gap-2">
-            <Button variant="outline" onClick={handleCloseFallbackModal}>
-              Plus tard
-            </Button>
-            <Button onClick={() => {
-              handleCloseFallbackModal();
-              const firstAction = getFeatureActions(currentFeature?.id)[0];
-              if (firstAction) {
-                firstAction.onClick();
-              }
-            }}>
-              Commencer maintenant
-            </Button>
+          <DialogFooter className="flex flex-col sm:flex-row gap-3">
+            <div className="flex gap-2 flex-1">
+              <Button 
+                variant="outline" 
+                onClick={handlePreviousFeature}
+                disabled={getCurrentFeatureIndex().current === 1}
+                className="flex-1"
+              >
+                ← Précédent
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={handleCloseFallbackModal}
+                className="flex-1"
+              >
+                Plus tard
+              </Button>
+            </div>
+            <div className="flex gap-2 flex-1">
+              <Button 
+                onClick={() => {
+                  const firstAction = getFeatureActions(currentFeature?.id, navigate, setShowFallbackModal)[0];
+                  if (firstAction) {
+                    firstAction.onClick();
+                  }
+                }}
+                className="flex-1"
+              >
+                <Play className="h-4 w-4 mr-2" />
+                Essayer maintenant
+              </Button>
+              <Button 
+                onClick={handleNextFeature}
+                className="flex-1"
+              >
+                {getCurrentFeatureIndex().current === getCurrentFeatureIndex().total ? 'Terminer' : 'Suivant →'}
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -219,7 +303,11 @@ export function TourGuide() {
   );
 }
 
-function getFeatureActions(featureId: string | undefined): Array<{
+function getFeatureActions(
+  featureId: string | undefined,
+  navigate: ReturnType<typeof useNavigate>,
+  setShowFallbackModal: (show: boolean) => void
+): Array<{
   title: string;
   description: string;
   icon: React.ReactNode;
@@ -233,143 +321,232 @@ function getFeatureActions(featureId: string | undefined): Array<{
   }>> = {
     'auto-reminders': [
       {
-        title: 'Voir mes factures impayées',
-        description: 'Accédez à la liste de vos factures en attente de paiement',
-        icon: <AlertCircle className="h-4 w-4 text-primary" />,
-        onClick: () => window.location.href = '/accounting/invoices'
+        title: 'Activer les relances automatiques',
+        description: 'Configurez vos premières règles de relance',
+        icon: <Play className="h-4 w-4 text-primary" />,
+        onClick: () => {
+          setShowFallbackModal(false);
+          navigate('/accounting/invoices');
+          // Après navigation, essayer d'ouvrir les paramètres de relance
+          setTimeout(() => {
+            const settingsButton = document.querySelector('[data-action="configure-reminders"]') as HTMLButtonElement;
+            if (settingsButton) {
+              settingsButton.click();
+            }
+          }, 1000);
+        }
       },
       {
-        title: 'Configurer les relances',
-        description: 'Définissez vos règles de relance automatique',
-        icon: <Play className="h-4 w-4 text-primary" />,
-        onClick: () => window.location.href = '/settings/reminders'
+        title: 'Consulter mes factures',
+        description: 'Voir la liste complète de vos factures',
+        icon: <BookOpen className="h-4 w-4 text-primary" />,
+        onClick: () => {
+          setShowFallbackModal(false);
+          navigate('/accounting/invoices');
+        }
       }
     ],
     'accounting': [
       {
-        title: 'Ajouter un compte bancaire',
-        description: 'Connectez votre premier compte pour synchroniser vos transactions',
+        title: 'Ajouter mon premier compte',
+        description: 'Ouvrez le formulaire pour connecter un compte bancaire',
         icon: <Play className="h-4 w-4 text-primary" />,
-        onClick: () => window.location.href = '/accounting'
+        onClick: () => {
+          setShowFallbackModal(false);
+          navigate('/accounting');
+          // Essayer de cliquer sur le bouton d'ajout de compte
+          setTimeout(() => {
+            const addButton = document.querySelector('.add-bank-button, [data-action="add-bank"]') as HTMLButtonElement;
+            if (addButton) {
+              addButton.click();
+            }
+          }, 1000);
+        }
       },
       {
-        title: 'Voir le tableau de bord comptable',
-        description: 'Consultez vue d\'ensemble de votre comptabilité',
+        title: 'Explorer la comptabilité',
+        description: 'Découvrez toutes les fonctionnalités comptables',
         icon: <BookOpen className="h-4 w-4 text-primary" />,
-        onClick: () => window.location.href = '/accounting/dashboard'
+        onClick: () => {
+          setShowFallbackModal(false);
+          navigate('/accounting');
+        }
       }
     ],
     'expertise-import': [
       {
-        title: 'Importer un rapport maintenant',
-        description: 'Testez la nouvelle interface d\'importation simplifiée',
+        title: 'Importer mon premier rapport',
+        description: 'Lancez l\'import d\'un rapport d\'expertise',
         icon: <Play className="h-4 w-4 text-primary" />,
         onClick: () => {
-          // Trouver et cliquer sur le bouton d'import s'il existe
-          const importButton = document.querySelector('.import-expertise-button') as HTMLButtonElement;
-          if (importButton) {
-            importButton.click();
-          } else {
-            window.location.href = '/documents/expertise';
-          }
+          setShowFallbackModal(false);
+          navigate('/documents/expertise');
+          setTimeout(() => {
+            const importButton = document.querySelector('.import-expertise-button, [data-action="import-expertise"]') as HTMLButtonElement;
+            if (importButton) {
+              importButton.click();
+            }
+          }, 1000);
         }
       },
       {
-        title: 'Voir mes rapports existants',
-        description: 'Consultez l\'historique de vos rapports d\'expertise',
+        title: 'Voir mes rapports',
+        description: 'Accédez à l\'historique de vos rapports',
         icon: <BookOpen className="h-4 w-4 text-primary" />,
-        onClick: () => window.location.href = '/documents/expertise'
+        onClick: () => {
+          setShowFallbackModal(false);
+          navigate('/documents/expertise');
+        }
       }
     ],
     'painting': [
       {
-        title: 'Accéder au module peinture',
-        description: 'Découvrez toutes les fonctionnalités de gestion peinture',
+        title: 'Créer une opération peinture',
+        description: 'Commencez votre première opération',
         icon: <Play className="h-4 w-4 text-primary" />,
-        onClick: () => window.location.href = '/painting'
+        onClick: () => {
+          setShowFallbackModal(false);
+          navigate('/painting');
+          setTimeout(() => {
+            const createButton = document.querySelector('[data-action="create-painting"]') as HTMLButtonElement;
+            if (createButton) {
+              createButton.click();
+            }
+          }, 1000);
+        }
       },
       {
-        title: 'Gérer les stocks',
-        description: 'Consultez et mettez à jour vos stocks de peinture',
+        title: 'Explorer le module',
+        description: 'Découvrez toutes les fonctionnalités',
         icon: <BookOpen className="h-4 w-4 text-primary" />,
-        onClick: () => window.location.href = '/painting/stocks'
+        onClick: () => {
+          setShowFallbackModal(false);
+          navigate('/painting');
+        }
       }
     ],
     'registered-mail': [
       {
-        title: 'Voir mes cessions de créance',
-        description: 'Accédez à la liste de vos cessions',
-        icon: <BookOpen className="h-4 w-4 text-primary" />,
-        onClick: () => window.location.href = '/cessions'
-      },
-      {
-        title: 'Envoyer un recommandé',
+        title: 'Envoyer mon premier recommandé',
         description: 'Créez et envoyez une lettre recommandée',
         icon: <Play className="h-4 w-4 text-primary" />,
-        onClick: () => window.location.href = '/cessions/new'
+        onClick: () => {
+          setShowFallbackModal(false);
+          navigate('/cessions');
+          setTimeout(() => {
+            const sendButton = document.querySelector('.send-registered-mail-button, [data-action="send-mail"]') as HTMLButtonElement;
+            if (sendButton) {
+              sendButton.click();
+            }
+          }, 1000);
+        }
+      },
+      {
+        title: 'Voir mes cessions',
+        description: 'Liste de toutes vos cessions de créance',
+        icon: <BookOpen className="h-4 w-4 text-primary" />,
+        onClick: () => {
+          setShowFallbackModal(false);
+          navigate('/cessions');
+        }
       }
     ],
     'loan-vehicle-pv': [
       {
-        title: 'Voir les véhicules de prêt',
-        description: 'Consultez la liste de vos véhicules de prêt',
-        icon: <BookOpen className="h-4 w-4 text-primary" />,
-        onClick: () => window.location.href = '/fleet'
+        title: 'Ajouter mon premier PV',
+        description: 'Documentez une infraction sur un véhicule de prêt',
+        icon: <Play className="h-4 w-4 text-primary" />,
+        onClick: () => {
+          setShowFallbackModal(false);
+          navigate('/fleet');
+          setTimeout(() => {
+            const addButton = document.querySelector('.add-pv-button, [data-action="add-pv"]') as HTMLButtonElement;
+            if (addButton) {
+              addButton.click();
+            }
+          }, 1000);
+        }
       },
       {
-        title: 'Ajouter un PV',
-        description: 'Documentez une nouvelle infraction',
-        icon: <Play className="h-4 w-4 text-primary" />,
-        onClick: () => window.location.href = '/fleet/pv/new'
+        title: 'Gérer mes véhicules de prêt',
+        description: 'Consultez tous vos véhicules',
+        icon: <BookOpen className="h-4 w-4 text-primary" />,
+        onClick: () => {
+          setShowFallbackModal(false);
+          navigate('/fleet');
+        }
       }
     ],
     'litigation': [
       {
-        title: 'Créer un dossier contentieux',
-        description: 'Initiez un nouveau dossier de contentieux',
+        title: 'Créer mon premier dossier',
+        description: 'Ouvrez un nouveau dossier de contentieux',
         icon: <Play className="h-4 w-4 text-primary" />,
-        onClick: () => window.location.href = '/contentieux/creation-dossier'
+        onClick: () => {
+          setShowFallbackModal(false);
+          navigate('/contentieux/creation-dossier');
+          setTimeout(() => {
+            const createButton = document.querySelector('.create-case-button, [data-action="create-case"]') as HTMLButtonElement;
+            if (createButton) {
+              createButton.click();
+            }
+          }, 1000);
+        }
       },
       {
         title: 'Voir mes dossiers',
-        description: 'Consultez tous vos dossiers en cours',
+        description: 'Tableau de bord de tous vos contentieux',
         icon: <BookOpen className="h-4 w-4 text-primary" />,
-        onClick: () => window.location.href = '/contentieux'
+        onClick: () => {
+          setShowFallbackModal(false);
+          navigate('/contentieux');
+        }
       }
     ],
     'planning': [
       {
-        title: 'Essayer le nouveau planning',
-        description: 'Explorez l\'interface modernisée avec toutes les vues',
-        icon: <Play className="h-4 w-4 text-primary" />,
-        onClick: () => window.location.href = '/planning'
-      },
-      {
         title: 'Planifier un véhicule',
-        description: 'Ajoutez une nouvelle tâche au planning',
-        icon: <BookOpen className="h-4 w-4 text-primary" />,
+        description: 'Ajoutez une tâche au planning',
+        icon: <Play className="h-4 w-4 text-primary" />,
         onClick: () => {
-          window.location.href = '/planning';
-          // Après navigation, essayer de cliquer sur l'onglet véhicules en attente
+          setShowFallbackModal(false);
+          navigate('/planning');
           setTimeout(() => {
             const waitingTab = document.querySelector('[value="waiting"]') as HTMLButtonElement;
-            if (waitingTab) waitingTab.click();
+            if (waitingTab) {
+              waitingTab.click();
+            }
           }, 1000);
+        }
+      },
+      {
+        title: 'Explorer le planning',
+        description: 'Découvrez toutes les vues disponibles',
+        icon: <BookOpen className="h-4 w-4 text-primary" />,
+        onClick: () => {
+          setShowFallbackModal(false);
+          navigate('/planning');
         }
       }
     ],
     'ai-secretary': [
       {
-        title: 'Voir le tableau de bord IA',
-        description: 'Découvrez les alertes et suggestions intelligentes',
+        title: 'Voir les alertes actives',
+        description: 'Consultez ce que l\'IA a détecté',
         icon: <Play className="h-4 w-4 text-primary" />,
-        onClick: () => window.location.href = '/ai-assistant'
+        onClick: () => {
+          setShowFallbackModal(false);
+          navigate('/ai-assistant');
+        }
       },
       {
-        title: 'Configurer les alertes',
-        description: 'Personnalisez les notifications que vous souhaitez recevoir',
+        title: 'Explorer Mission Control',
+        description: 'Découvrez toutes les capacités de l\'IA',
         icon: <BookOpen className="h-4 w-4 text-primary" />,
-        onClick: () => window.location.href = '/settings/ai'
+        onClick: () => {
+          setShowFallbackModal(false);
+          navigate('/ai-assistant');
+        }
       }
     ]
   };
