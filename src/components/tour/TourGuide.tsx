@@ -23,6 +23,12 @@ export function TourGuide() {
       if (feature) {
         setCurrentFeatureData(feature);
         
+        // Pour la fonctionnalité painting, toujours afficher le modal
+        if (feature.id === 'painting') {
+          setShowFallbackModal(true);
+          return;
+        }
+        
         // Convertir les TourStep en Step de react-joyride
         const joyrideSteps: Step[] = feature.tourSteps.map(step => ({
           target: step.target,
