@@ -172,6 +172,38 @@ export function TourGuide() {
         />
       )}
 
+      {/* Bouton flottant pour naviguer dans le parcours */}
+      {state.currentFeatureId && !showFallbackModal && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
+          <div className="bg-background border border-border rounded-lg px-4 py-2 shadow-lg">
+            <p className="text-sm font-medium">
+              Étape {getCurrentFeatureIndex().current} / {getCurrentFeatureIndex().total}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            {getCurrentFeatureIndex().current > 1 && (
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={handlePreviousFeature}
+                className="shadow-lg"
+              >
+                ← Précédent
+              </Button>
+            )}
+            <Button
+              size="lg"
+              onClick={handleNextFeature}
+              className="shadow-lg"
+            >
+              {getCurrentFeatureIndex().current === getCurrentFeatureIndex().total 
+                ? 'Terminer le parcours' 
+                : 'Étape suivante →'}
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Modal explicatif si les éléments de la page n'existent pas */}
       <Dialog open={showFallbackModal} onOpenChange={setShowFallbackModal}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
