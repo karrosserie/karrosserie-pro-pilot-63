@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Joyride, { CallBackProps, STATUS, Step } from 'react-joyride';
 import { useWelcomeTour } from '@/hooks/tour/useWelcomeTour';
 import { WELCOME_FEATURES } from '@/config/welcomeFeatures';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Play, BookOpen, ArrowRight, CheckCircle } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 
 export function TourGuide() {
+  const navigate = useNavigate();
   const { state, markFeatureCompleted, setCurrentFeature } = useWelcomeTour();
   const [run, setRun] = useState(false);
   const [steps, setSteps] = useState<Step[]>([]);
@@ -117,7 +120,7 @@ export function TourGuide() {
 
       {/* Modal explicatif si les éléments de la page n'existent pas */}
       <Dialog open={showFallbackModal} onOpenChange={setShowFallbackModal}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-2xl">
               <AlertCircle className="h-6 w-6 text-primary" />
@@ -128,36 +131,257 @@ export function TourGuide() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
-            <div className="bg-muted/50 p-4 rounded-lg">
-              <h4 className="font-semibold mb-2">📋 À propos de cette fonctionnalité</h4>
-              <p className="text-sm text-muted-foreground">
+          <div className="space-y-6 py-4">
+            {/* Description détaillée */}
+            <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-5 rounded-lg border border-primary/20">
+              <h4 className="font-semibold mb-3 flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-primary" />
+                À propos de cette fonctionnalité
+              </h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 {getFeatureExplanation(currentFeature?.id)}
               </p>
             </div>
 
+            {/* Étapes clés */}
             {currentFeature?.tourSteps && (
               <div className="space-y-3">
-                <h4 className="font-semibold">✨ Points clés</h4>
-                {currentFeature.tourSteps.map((step: any, index: number) => (
-                  <div key={index} className="border-l-2 border-primary pl-4 py-2">
-                    <h5 className="font-medium text-sm">{step.title}</h5>
-                    <p className="text-sm text-muted-foreground mt-1">{step.content}</p>
-                  </div>
-                ))}
+                <h4 className="font-semibold flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-primary" />
+                  Points clés à retenir
+                </h4>
+                <div className="grid gap-3">
+                  {currentFeature.tourSteps.map((step: any, index: number) => (
+                    <Card key={index} className="border-l-4 border-l-primary">
+                      <CardContent className="p-4">
+                        <div className="flex gap-3">
+                          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold">
+                            {index + 1}
+                          </div>
+                          <div className="flex-1">
+                            <h5 className="font-medium text-sm mb-1">{step.title}</h5>
+                            <p className="text-sm text-muted-foreground">{step.content}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               </div>
             )}
+
+            {/* Actions recommandées */}
+            <div className="space-y-3">
+              <h4 className="font-semibold flex items-center gap-2">
+                <Play className="h-5 w-5 text-primary" />
+                Prochaines étapes recommandées
+              </h4>
+              <div className="grid gap-3">
+                {getFeatureActions(currentFeature?.id).map((action, index) => (
+                  <Card key={index} className="hover:shadow-md transition-shadow cursor-pointer" onClick={action.onClick}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 rounded-lg bg-primary/10">
+                            {action.icon}
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm">{action.title}</p>
+                            <p className="text-xs text-muted-foreground">{action.description}</p>
+                          </div>
+                        </div>
+                        <ArrowRight className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
           </div>
 
-          <DialogFooter>
-            <Button onClick={handleCloseFallbackModal}>
-              J'ai compris
+          <DialogFooter className="flex gap-2">
+            <Button variant="outline" onClick={handleCloseFallbackModal}>
+              Plus tard
+            </Button>
+            <Button onClick={() => {
+              handleCloseFallbackModal();
+              const firstAction = getFeatureActions(currentFeature?.id)[0];
+              if (firstAction) {
+                firstAction.onClick();
+              }
+            }}>
+              Commencer maintenant
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
   );
+}
+
+function getFeatureActions(featureId: string | undefined): Array<{
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  onClick: () => void;
+}> {
+  const actions: Record<string, Array<{
+    title: string;
+    description: string;
+    icon: React.ReactNode;
+    onClick: () => void;
+  }>> = {
+    'auto-reminders': [
+      {
+        title: 'Voir mes factures impayées',
+        description: 'Accédez à la liste de vos factures en attente de paiement',
+        icon: <AlertCircle className="h-4 w-4 text-primary" />,
+        onClick: () => window.location.href = '/accounting/invoices'
+      },
+      {
+        title: 'Configurer les relances',
+        description: 'Définissez vos règles de relance automatique',
+        icon: <Play className="h-4 w-4 text-primary" />,
+        onClick: () => window.location.href = '/settings/reminders'
+      }
+    ],
+    'accounting': [
+      {
+        title: 'Ajouter un compte bancaire',
+        description: 'Connectez votre premier compte pour synchroniser vos transactions',
+        icon: <Play className="h-4 w-4 text-primary" />,
+        onClick: () => window.location.href = '/accounting'
+      },
+      {
+        title: 'Voir le tableau de bord comptable',
+        description: 'Consultez vue d\'ensemble de votre comptabilité',
+        icon: <BookOpen className="h-4 w-4 text-primary" />,
+        onClick: () => window.location.href = '/accounting/dashboard'
+      }
+    ],
+    'expertise-import': [
+      {
+        title: 'Importer un rapport maintenant',
+        description: 'Testez la nouvelle interface d\'importation simplifiée',
+        icon: <Play className="h-4 w-4 text-primary" />,
+        onClick: () => {
+          // Trouver et cliquer sur le bouton d'import s'il existe
+          const importButton = document.querySelector('.import-expertise-button') as HTMLButtonElement;
+          if (importButton) {
+            importButton.click();
+          } else {
+            window.location.href = '/documents/expertise';
+          }
+        }
+      },
+      {
+        title: 'Voir mes rapports existants',
+        description: 'Consultez l\'historique de vos rapports d\'expertise',
+        icon: <BookOpen className="h-4 w-4 text-primary" />,
+        onClick: () => window.location.href = '/documents/expertise'
+      }
+    ],
+    'painting': [
+      {
+        title: 'Accéder au module peinture',
+        description: 'Découvrez toutes les fonctionnalités de gestion peinture',
+        icon: <Play className="h-4 w-4 text-primary" />,
+        onClick: () => window.location.href = '/painting'
+      },
+      {
+        title: 'Gérer les stocks',
+        description: 'Consultez et mettez à jour vos stocks de peinture',
+        icon: <BookOpen className="h-4 w-4 text-primary" />,
+        onClick: () => window.location.href = '/painting/stocks'
+      }
+    ],
+    'registered-mail': [
+      {
+        title: 'Voir mes cessions de créance',
+        description: 'Accédez à la liste de vos cessions',
+        icon: <BookOpen className="h-4 w-4 text-primary" />,
+        onClick: () => window.location.href = '/cessions'
+      },
+      {
+        title: 'Envoyer un recommandé',
+        description: 'Créez et envoyez une lettre recommandée',
+        icon: <Play className="h-4 w-4 text-primary" />,
+        onClick: () => window.location.href = '/cessions/new'
+      }
+    ],
+    'loan-vehicle-pv': [
+      {
+        title: 'Voir les véhicules de prêt',
+        description: 'Consultez la liste de vos véhicules de prêt',
+        icon: <BookOpen className="h-4 w-4 text-primary" />,
+        onClick: () => window.location.href = '/fleet'
+      },
+      {
+        title: 'Ajouter un PV',
+        description: 'Documentez une nouvelle infraction',
+        icon: <Play className="h-4 w-4 text-primary" />,
+        onClick: () => window.location.href = '/fleet/pv/new'
+      }
+    ],
+    'litigation': [
+      {
+        title: 'Créer un dossier contentieux',
+        description: 'Initiez un nouveau dossier de contentieux',
+        icon: <Play className="h-4 w-4 text-primary" />,
+        onClick: () => window.location.href = '/contentieux/creation-dossier'
+      },
+      {
+        title: 'Voir mes dossiers',
+        description: 'Consultez tous vos dossiers en cours',
+        icon: <BookOpen className="h-4 w-4 text-primary" />,
+        onClick: () => window.location.href = '/contentieux'
+      }
+    ],
+    'planning': [
+      {
+        title: 'Essayer le nouveau planning',
+        description: 'Explorez l\'interface modernisée avec toutes les vues',
+        icon: <Play className="h-4 w-4 text-primary" />,
+        onClick: () => window.location.href = '/planning'
+      },
+      {
+        title: 'Planifier un véhicule',
+        description: 'Ajoutez une nouvelle tâche au planning',
+        icon: <BookOpen className="h-4 w-4 text-primary" />,
+        onClick: () => {
+          window.location.href = '/planning';
+          // Après navigation, essayer de cliquer sur l'onglet véhicules en attente
+          setTimeout(() => {
+            const waitingTab = document.querySelector('[value="waiting"]') as HTMLButtonElement;
+            if (waitingTab) waitingTab.click();
+          }, 1000);
+        }
+      }
+    ],
+    'ai-secretary': [
+      {
+        title: 'Voir le tableau de bord IA',
+        description: 'Découvrez les alertes et suggestions intelligentes',
+        icon: <Play className="h-4 w-4 text-primary" />,
+        onClick: () => window.location.href = '/ai-assistant'
+      },
+      {
+        title: 'Configurer les alertes',
+        description: 'Personnalisez les notifications que vous souhaitez recevoir',
+        icon: <BookOpen className="h-4 w-4 text-primary" />,
+        onClick: () => window.location.href = '/settings/ai'
+      }
+    ]
+  };
+  
+  return actions[featureId || ''] || [
+    {
+      title: 'Explorer cette fonctionnalité',
+      description: 'Découvrez toutes les possibilités offertes',
+      icon: <Play className="h-4 w-4 text-primary" />,
+      onClick: () => {}
+    }
+  ];
 }
 
 function getFeatureExplanation(featureId: string | undefined): string {
