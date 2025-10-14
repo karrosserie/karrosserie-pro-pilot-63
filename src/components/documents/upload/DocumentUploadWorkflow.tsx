@@ -51,7 +51,7 @@ export default function DocumentUploadWorkflow({
 }: DocumentUploadWorkflowProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [documents, setDocuments] = useState<{ [key: string]: File }>({});
-  const [documentBlobs, setDocumentBlobs] = useState<{ [key: string]: Blob }>({});
+  const [documentBlobs, setDocumentBlobs] = useState<{ [key: string]: ArrayBuffer }>({});
   const [whatsappConsent, setWhatsappConsent] = useState<boolean | null>(null);
 
   // Filtrer les étapes selon les documents manquants
@@ -103,21 +103,39 @@ export default function DocumentUploadWorkflow({
     const adjustedStep = hasSkippedDocuments ? currentStep - 1 : currentStep;
     const stepKey = documentSteps[adjustedStep].key;
     
-    // Convertir immédiatement le File en Blob pour éviter les problèmes de validité sur mobile
-    const blob = await file.arrayBuffer().then(buffer => new Blob([buffer], { type: file.type }));
-    
-    const updatedDocuments = { ...documents, [stepKey]: file };
-    const updatedBlobs = { ...documentBlobs, [stepKey]: blob };
-    
-    setDocuments(updatedDocuments);
-    setDocumentBlobs(updatedBlobs);
-    
-    console.log(`[UPLOAD DEBUG] File saved for ${stepKey}:`, { 
-      name: file.name, 
-      size: file.size, 
-      type: file.type,
-      blobSize: blob.size 
+    console.log(`[UPLOAD DEBUG] handleNext called for ${stepKey}`, {
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type,
+      fileValid: file instanceof File,
+      fileLastModified: file.lastModified
     });
+    
+    try {
+      // Lire le fichier comme arrayBuffer pour garantir sa validité
+      const arrayBuffer = await file.arrayBuffer();
+      console.log(`[UPLOAD DEBUG] ArrayBuffer read for ${stepKey}:`, {
+        bufferSize: arrayBuffer.byteLength
+      });
+      
+      // Stocker l'arrayBuffer au lieu du Blob
+      const updatedDocuments = { ...documents, [stepKey]: file };
+      const updatedBlobs = { ...documentBlobs, [stepKey]: arrayBuffer };
+      
+      setDocuments(updatedDocuments);
+      setDocumentBlobs(updatedBlobs);
+      
+      console.log(`[UPLOAD DEBUG] File saved for ${stepKey}:`, { 
+        name: file.name, 
+        size: file.size, 
+        type: file.type,
+        bufferSize: arrayBuffer.byteLength 
+      });
+    } catch (error) {
+      console.error(`[UPLOAD DEBUG] Error reading file for ${stepKey}:`, error);
+      alert(`Erreur lors de la lecture du fichier: ${error.message}`);
+      return;
+    }
 
     if (adjustedStep < documentSteps.length - 1) {
       setCurrentStep(currentStep + 1);
@@ -130,16 +148,44 @@ export default function DocumentUploadWorkflow({
   const handleWhatsAppConsent = (consent: boolean) => {
     setWhatsappConsent(consent);
     
-    // Recréer les File objects à partir des Blobs pour garantir leur validité
+    console.log('[UPLOAD DEBUG] handleWhatsAppConsent called', {
+      consent,
+      documentBlobsKeys: Object.keys(documentBlobs),
+      documentsKeys: Object.keys(documents)
+    });
+    
+    // Recréer les File objects à partir des ArrayBuffers pour garantir leur validité
     const validDocuments: { [key: string]: File } = {};
     Object.keys(documentBlobs).forEach(key => {
       const originalFile = documents[key];
-      validDocuments[key] = new File([documentBlobs[key]], originalFile.name, { 
-        type: originalFile.type 
+      const arrayBuffer = documentBlobs[key];
+      
+      console.log(`[UPLOAD DEBUG] Recreating file for ${key}:`, {
+        originalFileName: originalFile.name,
+        originalFileType: originalFile.type,
+        bufferSize: arrayBuffer.byteLength
+      });
+      
+      validDocuments[key] = new File([arrayBuffer], originalFile.name, { 
+        type: originalFile.type,
+        lastModified: Date.now()
+      });
+      
+      console.log(`[UPLOAD DEBUG] Recreated file for ${key}:`, {
+        name: validDocuments[key].name,
+        size: validDocuments[key].size,
+        type: validDocuments[key].type
       });
     });
     
-    console.log('[UPLOAD DEBUG] Final documents to upload:', Object.keys(validDocuments));
+    console.log('[UPLOAD DEBUG] Final documents to upload:', {
+      keys: Object.keys(validDocuments),
+      sizes: Object.keys(validDocuments).map(key => ({ 
+        key, 
+        size: validDocuments[key].size 
+      }))
+    });
+    
     onComplete(validDocuments, consent);
   };
 
