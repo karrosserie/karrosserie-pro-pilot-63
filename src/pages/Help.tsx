@@ -1,12 +1,24 @@
 
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import HelpHeader from '@/components/help/HelpHeader';
 import HelpSearchBar from '@/components/help/HelpSearchBar';
 import HelpFAQSectionComponent from '@/components/help/HelpFAQSection';
 import { faqSections } from '@/components/help/HelpFAQData';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Sparkles } from 'lucide-react';
+import { useWelcomeTour } from '@/hooks/tour/useWelcomeTour';
 
 const Help = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
+  const { resetTour } = useWelcomeTour();
+
+  const handleRestartTour = () => {
+    resetTour();
+    navigate('/welcome');
+  };
 
   const filteredSections = useMemo(() => {
     if (!searchTerm.trim()) {
@@ -36,6 +48,22 @@ const Help = () => {
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
       />
+
+      {/* Tour guidé */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Tour guidé des nouvelles fonctionnalités</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground mb-4">
+            Redécouvrez toutes les nouvelles fonctionnalités avec notre guide interactif
+          </p>
+          <Button onClick={handleRestartTour}>
+            <Sparkles className="h-4 w-4 mr-2" />
+            Recommencer le tour guidé
+          </Button>
+        </CardContent>
+      </Card>
       
       {/* FAQ Sections */}
       <div className="space-y-6">

@@ -16,6 +16,7 @@ import Messageries from "@/pages/Messageries";
 import PresencePointages from "@/pages/PresencePointages";
 import CreationDossierJudiciaire from "@/pages/CreationDossierJudiciaire";
 import DepotDossier from "@/pages/DepotDossier";
+import Welcome from "@/pages/Welcome";
 
 import GestionTemplates from "@/pages/GestionTemplates";
 
@@ -27,6 +28,14 @@ export const coreRoutes = [
         <AppLayout>
           <Index />
         </AppLayout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/welcome",
+    element: (
+      <ProtectedRoute>
+        <Welcome />
       </ProtectedRoute>
     )
   },

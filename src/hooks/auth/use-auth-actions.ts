@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { authService } from '@/services/supabase/auth';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { welcomeTourService } from '@/services/welcomeTour/WelcomeTourService';
 
 export const useAuthActions = (setLoading: (loading: boolean) => void) => {
   const navigate = useNavigate();
@@ -49,7 +50,34 @@ export const useAuthActions = (setLoading: (loading: boolean) => void) => {
         description: "Vous êtes maintenant connecté.",
       });
       
+      // Vérifier si c'est un client migré (si le champ existe)
+      try {
+        const userCompany = await supabase
+          .from('user_companies')
+          .select('company_id')
+          .eq('user_id', newUser.id)
+          .eq('active', true)
+          .single();
+
+        if (userCompany.data?.company_id) {
+          const { data: companyData } = await supabase
+            .from('company_info')
+            .select('*')
+            .eq('id', userCompany.data.company_id)
+            .single();
+          
+          // Rediriger vers /welcome si client migré et n'a pas vu la page de bienvenue
+          if (companyData && 'is_merged' in companyData && companyData.is_merged && !welcomeTourService.hasSeenWelcome()) {
+            navigate('/welcome');
+            return { session: newSession, user: newUser };
+          }
+        }
+      } catch (error) {
+        console.log('No is_merged field or error checking:', error);
+      }
+      
       navigate('/');
+      
       return { session: newSession, user: newUser };
     } catch (error: any) {
       let errorMessage = error.message;
