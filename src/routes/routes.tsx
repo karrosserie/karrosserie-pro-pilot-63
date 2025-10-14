@@ -8,11 +8,11 @@ import { adminRoutes } from './adminRoutes';
 // Export ProtectedRoute for backward compatibility
 export { ProtectedRoute } from '@/components/router/ProtectedRoute';
 
-// Combine all routes
+// Combine all routes - authRoutes must be last because it contains the catch-all route
 export const routes = [
-  ...authRoutes,
   ...coreRoutes,
   ...documentRoutes,
   ...paymentRoutes,
-  ...adminRoutes
+  ...adminRoutes,
+  ...authRoutes
 ];
