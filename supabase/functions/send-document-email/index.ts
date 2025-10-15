@@ -114,7 +114,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    console.log("=== DÉBUT EDGE FUNCTION ===");
+    console.log("=== DÉBUT EDGE FUNCTION (VERSION DENOMAILER SMTP) ===");
     
     const { to, subject, message, pdfBase64, invoiceReference, documentType = "facture" }: InvoiceEmailRequest = await req.json();
 
