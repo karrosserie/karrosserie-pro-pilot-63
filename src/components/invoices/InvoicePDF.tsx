@@ -399,8 +399,9 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
               <View>
                 <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>ADRESSE :</Text> {companyData?.address || ''}</Text>
                 <Text style={alternativeStyles.companyInfo}>{companyData?.zipcode || ''} {companyData?.city || ''}</Text>
-                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>TEL :</Text> {companyData?.phone || ''}</Text>
-                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>EMAIL :</Text> {companyData?.email || ''}</Text>
+                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>Tél :</Text> {companyData?.phone || ''}</Text>
+                <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>Email :</Text></Text>
+                <Text style={alternativeStyles.companyInfo}>{companyData?.email || ''}</Text>
                 <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>SIRET :</Text> {companyData?.siret || ''}</Text>
                 <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>TVA :</Text> {companyData?.tva || ''}</Text>
               </View>
