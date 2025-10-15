@@ -187,7 +187,8 @@ const alternativeStyles = StyleSheet.create({
     marginBottom: 30,
   },
   companySection: {
-    flex: 1,
+    flex: 1.2,
+    maxWidth: 300,
   },
   companyName: {
     fontSize: 16,
@@ -401,7 +402,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
                 <Text style={alternativeStyles.companyInfo}>{companyData?.zipcode || ''} {companyData?.city || ''}</Text>
                 <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>Tél :</Text> {companyData?.phone || ''}</Text>
                 <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>Email :</Text></Text>
-                <Text style={alternativeStyles.companyInfo}>{companyData?.email || ''}</Text>
+                <Text style={[alternativeStyles.companyInfo, { fontSize: 8 }]}>{companyData?.email || ''}</Text>
                 <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>SIRET :</Text> {companyData?.siret || ''}</Text>
                 <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>TVA :</Text> {companyData?.tva || ''}</Text>
               </View>
