@@ -14,7 +14,7 @@ interface DefaultCreditTotalsProps {
 const DefaultCreditTotals = ({ totals, clientData }: DefaultCreditTotalsProps) => {
   return (
     <>
-      <div className="mt-3 sm:mt-4 mr-1 sm:mr-2 flex justify-end">
+      <div className="mt-3 sm:mt-4 mr-1 sm:mr-2 flex justify-end break-inside-avoid">
         <div className="w-48 sm:w-56">
           <div className="space-y-0.5 sm:space-y-1 text-sm sm:text-base">
             <div className="flex justify-between font-bold">

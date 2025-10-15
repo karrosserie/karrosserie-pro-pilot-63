@@ -11,7 +11,7 @@ interface InvoicePDFTotalsProps {
 
 const InvoicePDFTotals = ({ subtotalAfterDiscount, totalVAT, finalTotal }: InvoicePDFTotalsProps) => {
   return (
-    <View style={pdfStyles.totalsSection}>
+    <View style={pdfStyles.totalsSection} wrap={false}>
       <View style={pdfStyles.totalsBox}>
         <View style={pdfStyles.totalRowBold}>
           <Text>Sous-total</Text>

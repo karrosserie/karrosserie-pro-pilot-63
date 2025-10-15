@@ -500,7 +500,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
           </View>
 
           {/* Totaux */}
-          <View style={alternativeStyles.totalsContainer}>
+          <View style={alternativeStyles.totalsContainer} wrap={false}>
             <View style={alternativeStyles.totalsTable}>
               <View style={alternativeStyles.totalsHeaderRow}>
                 <Text style={alternativeStyles.totalsHeaderCell}>Total HT</Text>
@@ -903,7 +903,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
         </View>
 
         {/* Totaux par défaut */}
-        <View style={defaultStyles.totalsSection}>
+        <View style={defaultStyles.totalsSection} wrap={false}>
           <View style={defaultStyles.totalsBox}>
             <View style={defaultStyles.totalRowBold}>
               <Text>Sous-total</Text>
