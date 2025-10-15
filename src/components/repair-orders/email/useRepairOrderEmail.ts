@@ -134,7 +134,7 @@ ${companyName}`
           to: formData.recipient,
           subject: formData.subject,
           message: formData.message,
-          pdfBase64: pdfBase64,
+          fileBase64: pdfBase64,
           invoiceReference: repairOrder.reference,
           documentType: 'repair_order'
         }

@@ -259,7 +259,7 @@ AUTO PAINT`;
           to: emailData.to,
           subject: emailData.subject,
           message: emailData.message,
-          pdfBase64: fileBase64,
+          fileBase64: fileBase64,
           invoiceReference: fileName.split('.')[0], // Nom sans extension
           documentType: fileExtension
         }

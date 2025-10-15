@@ -113,7 +113,7 @@ AUTO PAINT`;
           to: emailData.to,
           subject: emailData.subject,
           message: emailData.message,
-          pdfBase64: pdfBase64,
+          fileBase64: pdfBase64,
           invoiceReference: quote.reference,
           documentType: 'quote'
         }
