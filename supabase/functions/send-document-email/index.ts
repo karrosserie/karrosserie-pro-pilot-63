@@ -40,7 +40,7 @@ const sendEmail = async (to: string, subject: string, htmlBody: string, fileBase
       throw new Error('Configuration SMTP manquante');
     }
 
-    // Créer le client SMTP avec configuration TLS pour Gmail
+    // Créer le client SMTP
     console.log('🔌 Connexion au serveur SMTP...');
     client = new SMTPClient({
       connection: {
@@ -54,22 +54,23 @@ const sendEmail = async (to: string, subject: string, htmlBody: string, fileBase
       },
     });
 
-    console.log('📎 Préparation de la pièce jointe...');
+    console.log('📎 Préparation de la pièce jointe (conversion base64 -> binary)...');
+    // Convertir le base64 en Uint8Array (binary) comme attendu par denomailer
+    const binaryData = Uint8Array.from(atob(fileBase64), c => c.charCodeAt(0));
     
     console.log('📤 Envoi de l\'email avec pièce jointe...');
     
-    // Envoyer l'email avec le bon format pour denomailer (base64 string)
+    // Envoyer l'email avec denomailer - format simplifié
     await client.send({
       from: fromEmail,
       to: to,
       subject: subject,
+      content: 'auto',
       html: htmlBody,
       attachments: [
         {
           filename: filename,
-          content: fileBase64,
-          encoding: 'base64',
-          contentType: contentType,
+          content: binaryData,
         }
       ]
     });
