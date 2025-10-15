@@ -54,13 +54,11 @@ const sendEmail = async (to: string, subject: string, htmlBody: string, fileBase
       },
     });
 
-    // Convertir le base64 en buffer pour la pièce jointe
     console.log('📎 Préparation de la pièce jointe...');
-    const fileBuffer = Uint8Array.from(atob(fileBase64), c => c.charCodeAt(0));
     
     console.log('📤 Envoi de l\'email avec pièce jointe...');
     
-    // Envoyer l'email avec le bon format pour denomailer
+    // Envoyer l'email avec le bon format pour denomailer (base64 string)
     await client.send({
       from: fromEmail,
       to: to,
@@ -69,7 +67,8 @@ const sendEmail = async (to: string, subject: string, htmlBody: string, fileBase
       attachments: [
         {
           filename: filename,
-          content: fileBuffer,
+          content: fileBase64,
+          encoding: 'base64',
           contentType: contentType,
         }
       ]
