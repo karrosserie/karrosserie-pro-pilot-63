@@ -54,13 +54,11 @@ const sendEmail = async (to: string, subject: string, htmlBody: string, fileBase
       },
     });
 
-    console.log('📎 Préparation de la pièce jointe (conversion base64 -> binary)...');
-    // Convertir le base64 en Uint8Array (binary) comme attendu par denomailer
-    const binaryData = Uint8Array.from(atob(fileBase64), c => c.charCodeAt(0));
+    console.log('📎 Préparation de la pièce jointe (base64)...');
     
     console.log('📤 Envoi de l\'email avec pièce jointe...');
     
-    // Envoyer l'email avec denomailer - format simplifié
+    // Envoyer l'email avec denomailer - le format attendu est une string base64 avec encoding
     await client.send({
       from: fromEmail,
       to: to,
@@ -70,7 +68,9 @@ const sendEmail = async (to: string, subject: string, htmlBody: string, fileBase
       attachments: [
         {
           filename: filename,
-          content: binaryData,
+          content: fileBase64,
+          encoding: 'base64',
+          contentType: contentType,
         }
       ]
     });
