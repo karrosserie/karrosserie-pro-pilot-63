@@ -60,12 +60,11 @@ const sendEmail = async (to: string, subject: string, htmlBody: string, fileBase
     
     console.log('📤 Envoi de l\'email avec pièce jointe...');
     
-    // Envoyer l'email
+    // Envoyer l'email avec le bon format pour denomailer
     await client.send({
       from: fromEmail,
       to: to,
       subject: subject,
-      content: htmlBody,
       html: htmlBody,
       attachments: [
         {
