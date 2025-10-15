@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -15,10 +16,12 @@ interface InvoiceEmailRequest {
   documentType?: string;
 }
 
-// Fonction pour envoyer l'email avec nodemailer
+// Fonction pour envoyer l'email avec denomailer
 const sendEmail = async (to: string, subject: string, htmlBody: string, fileBase64: string, filename: string, fromEmail: string, contentType: string) => {
+  let client: SMTPClient | null = null;
+  
   try {
-    console.log('🚀 Début de sendEmail');
+    console.log('🚀 Début de sendEmail avec denomailer');
     
     const smtpHost = Deno.env.get('SMTP_HOST');
     const smtpPort = parseInt(Deno.env.get('SMTP_PORT') || '587');
@@ -37,45 +40,70 @@ const sendEmail = async (to: string, subject: string, htmlBody: string, fileBase
       throw new Error('Configuration SMTP manquante');
     }
 
-    console.log('📩 Simulation d\'envoi email');
-    
-    // Simulation d'envoi d'email
-    const mockTransporter = {
-      sendMail: async (mailOptions: any) => {
-        console.log('Email simulé envoyé:', mailOptions);
-        return { messageId: 'mock-message-id' };
-      }
-    };
+    // Créer le client SMTP avec configuration TLS pour Gmail
+    console.log('🔌 Connexion au serveur SMTP...');
+    client = new SMTPClient({
+      connection: {
+        hostname: smtpHost,
+        port: smtpPort,
+        tls: true,
+        auth: {
+          username: smtpUser,
+          password: smtpPassword,
+        },
+      },
+    });
 
-    console.log('📤 Envoi de l\'email avec pièce jointe...');
-    
     // Convertir le base64 en buffer pour la pièce jointe
+    console.log('📎 Préparation de la pièce jointe...');
     const fileBuffer = Uint8Array.from(atob(fileBase64), c => c.charCodeAt(0));
     
-    const info = await mockTransporter.sendMail({
+    console.log('📤 Envoi de l\'email avec pièce jointe...');
+    
+    // Envoyer l'email
+    await client.send({
       from: fromEmail,
       to: to,
       subject: subject,
+      content: htmlBody,
       html: htmlBody,
       attachments: [
         {
           filename: filename,
           content: fileBuffer,
-          contentType: contentType
+          contentType: contentType,
         }
       ]
     });
     
-    console.log('✅ Email envoyé avec succès:', info.messageId);
+    console.log('✅ Email envoyé avec succès via Gmail SMTP');
+    
     return { 
       success: true, 
-      messageId: info.messageId,
-      message: 'Email envoyé avec succès'
+      messageId: `sent-${Date.now()}`,
+      message: 'Email envoyé avec succès via Gmail'
     };
     
   } catch (error) {
     console.error('❌ Erreur dans sendEmail:', error);
+    
+    // Gestion des erreurs spécifiques Gmail
+    if (error.message?.includes('authentication')) {
+      console.error('⚠️ Erreur d\'authentification Gmail - Vérifiez le mot de passe d\'application');
+      throw new Error('Erreur d\'authentification Gmail. Vérifiez votre mot de passe d\'application.');
+    }
+    
     throw error;
+  } finally {
+    // Fermer la connexion SMTP
+    if (client) {
+      try {
+        await client.close();
+        console.log('🔌 Connexion SMTP fermée');
+      } catch (closeError) {
+        console.error('⚠️ Erreur lors de la fermeture de la connexion:', closeError);
+      }
+    }
   }
 };
 
