@@ -7,11 +7,14 @@ interface InvoicePDFFooterProps {
 }
 
 const InvoicePDFFooter = ({ companyData }: InvoicePDFFooterProps) => {
+  const firstLine = `${companyData?.name || 'KARROSSERIE'} - ${companyData?.address || ''} ${companyData?.zipcode || ''} ${companyData?.city || ''} - SIRET ${companyData?.siret || ''} - N° TVA : ${companyData?.tva || ''} - Tel : ${companyData?.phone || ''}`;
+  const emailLine = `Email : ${companyData?.email || ''}`;
+  
   return (
     <Text style={pdfStyles.footer}>
-      {companyData?.name || 'KARROSSERIE'} - {companyData?.address || ''} {companyData?.zipcode || ''} {companyData?.city || ''} - 
-      SIRET {companyData?.siret || ''} - N° TVA : {companyData?.tva || ''} - 
-      Tel : {companyData?.phone || ''} - Email : {companyData?.email || ''}
+      {firstLine}
+      {'\n'}
+      {emailLine}
     </Text>
   );
 };
