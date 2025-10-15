@@ -29,7 +29,7 @@ const DefaultInvoiceHeader = ({ companyData, invoiceData, clientData, remainingA
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6">
       {/* Colonne 1 - Entreprise */}
-      <div>
+      <div className="break-inside-avoid">
         <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-white px-2 sm:px-3 py-1 text-center mb-2 sm:mb-3" style={{backgroundColor: 'rgba(64,67,72,255)'}}>FACTURE</h1>
         {companyData.logo_url ? (
           <div className="flex items-start justify-start mb-3" style={{maxWidth: '250px'}}>

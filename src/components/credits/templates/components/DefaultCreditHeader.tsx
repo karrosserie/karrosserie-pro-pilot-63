@@ -25,7 +25,7 @@ const DefaultCreditHeader = ({ companyData, creditData, clientData }: DefaultCre
   return (
     <div className="grid grid-cols-3 gap-6 mb-6">
       {/* Colonne 1 - Entreprise */}
-      <div>
+      <div className="break-inside-avoid">
         <h1 className="text-2xl font-bold text-white px-3 py-1 text-center mb-3" style={{backgroundColor: 'rgba(64,67,72,255)'}}>AVOIR</h1>
         {companyData.logo_url ? (
           <div className="flex items-center justify-start mb-3" style={{maxWidth: '120px'}}>

@@ -26,7 +26,7 @@ const InvoicePDFHeader = ({ invoice, companyData, totalPaidAmount, finalTotal }:
   return (
     <View style={pdfStyles.header}>
       {/* Colonne 1 - Informations entreprise */}
-      <View style={pdfStyles.headerColumn}>
+      <View style={pdfStyles.headerColumn} wrap={false}>
         <View style={pdfStyles.title}>
           <Text>FACTURE</Text>
         </View>

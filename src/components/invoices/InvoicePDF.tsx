@@ -395,7 +395,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
         <Page size="A4" style={alternativeStyles.page}>
           {/* Header avec entreprise et facture */}
           <View style={alternativeStyles.mainHeader}>
-            <View style={alternativeStyles.companySection}>
+            <View style={alternativeStyles.companySection} wrap={false}>
               <Text style={alternativeStyles.companyName}>{companyData?.name || ''}</Text>
               <View>
                 <Text style={alternativeStyles.companyInfo}><Text style={{ fontWeight: 'bold' }}>ADRESSE :</Text> {companyData?.address || ''}</Text>
@@ -746,7 +746,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
       <Page size="A4" style={defaultStyles.page}>
         {/* Header par défaut */}
         <View style={defaultStyles.header}>
-          <View style={defaultStyles.headerColumn}>
+          <View style={defaultStyles.headerColumn} wrap={false}>
             <View style={defaultStyles.title}>
               <Text style={documentType === 'repair_order' ? { fontSize: 12 } : undefined}>
                 {documentType === 'repair_order' ? 'ORDRE DE RÉPARATION' : 
