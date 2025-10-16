@@ -134,7 +134,26 @@ Deno.serve(async (req) => {
         }
       }
 
+      // Récupérer l'état d'onboarding depuis la base de données
+      let onboardingState = {};
+      if (userId) {
+        try {
+          const { data: onboardingData } = await supabase
+            .from('onboarding_state')
+            .select('state')
+            .eq('user_id', userId)
+            .single();
+          
+          if (onboardingData?.state) {
+            onboardingState = onboardingData.state;
+          }
+        } catch (e) {
+          console.warn('Impossible de récupérer l\'état d\'onboarding:', e);
+        }
+      }
+
       const webhookPayload = {
+        ...onboardingState,
         user_id: userId,
         action_type: 'signature_or',
         repair_order_id: repairOrderId,
