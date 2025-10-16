@@ -38,8 +38,7 @@ const InvoicePDFHeader = ({ invoice, companyData, totalPaidAmount, finalTotal }:
           <Text>{companyData?.address || 'Votre adresse'}</Text>
           <Text>{companyData?.zipcode || ''} {companyData?.city || ''}</Text>
           <Text>Téléphone : {companyData?.phone || '+33 1 23 45 67 89'}</Text>
-          <Text>E-mail :</Text>
-          <Text> {companyData?.email || 'contact@karrosserie.fr'}</Text>
+          <Text>E-mail : {companyData?.email || 'contact@karrosserie.fr'}</Text>
           <Text>SIRET : {companyData?.siret || '123 456 789 00123'}</Text>
           <Text>N° TVA : {companyData?.tva || 'FR 12 123456789'}</Text>
         </View>
