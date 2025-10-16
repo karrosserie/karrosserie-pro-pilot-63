@@ -1,4 +1,5 @@
 import { onboardingService } from '../onboarding/OnboardingService';
+import { supabase } from '@/integrations/supabase/client';
 
 type UserActionType = 
   | 'connexion'
@@ -14,9 +15,14 @@ class UserActionWebhookService {
     try {
       // Récupérer l'état d'onboarding actuel
       const onboardingState = onboardingService.getOnboardingState();
+      
+      // Récupérer le user_id de la session
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id || additionalData?.user_id;
 
       const payload = {
         ...onboardingState,
+        user_id: userId,
         action_type: action,
         timestamp: new Date().toISOString(),
         ...additionalData
