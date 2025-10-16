@@ -244,7 +244,7 @@ export const generateInvoicePDFWithTemplate = async (invoice: Invoice, companyDa
     const blob = await asPdf.toBlob();
     
     // Créer un nom de fichier unique
-    const filename = `Facture_${invoice.reference}_${new Date().toISOString().split('T')[0]}.pdf`;
+    const filename = `Facture_${invoice.reference}.pdf`;
     
     // Créer un lien de téléchargement
     const url = URL.createObjectURL(blob);
