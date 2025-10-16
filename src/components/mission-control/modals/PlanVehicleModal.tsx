@@ -12,6 +12,7 @@ import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useCompany } from '@/hooks/use-company';
 import { supabase } from '@/integrations/supabase/client';
+import { userActionWebhookService } from '@/services/tracking/UserActionWebhookService';
 
 interface PlanVehicleModalProps {
   isOpen: boolean;
@@ -130,6 +131,22 @@ const PlanVehicleModal: React.FC<PlanVehicleModalProps> = ({
       // Ici on pourrait sauvegarder la planification dans une table dédiée
       // Pour l'instant, on simule juste une planification
       await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Envoyer le webhook pour l'action mise_planning
+      try {
+        await userActionWebhookService.sendUserAction('mise_planning', {
+          vehicle_info: vehicleInfo,
+          employee_id: selectedEmployee,
+          task_type: selectedTask,
+          scheduled_date: selectedDate?.toISOString(),
+          scheduled_time: selectedTime,
+          company_id: companyData?.id
+        });
+        console.log('✅ Webhook mise_planning envoyé avec succès');
+      } catch (webhookError) {
+        console.error('⚠️ Erreur lors de l\'envoi du webhook mise_planning:', webhookError);
+        // Ne pas bloquer la planification si le webhook échoue
+      }
 
       onPlanified();
       onClose();

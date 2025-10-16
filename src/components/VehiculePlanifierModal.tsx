@@ -5,6 +5,8 @@ import { Calendar, Clock } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { userActionWebhookService } from '@/services/tracking/UserActionWebhookService';
+import { toast } from 'sonner';
 
 interface VehiculePlanifierModalProps {
   isOpen: boolean;
@@ -24,14 +26,40 @@ export const VehiculePlanifierModal: React.FC<VehiculePlanifierModalProps> = ({
   const [selectedTechnician, setSelectedTechnician] = React.useState('');
   const [selectedTask, setSelectedTask] = React.useState('');
 
-  const handleConfirm = () => {
-    onConfirm?.({
-      date: selectedDate,
-      time: selectedTime,
-      technician: selectedTechnician,
-      task: selectedTask
-    });
-    onClose();
+  const handleConfirm = async () => {
+    try {
+      // Envoyer le webhook pour l'action mise_planning
+      await userActionWebhookService.sendUserAction('mise_planning', {
+        vehicle_info: `${vehicule?.marque} ${vehicule?.modele} - ${vehicule?.immatriculation}`,
+        vehicle_license_plate: vehicule?.immatriculation,
+        client: vehicule?.client,
+        technician: selectedTechnician,
+        task: selectedTask,
+        scheduled_date: selectedDate,
+        scheduled_time: selectedTime
+      });
+      console.log('✅ Webhook mise_planning envoyé avec succès');
+      
+      onConfirm?.({
+        date: selectedDate,
+        time: selectedTime,
+        technician: selectedTechnician,
+        task: selectedTask
+      });
+      onClose();
+      toast.success('Véhicule planifié avec succès');
+    } catch (error) {
+      console.error('⚠️ Erreur lors de l\'envoi du webhook mise_planning:', error);
+      // Ne pas bloquer la planification si le webhook échoue
+      onConfirm?.({
+        date: selectedDate,
+        time: selectedTime,
+        technician: selectedTechnician,
+        task: selectedTask
+      });
+      onClose();
+      toast.success('Véhicule planifié avec succès');
+    }
   };
 
   return (

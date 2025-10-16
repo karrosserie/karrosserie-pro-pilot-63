@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calendar, Clock, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { userActionWebhookService } from '@/services/tracking/UserActionWebhookService';
 
 interface Vehicle {
   id: string;
@@ -117,6 +118,22 @@ export const PlanVehicleModal = ({
 
       console.log('Tâche planifiée avec succès:', data);
       toast.success(`Véhicule ${vehicle.licensePlate} planifié avec succès`);
+      
+      // Envoyer le webhook pour l'action mise_planning
+      try {
+        await userActionWebhookService.sendUserAction('mise_planning', {
+          vehicle_id: vehicle.id,
+          vehicle_license_plate: vehicle.licensePlate,
+          employee_id: selectedEmployeeId,
+          task_type: selectedTaskType,
+          scheduled_date: startDateTime.toISOString(),
+          company_id: companyId
+        });
+        console.log('✅ Webhook mise_planning envoyé avec succès');
+      } catch (webhookError) {
+        console.error('⚠️ Erreur lors de l\'envoi du webhook mise_planning:', webhookError);
+        // Ne pas bloquer la planification si le webhook échoue
+      }
       
       // Réinitialiser le formulaire
       setSelectedEmployeeId('');
