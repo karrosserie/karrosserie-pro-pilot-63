@@ -5,6 +5,7 @@ import { authService } from '@/services/supabase/auth';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { welcomeTourService } from '@/services/welcomeTour/WelcomeTourService';
+import { userActionWebhookService } from '@/services/tracking/UserActionWebhookService';
 
 export const useAuthActions = (setLoading: (loading: boolean) => void) => {
   const navigate = useNavigate();
@@ -48,6 +49,12 @@ export const useAuthActions = (setLoading: (loading: boolean) => void) => {
       toast({
         title: "Connexion réussie",
         description: "Vous êtes maintenant connecté.",
+      });
+      
+      // Envoyer le webhook de connexion
+      userActionWebhookService.sendUserAction('connexion', {
+        user_email: email,
+        user_id: newUser.id
       });
       
       // Vérifier si c'est un client migré (si le champ existe)

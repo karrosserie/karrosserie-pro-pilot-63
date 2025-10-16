@@ -13,6 +13,7 @@ import { ProcessConfig } from "./ProcessConfig";
 import { OwnerPlanningTab } from "./OwnerPlanningTab";
 import { useUserRole } from "@/hooks/use-user-role";
 import { useViewManagement } from "@/hooks/use-view-management";
+import { userActionWebhookService } from '@/services/tracking/UserActionWebhookService';
 
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -259,6 +260,13 @@ export const WorkshopPlanningInterface = ({
         return;
       }
       console.log('Tâche créée avec succès:', newTask);
+
+      // Envoyer le webhook
+      userActionWebhookService.sendUserAction('mise_planning', {
+        task_id: newTask.id,
+        vehicle_id: vehicleId,
+        task_type: 'Accueil & Préparation du dossier'
+      });
 
       // Appeler onScheduleUpdate pour informer le parent
       if (onScheduleUpdate) {

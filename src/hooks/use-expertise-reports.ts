@@ -4,6 +4,7 @@ import { expertiseReportsService, NewExpertiseReport, UpdateExpertiseReport, Exp
 import { useToast } from '@/hooks/use-toast';
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { userActionWebhookService } from '@/services/tracking/UserActionWebhookService';
 
 export function useExpertiseReports() {
   const queryClient = useQueryClient();
@@ -63,11 +64,17 @@ export function useExpertiseReports() {
   
   const createReport = useMutation({
     mutationFn: (newReport: NewExpertiseReport) => expertiseReportsService.create(newReport),
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['expertiseReports'] });
       toast({
         title: "Rapport d'expertise en cours d'analyse...",
         description: "Le rapport d'expertise a été soumis et est maintenant en cours d'analyse par notre IA."
+      });
+      
+      // Envoyer le webhook
+      userActionWebhookService.sendUserAction('import_rapport_expertise', {
+        report_id: data?.id,
+        report_number: data?.report_number
       });
     },
     onError: (error) => {

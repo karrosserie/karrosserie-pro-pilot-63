@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { invoicesService } from '@/services/supabase/invoices';
 import { useImpersonation } from '@/hooks/use-impersonation';
 import { useEffect } from 'react';
+import { userActionWebhookService } from '@/services/tracking/UserActionWebhookService';
 
 export function useInvoices(showArchived: boolean = false) {
   const queryClient = useQueryClient();
@@ -30,11 +31,17 @@ export function useInvoices(showArchived: boolean = false) {
     mutationFn: async (invoiceData: any) => {
       return await invoicesService.create(invoiceData);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
       toast({
         title: "Facture créée",
         description: "La facture a été créée avec succès."
+      });
+      
+      // Envoyer le webhook
+      userActionWebhookService.sendUserAction('creation_facture', {
+        invoice_id: data?.id,
+        invoice_reference: data?.reference
       });
     },
     onError: (error) => {

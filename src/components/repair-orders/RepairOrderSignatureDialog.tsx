@@ -15,6 +15,7 @@ import { RepairOrder } from '@/services/supabase/repair-orders';
 import { useToast } from '@/hooks/use-toast';
 import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { Signature } from 'lucide-react';
+import { userActionWebhookService } from '@/services/tracking/UserActionWebhookService';
 
 interface RepairOrderSignatureDialogProps {
   open: boolean;
@@ -114,6 +115,12 @@ const RepairOrderSignatureDialog: React.FC<RepairOrderSignatureDialogProps> = ({
       toast({
         title: "Signature enregistrée",
         description: `L'ordre de réparation ${repairOrder?.reference} a été signé par le client.`
+      });
+
+      // Envoyer le webhook
+      userActionWebhookService.sendUserAction('signature_or', {
+        repair_order_id: repairOrder.id,
+        repair_order_reference: repairOrder.reference
       });
 
       onOpenChange(false);

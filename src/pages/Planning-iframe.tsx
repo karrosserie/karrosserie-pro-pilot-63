@@ -19,6 +19,7 @@ import { useTeamMembers, TeamMember } from '@/hooks/use-team-members';
 import { EmployeesList } from '@/components/planning/EmployeesList';
 import TaskDetailsModal from '@/components/planning/TaskDetailsModal';
 import { WorkshopPlanningInterface } from '@/components/planning/WorkshopPlanningInterface';
+import { userActionWebhookService } from '@/services/tracking/UserActionWebhookService';
 
 import { toast } from '@/hooks/use-toast';
 import { useCompanyId } from '@/hooks/use-company-id';
@@ -3226,6 +3227,18 @@ const Planning = () => {
                     if (errors.length > 0) {
                       throw new Error('Erreur lors de la création de certaines planifications');
                     }
+
+                    // Envoyer le webhook pour chaque tâche créée
+                    const createdTasks = results.filter(result => result.data);
+                    createdTasks.forEach((result: any) => {
+                      if (result.data && result.data[0]) {
+                        userActionWebhookService.sendUserAction('mise_planning', {
+                          task_id: result.data[0].id,
+                          vehicle_id: selectedVehicle.id,
+                          task_type: result.data[0].task_type
+                        });
+                      }
+                    });
 
                     // Utiliser setTimeout pour éviter l'erreur React de mise à jour avant le montage
                     setTimeout(() => {
