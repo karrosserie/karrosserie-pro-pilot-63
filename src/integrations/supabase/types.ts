@@ -2821,6 +2821,30 @@ export type Database = {
         }
         Relationships: []
       }
+      onboarding_state: {
+        Row: {
+          created_at: string
+          id: string
+          state: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          state?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          state?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       open_mail: {
         Row: {
           created_at: string

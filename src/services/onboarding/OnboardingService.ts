@@ -8,6 +8,7 @@ import {
   Tunnel3Steps,
 } from '@/types/onboarding';
 import { v4 as uuidv4 } from 'uuid';
+import { supabase } from '@/integrations/supabase/client';
 
 const ONBOARDING_KEY = 'onboarding_state';
 const ONBOARDING_VERSION = '1.0.0';
@@ -77,7 +78,7 @@ class OnboardingService {
   }
 
   /**
-   * Sauvegarde l'état d'onboarding dans localStorage et envoie au webhook
+   * Sauvegarde l'état d'onboarding dans localStorage, Supabase et envoie au webhook
    */
   private saveState(state: OnboardingState): void {
     try {
@@ -87,12 +88,57 @@ class OnboardingService {
       // Déclencher un événement personnalisé pour notifier les hooks
       window.dispatchEvent(new CustomEvent('onboarding-updated', { detail: state }));
       
+      // Synchroniser avec Supabase de manière asynchrone (ne pas bloquer)
+      this.syncToSupabase(state).catch(error => {
+        console.error('[Onboarding] Error syncing to Supabase:', error);
+      });
+      
       // Envoyer l'état au webhook n8n de manière asynchrone (ne pas bloquer)
       this.sendToWebhook(state).catch(error => {
         console.error('[Onboarding] Error sending to webhook:', error);
       });
     } catch (error) {
       console.error('Error saving onboarding state:', error);
+    }
+  }
+
+  /**
+   * Synchronise l'état d'onboarding avec Supabase
+   */
+  private async syncToSupabase(state: OnboardingState): Promise<void> {
+    try {
+      // Récupérer l'utilisateur connecté
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        console.warn('[Onboarding] No authenticated user, skipping Supabase sync');
+        return;
+      }
+
+      console.log('[Onboarding] Syncing state to Supabase for user:', user.id);
+
+      // Upsert (insert ou update) dans la table onboarding_state
+      const { error } = await supabase
+        .from('onboarding_state')
+        .upsert(
+          {
+            user_id: user.id,
+            state: state as any,
+            updated_at: new Date().toISOString()
+          },
+          {
+            onConflict: 'user_id'
+          }
+        );
+
+      if (error) {
+        throw error;
+      }
+
+      console.log('[Onboarding] Successfully synced state to Supabase');
+    } catch (error) {
+      console.error('[Onboarding] Failed to sync to Supabase:', error);
+      // Ne pas propager l'erreur pour ne pas bloquer le flux principal
     }
   }
 
