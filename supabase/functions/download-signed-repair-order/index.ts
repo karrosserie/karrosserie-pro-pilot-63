@@ -113,6 +113,66 @@ Deno.serve(async (req) => {
 
     console.log(`Document signé téléchargé et stocké avec succès: ${urlData.publicUrl}`);
 
+    // Déclencher le webhook n8n pour notifier la signature
+    try {
+      console.log('📤 Envoi du webhook signature OR vers n8n...', {
+        repair_order_id: repairOrderId,
+        repair_order_reference: repairOrder.reference
+      });
+
+      // Récupérer le user_id depuis le JWT
+      const authHeader = req.headers.get('authorization');
+      let userId = null;
+      
+      if (authHeader) {
+        try {
+          const token = authHeader.replace('Bearer ', '');
+          const { data: { user } } = await supabase.auth.getUser(token);
+          userId = user?.id;
+        } catch (e) {
+          console.warn('Impossible de récupérer le user_id depuis le JWT:', e);
+        }
+      }
+
+      const webhookPayload = {
+        user_id: userId,
+        action_type: 'signature_or',
+        repair_order_id: repairOrderId,
+        repair_order_reference: repairOrder.reference,
+        signed_document_url: urlData.publicUrl,
+        timestamp: new Date().toISOString()
+      };
+
+      console.log('📦 Payload webhook:', JSON.stringify(webhookPayload, null, 2));
+
+      const webhookResponse = await fetch(
+        'https://n8n.karrosserie.pro/webhook/cb45ad92-6f2a-4ead-ac63-e8b207642cf1',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(webhookPayload),
+        }
+      );
+
+      console.log('📡 Réponse webhook n8n:', {
+        status: webhookResponse.status,
+        statusText: webhookResponse.statusText,
+        ok: webhookResponse.ok
+      });
+
+      if (!webhookResponse.ok) {
+        const responseText = await webhookResponse.text();
+        console.warn(`⚠️ Webhook n8n failed: ${webhookResponse.status}`, responseText);
+      } else {
+        console.log('✅ Webhook n8n envoyé avec succès');
+      }
+    } catch (webhookError) {
+      console.error('❌ Erreur lors de l\'envoi du webhook n8n:', webhookError);
+      // On ne bloque pas la réponse même si le webhook échoue
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
