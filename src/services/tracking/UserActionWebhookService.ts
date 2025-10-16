@@ -28,6 +28,9 @@ class UserActionWebhookService {
         ...additionalData
       };
 
+      console.log('🌐 Envoi webhook vers:', this.webhookUrl);
+      console.log('📦 Payload:', JSON.stringify(payload, null, 2));
+
       const response = await fetch(this.webhookUrl, {
         method: 'POST',
         headers: {
@@ -36,11 +39,22 @@ class UserActionWebhookService {
         body: JSON.stringify(payload),
       });
 
+      console.log('📡 Réponse webhook:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
+      });
+
       if (!response.ok) {
-        console.warn(`Failed to send user action webhook: ${response.status}`);
+        const responseText = await response.text();
+        console.warn(`❌ Failed to send user action webhook: ${response.status}`, responseText);
+        throw new Error(`Webhook failed with status ${response.status}: ${responseText}`);
       }
+
+      console.log('✅ Webhook envoyé avec succès');
     } catch (error) {
-      console.error('Error sending user action webhook:', error);
+      console.error('❌ Error sending user action webhook:', error);
+      throw error; // Re-throw pour que l'appelant puisse gérer l'erreur
     }
   }
 }

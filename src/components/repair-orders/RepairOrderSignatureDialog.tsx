@@ -117,12 +117,25 @@ const RepairOrderSignatureDialog: React.FC<RepairOrderSignatureDialogProps> = ({
         description: `L'ordre de réparation ${repairOrder?.reference} a été signé par le client.`
       });
 
-      // Envoyer le webhook
-      userActionWebhookService.sendUserAction('signature_or', {
-        repair_order_id: repairOrder.id,
-        repair_order_reference: repairOrder.reference
-      });
+      // IMPORTANT: Envoyer le webhook ET attendre qu'il se termine avant de fermer le dialogue
+      try {
+        console.log('📤 Envoi du webhook signature OR...', {
+          repair_order_id: repairOrder.id,
+          repair_order_reference: repairOrder.reference
+        });
+        
+        await userActionWebhookService.sendUserAction('signature_or', {
+          repair_order_id: repairOrder.id,
+          repair_order_reference: repairOrder.reference
+        });
+        
+        console.log('✅ Webhook signature OR envoyé avec succès');
+      } catch (webhookError) {
+        console.error('❌ Erreur lors de l\'envoi du webhook signature OR:', webhookError);
+        // On ne bloque pas l'utilisateur même si le webhook échoue
+      }
 
+      // Fermer le dialogue seulement APRÈS l'envoi du webhook
       onOpenChange(false);
     } catch (error) {
       console.error('Error updating repair order:', error);
