@@ -762,7 +762,8 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
               <Text>{companyData?.address || ''}</Text>
               <Text>{companyData?.zipcode || ''} {companyData?.city || ''}</Text>
               <Text>Téléphone : {companyData?.phone || ''}</Text>
-              <Text>E-mail : {companyData?.email || ''}</Text>
+              <Text>E-mail :</Text>
+              <Text> {companyData?.email || ''}</Text>
               <Text>SIRET : {companyData?.siret || ''}</Text>
               <Text>N° TVA : {companyData?.tva || ''}</Text>
             </View>
