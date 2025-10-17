@@ -44,6 +44,18 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
     onMileageChange(value);
   };
 
+  const handleMileageFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (mileage === 0) {
+      e.target.value = '';
+    }
+  };
+
+  const handleMileageBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (e.target.value === '') {
+      onMileageChange(0);
+    }
+  };
+
   const handleImageAdd = (url: string) => {
     console.log('VehicleDetailsTab - Adding image:', url);
     console.log('Current images before add:', vehicleImages);
@@ -78,6 +90,8 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
               type="number"
               value={mileage}
               onChange={handleMileageChange}
+              onFocus={handleMileageFocus}
+              onBlur={handleMileageBlur}
               placeholder="Ex: 45000"
               disabled={isViewMode}
               min="0"
