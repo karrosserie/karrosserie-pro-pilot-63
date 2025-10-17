@@ -107,7 +107,12 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
   const { isFormValid } = useFleetLoanFormValidation(formData);
   const { validateTabByValue } = useTabValidation();
   
-  const { runTour, stepIndex, steps, handleJoyrideCallback } = useLoanFormGuide(isViewMode, isOpen);
+  const { runTour, stepIndex, steps, handleJoyrideCallback } = useLoanFormGuide(
+    isViewMode, 
+    isOpen,
+    formData.driverLicenseFrontUrl,
+    formData.driverLicenseBackUrl
+  );
 
   const tabs = [
     { value: 'client-info', label: 'Informations sur le client' },

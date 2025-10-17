@@ -1,11 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { Step, CallBackProps, STATUS } from 'react-joyride';
 
-export const useLoanFormGuide = (isViewMode: boolean, isOpen: boolean) => {
+export const useLoanFormGuide = (
+  isViewMode: boolean, 
+  isOpen: boolean,
+  driverLicenseFrontUrl?: string,
+  driverLicenseBackUrl?: string
+) => {
   const [runTour, setRunTour] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isInteractingRef = useRef(false);
+  const previousLicenseRef = useRef({ front: '', back: '' });
 
   useEffect(() => {
     if (!isViewMode && isOpen) {
@@ -52,6 +58,34 @@ export const useLoanFormGuide = (isViewMode: boolean, isOpen: boolean) => {
     }, 2000);
   };
 
+  // Détecter quand le permis de conduire est uploadé
+  useEffect(() => {
+    if (!isOpen || isViewMode || currentStep !== 1) return;
+
+    const hasNewFrontUrl = driverLicenseFrontUrl && driverLicenseFrontUrl !== previousLicenseRef.current.front;
+    const hasNewBackUrl = driverLicenseBackUrl && driverLicenseBackUrl !== previousLicenseRef.current.back;
+
+    if (hasNewFrontUrl || hasNewBackUrl) {
+      // Mise à jour des références
+      previousLicenseRef.current = {
+        front: driverLicenseFrontUrl || '',
+        back: driverLicenseBackUrl || ''
+      };
+
+      // Si au moins un côté du permis est uploadé, passer à l'étape suivante
+      if (inactivityTimerRef.current) {
+        clearTimeout(inactivityTimerRef.current);
+      }
+      isInteractingRef.current = false;
+      
+      // Attendre un peu puis passer à l'étape suivante
+      setTimeout(() => {
+        setCurrentStep(2);
+        setRunTour(true);
+      }, 1500);
+    }
+  }, [driverLicenseFrontUrl, driverLicenseBackUrl, currentStep, isOpen, isViewMode]);
+
   // Détecter les interactions avec les champs du formulaire
   useEffect(() => {
     if (!isOpen || isViewMode) return;
@@ -87,41 +121,6 @@ export const useLoanFormGuide = (isViewMode: boolean, isOpen: boolean) => {
       }
     };
 
-    // Observer les changements dans les zones d'upload de permis
-    const observeLicenseUpload = () => {
-      const driverLicenseSection = document.querySelector('[data-tour="driver-license"]');
-      if (!driverLicenseSection) return;
-
-      const observer = new MutationObserver((mutations) => {
-        // Vérifier si des images de permis ont été ajoutées
-        const hasLicenseImages = driverLicenseSection.querySelectorAll('img[src*="license"]').length > 0 ||
-                                 driverLicenseSection.querySelectorAll('img[alt*="Permis"]').length > 0;
-        
-        if (hasLicenseImages && currentStep === 1) {
-          // Le permis a été uploadé, passer à l'étape suivante après un court délai
-          if (inactivityTimerRef.current) {
-            clearTimeout(inactivityTimerRef.current);
-          }
-          isInteractingRef.current = false;
-          setTimeout(() => {
-            setCurrentStep(2);
-            setRunTour(true);
-          }, 1500);
-        }
-      });
-
-      observer.observe(driverLicenseSection, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['src']
-      });
-
-      return observer;
-    };
-
-    const observer = observeLicenseUpload();
-
     document.addEventListener('mousedown', handleClick, true);
     document.addEventListener('input', handleInput, true);
     document.addEventListener('change', handleChange, true);
@@ -130,9 +129,8 @@ export const useLoanFormGuide = (isViewMode: boolean, isOpen: boolean) => {
       document.removeEventListener('mousedown', handleClick, true);
       document.removeEventListener('input', handleInput, true);
       document.removeEventListener('change', handleChange, true);
-      if (observer) observer.disconnect();
     };
-  }, [isOpen, isViewMode, runTour, currentStep]);
+  }, [isOpen, isViewMode, runTour]);
 
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status, action, index, type } = data;
