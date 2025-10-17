@@ -11,6 +11,14 @@ import { Upload, FileText, X, Loader2 } from 'lucide-react';
 import { MovingCar } from '@/components/ui/moving-car';
 import { Button } from '@/components/ui/button';
 import { v4 as uuidv4 } from 'uuid';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface ExpertiseReportUploaderProps {
   onSuccess?: () => void;
@@ -31,6 +39,7 @@ export const ExpertiseReportUploader = ({
   const location = useLocation();
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -115,11 +124,8 @@ export const ExpertiseReportUploader = ({
         const { onboardingService } = await import('@/services/onboarding/OnboardingService');
         onboardingService.updateOnboardingStep('tunnel2', 'reportImported', { reportId: newReport.id });
         
-        // Afficher un toast de félicitations immédiatement
-        toast({
-          title: "🎉 Félicitations !",
-          description: "Votre rapport d'expertise a été importé avec succès et est en cours d'analyse. Le système va automatiquement extraire les informations et créer le client, le véhicule et le devis.",
-        });
+        // Afficher une pop-up de félicitations
+        setShowSuccessDialog(true);
         
         // Créer un message de félicitations pour l'utilisateur
         const onboardingState = onboardingService.getOnboardingState();
@@ -214,8 +220,26 @@ export const ExpertiseReportUploader = ({
   };
 
   return (
-    <div className={className}>
-      {/* Fenêtre d'attente - temporairement désactivée
+    <>
+      <AlertDialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-2xl">🎉 Félicitations !</AlertDialogTitle>
+            <AlertDialogDescription className="text-base">
+              Votre rapport d'expertise a été importé avec succès et est en cours d'analyse. 
+              Le système va automatiquement extraire les informations et créer le client, le véhicule et le devis.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button onClick={() => setShowSuccessDialog(false)}>
+              Compris
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <div className={className}>
+        {/* Fenêtre d'attente - temporairement désactivée
       {isUploading && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-8 max-w-md mx-4 text-center">
@@ -291,6 +315,7 @@ export const ExpertiseReportUploader = ({
           />
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 };
