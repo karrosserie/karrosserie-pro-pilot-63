@@ -8,15 +8,34 @@ import { Cession } from '@/services/supabase/cessions';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useIsMobile } from '@/hooks/use-mobile';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const Cessions = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedCession, setSelectedCession] = useState<Cession | null>(null);
+  const [showHelpDialog, setShowHelpDialog] = useState(false);
 
   const { cessions, isLoading, createCession, updateCession, deleteCession } = useCessions();
   const { toast } = useToast();
+
+  // Afficher le dialog d'aide au premier chargement
+  useEffect(() => {
+    const hasSeenCessionHelp = localStorage.getItem('hasSeenCessionHelp');
+    if (!hasSeenCessionHelp) {
+      setShowHelpDialog(true);
+      localStorage.setItem('hasSeenCessionHelp', 'true');
+    }
+  }, []);
 
   // Vérifier le statut de signature des cessions en attente
   useEffect(() => {
@@ -222,6 +241,22 @@ const Cessions = () => {
         onSubmit={handleSubmitCession}
         isSubmitting={createCession.isPending || updateCession.isPending}
       />
+
+      <AlertDialog open={showHelpDialog} onOpenChange={setShowHelpDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bienvenue dans les cessions de créance</AlertDialogTitle>
+            <AlertDialogDescription>
+              Pour créer une nouvelle cession de créance, cliquez sur le bouton <strong>"Nouvelle cession"</strong> puis sélectionnez l'ordre de réparation souhaité.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowHelpDialog(false)}>
+              J'ai compris
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
