@@ -39,29 +39,28 @@ export function OnboardingAgentMessagePopup() {
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
-      <DialogContent className="sm:max-w-2xl animate-fade-in">
+      <DialogContent className="sm:max-w-md animate-fade-in">
         <DialogHeader>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 rounded-full bg-primary/10">
-              <Bot className="h-6 w-6 text-primary" />
+          <div className="flex items-center gap-2 mb-2">
+            <div className="p-2 rounded-full bg-primary/10">
+              <Bot className="h-5 w-5 text-primary" />
             </div>
-            <span className="text-sm font-medium text-primary uppercase tracking-wider">
+            <span className="text-xs font-medium text-primary uppercase tracking-wider">
               Agent Onboarding
             </span>
           </div>
-          <DialogTitle className="text-2xl font-semibold mb-4">Nouveau message</DialogTitle>
-          <DialogDescription className="text-lg leading-relaxed text-foreground/80">
+          <DialogTitle className="text-xl">Nouveau message</DialogTitle>
+          <DialogDescription className="text-base leading-relaxed pt-2">
             {unreadMessage.message.content}
           </DialogDescription>
         </DialogHeader>
-        <div className="flex justify-end pt-6">
+        <div className="flex justify-end pt-4">
           <Button 
             onClick={handleClose} 
             disabled={isMarkingAsRead}
-            className="min-w-[120px]"
-            size="lg"
+            className="min-w-[100px]"
           >
-            {isMarkingAsRead ? 'Chargement...' : "J'ai compris"}
+            {isMarkingAsRead ? 'Chargement...' : 'Compris'}
           </Button>
         </div>
       </DialogContent>

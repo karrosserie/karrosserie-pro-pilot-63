@@ -10,14 +10,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useUserOnboardingProgress } from '@/hooks/use-user-onboarding-progress';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogContent,
@@ -26,7 +18,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { PartyPopper } from 'lucide-react';
 
 const Cessions = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -265,36 +256,24 @@ const Cessions = () => {
         isSubmitting={createCession.isPending || updateCession.isPending}
       />
 
-      <Dialog open={showHelpDialog} onOpenChange={setShowHelpDialog}>
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-3 rounded-full bg-primary/10">
-                <PartyPopper className="h-6 w-6 text-primary" />
-              </div>
-              <span className="text-sm font-medium text-primary uppercase tracking-wider">
-                Agent Onboarding
-              </span>
-            </div>
-            <DialogTitle className="text-2xl font-semibold mb-4">Bienvenue dans les cessions de créance</DialogTitle>
-            <DialogDescription className="text-lg leading-relaxed text-foreground/80">
+      <AlertDialog open={showHelpDialog} onOpenChange={setShowHelpDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bienvenue dans les cessions de créance</AlertDialogTitle>
+            <AlertDialogDescription>
               Pour créer une nouvelle cession de créance, cliquez sur le bouton <strong>"Nouvelle cession"</strong> puis sélectionnez l'ordre de réparation souhaité.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-end pt-6">
-            <Button 
-              onClick={() => {
-                setShowHelpDialog(false);
-                markHelpAsSeen('cession_help_seen');
-              }}
-              size="lg"
-              className="min-w-[120px]"
-            >
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => {
+              setShowHelpDialog(false);
+              markHelpAsSeen('cession_help_seen');
+            }}>
               J'ai compris
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog open={showCourtesyVehicleDialog} onOpenChange={setShowCourtesyVehicleDialog}>
         <AlertDialogContent>

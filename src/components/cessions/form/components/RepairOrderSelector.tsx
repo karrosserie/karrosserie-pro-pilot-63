@@ -8,14 +8,6 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useUserOnboardingProgress } from '@/hooks/use-user-onboarding-progress';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogContent,
@@ -24,7 +16,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { FileText } from 'lucide-react';
 
 interface RepairOrderSelectorProps {
   formData: CessionFormData;
@@ -91,41 +82,26 @@ export const RepairOrderSelector = ({
         )}
       </div>
 
-      <Dialog open={showHelpDialog} onOpenChange={setShowHelpDialog}>
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-3 rounded-full bg-primary/10">
-                <FileText className="h-6 w-6 text-primary" />
-              </div>
-              <span className="text-sm font-medium text-primary uppercase tracking-wider">
-                Agent Onboarding
-              </span>
-            </div>
-            <DialogTitle className="text-2xl font-semibold mb-4">📋 Sélectionnez un ordre de réparation</DialogTitle>
-            <DialogDescription className="text-lg leading-relaxed text-foreground/80 space-y-4">
-              <p>
-                Pour créer une cession de créance, vous devez d'abord <strong>choisir l'ordre de réparation</strong> avec lequel vous souhaitez faire la cession de créance.
-              </p>
-              <p>
-                La cession permettra à l'assurance de vous payer directement pour les réparations effectuées.
-              </p>
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-end pt-6">
-            <Button 
-              onClick={() => {
-                setShowHelpDialog(false);
-                markHelpAsSeen('cession_select_order_help_seen');
-              }}
-              size="lg"
-              className="min-w-[120px]"
-            >
+      <AlertDialog open={showHelpDialog} onOpenChange={setShowHelpDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>📋 Sélectionnez un ordre de réparation</AlertDialogTitle>
+            <AlertDialogDescription>
+              Pour créer une cession de créance, vous devez d'abord <strong>choisir l'ordre de réparation</strong> avec lequel vous souhaitez faire la cession de créance.
+              <br /><br />
+              La cession permettra à l'assurance de vous payer directement pour les réparations effectuées.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => {
+              setShowHelpDialog(false);
+              markHelpAsSeen('cession_select_order_help_seen');
+            }}>
               J'ai compris
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
