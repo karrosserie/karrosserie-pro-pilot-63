@@ -755,7 +755,6 @@ const RepairOrders = () => {
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl">🎉 Félicitations ! Ordre de réparation signé !</AlertDialogTitle>
             <AlertDialogDescription className="text-base space-y-3">
-              <p>Votre client a signé l'ordre de réparation. Vous pouvez maintenant commencer les travaux en toute sérénité juridique !</p>
               <p className="font-bold text-lg text-primary">
                 💰 En 4 clics tu te feras payer même sans être agréé !
               </p>
