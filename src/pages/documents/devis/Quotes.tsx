@@ -531,7 +531,7 @@ const Quotes = () => {
 
                         <Button size="sm" variant="validation" onClick={() => handleConvertToRepairOrder(quote)}>
                           <ArrowRight className="h-4 w-4 mr-1" />
-                            Convertir
+                            Convertir en OR
                           </Button>
 
                         {showArchived ? (
