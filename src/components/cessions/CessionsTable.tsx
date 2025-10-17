@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Joyride, { Step, CallBackProps, STATUS } from 'react-joyride';
 import { Button } from '@/components/ui/button';
 import { 
   Table, 
@@ -80,7 +81,7 @@ export const CessionsTable = ({
   const isMobile = useIsMobile();
   const { tokensRemaining, canPerformOperation } = useSubscription();
 
-  // Afficher le dialog d'aide pour le bouton initialiser après un délai
+  // Afficher le tour guidé pour le bouton initialiser
   useEffect(() => {
     if (shouldShowInitializeHelp) {
       const timer = setTimeout(() => {
@@ -89,6 +90,31 @@ export const CessionsTable = ({
       return () => clearTimeout(timer);
     }
   }, [shouldShowInitializeHelp]);
+
+  const initializeButtonSteps: Step[] = [
+    {
+      target: '.initialize-button-help',
+      content: (
+        <div>
+          <h3 className="font-semibold mb-2">Envoyer la cession à l'assurance</h3>
+          <p>Maintenant que vous avez créé votre cession de créance, vous devez <strong>l'initialiser</strong> pour l'envoyer à l'assurance du client.</p>
+          <br />
+          <p>Cliquez sur le bouton <strong className="text-primary">"Initialiser"</strong> pour commencer le processus d'envoi.</p>
+        </div>
+      ),
+      placement: 'top',
+      disableBeacon: true,
+    }
+  ];
+
+  const handleJoyrideCallback = (data: CallBackProps) => {
+    const { status } = data;
+    const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
+    if (finishedStatuses.includes(status)) {
+      setShowInitializeHelpDialog(false);
+      onInitializeHelpSeen?.();
+    }
+  };
 
   
   const parseValidationError = (validationError: string) => {
@@ -702,29 +728,29 @@ export const CessionsTable = ({
                          </Button>
                        )}
                         {cession.status === 'en_attente' && (
-                         <Button 
-                           variant="create" 
-                           size="sm"
-                           onClick={() => {
-                             handleInitializeProcedure(cession);
-                             onInitializeHelpSeen?.();
-                           }}
-                           disabled={isGeneratingPDF}
-                           className={shouldShowInitializeHelp ? 'animate-pulse' : ''}
-                         >
-                           {isGeneratingPDF ? (
-                             <>
-                               <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                               Génération...
-                             </>
-                           ) : (
-                             <>
-                               <Play className="h-4 w-4 mr-1" />
-                               Initialiser
-                             </>
-                           )}
-                         </Button>
-                       )}
+                          <Button 
+                            variant="create" 
+                            size="sm"
+                            onClick={() => {
+                              handleInitializeProcedure(cession);
+                              onInitializeHelpSeen?.();
+                            }}
+                            disabled={isGeneratingPDF}
+                            className={`initialize-button-help ${shouldShowInitializeHelp ? 'animate-pulse ring-2 ring-primary ring-offset-2' : ''}`}
+                          >
+                            {isGeneratingPDF ? (
+                              <>
+                                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                Génération...
+                              </>
+                            ) : (
+                              <>
+                                <Play className="h-4 w-4 mr-1" />
+                                Initialiser
+                              </>
+                            )}
+                          </Button>
+                        )}
                        {cession.status === 'en_attente' && (
                          <Button 
                            variant="delete" 
@@ -803,26 +829,26 @@ export const CessionsTable = ({
         cession={selectedCessionForProgress}
       />
 
-      <AlertDialog open={showInitializeHelpDialog} onOpenChange={setShowInitializeHelpDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Envoyer la cession à l'assurance</AlertDialogTitle>
-            <AlertDialogDescription>
-              Maintenant que vous avez créé votre cession de créance, vous devez <strong>l'initialiser</strong> pour l'envoyer à l'assurance du client.
-              <br /><br />
-              Cliquez sur le bouton <strong className="text-primary animate-pulse">"Initialiser"</strong> qui clignote pour commencer le processus d'envoi.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => {
-              setShowInitializeHelpDialog(false);
-              onInitializeHelpSeen?.();
-            }}>
-              J'ai compris
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Joyride
+        steps={initializeButtonSteps}
+        run={showInitializeHelpDialog}
+        continuous
+        showSkipButton
+        callback={handleJoyrideCallback}
+        styles={{
+          options: {
+            primaryColor: 'hsl(var(--primary))',
+            zIndex: 10000,
+          }
+        }}
+        locale={{
+          back: 'Retour',
+          close: 'Fermer',
+          last: 'Terminer',
+          next: 'Suivant',
+          skip: 'Passer',
+        }}
+      />
     </div>
   );
 };
