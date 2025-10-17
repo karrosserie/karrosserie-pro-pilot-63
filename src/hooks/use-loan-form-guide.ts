@@ -76,19 +76,23 @@ export const useLoanFormGuide = (
 
     const hasNewFrontUrl = driverLicenseFrontUrl && driverLicenseFrontUrl !== previousLicenseRef.current.front;
     const hasNewBackUrl = driverLicenseBackUrl && driverLicenseBackUrl !== previousLicenseRef.current.back;
+    const hasBothSides = driverLicenseFrontUrl && driverLicenseBackUrl;
 
-    console.log('License Upload Detection - Has new front?', hasNewFrontUrl, 'Has new back?', hasNewBackUrl);
+    console.log('License Upload Detection - Has new front?', hasNewFrontUrl, 'Has new back?', hasNewBackUrl, 'Has both?', hasBothSides);
 
+    // Mettre à jour les références si un nouveau fichier est détecté
     if (hasNewFrontUrl || hasNewBackUrl) {
-      console.log('License Upload Detection - New license detected! Advancing to next step...');
-      
-      // Mise à jour des références
       previousLicenseRef.current = {
         front: driverLicenseFrontUrl || '',
         back: driverLicenseBackUrl || ''
       };
+    }
 
-      // Si au moins un côté du permis est uploadé, passer à l'étape suivante
+    // Ne passer à l'étape suivante que si les DEUX côtés sont uploadés
+    if (hasBothSides && (hasNewFrontUrl || hasNewBackUrl)) {
+      console.log('License Upload Detection - Both sides detected! Advancing to next step...');
+      
+      // Si les deux côtés du permis sont uploadés, passer à l'étape suivante
       if (inactivityTimerRef.current) {
         clearTimeout(inactivityTimerRef.current);
       }
