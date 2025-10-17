@@ -65,6 +65,31 @@ export function useOnboardingImportWatcher() {
               quoteId: quote?.id,
             });
 
+            // Créer un message d'agent pour féliciter l'utilisateur
+            const onboardingState = onboardingService.getOnboardingState();
+            if (onboardingState?.id) {
+              try {
+                await supabase
+                  .from('ai_messages_history')
+                  .insert({
+                    session_id: onboardingState.id,
+                    read: false,
+                    message: {
+                      type: 'ai',
+                      content: '🎉 Félicitations ! Votre rapport d\'expertise a été importé avec succès. Le client, le véhicule et le devis ont été automatiquement créés dans votre système. Vous pouvez maintenant consulter ces informations et poursuivre le processus.',
+                      tool_calls: [],
+                      additional_kwargs: {},
+                      response_metadata: {},
+                      invalid_tool_calls: []
+                    }
+                  });
+                
+                console.log('[Onboarding] Congratulation message created for import:', importRecord.id);
+              } catch (error) {
+                console.error('[Onboarding] Error creating congratulation message:', error);
+              }
+            }
+
             console.log('[Onboarding] Automatic digitization detected for import:', importRecord.id);
           }
         } catch (error) {
