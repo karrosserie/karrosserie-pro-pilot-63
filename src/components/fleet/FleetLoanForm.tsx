@@ -184,8 +184,6 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
         showProgress
         showSkipButton
         spotlightClicks
-        disableOverlayClose
-        disableCloseOnEsc
         callback={handleJoyrideCallback}
         styles={{
           options: {
