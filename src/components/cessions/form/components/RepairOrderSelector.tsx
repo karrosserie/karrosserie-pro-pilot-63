@@ -1,11 +1,21 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { SearchableSelect } from '@/components/ui/searchable-select';
 import { CessionFormData, CessionFormErrors } from '../types';
 import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useUserOnboardingProgress } from '@/hooks/use-user-onboarding-progress';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface RepairOrderSelectorProps {
   formData: CessionFormData;
@@ -19,6 +29,16 @@ export const RepairOrderSelector = ({
   onFieldChange
 }: RepairOrderSelectorProps) => {
   const { orders, isLoading: isLoadingOrders } = useRepairOrders();
+  const { shouldShowCessionSelectOrderHelp, markHelpAsSeen } = useUserOnboardingProgress();
+  const [showHelpDialog, setShowHelpDialog] = useState(false);
+
+  // Afficher la pop-up d'aide si pas encore vue
+  useEffect(() => {
+    if (shouldShowCessionSelectOrderHelp && !isLoadingOrders) {
+      const timer = setTimeout(() => setShowHelpDialog(true), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldShowCessionSelectOrderHelp, isLoadingOrders]);
 
   const formatRepairOrderDisplay = (order: any) => {
     const clientName = order.clients ? `${order.clients.first_name} ${order.clients.last_name}` : 'Client non assigné';
@@ -44,21 +64,44 @@ export const RepairOrderSelector = ({
   }));
 
   return (
-    <div className="space-y-2">
-      <Label htmlFor="repair_order_id">
-        Ordre de réparation <span className="text-red-500">*</span>
-      </Label>
-      <SearchableSelect
-        options={repairOrderOptions}
-        value={formData.repair_order_id || ''}
-        onValueChange={(value) => onFieldChange('repair_order_id', value)}
-        placeholder={isLoadingOrders ? "Chargement..." : "Sélectionner un ordre de réparation"}
-        searchPlaceholder="Rechercher un ordre de réparation..."
-        disabled={isLoadingOrders}
-      />
-      {errors.repair_order_id && (
-        <div className="text-sm text-red-600">{errors.repair_order_id}</div>
-      )}
-    </div>
+    <>
+      <div className="space-y-2">
+        <Label htmlFor="repair_order_id">
+          Ordre de réparation <span className="text-red-500">*</span>
+        </Label>
+        <SearchableSelect
+          options={repairOrderOptions}
+          value={formData.repair_order_id || ''}
+          onValueChange={(value) => onFieldChange('repair_order_id', value)}
+          placeholder={isLoadingOrders ? "Chargement..." : "Sélectionner un ordre de réparation"}
+          searchPlaceholder="Rechercher un ordre de réparation..."
+          disabled={isLoadingOrders}
+        />
+        {errors.repair_order_id && (
+          <div className="text-sm text-red-600">{errors.repair_order_id}</div>
+        )}
+      </div>
+
+      <AlertDialog open={showHelpDialog} onOpenChange={setShowHelpDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>📋 Sélectionnez un ordre de réparation</AlertDialogTitle>
+            <AlertDialogDescription>
+              Pour créer une cession de créance, vous devez d'abord <strong>choisir l'ordre de réparation</strong> avec lequel vous souhaitez faire la cession de créance.
+              <br /><br />
+              La cession permettra à l'assurance de vous payer directement pour les réparations effectuées.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => {
+              setShowHelpDialog(false);
+              markHelpAsSeen('cession_select_order_help_seen');
+            }}>
+              J'ai compris
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };

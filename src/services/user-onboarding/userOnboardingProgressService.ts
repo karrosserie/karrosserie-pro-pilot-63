@@ -8,6 +8,7 @@ export interface UserOnboardingProgress {
   quote_convert_help_seen: boolean;
   repair_order_help_seen: boolean;
   cession_help_seen: boolean;
+  cession_select_order_help_seen: boolean;
   fleet_reservation_help_seen: boolean;
   fleet_reservation_guide_completed: boolean;
   expertise_report_prompt_seen: boolean;
@@ -19,6 +20,7 @@ export type OnboardingHelpType =
   | 'quote_convert_help_seen'
   | 'repair_order_help_seen'
   | 'cession_help_seen'
+  | 'cession_select_order_help_seen'
   | 'fleet_reservation_help_seen'
   | 'fleet_reservation_guide_completed'
   | 'expertise_report_prompt_seen';
@@ -78,6 +80,7 @@ class UserOnboardingProgressService {
           quote_convert_help_seen: false,
           repair_order_help_seen: false,
           cession_help_seen: false,
+          cession_select_order_help_seen: false,
           fleet_reservation_help_seen: false,
           fleet_reservation_guide_completed: false,
           expertise_report_prompt_seen: false,
@@ -169,6 +172,7 @@ class UserOnboardingProgressService {
           quote_convert_help_seen: false,
           repair_order_help_seen: false,
           cession_help_seen: false,
+          cession_select_order_help_seen: false,
           fleet_reservation_help_seen: false,
           fleet_reservation_guide_completed: false,
           expertise_report_prompt_seen: false,

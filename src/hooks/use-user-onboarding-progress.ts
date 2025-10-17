@@ -33,6 +33,7 @@ export function useUserOnboardingProgress() {
     shouldShowQuoteConvertHelp: !progress?.quote_convert_help_seen,
     shouldShowRepairOrderHelp: !progress?.repair_order_help_seen,
     shouldShowCessionHelp: !progress?.cession_help_seen,
+    shouldShowCessionSelectOrderHelp: !progress?.cession_select_order_help_seen,
     shouldShowFleetReservationHelp: !progress?.fleet_reservation_help_seen,
     shouldShowFleetGuide: !progress?.fleet_reservation_guide_completed,
     shouldShowExpertiseReportPrompt: !progress?.expertise_report_prompt_seen,
