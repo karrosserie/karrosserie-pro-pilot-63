@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { BrowserRouter } from "react-router-dom";
 import AppRouter from "@/components/router/AppRouter";
 import { OnboardingAgentMessagePopup } from "@/components/onboarding/OnboardingAgentMessagePopup";
+import { OnboardingWatcher } from "@/components/onboarding/OnboardingWatcher";
 import { TourGuide } from "@/components/tour/TourGuide";
 
 const queryClient = new QueryClient();
@@ -21,6 +22,7 @@ const App = () => (
             <Toaster />
             <Sonner />
             <OnboardingAgentMessagePopup />
+            <OnboardingWatcher />
             <TourGuide />
             <AppRouter />
           </ConfirmationProvider>
