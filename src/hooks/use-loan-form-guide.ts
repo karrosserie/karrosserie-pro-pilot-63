@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Step, CallBackProps, STATUS } from 'react-joyride';
 
 export const useLoanFormGuide = (isViewMode: boolean, isOpen: boolean) => {
   const [runTour, setRunTour] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const isInteractingRef = useRef(false);
 
   useEffect(() => {
     if (!isViewMode && isOpen) {
@@ -25,37 +26,45 @@ export const useLoanFormGuide = (isViewMode: boolean, isOpen: boolean) => {
     }
   }, [isViewMode, isOpen]);
 
-  // Gérer les interactions avec les champs
+  // Détecter les interactions avec les champs du formulaire
   useEffect(() => {
-    if (!runTour) return;
+    if (!isOpen || isViewMode) return;
 
-    const tourElements = document.querySelectorAll('[data-tour]');
+    const handleInteractionStart = (e: MouseEvent) => {
+      // Vérifier si on clique sur un élément de formulaire à l'intérieur d'une zone data-tour
+      const target = e.target as HTMLElement;
+      const tourElement = target.closest('[data-tour]');
+      
+      if (tourElement && !isInteractingRef.current) {
+        const isFormElement = target.matches('input, select, button, textarea, [role="combobox"]') ||
+                             target.closest('input, select, button, textarea, [role="combobox"]');
+        
+        if (isFormElement) {
+          isInteractingRef.current = true;
+          setRunTour(false);
+        }
+      }
+    };
+
+    const handleInteractionEnd = () => {
+      if (isInteractingRef.current) {
+        isInteractingRef.current = false;
+        // Attendre un peu avant de réafficher le guide à l'étape suivante
+        setTimeout(() => {
+          setCurrentStep(prev => Math.min(prev + 1, 7)); // Maximum 7 étapes (0-7)
+          setRunTour(true);
+        }, 800);
+      }
+    };
+
+    document.addEventListener('mousedown', handleInteractionStart, true);
+    document.addEventListener('change', handleInteractionEnd, true);
     
-    const handleFocus = () => {
-      // Masquer le guide quand on clique sur un champ
-      setRunTour(false);
-    };
-
-    const handleBlur = () => {
-      // Réafficher le guide à l'étape suivante après avoir quitté le champ
-      setTimeout(() => {
-        setCurrentStep(prev => prev + 1);
-        setRunTour(true);
-      }, 500);
-    };
-
-    tourElements.forEach(element => {
-      element.addEventListener('focus', handleFocus, true);
-      element.addEventListener('blur', handleBlur, true);
-    });
-
     return () => {
-      tourElements.forEach(element => {
-        element.removeEventListener('focus', handleFocus, true);
-        element.removeEventListener('blur', handleBlur, true);
-      });
+      document.removeEventListener('mousedown', handleInteractionStart, true);
+      document.removeEventListener('change', handleInteractionEnd, true);
     };
-  }, [runTour, currentStep]);
+  }, [isOpen, isViewMode]);
 
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status, action, index, type } = data;
@@ -68,7 +77,7 @@ export const useLoanFormGuide = (isViewMode: boolean, isOpen: boolean) => {
       if (action === 'next') {
         setCurrentStep(index + 1);
       } else if (action === 'prev') {
-        setCurrentStep(index - 1);
+        setCurrentStep(Math.max(0, index - 1));
       }
     }
   };
