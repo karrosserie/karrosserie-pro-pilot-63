@@ -6,28 +6,21 @@ export const useLoanFormGuide = (isViewMode: boolean, isOpen: boolean) => {
 
   useEffect(() => {
     // Démarrer le tour uniquement en mode création et à l'ouverture du dialog
-    console.log('Loan Guide - isViewMode:', isViewMode, 'isOpen:', isOpen);
     if (!isViewMode && isOpen) {
-      const hasSeenLoanGuide = localStorage.getItem('fleet-loan-guide-seen');
-      console.log('Loan Guide - hasSeenLoanGuide:', hasSeenLoanGuide);
-      if (!hasSeenLoanGuide) {
-        // Attendre que le DOM soit complètement chargé
-        console.log('Loan Guide - Starting tour in 1000ms');
-        setTimeout(() => {
-          // Vérifier que l'élément cible existe avant de lancer le tour
-          const firstElement = document.querySelector('[data-tour="client-select"]');
-          console.log('Loan Guide - First element exists:', !!firstElement);
-          if (firstElement) {
-            console.log('Loan Guide - setRunTour(true)');
-            setRunTour(true);
-          } else {
-            console.log('Loan Guide - Elements not found, retrying in 500ms');
-            setTimeout(() => setRunTour(true), 500);
-          }
-        }, 1000);
-      } else {
-        console.log('Loan Guide - Already seen, not showing');
-      }
+      // Attendre que le DOM soit complètement chargé
+      setTimeout(() => {
+        // Vérifier que l'élément cible existe avant de lancer le tour
+        const firstElement = document.querySelector('[data-tour="client-select"]');
+        if (firstElement) {
+          setRunTour(true);
+        } else {
+          // Réessayer si l'élément n'est pas encore dans le DOM
+          setTimeout(() => setRunTour(true), 500);
+        }
+      }, 1000);
+    } else {
+      // Réinitialiser le tour quand on ferme le dialog
+      setRunTour(false);
     }
   }, [isViewMode, isOpen]);
 
@@ -37,7 +30,6 @@ export const useLoanFormGuide = (isViewMode: boolean, isOpen: boolean) => {
 
     if (finishedStatuses.includes(status)) {
       setRunTour(false);
-      localStorage.setItem('fleet-loan-guide-seen', 'true');
     }
   };
 
