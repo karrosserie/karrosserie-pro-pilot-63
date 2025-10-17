@@ -117,6 +117,7 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
                 vehicle={vehicle}
                 onSubmit={handleLoanSubmit}
                 onCancel={onClose}
+                isOpen={isOpen}
               />
             ) : reservation && reservation.fleet_vehicles ? (
               <FleetLoanForm
@@ -125,6 +126,7 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
                 onCancel={onClose}
                 defaultValues={reservation}
                 isViewMode={mode === 'view'}
+                isOpen={isOpen}
               />
             ) : (
               <div className="p-4">

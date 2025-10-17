@@ -22,6 +22,7 @@ interface FleetLoanFormProps {
   onCancel: () => void;
   defaultValues?: any;
   isViewMode?: boolean;
+  isOpen?: boolean;
 }
 
 export interface LoanFormData {
@@ -71,7 +72,8 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
   onSubmit,
   onCancel,
   defaultValues,
-  isViewMode = false
+  isViewMode = false,
+  isOpen = false
 }) => {
   // État pour le dialog de création de client
   const [isClientDialogOpen, setIsClientDialogOpen] = useState(false);
@@ -106,7 +108,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
   const { validateTabByValue } = useTabValidation();
   
   // Tour guidé
-  const { runTour, steps, handleJoyrideCallback } = useLoanFormGuide(isViewMode, true);
+  const { runTour, steps, handleJoyrideCallback } = useLoanFormGuide(isViewMode, isOpen);
 
   const tabs = [
     { value: 'client-info', label: 'Informations sur le client' },
