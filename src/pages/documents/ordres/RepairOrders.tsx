@@ -107,13 +107,9 @@ const RepairOrders = () => {
     }
   }, [orders, searchParams, setSearchParams]);
 
-  // Afficher la pop-up d'information sur la signature lors de la première visite
+  // Afficher la pop-up d'information sur la signature à chaque visite
   useEffect(() => {
-    const hasSeenRepairOrderInfo = localStorage.getItem('hasSeenRepairOrderInfo');
-    if (!hasSeenRepairOrderInfo) {
-      setShowInfoDialog(true);
-      localStorage.setItem('hasSeenRepairOrderInfo', 'true');
-    }
+    setShowInfoDialog(true);
   }, []);
 
   // Vérifier si un ordre est passé en "Signé" pour afficher la pop-up de félicitation
