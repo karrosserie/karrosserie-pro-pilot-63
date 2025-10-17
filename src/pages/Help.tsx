@@ -7,17 +7,29 @@ import HelpFAQSectionComponent from '@/components/help/HelpFAQSection';
 import { faqSections } from '@/components/help/HelpFAQData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, RotateCcw } from 'lucide-react';
 import { useWelcomeTour } from '@/hooks/tour/useWelcomeTour';
+import { useUserOnboardingProgress } from '@/hooks/use-user-onboarding-progress';
+import { useToast } from '@/hooks/use-toast';
 
 const Help = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
   const { resetTour } = useWelcomeTour();
+  const { resetAllHelp } = useUserOnboardingProgress();
+  const { toast } = useToast();
 
   const handleRestartTour = () => {
     resetTour();
     navigate('/welcome');
+  };
+
+  const handleResetDiscoveryTour = () => {
+    resetAllHelp();
+    toast({
+      title: "Tour de découverte réinitialisé",
+      description: "Toutes les aides réapparaîtront lors de votre prochaine visite",
+    });
   };
 
   const filteredSections = useMemo(() => {
@@ -58,10 +70,16 @@ const Help = () => {
           <p className="text-muted-foreground mb-4">
             Redécouvrez toutes les nouvelles fonctionnalités avec notre guide interactif
           </p>
-          <Button onClick={handleRestartTour}>
-            <Sparkles className="h-4 w-4 mr-2" />
-            Recommencer le tour guidé
-          </Button>
+          <div className="flex flex-wrap gap-3">
+            <Button onClick={handleRestartTour}>
+              <Sparkles className="h-4 w-4 mr-2" />
+              Recommencer le tour guidé
+            </Button>
+            <Button onClick={handleResetDiscoveryTour} variant="outline">
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Refaire le tour de découverte
+            </Button>
+          </div>
         </CardContent>
       </Card>
       
