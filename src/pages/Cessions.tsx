@@ -276,10 +276,10 @@ const Cessions = () => {
       </AlertDialog>
 
       <AlertDialog open={showCourtesyVehicleDialog} onOpenChange={setShowCourtesyVehicleDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="sm:max-w-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Cession initialisée avec succès !</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-2xl">Cession initialisée avec succès !</AlertDialogTitle>
+            <AlertDialogDescription className="text-lg">
               La cession de créance a été envoyée pour signature.
               <br /><br />
               💡 <strong>N'oubliez pas :</strong> Vous pouvez également prêter un véhicule de courtoisie au client pendant la durée des réparations via le module "Flotte de véhicules".
