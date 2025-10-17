@@ -82,13 +82,13 @@ export const CessionsTable = ({
 
   // Afficher le dialog d'aide pour le bouton initialiser après un délai
   useEffect(() => {
-    if (shouldShowInitializeHelp && cessions.some(c => c.status === 'en_attente')) {
+    if (shouldShowInitializeHelp) {
       const timer = setTimeout(() => {
         setShowInitializeHelpDialog(true);
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [shouldShowInitializeHelp, cessions]);
+  }, [shouldShowInitializeHelp]);
 
   
   const parseValidationError = (validationError: string) => {
