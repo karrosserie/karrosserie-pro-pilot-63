@@ -766,7 +766,7 @@ const RepairOrders = () => {
             <AlertDialogCancel>Plus tard</AlertDialogCancel>
             <AlertDialogAction onClick={() => {
               setShowSignedDialog(false);
-              navigate('/documents/cessions');
+              navigate('/cessions');
             }}>
               Créer une cession maintenant
             </AlertDialogAction>
