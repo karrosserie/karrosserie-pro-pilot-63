@@ -17,9 +17,9 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <BrowserRouter>
-        <AuthProvider>
-          <ConfirmationProvider>
+      <ConfirmationProvider>
+        <BrowserRouter>
+          <AuthProvider>
             <Toaster />
             <Sonner />
             <OnboardingAgentMessagePopup />
@@ -27,9 +27,9 @@ const App = () => (
             <OnboardingCompletionDialog />
             <TourGuide />
             <AppRouter />
-          </ConfirmationProvider>
-        </AuthProvider>
-      </BrowserRouter>
+          </AuthProvider>
+        </BrowserRouter>
+      </ConfirmationProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
