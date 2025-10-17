@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Step, CallBackProps, STATUS } from 'react-joyride';
+import { Step, CallBackProps, STATUS, ACTIONS, EVENTS } from 'react-joyride';
 
 export const useLoanFormGuide = (isViewMode: boolean, isOpen: boolean) => {
   const [runTour, setRunTour] = useState(false);
@@ -25,10 +25,13 @@ export const useLoanFormGuide = (isViewMode: boolean, isOpen: boolean) => {
   }, [isViewMode, isOpen]);
 
   const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status } = data;
+    const { status, type, action } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
-    if (finishedStatuses.includes(status)) {
+    // Si l'utilisateur clique dans le spotlight, avancer à l'étape suivante
+    if (type === EVENTS.TARGET_NOT_FOUND || (type === EVENTS.STEP_AFTER && action === ACTIONS.CLOSE)) {
+      setRunTour(false);
+    } else if (finishedStatuses.includes(status)) {
       setRunTour(false);
     }
   };
