@@ -60,12 +60,21 @@ export const useLoanFormGuide = (
 
   // Détecter quand le permis de conduire est uploadé
   useEffect(() => {
-    if (!isOpen || isViewMode || currentStep !== 1) return;
+    console.log('License Upload Detection - Step:', currentStep, 'Front:', driverLicenseFrontUrl, 'Back:', driverLicenseBackUrl);
+    
+    if (!isOpen || isViewMode || currentStep !== 1) {
+      console.log('License Upload Detection - Skipped (not at step 1 or dialog closed)');
+      return;
+    }
 
     const hasNewFrontUrl = driverLicenseFrontUrl && driverLicenseFrontUrl !== previousLicenseRef.current.front;
     const hasNewBackUrl = driverLicenseBackUrl && driverLicenseBackUrl !== previousLicenseRef.current.back;
 
+    console.log('License Upload Detection - Has new front?', hasNewFrontUrl, 'Has new back?', hasNewBackUrl);
+
     if (hasNewFrontUrl || hasNewBackUrl) {
+      console.log('License Upload Detection - New license detected! Advancing to next step...');
+      
       // Mise à jour des références
       previousLicenseRef.current = {
         front: driverLicenseFrontUrl || '',
@@ -80,6 +89,7 @@ export const useLoanFormGuide = (
       
       // Attendre un peu puis passer à l'étape suivante
       setTimeout(() => {
+        console.log('License Upload Detection - Setting step to 2 and showing tour');
         setCurrentStep(2);
         setRunTour(true);
       }, 1500);
