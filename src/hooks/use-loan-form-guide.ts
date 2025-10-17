@@ -115,24 +115,30 @@ export const useLoanFormGuide = (
                              target.closest('input, select, button, textarea, [role="combobox"]');
         
         if (isFormElement && runTour) {
-          // Masquer le guide et démarrer le timer d'inactivité
+          // Ne pas démarrer le timer pour l'étape du permis (step 1)
+          const isLicenseStep = tourElement.getAttribute('data-tour') === 'driver-license';
+          
           isInteractingRef.current = true;
           setRunTour(false);
-          resetInactivityTimer();
+          
+          // Ne démarrer le timer que si ce n'est pas l'étape du permis
+          if (!isLicenseStep && currentStep !== 1) {
+            resetInactivityTimer();
+          }
         }
       }
     };
 
     const handleInput = () => {
-      // Réinitialiser le timer à chaque modification
-      if (isInteractingRef.current) {
+      // Ne pas réinitialiser le timer pour l'étape du permis
+      if (isInteractingRef.current && currentStep !== 1) {
         resetInactivityTimer();
       }
     };
 
     const handleChange = () => {
-      // Réinitialiser le timer à chaque changement
-      if (isInteractingRef.current) {
+      // Ne pas réinitialiser le timer pour l'étape du permis
+      if (isInteractingRef.current && currentStep !== 1) {
         resetInactivityTimer();
       }
     };
