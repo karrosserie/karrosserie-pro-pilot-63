@@ -119,10 +119,10 @@ export function useImportNotification() {
                       console.log('📄 Quote already exists for report:', report.id, 'Quote ID:', existingQuote.id);
                       console.log('🚀 Navigating to quote:', `/documents/devis?openQuote=${existingQuote.id}`);
                       
-                      // Rediriger vers le devis existant
+                      // Rediriger vers le devis existant (après 3s pour laisser le temps à la pop-up d'onboarding)
                       setTimeout(() => {
                         navigate(`/documents/devis?openQuote=${existingQuote.id}`);
-                      }, 1000);
+                      }, 3000);
                       
                       toast({
                         title: "Import terminé",
@@ -136,10 +136,10 @@ export function useImportNotification() {
                       console.log('✅ Quote created:', newQuote);
                       console.log('🚀 Navigating to new quote:', `/documents/devis?openQuote=${newQuote.id}`);
                       
-                      // Rediriger vers le nouveau devis
+                      // Rediriger vers le nouveau devis (après 3s pour laisser le temps à la pop-up d'onboarding)
                       setTimeout(() => {
                         navigate(`/documents/devis?openQuote=${newQuote.id}`);
-                      }, 1000);
+                      }, 3000);
                       
                       toast({
                         title: "Import et conversion terminés",
