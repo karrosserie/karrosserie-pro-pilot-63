@@ -244,6 +244,7 @@ const Cessions = () => {
         shouldShowInitializeHelp={cessionJustCreated}
         onInitializeHelpSeen={() => {
           setCessionJustCreated(false);
+          markHelpAsSeen('cession_initialize_button_help_seen');
         }}
       />
 
