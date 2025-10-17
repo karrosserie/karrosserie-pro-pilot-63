@@ -7,15 +7,7 @@ import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useUserOnboardingProgress } from '@/hooks/use-user-onboarding-progress';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import Joyride, { Step, CallBackProps, STATUS } from 'react-joyride';
 
 interface RepairOrderSelectorProps {
   formData: CessionFormData;
@@ -30,15 +22,32 @@ export const RepairOrderSelector = ({
 }: RepairOrderSelectorProps) => {
   const { orders, isLoading: isLoadingOrders } = useRepairOrders();
   const { shouldShowCessionSelectOrderHelp, markHelpAsSeen } = useUserOnboardingProgress();
-  const [showHelpDialog, setShowHelpDialog] = useState(false);
+  const [runTour, setRunTour] = useState(false);
 
-  // Afficher la pop-up d'aide si pas encore vue
+  // Afficher le guide si pas encore vu
   useEffect(() => {
     if (shouldShowCessionSelectOrderHelp && !isLoadingOrders) {
-      const timer = setTimeout(() => setShowHelpDialog(true), 500);
+      const timer = setTimeout(() => setRunTour(true), 500);
       return () => clearTimeout(timer);
     }
   }, [shouldShowCessionSelectOrderHelp, isLoadingOrders]);
+
+  const handleJoyrideCallback = (data: CallBackProps) => {
+    const { status } = data;
+    if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
+      setRunTour(false);
+      markHelpAsSeen('cession_select_order_help_seen');
+    }
+  };
+
+  const steps: Step[] = [
+    {
+      target: '#repair-order-selector',
+      content: 'Choisissez l\'ordre de réparation pour créer la cession de créance.',
+      disableBeacon: true,
+      placement: 'bottom',
+    },
+  ];
 
   const formatRepairOrderDisplay = (order: any) => {
     const clientName = order.clients ? `${order.clients.first_name} ${order.clients.last_name}` : 'Client non assigné';
@@ -65,7 +74,29 @@ export const RepairOrderSelector = ({
 
   return (
     <>
-      <div className="space-y-2">
+      <Joyride
+        steps={steps}
+        run={runTour}
+        continuous
+        showProgress
+        showSkipButton
+        callback={handleJoyrideCallback}
+        styles={{
+          options: {
+            primaryColor: 'hsl(var(--primary))',
+            zIndex: 10000,
+          },
+        }}
+        locale={{
+          back: 'Retour',
+          close: 'Fermer',
+          last: 'Terminer',
+          next: 'Suivant',
+          skip: 'Passer',
+        }}
+      />
+      
+      <div id="repair-order-selector" className="space-y-2">
         <Label htmlFor="repair_order_id">
           Ordre de réparation <span className="text-red-500">*</span>
         </Label>
@@ -81,25 +112,6 @@ export const RepairOrderSelector = ({
           <div className="text-sm text-red-600">{errors.repair_order_id}</div>
         )}
       </div>
-
-      <AlertDialog open={showHelpDialog} onOpenChange={setShowHelpDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-center">📋 Ordre de réparation</AlertDialogTitle>
-            <AlertDialogDescription className="text-center">
-              Choisissez l'ordre de réparation pour créer la cession de créance.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => {
-              setShowHelpDialog(false);
-              markHelpAsSeen('cession_select_order_help_seen');
-            }}>
-              J'ai compris
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 };
