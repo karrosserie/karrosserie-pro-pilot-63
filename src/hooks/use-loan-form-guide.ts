@@ -52,8 +52,11 @@ export const useLoanFormGuide = (
       console.log('Tab changed to:', activeTab, '- Setting guide step to:', newStep);
       setCurrentStep(newStep);
       
-      // Ne pas réafficher automatiquement le guide sur l'étape damages (trop d'interactions)
-      if (activeTab !== 'damages') {
+      // Désactiver complètement le guide sur l'onglet damages
+      if (activeTab === 'damages') {
+        setRunTour(false);
+      } else {
+        // Réafficher le guide pour les autres onglets
         setTimeout(() => {
           setRunTour(true);
         }, 500);

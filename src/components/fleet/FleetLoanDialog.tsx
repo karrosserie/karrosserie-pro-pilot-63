@@ -90,11 +90,10 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={mode === 'view' || mode === 'view_return' ? onClose : handleOpenChange}>
-      <DialogContent className="max-w-6xl h-[90vh] flex flex-col p-0">
-        <DialogHeader className="px-6 pt-6 pb-4 border-b">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
           <DialogTitle>{getTitle()}</DialogTitle>
         </DialogHeader>
-        <div className="flex-1 overflow-y-auto px-6 py-4">
         
         {(mode === 'return' || mode === 'view_return') ? (
           reservation && reservation.fleet_vehicles ? (
@@ -136,7 +135,6 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
             )}
           </>
         )}
-        </div>
       </DialogContent>
     </Dialog>
   );
