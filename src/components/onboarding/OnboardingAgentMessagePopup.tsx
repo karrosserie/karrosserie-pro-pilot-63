@@ -39,7 +39,7 @@ export function OnboardingAgentMessagePopup() {
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
-      <DialogContent className="sm:max-w-md animate-fade-in">
+      <DialogContent className="sm:max-w-2xl animate-fade-in">
         <DialogHeader>
           <div className="flex items-center gap-2 mb-2">
             <div className="p-2 rounded-full bg-primary/10">
@@ -49,8 +49,8 @@ export function OnboardingAgentMessagePopup() {
               Agent Onboarding
             </span>
           </div>
-          <DialogTitle className="text-xl text-center">Nouveau message</DialogTitle>
-          <DialogDescription className="text-base leading-relaxed pt-2 text-center">
+          <DialogTitle className="text-2xl text-center">Nouveau message</DialogTitle>
+          <DialogDescription className="text-lg leading-relaxed pt-2 text-center">
             {unreadMessage.message.content}
           </DialogDescription>
         </DialogHeader>
