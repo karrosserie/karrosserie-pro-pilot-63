@@ -15,20 +15,10 @@ import LoadingSpinner from '@/components/ui/loading-spinner';
 import { ErrorMessage } from '@/components/ui/error-message';
 import { useToast } from '@/hooks/use-toast';
 import RepairOrderViewerModal from '@/components/repair-orders/RepairOrderViewerModal';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useIsMobile } from '@/hooks/use-mobile';
 import RepairOrderMobileCard from '@/components/repair-orders/RepairOrderMobileCard';
 import { supabase } from '@/integrations/supabase/client';
-
 const RepairOrders = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -48,45 +38,51 @@ const RepairOrders = () => {
   const [showArchived, setShowArchived] = useState(false);
   const [showInfoDialog, setShowInfoDialog] = useState(false);
   const [showSignedDialog, setShowSignedDialog] = useState(false);
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const isMobile = useIsMobile();
-
-  const { orders, isLoading, error, deleteOrder, archiveOrder, restoreOrder, updateOrder } = useRepairOrders();
-  
+  const {
+    orders,
+    isLoading,
+    error,
+    deleteOrder,
+    archiveOrder,
+    restoreOrder,
+    updateOrder
+  } = useRepairOrders();
   const filteredOrders = orders?.filter(order => {
     const searchLower = searchTerm.toLowerCase();
-    
+
     // Search by reference
     let matchesSearch = false;
     if (order.reference?.toLowerCase().includes(searchLower)) {
       matchesSearch = true;
     }
-    
+
     // Search by client name
     if (order.clients && `${order.clients.first_name} ${order.clients.last_name}`.toLowerCase().includes(searchLower)) {
       matchesSearch = true;
     }
-    
+
     // Search by vehicle info
     if (order.vehicles) {
       const brand = order.vehicles.car_brands?.name || '';
       const model = order.vehicles.car_models?.name || '';
       const licensePlate = order.vehicles.license_plate || '';
       const vehicleInfo = `${brand} ${model} - ${licensePlate}`.toLowerCase();
-      
       if (vehicleInfo.includes(searchLower)) {
         matchesSearch = true;
       }
     }
-    
+
     // Apply search filter
     if (searchTerm && !matchesSearch) {
       return false;
     }
-    
+
     // Apply archive filter
     const matchesArchiveStatus = showArchived ? order.archived : !order.archived;
-    
     return matchesArchiveStatus;
   }) || [];
 
@@ -116,7 +112,6 @@ const RepairOrders = () => {
   useEffect(() => {
     const checkSignedOrders = () => {
       const checkedOrders = JSON.parse(localStorage.getItem('checked-signed-orders') || '[]');
-      
       orders?.forEach(order => {
         if (order.status === 'Signé' && !checkedOrders.includes(order.id)) {
           setShowSignedDialog(true);
@@ -125,7 +120,6 @@ const RepairOrders = () => {
         }
       });
     };
-
     if (orders && orders.length > 0) {
       checkSignedOrders();
       const interval = setInterval(checkSignedOrders, 5000);
@@ -137,45 +131,32 @@ const RepairOrders = () => {
   useEffect(() => {
     console.log('=== DEBUT DE LA VERIFICATION DES SIGNATURES REPAIR ORDERS ===');
     console.log('Orders reçus:', orders);
-
     const checkRepairOrderSignatureStatus = async () => {
       if (!orders) {
         console.log('Pas d\'ordres disponibles');
         return;
       }
-
       console.log('Nombre total d\'ordres:', orders.length);
-
-      const ordersWithSignaturePending = orders.filter(
-        order => order.oodrive_contract_id &&
-                 order.document_url &&
-                 !order.signed_document_url
-      );
-
+      const ordersWithSignaturePending = orders.filter(order => order.oodrive_contract_id && order.document_url && !order.signed_document_url);
       console.log('Ordres avec signature en attente trouvés:', ordersWithSignaturePending.length);
       console.log('Détails des ordres avec signature en attente:', ordersWithSignaturePending.map(o => ({
         id: o.id,
         reference: o.reference,
         oodrive_contract_id: o.oodrive_contract_id
       })));
-
       for (const order of ordersWithSignaturePending) {
         try {
           console.log(`=== APPEL API POUR ORDRE DE REPARATION ${order.id} ===`);
           console.log(`Contract ID: ${order.oodrive_contract_id}`);
-
           const url = `https://n8n.karrosserie.pro/webhook/e6854e25-9a51-4362-b9d2-9a18af911863?contractId=${order.oodrive_contract_id}`;
           console.log('URL de l\'appel API:', url);
-
           const response = await fetch(url, {
             method: 'GET',
             headers: {
-              'Content-Type': 'application/json',
+              'Content-Type': 'application/json'
             }
           });
-
           console.log('Réponse API statut:', response.status);
-
           if (response.ok) {
             const data = await response.json();
             console.log('Données reçues de l\'API pour repair order:', data);
@@ -184,21 +165,19 @@ const RepairOrders = () => {
             if (Array.isArray(data) && data.length === 1) {
               const isSigned = data[0].signature_status === 'SIGNED';
               console.log('La signature est-elle complète?', isSigned);
-
               if (isSigned) {
                 console.log('Signature détectée, téléchargement du document signé depuis Oodrive...');
-
                 try {
                   // Appeler la fonction edge pour télécharger le document signé depuis Oodrive
                   const downloadResponse = await supabase.functions.invoke('download-signed-repair-order', {
-                    body: { repairOrderId: order.id }
+                    body: {
+                      repairOrderId: order.id
+                    }
                   });
-
                   if (downloadResponse.error) {
                     console.error('Erreur lors du téléchargement du document signé:', downloadResponse.error);
                     throw new Error(`Téléchargement échoué: ${downloadResponse.error.message}`);
                   }
-
                   if (downloadResponse.data.success) {
                     console.log('Document signé téléchargé avec succès:', downloadResponse.data.documentUrl);
                     // La fonction edge met déjà à jour l'ordre de réparation
@@ -228,20 +207,16 @@ const RepairOrders = () => {
         }
       }
     };
-
     checkRepairOrderSignatureStatus();
   }, [orders, updateOrder]);
-
   const handleCreateOrder = () => {
     setSelectedOrder(null);
     setDialogOpen(true);
   };
-
   const handleEditOrder = (order: RepairOrder) => {
     setSelectedOrder(order);
     setDialogOpen(true);
   };
-
   const handleDownload = async (order: RepairOrder) => {
     try {
       // Si l'ordre a un document signé, le télécharger directement
@@ -250,14 +225,12 @@ const RepairOrders = () => {
           title: "Téléchargement du document signé",
           description: "Téléchargement en cours..."
         });
-
         try {
           // Télécharger le fichier signé depuis Supabase Storage
           const response = await fetch(order.signed_document_url);
           if (!response.ok) {
             throw new Error(`Erreur HTTP: ${response.status}`);
           }
-          
           const blob = await response.blob();
           const url = window.URL.createObjectURL(blob);
           const link = document.createElement('a');
@@ -267,7 +240,6 @@ const RepairOrders = () => {
           link.click();
           document.body.removeChild(link);
           window.URL.revokeObjectURL(url);
-
           toast({
             title: "Téléchargement réussi",
             description: `Le document signé de l'ordre ${order.reference} a été téléchargé.`
@@ -289,10 +261,10 @@ const RepairOrders = () => {
         title: "Génération du PDF",
         description: "Génération du PDF en cours..."
       });
-
-      const { generateRepairOrderPDFWithTemplate } = await import('@/utils/repairOrderPDFGeneration');
+      const {
+        generateRepairOrderPDFWithTemplate
+      } = await import('@/utils/repairOrderPDFGeneration');
       const result = await generateRepairOrderPDFWithTemplate(order, {});
-      
       if (result.success) {
         toast({
           title: "Téléchargement réussi",
@@ -310,17 +282,16 @@ const RepairOrders = () => {
       });
     }
   };
-
   const handlePrint = async (order: RepairOrder) => {
     try {
       toast({
         title: "Ouverture pour impression",
         description: `Ouverture de l'ordre de réparation ${order.reference} pour impression...`
       });
-
-      const { printRepairOrderPDFWithTemplate } = await import('@/utils/repairOrderPDFGeneration');
+      const {
+        printRepairOrderPDFWithTemplate
+      } = await import('@/utils/repairOrderPDFGeneration');
       const result = await printRepairOrderPDFWithTemplate(order, {});
-      
       if (!result.success) {
         throw new Error(result.error);
       }
@@ -333,17 +304,14 @@ const RepairOrders = () => {
       });
     }
   };
-
   const handleSendEmail = (order: RepairOrder) => {
     setSelectedOrderForEmail(order);
     setEmailDialogOpen(true);
   };
-
   const handleSignOrder = (order: RepairOrder) => {
     setSelectedOrderForSignature(order);
     setSignatureDialogOpen(true);
   };
-
   const handleSendForOodriveSignature = async (order: RepairOrder) => {
     try {
       // Vérifier que le client a un numéro de téléphone
@@ -355,18 +323,27 @@ const RepairOrders = () => {
         });
         return;
       }
-
       toast({
         title: "Préparation de la signature",
         description: "Génération du document en cours..."
       });
 
       // Importer les services nécessaires
-      const { generateRepairOrderSignaturePDF } = await import('@/services/pdf/repairOrderSignaturePDFService');
-      const { sendRepairOrderForSignature } = await import('@/services/api/repairOrderSignatureService');
-      const { companyService } = await import('@/services/supabase/company');
-      const { clientsService } = await import('@/services/supabase/clients');
-      const { repairOrdersService } = await import('@/services/supabase/repair-orders');
+      const {
+        generateRepairOrderSignaturePDF
+      } = await import('@/services/pdf/repairOrderSignaturePDFService');
+      const {
+        sendRepairOrderForSignature
+      } = await import('@/services/api/repairOrderSignatureService');
+      const {
+        companyService
+      } = await import('@/services/supabase/company');
+      const {
+        clientsService
+      } = await import('@/services/supabase/clients');
+      const {
+        repairOrdersService
+      } = await import('@/services/supabase/repair-orders');
 
       // Récupérer les données de la société
       const companyData = await companyService.getCompanyInfo();
@@ -384,11 +361,7 @@ const RepairOrders = () => {
       const documentUrl = await generateRepairOrderSignaturePDF(order, companyData, clientData);
 
       // Envoyer pour signature via Oodrive
-      const signatureResponse = await sendRepairOrderForSignature(
-        order.id,
-        documentUrl,
-        clientData
-      );
+      const signatureResponse = await sendRepairOrderForSignature(order.id, documentUrl, clientData);
 
       // Mettre à jour l'ordre de réparation avec l'URL du document et le contract_id
       await repairOrdersService.update(order.id, {
@@ -402,12 +375,10 @@ const RepairOrders = () => {
           oodrive_recipient_id: signatureResponse.recipients[0].id.toString()
         });
       }
-
       toast({
         title: "Document envoyé pour signature",
         description: `L'ordre de réparation ${order.reference} a été envoyé au client pour signature électronique.`
       });
-
     } catch (error: any) {
       console.error('Error sending repair order for signature:', error);
       toast({
@@ -417,17 +388,16 @@ const RepairOrders = () => {
       });
     }
   };
-
   const handleRequestDocuments = async (order: RepairOrder) => {
     try {
-      const { tokensService } = await import('@/services/supabase/tokens');
-      
+      const {
+        tokensService
+      } = await import('@/services/supabase/tokens');
       await tokensService.createToken({
         company_id: order.company_id!,
         client_id: order.client_id,
         vehicule_id: order.vehicle_id
       });
-
       toast({
         title: "Demande de justificatifs",
         description: `Demande de justificatifs envoyée pour l'ordre de réparation ${order.reference}. Token créé avec succès.`
@@ -441,11 +411,9 @@ const RepairOrders = () => {
       });
     }
   };
-
   const handleConvertToInvoice = (order: RepairOrder) => {
     // Préparer les données de la facture à partir de l'ordre de réparation
     const today = new Date().toISOString().split('T')[0];
-    
     const prefilledData: Partial<Invoice> = {
       client_id: order.client_id,
       vehicle_id: order.vehicle_id,
@@ -463,12 +431,11 @@ const RepairOrders = () => {
       incident_date: order.incident_date || '',
       // Inclure les données de réparations, pièces et remises de l'ordre de réparation
       // Convertir Json en string si nécessaire
-      repairs_data: order.repairs_data ? (typeof order.repairs_data === 'string' ? order.repairs_data : JSON.stringify(order.repairs_data)) : undefined,
-      parts_data: order.parts_data ? (typeof order.parts_data === 'string' ? order.parts_data : JSON.stringify(order.parts_data)) : undefined,
-      discounts_data: order.discounts_data ? (typeof order.discounts_data === 'string' ? order.discounts_data : JSON.stringify(order.discounts_data)) : undefined,
+      repairs_data: order.repairs_data ? typeof order.repairs_data === 'string' ? order.repairs_data : JSON.stringify(order.repairs_data) : undefined,
+      parts_data: order.parts_data ? typeof order.parts_data === 'string' ? order.parts_data : JSON.stringify(order.parts_data) : undefined,
+      discounts_data: order.discounts_data ? typeof order.discounts_data === 'string' ? order.discounts_data : JSON.stringify(order.discounts_data) : undefined
       // Ne pas inclure l'ID pour forcer la création d'une nouvelle facture
     };
-
     console.log('Converting repair order to invoice with data:', prefilledData);
     console.log('Original repair order data:', order);
 
@@ -476,7 +443,6 @@ const RepairOrders = () => {
     setPrefilledInvoice(prefilledData);
     setInvoiceDialogOpen(true);
   };
-
   const handleArchiveOrder = async (order: RepairOrder) => {
     try {
       await archiveOrder.mutateAsync(order.id);
@@ -493,7 +459,6 @@ const RepairOrders = () => {
       });
     }
   };
-
   const handleRestoreOrder = async (order: RepairOrder) => {
     try {
       await restoreOrder.mutateAsync(order.id);
@@ -510,17 +475,14 @@ const RepairOrders = () => {
       });
     }
   };
-
   const handleDeleteOrder = (order: RepairOrder) => {
     setSelectedOrderForDeletion(order);
     setDeleteDialogOpen(true);
   };
-
   const handleViewOrder = (order: RepairOrder) => {
     setSelectedOrder(order);
     setViewerModalOpen(true);
   };
-
   const confirmDeleteOrder = () => {
     if (selectedOrderForDeletion) {
       if (showArchived) {
@@ -532,25 +494,17 @@ const RepairOrders = () => {
       setSelectedOrderForDeletion(null);
     }
   };
-
   if (isLoading) {
-    return (
-      <div className="p-6 space-y-6">
+    return <div className="p-6 space-y-6">
         <LoadingSpinner />
-      </div>
-    );
+      </div>;
   }
-
   if (error) {
-    return (
-      <div className="p-6 space-y-6">
+    return <div className="p-6 space-y-6">
         <ErrorMessage message="Erreur lors du chargement des ordres de réparation" />
-      </div>
-    );
+      </div>;
   }
-  
-  return (
-    <div className="p-6 space-y-6">
+  return <div className="p-6 space-y-6">
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Ordres de réparation</h1>
         <p className="text-gray-600 mt-1">
@@ -559,24 +513,10 @@ const RepairOrders = () => {
         
         {/* Onglets pour basculer entre actifs et archivés */}
         <div className="flex space-x-1 mt-4 bg-gray-100 p-1 rounded-lg w-fit">
-          <button
-            onClick={() => setShowArchived(false)}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-              !showArchived 
-                ? 'bg-white text-gray-900 shadow-sm' 
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
+          <button onClick={() => setShowArchived(false)} className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${!showArchived ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
             Ordres actifs
           </button>
-          <button
-            onClick={() => setShowArchived(true)}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-              showArchived 
-                ? 'bg-white text-gray-900 shadow-sm' 
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
+          <button onClick={() => setShowArchived(true)} className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${showArchived ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
             Documents archivés
           </button>
         </div>
@@ -588,53 +528,30 @@ const RepairOrders = () => {
         <div className="flex items-center w-full md:w-auto space-x-2">
           <div className="relative flex-1 md:w-60">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input 
-              placeholder="Rechercher un ordre..." 
-              className="pl-10"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <Input placeholder="Rechercher un ordre..." className="pl-10" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
           </div>
           
           <Button variant="outline" size="icon">
             <Filter className="h-4 w-4" />
           </Button>
           
-          {!showArchived && (
-            <Button 
-              className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
-              onClick={handleCreateOrder}
-            >
+          {!showArchived && <Button className="bg-karrosserie-orange hover:bg-karrosserie-orange/90" onClick={handleCreateOrder}>
               <Plus className="h-4 w-4 mr-2" />
               Nouvel ordre
-            </Button>
-          )}
+            </Button>}
         </div>
       </div>
       
-      {isMobile ? (
-        <div className="space-y-3">
-          {filteredOrders.length > 0 ? (
-            filteredOrders.map((order) => (
-              <RepairOrderMobileCard
-                key={order.id}
-                order={order}
-                onViewOrder={handleViewOrder}
-                onEditOrder={handleEditOrder}
-                onArchiveOrder={showArchived ? handleDeleteOrder : handleArchiveOrder}
-                contextMenuProps={{
-                  onDownload: handleDownload,
-                  onPrint: handlePrint,
-                  onSendEmail: handleSendEmail,
-                  onSignOrder: handleSignOrder,
-                  onSendForOodriveSignature: handleSendForOodriveSignature,
-                  onRequestDocuments: handleRequestDocuments,
-                  onConvertToInvoice: handleConvertToInvoice
-                }}
-              />
-            ))
-          ) : (
-            <div className="card-container">
+      {isMobile ? <div className="space-y-3">
+          {filteredOrders.length > 0 ? filteredOrders.map(order => <RepairOrderMobileCard key={order.id} order={order} onViewOrder={handleViewOrder} onEditOrder={handleEditOrder} onArchiveOrder={showArchived ? handleDeleteOrder : handleArchiveOrder} contextMenuProps={{
+        onDownload: handleDownload,
+        onPrint: handlePrint,
+        onSendEmail: handleSendEmail,
+        onSignOrder: handleSignOrder,
+        onSendForOodriveSignature: handleSendForOodriveSignature,
+        onRequestDocuments: handleRequestDocuments,
+        onConvertToInvoice: handleConvertToInvoice
+      }} />) : <div className="card-container">
               <div className="flex flex-col items-center justify-center py-8">
                 <div className="h-10 w-10 text-gray-400 mb-2" />
                 <h3 className="font-medium text-gray-900">Aucun résultat</h3>
@@ -642,60 +559,31 @@ const RepairOrders = () => {
                   Aucun ordre de réparation correspondant à votre recherche n'a été trouvé.
                 </p>
               </div>
-            </div>
-          )}
-        </div>
-      ) : (
-        <RepairOrdersTable
-          orders={filteredOrders}
-          onEditOrder={handleEditOrder}
-          onDeleteOrder={handleDeleteOrder}
-          onRestoreOrder={handleRestoreOrder}
-          onViewOrder={handleViewOrder}
-          contextMenuProps={{
-            onDownload: handleDownload,
-            onPrint: handlePrint,
-            onSendEmail: handleSendEmail,
-            onSignOrder: handleSignOrder,
-            onSendForOodriveSignature: handleSendForOodriveSignature,
-            onRequestDocuments: handleRequestDocuments,
-            onConvertToInvoice: handleConvertToInvoice
-          }}
-        />
-      )}
+            </div>}
+        </div> : <RepairOrdersTable orders={filteredOrders} onEditOrder={handleEditOrder} onDeleteOrder={handleDeleteOrder} onRestoreOrder={handleRestoreOrder} onViewOrder={handleViewOrder} contextMenuProps={{
+      onDownload: handleDownload,
+      onPrint: handlePrint,
+      onSendEmail: handleSendEmail,
+      onSignOrder: handleSignOrder,
+      onSendForOodriveSignature: handleSendForOodriveSignature,
+      onRequestDocuments: handleRequestDocuments,
+      onConvertToInvoice: handleConvertToInvoice
+    }} />}
 
-      <RepairOrderDialog
-        order={selectedOrder}
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-      />
+      <RepairOrderDialog order={selectedOrder} open={dialogOpen} onOpenChange={setDialogOpen} />
 
-      <RepairOrderEmailDialog
-        repairOrder={selectedOrderForEmail}
-        open={emailDialogOpen}
-        onOpenChange={setEmailDialogOpen}
-      />
+      <RepairOrderEmailDialog repairOrder={selectedOrderForEmail} open={emailDialogOpen} onOpenChange={setEmailDialogOpen} />
 
-      <RepairOrderSignatureDialog
-        repairOrder={selectedOrderForSignature}
-        open={signatureDialogOpen}
-        onOpenChange={setSignatureDialogOpen}
-      />
+      <RepairOrderSignatureDialog repairOrder={selectedOrderForSignature} open={signatureDialogOpen} onOpenChange={setSignatureDialogOpen} />
 
-      <InvoiceDialog
-        invoice={null}
-        open={invoiceDialogOpen}
-        onOpenChange={(open) => {
-          setInvoiceDialogOpen(open);
-          if (!open) {
-            setPrefilledInvoice(null);
-          }
-        }}
-        prefillData={prefilledInvoice}
-        onSuccess={() => {
-          navigate('/documents/factures');
-        }}
-      />
+      <InvoiceDialog invoice={null} open={invoiceDialogOpen} onOpenChange={open => {
+      setInvoiceDialogOpen(open);
+      if (!open) {
+        setPrefilledInvoice(null);
+      }
+    }} prefillData={prefilledInvoice} onSuccess={() => {
+      navigate('/documents/factures');
+    }} />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
@@ -704,29 +592,19 @@ const RepairOrders = () => {
               {showArchived ? 'Supprimer définitivement l\'ordre de réparation' : 'Archiver l\'ordre de réparation'}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {showArchived 
-                ? 'Êtes-vous sûr de vouloir supprimer définitivement cet ordre de réparation ? Cette action est irréversible et supprimera définitivement toutes les données associées.'
-                : 'Êtes-vous sûr de vouloir archiver cet ordre de réparation ? Vous pourrez le restaurer depuis l\'onglet "Documents archivés".'
-              }
+              {showArchived ? 'Êtes-vous sûr de vouloir supprimer définitivement cet ordre de réparation ? Cette action est irréversible et supprimera définitivement toutes les données associées.' : 'Êtes-vous sûr de vouloir archiver cet ordre de réparation ? Vous pourrez le restaurer depuis l\'onglet "Documents archivés".'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={confirmDeleteOrder} 
-              className={showArchived ? "bg-red-600 hover:bg-red-700" : "bg-gray-600 hover:bg-gray-700"}
-            >
+            <AlertDialogAction onClick={confirmDeleteOrder} className={showArchived ? "bg-red-600 hover:bg-red-700" : "bg-gray-600 hover:bg-gray-700"}>
               {showArchived ? 'Supprimer' : 'Archiver'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      <RepairOrderViewerModal
-        repairOrder={selectedOrder}
-        open={viewerModalOpen}
-        onOpenChange={setViewerModalOpen}
-      />
+      <RepairOrderViewerModal repairOrder={selectedOrder} open={viewerModalOpen} onOpenChange={setViewerModalOpen} />
 
       <AlertDialog open={showInfoDialog} onOpenChange={setShowInfoDialog}>
         <AlertDialogContent className="max-w-4xl">
@@ -755,25 +633,21 @@ const RepairOrders = () => {
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl">🎉 Félicitations ! Ordre de réparation signé !</AlertDialogTitle>
             <AlertDialogDescription className="text-base space-y-3">
-              <p className="font-bold text-lg text-primary">
-                💰 En 4 clics tu te feras payer même sans être agréé !
-              </p>
-              <p>Passez à la cession de créance pour vous faire payer directement par l'assurance.</p>
+              <p className="font-bold text-lg text-primary">💰 Maintenant fait toi payer en direct par l'assurance même si tu n'es pas agréé !</p>
+              <p>Etape suivante : création de la cession de créance</p>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Plus tard</AlertDialogCancel>
             <AlertDialogAction onClick={() => {
-              setShowSignedDialog(false);
-              navigate('/cessions');
-            }}>
+            setShowSignedDialog(false);
+            navigate('/cessions');
+          }}>
               Créer une cession maintenant
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
-  );
+    </div>;
 };
-
 export default RepairOrders;
