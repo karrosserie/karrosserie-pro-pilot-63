@@ -111,7 +111,8 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     isViewMode, 
     isOpen,
     formData.driverLicenseFrontUrl,
-    formData.driverLicenseBackUrl
+    formData.driverLicenseBackUrl,
+    setActiveTab
   );
 
   const tabs = [

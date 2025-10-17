@@ -5,7 +5,8 @@ export const useLoanFormGuide = (
   isViewMode: boolean, 
   isOpen: boolean,
   driverLicenseFrontUrl?: string,
-  driverLicenseBackUrl?: string
+  driverLicenseBackUrl?: string,
+  setActiveTab?: (tab: string) => void
 ) => {
   const [runTour, setRunTour] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -92,6 +93,11 @@ export const useLoanFormGuide = (
         clearTimeout(inactivityTimerRef.current);
       }
       isInteractingRef.current = false;
+      
+      // Changer d'onglet vers "insurance" puis afficher le guide
+      if (setActiveTab) {
+        setActiveTab('insurance');
+      }
       
       // Attendre que l'élément cible soit dans le DOM puis passer à l'étape suivante
       setTimeout(() => {
