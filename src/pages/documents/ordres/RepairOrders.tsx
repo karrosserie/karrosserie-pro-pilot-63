@@ -729,10 +729,10 @@ const RepairOrders = () => {
       />
 
       <AlertDialog open={showInfoDialog} onOpenChange={setShowInfoDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-4xl">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-2xl">📝 Signature électronique offerte !</AlertDialogTitle>
-            <AlertDialogDescription className="text-base">
+            <AlertDialogTitle className="text-4xl text-center">📝 Signature électronique offerte !</AlertDialogTitle>
+            <AlertDialogDescription className="text-2xl text-center">
               Nous t'avons offert un pack de signatures électroniques.
               <br /><br />
               Fait signer ton OR tout de suite par ton client !
