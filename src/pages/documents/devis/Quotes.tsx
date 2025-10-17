@@ -67,10 +67,23 @@ const Quotes = () => {
     return matchesSearch && matchesArchiveStatus;
   }) || [];
 
+  // Debug: afficher l'état d'onboarding
+  useEffect(() => {
+    console.log('🔍 État onboarding sur page devis:', {
+      isInOnboarding,
+      quoteCount: filteredQuotes.length,
+      showConvertPopover
+    });
+  }, [isInOnboarding, filteredQuotes.length, showConvertPopover]);
+
   // Afficher le popover d'aide au chargement si en onboarding
   useEffect(() => {
     if (isInOnboarding && filteredQuotes.length > 0) {
-      const timer = setTimeout(() => setShowConvertPopover(true), 1000);
+      console.log('⏰ Démarrage du timer pour afficher le popover');
+      const timer = setTimeout(() => {
+        console.log('✅ Affichage du popover');
+        setShowConvertPopover(true);
+      }, 1000);
       return () => clearTimeout(timer);
     }
   }, [isInOnboarding, filteredQuotes.length]);
@@ -549,29 +562,44 @@ const Quotes = () => {
                             <Button 
                               size="sm" 
                               variant="validation" 
-                              onClick={() => handleConvertToRepairOrder(quote)}
-                              className={isInOnboarding ? "animate-pulse shadow-lg" : ""}
+                              onClick={() => {
+                                console.log('🖱️ Clic sur Convertir en OR');
+                                handleConvertToRepairOrder(quote);
+                              }}
+                              className={isInOnboarding ? "animate-blink-bright shadow-lg ring-2 ring-primary ring-offset-2" : ""}
+                              data-convert-button="true"
                             >
                               <ArrowRight className="h-4 w-4 mr-1" />
                               Convertir en OR
                             </Button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-80 z-50 pointer-events-auto" side="left" align="center">
-                            <div className="space-y-2">
-                              <h4 className="font-medium text-sm">💡 Transformez votre devis !</h4>
-                              <p className="text-sm text-muted-foreground">
-                                Cliquez sur ce bouton pour convertir automatiquement votre devis en ordre de réparation.
-                              </p>
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="w-full mt-2"
-                                onClick={() => setShowConvertPopover(false)}
-                              >
-                                J'ai compris
-                              </Button>
-                            </div>
-                          </PopoverContent>
+                          {index === 0 && isInOnboarding && (
+                            <PopoverContent 
+                              className="w-80 z-[100] pointer-events-auto bg-background border-primary shadow-xl" 
+                              side="left" 
+                              align="center"
+                              onOpenAutoFocus={(e) => e.preventDefault()}
+                            >
+                              <div className="space-y-2">
+                                <h4 className="font-medium text-sm">💡 Transformez votre devis !</h4>
+                                <p className="text-sm text-muted-foreground">
+                                  Cliquez sur ce bouton pour convertir automatiquement votre devis en ordre de réparation.
+                                </p>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="w-full mt-2"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    console.log('✅ Fermeture du popover');
+                                    setShowConvertPopover(false);
+                                  }}
+                                >
+                                  J'ai compris
+                                </Button>
+                              </div>
+                            </PopoverContent>
+                          )}
                         </Popover>
 
                         {showArchived ? (
