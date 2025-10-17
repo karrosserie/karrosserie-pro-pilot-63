@@ -50,7 +50,7 @@ export function OnboardingAgentMessagePopup() {
             </span>
           </div>
           <DialogTitle className="text-xl">Nouveau message</DialogTitle>
-          <DialogDescription className="text-base leading-relaxed pt-2">
+          <DialogDescription className="text-base leading-relaxed pt-2 text-center">
             {unreadMessage.message.content}
           </DialogDescription>
         </DialogHeader>

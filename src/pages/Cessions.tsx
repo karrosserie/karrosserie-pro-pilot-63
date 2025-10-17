@@ -260,7 +260,7 @@ const Cessions = () => {
         <AlertDialogContent className="sm:max-w-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl">Bienvenue dans les cessions de créance</AlertDialogTitle>
-            <AlertDialogDescription className="text-lg">
+            <AlertDialogDescription className="text-lg text-center">
               Pour créer une nouvelle cession de créance, cliquez sur le bouton <strong>"Nouvelle cession"</strong> puis sélectionnez l'ordre de réparation souhaité.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -279,7 +279,7 @@ const Cessions = () => {
         <AlertDialogContent className="sm:max-w-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl">Cession initialisée avec succès !</AlertDialogTitle>
-            <AlertDialogDescription className="text-lg">
+            <AlertDialogDescription className="text-lg text-center">
               La cession de créance a été envoyée pour signature.
               <br /><br />
               💡 <strong>N'oubliez pas :</strong> Vous pouvez également prêter un véhicule de courtoisie au client pendant la durée des réparations via le module "Flotte de véhicules".

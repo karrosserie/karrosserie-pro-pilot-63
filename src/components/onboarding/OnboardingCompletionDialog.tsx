@@ -46,7 +46,7 @@ export function OnboardingCompletionDialog() {
             <PartyPopper className="h-6 w-6 text-primary" />
             <AlertDialogTitle>Félicitations ! 🎉</AlertDialogTitle>
           </div>
-          <AlertDialogDescription className="space-y-4">
+          <AlertDialogDescription className="space-y-4 text-center">
             <p>
               Vous avez terminé toutes les étapes du guide d'aide !
             </p>

@@ -233,7 +233,7 @@ export const ExpertiseReportUploader = ({
         <AlertDialogContent className="sm:max-w-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl">🎉 Félicitations !</AlertDialogTitle>
-            <AlertDialogDescription className="text-lg">
+            <AlertDialogDescription className="text-lg text-center">
               Votre rapport d'expertise a été importé avec succès.
               <br /><br />
               karrosserie.pro va vous créer entièrement votre devis, créer le client ainsi que la voiture avec tous les détails.

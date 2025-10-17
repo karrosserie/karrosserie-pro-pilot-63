@@ -341,7 +341,7 @@ const FleetPageContent = () => {
                 : 'Prêter un véhicule de courtoisie'
               }
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-lg">
+            <AlertDialogDescription className="text-lg text-center">
               {vehicles.length === 0 ? (
                 <>
                   Pour commencer, vous devez d'abord <strong>ajouter un véhicule de courtoisie</strong> à votre flotte.
