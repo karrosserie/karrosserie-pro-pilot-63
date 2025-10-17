@@ -4,6 +4,7 @@ import { CessionFormData, CessionFormErrors } from './types';
 import { useRepairOrder } from '@/hooks/use-repair-order';
 import { useClient } from '@/hooks/use-clients';
 import { useClientVehicles } from '@/hooks/use-vehicles';
+import { useAccounts } from '@/hooks/use-accounts';
 import { validateCessionForm } from './utils/validation';
 import { validateRepairOrderData } from './utils/dataValidation';
 import { getInitialFormData, mapCessionToFormData, prepareSubmitData } from './utils/formState';
@@ -22,6 +23,7 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
   const { order, isLoading: isLoadingOrder } = useRepairOrder(formData.repair_order_id || undefined);
   const { client, isLoading: isLoadingClient } = useClient(order?.client_id || undefined);
   const { vehicles, isLoading: isLoadingVehicles } = useClientVehicles(order?.client_id || undefined);
+  const { accounts: bankAccounts, isLoading: isLoadingBankAccounts } = useAccounts();
 
   // Find the specific vehicle for this repair order
   const repairOrderVehicle = vehicles?.find(v => v.id === order?.vehicle_id);
@@ -34,6 +36,16 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
       setFormData(mapCessionToFormData(cession));
     }
   }, [cession]);
+
+  // Auto-select first bank account for new cessions
+  useEffect(() => {
+    if (!cession && !isLoadingBankAccounts && bankAccounts && bankAccounts.length > 0 && !formData.bank_account_id) {
+      setFormData(prev => ({
+        ...prev,
+        bank_account_id: bankAccounts[0].id
+      }));
+    }
+  }, [cession, bankAccounts, isLoadingBankAccounts, formData.bank_account_id]);
 
   // Effect to validate repair order data and pre-fill form when all data is loaded
   // Only for new cessions (not when editing existing ones)
