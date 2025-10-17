@@ -50,8 +50,8 @@ export function OnboardingAgentMessagePopup() {
             </span>
           </div>
           <DialogTitle className="text-2xl text-center">Nouveau message</DialogTitle>
-          <DialogDescription className="text-lg leading-relaxed pt-2 text-center">
-            {unreadMessage.message.content}
+          <DialogDescription className="text-lg leading-relaxed pt-2 text-center whitespace-pre-line">
+            Charge un nouveau rapport et valide !{'\n'}Karrosserie.pro créera automatiquement :{'\n'}Devis, dossier client, dossier voiture{'\n'}Tu n'as plus rien à taper au clavier !
           </DialogDescription>
         </DialogHeader>
         <div className="flex justify-end pt-4">
