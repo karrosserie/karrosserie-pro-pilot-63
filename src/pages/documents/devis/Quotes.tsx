@@ -29,7 +29,7 @@ import { StatusBadge } from '@/components/ui/status-badge';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
 import QuoteMobileCard from '@/components/quotes/QuoteMobileCard';
-import { useOnboarding } from '@/hooks/onboarding/useOnboarding';
+import { useUserOnboardingProgress } from '@/hooks/use-user-onboarding-progress';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 const Quotes = () => {
@@ -52,10 +52,7 @@ const Quotes = () => {
   const [showConvertPopover, setShowConvertPopover] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const { isStepCompleted } = useOnboarding();
-  
-  // Vérifier si l'utilisateur est en onboarding et n'a pas encore converti de devis en OR
-  const isInOnboarding = !isStepCompleted('tunnel2', 'quoteToRepairOrder');
+  const { shouldShowQuoteConvertHelp, markHelpAsSeen } = useUserOnboardingProgress();
   
   const filteredQuotes = sortedQuotes?.filter(quote => {
     const matchesSearch = quote.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -67,26 +64,13 @@ const Quotes = () => {
     return matchesSearch && matchesArchiveStatus;
   }) || [];
 
-  // Debug: afficher l'état d'onboarding
+  // Afficher le popover d'aide au chargement
   useEffect(() => {
-    console.log('🔍 État onboarding sur page devis:', {
-      isInOnboarding,
-      quoteCount: filteredQuotes.length,
-      showConvertPopover
-    });
-  }, [isInOnboarding, filteredQuotes.length, showConvertPopover]);
-
-  // Afficher le popover d'aide au chargement si en onboarding
-  useEffect(() => {
-    if (isInOnboarding && filteredQuotes.length > 0) {
-      console.log('⏰ Démarrage du timer pour afficher le popover');
-      const timer = setTimeout(() => {
-        console.log('✅ Affichage du popover');
-        setShowConvertPopover(true);
-      }, 1000);
+    if (shouldShowQuoteConvertHelp && filteredQuotes.length > 0) {
+      const timer = setTimeout(() => setShowConvertPopover(true), 1000);
       return () => clearTimeout(timer);
     }
-  }, [isInOnboarding, filteredQuotes.length]);
+  }, [shouldShowQuoteConvertHelp, filteredQuotes.length]);
 
   const handleCreateQuote = () => {
     setSelectedQuote(null);
@@ -557,23 +541,19 @@ const Quotes = () => {
                           Bon de commande
                         </Button>
 
-                        <Popover open={index === 0 && showConvertPopover && isInOnboarding} onOpenChange={setShowConvertPopover}>
+                        <Popover open={index === 0 && showConvertPopover && shouldShowQuoteConvertHelp} onOpenChange={setShowConvertPopover}>
                           <PopoverTrigger asChild>
                             <Button 
                               size="sm" 
                               variant="validation" 
-                              onClick={() => {
-                                console.log('🖱️ Clic sur Convertir en OR');
-                                handleConvertToRepairOrder(quote);
-                              }}
-                              className={isInOnboarding ? "animate-blink-bright shadow-lg ring-2 ring-primary ring-offset-2" : ""}
-                              data-convert-button="true"
+                              onClick={() => handleConvertToRepairOrder(quote)}
+                              className={shouldShowQuoteConvertHelp ? "animate-blink-bright shadow-lg ring-2 ring-primary ring-offset-2" : ""}
                             >
                               <ArrowRight className="h-4 w-4 mr-1" />
                               Convertir en OR
                             </Button>
                           </PopoverTrigger>
-                          {index === 0 && isInOnboarding && (
+                          {index === 0 && shouldShowQuoteConvertHelp && showConvertPopover && (
                             <PopoverContent 
                               className="w-80 z-[100] pointer-events-auto bg-background border-primary shadow-xl" 
                               side="left" 
@@ -591,8 +571,8 @@ const Quotes = () => {
                                   className="w-full mt-2"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    console.log('✅ Fermeture du popover');
                                     setShowConvertPopover(false);
+                                    markHelpAsSeen('quote_convert_help_seen');
                                   }}
                                 >
                                   J'ai compris

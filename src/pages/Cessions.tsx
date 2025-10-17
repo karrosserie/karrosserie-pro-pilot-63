@@ -8,6 +8,7 @@ import { Cession } from '@/services/supabase/cessions';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useUserOnboardingProgress } from '@/hooks/use-user-onboarding-progress';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,11 +30,14 @@ const Cessions = () => {
 
   const { cessions, isLoading, createCession, updateCession, deleteCession } = useCessions();
   const { toast } = useToast();
+  const { shouldShowCessionHelp, markHelpAsSeen } = useUserOnboardingProgress();
 
-  // Afficher le dialog d'aide à chaque chargement
+  // Afficher le dialog d'aide si pas encore vu
   useEffect(() => {
-    setShowHelpDialog(true);
-  }, []);
+    if (shouldShowCessionHelp) {
+      setShowHelpDialog(true);
+    }
+  }, [shouldShowCessionHelp]);
 
   // Vérifier le statut de signature des cessions en attente
   useEffect(() => {
@@ -252,7 +256,10 @@ const Cessions = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setShowHelpDialog(false)}>
+            <AlertDialogAction onClick={() => {
+              setShowHelpDialog(false);
+              markHelpAsSeen('cession_help_seen');
+            }}>
               J'ai compris
             </AlertDialogAction>
           </AlertDialogFooter>

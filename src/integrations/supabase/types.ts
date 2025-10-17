@@ -4223,6 +4223,70 @@ export type Database = {
           },
         ]
       }
+      user_onboarding_progress: {
+        Row: {
+          cession_help_seen: boolean
+          company_id: string | null
+          created_at: string
+          expertise_report_prompt_seen: boolean
+          fleet_reservation_guide_completed: boolean
+          fleet_reservation_help_seen: boolean
+          id: string
+          quote_convert_help_seen: boolean
+          repair_order_help_seen: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cession_help_seen?: boolean
+          company_id?: string | null
+          created_at?: string
+          expertise_report_prompt_seen?: boolean
+          fleet_reservation_guide_completed?: boolean
+          fleet_reservation_help_seen?: boolean
+          id?: string
+          quote_convert_help_seen?: boolean
+          repair_order_help_seen?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cession_help_seen?: boolean
+          company_id?: string | null
+          created_at?: string
+          expertise_report_prompt_seen?: boolean
+          fleet_reservation_guide_completed?: boolean
+          fleet_reservation_help_seen?: boolean
+          id?: string
+          quote_convert_help_seen?: boolean
+          repair_order_help_seen?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_onboarding_progress_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "user_onboarding_progress_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "user_onboarding_progress_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_sessions: {
         Row: {
           actions_performed: number | null

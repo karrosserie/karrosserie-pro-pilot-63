@@ -16,6 +16,7 @@ import FleetAttestationDialog from './FleetAttestationDialog';
 import FleetViolations from './FleetViolations';
 import { Loading } from '@/components/ui/loading';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useUserOnboardingProgress } from '@/hooks/use-user-onboarding-progress';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -69,17 +70,22 @@ const FleetPageContent = () => {
   const { returns } = useFleetReturns();
   const { companyData } = useCompany();
   const isMobile = useIsMobile();
+  const { shouldShowFleetReservationHelp, shouldShowFleetGuide, markHelpAsSeen } = useUserOnboardingProgress();
 
-  // Afficher le guide à chaque chargement
+  // Afficher le guide si pas encore vu
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && (shouldShowFleetReservationHelp || shouldShowFleetGuide)) {
       setShowGuideDialog(true);
     }
-  }, [isLoading]);
+  }, [isLoading, shouldShowFleetReservationHelp, shouldShowFleetGuide]);
 
-  // Fermer le guide
+  // Fermer le guide et marquer comme vu
   const handleCloseGuide = () => {
     setShowGuideDialog(false);
+    markHelpAsSeen('fleet_reservation_help_seen');
+    if (vehicles.length > 0) {
+      markHelpAsSeen('fleet_reservation_guide_completed');
+    }
   };
 
   // Guider vers l'action appropriée

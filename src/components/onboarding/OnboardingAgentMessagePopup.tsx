@@ -9,31 +9,26 @@ import {
 import { Button } from '@/components/ui/button';
 import { Bot } from 'lucide-react';
 import { useOnboardingAgentMessages } from '@/hooks/onboarding/useOnboardingAgentMessages';
+import { useUserOnboardingProgress } from '@/hooks/use-user-onboarding-progress';
 
 export function OnboardingAgentMessagePopup() {
   const { unreadMessage, markAsRead, isMarkingAsRead } = useOnboardingAgentMessages();
+  const { shouldShowExpertiseReportPrompt, markHelpAsSeen } = useUserOnboardingProgress();
   const [open, setOpen] = useState(false);
   const [lastDisplayedMessageId, setLastDisplayedMessageId] = useState<number | null>(null);
 
-  // Ouvrir automatiquement la popup quand un nouveau message non lu arrive
+  // Ouvrir automatiquement la popup quand un nouveau message non lu arrive ET si l'utilisateur doit voir le prompt
   useEffect(() => {
-    console.log('🎯 [Popup] useEffect triggered', {
-      unreadMessage: unreadMessage?.id,
-      lastDisplayedMessageId,
-      open
-    });
-
-    if (unreadMessage && unreadMessage.id !== lastDisplayedMessageId) {
-      console.log('✅ [Popup] Opening popup for new message:', unreadMessage.id);
+    if (shouldShowExpertiseReportPrompt && unreadMessage && unreadMessage.id !== lastDisplayedMessageId) {
       setOpen(true);
       setLastDisplayedMessageId(unreadMessage.id);
     }
-  }, [unreadMessage]);
+  }, [unreadMessage, shouldShowExpertiseReportPrompt, lastDisplayedMessageId]);
 
   const handleClose = () => {
-    console.log('🚪 [Popup] Closing popup, marking message as read:', unreadMessage?.id);
     if (unreadMessage) {
       markAsRead(unreadMessage.id);
+      markHelpAsSeen('expertise_report_prompt_seen');
     }
     setOpen(false);
   };

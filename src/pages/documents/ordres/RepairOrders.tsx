@@ -19,6 +19,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useIsMobile } from '@/hooks/use-mobile';
 import RepairOrderMobileCard from '@/components/repair-orders/RepairOrderMobileCard';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserOnboardingProgress } from '@/hooks/use-user-onboarding-progress';
 const RepairOrders = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ const RepairOrders = () => {
     toast
   } = useToast();
   const isMobile = useIsMobile();
+  const { shouldShowRepairOrderHelp, markHelpAsSeen } = useUserOnboardingProgress();
   const {
     orders,
     isLoading,
@@ -103,10 +105,12 @@ const RepairOrders = () => {
     }
   }, [orders, searchParams, setSearchParams]);
 
-  // Afficher la pop-up d'information sur la signature à chaque visite
+  // Afficher la pop-up d'information sur la signature si pas encore vue
   useEffect(() => {
-    setShowInfoDialog(true);
-  }, []);
+    if (shouldShowRepairOrderHelp) {
+      setShowInfoDialog(true);
+    }
+  }, [shouldShowRepairOrderHelp]);
 
   // Vérifier si un ordre est passé en "Signé" pour afficher la pop-up de félicitation
   useEffect(() => {
@@ -621,7 +625,10 @@ const RepairOrders = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <Button onClick={() => setShowInfoDialog(false)}>
+            <Button onClick={() => {
+              setShowInfoDialog(false);
+              markHelpAsSeen('repair_order_help_seen');
+            }}>
               J'ai compris
             </Button>
           </AlertDialogFooter>
