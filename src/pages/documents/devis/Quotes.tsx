@@ -29,6 +29,8 @@ import { StatusBadge } from '@/components/ui/status-badge';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
 import QuoteMobileCard from '@/components/quotes/QuoteMobileCard';
+import { useOnboarding } from '@/hooks/onboarding/useOnboarding';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 const Quotes = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -47,8 +49,13 @@ const Quotes = () => {
   const [prefilledRepairOrder, setPrefilledRepairOrder] = useState<Partial<RepairOrder> | null>(null);
   const [viewerModalOpen, setViewerModalOpen] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
+  const [showConvertPopover, setShowConvertPopover] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const { isStepCompleted } = useOnboarding();
+  
+  // Vérifier si l'utilisateur est en onboarding et n'a pas encore converti de devis en OR
+  const isInOnboarding = !isStepCompleted('tunnel2', 'quoteToRepairOrder');
   
   const filteredQuotes = sortedQuotes?.filter(quote => {
     const matchesSearch = quote.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -59,6 +66,14 @@ const Quotes = () => {
     
     return matchesSearch && matchesArchiveStatus;
   }) || [];
+
+  // Afficher le popover d'aide au chargement si en onboarding
+  useEffect(() => {
+    if (isInOnboarding && filteredQuotes.length > 0) {
+      const timer = setTimeout(() => setShowConvertPopover(true), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isInOnboarding, filteredQuotes.length]);
 
   const handleCreateQuote = () => {
     setSelectedQuote(null);
@@ -474,7 +489,7 @@ const Quotes = () => {
                 </TableCell>
               </TableRow>
             ) : filteredQuotes.length > 0 ? (
-              filteredQuotes.map((quote) => (
+              filteredQuotes.map((quote, index) => (
                 <React.Fragment key={quote.id}>
                   <TableRow className="border-b-0">
                     <TableCell className="font-medium">{quote.reference}</TableCell>
@@ -529,10 +544,35 @@ const Quotes = () => {
                           Bon de commande
                         </Button>
 
-                        <Button size="sm" variant="validation" onClick={() => handleConvertToRepairOrder(quote)}>
-                          <ArrowRight className="h-4 w-4 mr-1" />
-                            Convertir en OR
-                          </Button>
+                        <Popover open={index === 0 && showConvertPopover && isInOnboarding} onOpenChange={setShowConvertPopover}>
+                          <PopoverTrigger asChild>
+                            <Button 
+                              size="sm" 
+                              variant="validation" 
+                              onClick={() => handleConvertToRepairOrder(quote)}
+                              className={isInOnboarding ? "animate-pulse shadow-lg" : ""}
+                            >
+                              <ArrowRight className="h-4 w-4 mr-1" />
+                              Convertir en OR
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-80 z-50 pointer-events-auto" side="left" align="center">
+                            <div className="space-y-2">
+                              <h4 className="font-medium text-sm">💡 Transformez votre devis !</h4>
+                              <p className="text-sm text-muted-foreground">
+                                Cliquez sur ce bouton pour convertir automatiquement votre devis en ordre de réparation.
+                              </p>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="w-full mt-2"
+                                onClick={() => setShowConvertPopover(false)}
+                              >
+                                J'ai compris
+                              </Button>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
 
                         {showArchived ? (
                           <Button 
