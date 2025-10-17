@@ -24,6 +24,7 @@ const Cessions = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedCession, setSelectedCession] = useState<Cession | null>(null);
   const [showHelpDialog, setShowHelpDialog] = useState(false);
+  const [showInitializationDialog, setShowInitializationDialog] = useState(false);
 
   const { cessions, isLoading, createCession, updateCession, deleteCession } = useCessions();
   const { toast } = useToast();
@@ -206,6 +207,8 @@ const Cessions = () => {
         });
       } else {
         await createCession.mutateAsync(formData);
+        // Afficher la pop-up d'initialisation après création
+        setShowInitializationDialog(true);
       }
       setDialogOpen(false);
     } catch (error) {
@@ -252,6 +255,24 @@ const Cessions = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => setShowHelpDialog(false)}>
+              J'ai compris
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showInitializationDialog} onOpenChange={setShowInitializationDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cession créée avec succès !</AlertDialogTitle>
+            <AlertDialogDescription>
+              Vous devez maintenant <strong>initialiser la cession de créance</strong> afin de l'envoyer à l'assurance du client et vous faire payer.
+              <br /><br />
+              Cliquez sur le bouton "Initialiser" dans la liste des cessions pour commencer le processus.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowInitializationDialog(false)}>
               J'ai compris
             </AlertDialogAction>
           </AlertDialogFooter>
