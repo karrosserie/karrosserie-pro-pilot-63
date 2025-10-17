@@ -34,6 +34,7 @@ export function useUserOnboardingProgress() {
     shouldShowRepairOrderHelp: !progress?.repair_order_help_seen,
     shouldShowCessionHelp: !progress?.cession_help_seen,
     shouldShowCessionSelectOrderHelp: !progress?.cession_select_order_help_seen,
+    shouldShowCessionInitializeButtonHelp: !progress?.cession_initialize_button_help_seen,
     shouldShowFleetReservationHelp: !progress?.fleet_reservation_help_seen,
     shouldShowFleetGuide: !progress?.fleet_reservation_guide_completed,
     shouldShowExpertiseReportPrompt: !progress?.expertise_report_prompt_seen,

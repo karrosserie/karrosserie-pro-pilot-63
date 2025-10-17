@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   Table, 
@@ -8,6 +8,15 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { ValidationErrorDialog } from '@/components/cessions/form/components/ValidationErrorDialog';
 import { CessionEmailConfirmationDialog } from './CessionEmailConfirmationDialog';
 import { FileText, Download, Eye, Pencil, Trash, Play, Loader2, Mail, BarChart3 } from 'lucide-react';
@@ -39,6 +48,8 @@ interface CessionsTableProps {
   onEditCession: (cession: Cession) => void;
   onDeleteCession: (id: string) => void;
   onInitializationComplete?: () => void;
+  shouldShowInitializeHelp?: boolean;
+  onInitializeHelpSeen?: () => void;
 }
 
 export const CessionsTable = ({
@@ -46,7 +57,9 @@ export const CessionsTable = ({
   isLoading,
   onEditCession,
   onDeleteCession,
-  onInitializationComplete
+  onInitializationComplete,
+  shouldShowInitializeHelp = false,
+  onInitializeHelpSeen
 }: CessionsTableProps) => {
   const [errorDialogOpen, setErrorDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -59,12 +72,23 @@ export const CessionsTable = ({
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [progressDialogOpen, setProgressDialogOpen] = useState(false);
   const [selectedCessionForProgress, setSelectedCessionForProgress] = useState<Cession | null>(null);
+  const [showInitializeHelpDialog, setShowInitializeHelpDialog] = useState(false);
   
   const { companyData } = useCompany();
   const { insuranceCompanies } = useInsuranceCompanies();
   const { sortedData, sortConfig, handleSort } = useTableSorting(cessions, 'created_at');
   const isMobile = useIsMobile();
   const { tokensRemaining, canPerformOperation } = useSubscription();
+
+  // Afficher le dialog d'aide pour le bouton initialiser après un délai
+  useEffect(() => {
+    if (shouldShowInitializeHelp && cessions.some(c => c.status === 'en_attente')) {
+      const timer = setTimeout(() => {
+        setShowInitializeHelpDialog(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldShowInitializeHelp, cessions]);
 
   
   const parseValidationError = (validationError: string) => {
@@ -677,26 +701,30 @@ export const CessionsTable = ({
                            )}
                          </Button>
                        )}
-                       {cession.status === 'en_attente' && (
-                        <Button 
-                          variant="create" 
-                          size="sm"
-                          onClick={() => handleInitializeProcedure(cession)}
-                          disabled={isGeneratingPDF}
-                        >
-                          {isGeneratingPDF ? (
-                            <>
-                              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                              Génération...
-                            </>
-                          ) : (
-                            <>
-                              <Play className="h-4 w-4 mr-1" />
-                              Initialiser
-                            </>
-                          )}
-                        </Button>
-                      )}
+                        {cession.status === 'en_attente' && (
+                         <Button 
+                           variant="create" 
+                           size="sm"
+                           onClick={() => {
+                             handleInitializeProcedure(cession);
+                             onInitializeHelpSeen?.();
+                           }}
+                           disabled={isGeneratingPDF}
+                           className={shouldShowInitializeHelp ? 'animate-pulse' : ''}
+                         >
+                           {isGeneratingPDF ? (
+                             <>
+                               <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                               Génération...
+                             </>
+                           ) : (
+                             <>
+                               <Play className="h-4 w-4 mr-1" />
+                               Initialiser
+                             </>
+                           )}
+                         </Button>
+                       )}
                        {cession.status === 'en_attente' && (
                          <Button 
                            variant="delete" 
@@ -774,6 +802,27 @@ export const CessionsTable = ({
         }}
         cession={selectedCessionForProgress}
       />
+
+      <AlertDialog open={showInitializeHelpDialog} onOpenChange={setShowInitializeHelpDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Envoyer la cession à l'assurance</AlertDialogTitle>
+            <AlertDialogDescription>
+              Maintenant que vous avez créé votre cession de créance, vous devez <strong>l'initialiser</strong> pour l'envoyer à l'assurance du client.
+              <br /><br />
+              Cliquez sur le bouton <strong className="text-primary animate-pulse">"Initialiser"</strong> qui clignote pour commencer le processus d'envoi.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => {
+              setShowInitializeHelpDialog(false);
+              onInitializeHelpSeen?.();
+            }}>
+              J'ai compris
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

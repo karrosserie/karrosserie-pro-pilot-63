@@ -4226,6 +4226,7 @@ export type Database = {
       user_onboarding_progress: {
         Row: {
           cession_help_seen: boolean
+          cession_initialize_button_help_seen: boolean
           cession_select_order_help_seen: boolean
           company_id: string | null
           created_at: string
@@ -4240,6 +4241,7 @@ export type Database = {
         }
         Insert: {
           cession_help_seen?: boolean
+          cession_initialize_button_help_seen?: boolean
           cession_select_order_help_seen?: boolean
           company_id?: string | null
           created_at?: string
@@ -4254,6 +4256,7 @@ export type Database = {
         }
         Update: {
           cession_help_seen?: boolean
+          cession_initialize_button_help_seen?: boolean
           cession_select_order_help_seen?: boolean
           company_id?: string | null
           created_at?: string
