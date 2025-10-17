@@ -85,11 +85,9 @@ export const RepairOrderSelector = ({
       <AlertDialog open={showHelpDialog} onOpenChange={setShowHelpDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-center">📋 Sélectionnez un ordre de réparation</AlertDialogTitle>
+            <AlertDialogTitle className="text-center">📋 Ordre de réparation</AlertDialogTitle>
             <AlertDialogDescription className="text-center">
-              Pour créer une cession de créance, vous devez d'abord <strong>choisir l'ordre de réparation</strong> avec lequel vous souhaitez faire la cession de créance.
-              <br /><br />
-              La cession permettra à l'assurance de vous payer directement pour les réparations effectuées.
+              Choisissez l'ordre de réparation pour créer la cession de créance.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
