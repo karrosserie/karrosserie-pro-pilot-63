@@ -257,10 +257,10 @@ const Cessions = () => {
       />
 
       <AlertDialog open={showHelpDialog} onOpenChange={setShowHelpDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="sm:max-w-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Bienvenue dans les cessions de créance</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-2xl">Bienvenue dans les cessions de créance</AlertDialogTitle>
+            <AlertDialogDescription className="text-lg">
               Pour créer une nouvelle cession de créance, cliquez sur le bouton <strong>"Nouvelle cession"</strong> puis sélectionnez l'ordre de réparation souhaité.
             </AlertDialogDescription>
           </AlertDialogHeader>
