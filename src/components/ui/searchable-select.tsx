@@ -134,9 +134,8 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   };
 
   const handleInputFocus = () => {
-    if (!open) {
-      setOpen(true);
-    }
+    // Ne pas ouvrir automatiquement au focus
+    // Le dropdown s'ouvrira uniquement lors de la saisie ou du clic sur le chevron
   };
 
   const handleChevronClick = (e: React.MouseEvent) => {
@@ -167,7 +166,6 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
               disabled={disabled}
               className={cn("pr-8", className)}
               onFocus={handleInputFocus}
-              onClick={handleInputFocus}
             />
             <ChevronDown 
               className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 opacity-50 cursor-pointer pointer-events-auto"
