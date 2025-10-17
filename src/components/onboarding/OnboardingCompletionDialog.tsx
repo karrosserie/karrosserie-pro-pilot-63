@@ -38,18 +38,18 @@ export function OnboardingCompletionDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-md animate-fade-in">
+      <DialogContent className="sm:max-w-2xl animate-fade-in">
         <DialogHeader>
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-2 rounded-full bg-primary/10">
-              <PartyPopper className="h-5 w-5 text-primary" />
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-3 rounded-full bg-primary/10">
+              <PartyPopper className="h-6 w-6 text-primary" />
             </div>
-            <span className="text-xs font-medium text-primary uppercase tracking-wider">
+            <span className="text-sm font-medium text-primary uppercase tracking-wider">
               Agent Onboarding
             </span>
           </div>
-          <DialogTitle className="text-xl">Félicitations ! 🎉</DialogTitle>
-          <DialogDescription className="text-base leading-relaxed pt-2 space-y-3">
+          <DialogTitle className="text-2xl font-semibold mb-4">Félicitations ! 🎉</DialogTitle>
+          <DialogDescription className="text-lg leading-relaxed text-foreground/80 space-y-4">
             <p>
               Vous avez terminé toutes les étapes du guide d'aide !
             </p>
@@ -59,17 +59,19 @@ export function OnboardingCompletionDialog() {
             </p>
           </DialogDescription>
         </DialogHeader>
-        <div className="flex justify-end gap-2 pt-4">
+        <div className="flex justify-end gap-3 pt-6">
           <Button 
             variant="outline"
             onClick={handleFinish}
-            className="min-w-[140px]"
+            className="min-w-[160px]"
+            size="lg"
           >
             Continuer sans aide
           </Button>
           <Button 
             onClick={handleRestart}
-            className="min-w-[180px]"
+            className="min-w-[200px]"
+            size="lg"
           >
             Recommencer le parcours
           </Button>
