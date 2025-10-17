@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Filter, Plus } from 'lucide-react';
+import { Search, Filter, Plus, FileText } from 'lucide-react';
 import { RepairOrdersTable } from '@/components/repair-orders/RepairOrdersTable';
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
 import RepairOrderEmailDialog from '@/components/repair-orders/RepairOrderEmailDialog';
@@ -15,6 +15,13 @@ import LoadingSpinner from '@/components/ui/loading-spinner';
 import { ErrorMessage } from '@/components/ui/error-message';
 import { useToast } from '@/hooks/use-toast';
 import RepairOrderViewerModal from '@/components/repair-orders/RepairOrderViewerModal';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useIsMobile } from '@/hooks/use-mobile';
 import RepairOrderMobileCard from '@/components/repair-orders/RepairOrderMobileCard';
@@ -610,30 +617,39 @@ const RepairOrders = () => {
 
       <RepairOrderViewerModal repairOrder={selectedOrder} open={viewerModalOpen} onOpenChange={setViewerModalOpen} />
 
-      <AlertDialog open={showInfoDialog} onOpenChange={setShowInfoDialog}>
-        <AlertDialogContent className="max-w-4xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-4xl text-center mb-6">📝 Signature électronique offerte !</AlertDialogTitle>
-            <AlertDialogDescription className="text-2xl text-center">
-              Nous t'avons offert un pack de signatures électroniques.
-              <br /><br />
-              Fait signer ton OR tout de suite par ton client !
-              <br /><br />
-              <strong>OR SIGNÉ, PLUS DE SOUCIS JURIDIQUE</strong>
-              <br /><br />
-              FONCE !
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <Button onClick={() => {
-              setShowInfoDialog(false);
-              markHelpAsSeen('repair_order_help_seen');
-            }}>
+      <Dialog open={showInfoDialog} onOpenChange={setShowInfoDialog}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 rounded-full bg-primary/10">
+                <FileText className="h-6 w-6 text-primary" />
+              </div>
+              <span className="text-sm font-medium text-primary uppercase tracking-wider">
+                Agent Onboarding
+              </span>
+            </div>
+            <DialogTitle className="text-2xl font-semibold mb-4">📝 Signature électronique offerte !</DialogTitle>
+            <DialogDescription className="text-lg leading-relaxed text-foreground/80 space-y-4">
+              <p>Nous t'avons offert un pack de signatures électroniques.</p>
+              <p>Fait signer ton OR tout de suite par ton client !</p>
+              <p className="font-semibold">OR SIGNÉ, PLUS DE SOUCIS JURIDIQUE</p>
+              <p>FONCE !</p>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end pt-6">
+            <Button 
+              onClick={() => {
+                setShowInfoDialog(false);
+                markHelpAsSeen('repair_order_help_seen');
+              }}
+              size="lg"
+              className="min-w-[120px]"
+            >
               J'ai compris
             </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={showSignedDialog} onOpenChange={setShowSignedDialog}>
         <AlertDialogContent className="max-w-4xl">
