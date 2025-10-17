@@ -42,7 +42,7 @@ export function OnboardingCompletionDialog() {
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 justify-center">
             <PartyPopper className="h-6 w-6 text-primary" />
             <AlertDialogTitle>Félicitations ! 🎉</AlertDialogTitle>
           </div>

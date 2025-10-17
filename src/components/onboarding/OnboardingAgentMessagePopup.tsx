@@ -49,7 +49,7 @@ export function OnboardingAgentMessagePopup() {
               Agent Onboarding
             </span>
           </div>
-          <DialogTitle className="text-xl">Nouveau message</DialogTitle>
+          <DialogTitle className="text-xl text-center">Nouveau message</DialogTitle>
           <DialogDescription className="text-base leading-relaxed pt-2 text-center">
             {unreadMessage.message.content}
           </DialogDescription>

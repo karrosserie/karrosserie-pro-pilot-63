@@ -335,7 +335,7 @@ const FleetPageContent = () => {
       <AlertDialog open={showGuideDialog} onOpenChange={setShowGuideDialog}>
         <AlertDialogContent className="sm:max-w-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-2xl">
+            <AlertDialogTitle className="text-2xl text-center">
               {vehicles.length === 0 
                 ? 'Bienvenue dans la gestion de flotte !' 
                 : 'Prêter un véhicule de courtoisie'

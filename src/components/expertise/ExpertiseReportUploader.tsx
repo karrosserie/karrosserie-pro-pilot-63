@@ -232,7 +232,7 @@ export const ExpertiseReportUploader = ({
       <AlertDialog open={showSuccessDialog} onOpenChange={handleCloseSuccessDialog}>
         <AlertDialogContent className="sm:max-w-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-2xl">🎉 Félicitations !</AlertDialogTitle>
+            <AlertDialogTitle className="text-2xl text-center">🎉 Félicitations !</AlertDialogTitle>
             <AlertDialogDescription className="text-lg text-center">
               Votre rapport d'expertise a été importé avec succès.
               <br /><br />
