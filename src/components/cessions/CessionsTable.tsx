@@ -38,13 +38,15 @@ interface CessionsTableProps {
   isLoading: boolean;
   onEditCession: (cession: Cession) => void;
   onDeleteCession: (id: string) => void;
+  onInitializationComplete?: () => void;
 }
 
 export const CessionsTable = ({
   cessions,
   isLoading,
   onEditCession,
-  onDeleteCession
+  onDeleteCession,
+  onInitializationComplete
 }: CessionsTableProps) => {
   const [errorDialogOpen, setErrorDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -463,6 +465,9 @@ export const CessionsTable = ({
               title: "Document envoyé",
               description: "Le document a été envoyé pour signature avec succès et tous les identifiants ont été sauvegardés.",
             });
+            
+            // Notifier que l'initialisation est complète
+            onInitializationComplete?.();
           } else {
             console.log('Insufficient recipients in response:', signatureResponse.recipients?.length || 0);
             toast({

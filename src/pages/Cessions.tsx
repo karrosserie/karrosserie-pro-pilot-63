@@ -25,6 +25,7 @@ const Cessions = () => {
   const [selectedCession, setSelectedCession] = useState<Cession | null>(null);
   const [showHelpDialog, setShowHelpDialog] = useState(false);
   const [showInitializationDialog, setShowInitializationDialog] = useState(false);
+  const [showCourtesyVehicleDialog, setShowCourtesyVehicleDialog] = useState(false);
 
   const { cessions, isLoading, createCession, updateCession, deleteCession } = useCessions();
   const { toast } = useToast();
@@ -235,6 +236,7 @@ const Cessions = () => {
         isLoading={isLoading}
         onEditCession={handleEditCession}
         onDeleteCession={handleDeleteCession}
+        onInitializationComplete={() => setShowCourtesyVehicleDialog(true)}
       />
 
       <CessionDialog
@@ -273,6 +275,24 @@ const Cessions = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => setShowInitializationDialog(false)}>
+              J'ai compris
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showCourtesyVehicleDialog} onOpenChange={setShowCourtesyVehicleDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cession initialisée avec succès !</AlertDialogTitle>
+            <AlertDialogDescription>
+              La cession de créance a été envoyée pour signature.
+              <br /><br />
+              💡 <strong>N'oubliez pas :</strong> Vous pouvez également prêter un véhicule de courtoisie au client pendant la durée des réparations via le module "Flotte de véhicules".
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowCourtesyVehicleDialog(false)}>
               J'ai compris
             </AlertDialogAction>
           </AlertDialogFooter>
