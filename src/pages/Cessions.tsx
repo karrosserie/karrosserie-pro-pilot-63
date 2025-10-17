@@ -241,9 +241,8 @@ const Cessions = () => {
         onEditCession={handleEditCession}
         onDeleteCession={handleDeleteCession}
         onInitializationComplete={() => setShowCourtesyVehicleDialog(true)}
-        shouldShowInitializeHelp={shouldShowCessionInitializeButtonHelp && cessionJustCreated}
+        shouldShowInitializeHelp={cessionJustCreated}
         onInitializeHelpSeen={() => {
-          markHelpAsSeen('cession_initialize_button_help_seen');
           setCessionJustCreated(false);
         }}
       />
