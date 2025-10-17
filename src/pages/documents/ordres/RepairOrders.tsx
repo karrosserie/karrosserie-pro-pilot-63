@@ -629,9 +629,9 @@ const RepairOrders = () => {
       </AlertDialog>
 
       <AlertDialog open={showSignedDialog} onOpenChange={setShowSignedDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-4xl">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl">🎉 Félicitations ! Ordre de réparation signé !</AlertDialogTitle>
+            <AlertDialogTitle className="text-4xl text-center">🎉 Félicitations ! Ordre de réparation signé !</AlertDialogTitle>
             <AlertDialogDescription className="text-base space-y-3">
               <p className="font-bold text-lg text-primary">💰 Maintenant fait toi payer en direct par l'assurance même si tu n'es pas agréé !</p>
               <p>Etape suivante : création de la cession de créance</p>
