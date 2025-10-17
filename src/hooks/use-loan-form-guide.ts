@@ -93,11 +93,21 @@ export const useLoanFormGuide = (
       }
       isInteractingRef.current = false;
       
-      // Attendre un peu puis passer à l'étape suivante
+      // Attendre que l'élément cible soit dans le DOM puis passer à l'étape suivante
       setTimeout(() => {
-        console.log('License Upload Detection - Setting step to 2 and showing tour');
-        setCurrentStep(2);
-        setRunTour(true);
+        const nextElement = document.querySelector('[data-tour="insurance-switch"]');
+        if (nextElement) {
+          console.log('License Upload Detection - Target found, showing tour at step 2');
+          setCurrentStep(2);
+          setRunTour(true);
+        } else {
+          console.log('License Upload Detection - Target not found, retrying...');
+          setTimeout(() => {
+            console.log('License Upload Detection - Setting step to 2 and showing tour');
+            setCurrentStep(2);
+            setRunTour(true);
+          }, 500);
+        }
       }, 1500);
     }
   }, [driverLicenseFrontUrl, driverLicenseBackUrl, currentStep, isOpen, isViewMode]);
