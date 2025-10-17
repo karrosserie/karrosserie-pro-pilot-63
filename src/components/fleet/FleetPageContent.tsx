@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useFleetReservations } from '@/hooks/use-fleet-reservations';
 import { useFleetReturns } from '@/hooks/use-fleet-returns';
 import { useFleetPage } from '@/hooks/use-fleet-page';
@@ -16,12 +16,22 @@ import FleetAttestationDialog from './FleetAttestationDialog';
 import FleetViolations from './FleetViolations';
 import { Loading } from '@/components/ui/loading';
 import { useIsMobile } from '@/hooks/use-mobile';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const FleetPageContent = () => {
   // ALL HOOKS MUST BE CALLED AT THE TOP LEVEL
   // État pour le dialog d'attestation
   const [isAttestationDialogOpen, setIsAttestationDialogOpen] = useState(false);
   const [selectedLoanForAttestation, setSelectedLoanForAttestation] = useState<string | null>(null);
+  const [showGuideDialog, setShowGuideDialog] = useState(false);
 
   const {
     vehicles,
@@ -59,6 +69,30 @@ const FleetPageContent = () => {
   const { returns } = useFleetReturns();
   const { companyData } = useCompany();
   const isMobile = useIsMobile();
+
+  // Afficher le guide au premier chargement
+  useEffect(() => {
+    const hasSeenGuide = localStorage.getItem('fleet-guide-seen');
+    if (!hasSeenGuide && !isLoading) {
+      setShowGuideDialog(true);
+    }
+  }, [isLoading]);
+
+  // Marquer le guide comme vu
+  const handleCloseGuide = () => {
+    localStorage.setItem('fleet-guide-seen', 'true');
+    setShowGuideDialog(false);
+  };
+
+  // Guider vers l'action appropriée
+  const handleGuideAction = () => {
+    handleCloseGuide();
+    if (vehicles.length === 0) {
+      handleAddVehicle();
+    } else {
+      handleNewLoan();
+    }
+  };
 
   // Fonction pour gérer l'ouverture du dialog d'attestation
   const handleViewAttestation = (loanId: string) => {
@@ -293,6 +327,42 @@ const FleetPageContent = () => {
         loanId={selectedLoanForAttestation}
         loanData={reservations?.find(r => r.id === selectedLoanForAttestation)}
       />
+
+      <AlertDialog open={showGuideDialog} onOpenChange={setShowGuideDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {vehicles.length === 0 
+                ? 'Bienvenue dans la gestion de flotte !' 
+                : 'Prêter un véhicule de courtoisie'
+              }
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {vehicles.length === 0 ? (
+                <>
+                  Pour commencer, vous devez d'abord <strong>ajouter un véhicule de courtoisie</strong> à votre flotte.
+                  <br /><br />
+                  Cliquez sur le bouton "Ajouter un véhicule" pour enregistrer votre premier véhicule de prêt.
+                </>
+              ) : (
+                <>
+                  Vous avez des véhicules enregistrés dans votre flotte. 
+                  <br /><br />
+                  Pour prêter un véhicule à un client, cliquez sur le bouton <strong>"Nouveau prêt"</strong> dans la section "Prêts en cours".
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={handleCloseGuide} className="mr-2 bg-secondary text-secondary-foreground hover:bg-secondary/80">
+              Plus tard
+            </AlertDialogAction>
+            <AlertDialogAction onClick={handleGuideAction}>
+              {vehicles.length === 0 ? 'Ajouter un véhicule' : 'Nouveau prêt'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
