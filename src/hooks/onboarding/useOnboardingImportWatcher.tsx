@@ -27,27 +27,49 @@ export function useOnboardingImportWatcher() {
   });
 
   useEffect(() => {
-    if (!imports || imports.length === 0) return;
+    console.log('[OnboardingWatcher] useEffect triggered, imports:', imports);
+    
+    if (!imports || imports.length === 0) {
+      console.log('[OnboardingWatcher] No imports found');
+      return;
+    }
 
     imports.forEach(async (importRecord) => {
+      console.log('[OnboardingWatcher] Processing import:', {
+        id: importRecord.id,
+        status: importRecord.status,
+        report_id: importRecord.report_id,
+        alreadyProcessed: processedImportsRef.current.has(importRecord.id)
+      });
+      
       // Vérifier si cet import a déjà été traité
-      if (processedImportsRef.current.has(importRecord.id)) return;
+      if (processedImportsRef.current.has(importRecord.id)) {
+        console.log('[OnboardingWatcher] Import already processed:', importRecord.id);
+        return;
+      }
 
       // Vérifier si l'import est terminé (statut "Terminé", "Completed", "Importé", etc.)
       const completedStatuses = ['Terminé', 'Completed', 'Importé', 'Success'];
-      if (!completedStatuses.includes(importRecord.status)) return;
+      if (!completedStatuses.includes(importRecord.status)) {
+        console.log('[OnboardingWatcher] Import not completed, status:', importRecord.status);
+        return;
+      }
 
+      console.log('[OnboardingWatcher] Import is completed, marking as processed');
       // Marquer comme traité
       processedImportsRef.current.add(importRecord.id);
 
       // Récupérer les détails du rapport d'expertise pour obtenir client_id, vehicle_id, etc.
       if (importRecord.report_id) {
         try {
+          console.log('[OnboardingWatcher] Fetching report details for:', importRecord.report_id);
           const { data: report } = await supabase
             .from('expertise_reports')
             .select('id, client_id, vehicle_id')
             .eq('id', importRecord.report_id)
             .single();
+
+          console.log('[OnboardingWatcher] Report details:', report);
 
           if (report) {
             // Vérifier si un devis a été créé automatiquement
@@ -56,6 +78,8 @@ export function useOnboardingImportWatcher() {
               .select('id')
               .eq('report_id', report.id)
               .single();
+
+            console.log('[OnboardingWatcher] Quote found:', quote);
 
             // Mettre à jour l'étape d'onboarding
             onboardingService.updateOnboardingStep('tunnel2', 'automaticDigitization', {
@@ -67,9 +91,12 @@ export function useOnboardingImportWatcher() {
 
             // Créer un message d'agent pour féliciter l'utilisateur
             const onboardingState = onboardingService.getOnboardingState();
+            console.log('[OnboardingWatcher] Onboarding state:', onboardingState);
+            
             if (onboardingState?.id) {
               try {
-                await supabase
+                console.log('[OnboardingWatcher] Creating congratulation message...');
+                const { data: messageData, error: messageError } = await supabase
                   .from('ai_messages_history')
                   .insert({
                     session_id: onboardingState.id,
@@ -82,19 +109,28 @@ export function useOnboardingImportWatcher() {
                       response_metadata: {},
                       invalid_tool_calls: []
                     }
-                  });
+                  })
+                  .select();
                 
-                console.log('[Onboarding] Congratulation message created for import:', importRecord.id);
+                if (messageError) {
+                  console.error('[OnboardingWatcher] Error creating message:', messageError);
+                } else {
+                  console.log('[OnboardingWatcher] Congratulation message created:', messageData);
+                }
               } catch (error) {
-                console.error('[Onboarding] Error creating congratulation message:', error);
+                console.error('[OnboardingWatcher] Exception creating congratulation message:', error);
               }
+            } else {
+              console.warn('[OnboardingWatcher] No onboarding state found, cannot create message');
             }
 
-            console.log('[Onboarding] Automatic digitization detected for import:', importRecord.id);
+            console.log('[OnboardingWatcher] Automatic digitization detected for import:', importRecord.id);
           }
         } catch (error) {
-          console.error('[Onboarding] Error fetching report details:', error);
+          console.error('[OnboardingWatcher] Error fetching report details:', error);
         }
+      } else {
+        console.log('[OnboardingWatcher] No report_id for import:', importRecord.id);
       }
     });
   }, [imports]);
