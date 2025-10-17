@@ -70,17 +70,15 @@ const FleetPageContent = () => {
   const { companyData } = useCompany();
   const isMobile = useIsMobile();
 
-  // Afficher le guide au premier chargement
+  // Afficher le guide à chaque chargement
   useEffect(() => {
-    const hasSeenGuide = localStorage.getItem('fleet-guide-seen');
-    if (!hasSeenGuide && !isLoading) {
+    if (!isLoading) {
       setShowGuideDialog(true);
     }
   }, [isLoading]);
 
-  // Marquer le guide comme vu
+  // Fermer le guide
   const handleCloseGuide = () => {
-    localStorage.setItem('fleet-guide-seen', 'true');
     setShowGuideDialog(false);
   };
 

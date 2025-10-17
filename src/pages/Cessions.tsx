@@ -30,13 +30,9 @@ const Cessions = () => {
   const { cessions, isLoading, createCession, updateCession, deleteCession } = useCessions();
   const { toast } = useToast();
 
-  // Afficher le dialog d'aide au premier chargement
+  // Afficher le dialog d'aide à chaque chargement
   useEffect(() => {
-    const hasSeenCessionHelp = localStorage.getItem('hasSeenCessionHelp');
-    if (!hasSeenCessionHelp) {
-      setShowHelpDialog(true);
-      localStorage.setItem('hasSeenCessionHelp', 'true');
-    }
+    setShowHelpDialog(true);
   }, []);
 
   // Vérifier le statut de signature des cessions en attente
