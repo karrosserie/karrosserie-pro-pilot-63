@@ -124,9 +124,6 @@ export const ExpertiseReportUploader = ({
         const { onboardingService } = await import('@/services/onboarding/OnboardingService');
         onboardingService.updateOnboardingStep('tunnel2', 'reportImported', { reportId: newReport.id });
         
-        // Afficher une pop-up de félicitations
-        setShowSuccessDialog(true);
-        
         // Créer un message de félicitations pour l'utilisateur
         const onboardingState = onboardingService.getOnboardingState();
         if (onboardingState?.id) {
@@ -198,6 +195,9 @@ export const ExpertiseReportUploader = ({
         throw apiError;
       }
 
+
+      // Afficher la pop-up de félicitations
+      setShowSuccessDialog(true);
 
       // Rediriger vers la page des rapports d'expertise si on ne s'y trouve pas déjà
       if (!location.pathname.includes('/documents/expertise')) {
