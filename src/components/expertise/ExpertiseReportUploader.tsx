@@ -238,7 +238,7 @@ export const ExpertiseReportUploader = ({
               <br /><br />
               karrosserie.pro va vous créer entièrement votre devis, créer le client ainsi que la voiture avec tous les détails.
               <br /><br />
-              Maintenant tu peux transformer ton devis en ordre de réparation signé par le client.
+              <strong>ETAPE SUIVANTE, TRANSFORME TON DEVIS EN OR ET ENVOIE LE EN SIGNATURE AU CLIENT !</strong>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
