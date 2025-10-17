@@ -4,6 +4,7 @@ import { Step, CallBackProps, STATUS } from 'react-joyride';
 export const useLoanFormGuide = (isViewMode: boolean, isOpen: boolean) => {
   const [runTour, setRunTour] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isInteractingRef = useRef(false);
 
   useEffect(() => {
@@ -26,45 +27,76 @@ export const useLoanFormGuide = (isViewMode: boolean, isOpen: boolean) => {
     }
   }, [isViewMode, isOpen]);
 
+  // Nettoyer le timer à la destruction du composant
+  useEffect(() => {
+    return () => {
+      if (inactivityTimerRef.current) {
+        clearTimeout(inactivityTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Réinitialiser le timer d'inactivité
+  const resetInactivityTimer = () => {
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current);
+    }
+
+    // Après 2 secondes sans activité, réafficher le guide à l'étape suivante
+    inactivityTimerRef.current = setTimeout(() => {
+      if (isInteractingRef.current) {
+        isInteractingRef.current = false;
+        setCurrentStep(prev => Math.min(prev + 1, 7));
+        setRunTour(true);
+      }
+    }, 2000);
+  };
+
   // Détecter les interactions avec les champs du formulaire
   useEffect(() => {
     if (!isOpen || isViewMode) return;
 
-    const handleInteractionStart = (e: MouseEvent) => {
-      // Vérifier si on clique sur un élément de formulaire à l'intérieur d'une zone data-tour
+    const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const tourElement = target.closest('[data-tour]');
       
-      if (tourElement && !isInteractingRef.current) {
+      if (tourElement) {
         const isFormElement = target.matches('input, select, button, textarea, [role="combobox"]') ||
                              target.closest('input, select, button, textarea, [role="combobox"]');
         
-        if (isFormElement) {
+        if (isFormElement && runTour) {
+          // Masquer le guide et démarrer le timer d'inactivité
           isInteractingRef.current = true;
           setRunTour(false);
+          resetInactivityTimer();
         }
       }
     };
 
-    const handleInteractionEnd = () => {
+    const handleInput = () => {
+      // Réinitialiser le timer à chaque modification
       if (isInteractingRef.current) {
-        isInteractingRef.current = false;
-        // Attendre un peu avant de réafficher le guide à l'étape suivante
-        setTimeout(() => {
-          setCurrentStep(prev => Math.min(prev + 1, 7)); // Maximum 7 étapes (0-7)
-          setRunTour(true);
-        }, 800);
+        resetInactivityTimer();
       }
     };
 
-    document.addEventListener('mousedown', handleInteractionStart, true);
-    document.addEventListener('change', handleInteractionEnd, true);
+    const handleChange = () => {
+      // Réinitialiser le timer à chaque changement
+      if (isInteractingRef.current) {
+        resetInactivityTimer();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClick, true);
+    document.addEventListener('input', handleInput, true);
+    document.addEventListener('change', handleChange, true);
     
     return () => {
-      document.removeEventListener('mousedown', handleInteractionStart, true);
-      document.removeEventListener('change', handleInteractionEnd, true);
+      document.removeEventListener('mousedown', handleClick, true);
+      document.removeEventListener('input', handleInput, true);
+      document.removeEventListener('change', handleChange, true);
     };
-  }, [isOpen, isViewMode]);
+  }, [isOpen, isViewMode, runTour]);
 
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status, action, index, type } = data;
