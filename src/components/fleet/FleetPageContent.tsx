@@ -353,6 +353,21 @@ const FleetPageContent = () => {
                   Vous avez des véhicules enregistrés dans votre flotte. 
                   <br /><br />
                   Pour prêter un véhicule à un client, cliquez sur le bouton <strong>"Nouveau prêt"</strong> dans la section "Prêts en cours".
+                  <br /><br />
+                  <div className="space-y-2 mt-4">
+                    <div className="flex items-start gap-2">
+                      <span className="text-primary font-bold">✓</span>
+                      <span><strong>Contrat sécurisé en 2 clics</strong></span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-primary font-bold">✓</span>
+                      <span><strong>On gère les PV</strong></span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-primary font-bold">✓</span>
+                      <span><strong>On demande un paiement à l'assurance si c'est possible</strong></span>
+                    </div>
+                  </div>
                 </>
               )}
             </AlertDialogDescription>
