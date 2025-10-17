@@ -107,7 +107,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
   const { isFormValid } = useFleetLoanFormValidation(formData);
   const { validateTabByValue } = useTabValidation();
   
-  const { runTour, steps, handleJoyrideCallback } = useLoanFormGuide(isViewMode, isOpen);
+  const { runTour, stepIndex, steps, handleJoyrideCallback } = useLoanFormGuide(isViewMode, isOpen);
 
   const tabs = [
     { value: 'client-info', label: 'Informations sur le client' },
@@ -179,6 +179,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
       <Joyride
         steps={steps}
         run={runTour}
+        stepIndex={stepIndex}
         continuous
         showProgress
         showSkipButton

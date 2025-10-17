@@ -1,30 +1,75 @@
 import { useState, useEffect } from 'react';
-import { Step, CallBackProps, STATUS, ACTIONS, EVENTS } from 'react-joyride';
+import { Step, CallBackProps, STATUS } from 'react-joyride';
 
 export const useLoanFormGuide = (isViewMode: boolean, isOpen: boolean) => {
   const [runTour, setRunTour] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
 
   useEffect(() => {
     if (!isViewMode && isOpen) {
       setTimeout(() => {
         const firstElement = document.querySelector('[data-tour="client-select"]');
         if (firstElement) {
+          setCurrentStep(0);
           setRunTour(true);
         } else {
-          setTimeout(() => setRunTour(true), 500);
+          setTimeout(() => {
+            setCurrentStep(0);
+            setRunTour(true);
+          }, 500);
         }
       }, 1000);
     } else {
       setRunTour(false);
+      setCurrentStep(0);
     }
   }, [isViewMode, isOpen]);
 
+  // Gérer les interactions avec les champs
+  useEffect(() => {
+    if (!runTour) return;
+
+    const tourElements = document.querySelectorAll('[data-tour]');
+    
+    const handleFocus = () => {
+      // Masquer le guide quand on clique sur un champ
+      setRunTour(false);
+    };
+
+    const handleBlur = () => {
+      // Réafficher le guide à l'étape suivante après avoir quitté le champ
+      setTimeout(() => {
+        setCurrentStep(prev => prev + 1);
+        setRunTour(true);
+      }, 500);
+    };
+
+    tourElements.forEach(element => {
+      element.addEventListener('focus', handleFocus, true);
+      element.addEventListener('blur', handleBlur, true);
+    });
+
+    return () => {
+      tourElements.forEach(element => {
+        element.removeEventListener('focus', handleFocus, true);
+        element.removeEventListener('blur', handleBlur, true);
+      });
+    };
+  }, [runTour, currentStep]);
+
   const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status } = data;
+    const { status, action, index, type } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
     if (finishedStatuses.includes(status)) {
       setRunTour(false);
+      setCurrentStep(0);
+    } else if (type === 'step:after') {
+      if (action === 'next') {
+        setCurrentStep(index + 1);
+      } else if (action === 'prev') {
+        setCurrentStep(index - 1);
+      }
     }
   };
 
@@ -74,6 +119,7 @@ export const useLoanFormGuide = (isViewMode: boolean, isOpen: boolean) => {
 
   return {
     runTour,
+    stepIndex: currentStep,
     steps,
     handleJoyrideCallback,
   };
