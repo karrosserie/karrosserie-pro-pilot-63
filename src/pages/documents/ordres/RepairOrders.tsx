@@ -733,8 +733,12 @@ const RepairOrders = () => {
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl">📝 Signature électronique offerte !</AlertDialogTitle>
             <AlertDialogDescription className="text-base">
-              Nous vous offrons la possibilité d'envoyer vos ordres de réparation à signer électroniquement par vos clients. 
-              Cette signature a une valeur juridique et permet de valider légalement l'ordre de réparation avant de commencer les travaux.
+              Nous t'avons offert un pack de signatures électroniques.
+              <br /><br />
+              Fait signer ton OR tout de suite par ton client !
+              <br /><br />
+              <strong>OR SIGNÉ, PLUS DE SOUCIS JURIDIQUE</strong>
+              <br /><br />
               FONCE !
             </AlertDialogDescription>
           </AlertDialogHeader>
