@@ -26,6 +26,7 @@ const Cessions = () => {
   const [selectedCession, setSelectedCession] = useState<Cession | null>(null);
   const [showHelpDialog, setShowHelpDialog] = useState(false);
   const [showCourtesyVehicleDialog, setShowCourtesyVehicleDialog] = useState(false);
+  const [cessionJustCreated, setCessionJustCreated] = useState(false);
 
   const { cessions, isLoading, createCession, updateCession, deleteCession } = useCessions();
   const { toast } = useToast();
@@ -211,6 +212,8 @@ const Cessions = () => {
         });
       } else {
         await createCession.mutateAsync(formData);
+        // Déclencher l'aide pour le bouton initialiser après création
+        setCessionJustCreated(true);
       }
       setDialogOpen(false);
     } catch (error) {
@@ -238,8 +241,11 @@ const Cessions = () => {
         onEditCession={handleEditCession}
         onDeleteCession={handleDeleteCession}
         onInitializationComplete={() => setShowCourtesyVehicleDialog(true)}
-        shouldShowInitializeHelp={shouldShowCessionInitializeButtonHelp}
-        onInitializeHelpSeen={() => markHelpAsSeen('cession_initialize_button_help_seen')}
+        shouldShowInitializeHelp={shouldShowCessionInitializeButtonHelp && cessionJustCreated}
+        onInitializeHelpSeen={() => {
+          markHelpAsSeen('cession_initialize_button_help_seen');
+          setCessionJustCreated(false);
+        }}
       />
 
       <CessionDialog
