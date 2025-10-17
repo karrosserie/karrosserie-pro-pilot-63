@@ -87,6 +87,41 @@ export const useLoanFormGuide = (isViewMode: boolean, isOpen: boolean) => {
       }
     };
 
+    // Observer les changements dans les zones d'upload de permis
+    const observeLicenseUpload = () => {
+      const driverLicenseSection = document.querySelector('[data-tour="driver-license"]');
+      if (!driverLicenseSection) return;
+
+      const observer = new MutationObserver((mutations) => {
+        // Vérifier si des images de permis ont été ajoutées
+        const hasLicenseImages = driverLicenseSection.querySelectorAll('img[src*="license"]').length > 0 ||
+                                 driverLicenseSection.querySelectorAll('img[alt*="Permis"]').length > 0;
+        
+        if (hasLicenseImages && currentStep === 1) {
+          // Le permis a été uploadé, passer à l'étape suivante après un court délai
+          if (inactivityTimerRef.current) {
+            clearTimeout(inactivityTimerRef.current);
+          }
+          isInteractingRef.current = false;
+          setTimeout(() => {
+            setCurrentStep(2);
+            setRunTour(true);
+          }, 1500);
+        }
+      });
+
+      observer.observe(driverLicenseSection, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['src']
+      });
+
+      return observer;
+    };
+
+    const observer = observeLicenseUpload();
+
     document.addEventListener('mousedown', handleClick, true);
     document.addEventListener('input', handleInput, true);
     document.addEventListener('change', handleChange, true);
@@ -95,8 +130,9 @@ export const useLoanFormGuide = (isViewMode: boolean, isOpen: boolean) => {
       document.removeEventListener('mousedown', handleClick, true);
       document.removeEventListener('input', handleInput, true);
       document.removeEventListener('change', handleChange, true);
+      if (observer) observer.disconnect();
     };
-  }, [isOpen, isViewMode, runTour]);
+  }, [isOpen, isViewMode, runTour, currentStep]);
 
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status, action, index, type } = data;
