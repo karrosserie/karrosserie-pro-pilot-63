@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import Joyride from 'react-joyride';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { useFleetLoanForm } from '@/hooks/use-fleet-loan-form';
@@ -13,6 +14,7 @@ import InsuranceTab from './form/InsuranceTab';
 import AttestationTab from './form/AttestationTab';
 import ClientDialog from '@/components/client/ClientDialog';
 import { useClients } from '@/hooks/use-clients';
+import { useLoanFormGuide } from '@/hooks/use-loan-form-guide';
 
 interface FleetLoanFormProps {
   vehicle: FleetVehicle;
@@ -102,6 +104,9 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
 
   const { isFormValid } = useFleetLoanFormValidation(formData);
   const { validateTabByValue } = useTabValidation();
+  
+  // Tour guidé
+  const { runTour, steps, handleJoyrideCallback } = useLoanFormGuide(isViewMode, true);
 
   const tabs = [
     { value: 'client-info', label: 'Informations sur le client' },
@@ -170,6 +175,28 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
 
   return (
     <div className="space-y-6">
+      <Joyride
+        steps={steps}
+        run={runTour}
+        continuous
+        showProgress
+        showSkipButton
+        callback={handleJoyrideCallback}
+        styles={{
+          options: {
+            zIndex: 10000,
+            primaryColor: 'hsl(var(--primary))',
+          },
+        }}
+        locale={{
+          back: 'Précédent',
+          close: 'Fermer',
+          last: 'Terminer',
+          next: 'Suivant',
+          skip: 'Passer le guide',
+        }}
+      />
+      
       <div>
         <h3 className="text-lg font-medium text-gray-900">
           {getVehicleDisplayName()} ({vehicle.license_plate})

@@ -47,7 +47,7 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
     <div className="space-y-6">
       {/* Client, Start Date, and End Date on the same line */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-        <div className="col-span-3 space-y-2">
+        <div className="col-span-3 space-y-2" data-tour="client-select">
           <Label htmlFor="client">
             Client <span className="text-destructive">*</span>
           </Label>
@@ -100,7 +100,7 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
       </div>
 
       {/* Driver's License Documents */}
-      <div className="space-y-4">
+      <div className="space-y-4" data-tour="driver-license">
         <h3 className="text-lg font-medium">Permis de conduire</h3>
         <DrivingLicenseUpload
           frontUrl={formData.driverLicenseFrontUrl}

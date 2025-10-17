@@ -119,7 +119,7 @@ const DamageAssessmentTab: React.FC<DamageAssessmentTabProps> = ({
   const partieLatDroite = currentDamages.slice(22);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-tour="damage-assessment">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="p-4">
           <div className="grid grid-cols-7 gap-4 mb-4 pb-2 border-b border-gray-200">

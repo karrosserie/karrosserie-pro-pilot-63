@@ -131,7 +131,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
           </div>
 
           {/* Signature Section */}
-          <div className="border-t pt-6">
+          <div className="border-t pt-6" data-tour="attestation">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-4">
                 <div>

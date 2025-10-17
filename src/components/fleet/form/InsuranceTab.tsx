@@ -24,7 +24,7 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
   return (
     <div className="space-y-6">
       {/* Insurance Switch */}
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-2" data-tour="insurance-switch">
         <Switch
           id="clientInsurance"
           checked={formData.clientInsurance || false}
