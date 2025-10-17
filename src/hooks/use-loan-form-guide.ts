@@ -52,10 +52,12 @@ export const useLoanFormGuide = (
       console.log('Tab changed to:', activeTab, '- Setting guide step to:', newStep);
       setCurrentStep(newStep);
       
-      // Attendre un peu puis réafficher le guide
-      setTimeout(() => {
-        setRunTour(true);
-      }, 500);
+      // Ne pas réafficher automatiquement le guide sur l'étape damages (trop d'interactions)
+      if (activeTab !== 'damages') {
+        setTimeout(() => {
+          setRunTour(true);
+        }, 500);
+      }
     }
   }, [activeTab, isOpen, isViewMode]);
 
@@ -160,14 +162,15 @@ export const useLoanFormGuide = (
                              target.closest('input, select, button, textarea, [role="combobox"]');
         
         if (isFormElement && runTour) {
-          // Ne pas démarrer le timer pour l'étape du permis (step 1)
+          // Ne pas démarrer le timer pour l'étape du permis (step 1) et des dommages (step 3)
           const isLicenseStep = tourElement.getAttribute('data-tour') === 'driver-license';
+          const isDamageStep = tourElement.getAttribute('data-tour') === 'damage-assessment';
           
           isInteractingRef.current = true;
           setRunTour(false);
           
-          // Ne démarrer le timer que si ce n'est pas l'étape du permis
-          if (!isLicenseStep && currentStep !== 1) {
+          // Ne démarrer le timer que si ce n'est pas l'étape du permis ou des dommages
+          if (!isLicenseStep && !isDamageStep && currentStep !== 1 && currentStep !== 3) {
             resetInactivityTimer();
           }
         }
@@ -175,15 +178,15 @@ export const useLoanFormGuide = (
     };
 
     const handleInput = () => {
-      // Ne pas réinitialiser le timer pour l'étape du permis
-      if (isInteractingRef.current && currentStep !== 1) {
+      // Ne pas réinitialiser le timer pour l'étape du permis et des dommages
+      if (isInteractingRef.current && currentStep !== 1 && currentStep !== 3) {
         resetInactivityTimer();
       }
     };
 
     const handleChange = () => {
-      // Ne pas réinitialiser le timer pour l'étape du permis
-      if (isInteractingRef.current && currentStep !== 1) {
+      // Ne pas réinitialiser le timer pour l'étape du permis et des dommages
+      if (isInteractingRef.current && currentStep !== 1 && currentStep !== 3) {
         resetInactivityTimer();
       }
     };
