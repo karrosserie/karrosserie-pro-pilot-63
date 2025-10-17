@@ -46,6 +46,7 @@ const RepairOrders = () => {
   const [selectedOrderForDeletion, setSelectedOrderForDeletion] = useState<RepairOrder | null>(null);
   const [prefilledInvoice, setPrefilledInvoice] = useState<Partial<Invoice> | null>(null);
   const [showArchived, setShowArchived] = useState(false);
+  const [showInfoDialog, setShowInfoDialog] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -104,6 +105,15 @@ const RepairOrders = () => {
       }
     }
   }, [orders, searchParams, setSearchParams]);
+
+  // Afficher la pop-up d'information sur la signature lors de la première visite
+  useEffect(() => {
+    const hasSeenRepairOrderInfo = localStorage.getItem('hasSeenRepairOrderInfo');
+    if (!hasSeenRepairOrderInfo) {
+      setShowInfoDialog(true);
+      localStorage.setItem('hasSeenRepairOrderInfo', 'true');
+    }
+  }, []);
 
   // Vérifier le statut de signature des ordres de réparation en attente
   useEffect(() => {
@@ -699,6 +709,23 @@ const RepairOrders = () => {
         open={viewerModalOpen}
         onOpenChange={setViewerModalOpen}
       />
+
+      <AlertDialog open={showInfoDialog} onOpenChange={setShowInfoDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-2xl">📝 Signature électronique offerte !</AlertDialogTitle>
+            <AlertDialogDescription className="text-base">
+              Nous vous offrons la possibilité d'envoyer vos ordres de réparation à signer électroniquement par vos clients. 
+              Cette signature a une valeur juridique et permet de valider légalement l'ordre de réparation avant de commencer les travaux.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button onClick={() => setShowInfoDialog(false)}>
+              J'ai compris
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
