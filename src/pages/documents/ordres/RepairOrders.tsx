@@ -47,6 +47,7 @@ const RepairOrders = () => {
   const [prefilledInvoice, setPrefilledInvoice] = useState<Partial<Invoice> | null>(null);
   const [showArchived, setShowArchived] = useState(false);
   const [showInfoDialog, setShowInfoDialog] = useState(false);
+  const [showSignedDialog, setShowSignedDialog] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -114,6 +115,27 @@ const RepairOrders = () => {
       localStorage.setItem('hasSeenRepairOrderInfo', 'true');
     }
   }, []);
+
+  // Vérifier si un ordre est passé en "Signé" pour afficher la pop-up de félicitation
+  useEffect(() => {
+    const checkSignedOrders = () => {
+      const checkedOrders = JSON.parse(localStorage.getItem('checked-signed-orders') || '[]');
+      
+      orders?.forEach(order => {
+        if (order.status === 'Signé' && !checkedOrders.includes(order.id)) {
+          setShowSignedDialog(true);
+          checkedOrders.push(order.id);
+          localStorage.setItem('checked-signed-orders', JSON.stringify(checkedOrders));
+        }
+      });
+    };
+
+    if (orders && orders.length > 0) {
+      checkSignedOrders();
+      const interval = setInterval(checkSignedOrders, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [orders]);
 
   // Vérifier le statut de signature des ordres de réparation en attente
   useEffect(() => {
@@ -724,6 +746,30 @@ const RepairOrders = () => {
             <Button onClick={() => setShowInfoDialog(false)}>
               J'ai compris
             </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showSignedDialog} onOpenChange={setShowSignedDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-2xl">🎉 Félicitations ! Ordre de réparation signé !</AlertDialogTitle>
+            <AlertDialogDescription className="text-base space-y-3">
+              <p>Votre client a signé l'ordre de réparation. Vous pouvez maintenant commencer les travaux en toute sérénité juridique !</p>
+              <p className="font-bold text-lg text-primary">
+                💰 En 4 clics tu te feras payer même sans être agréé !
+              </p>
+              <p>Passez à la cession de créance pour vous faire payer directement par l'assurance.</p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Plus tard</AlertDialogCancel>
+            <AlertDialogAction onClick={() => {
+              setShowSignedDialog(false);
+              navigate('/documents/cessions');
+            }}>
+              Créer une cession maintenant
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
