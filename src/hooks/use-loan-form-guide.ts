@@ -6,11 +6,19 @@ export const useLoanFormGuide = (isViewMode: boolean, isOpen: boolean) => {
 
   useEffect(() => {
     // Démarrer le tour uniquement en mode création et à l'ouverture du dialog
+    console.log('Loan Guide - isViewMode:', isViewMode, 'isOpen:', isOpen);
     if (!isViewMode && isOpen) {
       const hasSeenLoanGuide = localStorage.getItem('fleet-loan-guide-seen');
+      console.log('Loan Guide - hasSeenLoanGuide:', hasSeenLoanGuide);
       if (!hasSeenLoanGuide) {
         // Petit délai pour s'assurer que le DOM est chargé
-        setTimeout(() => setRunTour(true), 500);
+        console.log('Loan Guide - Starting tour in 500ms');
+        setTimeout(() => {
+          console.log('Loan Guide - setRunTour(true)');
+          setRunTour(true);
+        }, 500);
+      } else {
+        console.log('Loan Guide - Already seen, not showing');
       }
     }
   }, [isViewMode, isOpen]);
