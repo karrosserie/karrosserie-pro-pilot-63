@@ -11,12 +11,20 @@ export const useLoanFormGuide = (isViewMode: boolean, isOpen: boolean) => {
       const hasSeenLoanGuide = localStorage.getItem('fleet-loan-guide-seen');
       console.log('Loan Guide - hasSeenLoanGuide:', hasSeenLoanGuide);
       if (!hasSeenLoanGuide) {
-        // Petit délai pour s'assurer que le DOM est chargé
-        console.log('Loan Guide - Starting tour in 500ms');
+        // Attendre que le DOM soit complètement chargé
+        console.log('Loan Guide - Starting tour in 1000ms');
         setTimeout(() => {
-          console.log('Loan Guide - setRunTour(true)');
-          setRunTour(true);
-        }, 500);
+          // Vérifier que l'élément cible existe avant de lancer le tour
+          const firstElement = document.querySelector('[data-tour="client-select"]');
+          console.log('Loan Guide - First element exists:', !!firstElement);
+          if (firstElement) {
+            console.log('Loan Guide - setRunTour(true)');
+            setRunTour(true);
+          } else {
+            console.log('Loan Guide - Elements not found, retrying in 500ms');
+            setTimeout(() => setRunTour(true), 500);
+          }
+        }, 1000);
       } else {
         console.log('Loan Guide - Already seen, not showing');
       }
