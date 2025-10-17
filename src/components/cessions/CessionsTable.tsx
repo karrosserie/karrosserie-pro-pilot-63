@@ -67,7 +67,7 @@ export const CessionsTable = ({
   const [selectedClient, setSelectedClient] = useState<any>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [selectedCession, setSelectedCession] = useState<Cession | null>(null);
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [processingCessionIds, setProcessingCessionIds] = useState<Set<string>>(new Set());
   const [emailConfirmationOpen, setEmailConfirmationOpen] = useState(false);
   const [selectedCessionForEmail, setSelectedCessionForEmail] = useState<Cession | null>(null);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
@@ -355,7 +355,7 @@ export const CessionsTable = ({
       return;
     }
 
-    setIsGeneratingPDF(true);
+    setProcessingCessionIds(prev => new Set(prev).add(cession.id));
 
     try {
       // Récupérer les données complètes de l'ordre de réparation avec client et véhicule
@@ -552,7 +552,11 @@ export const CessionsTable = ({
         variant: "destructive",
       });
     } finally {
-      setIsGeneratingPDF(false);
+      setProcessingCessionIds(prev => {
+        const next = new Set(prev);
+        next.delete(cession.id);
+        return next;
+      });
     }
   };
 
@@ -625,7 +629,7 @@ export const CessionsTable = ({
                 }}
                 onDownloadPDF={handleDownloadPDF}
                 onInitializeProcedure={handleInitializeProcedure}
-                isGeneratingPDF={isGeneratingPDF}
+                isGeneratingPDF={processingCessionIds.has(cession.id)}
               />
             ))
           ) : (
@@ -726,31 +730,31 @@ export const CessionsTable = ({
                              </>
                            )}
                          </Button>
-                       )}
-                        {cession.status === 'en_attente' && (
-                          <Button 
-                            variant="create" 
-                            size="sm"
-                            onClick={() => {
-                              handleInitializeProcedure(cession);
-                              onInitializeHelpSeen?.();
-                            }}
-                            disabled={isGeneratingPDF}
-                            className={`initialize-button-help ${shouldShowInitializeHelp ? 'animate-pulse ring-2 ring-primary ring-offset-2' : ''}`}
-                          >
-                            {isGeneratingPDF ? (
-                              <>
-                                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                                Génération...
-                              </>
-                            ) : (
-                              <>
-                                <Play className="h-4 w-4 mr-1" />
-                                Initialiser
-                              </>
-                            )}
-                          </Button>
                         )}
+                         {cession.status === 'en_attente' && (
+                           <Button 
+                             variant="create" 
+                             size="sm"
+                             onClick={() => {
+                               handleInitializeProcedure(cession);
+                               onInitializeHelpSeen?.();
+                             }}
+                             disabled={processingCessionIds.has(cession.id)}
+                             className={`initialize-button-help ${shouldShowInitializeHelp ? 'animate-pulse ring-2 ring-primary ring-offset-2' : ''}`}
+                           >
+                             {processingCessionIds.has(cession.id) ? (
+                               <>
+                                 <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                 Génération...
+                               </>
+                             ) : (
+                               <>
+                                 <Play className="h-4 w-4 mr-1" />
+                                 Initialiser
+                               </>
+                             )}
+                           </Button>
+                         )}
                        {cession.status === 'en_attente' && (
                          <Button 
                            variant="delete" 
