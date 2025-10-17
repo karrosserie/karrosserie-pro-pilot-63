@@ -6,7 +6,8 @@ export const useLoanFormGuide = (
   isOpen: boolean,
   driverLicenseFrontUrl?: string,
   driverLicenseBackUrl?: string,
-  setActiveTab?: (tab: string) => void
+  setActiveTab?: (tab: string) => void,
+  activeTab?: string
 ) => {
   const [runTour, setRunTour] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -33,6 +34,30 @@ export const useLoanFormGuide = (
       setCurrentStep(0);
     }
   }, [isViewMode, isOpen]);
+
+  // Suivre les changements d'onglets et mettre à jour le guide
+  useEffect(() => {
+    if (!isOpen || isViewMode || !activeTab) return;
+
+    const tabToStep: { [key: string]: number } = {
+      'client-info': 0,
+      'insurance': 2,
+      'damages': 3,
+      'vehicle-details': 4,
+      'attestation': 7
+    };
+
+    const newStep = tabToStep[activeTab];
+    if (newStep !== undefined && newStep !== currentStep) {
+      console.log('Tab changed to:', activeTab, '- Setting guide step to:', newStep);
+      setCurrentStep(newStep);
+      
+      // Attendre un peu puis réafficher le guide
+      setTimeout(() => {
+        setRunTour(true);
+      }, 500);
+    }
+  }, [activeTab, isOpen, isViewMode]);
 
   // Nettoyer le timer à la destruction du composant
   useEffect(() => {
