@@ -3,52 +3,28 @@ import { Step, CallBackProps, STATUS, ACTIONS, EVENTS } from 'react-joyride';
 
 export const useLoanFormGuide = (isViewMode: boolean, isOpen: boolean) => {
   const [runTour, setRunTour] = useState(false);
-  const [stepIndex, setStepIndex] = useState(0);
 
   useEffect(() => {
-    // Démarrer le tour uniquement en mode création et à l'ouverture du dialog
     if (!isViewMode && isOpen) {
-      // Attendre que le DOM soit complètement chargé
       setTimeout(() => {
-        // Vérifier que l'élément cible existe avant de lancer le tour
         const firstElement = document.querySelector('[data-tour="client-select"]');
         if (firstElement) {
-          setStepIndex(0);
           setRunTour(true);
         } else {
-          // Réessayer si l'élément n'est pas encore dans le DOM
-          setTimeout(() => {
-            setStepIndex(0);
-            setRunTour(true);
-          }, 500);
+          setTimeout(() => setRunTour(true), 500);
         }
       }, 1000);
     } else {
-      // Réinitialiser le tour quand on ferme le dialog
       setRunTour(false);
-      setStepIndex(0);
     }
   }, [isViewMode, isOpen]);
 
   const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status, type, action, index } = data;
+    const { status } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
     if (finishedStatuses.includes(status)) {
       setRunTour(false);
-      setStepIndex(0);
-    } else if (type === EVENTS.STEP_AFTER) {
-      // Masquer temporairement le guide lors du passage à l'étape suivante
-      if (action === ACTIONS.NEXT) {
-        setStepIndex(index + 1);
-        setRunTour(false);
-        // Réafficher le guide après un court délai pour permettre l'interaction
-        setTimeout(() => {
-          setRunTour(true);
-        }, 300);
-      } else if (action === ACTIONS.PREV) {
-        setStepIndex(Math.max(0, index - 1));
-      }
     }
   };
 
@@ -98,7 +74,6 @@ export const useLoanFormGuide = (isViewMode: boolean, isOpen: boolean) => {
 
   return {
     runTour,
-    stepIndex,
     steps,
     handleJoyrideCallback,
   };
