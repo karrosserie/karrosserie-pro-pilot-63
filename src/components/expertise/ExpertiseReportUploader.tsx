@@ -115,6 +115,12 @@ export const ExpertiseReportUploader = ({
         const { onboardingService } = await import('@/services/onboarding/OnboardingService');
         onboardingService.updateOnboardingStep('tunnel2', 'reportImported', { reportId: newReport.id });
         
+        // Afficher un toast de félicitations immédiatement
+        toast({
+          title: "🎉 Félicitations !",
+          description: "Votre rapport d'expertise a été importé avec succès et est en cours d'analyse. Le système va automatiquement extraire les informations et créer le client, le véhicule et le devis.",
+        });
+        
         // Créer un message de félicitations pour l'utilisateur
         const onboardingState = onboardingService.getOnboardingState();
         if (onboardingState?.id) {
