@@ -114,6 +114,31 @@ export const ExpertiseReportUploader = ({
       if (newReport?.id) {
         const { onboardingService } = await import('@/services/onboarding/OnboardingService');
         onboardingService.updateOnboardingStep('tunnel2', 'reportImported', { reportId: newReport.id });
+        
+        // Créer un message de félicitations pour l'utilisateur
+        const onboardingState = onboardingService.getOnboardingState();
+        if (onboardingState?.id) {
+          try {
+            console.log('[ExpertiseReportUploader] Creating congratulation message...');
+            await supabase
+              .from('ai_messages_history')
+              .insert({
+                session_id: onboardingState.id,
+                read: false,
+                message: {
+                  type: 'ai',
+                  content: '🎉 Félicitations ! Votre rapport d\'expertise a été importé avec succès et est en cours d\'analyse. Le système va automatiquement extraire les informations et créer le client, le véhicule et le devis.',
+                  tool_calls: [],
+                  additional_kwargs: {},
+                  response_metadata: {},
+                  invalid_tool_calls: []
+                }
+              });
+            console.log('[ExpertiseReportUploader] Congratulation message created');
+          } catch (error) {
+            console.error('[ExpertiseReportUploader] Error creating congratulation message:', error);
+          }
+        }
       }
 
       // 5. Créer une entrée dans la table imports avec le status "En cours d'analyse"
