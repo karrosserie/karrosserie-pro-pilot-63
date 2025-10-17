@@ -4229,6 +4229,7 @@ export type Database = {
           cession_initialize_button_help_seen: boolean
           cession_select_order_help_seen: boolean
           company_id: string | null
+          completion_dialog_shown: boolean
           created_at: string
           expertise_report_prompt_seen: boolean
           fleet_reservation_guide_completed: boolean
@@ -4244,6 +4245,7 @@ export type Database = {
           cession_initialize_button_help_seen?: boolean
           cession_select_order_help_seen?: boolean
           company_id?: string | null
+          completion_dialog_shown?: boolean
           created_at?: string
           expertise_report_prompt_seen?: boolean
           fleet_reservation_guide_completed?: boolean
@@ -4259,6 +4261,7 @@ export type Database = {
           cession_initialize_button_help_seen?: boolean
           cession_select_order_help_seen?: boolean
           company_id?: string | null
+          completion_dialog_shown?: boolean
           created_at?: string
           expertise_report_prompt_seen?: boolean
           fleet_reservation_guide_completed?: boolean

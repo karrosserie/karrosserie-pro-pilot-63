@@ -13,6 +13,7 @@ export interface UserOnboardingProgress {
   fleet_reservation_help_seen: boolean;
   fleet_reservation_guide_completed: boolean;
   expertise_report_prompt_seen: boolean;
+  completion_dialog_shown: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -25,7 +26,8 @@ export type OnboardingHelpType =
   | 'cession_initialize_button_help_seen'
   | 'fleet_reservation_help_seen'
   | 'fleet_reservation_guide_completed'
-  | 'expertise_report_prompt_seen';
+  | 'expertise_report_prompt_seen'
+  | 'completion_dialog_shown';
 
 class UserOnboardingProgressService {
   /**
@@ -87,6 +89,7 @@ class UserOnboardingProgressService {
           fleet_reservation_help_seen: false,
           fleet_reservation_guide_completed: false,
           expertise_report_prompt_seen: false,
+          completion_dialog_shown: false,
         })
         .select()
         .single();
@@ -180,6 +183,7 @@ class UserOnboardingProgressService {
           fleet_reservation_help_seen: false,
           fleet_reservation_guide_completed: false,
           expertise_report_prompt_seen: false,
+          completion_dialog_shown: false,
         })
         .eq('user_id', user.id)
         .eq('company_id', companyId);

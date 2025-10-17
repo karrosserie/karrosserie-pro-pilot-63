@@ -25,6 +25,16 @@ export function useUserOnboardingProgress() {
     },
   });
 
+  const allHelpsSeen = progress && 
+    progress.quote_convert_help_seen &&
+    progress.repair_order_help_seen &&
+    progress.cession_help_seen &&
+    progress.cession_select_order_help_seen &&
+    progress.cession_initialize_button_help_seen &&
+    progress.fleet_reservation_help_seen &&
+    progress.fleet_reservation_guide_completed &&
+    progress.expertise_report_prompt_seen;
+
   return {
     progress,
     isLoading,
@@ -38,5 +48,7 @@ export function useUserOnboardingProgress() {
     shouldShowFleetReservationHelp: !progress?.fleet_reservation_help_seen,
     shouldShowFleetGuide: !progress?.fleet_reservation_guide_completed,
     shouldShowExpertiseReportPrompt: !progress?.expertise_report_prompt_seen,
+    allHelpsSeen,
+    shouldShowCompletionDialog: allHelpsSeen && !progress?.completion_dialog_shown,
   };
 }
