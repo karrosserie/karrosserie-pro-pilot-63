@@ -717,6 +717,7 @@ const RepairOrders = () => {
             <AlertDialogDescription className="text-base">
               Nous vous offrons la possibilité d'envoyer vos ordres de réparation à signer électroniquement par vos clients. 
               Cette signature a une valeur juridique et permet de valider légalement l'ordre de réparation avant de commencer les travaux.
+              FONCE !
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
