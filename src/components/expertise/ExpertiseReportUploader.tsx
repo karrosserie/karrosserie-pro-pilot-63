@@ -40,6 +40,7 @@ export const ExpertiseReportUploader = ({
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [pendingSuccess, setPendingSuccess] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -198,15 +199,14 @@ export const ExpertiseReportUploader = ({
 
       // Afficher la pop-up de félicitations
       setShowSuccessDialog(true);
+      setPendingSuccess(true);
 
       // Rediriger vers la page des rapports d'expertise si on ne s'y trouve pas déjà
       if (!location.pathname.includes('/documents/expertise')) {
         navigate('/documents/expertise');
       }
 
-      if (onSuccess) {
-        onSuccess();
-      }
+      // onSuccess sera appelé quand l'utilisateur fermera la pop-up
     } catch (error: any) {
       console.error("Erreur lors de l'importation du rapport:", error);
       toast({
@@ -219,9 +219,17 @@ export const ExpertiseReportUploader = ({
     }
   };
 
+  const handleCloseSuccessDialog = () => {
+    setShowSuccessDialog(false);
+    if (pendingSuccess && onSuccess) {
+      onSuccess();
+      setPendingSuccess(false);
+    }
+  };
+
   return (
     <>
-      <AlertDialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+      <AlertDialog open={showSuccessDialog} onOpenChange={handleCloseSuccessDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl">🎉 Félicitations !</AlertDialogTitle>
@@ -231,7 +239,7 @@ export const ExpertiseReportUploader = ({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <Button onClick={() => setShowSuccessDialog(false)}>
+            <Button onClick={handleCloseSuccessDialog}>
               Compris
             </Button>
           </AlertDialogFooter>
