@@ -295,7 +295,7 @@ const Cessions = () => {
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-primary font-bold">✓</span>
-                  <span><strong>On demande un paiement à l'assurance si c'est possible</strong></span>
+                  <span><strong>On demande un paiement pour le prêt de véhicule à l'assurance si c'est possible</strong></span>
                 </div>
               </div>
             </AlertDialogDescription>
