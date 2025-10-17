@@ -62,8 +62,14 @@ export const useLoanFormGuide = (
   useEffect(() => {
     console.log('License Upload Detection - Step:', currentStep, 'Front:', driverLicenseFrontUrl, 'Back:', driverLicenseBackUrl);
     
-    if (!isOpen || isViewMode || currentStep !== 1) {
-      console.log('License Upload Detection - Skipped (not at step 1 or dialog closed)');
+    if (!isOpen || isViewMode) {
+      console.log('License Upload Detection - Skipped (dialog closed or view mode)');
+      return;
+    }
+
+    // Détecter l'upload uniquement si on est aux premières étapes (0, 1 ou 2)
+    if (currentStep > 2) {
+      console.log('License Upload Detection - Already past license step');
       return;
     }
 
