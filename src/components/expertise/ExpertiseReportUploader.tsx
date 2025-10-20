@@ -11,14 +11,7 @@ import { Upload, FileText, X, Loader2 } from 'lucide-react';
 import { MovingCar } from '@/components/ui/moving-car';
 import { Button } from '@/components/ui/button';
 import { v4 as uuidv4 } from 'uuid';
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { SuccessDialog } from '@/components/ui/success-dialog';
 
 interface ExpertiseReportUploaderProps {
   onSuccess?: () => void;
@@ -229,25 +222,13 @@ export const ExpertiseReportUploader = ({
 
   return (
     <>
-      <AlertDialog open={showSuccessDialog} onOpenChange={handleCloseSuccessDialog}>
-        <AlertDialogContent className="sm:max-w-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-2xl text-center">🎉 Félicitations !</AlertDialogTitle>
-            <AlertDialogDescription className="text-lg text-center">
-              Votre rapport d'expertise a été importé avec succès.
-              <br /><br />
-              karrosserie.pro va vous créer entièrement votre devis, créer le client ainsi que la voiture avec tous les détails.
-              <br /><br />
-              <strong>ETAPE SUIVANTE, TRANSFORME TON DEVIS EN ORDRE DE REPARATION(O.R) ET ENVOIE LE EN SIGNATURE AU CLIENT !</strong>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <Button onClick={handleCloseSuccessDialog}>
-              Compris
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <SuccessDialog
+        open={showSuccessDialog}
+        onClose={handleCloseSuccessDialog}
+        title="🎉 Félicitations !"
+        description={`Votre rapport d'expertise a été importé avec succès.\n\nkarrosserie.pro va vous créer entièrement votre devis, créer le client ainsi que la voiture avec tous les détails.\n\nETAPE SUIVANTE, TRANSFORME TON DEVIS EN ORDRE DE REPARATION(O.R) ET ENVOIE LE EN SIGNATURE AU CLIENT !`}
+        buttonText="Compris"
+      />
 
       <div className={className}>
         {/* Fenêtre d'attente - temporairement désactivée
