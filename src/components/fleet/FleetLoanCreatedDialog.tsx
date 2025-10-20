@@ -6,7 +6,8 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ArrowDown, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface FleetLoanCreatedDialogProps {
   open: boolean;
@@ -14,29 +15,50 @@ interface FleetLoanCreatedDialogProps {
 }
 
 export function FleetLoanCreatedDialog({ open, onClose }: FleetLoanCreatedDialogProps) {
+  const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
+
+  useEffect(() => {
+    if (open) {
+      // Trouver la section "Prêts en cours" et positionner le dialog à côté
+      const section = document.getElementById('fleet-current-loans-section');
+      if (section) {
+        const rect = section.getBoundingClientRect();
+        // Positionner le dialog à gauche de la section avec un décalage
+        setPosition({
+          top: rect.top + 50,
+          left: Math.max(20, rect.left - 550), // 550px = largeur du dialog (sm:max-w-2xl) + marge
+        });
+      }
+    }
+  }, [open]);
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl animate-fade-in fixed top-[20%] right-8 left-auto translate-x-0 translate-y-0">
-        <div className="absolute -right-4 top-1/2 -translate-y-1/2 hidden lg:block">
-          <ArrowRight className="h-8 w-8 text-primary animate-pulse" />
-        </div>
-        <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 lg:hidden">
-          <ArrowDown className="h-8 w-8 text-primary animate-pulse" />
-        </div>
+      <DialogContent 
+        className="sm:max-w-2xl animate-fade-in" 
+        style={position ? {
+          position: 'fixed',
+          top: `${position.top}px`,
+          left: `${position.left}px`,
+          transform: 'none',
+        } : undefined}
+      >
         <DialogHeader>
-          <div className="flex flex-col items-center gap-3 mb-2">
-            <div className="p-3 rounded-full bg-primary/10">
-              <ArrowDown className="h-6 w-6 text-primary" />
+          <div className="flex items-center gap-3 mb-2">
+            <div className="flex-1 text-right">
+              <DialogTitle className="text-2xl">
+                Prêt créé avec succès !
+              </DialogTitle>
             </div>
-            <DialogTitle className="text-2xl text-center">
-              Prêt créé avec succès !
-            </DialogTitle>
+            <div className="p-3 rounded-full bg-primary/10 animate-pulse">
+              <ArrowRight className="h-6 w-6 text-primary" />
+            </div>
           </div>
-          <DialogDescription className="text-lg leading-relaxed pt-2 text-center">
+          <DialogDescription className="text-lg leading-relaxed pt-2 text-right pr-16">
             Ici vous retrouverez vos véhicules en cours de prêt
           </DialogDescription>
         </DialogHeader>
-        <div className="flex justify-center pt-4">
+        <div className="flex justify-end pt-4 pr-16">
           <Button 
             onClick={onClose}
             className="min-w-[100px]"

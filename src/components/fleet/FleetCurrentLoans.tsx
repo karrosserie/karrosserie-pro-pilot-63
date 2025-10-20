@@ -31,7 +31,7 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
   onDownloadAttestation
 }) => {
   return (
-    <div className="card-container">
+    <div className="card-container" id="fleet-current-loans-section">
       <h2 className="text-lg font-semibold text-gray-800 mb-4">Prêts en cours</h2>
       
       <div className="space-y-4">
