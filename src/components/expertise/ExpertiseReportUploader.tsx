@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { expertiseReportsService } from '@/services/supabase/expertise-reports';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { useCompanyId } from '@/hooks/use-company-id';
+import { useUserOnboardingProgress } from '@/hooks/use-user-onboarding-progress';
 import { Upload, FileText, X, Loader2 } from 'lucide-react';
 import { MovingCar } from '@/components/ui/moving-car';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,7 @@ export const ExpertiseReportUploader = ({
   const { user } = useAuth();
   const { createReport } = useExpertiseReports();
   const { companyId } = useCompanyId();
+  const { shouldShowExpertiseReportPrompt, markHelpAsSeen } = useUserOnboardingProgress();
   const navigate = useNavigate();
   const location = useLocation();
   const [isUploading, setIsUploading] = useState(false);
@@ -191,13 +193,23 @@ export const ExpertiseReportUploader = ({
       }
 
 
-      // Afficher la pop-up de félicitations
-      setShowSuccessDialog(true);
-      setPendingSuccess(true);
+      // Afficher la pop-up de félicitations seulement si pas encore vue
+      if (shouldShowExpertiseReportPrompt) {
+        setShowSuccessDialog(true);
+        setPendingSuccess(true);
 
-      // Marquer qu'on doit naviguer après la fermeture du dialog
-      if (!location.pathname.includes('/documents/expertise')) {
-        setShouldNavigate(true);
+        // Marquer qu'on doit naviguer après la fermeture du dialog
+        if (!location.pathname.includes('/documents/expertise')) {
+          setShouldNavigate(true);
+        }
+      } else {
+        // Si déjà vue, naviguer directement et appeler onSuccess
+        if (!location.pathname.includes('/documents/expertise')) {
+          navigate('/documents/expertise');
+        }
+        if (onSuccess) {
+          onSuccess();
+        }
       }
 
       // onSuccess sera appelé quand l'utilisateur fermera la pop-up
@@ -215,6 +227,9 @@ export const ExpertiseReportUploader = ({
 
   const handleCloseSuccessDialog = () => {
     setShowSuccessDialog(false);
+    
+    // Marquer comme vue dans le système d'onboarding
+    markHelpAsSeen('expertise_report_prompt_seen');
     
     // Naviguer si nécessaire
     if (shouldNavigate) {
