@@ -255,7 +255,7 @@ const Cessions = () => {
           markHelpAsSeen('cession_help_seen');
         }}
         title="Bienvenue dans les cessions de créance"
-        description='Pour créer une nouvelle cession de créance, cliquez sur le bouton "Nouvelle cession" puis sélectionnez l\'ordre de réparation souhaité.'
+        description="Pour créer une nouvelle cession de créance, cliquez sur le bouton « Nouvelle cession » puis sélectionnez l'ordre de réparation souhaité."
         buttonText="J'ai compris"
       />
 
