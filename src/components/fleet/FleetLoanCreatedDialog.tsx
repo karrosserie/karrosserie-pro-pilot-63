@@ -23,11 +23,19 @@ export function FleetLoanCreatedDialog({ open, onClose }: FleetLoanCreatedDialog
       const section = document.getElementById('fleet-current-loans-section');
       if (section) {
         const rect = section.getBoundingClientRect();
-        // Positionner le dialog à gauche de la section avec un décalage
+        // Positionner le dialog à gauche de la section avec un décalage plus important
         setPosition({
           top: rect.top + 50,
-          left: Math.max(20, rect.left - 550), // 550px = largeur du dialog (sm:max-w-2xl) + marge
+          left: Math.max(20, rect.left - 650), // 650px pour décaler plus à gauche
         });
+        // Ajouter la classe de surbrillance
+        section.classList.add('ring-2', 'ring-primary', 'ring-offset-2');
+      }
+    } else {
+      // Retirer la surbrillance quand le dialog se ferme
+      const section = document.getElementById('fleet-current-loans-section');
+      if (section) {
+        section.classList.remove('ring-2', 'ring-primary', 'ring-offset-2');
       }
     }
   }, [open]);
