@@ -93,7 +93,7 @@ export const useFleetPage = () => {
       title: "Prêt enregistré",
       description: `Le véhicule ${vehicleDisplay} a été prêté avec succès.`
     });
-    // Afficher la première étape d'introduction
+    // Afficher la première étape d'introduction (sera filtré dans le composant selon l'onboarding)
     setShowIntroStep('loans');
   };
 

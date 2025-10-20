@@ -73,7 +73,15 @@ const FleetPageContent = () => {
   const { returns } = useFleetReturns();
   const { companyData } = useCompany();
   const isMobile = useIsMobile();
-  const { shouldShowFleetReservationHelp, shouldShowFleetGuide, shouldShowFleetLoanCreatedHelp, markHelpAsSeen } = useUserOnboardingProgress();
+  const { 
+    shouldShowFleetReservationHelp, 
+    shouldShowFleetGuide, 
+    shouldShowFleetLoanCreatedHelp, 
+    shouldShowFleetLoansIntro,
+    shouldShowFleetViolationsIntro,
+    shouldShowFleetHelpIntro,
+    markHelpAsSeen 
+  } = useUserOnboardingProgress();
 
   // Afficher le guide si pas encore vu
   useEffect(() => {
@@ -94,9 +102,34 @@ const FleetPageContent = () => {
   // Fermer le dialog d'introduction et passer à l'étape suivante
   const handleCloseIntroDialog = () => {
     if (showIntroStep === 'loans') {
-      markHelpAsSeen('fleet_loan_created_help_seen');
+      markHelpAsSeen('fleet_loans_intro_seen');
+      // Passer à violations seulement si pas encore vu
+      if (shouldShowFleetViolationsIntro) {
+        handleCloseIntro();
+      } else if (shouldShowFleetHelpIntro) {
+        // Sauter violations et aller directement à help
+        handleCloseIntro();
+        handleCloseIntro();
+      } else {
+        // Tout est déjà vu, fermer complètement
+        handleCloseIntro();
+        handleCloseIntro();
+        handleCloseIntro();
+      }
+    } else if (showIntroStep === 'violations') {
+      markHelpAsSeen('fleet_violations_intro_seen');
+      // Passer à help seulement si pas encore vu
+      if (shouldShowFleetHelpIntro) {
+        handleCloseIntro();
+      } else {
+        // Help déjà vu, fermer complètement
+        handleCloseIntro();
+        handleCloseIntro();
+      }
+    } else if (showIntroStep === 'help') {
+      markHelpAsSeen('fleet_help_intro_seen');
+      handleCloseIntro();
     }
-    handleCloseIntro();
   };
 
   // Guider vers l'action appropriée
@@ -395,7 +428,7 @@ const FleetPageContent = () => {
       </AlertDialog>
 
       <FleetLoanCreatedDialog
-        open={showIntroStep === 'loans'}
+        open={showIntroStep === 'loans' && shouldShowFleetLoansIntro}
         onClose={handleCloseIntroDialog}
         targetSectionId="fleet-current-loans-section"
         title="Prêt créé avec succès !"
@@ -403,7 +436,7 @@ const FleetPageContent = () => {
       />
 
       <FleetLoanCreatedDialog
-        open={showIntroStep === 'violations'}
+        open={showIntroStep === 'violations' && shouldShowFleetViolationsIntro}
         onClose={handleCloseIntroDialog}
         targetSectionId="fleet-violations-section"
         title="Gestion des contraventions"
@@ -411,7 +444,7 @@ const FleetPageContent = () => {
       />
 
       <FleetLoanCreatedDialog
-        open={showIntroStep === 'help'}
+        open={showIntroStep === 'help' && shouldShowFleetHelpIntro}
         onClose={handleCloseIntroDialog}
         title="Section Aide"
         description={

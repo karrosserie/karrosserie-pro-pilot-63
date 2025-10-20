@@ -36,6 +36,9 @@ export function useUserOnboardingProgress() {
     progress.fleet_reservation_help_seen &&
     progress.fleet_reservation_guide_completed &&
     progress.fleet_loan_created_help_seen &&
+    progress.fleet_loans_intro_seen &&
+    progress.fleet_violations_intro_seen &&
+    progress.fleet_help_intro_seen &&
     progress.expertise_report_prompt_seen;
 
   // Appeler le webhook automatiquement quand toutes les aides sont vues
@@ -59,6 +62,9 @@ export function useUserOnboardingProgress() {
     shouldShowFleetReservationHelp: !progress?.fleet_reservation_help_seen,
     shouldShowFleetGuide: !progress?.fleet_reservation_guide_completed,
     shouldShowFleetLoanCreatedHelp: !progress?.fleet_loan_created_help_seen,
+    shouldShowFleetLoansIntro: !progress?.fleet_loans_intro_seen,
+    shouldShowFleetViolationsIntro: !progress?.fleet_violations_intro_seen,
+    shouldShowFleetHelpIntro: !progress?.fleet_help_intro_seen,
     shouldShowExpertiseReportPrompt: !progress?.expertise_report_prompt_seen,
     allHelpsSeen,
   };
