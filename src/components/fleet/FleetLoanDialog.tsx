@@ -95,6 +95,7 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
           <DialogTitle>{getTitle()}</DialogTitle>
         </DialogHeader>
         
+        <div className="flex-1 min-h-0 flex flex-col">
         {(mode === 'return' || mode === 'view_return') ? (
           reservation && reservation.fleet_vehicles ? (
             <FleetReturnForm
@@ -135,6 +136,7 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
             )}
           </>
         )}
+        </div>
       </DialogContent>
     </Dialog>
   );
