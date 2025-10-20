@@ -5,9 +5,17 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+} from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface FleetLoanCreatedDialogProps {
   open: boolean;
@@ -19,6 +27,7 @@ interface FleetLoanCreatedDialogProps {
 
 export function FleetLoanCreatedDialog({ open, onClose, targetSectionId, title, description }: FleetLoanCreatedDialogProps) {
   const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (open && targetSectionId) {
@@ -48,6 +57,33 @@ export function FleetLoanCreatedDialog({ open, onClose, targetSectionId, title, 
     }
   }, [open, targetSectionId]);
 
+  // Sur mobile, on affiche toujours en Drawer centré
+  if (isMobile) {
+    return (
+      <Drawer open={open} onOpenChange={onClose}>
+        <DrawerContent>
+          <DrawerHeader className="text-center">
+            <DrawerTitle className="text-xl">
+              {title}
+            </DrawerTitle>
+            <DrawerDescription className="text-base leading-relaxed pt-2">
+              {description}
+            </DrawerDescription>
+          </DrawerHeader>
+          <div className="flex justify-center px-4 pb-6 pt-2">
+            <Button 
+              onClick={onClose}
+              className="min-w-[100px]"
+            >
+              Compris
+            </Button>
+          </div>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
+  // Sur desktop, on garde le Dialog avec positionnement
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent 
