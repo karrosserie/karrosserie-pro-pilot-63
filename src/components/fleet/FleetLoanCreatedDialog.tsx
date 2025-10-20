@@ -14,7 +14,7 @@ interface FleetLoanCreatedDialogProps {
   onClose: () => void;
   targetSectionId?: string;
   title: string;
-  description: string;
+  description: React.ReactNode;
 }
 
 export function FleetLoanCreatedDialog({ open, onClose, targetSectionId, title, description }: FleetLoanCreatedDialogProps) {

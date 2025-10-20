@@ -414,7 +414,11 @@ const FleetPageContent = () => {
         open={showIntroStep === 'help'}
         onClose={handleCloseIntroDialog}
         title="Section Aide"
-        description="Vous pouvez accéder si nécessaire à la section aide afin de bénéficier de plus d'aide. Cette section contient des vidéos pour chaque action dans l'application afin de vous aiguiller au mieux si besoin."
+        description={
+          <>
+            Vous pouvez accéder si nécessaire à la section <strong>aide</strong> afin de bénéficier de plus d&apos;aide. Cette section contient des vidéos pour chaque action dans l&apos;application afin de vous aiguiller au mieux si besoin.
+          </>
+        }
       />
     </div>
   );
