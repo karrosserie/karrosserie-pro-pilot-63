@@ -34,6 +34,7 @@ export const ExpertiseReportUploader = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [pendingSuccess, setPendingSuccess] = useState(false);
+  const [shouldNavigate, setShouldNavigate] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -194,9 +195,9 @@ export const ExpertiseReportUploader = ({
       setShowSuccessDialog(true);
       setPendingSuccess(true);
 
-      // Rediriger vers la page des rapports d'expertise si on ne s'y trouve pas déjà
+      // Marquer qu'on doit naviguer après la fermeture du dialog
       if (!location.pathname.includes('/documents/expertise')) {
-        navigate('/documents/expertise');
+        setShouldNavigate(true);
       }
 
       // onSuccess sera appelé quand l'utilisateur fermera la pop-up
@@ -214,6 +215,13 @@ export const ExpertiseReportUploader = ({
 
   const handleCloseSuccessDialog = () => {
     setShowSuccessDialog(false);
+    
+    // Naviguer si nécessaire
+    if (shouldNavigate) {
+      navigate('/documents/expertise');
+      setShouldNavigate(false);
+    }
+    
     if (pendingSuccess && onSuccess) {
       onSuccess();
       setPendingSuccess(false);
