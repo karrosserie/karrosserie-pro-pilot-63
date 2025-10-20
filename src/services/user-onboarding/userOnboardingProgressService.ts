@@ -12,6 +12,7 @@ export interface UserOnboardingProgress {
   cession_initialize_button_help_seen: boolean;
   fleet_reservation_help_seen: boolean;
   fleet_reservation_guide_completed: boolean;
+  fleet_loan_created_help_seen: boolean;
   expertise_report_prompt_seen: boolean;
   completion_dialog_shown: boolean;
   created_at: string;
@@ -26,6 +27,7 @@ export type OnboardingHelpType =
   | 'cession_initialize_button_help_seen'
   | 'fleet_reservation_help_seen'
   | 'fleet_reservation_guide_completed'
+  | 'fleet_loan_created_help_seen'
   | 'expertise_report_prompt_seen'
   | 'completion_dialog_shown';
 
@@ -88,6 +90,7 @@ class UserOnboardingProgressService {
           cession_initialize_button_help_seen: false,
           fleet_reservation_help_seen: false,
           fleet_reservation_guide_completed: false,
+          fleet_loan_created_help_seen: false,
           expertise_report_prompt_seen: false,
           completion_dialog_shown: false,
         })
@@ -182,6 +185,7 @@ class UserOnboardingProgressService {
           cession_initialize_button_help_seen: false,
           fleet_reservation_help_seen: false,
           fleet_reservation_guide_completed: false,
+          fleet_loan_created_help_seen: false,
           expertise_report_prompt_seen: false,
           completion_dialog_shown: false,
         })

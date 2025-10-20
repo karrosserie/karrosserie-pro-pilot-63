@@ -17,6 +17,7 @@ import FleetViolations from './FleetViolations';
 import { Loading } from '@/components/ui/loading';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useUserOnboardingProgress } from '@/hooks/use-user-onboarding-progress';
+import { FleetLoanCreatedDialog } from './FleetLoanCreatedDialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,6 +34,7 @@ const FleetPageContent = () => {
   const [isAttestationDialogOpen, setIsAttestationDialogOpen] = useState(false);
   const [selectedLoanForAttestation, setSelectedLoanForAttestation] = useState<string | null>(null);
   const [showGuideDialog, setShowGuideDialog] = useState(false);
+  const [showLoanCreatedDialog, setShowLoanCreatedDialog] = useState(false);
 
   const {
     vehicles,
@@ -70,7 +72,7 @@ const FleetPageContent = () => {
   const { returns } = useFleetReturns();
   const { companyData } = useCompany();
   const isMobile = useIsMobile();
-  const { shouldShowFleetReservationHelp, shouldShowFleetGuide, markHelpAsSeen } = useUserOnboardingProgress();
+  const { shouldShowFleetReservationHelp, shouldShowFleetGuide, shouldShowFleetLoanCreatedHelp, markHelpAsSeen } = useUserOnboardingProgress();
 
   // Afficher le guide si pas encore vu
   useEffect(() => {
@@ -79,6 +81,17 @@ const FleetPageContent = () => {
     }
   }, [isLoading, shouldShowFleetReservationHelp, shouldShowFleetGuide]);
 
+  // Afficher le dialog "prêt créé" après création d'un prêt
+  useEffect(() => {
+    if (!isLoading && currentLoans.length > 0 && shouldShowFleetLoanCreatedHelp) {
+      // Délai pour laisser le temps au dialog de prêt de se fermer
+      const timer = setTimeout(() => {
+        setShowLoanCreatedDialog(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, currentLoans.length, shouldShowFleetLoanCreatedHelp]);
+
   // Fermer le guide et marquer comme vu
   const handleCloseGuide = () => {
     setShowGuideDialog(false);
@@ -86,6 +99,12 @@ const FleetPageContent = () => {
     if (vehicles.length > 0) {
       markHelpAsSeen('fleet_reservation_guide_completed');
     }
+  };
+
+  // Fermer le dialog "prêt créé"
+  const handleCloseLoanCreatedDialog = () => {
+    setShowLoanCreatedDialog(false);
+    markHelpAsSeen('fleet_loan_created_help_seen');
   };
 
   // Guider vers l'action appropriée
@@ -382,6 +401,11 @@ const FleetPageContent = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <FleetLoanCreatedDialog
+        open={showLoanCreatedDialog}
+        onClose={handleCloseLoanCreatedDialog}
+      />
     </div>
   );
 };

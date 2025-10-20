@@ -33,6 +33,7 @@ export function useUserOnboardingProgress() {
     progress.cession_initialize_button_help_seen &&
     progress.fleet_reservation_help_seen &&
     progress.fleet_reservation_guide_completed &&
+    progress.fleet_loan_created_help_seen &&
     progress.expertise_report_prompt_seen;
 
   return {
@@ -47,6 +48,7 @@ export function useUserOnboardingProgress() {
     shouldShowCessionInitializeButtonHelp: !progress?.cession_initialize_button_help_seen,
     shouldShowFleetReservationHelp: !progress?.fleet_reservation_help_seen,
     shouldShowFleetGuide: !progress?.fleet_reservation_guide_completed,
+    shouldShowFleetLoanCreatedHelp: !progress?.fleet_loan_created_help_seen,
     shouldShowExpertiseReportPrompt: !progress?.expertise_report_prompt_seen,
     allHelpsSeen,
     shouldShowCompletionDialog: allHelpsSeen && !progress?.completion_dialog_shown,
