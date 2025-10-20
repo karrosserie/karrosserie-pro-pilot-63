@@ -282,7 +282,7 @@ const Cessions = () => {
             <AlertDialogDescription className="text-lg text-center">
               La cession de créance a été envoyée pour signature.
               <br /><br />
-              💡 <strong>N'oubliez pas :</strong> Vous pouvez également prêter un véhicule de courtoisie au client pendant la durée des réparations via le module "Flotte de véhicules".
+              💡 <strong>N'oubliez pas :</strong> Vous pouvez également prêter un véhicule de courtoisie au client pendant la durée des réparations via le module "véhicule de courtoisie".
               <br /><br />
               <div className="space-y-2 mt-4">
                 <div className="flex items-start gap-2">
