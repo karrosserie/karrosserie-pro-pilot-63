@@ -100,12 +100,6 @@ const sendSMS = async (phone: string, link: string) => {
   }
 };
 
-const detectEnvironment = () => {
-  const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
-  const isLovable = supabaseUrl.includes('lovable') || supabaseUrl.includes('localhost');
-  console.log('🌍 Environnement détecté:', { supabaseUrl, isLovable });
-  return isLovable;
-};
 
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
@@ -236,7 +230,7 @@ const handler = async (req: Request): Promise<Response> => {
     
     const uploadLink = `${baseUrl}/documents/upload/${tokenId}`;
 
-    // Déterminer le mode d'envoi : email ou SMS
+    // Déterminer le mode d'envoi : SMS en priorité, puis email
     let sendMode: 'email' | 'sms' | 'none' = 'none';
     let recipient: string = '';
 
@@ -246,27 +240,17 @@ const handler = async (req: Request): Promise<Response> => {
       recipient = targetEmail;
       console.log('📧 Email cible spécifié:', recipient);
     } else {
-      // Logique de choix automatique
-      const isLovable = detectEnvironment();
-      
-      if (isLovable) {
-        // En environnement de test, privilégier l'email
+      // Logique de choix automatique : priorité au SMS
+      if (clientData.phone) {
+        sendMode = 'sms';
+        recipient = clientData.phone;
+        console.log('📱 Téléphone client disponible, utilisation du SMS vers:', recipient);
+      } else if (clientData.email) {
         sendMode = 'email';
-        recipient = 'karrosseriepro@yopmail.com';
-        console.log('📧 Environnement Lovable détecté, utilisation de l\'email de test');
+        recipient = clientData.email;
+        console.log('📧 Pas de téléphone, utilisation de l\'email vers:', recipient);
       } else {
-        // En production, choisir selon les données disponibles
-        if (clientData.email) {
-          sendMode = 'email';
-          recipient = clientData.email;
-          console.log('📧 Email client disponible:', recipient);
-        } else if (clientData.phone) {
-          sendMode = 'sms';
-          recipient = clientData.phone;
-          console.log('📱 Pas d\'email, utilisation du SMS vers:', recipient);
-        } else {
-          throw new Error('Aucun moyen de contact disponible (email ou téléphone)');
-        }
+        throw new Error('Aucun moyen de contact disponible (email ou téléphone)');
       }
     }
 
