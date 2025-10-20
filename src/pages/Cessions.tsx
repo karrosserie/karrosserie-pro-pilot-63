@@ -9,15 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useUserOnboardingProgress } from '@/hooks/use-user-onboarding-progress';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { SuccessDialog } from '@/components/ui/success-dialog';
 
 const Cessions = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -256,57 +248,45 @@ const Cessions = () => {
         isSubmitting={createCession.isPending || updateCession.isPending}
       />
 
-      <AlertDialog open={showHelpDialog} onOpenChange={setShowHelpDialog}>
-        <AlertDialogContent className="sm:max-w-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-2xl text-center">Bienvenue dans les cessions de créance</AlertDialogTitle>
-            <AlertDialogDescription className="text-lg text-center">
-              Pour créer une nouvelle cession de créance, cliquez sur le bouton <strong>"Nouvelle cession"</strong> puis sélectionnez l'ordre de réparation souhaité.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => {
-              setShowHelpDialog(false);
-              markHelpAsSeen('cession_help_seen');
-            }}>
-              J'ai compris
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <SuccessDialog
+        open={showHelpDialog}
+        onClose={() => {
+          setShowHelpDialog(false);
+          markHelpAsSeen('cession_help_seen');
+        }}
+        title="Bienvenue dans les cessions de créance"
+        description='Pour créer une nouvelle cession de créance, cliquez sur le bouton "Nouvelle cession" puis sélectionnez l\'ordre de réparation souhaité.'
+        buttonText="J'ai compris"
+      />
 
-      <AlertDialog open={showCourtesyVehicleDialog} onOpenChange={setShowCourtesyVehicleDialog}>
-        <AlertDialogContent className="sm:max-w-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-2xl text-center">Cession initialisée avec succès !</AlertDialogTitle>
-            <AlertDialogDescription className="text-lg text-center">
-              La cession de créance a été envoyée pour signature.
-              <br /><br />
-              💡 <strong>N'oubliez pas :</strong> Vous pouvez également prêter un véhicule de courtoisie au client pendant la durée des réparations via le module "véhicule de courtoisie".
-              <br /><br />
-              <div className="space-y-2 mt-4">
-                <div className="flex items-start gap-2">
-                  <span className="text-primary font-bold">✓</span>
-                  <span><strong>Contrat sécurisé en 2 clics</strong></span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-primary font-bold">✓</span>
-                  <span><strong>On gère les PV</strong></span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-primary font-bold">✓</span>
-                  <span><strong>On demande un paiement pour le prêt de véhicule à l'assurance si c'est possible</strong></span>
-                </div>
+      <SuccessDialog
+        open={showCourtesyVehicleDialog}
+        onClose={() => setShowCourtesyVehicleDialog(false)}
+        title="Cession initialisée avec succès !"
+        description={
+          <div>
+            La cession de créance a été envoyée pour signature.
+            <br /><br />
+            💡 <strong>N'oubliez pas :</strong> Vous pouvez également prêter un véhicule de courtoisie au client pendant la durée des réparations via le module "véhicule de courtoisie".
+            <br /><br />
+            <div className="space-y-2 mt-4">
+              <div className="flex items-start gap-2">
+                <span className="text-primary font-bold">✓</span>
+                <span><strong>Contrat sécurisé en 2 clics</strong></span>
               </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setShowCourtesyVehicleDialog(false)}>
-              J'ai compris
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+              <div className="flex items-start gap-2">
+                <span className="text-primary font-bold">✓</span>
+                <span><strong>On gère les PV</strong></span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-primary font-bold">✓</span>
+                <span><strong>On demande un paiement pour le prêt de véhicule à l'assurance si c'est possible</strong></span>
+              </div>
+            </div>
+          </div>
+        }
+        buttonText="J'ai compris"
+      />
     </div>
   );
 };
