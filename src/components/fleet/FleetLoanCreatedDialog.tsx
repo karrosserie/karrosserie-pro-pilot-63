@@ -28,14 +28,14 @@ export function FleetLoanCreatedDialog({ open, onClose }: FleetLoanCreatedDialog
           top: rect.top + 50,
           left: Math.max(20, rect.left - 650), // 650px pour décaler plus à gauche
         });
-        // Ajouter la classe de surbrillance
-        section.classList.add('ring-2', 'ring-primary', 'ring-offset-2');
+        // Ajouter la classe de surbrillance et éclaircir la section
+        section.classList.add('ring-2', 'ring-primary', 'ring-offset-2', 'bg-primary/5', 'shadow-lg');
       }
     } else {
       // Retirer la surbrillance quand le dialog se ferme
       const section = document.getElementById('fleet-current-loans-section');
       if (section) {
-        section.classList.remove('ring-2', 'ring-primary', 'ring-offset-2');
+        section.classList.remove('ring-2', 'ring-primary', 'ring-offset-2', 'bg-primary/5', 'shadow-lg');
       }
     }
   }, [open]);
