@@ -13,6 +13,7 @@ interface CessionMobileCardProps {
   onDownloadPDF: (cession: Cession) => void;
   onInitializeProcedure: (cession: Cession) => void;
   isGeneratingPDF: boolean;
+  showInitializeHelp?: boolean;
 }
 
 export const CessionMobileCard = ({
@@ -22,7 +23,8 @@ export const CessionMobileCard = ({
   onViewPreview,
   onDownloadPDF,
   onInitializeProcedure,
-  isGeneratingPDF
+  isGeneratingPDF,
+  showInitializeHelp = false
 }: CessionMobileCardProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -186,7 +188,7 @@ export const CessionMobileCard = ({
         
         {cession.status === 'en_attente' && (
           <Button 
-            className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            className={`bg-primary hover:bg-primary/90 text-primary-foreground ${showInitializeHelp ? 'animate-blink-bright shadow-lg ring-2 ring-primary ring-offset-2' : ''}`}
             size="sm"
             onClick={() => onInitializeProcedure(cession)}
             disabled={isGeneratingPDF}

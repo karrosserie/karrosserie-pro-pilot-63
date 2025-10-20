@@ -42,6 +42,13 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { CessionMobileCard } from './CessionMobileCard';
 import { useSubscription } from '@/hooks/use-subscription';
 import { CessionProgressDialog } from './CessionProgressDialog';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+} from '@/components/ui/drawer';
 
 interface CessionsTableProps {
   cessions: Cession[];
@@ -74,6 +81,7 @@ export const CessionsTable = ({
   const [progressDialogOpen, setProgressDialogOpen] = useState(false);
   const [selectedCessionForProgress, setSelectedCessionForProgress] = useState<Cession | null>(null);
   const [showInitializeHelpDialog, setShowInitializeHelpDialog] = useState(false);
+  const [showInitializeDrawer, setShowInitializeDrawer] = useState(false);
   
   const { companyData } = useCompany();
   const { insuranceCompanies } = useInsuranceCompanies();
@@ -85,11 +93,15 @@ export const CessionsTable = ({
   useEffect(() => {
     if (shouldShowInitializeHelp) {
       const timer = setTimeout(() => {
-        setShowInitializeHelpDialog(true);
+        if (isMobile) {
+          setShowInitializeDrawer(true);
+        } else {
+          setShowInitializeHelpDialog(true);
+        }
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [shouldShowInitializeHelp]);
+  }, [shouldShowInitializeHelp, isMobile]);
 
   const initializeButtonSteps: Step[] = [
     {
@@ -617,7 +629,7 @@ export const CessionsTable = ({
       {isMobile ? (
         <div className="space-y-4">
           {sortedData.length > 0 ? (
-            sortedData.map((cession) => (
+            sortedData.map((cession, index) => (
               <CessionMobileCard
                 key={cession.id}
                 cession={cession}
@@ -630,6 +642,7 @@ export const CessionsTable = ({
                 onDownloadPDF={handleDownloadPDF}
                 onInitializeProcedure={handleInitializeProcedure}
                 isGeneratingPDF={processingCessionIds.has(cession.id)}
+                showInitializeHelp={index === 0 && cession.status === 'en_attente' && shouldShowInitializeHelp}
               />
             ))
           ) : (
@@ -853,6 +866,32 @@ export const CessionsTable = ({
           skip: 'Passer',
         }}
       />
+
+      <Drawer open={showInitializeDrawer} onOpenChange={setShowInitializeDrawer}>
+        <DrawerContent>
+          <DrawerHeader className="text-center">
+            <DrawerTitle className="text-xl">
+              💡 Envoyer la cession à l'assurance
+            </DrawerTitle>
+            <DrawerDescription className="text-base leading-relaxed pt-2">
+              Maintenant que vous avez créé votre cession de créance, vous devez <strong>l'initialiser</strong> pour l'envoyer à l'assurance du client.
+              <br /><br />
+              Cliquez sur le bouton <strong className="text-primary">"Initialiser"</strong> pour commencer le processus d'envoi.
+            </DrawerDescription>
+          </DrawerHeader>
+          <div className="flex justify-center px-4 pb-6 pt-2">
+            <Button 
+              onClick={() => {
+                setShowInitializeDrawer(false);
+                onInitializeHelpSeen?.();
+              }}
+              className="min-w-[100px]"
+            >
+              J'ai compris
+            </Button>
+          </div>
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 };
