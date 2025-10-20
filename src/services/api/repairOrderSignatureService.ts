@@ -64,7 +64,7 @@ export const sendRepairOrderForSignature = async (
       postal_code: clientData?.postal_code || '',
       city: clientData?.city || '',
       cell_phone: formattedClientPhone || '',
-      email: 'archive2@karrosserie.pro', // Email de test comme pour les cessions
+      email: 'karrosserie.p@gmail.com', // Email de test comme pour les cessions
       signature_mode: 15,
       transport_mode: 2
     };
