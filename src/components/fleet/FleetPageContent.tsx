@@ -409,6 +409,13 @@ const FleetPageContent = () => {
         title="Gestion des contraventions"
         description="Ici vous pourrez importer les PV liés au prêt de véhicule afin de vous les faire rembourser par le client"
       />
+
+      <FleetLoanCreatedDialog
+        open={showIntroStep === 'help'}
+        onClose={handleCloseIntroDialog}
+        title="Section Aide"
+        description="Vous pouvez accéder si nécessaire à la section aide afin de bénéficier de plus d'aide. Cette section contient des vidéos pour chaque action dans l'application afin de vous aiguiller au mieux si besoin."
+      />
     </div>
   );
 };

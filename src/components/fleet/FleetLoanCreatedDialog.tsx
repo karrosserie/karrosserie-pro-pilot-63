@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 interface FleetLoanCreatedDialogProps {
   open: boolean;
   onClose: () => void;
-  targetSectionId: string;
+  targetSectionId?: string;
   title: string;
   description: string;
 }
@@ -21,7 +21,7 @@ export function FleetLoanCreatedDialog({ open, onClose, targetSectionId, title, 
   const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
 
   useEffect(() => {
-    if (open) {
+    if (open && targetSectionId) {
       // Trouver la section cible et positionner le dialog à côté
       const section = document.getElementById(targetSectionId);
       if (section) {
@@ -34,12 +34,17 @@ export function FleetLoanCreatedDialog({ open, onClose, targetSectionId, title, 
         // Ajouter la classe de surbrillance et éclaircir la section
         section.classList.add('ring-2', 'ring-primary', 'ring-offset-2', 'bg-primary/5', 'shadow-lg');
       }
-    } else {
+    } else if (!open && targetSectionId) {
       // Retirer la surbrillance quand le dialog se ferme
       const section = document.getElementById(targetSectionId);
       if (section) {
         section.classList.remove('ring-2', 'ring-primary', 'ring-offset-2', 'bg-primary/5', 'shadow-lg');
       }
+    }
+    
+    // Si pas de section cible, centrer le dialog
+    if (open && !targetSectionId) {
+      setPosition(null);
     }
   }, [open, targetSectionId]);
 
@@ -56,20 +61,30 @@ export function FleetLoanCreatedDialog({ open, onClose, targetSectionId, title, 
       >
         <DialogHeader>
           <div className="flex items-center gap-3 mb-2">
-            <div className="flex-1 text-right">
-              <DialogTitle className="text-2xl">
-                {title}
-              </DialogTitle>
-            </div>
-            <div className="p-3 rounded-full bg-primary/10 animate-pulse">
-              <ArrowRight className="h-6 w-6 text-primary" />
-            </div>
+            {targetSectionId ? (
+              <>
+                <div className="flex-1 text-right">
+                  <DialogTitle className="text-2xl">
+                    {title}
+                  </DialogTitle>
+                </div>
+                <div className="p-3 rounded-full bg-primary/10 animate-pulse">
+                  <ArrowRight className="h-6 w-6 text-primary" />
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 text-center">
+                <DialogTitle className="text-2xl">
+                  {title}
+                </DialogTitle>
+              </div>
+            )}
           </div>
-          <DialogDescription className="text-lg leading-relaxed pt-2 text-right pr-16">
+          <DialogDescription className={`text-lg leading-relaxed pt-2 ${targetSectionId ? 'text-right pr-16' : 'text-center'}`}>
             {description}
           </DialogDescription>
         </DialogHeader>
-        <div className="flex justify-end pt-4 pr-16">
+        <div className={`flex ${targetSectionId ? 'justify-end pr-16' : 'justify-center'} pt-4`}>
           <Button 
             onClick={onClose}
             className="min-w-[100px]"

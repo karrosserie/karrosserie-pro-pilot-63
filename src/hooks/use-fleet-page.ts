@@ -18,7 +18,7 @@ export const useFleetPage = () => {
   const [loanDialogMode, setLoanDialogMode] = useState<'create' | 'edit' | 'view' | 'return' | 'view_return'>('create');
   const [selectedLoanId, setSelectedLoanId] = useState<string | null>(null);
   const [isVehicleSelectionOpen, setIsVehicleSelectionOpen] = useState(false);
-  const [showIntroStep, setShowIntroStep] = useState<'loans' | 'violations' | null>(null);
+  const [showIntroStep, setShowIntroStep] = useState<'loans' | 'violations' | 'help' | null>(null);
   const { toast } = useToast();
 
   // Update vehicle statuses based on active loans
@@ -211,6 +211,8 @@ export const useFleetPage = () => {
     handleCloseIntro: () => {
       if (showIntroStep === 'loans') {
         setShowIntroStep('violations');
+      } else if (showIntroStep === 'violations') {
+        setShowIntroStep('help');
       } else {
         setShowIntroStep(null);
       }
