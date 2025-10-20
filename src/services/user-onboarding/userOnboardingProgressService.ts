@@ -13,6 +13,9 @@ export interface UserOnboardingProgress {
   fleet_reservation_help_seen: boolean;
   fleet_reservation_guide_completed: boolean;
   fleet_loan_created_help_seen?: boolean;
+  fleet_loans_intro_seen: boolean;
+  fleet_violations_intro_seen: boolean;
+  fleet_help_intro_seen: boolean;
   expertise_report_prompt_seen: boolean;
   completion_dialog_shown: boolean;
   created_at: string;
@@ -28,6 +31,9 @@ export type OnboardingHelpType =
   | 'fleet_reservation_help_seen'
   | 'fleet_reservation_guide_completed'
   | 'fleet_loan_created_help_seen'
+  | 'fleet_loans_intro_seen'
+  | 'fleet_violations_intro_seen'
+  | 'fleet_help_intro_seen'
   | 'expertise_report_prompt_seen'
   | 'completion_dialog_shown';
 
@@ -91,6 +97,9 @@ class UserOnboardingProgressService {
           fleet_reservation_help_seen: false,
           fleet_reservation_guide_completed: false,
           fleet_loan_created_help_seen: false,
+          fleet_loans_intro_seen: false,
+          fleet_violations_intro_seen: false,
+          fleet_help_intro_seen: false,
           expertise_report_prompt_seen: false,
           completion_dialog_shown: false,
         })
@@ -186,6 +195,9 @@ class UserOnboardingProgressService {
           fleet_reservation_help_seen: false,
           fleet_reservation_guide_completed: false,
           fleet_loan_created_help_seen: false,
+          fleet_loans_intro_seen: false,
+          fleet_violations_intro_seen: false,
+          fleet_help_intro_seen: false,
           expertise_report_prompt_seen: false,
           completion_dialog_shown: false,
         })
