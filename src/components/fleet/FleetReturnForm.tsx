@@ -118,7 +118,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col flex-1 overflow-hidden">
-        <div className="px-4 shrink-0">
+        <div className="px-4 shrink-0 border-b">
           <TabsList className="grid w-full grid-cols-3 h-auto">
             {tabs.map(tab => (
               <TabsTrigger key={tab.value} value={tab.value} className="text-[10px] md:text-sm px-1 md:px-3 py-1.5 md:py-2">
@@ -128,9 +128,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
           </TabsList>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-3 md:px-4 py-4" style={{ paddingBottom: '120px' }}>
-
-        <TabsContent value="damages" className="space-y-4 md:space-y-6 mt-0">
+        <TabsContent value="damages" className="flex-1 overflow-y-auto px-3 md:px-4 py-4 mt-0" style={{ paddingBottom: '120px' }}>
           <ReturnDamageAssessmentTab
             damages={formData.damages}
             onDamageUpdate={handleDamageUpdate}
@@ -138,7 +136,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
           />
         </TabsContent>
 
-        <TabsContent value="vehicle-details" className="space-y-4 md:space-y-6 mt-0">
+        <TabsContent value="vehicle-details" className="flex-1 overflow-y-auto px-3 md:px-4 py-4 mt-0" style={{ paddingBottom: '120px' }}>
           <VehicleDetailsTab
             vehicleId={vehicle.id}
             mileage={formData.returnMileage}
@@ -160,7 +158,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
           />
         </TabsContent>
 
-        <TabsContent value="attestation" className="space-y-4 md:space-y-6 mt-0">
+        <TabsContent value="attestation" className="flex-1 overflow-y-auto px-3 md:px-4 py-4 mt-0" style={{ paddingBottom: '120px' }}>
           <ReturnAttestationTab
             formData={{
               clientId: formData.clientId,
@@ -177,7 +175,6 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
             isViewMode={isViewMode}
           />
         </TabsContent>
-        </div>
       </Tabs>
 
       <div className="px-4 pb-4 pt-2 shrink-0 border-t bg-background">
