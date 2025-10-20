@@ -31,16 +31,26 @@ export function FleetLoanCreatedDialog({ open, onClose, targetSectionId, title, 
 
   useEffect(() => {
     if (open && targetSectionId) {
-      // Trouver la section cible et positionner le dialog à côté
+      // Trouver la section cible
       const section = document.getElementById(targetSectionId);
       if (section) {
-        const rect = section.getBoundingClientRect();
-        // Positionner le dialog à gauche de la section avec un décalage plus important
-        setPosition({
-          top: rect.top + 50,
-          left: Math.max(20, rect.left - 650), // 650px pour décaler plus à gauche
-        });
-        // Ajouter la classe de surbrillance et éclaircir la section
+        if (!isMobile) {
+          // Sur desktop: positionner le dialog à côté
+          const rect = section.getBoundingClientRect();
+          setPosition({
+            top: rect.top + 50,
+            left: Math.max(20, rect.left - 650),
+          });
+        } else {
+          // Sur mobile: scroll vers la section avec un délai pour laisser le drawer s'ouvrir
+          setTimeout(() => {
+            section.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center' // Centrer la section à l'écran
+            });
+          }, 300);
+        }
+        // Ajouter la classe de surbrillance
         section.classList.add('ring-2', 'ring-primary', 'ring-offset-2', 'bg-primary/5', 'shadow-lg');
       }
     } else if (!open && targetSectionId) {
@@ -55,7 +65,7 @@ export function FleetLoanCreatedDialog({ open, onClose, targetSectionId, title, 
     if (open && !targetSectionId) {
       setPosition(null);
     }
-  }, [open, targetSectionId]);
+  }, [open, targetSectionId, isMobile]);
 
   // Sur mobile, on affiche toujours en Drawer centré
   if (isMobile) {
