@@ -117,7 +117,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col flex-1 overflow-hidden">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col flex-1 min-h-0">
         <div className="px-4 shrink-0 border-b">
           <TabsList className="grid w-full grid-cols-3 h-auto">
             {tabs.map(tab => (
@@ -128,7 +128,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
           </TabsList>
         </div>
 
-        <TabsContent value="damages" className="flex-1 overflow-y-auto px-3 md:px-4 py-4 mt-0" style={{ paddingBottom: '120px' }}>
+        <TabsContent value="damages" className="overflow-y-auto px-3 md:px-4 py-4 mt-0 data-[state=active]:flex-1" style={{ paddingBottom: '80px' }}>
           <ReturnDamageAssessmentTab
             damages={formData.damages}
             onDamageUpdate={handleDamageUpdate}
@@ -136,7 +136,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
           />
         </TabsContent>
 
-        <TabsContent value="vehicle-details" className="flex-1 overflow-y-auto px-3 md:px-4 py-4 mt-0" style={{ paddingBottom: '120px' }}>
+        <TabsContent value="vehicle-details" className="overflow-y-auto px-3 md:px-4 py-4 mt-0 data-[state=active]:flex-1" style={{ paddingBottom: '80px' }}>
           <VehicleDetailsTab
             vehicleId={vehicle.id}
             mileage={formData.returnMileage}
@@ -158,7 +158,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
           />
         </TabsContent>
 
-        <TabsContent value="attestation" className="flex-1 overflow-y-auto px-3 md:px-4 py-4 mt-0" style={{ paddingBottom: '120px' }}>
+        <TabsContent value="attestation" className="overflow-y-auto px-3 md:px-4 py-4 mt-0 data-[state=active]:flex-1" style={{ paddingBottom: '80px' }}>
           <ReturnAttestationTab
             formData={{
               clientId: formData.clientId,
