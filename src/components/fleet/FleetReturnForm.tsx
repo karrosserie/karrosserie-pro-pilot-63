@@ -128,7 +128,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
           </TabsList>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-4">
+        <div className="flex-1 overflow-y-auto px-3 md:px-4 py-4" style={{ paddingBottom: '120px' }}>
 
         <TabsContent value="damages" className="space-y-4 md:space-y-6 mt-0">
           <ReturnDamageAssessmentTab
