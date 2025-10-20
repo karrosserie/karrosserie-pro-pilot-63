@@ -31,6 +31,13 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import QuoteMobileCard from '@/components/quotes/QuoteMobileCard';
 import { useUserOnboardingProgress } from '@/hooks/use-user-onboarding-progress';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+} from '@/components/ui/drawer';
 
 const Quotes = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -50,6 +57,7 @@ const Quotes = () => {
   const [viewerModalOpen, setViewerModalOpen] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
   const [showConvertPopover, setShowConvertPopover] = useState(false);
+  const [showConvertDrawer, setShowConvertDrawer] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const { shouldShowQuoteConvertHelp, markHelpAsSeen } = useUserOnboardingProgress();
@@ -67,10 +75,16 @@ const Quotes = () => {
   // Afficher le popover d'aide au chargement
   useEffect(() => {
     if (shouldShowQuoteConvertHelp && filteredQuotes.length > 0) {
-      const timer = setTimeout(() => setShowConvertPopover(true), 1000);
+      const timer = setTimeout(() => {
+        if (isMobile) {
+          setShowConvertDrawer(true);
+        } else {
+          setShowConvertPopover(true);
+        }
+      }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [shouldShowQuoteConvertHelp, filteredQuotes.length]);
+  }, [shouldShowQuoteConvertHelp, filteredQuotes.length, isMobile]);
 
   const handleCreateQuote = () => {
     setSelectedQuote(null);
@@ -421,7 +435,7 @@ const Quotes = () => {
       {isMobile ? (
         <div className="space-y-3">
           {filteredQuotes.length > 0 ? (
-            filteredQuotes.map((quote) => (
+            filteredQuotes.map((quote, index) => (
               <QuoteMobileCard
                 key={quote.id}
                 quote={quote}
@@ -433,6 +447,7 @@ const Quotes = () => {
                 onSendEmail={handleSendEmail}
                 onRequestDocuments={handleRequestDocuments}
                 onConvertToRepairOrder={handleConvertToRepairOrder}
+                showConvertHelp={index === 0 && shouldShowQuoteConvertHelp}
               />
             ))
           ) : (
@@ -667,6 +682,30 @@ const Quotes = () => {
         quoteReference={selectedQuoteForBonCommande?.reference || ''}
         clientId={selectedQuoteForBonCommande?.client_id || undefined}
       />
+
+      <Drawer open={showConvertDrawer} onOpenChange={setShowConvertDrawer}>
+        <DrawerContent>
+          <DrawerHeader className="text-center">
+            <DrawerTitle className="text-xl">
+              💡 Transformez votre devis !
+            </DrawerTitle>
+            <DrawerDescription className="text-base leading-relaxed pt-2">
+              Cliquez sur le bouton "Convertir" pour transformer automatiquement votre devis en ordre de réparation.
+            </DrawerDescription>
+          </DrawerHeader>
+          <div className="flex justify-center px-4 pb-6 pt-2">
+            <Button 
+              onClick={() => {
+                setShowConvertDrawer(false);
+                markHelpAsSeen('quote_convert_help_seen');
+              }}
+              className="min-w-[100px]"
+            >
+              J'ai compris
+            </Button>
+          </div>
+        </DrawerContent>
+      </Drawer>
     </div>
     </TooltipProvider>
   );

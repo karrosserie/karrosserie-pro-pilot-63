@@ -15,6 +15,7 @@ interface QuoteMobileCardProps {
   onSendEmail: (quote: Quote) => void;
   onRequestDocuments?: (quote: Quote) => void;
   onConvertToRepairOrder?: (quote: Quote) => void;
+  showConvertHelp?: boolean;
 }
 
 const QuoteMobileCard: React.FC<QuoteMobileCardProps> = ({
@@ -26,7 +27,8 @@ const QuoteMobileCard: React.FC<QuoteMobileCardProps> = ({
   onPrint,
   onSendEmail,
   onRequestDocuments,
-  onConvertToRepairOrder
+  onConvertToRepairOrder,
+  showConvertHelp = false
 }) => {
   const formatAmount = (amount: number | null | undefined): string => {
     if (amount === null || amount === undefined) return '-';
@@ -161,7 +163,12 @@ const QuoteMobileCard: React.FC<QuoteMobileCardProps> = ({
           </Button>
         )}
         {onConvertToRepairOrder && (
-          <Button variant="validation" size="sm" onClick={() => onConvertToRepairOrder(quote)} className="text-xs h-8 justify-center">
+          <Button 
+            variant="validation" 
+            size="sm" 
+            onClick={() => onConvertToRepairOrder(quote)} 
+            className={`text-xs h-8 justify-center ${showConvertHelp ? 'animate-blink-bright shadow-lg ring-2 ring-primary ring-offset-2' : ''}`}
+          >
             <ArrowRight className="h-3 w-3 mr-1" />
             <span className="hidden xs:inline">Convertir</span>
             <span className="xs:hidden">Conv.</span>
