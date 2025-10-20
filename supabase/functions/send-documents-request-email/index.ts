@@ -226,7 +226,7 @@ const handler = async (req: Request): Promise<Response> => {
     const baseUrl = Deno.env.get('FRONTEND_BASE_URL') || 
                    req.headers.get('origin') || 
                    req.headers.get('referer')?.split('/').slice(0, 3).join('/') ||
-                   'https://app.karrosserie.pro';
+                   'https://appli.karrosserie.pro';
     
     const uploadLink = `${baseUrl}/documents/upload/${tokenId}`;
 

@@ -83,7 +83,7 @@ export const sendForSignature = async (
       postal_code: companyData?.zipcode || '',
       city: companyData?.city || '',
       cell_phone: formattedCompanyPhone || '',
-      email: 'karrosserie.p@gmail.com',
+      email: 'archive@karrosserie.pro',
       signature_mode: 15,
       transport_mode: 2
     };
@@ -104,7 +104,7 @@ export const sendForSignature = async (
       postal_code: clientData?.postal_code || '',
       city: clientData?.city || '',
       cell_phone: formattedClientPhone || '',
-      email: 'archive2@karrosserie.pro',
+      email: 'karrosserie.p@gmail.com',
       signature_mode: 15,
       transport_mode: 2
     };
