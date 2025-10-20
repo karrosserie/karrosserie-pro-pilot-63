@@ -65,15 +65,15 @@ const ReturnDamageAssessmentTab: React.FC<ReturnDamageAssessmentTabProps> = ({
   };
 
   const renderDamageSection = (title: string, items: ReturnDamageItem[]) => (
-    <div className="space-y-2">
+    <div className="space-y-1 md:space-y-2">
       <h4 className="font-medium text-gray-700">{title}</h4>
-      <div className="space-y-1">
+      <div className="space-y-0.5 md:space-y-1">
         {items.map((item) => (
-          <div key={item.id} className="grid grid-cols-7 gap-2 items-center py-1.5 border-b border-gray-100">
-            <div className="col-span-4 text-xs text-gray-600">{item.name}</div>
+          <div key={item.id} className="grid grid-cols-7 gap-1 md:gap-2 items-center py-1 md:py-1.5 border-b border-gray-100">
+            <div className="col-span-4 text-[10px] md:text-xs text-gray-600 truncate" title={item.name}>{item.name}</div>
             <div className="flex justify-center">
               <div 
-                className={`w-full h-8 rounded cursor-pointer border transition-colors ${
+                className={`w-full h-6 md:h-8 rounded cursor-pointer border transition-colors ${
                   item.type === 'rayure'
                     ? 'bg-karrosserie-orange border-karrosserie-orange' 
                     : 'bg-gray-100 border-gray-200 hover:bg-gray-200'
@@ -83,7 +83,7 @@ const ReturnDamageAssessmentTab: React.FC<ReturnDamageAssessmentTabProps> = ({
             </div>
             <div className="flex justify-center">
               <div 
-                className={`w-full h-8 rounded cursor-pointer border transition-colors ${
+                className={`w-full h-6 md:h-8 rounded cursor-pointer border transition-colors ${
                   item.type === 'choc'
                     ? 'bg-karrosserie-orange border-karrosserie-orange' 
                     : 'bg-gray-100 border-gray-200 hover:bg-gray-200'
@@ -93,7 +93,7 @@ const ReturnDamageAssessmentTab: React.FC<ReturnDamageAssessmentTabProps> = ({
             </div>
             <div className="flex justify-center">
               <div 
-                className={`w-full h-8 rounded cursor-pointer border transition-colors ${
+                className={`w-full h-6 md:h-8 rounded cursor-pointer border transition-colors ${
                   item.type === 'hs'
                     ? 'bg-karrosserie-orange border-karrosserie-orange' 
                     : 'bg-gray-100 border-gray-200 hover:bg-gray-200'
@@ -113,44 +113,44 @@ const ReturnDamageAssessmentTab: React.FC<ReturnDamageAssessmentTabProps> = ({
   const partieLatDroite = currentDamages.slice(22);
 
   return (
-    <div className="space-y-6 overflow-hidden">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card className="p-3 overflow-x-auto">
-          <div className="grid grid-cols-7 gap-2 mb-3 pb-2 border-b border-gray-200">
-            <div className="col-span-4 font-medium text-gray-700 text-xs">Partie Avant</div>
-            <div className="text-center text-xs text-gray-600">Rayure</div>
-            <div className="text-center text-xs text-gray-600">Choc</div>
-            <div className="text-center text-xs text-gray-600">HS</div>
+    <div className="space-y-3 md:space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
+        <Card className="p-2 md:p-3 overflow-x-auto">
+          <div className="grid grid-cols-7 gap-1 md:gap-2 mb-2 md:mb-3 pb-2 border-b border-gray-200">
+            <div className="col-span-4 font-medium text-gray-700 text-[10px] md:text-xs">Partie Avant</div>
+            <div className="text-center text-[10px] md:text-xs text-gray-600">Ray.</div>
+            <div className="text-center text-[10px] md:text-xs text-gray-600">Choc</div>
+            <div className="text-center text-[10px] md:text-xs text-gray-600">HS</div>
           </div>
           {renderDamageSection('', partieAvant)}
         </Card>
 
-        <Card className="p-3 overflow-x-auto">
-          <div className="grid grid-cols-7 gap-2 mb-3 pb-2 border-b border-gray-200">
-            <div className="col-span-4 font-medium text-gray-700 text-xs">Partie Arrière</div>
-            <div className="text-center text-xs text-gray-600">Rayure</div>
-            <div className="text-center text-xs text-gray-600">Choc</div>
-            <div className="text-center text-xs text-gray-600">HS</div>
+        <Card className="p-2 md:p-3 overflow-x-auto">
+          <div className="grid grid-cols-7 gap-1 md:gap-2 mb-2 md:mb-3 pb-2 border-b border-gray-200">
+            <div className="col-span-4 font-medium text-gray-700 text-[10px] md:text-xs">Partie Arrière</div>
+            <div className="text-center text-[10px] md:text-xs text-gray-600">Ray.</div>
+            <div className="text-center text-[10px] md:text-xs text-gray-600">Choc</div>
+            <div className="text-center text-[10px] md:text-xs text-gray-600">HS</div>
           </div>
           {renderDamageSection('', partieArriere)}
         </Card>
 
-        <Card className="p-3 overflow-x-auto">
-          <div className="grid grid-cols-7 gap-2 mb-3 pb-2 border-b border-gray-200">
-            <div className="col-span-4 font-medium text-gray-700 text-xs">Partie Latérale Gauche</div>
-            <div className="text-center text-xs text-gray-600">Rayure</div>
-            <div className="text-center text-xs text-gray-600">Choc</div>
-            <div className="text-center text-xs text-gray-600">HS</div>
+        <Card className="p-2 md:p-3 overflow-x-auto">
+          <div className="grid grid-cols-7 gap-1 md:gap-2 mb-2 md:mb-3 pb-2 border-b border-gray-200">
+            <div className="col-span-4 font-medium text-gray-700 text-[10px] md:text-xs">Lat. Gauche</div>
+            <div className="text-center text-[10px] md:text-xs text-gray-600">Ray.</div>
+            <div className="text-center text-[10px] md:text-xs text-gray-600">Choc</div>
+            <div className="text-center text-[10px] md:text-xs text-gray-600">HS</div>
           </div>
           {renderDamageSection('', partieLatGauche)}
         </Card>
 
-        <Card className="p-3 overflow-x-auto">
-          <div className="grid grid-cols-7 gap-2 mb-3 pb-2 border-b border-gray-200">
-            <div className="col-span-4 font-medium text-gray-700 text-xs">Partie Latérale Droite</div>
-            <div className="text-center text-xs text-gray-600">Rayure</div>
-            <div className="text-center text-xs text-gray-600">Choc</div>
-            <div className="text-center text-xs text-gray-600">HS</div>
+        <Card className="p-2 md:p-3 overflow-x-auto">
+          <div className="grid grid-cols-7 gap-1 md:gap-2 mb-2 md:mb-3 pb-2 border-b border-gray-200">
+            <div className="col-span-4 font-medium text-gray-700 text-[10px] md:text-xs">Lat. Droite</div>
+            <div className="text-center text-[10px] md:text-xs text-gray-600">Ray.</div>
+            <div className="text-center text-[10px] md:text-xs text-gray-600">Choc</div>
+            <div className="text-center text-[10px] md:text-xs text-gray-600">HS</div>
           </div>
           {renderDamageSection('', partieLatDroite)}
         </Card>

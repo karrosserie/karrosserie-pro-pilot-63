@@ -86,45 +86,51 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-        <div className="col-span-4 space-y-2">
-          <h3 className="text-lg font-medium text-gray-900">
-            {getVehicleDisplayName()} ({vehicle.license_plate})
-          </h3>
-          <div>Client : {formData.clientName}</div>
-          {fleetReturn && (
-            <div className="text-sm text-green-600">
-              ✓ Retour déjà effectué le {new Date(fleetReturn.return_date).toLocaleDateString('fr-FR')}
-            </div>
-          )}
-        </div>
-  
-        {/* Date et heure de retour field - outside tabs */}
-        <div className="space-y-2">
-          <Label htmlFor="returnDate">Date et heure de retour</Label>
-          <Input
-            id="returnDate"
-            name="returnDate"
-            type="datetime-local"
-            value={formData.returnDate}
-            onChange={handleInputChange}
-            className="mt-2"
-            disabled={isViewMode}
-          />
+    <div className="flex flex-col h-full">
+      <div className="px-4 pb-2 shrink-0">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 md:gap-6">
+          <div className="col-span-4 space-y-2">
+            <h3 className="text-base md:text-lg font-medium text-gray-900">
+              {getVehicleDisplayName()} ({vehicle.license_plate})
+            </h3>
+            <div className="text-sm">Client : {formData.clientName}</div>
+            {fleetReturn && (
+              <div className="text-sm text-green-600">
+                ✓ Retour déjà effectué le {new Date(fleetReturn.return_date).toLocaleDateString('fr-FR')}
+              </div>
+            )}
+          </div>
+    
+          {/* Date et heure de retour field - outside tabs */}
+          <div className="space-y-2">
+            <Label htmlFor="returnDate">Date et heure de retour</Label>
+            <Input
+              id="returnDate"
+              name="returnDate"
+              type="datetime-local"
+              value={formData.returnDate}
+              onChange={handleInputChange}
+              className="mt-2"
+              disabled={isViewMode}
+            />
+          </div>
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          {tabs.map(tab => (
-            <TabsTrigger key={tab.value} value={tab.value}>
-              {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col flex-1 overflow-hidden">
+        <div className="px-4 shrink-0">
+          <TabsList className="grid w-full grid-cols-3 h-auto">
+            {tabs.map(tab => (
+              <TabsTrigger key={tab.value} value={tab.value} className="text-[10px] md:text-sm px-1 md:px-3 py-1.5 md:py-2">
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
 
-        <TabsContent value="damages" className="space-y-6">
+        <div className="flex-1 overflow-y-auto px-4 py-4">
+
+        <TabsContent value="damages" className="space-y-4 md:space-y-6 mt-0">
           <ReturnDamageAssessmentTab
             damages={formData.damages}
             onDamageUpdate={handleDamageUpdate}
@@ -132,7 +138,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
           />
         </TabsContent>
 
-        <TabsContent value="vehicle-details" className="space-y-6">
+        <TabsContent value="vehicle-details" className="space-y-4 md:space-y-6 mt-0">
           <VehicleDetailsTab
             vehicleId={vehicle.id}
             mileage={formData.returnMileage}
@@ -154,7 +160,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
           />
         </TabsContent>
 
-        <TabsContent value="attestation" className="space-y-6">
+        <TabsContent value="attestation" className="space-y-4 md:space-y-6 mt-0">
           <ReturnAttestationTab
             formData={{
               clientId: formData.clientId,
@@ -171,8 +177,10 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
             isViewMode={isViewMode}
           />
         </TabsContent>
+        </div>
       </Tabs>
 
+      <div className="px-4 pb-4 pt-2 shrink-0 border-t bg-background">
       {!isViewMode && (
         <FleetReturnFormNavigation
           activeTab={activeTab}
@@ -198,6 +206,7 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
           </button>
         </div>
       )}
+      </div>
     </div>
   );
 };

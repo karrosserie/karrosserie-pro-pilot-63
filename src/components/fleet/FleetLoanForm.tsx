@@ -182,7 +182,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col h-full">
       <Joyride
         steps={steps}
         run={runTour}
@@ -207,22 +207,26 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
         }}
       />
       
-      <div>
-        <h3 className="text-lg font-medium text-gray-900">
+      <div className="px-4 pb-2 shrink-0">
+        <h3 className="text-base md:text-lg font-medium text-gray-900">
           {getVehicleDisplayName()} ({vehicle.license_plate})
         </h3>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
-          {tabs.map(tab => (
-            <TabsTrigger key={tab.value} value={tab.value}>
-              {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col flex-1 overflow-hidden">
+        <div className="px-4 shrink-0">
+          <TabsList className="grid w-full grid-cols-5 h-auto">
+            {tabs.map(tab => (
+              <TabsTrigger key={tab.value} value={tab.value} className="text-[10px] md:text-sm px-1 md:px-3 py-1.5 md:py-2">
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
 
-        <TabsContent value="client-info" className="space-y-6">
+        <div className="flex-1 overflow-y-auto px-4 py-4">
+
+        <TabsContent value="client-info" className="space-y-4 md:space-y-6 mt-0">
           <ClientInfoTab
             formData={formData}
             onInputChange={handleInputChange}
@@ -236,7 +240,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
           />
         </TabsContent>
 
-        <TabsContent value="insurance" className="space-y-6">
+        <TabsContent value="insurance" className="space-y-4 md:space-y-6 mt-0">
           <InsuranceTab
             formData={formData}
             onInputChange={handleInputChange}
@@ -246,7 +250,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
           />
         </TabsContent>
 
-        <TabsContent value="damages" className="space-y-6">
+        <TabsContent value="damages" className="space-y-4 md:space-y-6 mt-0">
           <DamageAssessmentTab
             damages={formData.damages}
             onDamageUpdate={handleDamageUpdate}
@@ -254,7 +258,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
           />
         </TabsContent>
 
-        <TabsContent value="vehicle-details" className="space-y-6">
+        <TabsContent value="vehicle-details" className="space-y-4 md:space-y-6 mt-0">
           <VehicleDetailsTab
             vehicleId={vehicle.id}
             mileage={formData.mileage}
@@ -276,7 +280,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
           />
         </TabsContent>
 
-        <TabsContent value="attestation" className="space-y-6">
+        <TabsContent value="attestation" className="space-y-4 md:space-y-6 mt-0">
           <AttestationTab
             formData={formData}
             vehicle={vehicle}
@@ -285,8 +289,10 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
             isViewMode={isViewMode}
           />
         </TabsContent>
+        </div>
       </Tabs>
 
+      <div className="px-4 pb-4 pt-2 shrink-0 border-t bg-background">
       <FleetLoanFormNavigation
         activeTab={activeTab}
         onCancel={onCancel}
@@ -299,6 +305,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
         isLastTab={isLastTab}
         isViewMode={isViewMode}
       />
+      </div>
 
       {/* Dialog pour créer un nouveau client */}
       <ClientDialog
