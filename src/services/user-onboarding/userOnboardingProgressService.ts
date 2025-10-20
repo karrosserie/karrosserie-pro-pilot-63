@@ -203,6 +203,46 @@ class UserOnboardingProgressService {
       return false;
     }
   }
+
+  /**
+   * Envoie le webhook de fin de parcours
+   */
+  async sendCompletionWebhook(): Promise<boolean> {
+    try {
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        console.error('User not authenticated', userError);
+        return false;
+      }
+
+      const companyId = await getCurrentUserCompanyId();
+
+      const webhookUrl = 'https://n8n.karrosserie.pro/webhook/0f93ed62-885f-4d65-a465-a6964feee9eb';
+      
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: user.id,
+          company_id: companyId,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Webhook call failed:', response.status);
+        return false;
+      }
+
+      console.log('✅ Webhook de fin de parcours envoyé avec succès');
+      return true;
+    } catch (error) {
+      console.error('Error sending completion webhook:', error);
+      return false;
+    }
+  }
 }
 
 export const userOnboardingProgressService = new UserOnboardingProgressService();

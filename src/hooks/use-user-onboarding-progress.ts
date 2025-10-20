@@ -1,8 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useRef } from 'react';
 import { userOnboardingProgressService, OnboardingHelpType } from '@/services/user-onboarding/userOnboardingProgressService';
 
 export function useUserOnboardingProgress() {
   const queryClient = useQueryClient();
+  const webhookSentRef = useRef(false);
 
   const { data: progress, isLoading } = useQuery({
     queryKey: ['user-onboarding-progress'],
@@ -36,6 +38,14 @@ export function useUserOnboardingProgress() {
     progress.fleet_loan_created_help_seen &&
     progress.expertise_report_prompt_seen;
 
+  // Appeler le webhook automatiquement quand toutes les aides sont vues
+  useEffect(() => {
+    if (allHelpsSeen && !webhookSentRef.current) {
+      webhookSentRef.current = true;
+      userOnboardingProgressService.sendCompletionWebhook();
+    }
+  }, [allHelpsSeen]);
+
   return {
     progress,
     isLoading,
@@ -51,6 +61,5 @@ export function useUserOnboardingProgress() {
     shouldShowFleetLoanCreatedHelp: !progress?.fleet_loan_created_help_seen,
     shouldShowExpertiseReportPrompt: !progress?.expertise_report_prompt_seen,
     allHelpsSeen,
-    shouldShowCompletionDialog: allHelpsSeen && !progress?.completion_dialog_shown,
   };
 }
