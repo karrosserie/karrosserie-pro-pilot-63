@@ -12,15 +12,18 @@ import { useEffect, useState } from 'react';
 interface FleetLoanCreatedDialogProps {
   open: boolean;
   onClose: () => void;
+  targetSectionId: string;
+  title: string;
+  description: string;
 }
 
-export function FleetLoanCreatedDialog({ open, onClose }: FleetLoanCreatedDialogProps) {
+export function FleetLoanCreatedDialog({ open, onClose, targetSectionId, title, description }: FleetLoanCreatedDialogProps) {
   const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
 
   useEffect(() => {
     if (open) {
-      // Trouver la section "Prêts en cours" et positionner le dialog à côté
-      const section = document.getElementById('fleet-current-loans-section');
+      // Trouver la section cible et positionner le dialog à côté
+      const section = document.getElementById(targetSectionId);
       if (section) {
         const rect = section.getBoundingClientRect();
         // Positionner le dialog à gauche de la section avec un décalage plus important
@@ -33,12 +36,12 @@ export function FleetLoanCreatedDialog({ open, onClose }: FleetLoanCreatedDialog
       }
     } else {
       // Retirer la surbrillance quand le dialog se ferme
-      const section = document.getElementById('fleet-current-loans-section');
+      const section = document.getElementById(targetSectionId);
       if (section) {
         section.classList.remove('ring-2', 'ring-primary', 'ring-offset-2', 'bg-primary/5', 'shadow-lg');
       }
     }
-  }, [open]);
+  }, [open, targetSectionId]);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -55,7 +58,7 @@ export function FleetLoanCreatedDialog({ open, onClose }: FleetLoanCreatedDialog
           <div className="flex items-center gap-3 mb-2">
             <div className="flex-1 text-right">
               <DialogTitle className="text-2xl">
-                Prêt créé avec succès !
+                {title}
               </DialogTitle>
             </div>
             <div className="p-3 rounded-full bg-primary/10 animate-pulse">
@@ -63,7 +66,7 @@ export function FleetLoanCreatedDialog({ open, onClose }: FleetLoanCreatedDialog
             </div>
           </div>
           <DialogDescription className="text-lg leading-relaxed pt-2 text-right pr-16">
-            Ici vous retrouverez vos véhicules en cours de prêt
+            {description}
           </DialogDescription>
         </DialogHeader>
         <div className="flex justify-end pt-4 pr-16">

@@ -18,6 +18,7 @@ export const useFleetPage = () => {
   const [loanDialogMode, setLoanDialogMode] = useState<'create' | 'edit' | 'view' | 'return' | 'view_return'>('create');
   const [selectedLoanId, setSelectedLoanId] = useState<string | null>(null);
   const [isVehicleSelectionOpen, setIsVehicleSelectionOpen] = useState(false);
+  const [showIntroStep, setShowIntroStep] = useState<'loans' | 'violations' | null>(null);
   const { toast } = useToast();
 
   // Update vehicle statuses based on active loans
@@ -92,6 +93,8 @@ export const useFleetPage = () => {
       title: "Prêt enregistré",
       description: `Le véhicule ${vehicleDisplay} a été prêté avec succès.`
     });
+    // Afficher la première étape d'introduction
+    setShowIntroStep('loans');
   };
 
   const handleCloseLoanDialog = () => {
@@ -180,6 +183,7 @@ export const useFleetPage = () => {
     loanDialogMode,
     selectedLoanId,
     isVehicleSelectionOpen,
+    showIntroStep,
     
     // Setters
     setSearchTerm,
@@ -203,6 +207,13 @@ export const useFleetPage = () => {
     handleVehicleSelected,
     handleViewLoan,
     handleViewReturn,
-    handleDeleteLoan
+    handleDeleteLoan,
+    handleCloseIntro: () => {
+      if (showIntroStep === 'loans') {
+        setShowIntroStep('violations');
+      } else {
+        setShowIntroStep(null);
+      }
+    }
   };
 };

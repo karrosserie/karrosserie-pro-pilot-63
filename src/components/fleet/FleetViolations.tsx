@@ -82,7 +82,7 @@ const FleetViolations: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="card-container">
+      <div className="card-container transition-all duration-300" id="fleet-violations-section">
         <h2 className="text-lg font-semibold text-foreground mb-4">Contraventions</h2>
         <div className="flex justify-center py-8">
           <div className="animate-pulse text-muted-foreground">Chargement...</div>
@@ -92,7 +92,7 @@ const FleetViolations: React.FC = () => {
   }
 
   return (
-    <div className="card-container">
+    <div className="card-container transition-all duration-300" id="fleet-violations-section">
       <div className="mb-4">
         <h2 className="text-lg font-semibold text-foreground mb-3">Contraventions</h2>
         <Button 

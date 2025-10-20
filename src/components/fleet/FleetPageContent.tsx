@@ -34,7 +34,6 @@ const FleetPageContent = () => {
   const [isAttestationDialogOpen, setIsAttestationDialogOpen] = useState(false);
   const [selectedLoanForAttestation, setSelectedLoanForAttestation] = useState<string | null>(null);
   const [showGuideDialog, setShowGuideDialog] = useState(false);
-  const [showLoanCreatedDialog, setShowLoanCreatedDialog] = useState(false);
 
   const {
     vehicles,
@@ -65,7 +64,9 @@ const FleetPageContent = () => {
     handleVehicleSelected,
     handleViewLoan,
     handleViewReturn,
-    handleDeleteLoan
+    handleDeleteLoan,
+    showIntroStep,
+    handleCloseIntro
   } = useFleetPage();
 
   const { reservations } = useFleetReservations();
@@ -81,17 +82,6 @@ const FleetPageContent = () => {
     }
   }, [isLoading, shouldShowFleetReservationHelp, shouldShowFleetGuide]);
 
-  // Afficher le dialog "prêt créé" après création d'un prêt
-  useEffect(() => {
-    if (!isLoading && currentLoans.length > 0 && shouldShowFleetLoanCreatedHelp) {
-      // Délai pour laisser le temps au dialog de prêt de se fermer
-      const timer = setTimeout(() => {
-        setShowLoanCreatedDialog(true);
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [isLoading, currentLoans.length, shouldShowFleetLoanCreatedHelp]);
-
   // Fermer le guide et marquer comme vu
   const handleCloseGuide = () => {
     setShowGuideDialog(false);
@@ -101,10 +91,12 @@ const FleetPageContent = () => {
     }
   };
 
-  // Fermer le dialog "prêt créé"
-  const handleCloseLoanCreatedDialog = () => {
-    setShowLoanCreatedDialog(false);
-    markHelpAsSeen('fleet_loan_created_help_seen');
+  // Fermer le dialog d'introduction et passer à l'étape suivante
+  const handleCloseIntroDialog = () => {
+    if (showIntroStep === 'loans') {
+      markHelpAsSeen('fleet_loan_created_help_seen');
+    }
+    handleCloseIntro();
   };
 
   // Guider vers l'action appropriée
@@ -403,8 +395,19 @@ const FleetPageContent = () => {
       </AlertDialog>
 
       <FleetLoanCreatedDialog
-        open={showLoanCreatedDialog}
-        onClose={handleCloseLoanCreatedDialog}
+        open={showIntroStep === 'loans'}
+        onClose={handleCloseIntroDialog}
+        targetSectionId="fleet-current-loans-section"
+        title="Prêt créé avec succès !"
+        description="Ici vous retrouverez vos véhicules en cours de prêt"
+      />
+
+      <FleetLoanCreatedDialog
+        open={showIntroStep === 'violations'}
+        onClose={handleCloseIntroDialog}
+        targetSectionId="fleet-violations-section"
+        title="Gestion des contraventions"
+        description="Ici vous pourrez importer les PV liés au prêt de véhicule afin de vous les faire rembourser par le client"
       />
     </div>
   );
