@@ -4232,6 +4232,7 @@ export type Database = {
           completion_dialog_shown: boolean
           created_at: string
           expertise_report_prompt_seen: boolean
+          fleet_loan_created_help_seen: boolean
           fleet_reservation_guide_completed: boolean
           fleet_reservation_help_seen: boolean
           id: string
@@ -4248,6 +4249,7 @@ export type Database = {
           completion_dialog_shown?: boolean
           created_at?: string
           expertise_report_prompt_seen?: boolean
+          fleet_loan_created_help_seen?: boolean
           fleet_reservation_guide_completed?: boolean
           fleet_reservation_help_seen?: boolean
           id?: string
@@ -4264,6 +4266,7 @@ export type Database = {
           completion_dialog_shown?: boolean
           created_at?: string
           expertise_report_prompt_seen?: boolean
+          fleet_loan_created_help_seen?: boolean
           fleet_reservation_guide_completed?: boolean
           fleet_reservation_help_seen?: boolean
           id?: string

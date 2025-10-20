@@ -12,7 +12,7 @@ export interface UserOnboardingProgress {
   cession_initialize_button_help_seen: boolean;
   fleet_reservation_help_seen: boolean;
   fleet_reservation_guide_completed: boolean;
-  fleet_loan_created_help_seen: boolean;
+  fleet_loan_created_help_seen?: boolean;
   expertise_report_prompt_seen: boolean;
   completion_dialog_shown: boolean;
   created_at: string;
