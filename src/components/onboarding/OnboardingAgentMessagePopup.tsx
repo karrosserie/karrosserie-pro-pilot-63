@@ -15,17 +15,24 @@ import { useUserRole } from '@/hooks/use-user-role';
 export function OnboardingAgentMessagePopup() {
   const { unreadMessage, markAsRead, isMarkingAsRead } = useOnboardingAgentMessages();
   const { shouldShowExpertiseReportPrompt, markHelpAsSeen } = useUserOnboardingProgress();
-  const { isCarrossier, isCarrossierCourtesy } = useUserRole();
+  const { isCarrossier, isCarrossierCourtesy, isLoading: isRoleLoading } = useUserRole();
   const [open, setOpen] = useState(false);
   const [lastDisplayedMessageId, setLastDisplayedMessageId] = useState<number | null>(null);
 
-  // Ouvrir automatiquement la popup quand un nouveau message non lu arrive ET si l'utilisateur doit voir le prompt
+  // Ouvrir automatiquement la popup quand un nouveau message non lu arrive
+  // Ne pas afficher pour les carrossiers et carrossiers-véhicule de courtoisie
   useEffect(() => {
-    if (shouldShowExpertiseReportPrompt && unreadMessage && unreadMessage.id !== lastDisplayedMessageId) {
+    // Attendre que le rôle soit chargé
+    if (isRoleLoading) return;
+    
+    // Ne pas afficher pour les carrossiers
+    if (isCarrossier || isCarrossierCourtesy) return;
+    
+    if (unreadMessage && unreadMessage.id !== lastDisplayedMessageId) {
       setOpen(true);
       setLastDisplayedMessageId(unreadMessage.id);
     }
-  }, [unreadMessage, shouldShowExpertiseReportPrompt, lastDisplayedMessageId]);
+  }, [unreadMessage, lastDisplayedMessageId, isCarrossier, isCarrossierCourtesy, isRoleLoading]);
 
   const handleClose = () => {
     if (unreadMessage) {
@@ -35,8 +42,8 @@ export function OnboardingAgentMessagePopup() {
     setOpen(false);
   };
 
-  // Ne pas afficher pour les carrossiers et carrossiers-véhicule de courtoisie
-  if (!unreadMessage || isCarrossier || isCarrossierCourtesy) {
+  // Ne rien rendre si pas de message, en cours de chargement, ou rôle carrossier
+  if (!unreadMessage || isRoleLoading || isCarrossier || isCarrossierCourtesy) {
     return null;
   }
 
