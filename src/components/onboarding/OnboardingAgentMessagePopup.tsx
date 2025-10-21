@@ -10,10 +10,12 @@ import { Button } from '@/components/ui/button';
 import { Bot } from 'lucide-react';
 import { useOnboardingAgentMessages } from '@/hooks/onboarding/useOnboardingAgentMessages';
 import { useUserOnboardingProgress } from '@/hooks/use-user-onboarding-progress';
+import { useUserRole } from '@/hooks/use-user-role';
 
 export function OnboardingAgentMessagePopup() {
   const { unreadMessage, markAsRead, isMarkingAsRead } = useOnboardingAgentMessages();
   const { shouldShowExpertiseReportPrompt, markHelpAsSeen } = useUserOnboardingProgress();
+  const { isCarrossier, isCarrossierCourtesy } = useUserRole();
   const [open, setOpen] = useState(false);
   const [lastDisplayedMessageId, setLastDisplayedMessageId] = useState<number | null>(null);
 
@@ -33,7 +35,8 @@ export function OnboardingAgentMessagePopup() {
     setOpen(false);
   };
 
-  if (!unreadMessage) {
+  // Ne pas afficher pour les carrossiers et carrossiers-véhicule de courtoisie
+  if (!unreadMessage || isCarrossier || isCarrossierCourtesy) {
     return null;
   }
 
