@@ -21,7 +21,9 @@ import QuoteDialog from './QuoteDialog';
 import QuoteEmailDialog from './QuoteEmailDialog';
 import RepairOrderDialog from '../repair-orders/RepairOrderDialog';
 import BonCommandeModal from './BonCommandeModal';
+import { AttachModificatifDialog } from './AttachModificatifDialog';
 import { RepairOrder } from '@/services/supabase/repair-orders';
+import { Paperclip, ExternalLink } from 'lucide-react';
 
 interface QuoteViewerModalProps {
   quote: Quote | null;
@@ -45,6 +47,7 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [repairOrderDialogOpen, setRepairOrderDialogOpen] = useState(false);
   const [bonCommandeModalOpen, setBonCommandeModalOpen] = useState(false);
+  const [attachModificatifDialogOpen, setAttachModificatifDialogOpen] = useState(false);
   const [prefilledRepairOrder, setPrefilledRepairOrder] = useState<Partial<RepairOrder> | null>(null);
 
   // Mettre à jour le devis actuel quand la prop change
@@ -377,6 +380,33 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
     setBonCommandeModalOpen(true);
   };
 
+  const handleAttachModificatif = () => {
+    setAttachModificatifDialogOpen(true);
+  };
+
+  const handleViewModificatif = async () => {
+    if (!currentQuote.modificatif_report_id) return;
+    
+    try {
+      const { data: report } = await supabase
+        .from('expertise_reports')
+        .select('document_url')
+        .eq('id', currentQuote.modificatif_report_id)
+        .single();
+      
+      if (report?.document_url) {
+        window.open(report.document_url, '_blank');
+      }
+    } catch (error) {
+      console.error('Error viewing modificatif:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible d\'ouvrir le rapport modificatif.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -414,6 +444,32 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
                 <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
                 <span className="hidden sm:inline ml-1">Bon de commande</span>
               </Button>
+
+              {/* Bouton pour attacher le modificatif si demandé mais pas encore reçu */}
+              {currentQuote.is_modified_from_report && !currentQuote.modificatif_received_at && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleAttachModificatif}
+                  className="border-success text-success hover:bg-success/10 text-xs sm:text-sm h-8 sm:h-9"
+                >
+                  <Paperclip className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                  <span className="hidden sm:inline ml-1">Joindre modificatif</span>
+                </Button>
+              )}
+
+              {/* Bouton pour voir le modificatif s'il est déjà reçu */}
+              {currentQuote.modificatif_received_at && currentQuote.modificatif_report_id && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleViewModificatif}
+                  className="border-success text-success hover:bg-success/10 text-xs sm:text-sm h-8 sm:h-9"
+                >
+                  <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                  <span className="hidden sm:inline ml-1">Voir modificatif</span>
+                </Button>
+              )}
 
               <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-xs sm:text-sm h-8 sm:h-9" onClick={handleConvertToRepairOrder}>
                 <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />

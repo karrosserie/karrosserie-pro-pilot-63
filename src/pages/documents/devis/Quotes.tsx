@@ -13,7 +13,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Search, FileText, Plus, Filter, Eye, Pencil, Trash, Download, Printer, Mail, FileCheck, ArrowRight, RotateCcw, ShoppingCart } from 'lucide-react';
+import { Search, FileText, Plus, Filter, Eye, Pencil, Trash, Download, Printer, Mail, FileCheck, ArrowRight, RotateCcw, ShoppingCart, Paperclip } from 'lucide-react';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { useTableSorting } from '@/hooks/use-table-sorting';
 import { useQuotes } from '@/hooks/use-quotes';
@@ -22,6 +22,7 @@ import QuoteViewerModal from '@/components/quotes/QuoteViewerModal';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
 import QuoteEmailDialog from '@/components/quotes/QuoteEmailDialog';
 import BonCommandeModal from '@/components/quotes/BonCommandeModal';
+import { AttachModificatifDialog } from '@/components/quotes/AttachModificatifDialog';
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
 import { Quote } from '@/services/supabase/quotes';
 import { RepairOrder } from '@/services/supabase/repair-orders';
@@ -50,6 +51,7 @@ const Quotes = () => {
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [repairOrderDialogOpen, setRepairOrderDialogOpen] = useState(false);
   const [bonCommandeModalOpen, setBonCommandeModalOpen] = useState(false);
+  const [attachModificatifDialogOpen, setAttachModificatifDialogOpen] = useState(false);
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [selectedQuoteForEmail, setSelectedQuoteForEmail] = useState<Quote | null>(null);
   const [selectedQuoteForBonCommande, setSelectedQuoteForBonCommande] = useState<Quote | null>(null);
@@ -314,6 +316,11 @@ const Quotes = () => {
     setBonCommandeModalOpen(true);
   };
 
+  const handleAttachModificatif = (quote: Quote) => {
+    setSelectedQuote(quote);
+    setAttachModificatifDialogOpen(true);
+  };
+
   const handleConvertToRepairOrder = (quote: Quote) => {
     // Préparer les données de l'ordre de réparation à partir du devis
     
@@ -556,6 +563,19 @@ const Quotes = () => {
                           Bon de commande
                         </Button>
 
+                        {/* Bouton pour attacher le modificatif si demandé mais pas encore reçu */}
+                        {quote.is_modified_from_report && !quote.modificatif_received_at && (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => handleAttachModificatif(quote)}
+                            className="border-success text-success hover:bg-success/10"
+                          >
+                            <Paperclip className="h-4 w-4 mr-1" />
+                            Joindre modificatif
+                          </Button>
+                        )}
+
                         <Popover open={index === 0 && showConvertPopover && shouldShowQuoteConvertHelp} onOpenChange={setShowConvertPopover}>
                           <PopoverTrigger asChild>
                             <Button 
@@ -681,6 +701,12 @@ const Quotes = () => {
         quoteId={selectedQuoteForBonCommande?.id || ''}
         quoteReference={selectedQuoteForBonCommande?.reference || ''}
         clientId={selectedQuoteForBonCommande?.client_id || undefined}
+      />
+
+      <AttachModificatifDialog
+        quote={selectedQuote}
+        open={attachModificatifDialogOpen}
+        onOpenChange={setAttachModificatifDialogOpen}
       />
 
       <Drawer open={showConvertDrawer} onOpenChange={setShowConvertDrawer}>
