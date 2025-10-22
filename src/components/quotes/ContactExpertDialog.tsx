@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Quote } from '@/services/supabase/quotes';
 import { Mail, Phone, MessageSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { QuoteRepairItem, QuotePartItem } from './form/types';
+import { calculateGlobalTotals } from './form/utils/calculations';
+import { formatQuoteTable } from './utils/formatQuoteTable';
 
 interface ContactExpertDialogProps {
   open: boolean;
@@ -31,11 +34,33 @@ export const ContactExpertDialog = ({
   const { toast } = useToast();
   const [expertEmail, setExpertEmail] = useState('');
   const [expertPhone, setExpertPhone] = useState('');
+  
+  // Parser et calculer le tableau du devis
+  const quoteDetails = useMemo(() => {
+    try {
+      const repairs: QuoteRepairItem[] = quote.repairs_data 
+        ? JSON.parse(quote.repairs_data) 
+        : [];
+      const parts: QuotePartItem[] = quote.parts_data 
+        ? JSON.parse(quote.parts_data) 
+        : [];
+      const totals = calculateGlobalTotals(repairs, parts, []);
+      const table = formatQuoteTable(repairs, parts, totals);
+      
+      return { repairs, parts, totals, table };
+    } catch (error) {
+      console.error('Erreur parsing devis:', error);
+      return { repairs: [], parts: [], totals: { subTotal: 0, totalVat: 0, totalDiscount: 0, total: 0 }, table: '' };
+    }
+  }, [quote]);
+  
   const [message, setMessage] = useState(
     `Bonjour,\n\nSuite à des modifications apportées au devis ${quote.reference}, nous avons besoin d'un rapport modificatif pour le dossier:\n\n` +
     `- Numéro de sinistre: ${quote.claim_number || 'N/A'}\n` +
     `- Numéro de rapport initial: ${quote.report_number || 'N/A'}\n` +
-    `- Immatriculation: ${quote.vehicles?.license_plate || 'N/A'}\n\n` +
+    `- Immatriculation: ${quote.vehicles?.license_plate || 'N/A'}\n` +
+    `- Véhicule: ${quote.vehicles?.car_brands?.name || ''} ${quote.vehicles?.car_models?.name || ''}\n\n` +
+    `DÉTAIL DU DEVIS MODIFIÉ:\n\n${quoteDetails.table}\n\n` +
     `Merci de nous faire parvenir le rapport modificatif dans les meilleurs délais.\n\n` +
     `Cordialement`
   );
