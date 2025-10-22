@@ -44,218 +44,8 @@ const PaymentRelances: React.FC<PaymentRelancesProps> = () => {
   const [viewingStatDetails, setViewingStatDetails] = useState<{type: string, data: any} | null>(null);
   const [isBlinking, setIsBlinking] = useState(false);
 
-  // Force rebuild - données fictives pour la démonstration
-  const mockInvoices = [
-    {
-      id: 'FAC-2024-001',
-      uuid: 'uuid-001',
-      client: 'SARL Dupont Transport',
-      vehicle: 'Renault Master',
-      vehicleRef: 'AB-123-CD',
-      garage: 'Garage Martin',
-      garageRef: '12345678901234',
-      amount: '3 450,00 €',
-      dueDate: '15/11/2024',
-      lastRelanceDate: '20/12/2024',
-      relanceType: 'Relance 2',
-      relanceTypeColor: 'bg-orange-100 text-orange-800',
-      status: 'relance2',
-      availableActions: ['whatsapp', 'sms', 'mail'],
-      history: [
-        { 
-          action: 'Relance email', 
-          type: 'email',
-          date: '20/12/2024', 
-          time: '14:30',
-          status: 'Envoyé',
-          content: {
-            subject: 'Rappel de paiement - Facture FAC-2024-001',
-            body: `Madame, Monsieur,
-
-Nous vous rappelons qu'une facture d'un montant de 3 450,00 € est arrivée à échéance le 15/11/2024.
-
-Détails de la facture :
-- Numéro : FAC-2024-001
-- Véhicule : Renault Master (AB-123-CD)
-- Montant : 3 450,00 €
-- Date d'échéance : 15/11/2024
-
-Nous vous serions reconnaissants de bien vouloir procéder au règlement dans les meilleurs délais.
-
-Cordialement,
-Garage Martin`
-          }
-        },
-        { 
-          action: 'Relance téléphonique', 
-          type: 'phone',
-          date: '22/12/2024', 
-          time: '16:15',
-          status: 'Conversation',
-          content: {
-            note: 'Appel effectué à 16h15. Contact établi avec M. Dupont. Il confirme avoir reçu la facture et s\'engage à effectuer le paiement avant la fin de semaine. Promesse de paiement obtenue pour le 27/12/2024.',
-            duration: '3min 45s',
-            outcome: 'Promesse de paiement - 27/12/2024'
-          }
-        },
-        { 
-          action: 'SMS de rappel', 
-          type: 'sms',
-          date: '25/12/2024', 
-          time: '10:15',
-          status: 'Lu',
-          content: {
-            message: 'GARAGE MARTIN: Facture FAC-2024-001 de 3450€ impayée depuis le 15/11. Merci de régulariser. Contact: 01.23.45.67.89'
-          }
-        }
-      ],
-      clientPhone: '06 12 34 56 78',
-      clientEmail: 'contact@dupont-transport.fr',
-      clientAddress: '15 rue de la République\n75001 Paris\nFrance',
-      daysOverdue: 25,
-      autoRelancesDisabled: false,
-      clientId: 'client-001'
-    },
-    {
-      id: 'FAC-2024-015',
-      uuid: 'uuid-002', 
-      client: 'Entreprise Leroy',
-      vehicle: 'Peugeot Partner',
-      vehicleRef: 'EF-456-GH',
-      garage: 'Garage Martin',
-      garageRef: '12345678901234',
-      amount: '1 250,00 €',
-      dueDate: '10/12/2024',
-      lastRelanceDate: '15/01/2025',
-      relanceType: 'Relance 1',
-      relanceTypeColor: 'bg-blue-100 text-blue-800',
-      status: 'relance1',
-      availableActions: ['whatsapp', 'sms', 'vms', 'mail'],
-      history: [
-        { 
-          action: 'Email automatique', 
-          type: 'email',
-          date: '15/01/2025', 
-          time: '09:00',
-          status: 'Envoyé',
-          content: {
-            subject: 'Facture en retard - FAC-2024-015',
-            body: `Bonjour,
-
-Nous constatons qu'une facture reste impayée à ce jour.
-
-Référence : FAC-2024-015
-Véhicule : Peugeot Partner (EF-456-GH)
-Montant : 1 250,00 €
-Échéance dépassée depuis : 12 jours
-
-Merci de procéder au règlement rapidement.
-
-Garage Martin`
-          }
-        },
-        { 
-          action: 'Relance téléphonique', 
-          type: 'phone',
-          date: '18/01/2025', 
-          time: '11:30',
-          status: 'Répondeur',
-          content: {
-            note: 'Appel effectué à 11h30. Pas de réponse, message laissé sur répondeur : "Bonjour, Jean Martin du Garage Martin. Je vous appelle concernant votre facture FAC-2024-015 d\'un montant de 1250€ qui est en retard depuis 15 jours. Merci de me rappeler au 01.23.45.67.89 pour régulariser la situation."',
-            duration: '1min 15s',
-            outcome: 'Message laissé sur répondeur'
-          }
-        }
-      ],
-      clientPhone: '06 98 76 54 32',
-      clientEmail: 'leroy.entreprise@gmail.com',
-      clientAddress: '28 avenue des Tilleuls\n69003 Lyon\nFrance',
-      daysOverdue: 12,
-      autoRelancesDisabled: false,
-      clientId: 'client-002'
-    },
-    {
-      id: 'FAC-2024-032',
-      uuid: 'uuid-003',
-      client: 'SAS Moreau & Fils',
-      vehicle: 'Citroën Berlingo',
-      vehicleRef: 'IJ-789-KL',
-      garage: 'Garage Martin',
-      garageRef: '12345678901234',
-      amount: '5 680,00 €',
-      dueDate: '01/10/2024',
-      lastRelanceDate: '15/01/2025',
-      relanceType: 'Contentieux',
-      relanceTypeColor: 'bg-red-100 text-red-800',
-      status: 'contentieux',
-      availableActions: ['recommande', 'judiciaire'],
-      history: [
-        { 
-          action: 'Relance email', 
-          type: 'email',
-          date: '05/11/2024', 
-          time: '16:45',
-          status: 'Envoyé',
-          content: {
-            subject: 'Première relance - Facture FAC-2024-032',
-            body: 'Madame, Monsieur,\n\nVotre facture d\'un montant de 5 680,00 € est échue depuis le 01/10/2024...'
-          }
-        },
-        { 
-          action: 'SMS de rappel', 
-          type: 'sms',
-          date: '20/11/2024', 
-          time: '11:30',
-          status: 'Lu',
-          content: {
-            message: 'URGENT: Facture FAC-2024-032 de 5680€ impayée depuis 50 jours. Contactez-nous: 01.23.45.67.89'
-          }
-        },
-        { 
-          action: 'Relance téléphonique', 
-          type: 'phone',
-          date: '05/12/2024', 
-          time: '14:20',
-          status: 'Répondeur',
-          content: {
-            note: 'Appel effectué à 14h20. Messagerie vocale laissée: "Bonjour, Garage Martin au sujet de votre facture impayée FAC-2024-032 de 5680€. Merci de nous rappeler au 01.23.45.67.89"',
-            duration: '1min 30s'
-          }
-        },
-        { 
-          action: 'Mise en demeure', 
-          type: 'registered',
-          date: '20/12/2024', 
-          time: '08:00',
-          status: 'Reçu',
-          content: {
-            subject: 'MISE EN DEMEURE - Facture FAC-2024-032',
-            body: 'Par la présente, nous vous mettons en demeure de procéder au règlement de la facture...'
-          }
-        },
-        { 
-          action: 'Dépôt dossier tribunal', 
-          type: 'legal',
-          date: '15/01/2025', 
-          time: '09:30',
-          status: 'En cours',
-          content: {
-            note: 'Dossier déposé au tribunal de commerce. Référence tribunal: TC-2025-00142',
-            amount: '5 680,00 € + frais de procédure'
-          }
-        }
-      ],
-      clientPhone: '04 78 12 34 56',
-      clientEmail: 'contact@moreau-fils.fr',
-      clientAddress: '142 route de Grenoble\n38000 Grenoble\nFrance',
-      daysOverdue: 95,
-      autoRelancesDisabled: false,
-      clientId: 'client-003'
-    }
-  ];
-
-  // Utiliser les données fictives au lieu des vraies données
-  const formattedInvoices = mockInvoices;
+  // Utiliser les vraies données
+  const formattedInvoices = realInvoices;
 
   // Filter invoices based on selected status
   const filteredInvoices = formattedInvoices.filter(invoice => {
@@ -451,37 +241,19 @@ Garage Martin`
     const campaignData = {
       janvier2025: {
         id: 'janvier2025',
-        name: `Relance ${currentMonth}`, // Mois en cours
+        name: `Relance ${currentMonth}`,
         description: `Relances en cours - Dernière automatique le ${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()}`,
         status: campaignStatus.janvier2025,
-        stats: { total: 8, envoyes: 4, ouverts: 2, enAttente: 4 }, // Stats du mois en cours
-        clients: [
-          { name: 'SARL Dupont Transport', facture: 'FAC-2025-001', montant: '3 450,00 €', statut: 'SMS envoyé', dateEnvoi: '15/01/2025', ouvert: true, type: 'actuel' },
-          { name: 'Entreprise Leroy', facture: 'FAC-2025-003', montant: '1 250,00 €', statut: 'Email envoyé', dateEnvoi: '16/01/2025', ouvert: false, type: 'actuel' },  
-          { name: 'EURL Rousseau Plomberie', facture: 'FAC-2025-005', montant: '890,50 €', statut: 'SMS envoyé', dateEnvoi: '17/01/2025', ouvert: true, type: 'actuel' },
-          { name: 'Mme Catherine Bernard', facture: 'FAC-2025-007', montant: '2 150,00 €', statut: 'Email envoyé', dateEnvoi: '18/01/2025', ouvert: false, type: 'actuel' },
-          { name: 'M. Pierre Dubois', facture: 'FAC-2025-009', montant: '650,00 €', statut: 'SMS programmé', dateEnvoi: 'Aujourd\'hui 14h30', ouvert: false, type: 'programme' },
-          { name: 'SARL Petit Électricité', facture: 'FAC-2025-011', montant: '1 890,00 €', statut: 'Email programmé', dateEnvoi: 'Demain 9h00', ouvert: false, type: 'programme' },
-          { name: 'SCI Lambert Immobilier', facture: 'FAC-2025-013', montant: '4 320,00 €', statut: 'SMS programmé', dateEnvoi: 'Demain 15h00', ouvert: false, type: 'programme' },
-          { name: 'SAS Moreau & Fils', facture: 'FAC-2025-015', montant: '5 680,00 €', statut: 'Email programmé', dateEnvoi: 'Demain 10h30', ouvert: false, type: 'programme' }
-        ]
+        stats: { total: 0, envoyes: 0, ouverts: 0, enAttente: 0 },
+        clients: []
       },
       decembre2024: {
         id: 'decembre2024', 
-        name: `Relance ${previousMonth}`, // Mois précédent
+        name: `Relance ${previousMonth}`,
         description: `Campagne clôturée le 31/${previousMonth.split(' ')[0] === 'décembre' ? '12' : '11'}/2024`,
         status: campaignStatus.decembre2024,
-        stats: { total: 34, payes: 5, enLitige: 3, recupere: '18 450€' }, // Stats finales du mois précédent
-        clients: [
-          { name: 'Garage Renault Lyon', facture: 'FAC-2024-198', montant: '2 450,00 €', statut: 'Payé', datePaiement: '28/12/2024', recouvre: true, type: 'recouvre' },
-          { name: 'Taxi Marseille SARL', facture: 'FAC-2024-201', montant: '1 890,00 €', statut: 'Payé', datePaiement: '30/12/2024', recouvre: true, type: 'recouvre' },
-          { name: 'Transport Bordeaux', facture: 'FAC-2024-189', montant: '3 200,00 €', statut: 'En contentieux', dateContentieux: '20/12/2024', recouvre: false, type: 'litige' },
-          { name: 'Flotte Auto Paris', facture: 'FAC-2024-203', montant: '5 400,00 €', statut: 'Payé', datePaiement: '29/12/2024', recouvre: true, type: 'recouvre' },
-          { name: 'EURL Transport Sud', facture: 'FAC-2024-156', montant: '1 200,00 €', statut: 'En contentieux', dateContentieux: '22/12/2024', recouvre: false, type: 'litige' },
-          { name: 'SAS Logistique Nord', facture: 'FAC-2024-134', montant: '2 800,00 €', statut: 'Payé', datePaiement: '27/12/2024', recouvre: true, type: 'recouvre' },
-          { name: 'Ambulances Urgences', facture: 'FAC-2024-167', montant: '950,00 €', statut: 'En contentieux', dateContentieux: '25/12/2024', recouvre: false, type: 'litige' },
-          { name: 'Société Maintenance', facture: 'FAC-2024-178', montant: '1 650,00 €', statut: 'Payé', datePaiement: '31/12/2024', recouvre: true, type: 'recouvre' }
-        ]
+        stats: { total: 0, payes: 0, enLitige: 0, recupere: '0€' },
+        clients: []
       }
     };
     
@@ -673,15 +445,15 @@ Garage Martin`
               <CardContent className="p-4">
                 <div className="grid grid-cols-3 gap-4 mb-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-foreground">8</div>
+                    <div className="text-2xl font-bold text-foreground">0</div>
                     <div className="text-xs text-muted-foreground">Total</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-foreground">4</div>
+                    <div className="text-2xl font-bold text-foreground">0</div>
                     <div className="text-xs text-muted-foreground">Envoyés</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-foreground">4</div>
+                    <div className="text-2xl font-bold text-foreground">0</div>
                     <div className="text-xs text-muted-foreground">Programmés</div>
                   </div>
                 </div>
@@ -710,15 +482,15 @@ Garage Martin`
               <CardContent className="p-4">
                 <div className="grid grid-cols-3 gap-4 mb-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-foreground">34</div>
+                    <div className="text-2xl font-bold text-foreground">0</div>
                     <div className="text-xs text-muted-foreground">Total</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-foreground">5</div>
+                    <div className="text-2xl font-bold text-foreground">0</div>
                     <div className="text-xs text-muted-foreground">Recouvrés</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-foreground">3</div>
+                    <div className="text-2xl font-bold text-foreground">0</div>
                     <div className="text-xs text-muted-foreground">En litige</div>
                   </div>
                 </div>
@@ -899,7 +671,7 @@ Garage Martin`
               <div className="flex-1 relative min-w-0">
                 <div className="bg-white text-black border-3 border-blue-500 rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
                   <div className="text-xs opacity-70 truncate">Factures impayées</div>
-                  <div className="text-xl lg:text-2xl font-bold">45</div>
+                  <div className="text-xl lg:text-2xl font-bold">{formattedInvoices.length}</div>
                 </div>
                 <div className="absolute -right-0.5 top-1/2 transform -translate-y-1/2 text-blue-400">
                   <svg width="6" height="12" viewBox="0 0 6 12" fill="currentColor" className="lg:w-2 lg:h-4">
@@ -912,7 +684,7 @@ Garage Martin`
               <div className="flex-1 relative min-w-0 ml-0.5">
                 <div className="bg-white text-black border-3 border-orange-500 rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
                   <div className="text-xs opacity-70 truncate">Relances auto</div>
-                  <div className="text-xl lg:text-2xl font-bold">38</div>
+                  <div className="text-xl lg:text-2xl font-bold">{formattedInvoices.filter(i => ['relance1', 'relance2', 'relance3'].includes(i.status)).length}</div>
                 </div>
                 <div className="absolute -right-0.5 top-1/2 transform -translate-y-1/2 text-orange-400">
                   <svg width="6" height="12" viewBox="0 0 6 12" fill="currentColor" className="lg:w-2 lg:h-4">
@@ -925,7 +697,7 @@ Garage Martin`
               <div className="flex-1 relative min-w-0 ml-0.5">
                 <div className="bg-white text-black border-3 border-red-500 rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
                   <div className="text-xs opacity-70 truncate">Mises demeure</div>
-                  <div className="text-xl lg:text-2xl font-bold">15</div>
+                  <div className="text-xl lg:text-2xl font-bold">{formattedInvoices.filter(i => i.status === 'relance4').length}</div>
                 </div>
                 <div className="absolute -right-0.5 top-1/2 transform -translate-y-1/2 text-red-400">
                   <svg width="6" height="12" viewBox="0 0 6 12" fill="currentColor" className="lg:w-2 lg:h-4">
@@ -938,7 +710,7 @@ Garage Martin`
               <div className="flex-1 relative min-w-0 ml-0.5">
                 <div className="bg-white text-black border-3 border-purple-500 rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
                   <div className="text-xs opacity-70 truncate">Judiciaires</div>
-                  <div className="text-xl lg:text-2xl font-bold">8</div>
+                  <div className="text-xl lg:text-2xl font-bold">{formattedInvoices.filter(i => i.status === 'contentieux').length}</div>
                 </div>
                 <div className="absolute -right-0.5 top-1/2 transform -translate-y-1/2 text-purple-400">
                   <svg width="6" height="12" viewBox="0 0 6 12" fill="currentColor" className="lg:w-2 lg:h-4">
@@ -951,7 +723,7 @@ Garage Martin`
               <div className="flex-1 min-w-0 ml-0.5">
                 <div className="bg-white text-black border-3 border-green-500 rounded-xl px-3 lg:px-4 py-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
                   <div className="text-xs opacity-70 truncate">Récupérés</div>
-                  <div className="text-xl lg:text-2xl font-bold">78% • 156k€</div>
+                  <div className="text-xl lg:text-2xl font-bold">-</div>
                 </div>
               </div>
             </div>
@@ -961,35 +733,35 @@ Garage Martin`
               <div className="bg-white text-black border-3 border-blue-500 rounded-xl p-4 shadow-lg">
                 <div className="flex justify-between items-center">
                   <div className="text-sm opacity-70">Factures impayées</div>
-                  <div className="text-2xl font-bold">45</div>
+                  <div className="text-2xl font-bold">{formattedInvoices.length}</div>
                 </div>
               </div>
               
               <div className="bg-white text-black border-3 border-orange-500 rounded-xl p-4 shadow-lg mx-4">
                 <div className="flex justify-between items-center">
                   <div className="text-sm opacity-70">Relances automatiques</div>
-                  <div className="text-2xl font-bold">38</div>
+                  <div className="text-2xl font-bold">{formattedInvoices.filter(i => ['relance1', 'relance2', 'relance3'].includes(i.status)).length}</div>
                 </div>
               </div>
               
               <div className="bg-white text-black border-3 border-red-500 rounded-xl p-4 shadow-lg mx-8">
                 <div className="flex justify-between items-center">
                   <div className="text-sm opacity-70">Mises en demeure</div>
-                  <div className="text-2xl font-bold">15</div>
+                  <div className="text-2xl font-bold">{formattedInvoices.filter(i => i.status === 'relance4').length}</div>
                 </div>
               </div>
               
               <div className="bg-white text-black border-3 border-purple-500 rounded-xl p-4 shadow-lg mx-12">
                 <div className="flex justify-between items-center">
                   <div className="text-sm opacity-70">Procédures judiciaires</div>
-                  <div className="text-2xl font-bold">8</div>
+                  <div className="text-2xl font-bold">{formattedInvoices.filter(i => i.status === 'contentieux').length}</div>
                 </div>
               </div>
               
               <div className="bg-white text-black border-3 border-green-500 rounded-xl p-4 shadow-lg mx-16">
                 <div className="flex justify-between items-center">
                   <div className="text-sm opacity-70">Montants récupérés</div>
-                  <div className="text-2xl font-bold">78%</div>
+                  <div className="text-2xl font-bold">-</div>
                 </div>
               </div>
             </div>
@@ -997,11 +769,11 @@ Garage Martin`
             {/* Indicateurs de performance */}
             <div className="flex flex-col sm:flex-row sm:justify-between text-xs text-muted-foreground mt-4 gap-2 sm:gap-0 px-1">
               <div className="flex gap-4">
-                <span>Taux conversion: <span className="font-semibold text-green-600">84%</span></span>
-                <span>Temps moyen: <span className="font-semibold">45j</span></span>
+                <span>Taux conversion: <span className="font-semibold text-green-600">-</span></span>
+                <span>Temps moyen: <span className="font-semibold">-</span></span>
               </div>
               <div className="text-right">
-                <span>Dernière MàJ: <span className="font-semibold">il y a 2min</span></span>
+                <span>Dernière MàJ: <span className="font-semibold">{format(new Date(), 'dd/MM/yyyy HH:mm', { locale: fr })}</span></span>
               </div>
             </div>
           </div>
@@ -1016,18 +788,7 @@ Garage Martin`
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {[
-                  { time: "09/01/2025 17:02", client: "SAS Moreau", action: "Mise en demeure", status: "Envoyé", type: "success", details: "Mise en demeure envoyée par courrier recommandé. Accusé de réception en attente.", invoiceAmount: "5680€", dueDate: "01/10/2024", importance: "critical" },
-                  { time: "09/01/2025 16:58", client: "EURL Rousseau", action: "Email amiable", status: "Erreur", type: "error", details: "Adresse email invalide. Tentative d'envoi échouée. Vérifier les coordonnées client.", invoiceAmount: "890€", dueDate: "15/12/2024", importance: "critical" },
-                  { time: "09/01/2025 16:45", client: "M. Pierre Dubois", action: "SMS message", status: "Lu", type: "info", details: "SMS de relance lu à 16h52. Taux de lecture: 100%. Aucune réponse reçue.", invoiceAmount: "650€", dueDate: "20/12/2024", importance: "medium" },
-                  { time: "09/01/2025 16:12", client: "SAS Moreau", action: "Email amiable", status: "Lu", type: "info", details: "Email ouvert à 16h18. Lien de paiement cliqué mais transaction non finalisée.", invoiceAmount: "5680€", dueDate: "01/10/2024", importance: "critical" },
-                  { time: "09/01/2025 15:38", client: "SARL Petit Électricité", action: "SMS message", status: "Réception interrompue", type: "warning", details: "SMS partiellement délivré. Opérateur mobile a signalé une interruption de service.", invoiceAmount: "1890€", dueDate: "10/12/2024", importance: "medium" },
-                  { time: "09/01/2025 15:12", client: "SAS Moreau", action: "SMS message", status: "Envoyé", type: "success", details: "SMS de première relance envoyé avec succès. Coût: 0,08€", invoiceAmount: "5680€", dueDate: "01/10/2024", importance: "critical" },
-                  { time: "09/01/2025 14:45", client: "SARL Dupont", action: "SMS message", status: "Envoyé", type: "success", details: "SMS automatique de rappel d'échéance. Facture FAC-2024-001 - 3450€", invoiceAmount: "3450€", dueDate: "15/11/2024", importance: "medium" },
-                  { time: "09/01/2025 14:23", client: "Entreprise Leroy", action: "LTR message", status: "Envoyé", type: "success", details: "Lettre recommandée avec AR expédiée. Suivi: RR123456789FR", invoiceAmount: "1250€", dueDate: "10/12/2024", importance: "medium" },
-                  { time: "09/01/2025 13:56", client: "SARL Petit Électricité", action: "SMS message", status: "Envoyé", type: "success", details: "SMS de relance 2. Message personnalisé avec historique des impayés.", invoiceAmount: "1890€", dueDate: "10/12/2024", importance: "medium" },
-                  { time: "09/01/2025 13:12", client: "SARL Dupont", action: "LTR message", status: "Envoyé", type: "success", details: "Courrier simple de première relance. Coût d'affranchissement: 1,16€", invoiceAmount: "3450€", dueDate: "15/11/2024", importance: "low" }
-                ].sort((a, b) => {
+                {[].sort((a, b) => {
                   // Tri par importance : critical > medium > low
                   const importanceOrder = { 'critical': 3, 'medium': 2, 'low': 1 };
                   return importanceOrder[b.importance] - importanceOrder[a.importance];
