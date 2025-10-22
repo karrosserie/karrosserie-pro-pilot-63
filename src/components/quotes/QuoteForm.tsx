@@ -13,6 +13,9 @@ import { QuoteRepairsAndPartsSection } from './form/QuoteRepairsAndPartsSection'
 import { QuoteDiscountsSection } from './form/QuoteDiscountsSection';
 import { QuoteFormActions } from './form/QuoteFormActions';
 import { useQuoteFormLogic } from './form/useQuoteFormLogic';
+import { ModificatifAlert } from './ModificatifAlert';
+import { ContactExpertDialog } from './ContactExpertDialog';
+import { useQuoteModificatif } from '@/hooks/use-quote-modificatif';
 
 interface QuoteFormProps {
   quote?: Quote | null;
@@ -36,6 +39,10 @@ export const QuoteForm = ({
   const { createVehicle } = useVehicles();
   const [isClientDialogOpen, setIsClientDialogOpen] = useState(false);
   const [isVehicleDialogOpen, setIsVehicleDialogOpen] = useState(false);
+  const [showModificatifAlert, setShowModificatifAlert] = useState(false);
+  const [showContactExpertDialog, setShowContactExpertDialog] = useState(false);
+  const [pendingSubmitData, setPendingSubmitData] = useState<any>(null);
+  const { requestModificatif } = useQuoteModificatif();
   
   const {
     formData,
@@ -61,22 +68,16 @@ export const QuoteForm = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (isSubmitting) return; // Prevent double submissions
+    console.log('=== QUOTE FORM SUBMIT ===');
+    console.log('Form data before validation:', formData);
+    console.log('Claim number:', claimNumber);
     
-    console.log('Validation attempt - Current errors before validation:', errors);
-    console.log('Form data before validation:', { formData, claimNumber });
-    
-    const validationResult = validateForm();
-    
-    console.log('Validation result:', validationResult.isValid);
-    console.log('Errors from validation:', validationResult.errors);
-    
-    if (!validationResult.isValid) {
-      console.log('Validation failed - showing toast');
-      console.log('About to pass errors to components:', validationResult.errors);
+    // Valider avant la soumission
+    if (!validateForm()) {
+      console.log('Validation failed:', errors);
       toast({
         title: "Erreur de validation",
-        description: "Veuillez corriger les erreurs dans le formulaire.",
+        description: "Veuillez remplir tous les champs obligatoires.",
         variant: "destructive"
       });
       return;
@@ -92,10 +93,49 @@ export const QuoteForm = ({
       console.log('🔄 QuoteForm - client_id type and value:', typeof submitData.client_id, submitData.client_id);
       console.log('🔄 QuoteForm - vehicle_id type and value:', typeof submitData.vehicle_id, submitData.vehicle_id);
       
+      // Si c'est une modification d'un devis lié à un rapport ET qu'il n'a pas encore été marqué comme modifié
+      const isEditing = quote && quote.id;
+      const hasReportId = quote?.report_id || submitData.report_id;
+      const alreadyMarkedAsModified = quote?.is_modified_from_report;
+      
+      if (isEditing && hasReportId && !alreadyMarkedAsModified) {
+        // Stocker les données pour soumission après confirmation
+        setPendingSubmitData(submitData);
+        setShowModificatifAlert(true);
+        return; // Attendre la décision de l'utilisateur
+      }
+      
       await onSubmit(submitData);
     } catch (error: any) {
       console.error('❌ QuoteForm - Error submitting quote:', error);
       // Don't show toast here as it might be already handled in the parent
+    }
+  };
+
+  const handleContinueWithoutModificatif = async () => {
+    setShowModificatifAlert(false);
+    if (pendingSubmitData) {
+      // Soumettre sans marquer comme modifié
+      await onSubmit(pendingSubmitData);
+      setPendingSubmitData(null);
+    }
+  };
+
+  const handleRequestModificatif = () => {
+    setShowModificatifAlert(false);
+    setShowContactExpertDialog(true);
+  };
+
+  const handleModificatifRequestSent = async () => {
+    if (pendingSubmitData && quote?.id) {
+      // Marquer le devis comme modifié et nécessitant un modificatif
+      await requestModificatif(quote.id);
+      // Soumettre avec le flag is_modified_from_report
+      await onSubmit({
+        ...pendingSubmitData,
+        is_modified_from_report: true
+      });
+      setPendingSubmitData(null);
     }
   };
 
@@ -208,6 +248,22 @@ export const QuoteForm = ({
         onCancel={onCancel}
         isConversionFromReport={isConversionFromReport}
       />
+
+      <ModificatifAlert
+        open={showModificatifAlert}
+        onOpenChange={setShowModificatifAlert}
+        onContinueWithout={handleContinueWithoutModificatif}
+        onRequestModificatif={handleRequestModificatif}
+      />
+
+      {quote && (
+        <ContactExpertDialog
+          open={showContactExpertDialog}
+          onOpenChange={setShowContactExpertDialog}
+          quote={quote}
+          onRequestSent={handleModificatifRequestSent}
+        />
+      )}
 
       <ClientDialog
         open={isClientDialogOpen}

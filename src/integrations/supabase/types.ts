@@ -1190,6 +1190,27 @@ export type Database = {
           },
         ]
       }
+      demande_paiment_pret_de_vehicule: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          id: number
+          is_answer: boolean | null
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          id?: number
+          is_answer?: boolean | null
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          id?: number
+          is_answer?: boolean | null
+        }
+        Relationships: []
+      }
       document_sav: {
         Row: {
           content: string
@@ -3225,6 +3246,10 @@ export type Database = {
           expert_name: string | null
           id: string
           incident_date: string | null
+          is_modified_from_report: boolean | null
+          modificatif_received_at: string | null
+          modificatif_report_id: string | null
+          modificatif_requested_at: string | null
           notes: string | null
           parts_data: string | null
           policy_number: string | null
@@ -3233,6 +3258,7 @@ export type Database = {
           report_date: string | null
           report_id: string | null
           report_number: string | null
+          source_report_id: string | null
           status: string | null
           tax_rate: number | null
           updated_at: string
@@ -3251,6 +3277,10 @@ export type Database = {
           expert_name?: string | null
           id?: string
           incident_date?: string | null
+          is_modified_from_report?: boolean | null
+          modificatif_received_at?: string | null
+          modificatif_report_id?: string | null
+          modificatif_requested_at?: string | null
           notes?: string | null
           parts_data?: string | null
           policy_number?: string | null
@@ -3259,6 +3289,7 @@ export type Database = {
           report_date?: string | null
           report_id?: string | null
           report_number?: string | null
+          source_report_id?: string | null
           status?: string | null
           tax_rate?: number | null
           updated_at?: string
@@ -3277,6 +3308,10 @@ export type Database = {
           expert_name?: string | null
           id?: string
           incident_date?: string | null
+          is_modified_from_report?: boolean | null
+          modificatif_received_at?: string | null
+          modificatif_report_id?: string | null
+          modificatif_requested_at?: string | null
           notes?: string | null
           parts_data?: string | null
           policy_number?: string | null
@@ -3285,6 +3320,7 @@ export type Database = {
           report_date?: string | null
           report_id?: string | null
           report_number?: string | null
+          source_report_id?: string | null
           status?: string | null
           tax_rate?: number | null
           updated_at?: string
@@ -3300,8 +3336,22 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "quotes_modificatif_report_id_fkey"
+            columns: ["modificatif_report_id"]
+            isOneToOne: false
+            referencedRelation: "expertise_reports"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "quotes_report_id_fkey"
             columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "expertise_reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_source_report_id_fkey"
+            columns: ["source_report_id"]
             isOneToOne: false
             referencedRelation: "expertise_reports"
             referencedColumns: ["id"]
@@ -3390,6 +3440,10 @@ export type Database = {
           general_condition: string | null
           id: string
           incident_date: string | null
+          is_modified_from_report: boolean | null
+          modificatif_received_at: string | null
+          modificatif_report_id: string | null
+          modificatif_requested_at: string | null
           notes: string | null
           oodrive_contract_id: string | null
           operator_name: string | null
@@ -3405,6 +3459,7 @@ export type Database = {
           report_number: string | null
           signature_date: string | null
           signed_document_url: string | null
+          source_report_id: string | null
           start_date: string | null
           status: string | null
           total_surface_m2: number | null
@@ -3429,6 +3484,10 @@ export type Database = {
           general_condition?: string | null
           id?: string
           incident_date?: string | null
+          is_modified_from_report?: boolean | null
+          modificatif_received_at?: string | null
+          modificatif_report_id?: string | null
+          modificatif_requested_at?: string | null
           notes?: string | null
           oodrive_contract_id?: string | null
           operator_name?: string | null
@@ -3444,6 +3503,7 @@ export type Database = {
           report_number?: string | null
           signature_date?: string | null
           signed_document_url?: string | null
+          source_report_id?: string | null
           start_date?: string | null
           status?: string | null
           total_surface_m2?: number | null
@@ -3468,6 +3528,10 @@ export type Database = {
           general_condition?: string | null
           id?: string
           incident_date?: string | null
+          is_modified_from_report?: boolean | null
+          modificatif_received_at?: string | null
+          modificatif_report_id?: string | null
+          modificatif_requested_at?: string | null
           notes?: string | null
           oodrive_contract_id?: string | null
           operator_name?: string | null
@@ -3483,6 +3547,7 @@ export type Database = {
           report_number?: string | null
           signature_date?: string | null
           signed_document_url?: string | null
+          source_report_id?: string | null
           start_date?: string | null
           status?: string | null
           total_surface_m2?: number | null
@@ -3498,10 +3563,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "repair_orders_modificatif_report_id_fkey"
+            columns: ["modificatif_report_id"]
+            isOneToOne: false
+            referencedRelation: "expertise_reports"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "repair_orders_quote_id_fkey"
             columns: ["quote_id"]
             isOneToOne: false
             referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repair_orders_source_report_id_fkey"
+            columns: ["source_report_id"]
+            isOneToOne: false
+            referencedRelation: "expertise_reports"
             referencedColumns: ["id"]
           },
           {
@@ -4992,26 +5071,13 @@ export type Database = {
       }
     }
     Functions: {
-      binary_quantize: {
-        Args: { "": string } | { "": unknown }
-        Returns: unknown
-      }
-      bytea_to_text: {
-        Args: { data: string }
-        Returns: string
-      }
+      bytea_to_text: { Args: { data: string }; Returns: string }
       calculate_repair_order_surface: {
         Args: { repair_order_id: string }
         Returns: number
       }
-      check_token_for_upload: {
-        Args: { file_path: string }
-        Returns: boolean
-      }
-      cleanup_expired_otp_codes: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      check_token_for_upload: { Args: { file_path: string }; Returns: boolean }
+      cleanup_expired_otp_codes: { Args: never; Returns: undefined }
       create_campaign_log: {
         Args: {
           p_anomaly_type?: string
@@ -5024,10 +5090,7 @@ export type Database = {
         }
         Returns: string
       }
-      current_setting: {
-        Args: { setting_name: string }
-        Returns: string
-      }
+      current_setting: { Args: { setting_name: string }; Returns: string }
       get_available_employees: {
         Args: { p_company_id: string; p_task_type: string }
         Returns: {
@@ -5051,7 +5114,7 @@ export type Database = {
         }[]
       }
       get_companies_with_users: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           created_at: string
           days_since_creation: number
@@ -5100,70 +5163,82 @@ export type Database = {
           recommendations: string[]
         }[]
       }
-      get_current_user_role: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_effective_company_id: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      halfvec_avg: {
-        Args: { "": number[] }
-        Returns: unknown
-      }
-      halfvec_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      halfvec_send: {
-        Args: { "": unknown }
-        Returns: string
-      }
-      halfvec_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
-      }
-      hnsw_bit_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnsw_halfvec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnsw_sparsevec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnswhandler: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
+      get_current_user_role: { Args: never; Returns: string }
+      get_effective_company_id: { Args: never; Returns: string }
       http: {
         Args: { request: Database["public"]["CompositeTypes"]["http_request"] }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
+        SetofOptions: {
+          from: "http_request"
+          to: "http_response"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
-      http_delete: {
-        Args:
-          | { content: string; content_type: string; uri: string }
-          | { uri: string }
-        Returns: Database["public"]["CompositeTypes"]["http_response"]
-      }
-      http_get: {
-        Args: { data: Json; uri: string } | { uri: string }
-        Returns: Database["public"]["CompositeTypes"]["http_response"]
-      }
+      http_delete:
+        | {
+            Args: { uri: string }
+            Returns: Database["public"]["CompositeTypes"]["http_response"]
+            SetofOptions: {
+              from: "*"
+              to: "http_response"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
+        | {
+            Args: { content: string; content_type: string; uri: string }
+            Returns: Database["public"]["CompositeTypes"]["http_response"]
+            SetofOptions: {
+              from: "*"
+              to: "http_response"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
+      http_get:
+        | {
+            Args: { uri: string }
+            Returns: Database["public"]["CompositeTypes"]["http_response"]
+            SetofOptions: {
+              from: "*"
+              to: "http_response"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
+        | {
+            Args: { data: Json; uri: string }
+            Returns: Database["public"]["CompositeTypes"]["http_response"]
+            SetofOptions: {
+              from: "*"
+              to: "http_response"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
       http_head: {
         Args: { uri: string }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
+        SetofOptions: {
+          from: "*"
+          to: "http_response"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       http_header: {
         Args: { field: string; value: string }
         Returns: Database["public"]["CompositeTypes"]["http_header"]
+        SetofOptions: {
+          from: "*"
+          to: "http_header"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       http_list_curlopt: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           curlopt: string
           value: string
@@ -5172,53 +5247,51 @@ export type Database = {
       http_patch: {
         Args: { content: string; content_type: string; uri: string }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
+        SetofOptions: {
+          from: "*"
+          to: "http_response"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
-      http_post: {
-        Args:
-          | { content: string; content_type: string; uri: string }
-          | { data: Json; uri: string }
-        Returns: Database["public"]["CompositeTypes"]["http_response"]
-      }
+      http_post:
+        | {
+            Args: { content: string; content_type: string; uri: string }
+            Returns: Database["public"]["CompositeTypes"]["http_response"]
+            SetofOptions: {
+              from: "*"
+              to: "http_response"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
+        | {
+            Args: { data: Json; uri: string }
+            Returns: Database["public"]["CompositeTypes"]["http_response"]
+            SetofOptions: {
+              from: "*"
+              to: "http_response"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
       http_put: {
         Args: { content: string; content_type: string; uri: string }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
+        SetofOptions: {
+          from: "*"
+          to: "http_response"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
-      http_reset_curlopt: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      http_reset_curlopt: { Args: never; Returns: boolean }
       http_set_curlopt: {
         Args: { curlopt: string; value: string }
         Returns: boolean
       }
-      is_admin_impersonating: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      is_valid_token: {
-        Args: { token_id: string }
-        Returns: boolean
-      }
-      ivfflat_bit_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflat_halfvec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflathandler: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      l2_norm: {
-        Args: { "": unknown } | { "": unknown }
-        Returns: number
-      }
-      l2_normalize: {
-        Args: { "": string } | { "": unknown } | { "": unknown }
-        Returns: unknown
-      }
+      is_admin_impersonating: { Args: never; Returns: boolean }
+      is_valid_token: { Args: { token_id: string }; Returns: boolean }
       match_documents: {
         Args: { filter?: Json; match_count: number; query_embedding: string }
         Returns: {
@@ -5236,10 +5309,7 @@ export type Database = {
         }
         Returns: string
       }
-      refresh_company_business_metrics: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      refresh_company_business_metrics: { Args: never; Returns: undefined }
       set_config: {
         Args: {
           is_local?: boolean
@@ -5248,26 +5318,8 @@ export type Database = {
         }
         Returns: undefined
       }
-      sparsevec_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      sparsevec_send: {
-        Args: { "": unknown }
-        Returns: string
-      }
-      sparsevec_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
-      }
-      test_geocoding: {
-        Args: { address_param: string }
-        Returns: Json
-      }
-      text_to_bytea: {
-        Args: { data: string }
-        Returns: string
-      }
+      test_geocoding: { Args: { address_param: string }; Returns: Json }
+      text_to_bytea: { Args: { data: string }; Returns: string }
       update_campaign_status: {
         Args: {
           p_campaign_id: string
@@ -5277,10 +5329,20 @@ export type Database = {
         }
         Returns: boolean
       }
-      urlencode: {
-        Args: { data: Json } | { string: string } | { string: string }
-        Returns: string
-      }
+      urlencode:
+        | { Args: { data: Json }; Returns: string }
+        | {
+            Args: { string: string }
+            Returns: {
+              error: true
+            } & "Could not choose the best candidate function between: public.urlencode(string => bytea), public.urlencode(string => varchar). Try renaming the parameters or the function itself in the database so function overloading can be resolved"
+          }
+        | {
+            Args: { string: string }
+            Returns: {
+              error: true
+            } & "Could not choose the best candidate function between: public.urlencode(string => bytea), public.urlencode(string => varchar). Try renaming the parameters or the function itself in the database so function overloading can be resolved"
+          }
       user_belongs_to_company: {
         Args: { p_company_id: string; p_user_id: string }
         Returns: boolean
@@ -5288,30 +5350,6 @@ export type Database = {
       user_is_company_owner: {
         Args: { p_company_id: string; p_user_id: string }
         Returns: boolean
-      }
-      vector_avg: {
-        Args: { "": number[] }
-        Returns: string
-      }
-      vector_dims: {
-        Args: { "": string } | { "": unknown }
-        Returns: number
-      }
-      vector_norm: {
-        Args: { "": string }
-        Returns: number
-      }
-      vector_out: {
-        Args: { "": string }
-        Returns: unknown
-      }
-      vector_send: {
-        Args: { "": string }
-        Returns: string
-      }
-      vector_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
       }
     }
     Enums: {
@@ -5369,7 +5407,7 @@ export type Database = {
         value: string | null
       }
       http_request: {
-        method: unknown | null
+        method: unknown
         uri: string | null
         headers: Database["public"]["CompositeTypes"]["http_header"][] | null
         content_type: string | null

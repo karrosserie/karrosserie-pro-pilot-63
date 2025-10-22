@@ -360,6 +360,7 @@ export const quotesService = {
       expert_name: expertiseReport.expert_name || '',
       incident_date: expertiseReport.incident_date || '',
       report_id: expertiseReport.id,
+      source_report_id: expertiseReport.id, // Stocker le rapport source pour traçabilité
       company_id: userCompany.company_id,
       valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
     };

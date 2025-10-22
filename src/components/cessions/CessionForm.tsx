@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Cession } from '@/services/supabase/cessions';
 import { CessionBasicInfoSection } from './form/CessionBasicInfoSection';
 import { CessionFormActions } from './form/CessionFormActions';
 import { useCessionFormLogic } from './form/useCessionFormLogic';
+import { CessionModificatifWarning } from './CessionModificatifWarning';
 
 interface CessionFormProps {
   cession?: Cession | null;
@@ -20,6 +21,8 @@ export const CessionForm = ({
   isSubmitting
 }: CessionFormProps) => {
   const { toast } = useToast();
+  const [showModificatifWarning, setShowModificatifWarning] = useState(false);
+  const [pendingSubmitData, setPendingSubmitData] = useState<any>(null);
   
   const {
     formData,
@@ -27,6 +30,7 @@ export const CessionForm = ({
     isReadOnly,
     validationErrorMessage,
     client,
+    repairOrder,
     handleChange,
     validateForm,
     prepareSubmitData,
@@ -58,6 +62,14 @@ export const CessionForm = ({
     try {
       console.log('Form validation passed, preparing data...');
       const submitData = prepareSubmitData();
+      
+      // Vérifier si l'ordre de réparation est lié à un devis modifié sans modificatif
+      if (repairOrder?.is_modified_from_report && !repairOrder?.modificatif_received_at) {
+        setPendingSubmitData(submitData);
+        setShowModificatifWarning(true);
+        return;
+      }
+      
       console.log('Calling onSubmit with data:', submitData);
       await onSubmit(submitData);
       console.log('onSubmit completed successfully');
@@ -67,23 +79,39 @@ export const CessionForm = ({
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto">
-      <CessionBasicInfoSection 
-        formData={formData}
-        errors={errors}
-        validationErrorMessage={validationErrorMessage}
-        client={client}
-        companyId={undefined}
-        onFieldChange={handleChange}
-        onClearValidationError={clearValidationError}
-      />
+  const handleConfirmWithModificatif = async () => {
+    setShowModificatifWarning(false);
+    if (pendingSubmitData) {
+      await onSubmit(pendingSubmitData);
+      setPendingSubmitData(null);
+    }
+  };
 
-      <CessionFormActions 
-        cession={cession}
-        isSubmitting={isSubmitting}
-        onCancel={onCancel}
+  return (
+    <>
+      <form onSubmit={handleSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto">
+        <CessionBasicInfoSection 
+          formData={formData}
+          errors={errors}
+          validationErrorMessage={validationErrorMessage}
+          client={client}
+          companyId={undefined}
+          onFieldChange={handleChange}
+          onClearValidationError={clearValidationError}
+        />
+
+        <CessionFormActions 
+          cession={cession}
+          isSubmitting={isSubmitting}
+          onCancel={onCancel}
+        />
+      </form>
+
+      <CessionModificatifWarning
+        open={showModificatifWarning}
+        onOpenChange={setShowModificatifWarning}
+        onConfirm={handleConfirmWithModificatif}
       />
-    </form>
+    </>
   );
 };
