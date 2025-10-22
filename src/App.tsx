@@ -10,8 +10,30 @@ import AppRouter from "@/components/router/AppRouter";
 import { OnboardingAgentMessagePopup } from "@/components/onboarding/OnboardingAgentMessagePopup";
 import { OnboardingWatcher } from "@/components/onboarding/OnboardingWatcher";
 import { TourGuide } from "@/components/tour/TourGuide";
+import { QuoteConversionWarningDialog } from "@/components/quotes/QuoteConversionWarningDialog";
+import { useQuoteConversionWarning } from "@/hooks/use-quote-conversion-warning";
 
 const queryClient = new QueryClient();
+
+const AppContent = () => {
+  const { shouldShowWarning, unconvertedQuotes, dismissWarning } = useQuoteConversionWarning();
+
+  return (
+    <>
+      <Toaster />
+      <Sonner />
+      <OnboardingAgentMessagePopup />
+      <OnboardingWatcher />
+      <TourGuide />
+      <QuoteConversionWarningDialog
+        open={shouldShowWarning}
+        onClose={dismissWarning}
+        unconvertedQuotes={unconvertedQuotes}
+      />
+      <AppRouter />
+    </>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -19,12 +41,7 @@ const App = () => (
       <ConfirmationProvider>
         <BrowserRouter>
           <AuthProvider>
-            <Toaster />
-            <Sonner />
-            <OnboardingAgentMessagePopup />
-            <OnboardingWatcher />
-            <TourGuide />
-            <AppRouter />
+            <AppContent />
           </AuthProvider>
         </BrowserRouter>
       </ConfirmationProvider>

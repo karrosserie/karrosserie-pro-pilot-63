@@ -378,5 +378,104 @@ export const quotesService = {
 
     console.log('Quote created from report successfully:', data);
     return data;
+  },
+
+  getUnconvertedQuotesFromReports: async () => {
+    // Utiliser getCurrentUserCompanyId pour gérer correctement l'impersonation
+    const { getCurrentUserCompanyId } = await import('./auth-company');
+    const companyId = await getCurrentUserCompanyId();
+    
+    // Récupérer les devis créés depuis des rapports d'expertise qui ne sont pas archivés
+    const { data: quotes, error: quotesError } = await supabase
+      .from('quotes')
+      .select('*')
+      .eq('company_id', companyId)
+      .not('source_report_id', 'is', null) // Créés depuis un rapport
+      .eq('archived', false)
+      .order('created_at', { ascending: false });
+
+    if (quotesError) {
+      console.error('Error fetching quotes from reports:', quotesError);
+      throw new Error(quotesError.message);
+    }
+
+    if (!quotes || quotes.length === 0) {
+      return [];
+    }
+
+    // Vérifier si la table repair_orders existe et filtrer les devis déjà convertis
+    const quotesWithoutOrders = [];
+    
+    for (const quote of quotes) {
+      try {
+        const { data: orders } = await supabase
+          .from('repair_orders')
+          .select('id')
+          .eq('quote_id', quote.id)
+          .limit(1);
+        
+        // Si pas d'ordre de réparation trouvé, ajouter à la liste
+        if (!orders || orders.length === 0) {
+          quotesWithoutOrders.push(quote);
+        }
+      } catch (error) {
+        // Si la table repair_orders n'existe pas, on considère tous les devis comme non convertis
+        quotesWithoutOrders.push(quote);
+      }
+    }
+
+    if (quotesWithoutOrders.length === 0) {
+      return [];
+    }
+
+    // Récupérer les clients associés
+    const clientIds = quotesWithoutOrders.map(quote => quote.client_id).filter(id => id);
+    let clientsData = [];
+    if (clientIds.length > 0) {
+      const { data: clients } = await supabase
+        .from('clients')
+        .select('id, first_name, last_name')
+        .in('id', clientIds);
+      
+      if (clients) {
+        clientsData = clients;
+      }
+    }
+
+    // Récupérer les véhicules associés avec leurs marques et modèles
+    const vehicleIds = quotesWithoutOrders.map(quote => quote.vehicle_id).filter(id => id);
+    let vehiclesData = [];
+    if (vehicleIds.length > 0) {
+      const { data: vehicles } = await supabase
+        .from('vehicles')
+        .select(`
+          id,
+          license_plate,
+          brand,
+          model,
+          car_brands (
+            id,
+            name
+          ),
+          car_models (
+            id,
+            name
+          )
+        `)
+        .in('id', vehicleIds);
+      
+      if (vehicles) {
+        vehiclesData = vehicles;
+      }
+    }
+
+    // Combiner les données
+    const quotesWithRelations = quotesWithoutOrders.map(quote => ({
+      ...quote,
+      clients: clientsData.find(client => client.id === quote.client_id) || null,
+      vehicles: vehiclesData.find(vehicle => vehicle.id === quote.vehicle_id) || null
+    }));
+    
+    return quotesWithRelations;
   }
 };
