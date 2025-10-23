@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, Clock, DollarSign, Target, AlertCircle, CheckCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import DocumentRequestAlerts from './DocumentRequestAlerts';
 
 const AIDashboard = () => {
   const metrics = [
@@ -58,6 +59,9 @@ const AIDashboard = () => {
 
   return (
     <div className="space-y-6">
+      {/* Demandes de Documents */}
+      <DocumentRequestAlerts />
+
       {/* Métriques IA */}
       <Card className="bg-gradient-to-br from-gray-50 to-white shadow-lg border-0">
         <CardHeader>
