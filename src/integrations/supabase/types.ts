@@ -3421,6 +3421,30 @@ export type Database = {
           },
         ]
       }
+      remonté_demande_document: {
+        Row: {
+          client_id: string | null
+          company_id: string | null
+          created_at: string
+          id: number
+          probleme: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          company_id?: string | null
+          created_at?: string
+          id?: number
+          probleme?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          company_id?: string | null
+          created_at?: string
+          id?: number
+          probleme?: string | null
+        }
+        Relationships: []
+      }
       repair_orders: {
         Row: {
           archived: boolean
