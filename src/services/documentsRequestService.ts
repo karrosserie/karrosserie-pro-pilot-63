@@ -64,6 +64,28 @@ export const sendDocumentsRequest = async (clientId: string, companyId?: string)
       throw error;
     }
 
+    // Appeler le webhook n8n
+    try {
+      const webhookResponse = await fetch('https://n8n.karrosserie.pro/webhook/733c39a8-3260-4650-882c-a28c7ca6a279', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          client_id: clientId,
+          company_id: effectiveCompanyId,
+        }),
+      });
+
+      if (!webhookResponse.ok) {
+        console.error('❌ Erreur webhook n8n:', await webhookResponse.text());
+      } else {
+        console.log('✅ Webhook n8n appelé avec succès');
+      }
+    } catch (webhookError) {
+      console.error('❌ Exception lors de l\'appel au webhook n8n:', webhookError);
+    }
+
     // Créer une messagerie pour notifier l'envoi
     if (data?.uploadLink) {
       console.log('🔍 Tentative de création de messagerie...');
