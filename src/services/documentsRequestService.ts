@@ -3,7 +3,9 @@ import { toast } from 'sonner';
 
 export const sendDocumentsRequest = async (clientId: string, companyId?: string) => {
   try {
-    // D'abord, récupérer les informations du client
+    console.log('🔍 [sendDocumentsRequest] Début - clientId:', clientId, 'companyId:', companyId);
+    
+    // Récupérer les informations du client
     const { data: clientData, error: clientError } = await supabase
       .from('clients')
       .select('first_name, last_name')
@@ -15,7 +17,7 @@ export const sendDocumentsRequest = async (clientId: string, companyId?: string)
       throw new Error('Client non trouvé');
     }
 
-    // Ensuite, récupérer le premier véhicule du client
+    // Récupérer le premier véhicule du client
     const { data: vehicleData, error: vehicleError } = await supabase
       .from('vehicles')
       .select('id')
@@ -28,7 +30,7 @@ export const sendDocumentsRequest = async (clientId: string, companyId?: string)
       throw new Error('Le client doit avoir au moins un véhicule pour demander des documents');
     }
 
-    // Ensuite, créer un token pour la demande de documents
+    // Créer un token pour la demande de documents
     const { data: tokenData, error: tokenError } = await supabase
       .from('tokens')
       .insert({
@@ -36,7 +38,7 @@ export const sendDocumentsRequest = async (clientId: string, companyId?: string)
         company_id: companyId,
         vehicule_id: vehicleData.id,
       })
-      .select('id')
+      .select('id, company_id')
       .single();
 
     if (tokenError || !tokenData) {
@@ -44,12 +46,18 @@ export const sendDocumentsRequest = async (clientId: string, companyId?: string)
       throw new Error('Erreur lors de la création du token');
     }
 
-    // Ensuite, appeler l'edge function pour envoyer la demande
+    // Utiliser le company_id du token si celui passé en paramètre est undefined
+    const effectiveCompanyId = companyId || tokenData.company_id;
+    console.log('🔍 Company ID effectif:', effectiveCompanyId);
+
+    // Appeler l'edge function pour envoyer la demande
     const { data, error } = await supabase.functions.invoke('send-documents-request-email', {
       body: {
         tokenId: tokenData.id
       }
     });
+
+    console.log('🔍 Réponse edge function:', { data, error });
 
     if (error) {
       console.error('Erreur edge function:', error);
@@ -57,25 +65,38 @@ export const sendDocumentsRequest = async (clientId: string, companyId?: string)
     }
 
     // Créer une messagerie pour notifier l'envoi
-    if (data?.uploadLink && companyId) {
+    if (data?.uploadLink) {
+      console.log('🔍 Tentative de création de messagerie...');
       const clientName = `${clientData.first_name} ${clientData.last_name}`;
       const messageContent = `Client: ${clientName}\n\nPour la prise en charge de votre dossier par votre carrossier, vous pouvez envoyer vos justificatifs au lien suivant: ${data.uploadLink}`;
       
-      await supabase.from('messageries').insert({
-        company_id: companyId,
-        priority: 3, // Priorité basse
-        title: `Demande de justificatifs - ${clientName}`,
-        channel: data.sendMode === 'sms' ? 'SMS' : 'Email',
-        eta: 'N/A',
-        time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-        date: new Date().toLocaleDateString('fr-FR'),
-        summary: 'Demande de justificatifs client',
-        message: messageContent,
-        contact: data.recipient,
-        tags: ['documents', 'client'],
-        resolved: false,
-        archived: false,
-      });
+      try {
+        const messageResult = await supabase.from('messageries').insert({
+          company_id: effectiveCompanyId,
+          priority: 3, // Priorité basse
+          title: `Demande de justificatifs - ${clientName}`,
+          channel: data.sendMode === 'sms' ? 'SMS' : 'Email',
+          eta: 'N/A',
+          time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+          date: new Date().toLocaleDateString('fr-FR'),
+          summary: 'Demande de justificatifs client',
+          message: messageContent,
+          contact: data.recipient,
+          tags: ['documents', 'client'],
+          resolved: false,
+          archived: false,
+        });
+
+        if (messageResult.error) {
+          console.error('❌ Erreur lors de la création du message dans messageries:', messageResult.error);
+        } else {
+          console.log('✅ Message créé dans messageries avec succès');
+        }
+      } catch (msgError) {
+        console.error('❌ Exception lors de la création du message:', msgError);
+      }
+    } else {
+      console.warn('⚠️ uploadLink manquant dans la réponse de l\'edge function');
     }
 
     toast.success('Demande de documents envoyée avec succès');
