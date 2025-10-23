@@ -61,7 +61,14 @@ const DocumentRequestAlerts = () => {
               { 
                 label: 'Voir détails', 
                 variant: 'outline',
-                navigationTo: `/clients/${request.client_id}`
+                modalType: 'document_request_details',
+                modalData: { 
+                  title: 'Détails de la demande',
+                  clientId: request.client_id,
+                  companyId: request.company_id,
+                  problem: request.probleme,
+                  createdAt: request.created_at
+                }
               }
             ]}
           />
