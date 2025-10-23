@@ -7,6 +7,10 @@ export interface DocumentRequestAlert {
   company_id: string;
   probleme: string;
   created_at: string;
+  client?: {
+    first_name: string;
+    last_name: string;
+  };
 }
 
 export function useDocumentRequests(companyId?: string | null) {
@@ -17,7 +21,10 @@ export function useDocumentRequests(companyId?: string | null) {
 
       const { data, error } = await supabase
         .from('remonté_demande_document' as any)
-        .select('*')
+        .select(`
+          *,
+          clients!inner(first_name, last_name)
+        `)
         .eq('company_id', companyId)
         .order('created_at', { ascending: false });
 
@@ -26,7 +33,10 @@ export function useDocumentRequests(companyId?: string | null) {
         throw error;
       }
 
-      return (data || []) as unknown as DocumentRequestAlert[];
+      return (data || []).map((item: any) => ({
+        ...item,
+        client: item.clients
+      })) as DocumentRequestAlert[];
     },
     enabled: !!companyId,
   });

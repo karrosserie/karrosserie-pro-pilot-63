@@ -26,7 +26,7 @@ const DocumentRequestAlerts = () => {
             type="critical"
             icon="administration"
             title="Demande de document"
-            subtitle={`📄 Client ID: ${request.client_id}`}
+            subtitle={`📄 ${request.client?.first_name} ${request.client?.last_name}`}
             description={request.probleme}
             impact="Document manquant - Impact sur le traitement du dossier client"
             suggestion="Contacter le client pour obtenir le document manquant et finaliser le dossier"
