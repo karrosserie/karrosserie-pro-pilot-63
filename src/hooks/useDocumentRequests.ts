@@ -23,7 +23,7 @@ export function useDocumentRequests(companyId?: string | null) {
         .from('remonté_demande_document' as any)
         .select(`
           *,
-          clients!inner(first_name, last_name)
+          clients!client_id(first_name, last_name)
         `)
         .eq('company_id', companyId)
         .order('created_at', { ascending: false });
@@ -33,9 +33,15 @@ export function useDocumentRequests(companyId?: string | null) {
         throw error;
       }
 
+      console.log('Document requests data:', data);
+
       return (data || []).map((item: any) => ({
-        ...item,
-        client: item.clients
+        id: item.id,
+        client_id: item.client_id,
+        company_id: item.company_id,
+        probleme: item.probleme,
+        created_at: item.created_at,
+        client: item.clients || null
       })) as DocumentRequestAlert[];
     },
     enabled: !!companyId,
