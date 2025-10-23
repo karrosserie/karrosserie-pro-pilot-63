@@ -313,6 +313,7 @@ const handler = async (req: Request): Promise<Response> => {
         message: `Demande de justificatifs envoyée avec succès via ${sendMode}`,
         sendMode: sendMode,
         recipient: recipient,
+        uploadLink: uploadLink,
         originalClientEmail: clientData.email,
         originalClientPhone: clientData.phone
       }),

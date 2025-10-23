@@ -44,6 +44,27 @@ export const sendDocumentsRequest = async (clientId: string, companyId?: string)
       throw error;
     }
 
+    // Créer une messagerie pour notifier l'envoi
+    if (data?.uploadLink && companyId) {
+      const messageContent = `Pour la prise en charge de votre dossier par votre carrossier, vous pouvez envoyer vos justificatifs au lien suivant: ${data.uploadLink}`;
+      
+      await supabase.from('messageries').insert({
+        company_id: companyId,
+        priority: 3, // Priorité basse
+        title: 'Demande de pièces justificatives envoyée',
+        channel: data.sendMode === 'sms' ? 'SMS' : 'Email',
+        eta: 'N/A',
+        time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+        date: new Date().toLocaleDateString('fr-FR'),
+        summary: 'Demande de justificatifs client',
+        message: messageContent,
+        contact: data.recipient,
+        tags: ['documents', 'client'],
+        resolved: false,
+        archived: false,
+      });
+    }
+
     toast.success('Demande de documents envoyée avec succès');
     return data;
   } catch (error: any) {
