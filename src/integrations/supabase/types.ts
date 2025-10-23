@@ -3443,7 +3443,15 @@ export type Database = {
           id?: number
           probleme?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "remonté_demande_document_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       repair_orders: {
         Row: {
