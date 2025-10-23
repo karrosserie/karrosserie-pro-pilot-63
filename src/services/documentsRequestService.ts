@@ -71,14 +71,15 @@ export const sendDocumentsRequest = async (clientId: string, companyId?: string)
       const messageContent = `Client: ${clientName}\n\nPour la prise en charge de votre dossier par votre carrossier, vous pouvez envoyer vos justificatifs au lien suivant: ${data.uploadLink}`;
       
       try {
+        const now = new Date();
         const messageResult = await supabase.from('messageries').insert({
           company_id: effectiveCompanyId,
           priority: 3, // Priorité basse
           title: `Demande de justificatifs - ${clientName}`,
-          channel: data.sendMode === 'sms' ? 'SMS' : 'Email',
+          channel: data.sendMode === 'sms' ? 'Message' : 'Mail',
           eta: 'N/A',
-          time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-          date: new Date().toLocaleDateString('fr-FR'),
+          time: now.toTimeString().split(' ')[0], // Format HH:MM:SS
+          date: now.toISOString().split('T')[0], // Format YYYY-MM-DD
           summary: 'Demande de justificatifs client',
           message: messageContent,
           contact: data.recipient,
