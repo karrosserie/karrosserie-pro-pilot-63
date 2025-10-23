@@ -235,12 +235,9 @@ const MissionControlDashboard = () => {
         onModeChange={setSelectedMode}
       />
       
-      {/* Section Demandes de Documents */}
-      <div className="mb-6">
-        <DocumentRequestAlerts />
-      </div>
-      
       <div className="alert-cards-container grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+        {/* Demandes de Documents */}
+        <DocumentRequestAlerts />
         {currentMissions.length === 0 ? (
           <div className="col-span-full text-center py-12">
             <div className="text-gray-500">
