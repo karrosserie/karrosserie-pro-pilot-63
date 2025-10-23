@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   Table, 
@@ -27,6 +27,7 @@ interface ClientsTableProps {
   onDeleteClient: (client: Client) => void;
   onCreateVehicle?: (client: Client) => void;
   onRequestDocuments?: (client: Client) => void;
+  highlightedClientId?: string | null;
 }
 
 const ClientsTable: React.FC<ClientsTableProps> = ({
@@ -35,10 +36,24 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
   onEditClient,
   onDeleteClient,
   onCreateVehicle,
-  onRequestDocuments
+  onRequestDocuments,
+  highlightedClientId
 }) => {
   const { sortedData: sortedClients, sortConfig, handleSort } = useTableSorting(clients, 'last_name');
   const isMobile = useIsMobile();
+  const highlightedRef = useRef<HTMLTableRowElement>(null);
+  const highlightedMobileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (highlightedClientId) {
+      const ref = isMobile ? highlightedMobileRef : highlightedRef;
+      if (ref.current) {
+        setTimeout(() => {
+          ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+      }
+    }
+  }, [highlightedClientId, isMobile]);
   
   if (isMobile) {
     return (
@@ -53,6 +68,8 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
               onDeleteClient={onDeleteClient}
               onCreateVehicle={onCreateVehicle}
               onRequestDocuments={onRequestDocuments}
+              isHighlighted={highlightedClientId === client.id}
+              highlightedRef={highlightedClientId === client.id ? highlightedMobileRef : undefined}
             />
           ))
         ) : (
@@ -96,10 +113,14 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
               const hasBackLicense = clientData.driver_license_back_url;
               const hasCompleteLicense = hasFrontLicense && hasBackLicense;
 
+              const isHighlighted = highlightedClientId === client.id;
               
               return (
                 <React.Fragment key={client.id}>
-                  <TableRow className="hover:bg-gray-50 border-b-0">
+                  <TableRow 
+                    ref={isHighlighted ? highlightedRef : undefined}
+                    className={`hover:bg-gray-50 border-b-0 ${isHighlighted ? 'highlight-client' : ''}`}
+                  >
                     <TableCell className="font-medium">
                       {client.first_name} {client.last_name}
                     </TableCell>
@@ -113,7 +134,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                       />
                     </TableCell>
                   </TableRow>
-                  <TableRow className="border-t-0">
+                  <TableRow className={`border-t-0 ${isHighlighted ? 'highlight-client' : ''}`}>
                     <TableCell colSpan={5} className="py-3 border-t-0">
                       <div className="flex flex-wrap gap-2 justify-end px-4">
                         <Button variant="view" size="sm" onClick={() => onViewClient(client)}>

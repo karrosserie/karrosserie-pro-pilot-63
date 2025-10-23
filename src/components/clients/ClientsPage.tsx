@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import ClientsHeader from './ClientsHeader';
 import ClientsTable from './ClientsTable';
 import ClientsFilters from './ClientsFilters';
@@ -18,10 +19,29 @@ import { Client } from '@/services/supabase/clients';
 const ClientsPage = () => {
   const { clients, isLoading, error } = useClients();
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [highlightedClientId, setHighlightedClientId] = useState<string | null>(null);
   
   // Vehicle dialog state
   const [vehicleDialogOpen, setVehicleDialogOpen] = useState(false);
   const [selectedClientForVehicle, setSelectedClientForVehicle] = useState<Client | null>(null);
+
+  // Handle highlighting client from URL parameter
+  useEffect(() => {
+    const clientId = searchParams.get('clientId');
+    if (clientId) {
+      setHighlightedClientId(clientId);
+      
+      // Remove the parameter after 3 seconds
+      const timeout = setTimeout(() => {
+        setHighlightedClientId(null);
+        searchParams.delete('clientId');
+        setSearchParams(searchParams, { replace: true });
+      }, 3000);
+      
+      return () => clearTimeout(timeout);
+    }
+  }, [searchParams, setSearchParams]);
   
   const { createVehicle } = useVehicles();
   const { user } = useAuth();
@@ -142,6 +162,7 @@ const ClientsPage = () => {
         onDeleteClient={handleDeleteClient}
         onCreateVehicle={handleCreateVehicle}
         onRequestDocuments={handleRequestDocuments}
+        highlightedClientId={highlightedClientId}
       />
 
       <ClientDialogs

@@ -163,6 +163,20 @@
     }
   }
 
+  @keyframes highlight-pulse {
+    0%, 100% {
+      background-color: transparent;
+    }
+    50% {
+      background-color: hsl(var(--karrosserie-orange) / 0.15);
+    }
+  }
+
+  .highlight-client {
+    animation: highlight-pulse 1s ease-in-out 3;
+    scroll-margin-top: 2rem;
+  }
+
   /* Responsive breakpoint for xs (extra small) */
   @media (min-width: 475px) {
     .xs\:hidden {
