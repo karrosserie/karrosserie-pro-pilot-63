@@ -3,7 +3,19 @@ import { toast } from 'sonner';
 
 export const sendDocumentsRequest = async (clientId: string, companyId?: string) => {
   try {
-    // D'abord, récupérer le premier véhicule du client
+    // D'abord, récupérer les informations du client
+    const { data: clientData, error: clientError } = await supabase
+      .from('clients')
+      .select('first_name, last_name')
+      .eq('id', clientId)
+      .single();
+
+    if (clientError) {
+      console.error('Erreur lors de la récupération du client:', clientError);
+      throw new Error('Client non trouvé');
+    }
+
+    // Ensuite, récupérer le premier véhicule du client
     const { data: vehicleData, error: vehicleError } = await supabase
       .from('vehicles')
       .select('id')
@@ -46,12 +58,13 @@ export const sendDocumentsRequest = async (clientId: string, companyId?: string)
 
     // Créer une messagerie pour notifier l'envoi
     if (data?.uploadLink && companyId) {
-      const messageContent = `Pour la prise en charge de votre dossier par votre carrossier, vous pouvez envoyer vos justificatifs au lien suivant: ${data.uploadLink}`;
+      const clientName = `${clientData.first_name} ${clientData.last_name}`;
+      const messageContent = `Client: ${clientName}\n\nPour la prise en charge de votre dossier par votre carrossier, vous pouvez envoyer vos justificatifs au lien suivant: ${data.uploadLink}`;
       
       await supabase.from('messageries').insert({
         company_id: companyId,
         priority: 3, // Priorité basse
-        title: 'Demande de pièces justificatives envoyée',
+        title: `Demande de justificatifs - ${clientName}`,
         channel: data.sendMode === 'sms' ? 'SMS' : 'Email',
         eta: 'N/A',
         time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
