@@ -82,7 +82,6 @@ export const sendDocumentsRequest = async (clientId: string, companyId?: string)
           date: now.toISOString().split('T')[0], // Format YYYY-MM-DD
           summary: 'Demande de justificatifs client',
           message: messageContent,
-          contact: data.recipient,
           tags: ['documents', 'client'],
           resolved: false,
           archived: false,
