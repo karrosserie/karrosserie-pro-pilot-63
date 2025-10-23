@@ -6,6 +6,7 @@ import { useSystemAlerts } from '@/hooks/use-system-alerts';
 import { createMissingVehicleAlerts } from '@/utils/createMissingVehicleAlerts';
 import { useCompany } from '@/hooks/use-company';
 import { useEmployeeData } from '@/hooks/useEmployeeData';
+import DocumentRequestAlerts from '@/components/ai-assistant/DocumentRequestAlerts';
 
 
 const MissionControlDashboard = () => {
@@ -233,6 +234,11 @@ const MissionControlDashboard = () => {
         selectedMode={selectedMode}
         onModeChange={setSelectedMode}
       />
+      
+      {/* Section Demandes de Documents */}
+      <div className="mb-6">
+        <DocumentRequestAlerts />
+      </div>
       
       <div className="alert-cards-container grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
         {currentMissions.length === 0 ? (
