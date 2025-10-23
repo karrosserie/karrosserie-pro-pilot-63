@@ -49,26 +49,9 @@ const DocumentRequestAlerts = () => {
             ]}
             actions={[
               { 
-                label: 'Contacter client', 
+                label: 'Voir client', 
                 variant: 'primary',
-                modalType: 'contact_client',
-                modalData: { 
-                  title: 'Contacter le client',
-                  clientId: request.client_id,
-                  problem: request.probleme
-                }
-              },
-              { 
-                label: 'Voir détails', 
-                variant: 'outline',
-                modalType: 'document_request_details',
-                modalData: { 
-                  title: 'Détails de la demande',
-                  clientId: request.client_id,
-                  companyId: request.company_id,
-                  problem: request.probleme,
-                  createdAt: request.created_at
-                }
+                navigationTo: `/clients?clientId=${request.client_id}`
               }
             ]}
           />
