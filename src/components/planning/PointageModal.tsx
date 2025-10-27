@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Clock, User, MapPin, Loader } from 'lucide-react';
+import { Clock, User, MapPin, Loader, LogOut } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { clockIn } from '@/utils/pointageSupabaseUtils';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface PointageModalProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export const PointageModal: React.FC<PointageModalProps> = ({
   employeId
 }) => {
   const { toast } = useToast();
+  const { signOut } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePointer = async () => {
@@ -109,6 +111,16 @@ export const PointageModal: React.FC<PointageModalProps> = ({
             <MapPin className="w-3 h-3" />
             Vérification de position dans un rayon de 100m
           </p>
+
+          <Button 
+            onClick={signOut}
+            variant="outline"
+            size="sm"
+            className="mt-4 text-muted-foreground hover:text-destructive"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Se déconnecter
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
