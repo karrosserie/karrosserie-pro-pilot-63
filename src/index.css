@@ -202,18 +202,4 @@
       transform: scale(0.98);
     }
   }
-
-  /* Assurer le scroll à la molette dans les menus déroulants */
-  [data-radix-select-viewport] {
-    overflow-y: auto !important;
-    overscroll-behavior: contain;
-  }
-
-  [data-radix-popper-content-wrapper] {
-    overflow: visible !important;
-  }
-
-  [data-radix-scroll-area-viewport] {
-    overscroll-behavior: contain;
-  }
 }

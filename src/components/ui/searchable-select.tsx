@@ -5,7 +5,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Check, ChevronDown, UserPlus, Car } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -176,7 +175,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
         </PopoverTrigger>
         <PopoverContent className="w-[--radix-popover-trigger-width] p-0 z-[120] bg-background border rounded-md shadow-md" align="start" sideOffset={4}>
           <Command>
-            <ScrollArea className="max-h-[300px]">
+            <div className="max-h-[300px] overflow-y-auto">
               <CommandList>
                 {/* Option "Nouveau client" toujours en haut si activée */}
                 {showNewClientOption && (
@@ -234,7 +233,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                   </CommandGroup>
                 )}
               </CommandList>
-            </ScrollArea>
+            </div>
           </Command>
         </PopoverContent>
       </Popover>
