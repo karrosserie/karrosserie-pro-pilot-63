@@ -105,7 +105,7 @@ export function useQuotes() {
         .eq('id', id)
         .select(`
           *,
-          clients(first_name, last_name),
+          clients(first_name, last_name, email, phone),
           vehicles(
             id,
             license_plate,
@@ -138,6 +138,8 @@ export function useQuotes() {
             ...updatedQuote,
             company_id: updatedQuote.company_id,
             notes: updatedQuote.notes,
+            client_email: updatedQuote.clients?.email || '',
+            client_phone: updatedQuote.clients?.phone || '',
             timestamp: new Date().toISOString()
           })
         });
