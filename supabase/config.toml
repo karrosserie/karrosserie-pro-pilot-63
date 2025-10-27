@@ -1,5 +1,8 @@
 project_id = "jukdsypvuehnniskgpfd"
 
+[functions.replace-document]
+verify_jwt = true
+
 [functions.notify-company-creation]
 verify_jwt = false
 
