@@ -173,7 +173,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
             />
           </div>
         </PopoverTrigger>
-        <PopoverContent className="w-[--radix-popover-trigger-width] p-0 z-[120] bg-background border rounded-md shadow-md" align="start" sideOffset={4}>
+        <PopoverContent className="w-[--radix-popover-trigger-width] p-0 z-[120] bg-background border rounded-md shadow-md" align="start" sideOffset={4} onWheel={(e) => e.stopPropagation()}>
           <Command>
             <CommandList>
                 {/* Option "Nouveau client" toujours en haut si activée */}
