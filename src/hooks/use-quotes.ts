@@ -122,12 +122,41 @@ export function useQuotes() {
 
       return result;
     },
-    onSuccess: () => {
+    onSuccess: async (updatedQuote) => {
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
-      toast({
-        title: "Devis mis à jour",
-        description: "Le devis a été mis à jour avec succès."
-      });
+      
+      // Envoyer les données au webhook N8n
+      try {
+        const webhookUrl = 'https://n8n.karrosserie.pro/webhook/0c2053ca-0621-42c7-81df-b890fb2b494f';
+        
+        const response = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...updatedQuote,
+            company_id: updatedQuote.company_id,
+            timestamp: new Date().toISOString()
+          })
+        });
+
+        if (response.ok) {
+          toast({
+            title: "Devis mis à jour et envoyé",
+            description: "Le devis a été mis à jour et envoyé au workflow avec succès."
+          });
+        } else {
+          throw new Error('Erreur lors de l\'envoi au workflow');
+        }
+      } catch (error) {
+        console.error('Error sending to N8n webhook:', error);
+        toast({
+          title: "Devis mis à jour",
+          description: "Le devis a été mis à jour mais l'envoi au workflow a échoué.",
+          variant: "destructive"
+        });
+      }
     },
     onError: (error) => {
       toast({
