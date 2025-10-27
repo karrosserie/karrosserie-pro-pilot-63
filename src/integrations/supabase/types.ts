@@ -1411,6 +1411,81 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_work_time_tracking: {
+        Row: {
+          company_id: string
+          created_at: string
+          current_task_id: string | null
+          current_task_start: string | null
+          date: string
+          id: string
+          is_currently_working: boolean
+          total_work_minutes: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          current_task_id?: string | null
+          current_task_start?: string | null
+          date?: string
+          id?: string
+          is_currently_working?: boolean
+          total_work_minutes?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          current_task_id?: string | null
+          current_task_start?: string | null
+          date?: string
+          id?: string
+          is_currently_working?: boolean
+          total_work_minutes?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_work_time_tracking_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "employee_work_time_tracking_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "employee_work_time_tracking_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_work_time_tracking_current_task_id_fkey"
+            columns: ["current_task_id"]
+            isOneToOne: false
+            referencedRelation: "employee_schedule"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_work_time_tracking_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       environment: {
         Row: {
           asynchronous_import: boolean
@@ -5162,6 +5237,69 @@ export type Database = {
           total_revenue: number | null
         }
         Relationships: []
+      }
+      employee_work_time_summary: {
+        Row: {
+          company_id: string | null
+          current_task_id: string | null
+          current_task_start: string | null
+          current_task_type:
+            | Database["public"]["Enums"]["schedule_task_type"]
+            | null
+          current_total_minutes: number | null
+          current_vehicle_id: string | null
+          current_vehicle_plate: string | null
+          date: string | null
+          employee_name: string | null
+          formatted_duration: string | null
+          is_currently_working: boolean | null
+          total_work_minutes: number | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_schedule_vehicle_id_fkey"
+            columns: ["current_vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_work_time_tracking_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "employee_work_time_tracking_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "employee_work_time_tracking_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_work_time_tracking_current_task_id_fkey"
+            columns: ["current_task_id"]
+            isOneToOne: false
+            referencedRelation: "employee_schedule"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_work_time_tracking_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vehicle_work_time_summary: {
         Row: {

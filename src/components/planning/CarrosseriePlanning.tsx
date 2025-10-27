@@ -9,6 +9,7 @@ import { useVehicleData } from '@/hooks/useVehicleData';
 import { useWaitingVehicles } from '@/hooks/useWaitingVehicles';
 import { usePlanningTasks } from '@/hooks/usePlanningTasks';
 import { usePlanningManager } from '@/hooks/usePlanningManager';
+import { useAllEmployeesWorkTime } from '@/hooks/use-employee-work-time';
 
 // UI Components
 import { useToast } from '@/hooks/use-toast';
@@ -33,6 +34,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCompanyId } from '@/hooks/use-company-id';
 import { useUserRole } from '@/hooks/use-user-role';
 import { useViewManagement } from '@/hooks/use-view-management';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 const CarrosseriePlanning = () => {
   console.log('🚀 COMPOSANT CARROSSERIE PLANNING CHARGÉ - DEBUT');
@@ -98,6 +101,7 @@ const CarrosseriePlanning = () => {
   const { vehicles, loading: vehiclesLoading, refetch: refetchVehicles } = useVehicleData(companyId);
   const { waitingVehicles, loading: waitingVehiclesLoading, refetch: refetchWaitingVehicles } = useWaitingVehicles(companyId);
   const { planningTaches, getTasksForEmployee, getTasksForEmployeeById, getTodayTasks, getAllWorkflowTasks, getAllTasksIncludingWaiting, loading: planningLoading, refetch: refetchPlanning } = usePlanningTasks(companyId);
+  const { data: allWorkTimes = [] } = useAllEmployeesWorkTime();
 
   console.log('🚀 COMPOSANT CARROSSERIE PLANNING - HOOKS APPELÉS:', {
     employesFromDataLength: employesFromData.length,
@@ -214,6 +218,30 @@ const CarrosseriePlanning = () => {
 
   return (
     <div className="space-y-6">
+      {/* Daily Work Time Summary */}
+      {allWorkTimes.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Temps de travail du jour</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {allWorkTimes.map(wt => (
+                <div key={wt.user_id} className="flex items-center justify-between p-2 bg-muted rounded">
+                  <span className="font-medium">{wt.employee_name}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold">{wt.formatted_duration}</span>
+                    {wt.is_currently_working && (
+                      <Badge className="bg-green-500 text-white">En cours</Badge>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Main Planning Interface */}
       <WorkshopPlanningInterface
         employees={employes}

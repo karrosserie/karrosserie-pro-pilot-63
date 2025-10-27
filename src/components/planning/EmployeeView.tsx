@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Play, Pause, CheckCircle, Calendar, User, BarChart, Coffee, LogOut, Camera, AlertTriangle } from 'lucide-react';
 import { CurrentTaskDisplay } from '@/components/planning/CurrentTaskDisplay';
+import { EmployeeWorkTimeDisplay } from '@/components/planning/EmployeeWorkTimeDisplay';
 import { useEmployeeSchedule } from '@/hooks/use-employee-schedule';
 import { useCompany } from '@/hooks/use-company';
 import { useAuth } from '@/contexts/AuthContext';
@@ -653,6 +654,14 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      {/* Employee Work Time Display */}
+      {currentUserId && (
+        <EmployeeWorkTimeDisplay 
+          userId={currentUserId}
+          employeeName="Mon temps de travail"
+        />
+      )}
 
       {/* Tâche en cours - Nouveau design */}
       {currentTask ? (
