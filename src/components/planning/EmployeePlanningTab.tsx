@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, Clock, User, MapPin, Phone, Mail, Plus, Search, Filter, TrendingUp, Activity } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { EmployeeWorkTimeDisplay } from './EmployeeWorkTimeDisplay';
 
 interface EmployeePlanningTabProps {
   employees?: any[];
@@ -271,6 +272,15 @@ export const EmployeePlanningTab = ({ employees = [], schedules = [] }: Employee
                     <div className="text-lg sm:text-xl font-bold text-orange-700">{stats.totalTime}h</div>
                     <div className="text-xs text-orange-600 font-medium">Temps</div>
                   </div>
+                </div>
+
+                {/* Temps de travail effectif */}
+                <div className="mt-4 p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200/50">
+                  <EmployeeWorkTimeDisplay 
+                    userId={employee.user_id}
+                    employeeName={employee.nom}
+                    compact={true}
+                  />
                 </div>
               </CardHeader>
 
