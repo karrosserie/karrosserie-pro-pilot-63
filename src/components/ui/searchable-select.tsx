@@ -176,63 +176,65 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
         </PopoverTrigger>
         <PopoverContent className="w-[--radix-popover-trigger-width] p-0 z-[120] bg-background border rounded-md shadow-md" align="start" sideOffset={4}>
           <Command>
-            <CommandList className="max-h-[300px] overflow-auto">
-              {/* Option "Nouveau client" toujours en haut si activée */}
-              {showNewClientOption && (
-                <CommandGroup>
-                  <CommandItem
-                    key="new-client"
-                    onSelect={handleNewClientClick}
-                    className="cursor-pointer bg-muted/50 hover:bg-muted font-medium text-primary"
-                  >
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    Nouveau client
-                  </CommandItem>
-                </CommandGroup>
-              )}
-              
-              {/* Option "Nouveau véhicule" toujours en haut si activée */}
-              {showNewVehicleOption && (
-                <CommandGroup>
-                  <CommandItem
-                    key="new-vehicle"
-                    onSelect={handleNewVehicleClick}
-                    className="cursor-pointer bg-muted/50 hover:bg-muted font-medium text-primary"
-                  >
-                    <Car className="mr-2 h-4 w-4" />
-                    Nouveau véhicule
-                  </CommandItem>
-                </CommandGroup>
-              )}
-              
-              {filteredOptions.length === 0 ? (
-                <CommandEmpty>
-                  {allowFreeText 
-                    ? "Aucun client trouvé. Vous pouvez saisir un nouveau nom." 
-                    : "Aucun résultat trouvé."
-                  }
-                </CommandEmpty>
-              ) : (
-                <CommandGroup>
-                  {filteredOptions.map((option) => (
+            <ScrollArea className="max-h-[300px]">
+              <CommandList>
+                {/* Option "Nouveau client" toujours en haut si activée */}
+                {showNewClientOption && (
+                  <CommandGroup>
                     <CommandItem
-                      key={option.value}
-                      value={option.value}
-                      onSelect={() => handleSelectOption(option.value)}
-                      className="cursor-pointer"
+                      key="new-client"
+                      onSelect={handleNewClientClick}
+                      className="cursor-pointer bg-muted/50 hover:bg-muted font-medium text-primary"
                     >
-                      {option.label}
-                      <Check
-                        className={cn(
-                          "ml-auto h-4 w-4",
-                          value === option.value ? "opacity-100" : "opacity-0"
-                        )}
-                      />
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      Nouveau client
                     </CommandItem>
-                  ))}
-                </CommandGroup>
-              )}
-            </CommandList>
+                  </CommandGroup>
+                )}
+                
+                {/* Option "Nouveau véhicule" toujours en haut si activée */}
+                {showNewVehicleOption && (
+                  <CommandGroup>
+                    <CommandItem
+                      key="new-vehicle"
+                      onSelect={handleNewVehicleClick}
+                      className="cursor-pointer bg-muted/50 hover:bg-muted font-medium text-primary"
+                    >
+                      <Car className="mr-2 h-4 w-4" />
+                      Nouveau véhicule
+                    </CommandItem>
+                  </CommandGroup>
+                )}
+                
+                {filteredOptions.length === 0 ? (
+                  <CommandEmpty>
+                    {allowFreeText 
+                      ? "Aucun client trouvé. Vous pouvez saisir un nouveau nom." 
+                      : "Aucun résultat trouvé."
+                    }
+                  </CommandEmpty>
+                ) : (
+                  <CommandGroup>
+                    {filteredOptions.map((option) => (
+                      <CommandItem
+                        key={option.value}
+                        value={option.value}
+                        onSelect={() => handleSelectOption(option.value)}
+                        className="cursor-pointer"
+                      >
+                        {option.label}
+                        <Check
+                          className={cn(
+                            "ml-auto h-4 w-4",
+                            value === option.value ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
+              </CommandList>
+            </ScrollArea>
           </Command>
         </PopoverContent>
       </Popover>
