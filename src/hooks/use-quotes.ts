@@ -137,6 +137,7 @@ export function useQuotes() {
           body: JSON.stringify({
             ...updatedQuote,
             company_id: updatedQuote.company_id,
+            notes: updatedQuote.notes,
             timestamp: new Date().toISOString()
           })
         });
