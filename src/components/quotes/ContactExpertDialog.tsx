@@ -65,7 +65,7 @@ export const ContactExpertDialog = ({
     `Cordialement`
   );
 
-  const handleSendEmail = () => {
+  const handleSendEmail = async () => {
     if (!expertEmail) {
       toast({
         title: "Email requis",
@@ -73,6 +73,48 @@ export const ContactExpertDialog = ({
         variant: "destructive"
       });
       return;
+    }
+
+    // Envoyer les données au webhook N8n
+    try {
+      const webhookUrl = 'https://n8n.karrosserie.pro/webhook/0c2053ca-0621-42c7-81df-b890fb2b494f';
+      
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          quote_id: quote.id,
+          quote_reference: quote.reference,
+          expert_name: quote.expert_name,
+          expert_email: expertEmail,
+          expert_phone: expertPhone,
+          message: message,
+          claim_number: quote.claim_number,
+          report_number: quote.report_number,
+          client_email: (quote.clients as any)?.email || '',
+          client_phone: (quote.clients as any)?.phone || '',
+          company_id: quote.company_id,
+          timestamp: new Date().toISOString()
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de l\'envoi au workflow');
+      }
+
+      toast({
+        title: "Données envoyées",
+        description: "Les informations ont été envoyées au workflow avec succès."
+      });
+    } catch (error) {
+      console.error('Error sending to N8n webhook:', error);
+      toast({
+        title: "Erreur",
+        description: "L'envoi au workflow a échoué.",
+        variant: "destructive"
+      });
     }
 
     // Ouvrir le client email
