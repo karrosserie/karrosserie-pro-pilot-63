@@ -24,8 +24,10 @@ import {
   MessageSquare,
   Scale
 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { useAdmin } from '@/hooks/use-admin';
 import { useUserRole } from '@/hooks/use-user-role';
+import { useSystemAlerts } from '@/hooks/use-system-alerts';
 
 interface SidebarProps {
   isMobile: boolean;
@@ -43,9 +45,10 @@ interface NavItemProps {
   onClose?: () => void;
   openMenuPath: string | null;
   onMenuToggle: (path: string | null) => void;
+  badgeCount?: number;
 }
 
-const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems = [], onClose, openMenuPath, onMenuToggle }: NavItemProps) => {
+const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems = [], onClose, openMenuPath, onMenuToggle, badgeCount }: NavItemProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -94,6 +97,11 @@ const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems
       >
         <span className="mr-3 flex-shrink-0">{icon}</span>
         <span className="flex-1 truncate">{label}</span>
+        {badgeCount !== undefined && badgeCount > 0 && (
+          <Badge className="ml-2 bg-karrosserie-orange hover:bg-karrosserie-orange text-white">
+            {badgeCount}
+          </Badge>
+        )}
         {hasSubMenu && (
           <span className="ml-2 flex-shrink-0">
             {isSubMenuOpen 
@@ -137,9 +145,13 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
   const location = useLocation();
   const { isAdmin } = useAdmin();
   const { userRole, isCarrossierCourtesy, isCarrossier, isResponsable, isResponsableAdmin } = useUserRole();
+  const { alerts } = useSystemAlerts();
   
   // État global pour gérer quel menu déroulant est ouvert
   const [openMenuPath, setOpenMenuPath] = useState<string | null>(null);
+  
+  // Compter les alertes non traitées
+  const unhandledAlertsCount = alerts.length;
   
   const isActivePath = (path: string): boolean => {
     if (path === '/') {
@@ -304,6 +316,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
                 onClose={isMobile ? onClose : undefined}
                 openMenuPath={openMenuPath}
                 onMenuToggle={setOpenMenuPath}
+                badgeCount={item.path === '/ai-assistant' ? unhandledAlertsCount : undefined}
               />
             ))}
           </nav>
