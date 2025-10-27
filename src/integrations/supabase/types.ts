@@ -4633,6 +4633,68 @@ export type Database = {
           },
         ]
       }
+      vehicle_work_time_tracking: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          is_currently_working: boolean
+          last_task_start: string | null
+          total_work_minutes: number
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          is_currently_working?: boolean
+          last_task_start?: string | null
+          total_work_minutes?: number
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          is_currently_working?: boolean
+          last_task_start?: string | null
+          total_work_minutes?: number
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_work_time_tracking_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "vehicle_work_time_tracking_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "vehicle_work_time_tracking_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_work_time_tracking_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_workflow_steps: {
         Row: {
           company_id: string
@@ -5100,6 +5162,49 @@ export type Database = {
           total_revenue: number | null
         }
         Relationships: []
+      }
+      vehicle_work_time_summary: {
+        Row: {
+          company_id: string | null
+          current_total_minutes: number | null
+          formatted_duration: string | null
+          is_currently_working: boolean | null
+          last_task_start: string | null
+          license_plate: string | null
+          total_work_minutes: number | null
+          vehicle_id: string | null
+          vehicle_status: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_work_time_tracking_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "vehicle_work_time_tracking_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "vehicle_work_time_tracking_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_work_time_tracking_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {

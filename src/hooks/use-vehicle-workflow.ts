@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAllVehiclesWorkTime } from './use-vehicle-work-time';
 
 export interface WorkflowVehicle {
   id: string;
@@ -25,6 +26,15 @@ export const useVehicleWorkflow = (companyId?: string) => {
   const [workflowSteps, setWorkflowSteps] = useState<WorkflowStep[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Récupérer tous les temps de travail des véhicules
+  const { data: allWorkTimes = [] } = useAllVehiclesWorkTime();
+  
+  // Créer une map pour accès rapide
+  const workTimeMap = useMemo(() => {
+    if (!Array.isArray(allWorkTimes)) return new Map();
+    return new Map(allWorkTimes.map(wt => [wt.vehicle_id, wt]));
+  }, [allWorkTimes]);
 
   const loadWorkflowData = async () => {
     if (!companyId) return;
@@ -121,6 +131,9 @@ export const useVehicleWorkflow = (companyId?: string) => {
         const taxRate = quote?.tax_rate || 20;
         const amountTTC = amountHT * (1 + taxRate / 100);
         
+        // Récupérer le temps de travail pour ce véhicule
+        const vehicleWorkTime = workTimeMap.get(vehicle.id);
+        
         if (stepMap[currentStep]) {
           stepMap[currentStep].vehicles.push({
             id: vehicle.id,
@@ -128,7 +141,7 @@ export const useVehicleWorkflow = (companyId?: string) => {
             plate: vehicle.license_plate,
             client: `${vehicle.clients?.first_name || ''} ${vehicle.clients?.last_name || ''}`.trim() || 'Client inconnu',
             price: `${amountTTC.toFixed(2).replace('.', ',')}€`,
-            duration: "0h", // À calculer selon la configuration
+            duration: vehicleWorkTime?.formatted_duration || '0h 0min',
             status: workflowStep.progress_percentage === 100 ? "Terminé" : "En cours",
             inProgress: workflowStep.progress_percentage > 0 && workflowStep.progress_percentage < 100,
             technician: workflowStep.technician_id ? "Assigné" : null,

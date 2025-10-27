@@ -1,11 +1,15 @@
 
 import React from 'react';
-import { Car, User, Eye, Pencil, Trash, FileText, Receipt } from 'lucide-react';
+import { Car, User, Eye, Pencil, Trash, FileText, Receipt, Clock, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
+import { useVehicleWorkTime } from '@/hooks/use-vehicle-work-time';
+import { cn } from '@/lib/utils';
 
 interface VehicleCardProps {
+  vehicleId?: string;
   brand: string;
   model: string;
   year: number;
@@ -24,6 +28,7 @@ interface VehicleCardProps {
 }
 
 const VehicleCard: React.FC<VehicleCardProps> = ({
+  vehicleId,
   brand,
   model,
   licensePlate,
@@ -39,6 +44,11 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
   onCreateQuote,
   onCreateInvoice
 }) => {
+  // Récupérer le temps de travail du véhicule
+  const { data: workTime } = useVehicleWorkTime(vehicleId);
+  
+  // Type guard pour s'assurer que workTime est un objet unique
+  const workTimeData = workTime && !Array.isArray(workTime) ? workTime : null;
   // Détermine la couleur du statut
   const getStatusColor = () => {
     switch (status) {
@@ -163,6 +173,34 @@ const VehicleCard: React.FC<VehicleCardProps> = ({
             className={hasCompleteRegistration ? "bg-green-100 text-green-800 hover:bg-green-100" : "bg-amber-100 text-amber-800 hover:bg-amber-100"}
           />
         </div>
+        
+        {/* Affichage du temps de travail */}
+        {vehicleId && workTimeData && workTimeData.current_total_minutes > 0 && (
+          <div className="mt-3 pt-3 border-t border-gray-100">
+            <div className="flex items-center gap-2 text-sm">
+              <Clock className="h-4 w-4 text-gray-500" />
+              <span className={cn(
+                "font-medium",
+                workTimeData.is_currently_working && "text-green-600 animate-pulse"
+              )}>
+                {workTimeData.formatted_duration}
+              </span>
+              {workTimeData.is_currently_working && (
+                <Badge className="bg-green-500 text-white hover:bg-green-600">
+                  En cours
+                </Badge>
+              )}
+            </div>
+            
+            {/* Alerte si le temps dépasse 8h */}
+            {workTimeData.current_total_minutes > 480 && (
+              <div className="flex items-center gap-1 mt-1 text-xs text-amber-600">
+                <AlertTriangle className="h-3 w-3" />
+                <span>Temps de travail élevé ({Math.floor(workTimeData.current_total_minutes / 60)}h)</span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
       
       <div className="border-t border-gray-100 mt-4 pt-4 flex justify-center">

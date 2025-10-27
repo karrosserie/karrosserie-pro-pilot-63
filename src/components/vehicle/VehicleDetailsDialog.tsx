@@ -26,6 +26,9 @@ import { getVehiclePhotos } from '@/utils/vehiclePhotoService';
 import { getTaskPhotosByVehicle } from '@/utils/taskPhotoService';
 import { VehicleImagesTab } from './tabs/VehicleImagesTab';
 import { useVehiclePaintMetrics } from '@/hooks/dashboard/use-vehicle-paint-metrics';
+import { useVehicleWorkTime } from '@/hooks/use-vehicle-work-time';
+import { Badge } from '@/components/ui/badge';
+import { Clock } from 'lucide-react';
 
 
 interface VehicleDetailsDialogProps {
@@ -56,6 +59,10 @@ const VehicleDetailsDialog: React.FC<VehicleDetailsDialogProps> = ({
 
   // Hook pour les métriques de peinture du véhicule
   const { vehiclePaintMetrics } = useVehiclePaintMetrics(defaultValues?.id || null);
+  
+  // Hook pour le temps de travail du véhicule
+  const { data: workTime } = useVehicleWorkTime(defaultValues?.id);
+  const workTimeData = workTime && !Array.isArray(workTime) ? workTime : null;
   
 
   const handleCancel = () => {
@@ -131,12 +138,42 @@ const VehicleDetailsDialog: React.FC<VehicleDetailsDialogProps> = ({
     switch (activeTab) {
       case 'details':
         return (
-          <VehicleForm 
-            onSubmit={handleSubmit}
-            defaultValues={defaultValues || {}}
-            isViewMode={true}
-            onCancel={handleCancel}
-          />
+          <div className="space-y-6">
+            {/* Section du temps de travail */}
+            {workTimeData && (
+              <div className="p-4 bg-gray-50 rounded-lg space-y-2">
+                <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  Temps de travail effectif
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs text-gray-500">Temps total</p>
+                    <p className="text-lg font-semibold">{workTimeData.formatted_duration}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Statut</p>
+                    <div className="mt-1">
+                      {workTimeData.is_currently_working ? (
+                        <Badge className="bg-green-500 text-white hover:bg-green-600">
+                          🔄 En cours
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary">Aucune tâche en cours</Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <VehicleForm 
+              onSubmit={handleSubmit}
+              defaultValues={defaultValues || {}}
+              isViewMode={true}
+              onCancel={handleCancel}
+            />
+          </div>
         );
       case 'expertise':
         return <VehicleExpertiseReportsTab vehicleId={defaultValues?.id} />;
