@@ -175,8 +175,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
         </PopoverTrigger>
         <PopoverContent className="w-[--radix-popover-trigger-width] p-0 z-[120] bg-background border rounded-md shadow-md" align="start" sideOffset={4}>
           <Command>
-            <div className="max-h-[300px] overflow-y-auto">
-              <CommandList>
+            <CommandList>
                 {/* Option "Nouveau client" toujours en haut si activée */}
                 {showNewClientOption && (
                   <CommandGroup>
@@ -233,7 +232,6 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                   </CommandGroup>
                 )}
               </CommandList>
-            </div>
           </Command>
         </PopoverContent>
       </Popover>
