@@ -154,6 +154,16 @@ export const AccountForm = ({
             step="0.01"
             value={formData.balance}
             onChange={(e) => handleChange('balance', parseFloat(e.target.value) || 0)}
+            onFocus={(e) => {
+              if (formData.balance === 0) {
+                e.target.value = '';
+              }
+            }}
+            onBlur={(e) => {
+              if (e.target.value === '') {
+                handleChange('balance', 0);
+              }
+            }}
             placeholder="0.00"
           />
         </div>
