@@ -17,6 +17,7 @@ import PresencePointages from "@/pages/PresencePointages";
 import CreationDossierJudiciaire from "@/pages/CreationDossierJudiciaire";
 import DepotDossier from "@/pages/DepotDossier";
 import Welcome from "@/pages/Welcome";
+import TermsAndConditions from "@/pages/TermsAndConditions";
 
 import GestionTemplates from "@/pages/GestionTemplates";
 
@@ -195,6 +196,16 @@ export const coreRoutes = [
       <ProtectedRoute>
         <AppLayout>
           <GestionTemplates />
+        </AppLayout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/terms",
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <TermsAndConditions />
         </AppLayout>
       </ProtectedRoute>
     )

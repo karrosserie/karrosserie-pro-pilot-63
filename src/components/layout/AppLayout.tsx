@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useIsMobile } from "@/hooks/use-mobile";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
+import Footer from "./Footer";
 import QuickActions from "@/components/shared/QuickActions";
 import AccessRestriction from "./AccessRestriction";
 import SubscriptionExpiryAlert from "@/components/subscription/SubscriptionExpiryAlert";
@@ -42,10 +43,13 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         <Navbar onToggleSidebar={toggleSidebar} isSidebarOpen={sidebarOpen} />
         <main className="flex-1 overflow-y-auto">
-          <div className="min-h-full">
-            <AccessRestriction requiresFullAccess={requiresFullAccess}>
-              {children}
-            </AccessRestriction>
+          <div className="min-h-full flex flex-col">
+            <div className="flex-1">
+              <AccessRestriction requiresFullAccess={requiresFullAccess}>
+                {children}
+              </AccessRestriction>
+            </div>
+            <Footer />
           </div>
         </main>
       </div>
