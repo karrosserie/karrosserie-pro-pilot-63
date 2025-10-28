@@ -361,8 +361,34 @@ const RepairOrders = () => {
         throw new Error('Données du client non trouvées');
       }
 
-      // Générer le PDF avec la mention [Signature1/]
-      const documentUrl = await generateRepairOrderSignaturePDF(order, companyData, clientData);
+      // Récupérer l'ordre de réparation complet avec les données du devis
+      const fullOrder = await repairOrdersService.getById(order.id);
+
+      // Déterminer si on doit afficher les détails des items
+      let showItemsDetails = true;
+
+      // Vérifier si l'OR est lié à un rapport d'expertise
+      const hasReportLink = fullOrder.source_report_id || fullOrder.modificatif_report_id;
+
+      // Si pas de lien direct, vérifier si le devis associé est lié à un rapport
+      if (!hasReportLink && fullOrder.quotes) {
+        const quote = fullOrder.quotes;
+        if (quote.source_report_id || quote.modificatif_report_id || quote.report_id) {
+          showItemsDetails = false;
+        }
+      } else if (hasReportLink) {
+        showItemsDetails = false;
+      }
+
+      console.log('Génération du PDF avec showItemsDetails:', showItemsDetails);
+
+      // Générer le PDF avec ou sans détails selon le cas
+      const documentUrl = await generateRepairOrderSignaturePDF(
+        fullOrder, 
+        companyData, 
+        clientData,
+        showItemsDetails
+      );
 
       // Envoyer pour signature via Oodrive
       const signatureResponse = await sendRepairOrderForSignature(order.id, documentUrl, clientData);

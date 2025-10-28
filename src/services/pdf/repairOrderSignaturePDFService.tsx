@@ -8,7 +8,8 @@ import { parseInvoiceData, calculateInvoiceTotals } from '@/utils/invoiceCalcula
 export const generateRepairOrderSignaturePDF = async (
   repairOrder: RepairOrder,
   companyData: any,
-  clientData: any
+  clientData: any,
+  showItemsDetails: boolean = true
 ): Promise<string> => {
   try {
     console.log('Generating repair order signature PDF for:', repairOrder.id);
@@ -94,6 +95,7 @@ export const generateRepairOrderSignaturePDF = async (
         vehicleData={vehicleData}
         signatureData={signatureData}
         documentType="repair_order"
+        showItemsDetails={showItemsDetails}
       />
     );
 

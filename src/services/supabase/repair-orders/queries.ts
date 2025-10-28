@@ -77,6 +77,14 @@ export const getRepairOrderById = async (id: string): Promise<RepairOrder> => {
         ),
         registration_document_front_url,
         registration_document_back_url
+      ),
+      quotes(
+        id,
+        reference,
+        amount,
+        source_report_id,
+        modificatif_report_id,
+        report_id
       )
     `)
     .eq('id', id)

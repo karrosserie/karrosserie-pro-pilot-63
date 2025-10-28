@@ -28,6 +28,9 @@ export type RepairOrder = Database['public']['Tables']['repair_orders']['Row'] &
     id: string;
     reference: string;
     amount: number;
+    source_report_id?: string | null;
+    modificatif_report_id?: string | null;
+    report_id?: string | null;
   } | null;
   invoices?: {
     id: string;
@@ -43,6 +46,8 @@ export type RepairOrder = Database['public']['Tables']['repair_orders']['Row'] &
   personal_items?: string | null;
   oodrive_contract_id?: string | null;
   signed_document_url?: string | null;
+  source_report_id?: string | null;
+  modificatif_report_id?: string | null;
 };
 
 export type NewRepairOrder = Database['public']['Tables']['repair_orders']['Insert'];

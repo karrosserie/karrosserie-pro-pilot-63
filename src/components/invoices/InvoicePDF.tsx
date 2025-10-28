@@ -17,6 +17,7 @@ interface InvoicePDFProps {
   };
   template?: string;
   documentType?: 'invoice' | 'repair_order' | 'credit' | 'quote';
+  showItemsDetails?: boolean;
 }
 
 // Styles pour le template par défaut
@@ -363,7 +364,7 @@ const alternativeStyles = StyleSheet.create({
   },
 });
 
-const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleData, signatureData, template = 'default', documentType = 'invoice' }: InvoicePDFProps) => {
+const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleData, signatureData, template = 'default', documentType = 'invoice', showItemsDetails = true }: InvoicePDFProps) => {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '-';
     try {
@@ -461,43 +462,45 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
           </View>
 
           {/* Tableau des articles */}
-          <View style={alternativeStyles.tableContainer}>
-            <View style={alternativeStyles.tableHeader}>
-              <Text style={[alternativeStyles.tableHeaderCell, { width: 30 }]}>Réf</Text>
-              <Text style={[alternativeStyles.tableHeaderCell, { width: 225 }]}>Description</Text>
-              <Text style={[alternativeStyles.tableHeaderCell, { width: 50 }]}>Quantité</Text>
-              <Text style={[alternativeStyles.tableHeaderCell, { width: 40 }]}>Remise</Text>
-              <Text style={[alternativeStyles.tableHeaderCell, { width: 50 }]}>Prix HT</Text>
-              <Text style={[alternativeStyles.tableHeaderCell, { width: 35 }]}>TVA</Text>
-              <Text style={[alternativeStyles.tableHeaderCell, { width: 50 }]}>Total HT</Text>
-              <Text style={[alternativeStyles.tableHeaderCellLast, { width: 50 }]}>Total TTC</Text>
-            </View>
-            
-            {(clientData?.items || []).map((item: any, index: number) => (
-              <View key={index} style={alternativeStyles.tableRow}>
-                <Text style={[alternativeStyles.tableCellLeft, { width: 30 }]}>{item.ref || ''}</Text>
-                <Text style={[alternativeStyles.tableCellLeft, { width: 225 }]}>{item.description || 'N/A'}</Text>
-                <Text style={[alternativeStyles.tableCell, { width: 50 }]}>
-                  {item.quantity?.toString().replace('.', ',') || '0'}
-                </Text>
-                <Text style={[alternativeStyles.tableCell, { width: 40 }]}>
-                  {item.discount || 0}%
-                </Text>
-                <Text style={[alternativeStyles.tableCell, { width: 50 }]}>
-                  {item.unitPrice?.toFixed(2).replace('.', ',') || '0,00'}€
-                </Text>
-                <Text style={[alternativeStyles.tableCell, { width: 35 }]}>
-                  {item.vat || 20}%
-                </Text>
-                <Text style={[alternativeStyles.tableCell, { width: 50 }]}>
-                  {item.totalHT?.toFixed(2).replace('.', ',') || '0,00'}€
-                </Text>
-                <Text style={[alternativeStyles.tableCellLast, { width: 50 }]}>
-                  {item.totalTTC?.toFixed(2).replace('.', ',') || '0,00'}€
-                </Text>
+          {showItemsDetails && (
+            <View style={alternativeStyles.tableContainer}>
+              <View style={alternativeStyles.tableHeader}>
+                <Text style={[alternativeStyles.tableHeaderCell, { width: 30 }]}>Réf</Text>
+                <Text style={[alternativeStyles.tableHeaderCell, { width: 225 }]}>Description</Text>
+                <Text style={[alternativeStyles.tableHeaderCell, { width: 50 }]}>Quantité</Text>
+                <Text style={[alternativeStyles.tableHeaderCell, { width: 40 }]}>Remise</Text>
+                <Text style={[alternativeStyles.tableHeaderCell, { width: 50 }]}>Prix HT</Text>
+                <Text style={[alternativeStyles.tableHeaderCell, { width: 35 }]}>TVA</Text>
+                <Text style={[alternativeStyles.tableHeaderCell, { width: 50 }]}>Total HT</Text>
+                <Text style={[alternativeStyles.tableHeaderCellLast, { width: 50 }]}>Total TTC</Text>
               </View>
-            ))}
-          </View>
+              
+              {(clientData?.items || []).map((item: any, index: number) => (
+                <View key={index} style={alternativeStyles.tableRow}>
+                  <Text style={[alternativeStyles.tableCellLeft, { width: 30 }]}>{item.ref || ''}</Text>
+                  <Text style={[alternativeStyles.tableCellLeft, { width: 225 }]}>{item.description || 'N/A'}</Text>
+                  <Text style={[alternativeStyles.tableCell, { width: 50 }]}>
+                    {item.quantity?.toString().replace('.', ',') || '0'}
+                  </Text>
+                  <Text style={[alternativeStyles.tableCell, { width: 40 }]}>
+                    {item.discount || 0}%
+                  </Text>
+                  <Text style={[alternativeStyles.tableCell, { width: 50 }]}>
+                    {item.unitPrice?.toFixed(2).replace('.', ',') || '0,00'}€
+                  </Text>
+                  <Text style={[alternativeStyles.tableCell, { width: 35 }]}>
+                    {item.vat || 20}%
+                  </Text>
+                  <Text style={[alternativeStyles.tableCell, { width: 50 }]}>
+                    {item.totalHT?.toFixed(2).replace('.', ',') || '0,00'}€
+                  </Text>
+                  <Text style={[alternativeStyles.tableCellLast, { width: 50 }]}>
+                    {item.totalTTC?.toFixed(2).replace('.', ',') || '0,00'}€
+                  </Text>
+                </View>
+              ))}
+            </View>
+          )}
 
           {/* Totaux */}
           <View style={alternativeStyles.totalsContainer} wrap={false}>
@@ -875,33 +878,35 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
         </View>
 
         {/* Tableau des articles par défaut */}
-        <View style={defaultStyles.table}>
-          <View style={defaultStyles.tableHeader}>
-            <Text style={[defaultStyles.tableHeaderText, { flex: 3 }]}>Description</Text>
-            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'center' }]}>Quantité</Text>
-            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'center' }]}>Remise</Text>
-            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'center' }]}>Coût unitaire</Text>
-            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'center' }]}>TVA</Text>
-            <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'center' }]}>Total HT</Text>
+        {showItemsDetails && (
+          <View style={defaultStyles.table}>
+            <View style={defaultStyles.tableHeader}>
+              <Text style={[defaultStyles.tableHeaderText, { flex: 3 }]}>Description</Text>
+              <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'center' }]}>Quantité</Text>
+              <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'center' }]}>Remise</Text>
+              <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'center' }]}>Coût unitaire</Text>
+              <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'center' }]}>TVA</Text>
+              <Text style={[defaultStyles.tableHeaderText, { flex: 1, textAlign: 'center' }]}>Total HT</Text>
+            </View>
+            
+            {(clientData?.items || []).length > 0 ? (clientData?.items || []).map((item: any, index: number) => (
+              <View key={index} style={defaultStyles.tableRow}>
+                <Text style={[defaultStyles.tableCell, { flex: 3 }]}>{item.description || 'N/A'}</Text>
+                <Text style={[defaultStyles.tableCell, { flex: 1, textAlign: 'center' }]}>{item.quantity?.toString().replace('.', ',') || '0'}</Text>
+                <Text style={[defaultStyles.tableCell, { flex: 1, textAlign: 'center' }]}>{item.discount || 0}%</Text>
+                <Text style={[defaultStyles.tableCell, { flex: 1, textAlign: 'center' }]}>{formatAmount(item.unitPrice || 0)}</Text>
+                <Text style={[defaultStyles.tableCell, { flex: 1, textAlign: 'center' }]}>{item.vat || 20}%</Text>
+                <Text style={[defaultStyles.tableCell, { flex: 1, textAlign: 'center' }]}>{formatAmount(item.totalHT || 0)}</Text>
+              </View>
+            )) : (
+              <View style={defaultStyles.tableRow}>
+                <Text style={[defaultStyles.tableCell, { flex: 6, textAlign: 'center' }]}>
+                  Aucun article dans cette facture
+                </Text>
+              </View>
+            )}
           </View>
-          
-          {(clientData?.items || []).length > 0 ? (clientData?.items || []).map((item: any, index: number) => (
-            <View key={index} style={defaultStyles.tableRow}>
-              <Text style={[defaultStyles.tableCell, { flex: 3 }]}>{item.description || 'N/A'}</Text>
-              <Text style={[defaultStyles.tableCell, { flex: 1, textAlign: 'center' }]}>{item.quantity?.toString().replace('.', ',') || '0'}</Text>
-              <Text style={[defaultStyles.tableCell, { flex: 1, textAlign: 'center' }]}>{item.discount || 0}%</Text>
-              <Text style={[defaultStyles.tableCell, { flex: 1, textAlign: 'center' }]}>{formatAmount(item.unitPrice || 0)}</Text>
-              <Text style={[defaultStyles.tableCell, { flex: 1, textAlign: 'center' }]}>{item.vat || 20}%</Text>
-              <Text style={[defaultStyles.tableCell, { flex: 1, textAlign: 'center' }]}>{formatAmount(item.totalHT || 0)}</Text>
-            </View>
-          )) : (
-            <View style={defaultStyles.tableRow}>
-              <Text style={[defaultStyles.tableCell, { flex: 6, textAlign: 'center' }]}>
-                Aucun article dans cette facture
-              </Text>
-            </View>
-          )}
-        </View>
+        )}
 
         {/* Totaux par défaut */}
         <View style={defaultStyles.totalsSection} wrap={false}>
