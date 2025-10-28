@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -54,16 +54,22 @@ export const ContactExpertDialog = ({
     }
   }, [quote]);
   
-  const [message, setMessage] = useState(
-    `Bonjour,\n\nSuite à des modifications apportées au devis ${quote.reference}, nous avons besoin d'un rapport modificatif pour le dossier:\n\n` +
-    `- Numéro de sinistre: ${quote.claim_number || 'N/A'}\n` +
-    `- Numéro de rapport initial: ${quote.report_number || 'N/A'}\n` +
-    `- Immatriculation: ${quote.vehicles?.license_plate || 'N/A'}\n` +
-    `- Véhicule: ${quote.vehicles?.car_brands?.name || ''} ${quote.vehicles?.car_models?.name || ''}\n\n` +
-    `DÉTAIL DU DEVIS MODIFIÉ:\n\n${quoteDetails.table}\n\n` +
-    `Merci de nous faire parvenir le rapport modificatif dans les meilleurs délais.\n\n` +
-    `Cordialement`
-  );
+  const [message, setMessage] = useState('');
+
+  // Mettre à jour le message quand le devis ou les détails changent
+  useEffect(() => {
+    const defaultMessage = 
+      `Bonjour,\n\nSuite à des modifications apportées au devis ${quote.reference}, nous avons besoin d'un rapport modificatif pour le dossier:\n\n` +
+      `- Numéro de sinistre: ${quote.claim_number || 'N/A'}\n` +
+      `- Numéro de rapport initial: ${quote.report_number || 'N/A'}\n` +
+      `- Immatriculation: ${quote.vehicles?.license_plate || 'N/A'}\n` +
+      `- Véhicule: ${quote.vehicles?.car_brands?.name || ''} ${quote.vehicles?.car_models?.name || ''}\n\n` +
+      `DÉTAIL DU DEVIS MODIFIÉ:\n\n${quoteDetails.table}\n\n` +
+      `Merci de nous faire parvenir le rapport modificatif dans les meilleurs délais.\n\n` +
+      `Cordialement`;
+    
+    setMessage(defaultMessage);
+  }, [quote, quoteDetails.table]);
 
   const handleSendEmail = async () => {
     if (!expertEmail) {
