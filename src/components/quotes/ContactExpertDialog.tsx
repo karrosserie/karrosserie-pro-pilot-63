@@ -90,25 +90,29 @@ export const ContactExpertDialog = ({
     try {
       const webhookUrl = 'https://n8n.karrosserie.pro/webhook/0c2053ca-0621-42c7-81df-b890fb2b494f';
       
+      const webhookPayload = {
+        quote_id: quote.id,
+        quote_reference: quote.reference,
+        expert_name: quote.expert_name,
+        expert_email: expertEmail,
+        expert_phone: expertPhone,
+        message: message,
+        claim_number: quote.claim_number,
+        report_number: quote.report_number,
+        client_email: (quote.clients as any)?.email || '',
+        client_phone: (quote.clients as any)?.phone || '',
+        company_id: quote.company_id,
+        timestamp: new Date().toISOString()
+      };
+
+      console.log('📧 Envoi au webhook modificatif:', webhookPayload);
+      
       const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          quote_id: quote.id,
-          quote_reference: quote.reference,
-          expert_name: quote.expert_name,
-          expert_email: expertEmail,
-          expert_phone: expertPhone,
-          message: message,
-          claim_number: quote.claim_number,
-          report_number: quote.report_number,
-          client_email: (quote.clients as any)?.email || '',
-          client_phone: (quote.clients as any)?.phone || '',
-          company_id: quote.company_id,
-          timestamp: new Date().toISOString()
-        })
+        body: JSON.stringify(webhookPayload)
       });
 
       if (!response.ok) {
