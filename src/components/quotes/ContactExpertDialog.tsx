@@ -23,27 +23,32 @@ interface ContactExpertDialogProps {
   onOpenChange: (open: boolean) => void;
   quote: Quote;
   onRequestSent: () => void;
+  modifiedRepairs?: QuoteRepairItem[];
+  modifiedParts?: QuotePartItem[];
 }
 
 export const ContactExpertDialog = ({
   open,
   onOpenChange,
   quote,
-  onRequestSent
+  onRequestSent,
+  modifiedRepairs,
+  modifiedParts
 }: ContactExpertDialogProps) => {
   const { toast } = useToast();
   const [expertEmail, setExpertEmail] = useState('');
   const [expertPhone, setExpertPhone] = useState('');
   
-  // Parser et calculer le tableau du devis
+  // Parser et calculer le tableau du devis (utiliser les données modifiées si disponibles)
   const quoteDetails = useMemo(() => {
     try {
-      const repairs: QuoteRepairItem[] = quote.repairs_data 
+      // Utiliser les données modifiées si fournies, sinon celles de la base
+      const repairs: QuoteRepairItem[] = modifiedRepairs || (quote.repairs_data 
         ? JSON.parse(quote.repairs_data) 
-        : [];
-      const parts: QuotePartItem[] = quote.parts_data 
+        : []);
+      const parts: QuotePartItem[] = modifiedParts || (quote.parts_data 
         ? JSON.parse(quote.parts_data) 
-        : [];
+        : []);
       const totals = calculateGlobalTotals(repairs, parts, []);
       const table = formatQuoteTable(repairs, parts, totals);
       
@@ -52,7 +57,7 @@ export const ContactExpertDialog = ({
       console.error('Erreur parsing devis:', error);
       return { repairs: [], parts: [], totals: { subTotal: 0, totalVat: 0, totalDiscount: 0, total: 0 }, table: '' };
     }
-  }, [quote]);
+  }, [quote, modifiedRepairs, modifiedParts]);
   
   const [message, setMessage] = useState('');
 

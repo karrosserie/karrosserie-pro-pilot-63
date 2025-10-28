@@ -262,6 +262,8 @@ export const QuoteForm = ({
           onOpenChange={setShowContactExpertDialog}
           quote={quote}
           onRequestSent={handleModificatifRequestSent}
+          modifiedRepairs={repairs}
+          modifiedParts={parts}
         />
       )}
 
