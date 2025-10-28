@@ -6,7 +6,7 @@ import { useFleetLoanFormHandlers } from './fleet-loan-form/use-form-handlers';
 
 export const useFleetLoanForm = (vehicle: FleetVehicle, onSubmit: (loanData: LoanFormData) => void, defaultValues?: any) => {
   const formState = useFleetLoanFormState(vehicle, defaultValues);
-  const handlers = useFleetLoanFormHandlers(formState, onSubmit, defaultValues);
+  const handlers = useFleetLoanFormHandlers(formState, onSubmit, vehicle, defaultValues);
 
   return {
     ...formState,
