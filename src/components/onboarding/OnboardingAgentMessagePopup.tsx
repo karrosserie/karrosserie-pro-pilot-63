@@ -42,8 +42,8 @@ export function OnboardingAgentMessagePopup() {
     setOpen(false);
   };
 
-  // Ne rien rendre si pas de message, en cours de chargement, ou rôle carrossier
-  if (!unreadMessage || isRoleLoading || isCarrossier || isCarrossierCourtesy) {
+  // Ne rien rendre si pas de message, en cours de chargement, rôle carrossier, ou déjà vu
+  if (!unreadMessage || isRoleLoading || isCarrossier || isCarrossierCourtesy || !shouldShowExpertiseReportPrompt) {
     return null;
   }
 
