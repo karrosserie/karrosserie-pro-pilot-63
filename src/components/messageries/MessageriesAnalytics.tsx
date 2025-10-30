@@ -23,6 +23,7 @@ export default function MessageriesAnalytics() {
   const [selectedType, setSelectedType] = useState("all");
   const [selectedClientFilter, setSelectedClientFilter] = useState("all");
   const [selectedPeriod, setSelectedPeriod] = useState("all");
+  const [selectedPriority, setSelectedPriority] = useState("all");
   const [selectedMessage, setSelectedMessage] = useState<Messagerie | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [clientHistoryModalOpen, setClientHistoryModalOpen] = useState(false);
@@ -86,6 +87,11 @@ export default function MessageriesAnalytics() {
       });
     }
 
+    // Filtre par priorité
+    if (selectedPriority !== "all") {
+      filtered = filtered.filter(m => m.priority === parseInt(selectedPriority));
+    }
+
     // Filtre par recherche
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
@@ -98,26 +104,33 @@ export default function MessageriesAnalytics() {
       );
     }
 
-    return filtered.sort((a, b) => 
-      new Date(b.actual_communication_date || b.created_at).getTime() - 
-      new Date(a.actual_communication_date || a.created_at).getTime()
-    );
-  }, [messageries, selectedType, selectedClientFilter, selectedPeriod, searchTerm]);
+    // Tri intelligent : non résolus d'abord, puis par priorité (1 = plus urgent), puis par date
+    return filtered.sort((a, b) => {
+      // 1. Messages non résolus d'abord
+      if (a.resolved !== b.resolved) {
+        return a.resolved ? 1 : -1;
+      }
+      
+      // 2. Par priorité (1 = plus urgent, donc ordre croissant)
+      if (a.priority !== b.priority) {
+        return a.priority - b.priority;
+      }
+      
+      // 3. Par date (plus récent en premier)
+      return new Date(b.actual_communication_date || b.created_at).getTime() - 
+             new Date(a.actual_communication_date || a.created_at).getTime();
+    });
+  }, [messageries, selectedType, selectedClientFilter, selectedPeriod, searchTerm, selectedPriority]);
 
   // Calcul des statistiques
   const stats = useMemo(() => {
-    const total = messageries.filter(m => !m.archived).length;
-    const unread = messageries.filter(m => !m.resolved && !m.archived).length;
-    const aiMessages = messageries.filter(m => m.priority === 4 && !m.archived).length;
-    const support = messageries.filter(m => 
-      (m.channel === "Téléphone" || m.channel === "Mail") && !m.archived
-    ).length;
-
+    const nonArchived = messageries.filter(m => !m.archived);
+    
     return {
-      total,
-      unread,
-      aiMessages,
-      support,
+      total: nonArchived.length,
+      urgent: nonArchived.filter(m => m.priority === 1 && !m.resolved).length,
+      highPriority: nonArchived.filter(m => m.priority === 2 && !m.resolved).length,
+      unresolved: nonArchived.filter(m => !m.resolved).length,
     };
   }, [messageries]);
 
@@ -138,13 +151,20 @@ export default function MessageriesAnalytics() {
   return (
     <div className="p-6 bg-background min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <MessageriesHeader />
+        <MessageriesHeader 
+          onQuickFilterUrgent={() => setSelectedPriority("1")}
+          onQuickFilterHigh={() => setSelectedPriority("2")}
+          onShowAll={() => setSelectedPriority("all")}
+          urgentCount={stats.urgent}
+          highPriorityCount={stats.highPriority}
+          currentFilter={selectedPriority}
+        />
 
         <MessageriesStats
           totalMessages={stats.total}
-          unreadMessages={stats.unread}
-          aiMessages={stats.aiMessages}
-          supportMessages={stats.support}
+          urgentMessages={stats.urgent}
+          highPriorityMessages={stats.highPriority}
+          unresolvedMessages={stats.unresolved}
         />
 
         <MessageriesFilters
@@ -152,11 +172,13 @@ export default function MessageriesAnalytics() {
           selectedType={selectedType}
           selectedClient={selectedClientFilter}
           selectedPeriod={selectedPeriod}
+          selectedPriority={selectedPriority}
           clients={allClients}
           onSearchChange={setSearchTerm}
           onTypeChange={setSelectedType}
           onClientChange={setSelectedClientFilter}
           onPeriodChange={setSelectedPeriod}
+          onPriorityChange={setSelectedPriority}
         />
 
         <MessageriesTimeline

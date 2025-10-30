@@ -19,11 +19,13 @@ interface MessageriesFiltersProps {
   selectedType: string;
   selectedClient: string;
   selectedPeriod: string;
+  selectedPriority: string;
   clients: Client[];
   onSearchChange: (value: string) => void;
   onTypeChange: (value: string) => void;
   onClientChange: (value: string) => void;
   onPeriodChange: (value: string) => void;
+  onPriorityChange: (value: string) => void;
 }
 
 export function MessageriesFilters({
@@ -31,15 +33,17 @@ export function MessageriesFilters({
   selectedType,
   selectedClient,
   selectedPeriod,
+  selectedPriority,
   clients,
   onSearchChange,
   onTypeChange,
   onClientChange,
   onPeriodChange,
+  onPriorityChange,
 }: MessageriesFiltersProps) {
   return (
     <div className="bg-card rounded-lg border p-4 mb-6">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <Select value={selectedType} onValueChange={onTypeChange}>
           <SelectTrigger>
             <SelectValue placeholder="Tous les types" />
@@ -76,6 +80,19 @@ export function MessageriesFilters({
             <SelectItem value="today">Aujourd'hui</SelectItem>
             <SelectItem value="week">Cette semaine</SelectItem>
             <SelectItem value="month">Ce mois</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={selectedPriority} onValueChange={onPriorityChange}>
+          <SelectTrigger>
+            <SelectValue placeholder="Urgence" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Toutes les urgences</SelectItem>
+            <SelectItem value="1">🔴 Urgents seulement</SelectItem>
+            <SelectItem value="2">🟠 Haute priorité</SelectItem>
+            <SelectItem value="3">🟡 Normale</SelectItem>
+            <SelectItem value="4">🔵 Basse</SelectItem>
           </SelectContent>
         </Select>
 

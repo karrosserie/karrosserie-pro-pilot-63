@@ -28,15 +28,25 @@ const getPriorityBadge = (priority: number, resolved: boolean) => {
   
   switch (priority) {
     case 1:
-      return <Badge className="bg-destructive/10 text-destructive border-destructive">Urgent</Badge>;
+      return <Badge className="bg-destructive/10 text-destructive border-destructive">🔴 Urgent</Badge>;
     case 2:
-      return <Badge className="bg-karrosserie-orange/10 text-karrosserie-orange border-karrosserie-orange">Haute</Badge>;
+      return <Badge className="bg-karrosserie-orange/10 text-karrosserie-orange border-karrosserie-orange">🟠 Haute</Badge>;
     case 3:
-      return <Badge className="bg-yellow-50 text-yellow-700 border-yellow-200">Normale</Badge>;
+      return <Badge className="bg-yellow-50 text-yellow-700 border-yellow-200">🟡 Normale</Badge>;
     case 4:
-      return <Badge className="bg-blue-50 text-blue-700 border-blue-200">Basse</Badge>;
+      return <Badge className="bg-blue-50 text-blue-700 border-blue-200">🔵 Basse</Badge>;
     default:
       return null;
+  }
+};
+
+const getPriorityBorderColor = (priority: number) => {
+  switch (priority) {
+    case 1: return 'border-l-red-500';
+    case 2: return 'border-l-orange-500';
+    case 3: return 'border-l-yellow-500';
+    case 4: return 'border-l-blue-500';
+    default: return 'border-l-gray-300';
   }
 };
 
@@ -62,7 +72,7 @@ export function MessageriesTimeline({ messages, onViewMessage, onViewClientHisto
         });
 
         return (
-          <Card key={message.id} className="hover:shadow-md transition-shadow">
+          <Card key={message.id} className={`hover:shadow-md transition-shadow border-l-4 ${getPriorityBorderColor(message.priority)}`}>
             <CardContent className="p-5">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">

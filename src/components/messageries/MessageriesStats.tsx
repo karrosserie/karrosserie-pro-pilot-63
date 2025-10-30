@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { MessageSquare, Eye, Bot, Headphones, LucideIcon } from "lucide-react";
+import { AlertTriangle, AlertCircle, Clock, CheckCircle, LucideIcon } from "lucide-react";
 
 interface StatCardProps {
   icon: LucideIcon;
@@ -29,46 +29,46 @@ function StatCard({ icon: Icon, label, value, bgColor, iconColor }: StatCardProp
 
 interface MessageriesStatsProps {
   totalMessages: number;
-  unreadMessages: number;
-  aiMessages: number;
-  supportMessages: number;
+  urgentMessages: number;
+  highPriorityMessages: number;
+  unresolvedMessages: number;
 }
 
 export function MessageriesStats({ 
   totalMessages, 
-  unreadMessages, 
-  aiMessages, 
-  supportMessages 
+  urgentMessages, 
+  highPriorityMessages, 
+  unresolvedMessages 
 }: MessageriesStatsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <StatCard
-        icon={MessageSquare}
+        icon={AlertTriangle}
+        label="🔴 Urgents"
+        value={urgentMessages}
+        bgColor="bg-red-100"
+        iconColor="text-red-600"
+      />
+      <StatCard
+        icon={AlertCircle}
+        label="🟠 Haute priorité"
+        value={highPriorityMessages}
+        bgColor="bg-orange-100"
+        iconColor="text-orange-600"
+      />
+      <StatCard
+        icon={Clock}
+        label="En attente"
+        value={unresolvedMessages}
+        bgColor="bg-blue-100"
+        iconColor="text-blue-600"
+      />
+      <StatCard
+        icon={CheckCircle}
         label="Total échanges"
         value={totalMessages}
-        bgColor="bg-primary/10"
-        iconColor="text-primary"
-      />
-      <StatCard
-        icon={Eye}
-        label="En attente de suivi"
-        value={unreadMessages}
-        bgColor="bg-karrosserie-orange/10"
-        iconColor="text-karrosserie-orange"
-      />
-      <StatCard
-        icon={Bot}
-        label="Assistant IA"
-        value={aiMessages}
-        bgColor="bg-violet-100"
-        iconColor="text-violet-600"
-      />
-      <StatCard
-        icon={Headphones}
-        label="Support SAV"
-        value={supportMessages}
-        bgColor="bg-muted"
-        iconColor="text-muted-foreground"
+        bgColor="bg-gray-100"
+        iconColor="text-gray-600"
       />
     </div>
   );
