@@ -319,7 +319,8 @@ Deno.serve(async (req) => {
         start_datetime: finalEmergencyStart.toISOString(),
         end_datetime: finalEmergencyEnd.toISOString(),
         status: 'En cours',
-        real_start_datetime: new Date().toISOString()
+        real_start_datetime: new Date().toISOString(),
+        is_emergency: true // Mark as emergency to prevent workflow continuation
       })
       .select()
       .single();

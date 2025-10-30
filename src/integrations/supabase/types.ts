@@ -1300,6 +1300,7 @@ export type Database = {
           end_datetime: string
           id: string
           interrupted_by: string | null
+          is_emergency: boolean | null
           paint_brand: string | null
           real_end_datetime: string | null
           real_start_datetime: string | null
@@ -1319,6 +1320,7 @@ export type Database = {
           end_datetime: string
           id?: string
           interrupted_by?: string | null
+          is_emergency?: boolean | null
           paint_brand?: string | null
           real_end_datetime?: string | null
           real_start_datetime?: string | null
@@ -1338,6 +1340,7 @@ export type Database = {
           end_datetime?: string
           id?: string
           interrupted_by?: string | null
+          is_emergency?: boolean | null
           paint_brand?: string | null
           real_end_datetime?: string | null
           real_start_datetime?: string | null

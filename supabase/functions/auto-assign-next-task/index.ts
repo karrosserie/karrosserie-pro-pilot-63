@@ -124,7 +124,35 @@ serve(async (req: Request) => {
       );
     }
 
-    // 2. Déterminer l'étape suivante selon le workflow
+    // 2. VÉRIFICATION CRITIQUE: Si c'est une tâche d'urgence, NE PAS continuer le workflow
+    if (completedTask.is_emergency === true) {
+      console.log('🚨 EMERGENCY TASK COMPLETED - Workflow will NOT continue (emergency tasks are standalone)');
+      
+      // Marquer le véhicule comme terminé
+      const { error: vehicleUpdateError } = await supabase
+        .from('vehicles')
+        .update({ status: 'Terminé' })
+        .eq('id', completedTask.vehicle_id)
+        .eq('company_id', companyId);
+        
+      if (vehicleUpdateError) {
+        console.error('❌ Error updating vehicle status:', vehicleUpdateError);
+      } else {
+        console.log('✅ Emergency vehicle marked as completed');
+      }
+      
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: 'Emergency task completed - vehicle marked as finished (no workflow continuation)',
+          isEmergency: true,
+          vehicleStatus: 'Terminé'
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // 3. Déterminer l'étape suivante selon le workflow
     const getNextTaskType = (currentTaskType: string): string | null => {
       const workflow = {
         // Workflow basé sur les vrais types de tâches dans la DB
