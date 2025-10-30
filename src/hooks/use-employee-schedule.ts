@@ -15,6 +15,7 @@ export interface EmployeeSchedule {
   real_end_datetime: string | null;
   paint_brand?: string | null;
   color_code?: string | null;
+  urgency_notes?: string | null;
   detailed_instructions?: {
     instructions: Array<{
       number: number;

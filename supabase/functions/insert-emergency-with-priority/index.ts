@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     )
 
-    const { plaque, nom, prenom, heure, employeId, companyId } = await req.json();
+    const { plaque, nom, prenom, heure, employeId, companyId, notes } = await req.json();
 
     if (!plaque || !nom || !prenom || !heure || !employeId || !companyId) {
       return new Response(
@@ -56,6 +56,8 @@ Deno.serve(async (req) => {
         }
       )
     }
+
+    const formattedPlaque = plaque.toUpperCase();
 
     console.log('🚨 PRIORITY: Creating emergency vehicle:', { plaque, nom, prenom, heure, employeId, companyId });
 
@@ -320,7 +322,8 @@ Deno.serve(async (req) => {
         end_datetime: finalEmergencyEnd.toISOString(),
         status: 'En cours',
         real_start_datetime: new Date().toISOString(),
-        is_emergency: true // Mark as emergency to prevent workflow continuation
+        is_emergency: true, // Mark as emergency to prevent workflow continuation
+        urgency_notes: notes || null // Store urgency explanation
       })
       .select()
       .single();

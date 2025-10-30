@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Play, Pause, CheckCircle, Calendar, User, BarChart, Coffee, LogOut, Camera, AlertTriangle } from 'lucide-react';
+import { Clock, Play, Pause, CheckCircle, Calendar, User, BarChart, Coffee, LogOut, Camera, AlertTriangle, FileText } from 'lucide-react';
 import { CurrentTaskDisplay } from '@/components/planning/CurrentTaskDisplay';
 import { EmployeeWorkTimeDisplay } from '@/components/planning/EmployeeWorkTimeDisplay';
 import { useEmployeeSchedule } from '@/hooks/use-employee-schedule';
@@ -242,7 +242,8 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
       status: schedule.status,
       description: `${schedule.task_type} - ${schedule.vehicles?.license_plate || ''}`,
       paint_brand: schedule.paint_brand,
-      color_code: schedule.color_code
+      color_code: schedule.color_code,
+      urgencyNotes: schedule.urgency_notes
     };
   });
 
@@ -811,20 +812,31 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
                         Raison: {task.waiting_reason}
                       </p>
                     )}
-                  </div>
-                  
-                  <div className="flex flex-col sm:flex-row lg:flex-col gap-2 justify-start sm:justify-end lg:justify-start">
-                    <Button 
-                      size="sm" 
-                      variant="default"
-                      onClick={() => handleStartTask(task.id)}
-                      className="flex items-center gap-2 w-full sm:w-auto bg-red-600 hover:bg-red-700"
-                      disabled={isOnBreak || isProcessingPhoto || !!currentTask}
-                    >
-                      <Play className="w-4 h-4" />
-                      <span className="text-xs sm:text-sm">Reprendre la tâche</span>
-                    </Button>
-                  </div>
+            {task.urgency_notes && (
+              <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded-md">
+                <p className="text-xs sm:text-sm font-medium text-amber-800 flex items-center gap-1 mb-1">
+                  <FileText className="w-3 h-3" />
+                  Détails de l'urgence:
+                </p>
+                <p className="text-xs sm:text-sm text-amber-900 whitespace-pre-wrap">
+                  {task.urgency_notes}
+                </p>
+              </div>
+            )}
+                   </div>
+                   
+                   <div className="flex flex-col sm:flex-row lg:flex-col gap-2 justify-start sm:justify-end lg:justify-start">
+                     <Button 
+                       size="sm" 
+                       variant="default"
+                       onClick={() => handleStartTask(task.id)}
+                       className="flex items-center gap-2 w-full sm:w-auto bg-red-600 hover:bg-red-700"
+                       disabled={isOnBreak || isProcessingPhoto || !!currentTask}
+                     >
+                       <Play className="w-4 h-4" />
+                       <span className="text-xs sm:text-sm">Reprendre la tâche</span>
+                     </Button>
+                   </div>
                 </div>
               </div>
             ))}

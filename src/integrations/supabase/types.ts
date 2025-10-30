@@ -1308,6 +1308,7 @@ export type Database = {
           status: Database["public"]["Enums"]["task_status"]
           task_type: Database["public"]["Enums"]["schedule_task_type"]
           updated_at: string
+          urgency_notes: string | null
           user_id: string
           vehicle_id: string | null
           waiting_reason: string | null
@@ -1328,6 +1329,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["task_status"]
           task_type: Database["public"]["Enums"]["schedule_task_type"]
           updated_at?: string
+          urgency_notes?: string | null
           user_id: string
           vehicle_id?: string | null
           waiting_reason?: string | null
@@ -1348,6 +1350,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["task_status"]
           task_type?: Database["public"]["Enums"]["schedule_task_type"]
           updated_at?: string
+          urgency_notes?: string | null
           user_id?: string
           vehicle_id?: string | null
           waiting_reason?: string | null

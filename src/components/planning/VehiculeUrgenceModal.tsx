@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, Clock, User, Car } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { AlertTriangle, Clock, User, Car, FileText } from 'lucide-react';
 import { Employe } from '@/hooks/usePlanningManager';
 import VoiceInputButton from '@/components/common/VoiceInputButton';
 import { formatPlaque } from '@/lib/utils';
@@ -20,6 +21,7 @@ interface VehiculeUrgenceModalProps {
     prenom: string;
     heure: string;
     employeId: string;
+    notes?: string;
   }) => void;
 }
 
@@ -34,7 +36,8 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
     nom: '',
     prenom: '',
     heure: '',
-    employeId: ''
+    employeId: '',
+    notes: ''
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -71,7 +74,8 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
         nom: formData.nom,
         prenom: formData.prenom,
         heure: formData.heure,
-        employeId: formData.employeId
+        employeId: formData.employeId,
+        notes: formData.notes
       });
       
       // Reset form
@@ -80,7 +84,8 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
         nom: '',
         prenom: '',
         heure: '',
-        employeId: ''
+        employeId: '',
+        notes: ''
       });
       setErrors({});
       onClose();
@@ -93,7 +98,8 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
       nom: '',
       prenom: '',
       heure: '',
-      employeId: ''
+      employeId: '',
+      notes: ''
     });
     setErrors({});
   };
@@ -268,6 +274,32 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
             {errors.employeId && (
               <p className="text-xs sm:text-sm text-destructive animate-fade-in">{errors.employeId}</p>
             )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="notes" className="flex items-center gap-2 text-sm">
+              <FileText className="h-4 w-4" />
+              Détails de l'urgence
+            </Label>
+            <div className="flex gap-2">
+              <Textarea
+                id="notes"
+                value={formData.notes}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                placeholder="Décrivez ce qui doit être fait en urgence..."
+                rows={3}
+                className="flex-1"
+              />
+              <VoiceInputButton
+                fieldName="notes"
+                onTranscript={(text) => {
+                  setFormData({ ...formData, notes: formData.notes + (formData.notes ? ' ' : '') + text });
+                }}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Cette note sera visible par l'employé assigné
+            </p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:justify-between pt-4 border-t">

@@ -7,6 +7,7 @@ export interface VehiculeUrgenceData {
   heure: string;
   employeId: string;
   companyId: string;
+  notes?: string;
 }
 
 export interface VehiculeUrgenceResult {

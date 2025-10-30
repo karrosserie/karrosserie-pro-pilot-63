@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Clock, Car, CheckCircle, Pause, AlertTriangle, Camera, Paintbrush } from 'lucide-react';
+import { Clock, Car, CheckCircle, Pause, AlertTriangle, Camera, Paintbrush, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { TaskInstructions } from './TaskInstructions';
@@ -30,6 +30,7 @@ interface CurrentTaskDisplayProps {
     color_code?: string;
     vehicleId: string;
     companyId: string;
+    urgencyNotes?: string | null;
   };
   onCompleteTask: (taskId: string) => void;
   onPauseTask: (taskId: string) => void;
@@ -182,6 +183,24 @@ export const CurrentTaskDisplay = ({
             <Car className="w-6 h-6 text-primary" />
             <h3 className="text-lg font-medium">{task.taskType}</h3>
           </div>
+
+          {/* Notes d'urgence */}
+          {task.urgencyNotes && (
+            <Card className="bg-amber-50 border-amber-200">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-amber-800 mb-1 flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      Détails de l'urgence
+                    </h4>
+                    <p className="text-sm text-amber-900 whitespace-pre-wrap">{task.urgencyNotes}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Durée estimée */}
           <p className="text-muted-foreground">
