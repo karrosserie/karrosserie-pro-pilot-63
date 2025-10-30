@@ -340,15 +340,16 @@ export const usePlanningManager = () => {
         });
         
         if (result.success) {
-          // Créer notification de succès avec information sur les tâches décalées
+          // Créer notification de succès avec information sur les tâches décalées et pause
           const baseMessage = `Traitement immédiat - ${vehiculeUrgence.plaque} (${vehiculeUrgence.prenom} ${vehiculeUrgence.nom})`;
           const shiftInfo = result.data?.conflictsResolved ? ` - ${result.data.conflictsResolved} tâche(s) décalée(s)` : '';
+          const pauseInfo = result.data?.pausedTaskId ? ' - Tâche en cours mise en pause ⏸️' : '';
           
           const notificationUrgence: Notification = {
             id: `notif_urgence_${Date.now()}`,
             type: 'nouvelle_tache',
-            titre: '🚨 VÉHICULE URGENCE AJOUTÉ - PRIORITÉ',
-            message: baseMessage + shiftInfo,
+            titre: '🚨 VÉHICULE URGENCE - TRAITEMENT IMMÉDIAT',
+            message: baseMessage + shiftInfo + pauseInfo,
             employeId: vehiculeUrgence.employeId.toString(),
             vehiculeId: 0, // Sera mis à jour par la vraie donnée DB
             tacheId: result.data?.scheduleId || 'unknown',

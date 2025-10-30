@@ -16,6 +16,7 @@ export interface VehiculeUrgenceResult {
     clientId: string;
     vehicleId: string;
     scheduleId: string;
+    pausedTaskId?: string;
     shiftedTasks?: Array<{
       id: string;
       task_type: string;
@@ -66,11 +67,13 @@ export class UrgencyVehicleService {
       return {
         success: true,
         message: result.message + (result.data?.conflictsResolved > 0 ? 
-          ` (${result.data.conflictsResolved} tâche(s) décalée(s))` : ''),
+          ` (${result.data.conflictsResolved} tâche(s) décalée(s))` : '') +
+          (result.data?.pausedTaskId ? ' - Tâche en cours mise en pause' : ''),
         data: {
           clientId: result.data.clientId,
           vehicleId: result.data.vehicleId,
           scheduleId: result.data.scheduleId,
+          pausedTaskId: result.data.pausedTaskId,
           shiftedTasks: result.data.shiftedTasks || [],
           conflictsResolved: result.data.conflictsResolved || 0
         }

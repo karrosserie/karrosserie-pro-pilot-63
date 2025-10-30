@@ -136,6 +136,78 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
     }
   }, [currentUserId]);
 
+  // Écouter les changements en temps réel sur employee_schedule
+  useEffect(() => {
+    if (!companyInfo?.id || !currentUserId) return;
+    
+    console.log('🔔 Setting up real-time listener for employee schedule changes');
+    
+    const channel = supabase
+      .channel('employee-schedule-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'employee_schedule',
+          filter: `user_id=eq.${currentUserId}`
+        },
+        (payload) => {
+          console.log('🚨 NEW TASK INSERTED:', payload);
+          
+          // Vérifier si c'est une tâche d'urgence (status "En cours" dès l'insertion)
+          if (payload.new.status === 'En cours') {
+            console.log('🚨 URGENT TASK DETECTED - Refreshing schedule');
+            
+            // Afficher une notification
+            toast({
+              title: "🚨 Tâche d'urgence assignée !",
+              description: `${payload.new.task_type} - Traitement immédiat requis`,
+              variant: "destructive"
+            });
+            
+            // Rafraîchir les données après un court délai
+            setTimeout(() => {
+              refetch();
+            }, 500);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'employee_schedule',
+          filter: `user_id=eq.${currentUserId}`
+        },
+        (payload) => {
+          console.log('🔄 TASK UPDATED:', payload);
+          
+          // Si une tâche est mise en pause (En cours → En attente)
+          if (payload.old.status === 'En cours' && payload.new.status === 'En attente') {
+            console.log('⏸️ TASK PAUSED - Refreshing schedule');
+            
+            toast({
+              title: "⏸️ Tâche mise en pause",
+              description: "Une tâche urgente nécessite votre attention immédiate"
+            });
+            
+            // Rafraîchir les données après un court délai
+            setTimeout(() => {
+              refetch();
+            }, 500);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      console.log('🔕 Cleaning up real-time listener');
+      supabase.removeChannel(channel);
+    };
+  }, [companyInfo?.id, currentUserId, refetch, toast]);
+
   // Convertir les données Supabase au format attendu par l'interface
   const tasks = schedules.map(schedule => {
     // Validation des dates pour éviter les erreurs "Invalid time value"

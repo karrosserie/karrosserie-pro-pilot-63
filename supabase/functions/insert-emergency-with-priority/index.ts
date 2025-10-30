@@ -85,7 +85,41 @@ Deno.serve(async (req) => {
     const actualUserId = userCompany.user_id;
     console.log('✅ Employee validated:', actualUserId);
 
-    // 2. Calculate the emergency time slot with working hours validation
+    // 2. Check if employee has a task in progress
+    const { data: currentTask, error: currentTaskError } = await supabase
+      .from('employee_schedule')
+      .select('id, task_type, start_datetime, real_start_datetime')
+      .eq('user_id', actualUserId)
+      .eq('company_id', companyId)
+      .eq('status', 'En cours')
+      .maybeSingle();
+
+    if (currentTaskError) {
+      console.error('❌ Error checking current task:', currentTaskError);
+    }
+
+    let pausedTaskId = null;
+    if (currentTask) {
+      console.log(`⏸️ Employee has a task in progress: ${currentTask.task_type}`);
+      
+      // Put the current task on pause (status "En attente")
+      const { error: pauseError } = await supabase
+        .from('employee_schedule')
+        .update({
+          status: 'En attente',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', currentTask.id);
+      
+      if (pauseError) {
+        console.error('❌ Error pausing current task:', pauseError);
+      } else {
+        console.log(`✅ Task paused: ${currentTask.task_type}`);
+        pausedTaskId = currentTask.id;
+      }
+    }
+
+    // 3. Calculate the emergency time slot with working hours validation
     const now = new Date();
     const [hours, minutes] = heure.split(':').map(Number);
     
@@ -116,7 +150,7 @@ Deno.serve(async (req) => {
       end: emergencyEnd.toISOString()
     });
 
-    // 3. Find conflicting tasks for the same employee on the same day and analyze availability
+    // 4. Find conflicting tasks for the same employee on the same day and analyze availability
     const dayStart = new Date(emergencyStart);
     dayStart.setHours(0, 0, 0, 0);
     const dayEnd = new Date(emergencyStart);
@@ -148,7 +182,7 @@ Deno.serve(async (req) => {
 
     console.log(`📋 Found ${existingTasks?.length || 0} existing tasks for employee`);
 
-    // EMERGENCY PRIORITY: Always use the exact requested time, never adapt
+    // 5. EMERGENCY PRIORITY: Always use the exact requested time, never adapt
     const taskDuration = 60 * 60 * 1000; // 1 hour in milliseconds
     let finalEmergencyStart = emergencyStart; // ALWAYS use the exact requested time
     
@@ -161,7 +195,7 @@ Deno.serve(async (req) => {
       console.log(`✅ No existing tasks, emergency can be scheduled at requested time`);
     }
 
-    // 4. Identify conflicts and calculate shifts based on final emergency time
+    // 6. Identify conflicts and calculate shifts based on final emergency time
     const conflictingTasks: TaskConflict[] = [];
     const shiftedTasks: ShiftedTask[] = [];
     const finalEmergencyEnd = new Date(finalEmergencyStart.getTime() + taskDuration);
@@ -183,7 +217,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 5. Create client and vehicle first
+    // 7. Create client and vehicle first
     const { data: clientData, error: clientError } = await supabase
       .from('clients')
       .insert({
@@ -235,7 +269,7 @@ Deno.serve(async (req) => {
 
     console.log('✅ Client and vehicle created successfully');
 
-    // 6. Shift conflicting tasks
+    // 8. Shift conflicting tasks
     if (conflictingTasks.length > 0) {
       console.log(`🔄 Shifting ${conflictingTasks.length} conflicting tasks...`);
       
@@ -288,7 +322,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 7. Create the emergency task at the exact requested time
+    // 9. Create the emergency task at the exact requested time with "En cours" status
     const { data: scheduleData, error: scheduleError } = await supabase
       .from('employee_schedule')
       .insert({
@@ -298,7 +332,8 @@ Deno.serve(async (req) => {
         task_type: 'Accueil & Préparation du dossier',
         start_datetime: finalEmergencyStart.toISOString(),
         end_datetime: finalEmergencyEnd.toISOString(),
-        status: 'En attente'
+        status: 'En cours',
+        real_start_datetime: new Date().toISOString()
       })
       .select()
       .single();
@@ -326,6 +361,7 @@ Deno.serve(async (req) => {
         clientId: clientData.id,
         vehicleId: vehicleData.id,
         scheduleId: scheduleData.id,
+        pausedTaskId: pausedTaskId,
         emergencyTime: {
           start: finalEmergencyStart.toISOString(),
           end: finalEmergencyEnd.toISOString()
