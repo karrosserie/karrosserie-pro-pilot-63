@@ -4,8 +4,8 @@ import { MessageriesStats } from "./MessageriesStats";
 import { MessageriesFilters } from "./MessageriesFilters";
 import { MessageriesTimeline } from "./MessageriesTimeline";
 import { MessageDetailModal } from "./MessageDetailModal";
-import { ReplyModal } from "./ReplyModal";
-import { NewMessageModal } from "./NewMessageModal";
+import { AddFollowUpRecordModal } from "./AddFollowUpRecordModal";
+import { AddCommunicationRecordModal } from "./AddCommunicationRecordModal";
 import { ClientHistoryModal } from "./ClientHistoryModal";
 import { MessageriesHeader } from "./MessageriesHeader";
 import { Loading } from "@/components/ui/loading";
@@ -169,16 +169,21 @@ export default function MessageriesAnalytics() {
           onViewClientHistory={handleViewClientHistory}
         />
 
-        <ReplyModal
+        <AddFollowUpRecordModal
           isOpen={replyModalOpen}
-          onClose={() => {
+          onClose={() => setReplyModalOpen(false)}
+          messagerie={replyMessage}
+          onSuccess={() => {
             setReplyModalOpen(false);
             refetch();
+            if (replyMessage) {
+              setSelectedMessage(replyMessage);
+              setDetailModalOpen(true);
+            }
           }}
-          messagerie={replyMessage}
         />
 
-        <NewMessageModal
+        <AddCommunicationRecordModal
           isOpen={newMessageModalOpen}
           onClose={() => setNewMessageModalOpen(false)}
           onSuccess={handleNewMessageSuccess}

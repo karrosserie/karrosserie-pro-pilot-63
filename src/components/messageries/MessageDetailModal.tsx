@@ -62,6 +62,16 @@ export function MessageDetailModal({
     }
   }, [message, open]);
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
   const fetchReplies = async () => {
     if (!message) return;
     
@@ -163,26 +173,34 @@ export function MessageDetailModal({
                   <Card
                     key={reply.id}
                     className={`p-3 ${
-                      reply.sender_type === 'carrosserie'
-                        ? 'bg-primary/5 ml-8'
-                        : 'bg-muted/50 mr-8'
+                      reply.sender_type === 'internal'
+                        ? 'bg-yellow-50 border-l-4 border-yellow-400'
+                        : reply.sender_type === 'client'
+                        ? 'bg-blue-50 ml-4'
+                        : 'bg-gray-50 mr-4'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <Badge variant={reply.sender_type === 'carrosserie' ? 'default' : 'secondary'} className="text-xs">
-                        {reply.sender_type === 'carrosserie' ? 'Carrosserie' : 'Client'}
-                      </Badge>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Badge variant="outline" className="text-xs">
-                          {reply.channel}
+                      <div className="flex items-center gap-2">
+                        <Badge variant={
+                          reply.sender_type === 'internal' ? 'secondary' :
+                          reply.sender_type === 'carrosserie' ? 'default' : 'secondary'
+                        } className="text-xs">
+                          {reply.sender_type === 'internal' 
+                            ? '📝 Note interne'
+                            : reply.is_inbound 
+                            ? '→ Client' 
+                            : '← Nous'}
                         </Badge>
-                        <span>
-                          {formatDistanceToNow(new Date(reply.sent_at), {
-                            addSuffix: true,
-                            locale: fr,
-                          })}
-                        </span>
+                        {reply.channel && reply.sender_type !== 'internal' && (
+                          <Badge variant="outline" className="text-xs">
+                            {reply.channel}
+                          </Badge>
+                        )}
                       </div>
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">
+                        {formatDate(reply.actual_communication_date)}
+                      </span>
                     </div>
                     <p className="text-sm whitespace-pre-wrap">{reply.content}</p>
                   </Card>
@@ -276,7 +294,7 @@ export function MessageDetailModal({
                   }}
                   className="bg-primary hover:bg-primary/90"
                 >
-                  Répondre
+                  Ajouter un échange
                 </Button>
                 <Button
                   onClick={() => {

@@ -2817,11 +2817,13 @@ export type Database = {
       }
       messagerie_replies: {
         Row: {
+          actual_communication_date: string | null
           channel: string
           company_id: string
           content: string
           created_at: string | null
           id: string
+          is_inbound: boolean | null
           messagerie_id: string
           read_by_client: boolean | null
           read_by_company: boolean | null
@@ -2831,11 +2833,13 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          actual_communication_date?: string | null
           channel: string
           company_id: string
           content: string
           created_at?: string | null
           id?: string
+          is_inbound?: boolean | null
           messagerie_id: string
           read_by_client?: boolean | null
           read_by_company?: boolean | null
@@ -2845,11 +2849,13 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          actual_communication_date?: string | null
           channel?: string
           company_id?: string
           content?: string
           created_at?: string | null
           id?: string
+          is_inbound?: boolean | null
           messagerie_id?: string
           read_by_client?: boolean | null
           read_by_company?: boolean | null
@@ -2891,6 +2897,7 @@ export type Database = {
       }
       messageries: {
         Row: {
+          actual_communication_date: string | null
           archived: boolean
           channel: string
           client_id: string | null
@@ -2900,6 +2907,7 @@ export type Database = {
           date: string
           eta: string
           id: string
+          is_inbound: boolean | null
           last_reply_at: string | null
           message: string
           priority: number
@@ -2913,6 +2921,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          actual_communication_date?: string | null
           archived?: boolean
           channel: string
           client_id?: string | null
@@ -2922,6 +2931,7 @@ export type Database = {
           date?: string
           eta: string
           id?: string
+          is_inbound?: boolean | null
           last_reply_at?: string | null
           message: string
           priority: number
@@ -2935,6 +2945,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          actual_communication_date?: string | null
           archived?: boolean
           channel?: string
           client_id?: string | null
@@ -2944,6 +2955,7 @@ export type Database = {
           date?: string
           eta?: string
           id?: string
+          is_inbound?: boolean | null
           last_reply_at?: string | null
           message?: string
           priority?: number

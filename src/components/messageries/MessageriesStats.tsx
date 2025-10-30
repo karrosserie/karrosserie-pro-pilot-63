@@ -44,14 +44,14 @@ export function MessageriesStats({
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <StatCard
         icon={MessageSquare}
-        label="Total Communications"
+        label="Total échanges"
         value={totalMessages}
         bgColor="bg-primary/10"
         iconColor="text-primary"
       />
       <StatCard
         icon={Eye}
-        label="Messages non lus"
+        label="En attente de suivi"
         value={unreadMessages}
         bgColor="bg-karrosserie-orange/10"
         iconColor="text-karrosserie-orange"

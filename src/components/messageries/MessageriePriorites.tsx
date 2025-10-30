@@ -24,7 +24,7 @@ import { useMessageries } from "@/hooks/use-messageries";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MessagerieMobileCard } from './MessagerieMobileCard';
 import { SemiAutoModal } from './SemiAutoModal';
-import { ReplyModal } from './ReplyModal';
+import { AddFollowUpRecordModal } from './AddFollowUpRecordModal';
 
 // -------------------------------
 // MessageriePriorites (connecté à Supabase)
@@ -505,10 +505,11 @@ export default function MessageriePriorites() {
       />
       
       {/* Modal Réponse */}
-      <ReplyModal
+      <AddFollowUpRecordModal
         isOpen={replyModalOpen}
         onClose={() => setReplyModalOpen(false)}
         messagerie={replyMessage}
+        onSuccess={() => setReplyModalOpen(false)}
       />
     </div>
   );

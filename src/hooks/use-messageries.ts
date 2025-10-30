@@ -14,10 +14,12 @@ export interface MessagerieReply {
   id: string;
   messagerie_id: string;
   company_id: string;
-  sender_type: 'carrosserie' | 'client';
+  sender_type: 'carrosserie' | 'client' | 'internal';
   sender_id: string | null;
   content: string;
   channel: string;
+  actual_communication_date: string;
+  is_inbound: boolean;
   sent_at: string;
   read_by_client: boolean;
   read_by_company: boolean;
@@ -44,6 +46,8 @@ export interface Messagerie {
   archived: boolean;
   replies_count?: number;
   last_reply_at?: string;
+  actual_communication_date: string;
+  is_inbound: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -129,10 +133,12 @@ export function useMessageries() {
 
   // Ajouter une réponse au fil de conversation
   const addReply = async (
-    messagerieId: string, 
-    content: string, 
+    messagerieId: string,
+    content: string,
     channel: string,
-    senderType: 'carrosserie' | 'client' = 'carrosserie'
+    senderType: 'carrosserie' | 'client' | 'internal' = 'carrosserie',
+    actualCommunicationDate: string = new Date().toISOString(),
+    isInbound: boolean = false
   ) => {
     try {
       const messagerie = messageries.find(m => m.id === messagerieId);
@@ -149,13 +155,18 @@ export function useMessageries() {
           sender_id: senderType === 'carrosserie' ? userData.user?.id : messagerie.client_id,
           content,
           channel,
+          actual_communication_date: actualCommunicationDate,
+          is_inbound: isInbound,
+          sent_at: actualCommunicationDate,
+          read_by_client: false,
+          read_by_company: true,
         });
 
       if (error) throw error;
 
       toast({
         title: "Succès",
-        description: "Réponse envoyée avec succès",
+        description: "Échange enregistré avec succès",
       });
 
       // Rafraîchir les messageries pour mettre à jour replies_count
@@ -163,10 +174,10 @@ export function useMessageries() {
       
       return true;
     } catch (error) {
-      console.error('Erreur lors de l\'ajout de la réponse:', error);
+      console.error('Erreur lors de l\'ajout de l\'échange:', error);
       toast({
         title: "Erreur",
-        description: "Impossible d'envoyer la réponse",
+        description: "Impossible d'enregistrer l'échange",
         variant: "destructive",
       });
       return false;

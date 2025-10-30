@@ -82,10 +82,26 @@ export function MessageriesTimeline({ messages, onViewMessage, onViewClientHisto
                         <ChannelIcon className="h-3 w-3 mr-1" />
                         {message.channel}
                       </Badge>
+                      <span className={`text-xs px-2 py-1 rounded ${
+                        message.is_inbound 
+                          ? 'bg-blue-100 text-blue-700' 
+                          : 'bg-gray-100 text-gray-700'
+                      }`}>
+                        {message.is_inbound ? '→ Entrant' : '← Sortant'}
+                      </span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground whitespace-nowrap">
-                      <Clock className="h-3 w-3" />
-                      {timeAgo}
+                    <div className="flex flex-col items-end text-sm text-muted-foreground whitespace-nowrap">
+                      <span className="text-xs">
+                        {new Date(message.actual_communication_date).toLocaleDateString('fr-FR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                        })}
+                      </span>
+                      <span className="text-xs flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {timeAgo}
+                      </span>
                     </div>
                   </div>
 
