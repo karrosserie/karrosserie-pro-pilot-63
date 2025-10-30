@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,10 +6,12 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { AlertTriangle, Clock, User, Car, FileText } from 'lucide-react';
+import { AlertTriangle, Clock, User, Car, FileText, CheckCircle } from 'lucide-react';
 import { Employe } from '@/hooks/usePlanningManager';
 import VoiceInputButton from '@/components/common/VoiceInputButton';
 import { formatPlaque } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface VehiculeUrgenceModalProps {
   isOpen: boolean;
@@ -41,6 +43,119 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [autoFillStatus, setAutoFillStatus] = useState<{
+    plaque?: boolean;
+    client?: boolean;
+  }>({});
+  const [isSearching, setIsSearching] = useState(false);
+  const { toast } = useToast();
+
+  // Debounce pour la recherche
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (formData.plaque.length >= 5 && !autoFillStatus.plaque) {
+        searchVehicleByPlaque(formData.plaque);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [formData.plaque]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (formData.nom.length >= 2 && formData.prenom.length >= 2 && !autoFillStatus.client) {
+        searchClientByName(formData.nom, formData.prenom);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [formData.nom, formData.prenom]);
+
+  const searchVehicleByPlaque = async (plaque: string) => {
+    try {
+      setIsSearching(true);
+      const { data: vehicles, error } = await supabase
+        .from('vehicles')
+        .select(`
+          *,
+          client:clients(
+            id,
+            first_name,
+            last_name
+          )
+        `)
+        .ilike('license_plate', `%${plaque}%`)
+        .limit(1);
+
+      if (error) throw error;
+
+      if (vehicles && vehicles.length > 0) {
+        const vehicle = vehicles[0];
+        if (vehicle.client) {
+          setFormData(prev => ({
+            ...prev,
+            nom: vehicle.client.last_name || prev.nom,
+            prenom: vehicle.client.first_name || prev.prenom,
+          }));
+          setAutoFillStatus({ plaque: true, client: true });
+          toast({
+            title: "Client trouvé",
+            description: `${vehicle.client.first_name} ${vehicle.client.last_name}`,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Erreur recherche véhicule:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const searchClientByName = async (nom: string, prenom: string) => {
+    try {
+      setIsSearching(true);
+      const { data: clients, error } = await supabase
+        .from('clients')
+        .select(`
+          *,
+          vehicles:vehicles(
+            license_plate
+          )
+        `)
+        .ilike('last_name', `%${nom}%`)
+        .ilike('first_name', `%${prenom}%`)
+        .limit(1);
+
+      if (error) throw error;
+
+      if (clients && clients.length > 0) {
+        const client = clients[0];
+        // Si le client a des véhicules, prendre le premier
+        if (client.vehicles && client.vehicles.length > 0) {
+          const vehicle = client.vehicles[0];
+          setFormData(prev => ({
+            ...prev,
+            plaque: vehicle.license_plate || prev.plaque,
+          }));
+          setAutoFillStatus({ plaque: true, client: true });
+          toast({
+            title: "Véhicule trouvé",
+            description: `Plaque: ${vehicle.license_plate}`,
+          });
+        } else {
+          setAutoFillStatus({ client: true });
+          toast({
+            title: "Client trouvé",
+            description: "Aucun véhicule enregistré",
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Erreur recherche client:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -102,6 +217,7 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
       notes: ''
     });
     setErrors({});
+    setAutoFillStatus({});
   };
 
   // Générer les options d'heure (8h à 18h par tranches de 30min)
@@ -149,14 +265,23 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
               <Label htmlFor="plaque" className="flex items-center gap-2 text-sm">
                 <Car className="h-4 w-4" />
                 Plaque *
+                {autoFillStatus.plaque && (
+                  <Badge variant="outline" className="text-xs bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800">
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                    Auto-rempli
+                  </Badge>
+                )}
               </Label>
               <div className="flex gap-2">
                 <Input
                   id="plaque"
                   value={formData.plaque}
-                  onChange={(e) => setFormData({ ...formData, plaque: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, plaque: e.target.value });
+                    setAutoFillStatus(prev => ({ ...prev, plaque: false }));
+                  }}
                   placeholder="XX-123-XX"
-                  className={`transition-all duration-200 flex-1 ${errors.plaque ? 'border-destructive' : 'border-input'}`}
+                  className={`transition-all duration-200 flex-1 ${errors.plaque ? 'border-destructive' : 'border-input'} ${isSearching ? 'animate-pulse' : ''}`}
                   style={{ textTransform: 'uppercase' }}
                 />
                 <VoiceInputButton
@@ -165,6 +290,7 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
                     const formattedPlaque = formatPlaque(text);
                     setFormData({ ...formData, plaque: formattedPlaque });
                     setErrors({ ...errors, plaque: '' });
+                    setAutoFillStatus(prev => ({ ...prev, plaque: false }));
                   }}
                 />
               </div>
@@ -198,20 +324,32 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="nom" className="text-sm">Nom du client *</Label>
+              <Label htmlFor="nom" className="text-sm flex items-center gap-2">
+                Nom du client *
+                {autoFillStatus.client && (
+                  <Badge variant="outline" className="text-xs bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800">
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                    Auto-rempli
+                  </Badge>
+                )}
+              </Label>
               <div className="flex gap-2">
                 <Input
                   id="nom"
                   value={formData.nom}
-                  onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, nom: e.target.value });
+                    setAutoFillStatus(prev => ({ ...prev, client: false }));
+                  }}
                   placeholder="Nom"
-                  className={`flex-1 ${errors.nom ? 'border-destructive' : ''}`}
+                  className={`flex-1 ${errors.nom ? 'border-destructive' : ''} ${isSearching ? 'animate-pulse' : ''}`}
                 />
                 <VoiceInputButton
                   fieldName="nom"
                   onTranscript={(text) => {
                     setFormData({ ...formData, nom: text });
                     setErrors({ ...errors, nom: '' });
+                    setAutoFillStatus(prev => ({ ...prev, client: false }));
                   }}
                 />
               </div>
@@ -226,15 +364,19 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
                 <Input
                   id="prenom"
                   value={formData.prenom}
-                  onChange={(e) => setFormData({ ...formData, prenom: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, prenom: e.target.value });
+                    setAutoFillStatus(prev => ({ ...prev, client: false }));
+                  }}
                   placeholder="Prénom"
-                  className={`flex-1 ${errors.prenom ? 'border-destructive' : ''}`}
+                  className={`flex-1 ${errors.prenom ? 'border-destructive' : ''} ${isSearching ? 'animate-pulse' : ''}`}
                 />
                 <VoiceInputButton
                   fieldName="prenom"
                   onTranscript={(text) => {
                     setFormData({ ...formData, prenom: text });
                     setErrors({ ...errors, prenom: '' });
+                    setAutoFillStatus(prev => ({ ...prev, client: false }));
                   }}
                 />
               </div>
