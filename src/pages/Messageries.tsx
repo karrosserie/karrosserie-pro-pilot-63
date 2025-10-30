@@ -1,5 +1,5 @@
-import MessageriePriorites from "@/components/messageries/MessageriePriorites";
+import MessageriesAnalytics from "@/components/messageries/MessageriesAnalytics";
 
 export default function Messageries() {
-  return <MessageriePriorites />;
+  return <MessageriesAnalytics />;
 }
