@@ -110,39 +110,39 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-background to-muted/30 border-warning/20">
-        <DialogHeader className="space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-warning/10 rounded-lg">
-              <AlertTriangle className="h-6 w-6 text-warning animate-pulse" />
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-gradient-to-br from-background to-muted/30 border-amber-500/20">
+        <DialogHeader className="space-y-2 sm:space-y-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-amber-500/10 rounded-lg flex-shrink-0">
+              <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-amber-500 animate-pulse" />
             </div>
-            <div>
-              <DialogTitle className="text-xl font-semibold bg-gradient-elegant bg-clip-text text-transparent">
-                Véhicule en Urgence - PRIORITÉ ABSOLUE
+            <div className="flex-1 min-w-0">
+              <DialogTitle className="text-base sm:text-xl font-semibold text-foreground leading-tight">
+                Véhicule en Urgence
               </DialogTitle>
-              <DialogDescription className="text-muted-foreground">
-                Insertion immédiate à l'heure choisie - Les autres tâches seront décalées si nécessaire
+              <DialogDescription className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
+                Insertion immédiate - Les autres tâches seront décalées
               </DialogDescription>
             </div>
           </div>
-          <div className="flex flex-col gap-2">
-            <Badge variant="destructive" className="w-fit animate-bounce">
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="destructive" className="text-xs animate-bounce">
               <AlertTriangle className="h-3 w-3 mr-1" />
-              URGENCE - Traitement immédiat
+              URGENCE
             </Badge>
-            <Badge variant="outline" className="w-fit text-warning border-warning/50">
+            <Badge variant="outline" className="text-xs text-amber-600 border-amber-500/50">
               <Clock className="h-3 w-3 mr-1" />
-              Priorité sur les tâches existantes
+              Priorité absolue
             </Badge>
           </div>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="plaque" className="flex items-center gap-2">
+              <Label htmlFor="plaque" className="flex items-center gap-2 text-sm">
                 <Car className="h-4 w-4" />
-                Plaque d'immatriculation *
+                Plaque *
               </Label>
               <div className="flex gap-2">
                 <Input
@@ -163,18 +163,18 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
                 />
               </div>
               {errors.plaque && (
-                <p className="text-sm text-destructive animate-fade-in">{errors.plaque}</p>
+                <p className="text-xs sm:text-sm text-destructive animate-fade-in">{errors.plaque}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="heure" className="flex items-center gap-2">
+              <Label htmlFor="heure" className="flex items-center gap-2 text-sm">
                 <Clock className="h-4 w-4" />
-                Heure d'affectation *
+                Heure *
               </Label>
               <Select value={formData.heure} onValueChange={(value) => setFormData({ ...formData, heure: value })}>
                 <SelectTrigger className={errors.heure ? 'border-destructive' : ''}>
-                  <SelectValue placeholder="Sélectionner l'heure" />
+                  <SelectValue placeholder="Heure" />
                 </SelectTrigger>
                 <SelectContent>
                   {generateTimeOptions().map((time) => (
@@ -185,14 +185,14 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
                 </SelectContent>
               </Select>
               {errors.heure && (
-                <p className="text-sm text-destructive animate-fade-in">{errors.heure}</p>
+                <p className="text-xs sm:text-sm text-destructive animate-fade-in">{errors.heure}</p>
               )}
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="nom">Nom du client *</Label>
+              <Label htmlFor="nom" className="text-sm">Nom du client *</Label>
               <div className="flex gap-2">
                 <Input
                   id="nom"
@@ -210,12 +210,12 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
                 />
               </div>
               {errors.nom && (
-                <p className="text-sm text-destructive animate-fade-in">{errors.nom}</p>
+                <p className="text-xs sm:text-sm text-destructive animate-fade-in">{errors.nom}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="prenom">Prénom du client *</Label>
+              <Label htmlFor="prenom" className="text-sm">Prénom du client *</Label>
               <div className="flex gap-2">
                 <Input
                   id="prenom"
@@ -233,19 +233,19 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
                 />
               </div>
               {errors.prenom && (
-                <p className="text-sm text-destructive animate-fade-in">{errors.prenom}</p>
+                <p className="text-xs sm:text-sm text-destructive animate-fade-in">{errors.prenom}</p>
               )}
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="employe" className="flex items-center gap-2">
+            <Label htmlFor="employe" className="flex items-center gap-2 text-sm">
               <User className="h-4 w-4" />
-              Employé assigné *
+              Employé *
             </Label>
             <Select value={formData.employeId} onValueChange={(value) => setFormData({ ...formData, employeId: value })}>
               <SelectTrigger className={errors.employeId ? 'border-destructive' : ''}>
-                <SelectValue placeholder="Sélectionner un employé" />
+                <SelectValue placeholder="Employé" />
               </SelectTrigger>
               <SelectContent>
                 {employes
@@ -257,7 +257,7 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
                   <SelectItem key={employe.id} value={employe.id.toString()}>
                     <div className="flex items-center gap-2">
                       <span>{employe.nom}</span>
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-xs hidden sm:inline-flex">
                         {employe.qualifications.length} qualif.
                       </Badge>
                     </div>
@@ -266,35 +266,36 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
               </SelectContent>
             </Select>
             {errors.employeId && (
-              <p className="text-sm text-destructive animate-fade-in">{errors.employeId}</p>
+              <p className="text-xs sm:text-sm text-destructive animate-fade-in">{errors.employeId}</p>
             )}
           </div>
 
-          <div className="flex justify-between pt-4 border-t">
+          <div className="flex flex-col sm:flex-row gap-3 sm:justify-between pt-4 border-t">
             <Button
               type="button"
               variant="outline"
               onClick={handleReset}
-              className="hover-scale"
+              className="w-full sm:w-auto order-3 sm:order-1"
             >
               Réinitialiser
             </Button>
             
-            <div className="flex gap-2">
+            <div className="flex gap-2 order-1 sm:order-2">
               <Button
                 type="button"
                 variant="ghost"
                 onClick={onClose}
-                className="hover-scale"
+                className="flex-1 sm:flex-none"
               >
                 Annuler
               </Button>
               <Button
                 type="submit"
-                className="bg-green-100 hover:bg-green-200 text-black hover-scale"
+                className="flex-1 sm:flex-none bg-amber-500 hover:bg-amber-600 text-white"
               >
                 <AlertTriangle className="h-4 w-4 mr-2" />
-                Ajouter en urgence
+                <span className="hidden sm:inline">Ajouter en urgence</span>
+                <span className="sm:hidden">Ajouter</span>
               </Button>
             </div>
           </div>
