@@ -1,16 +1,22 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bot, Car, Users, FileText, ArrowRight, Zap, Camera, Receipt, Shield } from 'lucide-react';
+import { Bot, Car, Users, FileText, ArrowRight, Zap, Camera, Receipt, Shield, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useDashboardData } from '@/hooks/use-dashboard-data';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { useUserRole } from '@/hooks/use-user-role';
+import { useCompanyId } from '@/hooks/use-company-id';
+import { useEmployeeData } from '@/hooks/useEmployeeData';
+import { usePlanningManager } from '@/hooks/usePlanningManager';
+import { useVehicleData } from '@/hooks/useVehicleData';
 import ImportDialog from '@/components/layout/navbar/ImportDialog';
 import VehiclePhotoDialog from './VehiclePhotoDialog';
 import ExpenseDialog from '@/components/expenses/ExpenseDialog';
+import { VehiculeUrgenceModal } from '@/components/planning/VehiculeUrgenceModal';
+import { useToast } from '@/hooks/use-toast';
 
 const MobileHomePage = () => {
   console.log('MobileHomePage: Component rendering');
@@ -18,10 +24,18 @@ const MobileHomePage = () => {
   const { dashboardStats } = useDashboardData();
   const { vehicles } = useVehicles();
   const { userRole, isOwner } = useUserRole();
+  const { companyId } = useCompanyId();
+  const { toast } = useToast();
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showPhotoDialog, setShowPhotoDialog] = useState(false);
   const [showVehiclePhotoDialog, setShowVehiclePhotoDialog] = useState(false);
   const [showExpenseDialog, setShowExpenseDialog] = useState(false);
+  const [showVehiculeUrgenceModal, setShowVehiculeUrgenceModal] = useState(false);
+
+  // Récupérer les employés pour le modal d'urgence
+  const { employees: employesFromData, refetch: refetchEmployees } = useEmployeeData(companyId);
+  const { refetch: refetchVehicles } = useVehicleData(companyId);
+  const { ajouterVehiculeUrgence } = usePlanningManager();
 
   const quickActions = [
     {
@@ -129,7 +143,7 @@ const MobileHomePage = () => {
         
         {/* Bouton Tour de contrôle - uniquement pour les propriétaires */}
         {isOwner && (
-          <div className="mb-8">
+          <div className="mb-4">
             <Link to="/ai-assistant">
               <Button 
                 className="w-full h-12 bg-red-600 text-white hover:bg-red-700 font-medium transition-all duration-300"
@@ -140,6 +154,17 @@ const MobileHomePage = () => {
             </Link>
           </div>
         )}
+
+        {/* Bouton Véhicule d'urgence */}
+        <div className="mb-8">
+          <Button 
+            onClick={() => setShowVehiculeUrgenceModal(true)}
+            className="w-full h-12 bg-warning text-white hover:bg-warning/90 font-medium transition-all duration-300"
+          >
+            <AlertTriangle className="h-4 w-4 mr-2" />
+            Véhicule d&apos;urgence
+          </Button>
+        </div>
         
         <div className="grid grid-cols-2 gap-4 mb-8">
           {quickActions.map((action, index) => {
@@ -251,6 +276,35 @@ const MobileHomePage = () => {
       <ExpenseDialog
         open={showExpenseDialog}
         onOpenChange={setShowExpenseDialog}
+      />
+
+      {/* Modal pour véhicule d'urgence */}
+      <VehiculeUrgenceModal
+        isOpen={showVehiculeUrgenceModal}
+        onClose={() => setShowVehiculeUrgenceModal(false)}
+        employes={employesFromData || []}
+        onAjouterVehicule={async (vehiculeUrgence) => {
+          console.log('Véhicule urgence ajouté:', vehiculeUrgence);
+          if (companyId) {
+            try {
+              await ajouterVehiculeUrgence(vehiculeUrgence, companyId, {
+                refetchEmployees,
+                refetchVehicles
+              });
+              toast({
+                title: "Véhicule d'urgence ajouté",
+                description: `${vehiculeUrgence.plaque} a été ajouté avec succès`,
+              });
+            } catch (error) {
+              console.error('Erreur lors de l\'ajout du véhicule d\'urgence:', error);
+              toast({
+                title: "Erreur",
+                description: "Une erreur est survenue lors de l'ajout du véhicule",
+                variant: "destructive"
+              });
+            }
+          }
+        }}
       />
     </div>
   );
