@@ -2899,6 +2899,7 @@ export type Database = {
         Row: {
           actual_communication_date: string | null
           archived: boolean
+          category: string | null
           channel: string
           client_id: string | null
           company_id: string
@@ -2914,6 +2915,7 @@ export type Database = {
           replies_count: number | null
           reponse: string | null
           resolved: boolean
+          status: string | null
           summary: string
           tags: string[] | null
           time: string
@@ -2923,6 +2925,7 @@ export type Database = {
         Insert: {
           actual_communication_date?: string | null
           archived?: boolean
+          category?: string | null
           channel: string
           client_id?: string | null
           company_id: string
@@ -2938,6 +2941,7 @@ export type Database = {
           replies_count?: number | null
           reponse?: string | null
           resolved?: boolean
+          status?: string | null
           summary: string
           tags?: string[] | null
           time?: string
@@ -2947,6 +2951,7 @@ export type Database = {
         Update: {
           actual_communication_date?: string | null
           archived?: boolean
+          category?: string | null
           channel?: string
           client_id?: string | null
           company_id?: string
@@ -2962,6 +2967,7 @@ export type Database = {
           replies_count?: number | null
           reponse?: string | null
           resolved?: boolean
+          status?: string | null
           summary?: string
           tags?: string[] | null
           time?: string

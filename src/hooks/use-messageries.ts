@@ -32,6 +32,8 @@ export interface Messagerie {
   client_id: string | null;
   client?: Client;
   priority: number;
+  category: 'sinistre' | 'devis' | 'sav' | 'reclamation' | 'information' | 'facturation' | 'autre';
+  status: 'nouveau' | 'en_cours' | 'en_attente_client' | 'planifie' | 'resolu' | 'archive';
   title: string;
   channel: string;
   eta: string;
@@ -79,7 +81,14 @@ export function useMessageries() {
         return;
       }
 
-      setMessageries(data || []);
+      // Cast les types pour correspondre à l'interface
+      const typedData = (data || []).map(m => ({
+        ...m,
+        category: (m.category || 'autre') as Messagerie['category'],
+        status: (m.status || 'nouveau') as Messagerie['status'],
+      }));
+
+      setMessageries(typedData);
     } catch (error) {
       console.error('Erreur:', error);
       toast({

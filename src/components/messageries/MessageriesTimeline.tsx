@@ -1,10 +1,14 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Phone, Mail, MessageSquare, Smartphone, Clock, User } from "lucide-react";
+import { Mail, Phone, MessageSquare, User, Clock, LucideIcon } from "lucide-react";
 import { Messagerie, Client } from "@/hooks/use-messageries";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
+import { cn } from "@/lib/utils";
+import { MessageriesCategoryBadge } from "./MessageriesCategoryBadge";
+import { MessageriesStatusBadge } from "./MessageriesStatusBadge";
+import { getCategoryConfig } from "@/lib/messageries-utils";
 
 interface MessageriesTimelineProps {
   messages: Messagerie[];
@@ -12,35 +16,27 @@ interface MessageriesTimelineProps {
   onViewClientHistory?: (client: Client) => void;
 }
 
-const getChannelIcon = (channel: string) => {
-  switch (channel) {
-    case "Téléphone": return Phone;
-    case "Mail": return Mail;
-    case "WhatsApp": return MessageSquare;
-    case "Message": default: return Smartphone;
-  }
-};
+function getChannelIcon(channel: string): LucideIcon {
+  const channelLower = channel.toLowerCase();
+  if (channelLower.includes('mail') || channelLower.includes('email')) return Mail;
+  if (channelLower.includes('phone') || channelLower.includes('téléphone')) return Phone;
+  if (channelLower.includes('whatsapp') || channelLower.includes('message')) return MessageSquare;
+  return Mail;
+}
 
-const getPriorityBadge = (priority: number, resolved: boolean) => {
-  if (resolved) {
-    return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Traité</Badge>;
-  }
+function getPriorityBadge(priority: number, resolved: boolean) {
+  if (resolved) return <Badge variant="outline" className="bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800">Traité</Badge>;
   
   switch (priority) {
-    case 1:
-      return <Badge className="bg-destructive/10 text-destructive border-destructive">🔴 Urgent</Badge>;
-    case 2:
-      return <Badge className="bg-karrosserie-orange/10 text-karrosserie-orange border-karrosserie-orange">🟠 Haute</Badge>;
-    case 3:
-      return <Badge className="bg-yellow-50 text-yellow-700 border-yellow-200">🟡 Normale</Badge>;
-    case 4:
-      return <Badge className="bg-blue-50 text-blue-700 border-blue-200">🔵 Basse</Badge>;
-    default:
-      return null;
+    case 1: return <Badge className="bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800">🔴 Urgent</Badge>;
+    case 2: return <Badge className="bg-orange-50 dark:bg-orange-950/20 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800">🟠 Haute</Badge>;
+    case 3: return <Badge className="bg-yellow-50 dark:bg-yellow-950/20 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800">🟡 Normale</Badge>;
+    case 4: return <Badge className="bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800">🔵 Basse</Badge>;
+    default: return null;
   }
-};
+}
 
-const getPriorityBorderColor = (priority: number) => {
+function getPriorityBorderColor(priority: number) {
   switch (priority) {
     case 1: return 'border-l-red-500';
     case 2: return 'border-l-orange-500';
@@ -48,129 +44,61 @@ const getPriorityBorderColor = (priority: number) => {
     case 4: return 'border-l-blue-500';
     default: return 'border-l-gray-300';
   }
-};
+}
 
 export function MessageriesTimeline({ messages, onViewMessage, onViewClientHistory }: MessageriesTimelineProps) {
-  if (messages.length === 0) {
-    return (
-      <Card>
-        <CardContent className="p-12 text-center">
-          <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">Aucun message trouvé</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
-    <div className="space-y-4">
-      {messages.map((message) => {
-        const ChannelIcon = getChannelIcon(message.channel);
-        const timeAgo = formatDistanceToNow(new Date(message.created_at), {
-          addSuffix: true,
-          locale: fr,
-        });
-
-        return (
-          <Card key={message.id} className={`hover:shadow-md transition-shadow border-l-4 ${getPriorityBorderColor(message.priority)}`}>
-            <CardContent className="p-5">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <ChannelIcon className="h-5 w-5 text-primary" />
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-4 mb-2">
-                    <div className="flex items-center gap-2 flex-wrap">
+    <div className="space-y-4 animate-fade-in">
+      {messages.length === 0 ? (
+        <Card><CardContent className="flex items-center justify-center py-12"><p className="text-muted-foreground">Aucun message</p></CardContent></Card>
+      ) : (
+        messages.map((message, index) => {
+          const ChannelIcon = getChannelIcon(message.channel);
+          const categoryConfig = getCategoryConfig(message.category || 'autre');
+          const CategoryIconComponent = categoryConfig.icon;
+          
+          return (
+            <Card key={message.id} className={cn("group hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border-l-4 relative overflow-hidden animate-slide-in dark:bg-card/50 dark:backdrop-blur-sm dark:border-primary/20 dark:hover:border-primary/40", getPriorityBorderColor(message.priority))} style={{ animationDelay: `${index * 50}ms` }}>
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <CardContent className="p-5 relative z-10">
+                <div className="flex items-start gap-4">
+                  <div className={cn("w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg group-hover:shadow-xl transition-shadow", `bg-gradient-to-br ${categoryConfig.gradient}`)}>
+                    <CategoryIconComponent className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      <Badge variant="outline" className="text-xs"><ChannelIcon className="h-3 w-3 mr-1" />{message.channel}</Badge>
+                      <MessageriesCategoryBadge category={message.category || 'autre'} className="text-xs" />
+                      <MessageriesStatusBadge status={message.status || 'nouveau'} className="text-xs" />
                       {getPriorityBadge(message.priority, message.resolved)}
-                      {!message.resolved && (
-                        <Badge variant="secondary" className="bg-karrosserie-orange/10 text-karrosserie-orange">
-                          Non lu
-                        </Badge>
-                      )}
-                      <Badge variant="outline" className="text-xs">
-                        <ChannelIcon className="h-3 w-3 mr-1" />
-                        {message.channel}
-                      </Badge>
-                      <span className={`text-xs px-2 py-1 rounded ${
-                        message.is_inbound 
-                          ? 'bg-blue-100 text-blue-700' 
-                          : 'bg-gray-100 text-gray-700'
-                      }`}>
-                        {message.is_inbound ? '→ Entrant' : '← Sortant'}
-                      </span>
+                      <Badge variant="outline" className={cn("text-xs transition-all", message.is_inbound ? "bg-blue-50 dark:bg-blue-950/20 border-blue-300 dark:border-blue-800" : "bg-gray-50 dark:bg-gray-950/20")}>{message.is_inbound ? '→ Entrant' : '← Sortant'}</Badge>
                     </div>
-                    <div className="flex flex-col items-end text-sm text-muted-foreground whitespace-nowrap">
-                      <span className="text-xs">
-                        {new Date(message.actual_communication_date).toLocaleDateString('fr-FR', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                        })}
-                      </span>
-                      <span className="text-xs flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {timeAgo}
-                      </span>
-                    </div>
-                  </div>
-
-                  <h3 className="font-semibold text-base mb-1">{message.title}</h3>
-                  
-                  {message.client && (
-                    <div className="flex items-center gap-2 mb-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-auto p-0 text-sm text-muted-foreground hover:text-primary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (onViewClientHistory && message.client) {
-                            onViewClientHistory(message.client);
-                          }
-                        }}
-                      >
+                    <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">{message.title}</h3>
+                    {message.client && (
+                      <Button variant="ghost" size="sm" className="h-auto p-1 mb-2 hover:bg-primary/10 transition-colors -ml-1" onClick={(e) => { e.stopPropagation(); onViewClientHistory?.(message.client!); }}>
                         <User className="h-3 w-3 mr-1" />
-                        {message.client.first_name} {message.client.last_name}
+                        <span className="font-medium">{message.client.first_name} {message.client.last_name}</span>
+                        {message.client.email && <span className="text-xs text-muted-foreground ml-2">• {message.client.email}</span>}
                       </Button>
-                      {message.client.email && (
-                        <span className="text-xs text-muted-foreground">• {message.client.email}</span>
-                      )}
+                    )}
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{message.summary}</p>
+                    <div className="flex items-center justify-between flex-wrap gap-3">
+                      <div className="flex gap-1 flex-wrap">
+                        {message.tags.slice(0, 3).map((tag, i) => <Badge key={i} variant="outline" className="text-xs">{tag}</Badge>)}
+                        {message.tags.length > 3 && <Badge variant="outline" className="text-xs">+{message.tags.length - 3}</Badge>}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" />{formatDistanceToNow(new Date(message.actual_communication_date), { locale: fr, addSuffix: true })}</span>
+                        <Button size="sm" onClick={() => onViewMessage(message)} className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 transition-all">Voir</Button>
+                      </div>
                     </div>
-                  )}
-                  
-                  {!message.client && message.contact && (
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Contact: {message.contact}
-                    </p>
-                  )}
-
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                    {message.summary}
-                  </p>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex gap-2 flex-wrap">
-                      {message.tags.map((tag, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                    <Button
-                      size="sm"
-                      onClick={() => onViewMessage(message)}
-                      className="bg-primary hover:bg-primary/90"
-                    >
-                      Voir
-                    </Button>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        );
-      })}
+              </CardContent>
+            </Card>
+          );
+        })
+      )}
     </div>
   );
 }

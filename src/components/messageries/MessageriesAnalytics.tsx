@@ -6,6 +6,7 @@ import { MessageriesTimeline } from "./MessageriesTimeline";
 import { MessageDetailModal } from "./MessageDetailModal";
 import { ClientHistoryModal } from "./ClientHistoryModal";
 import { MessageriesHeader } from "./MessageriesHeader";
+import { MessageriesTabs } from "./MessageriesTabs";
 import { Loading } from "@/components/ui/loading";
 import { Messagerie, Client } from "@/hooks/use-messageries";
 import { clientsService } from "@/services/supabase/clients";
@@ -24,6 +25,9 @@ export default function MessageriesAnalytics() {
   const [selectedClientFilter, setSelectedClientFilter] = useState("all");
   const [selectedPeriod, setSelectedPeriod] = useState("all");
   const [selectedPriority, setSelectedPriority] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [activeView, setActiveView] = useState("all");
   const [selectedMessage, setSelectedMessage] = useState<Messagerie | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [clientHistoryModalOpen, setClientHistoryModalOpen] = useState(false);
@@ -54,6 +58,17 @@ export default function MessageriesAnalytics() {
   const filteredMessages = useMemo(() => {
     let filtered = messageries.filter(m => !m.archived);
 
+    // Filtre par vue active
+    if (activeView === "urgent") {
+      filtered = filtered.filter(m => m.priority === 1 && !m.resolved);
+    } else if (activeView === "new") {
+      filtered = filtered.filter(m => m.status === 'nouveau');
+    } else if (activeView === "pending") {
+      filtered = filtered.filter(m => m.status === 'en_cours' || m.status === 'en_attente_client');
+    } else if (activeView === "resolved") {
+      filtered = filtered.filter(m => m.resolved || m.status === 'resolu');
+    }
+
     // Filtre par type
     if (selectedType !== "all") {
       filtered = filtered.filter(m => m.channel === selectedType);
@@ -62,6 +77,16 @@ export default function MessageriesAnalytics() {
     // Filtre par client
     if (selectedClientFilter !== "all") {
       filtered = filtered.filter(m => m.client_id === selectedClientFilter);
+    }
+
+    // Filtre par catégorie
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter(m => m.category === selectedCategory);
+    }
+
+    // Filtre par statut
+    if (selectedStatus !== "all") {
+      filtered = filtered.filter(m => m.status === selectedStatus);
     }
 
     // Filtre par période
@@ -120,7 +145,7 @@ export default function MessageriesAnalytics() {
       return new Date(b.actual_communication_date || b.created_at).getTime() - 
              new Date(a.actual_communication_date || a.created_at).getTime();
     });
-  }, [messageries, selectedType, selectedClientFilter, selectedPeriod, searchTerm, selectedPriority]);
+  }, [messageries, selectedType, selectedClientFilter, selectedPeriod, searchTerm, selectedPriority, selectedCategory, selectedStatus, activeView]);
 
   // Calcul des statistiques
   const stats = useMemo(() => {
@@ -131,6 +156,9 @@ export default function MessageriesAnalytics() {
       urgent: nonArchived.filter(m => m.priority === 1 && !m.resolved).length,
       highPriority: nonArchived.filter(m => m.priority === 2 && !m.resolved).length,
       unresolved: nonArchived.filter(m => !m.resolved).length,
+      new: nonArchived.filter(m => m.status === 'nouveau').length,
+      pending: nonArchived.filter(m => m.status === 'en_cours' || m.status === 'en_attente_client').length,
+      resolved: nonArchived.filter(m => m.resolved || m.status === 'resolu').length,
     };
   }, [messageries]);
 
@@ -152,9 +180,18 @@ export default function MessageriesAnalytics() {
     <div className="p-6 bg-background min-h-screen">
       <div className="max-w-7xl mx-auto">
         <MessageriesHeader 
-          onQuickFilterUrgent={() => setSelectedPriority("1")}
-          onQuickFilterHigh={() => setSelectedPriority("2")}
-          onShowAll={() => setSelectedPriority("all")}
+          onQuickFilterUrgent={() => {
+            setSelectedPriority("1");
+            setActiveView("urgent");
+          }}
+          onQuickFilterHigh={() => {
+            setSelectedPriority("2");
+            setActiveView("all");
+          }}
+          onShowAll={() => {
+            setSelectedPriority("all");
+            setActiveView("all");
+          }}
           urgentCount={stats.urgent}
           highPriorityCount={stats.highPriority}
           currentFilter={selectedPriority}
@@ -167,18 +204,40 @@ export default function MessageriesAnalytics() {
           unresolvedMessages={stats.unresolved}
         />
 
+        <MessageriesTabs
+          activeView={activeView}
+          onViewChange={(view) => {
+            setActiveView(view);
+            // Reset autres filtres quand on change de vue
+            if (view !== "all") {
+              setSelectedPriority("all");
+            }
+          }}
+          stats={{
+            total: stats.total,
+            urgent: stats.urgent,
+            new: stats.new,
+            pending: stats.pending,
+            resolved: stats.resolved,
+          }}
+        />
+
         <MessageriesFilters
           searchTerm={searchTerm}
           selectedType={selectedType}
           selectedClient={selectedClientFilter}
           selectedPeriod={selectedPeriod}
           selectedPriority={selectedPriority}
+          selectedCategory={selectedCategory}
+          selectedStatus={selectedStatus}
           clients={allClients}
           onSearchChange={setSearchTerm}
           onTypeChange={setSelectedType}
           onClientChange={setSelectedClientFilter}
           onPeriodChange={setSelectedPeriod}
           onPriorityChange={setSelectedPriority}
+          onCategoryChange={setSelectedCategory}
+          onStatusChange={setSelectedStatus}
         />
 
         <MessageriesTimeline
