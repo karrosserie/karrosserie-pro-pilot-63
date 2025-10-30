@@ -39,3 +39,24 @@ export function safeNumber(value: any): number {
   const parsed = parseFloat(String(value).replace(',', '.'));
   return isNaN(parsed) ? 0 : parsed;
 }
+
+export function formatPlaque(plaque: string): string {
+  // Enlever tous les caractères non alphanumériques et convertir en majuscules
+  const clean = plaque.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  
+  // Format français: AB-123-CD (2 lettres, 3 chiffres, 2 lettres)
+  if (clean.length >= 7) {
+    return `${clean.slice(0, 2)}-${clean.slice(2, 5)}-${clean.slice(5, 7)}`;
+  }
+  
+  // Si moins de 7 caractères, formater ce qui est disponible
+  if (clean.length >= 5) {
+    return `${clean.slice(0, 2)}-${clean.slice(2, 5)}-${clean.slice(5)}`;
+  }
+  
+  if (clean.length >= 2) {
+    return `${clean.slice(0, 2)}-${clean.slice(2)}`;
+  }
+  
+  return clean;
+}

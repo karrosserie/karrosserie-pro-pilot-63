@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, Clock, User, Car } from 'lucide-react';
 import { Employe } from '@/hooks/usePlanningManager';
 import VoiceInputButton from '@/components/common/VoiceInputButton';
+import { formatPlaque } from '@/lib/utils';
 
 interface VehiculeUrgenceModalProps {
   isOpen: boolean;
@@ -155,7 +156,8 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
                 <VoiceInputButton
                   fieldName="plaque"
                   onTranscript={(text) => {
-                    setFormData({ ...formData, plaque: text.toUpperCase() });
+                    const formattedPlaque = formatPlaque(text);
+                    setFormData({ ...formData, plaque: formattedPlaque });
                     setErrors({ ...errors, plaque: '' });
                   }}
                 />
