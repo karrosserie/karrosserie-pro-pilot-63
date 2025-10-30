@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, Clock, User, Car } from 'lucide-react';
 import { Employe } from '@/hooks/usePlanningManager';
+import VoiceInputButton from '@/components/common/VoiceInputButton';
 
 interface VehiculeUrgenceModalProps {
   isOpen: boolean;
@@ -142,14 +143,23 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
                 <Car className="h-4 w-4" />
                 Plaque d'immatriculation *
               </Label>
-              <Input
-                id="plaque"
-                value={formData.plaque}
-                onChange={(e) => setFormData({ ...formData, plaque: e.target.value })}
-                placeholder="XX-123-XX"
-                className={`transition-all duration-200 ${errors.plaque ? 'border-destructive' : 'border-input'}`}
-                style={{ textTransform: 'uppercase' }}
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="plaque"
+                  value={formData.plaque}
+                  onChange={(e) => setFormData({ ...formData, plaque: e.target.value })}
+                  placeholder="XX-123-XX"
+                  className={`transition-all duration-200 flex-1 ${errors.plaque ? 'border-destructive' : 'border-input'}`}
+                  style={{ textTransform: 'uppercase' }}
+                />
+                <VoiceInputButton
+                  fieldName="plaque"
+                  onTranscript={(text) => {
+                    setFormData({ ...formData, plaque: text.toUpperCase() });
+                    setErrors({ ...errors, plaque: '' });
+                  }}
+                />
+              </div>
               {errors.plaque && (
                 <p className="text-sm text-destructive animate-fade-in">{errors.plaque}</p>
               )}
@@ -181,13 +191,22 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="nom">Nom du client *</Label>
-              <Input
-                id="nom"
-                value={formData.nom}
-                onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
-                placeholder="Nom"
-                className={errors.nom ? 'border-destructive' : ''}
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="nom"
+                  value={formData.nom}
+                  onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
+                  placeholder="Nom"
+                  className={`flex-1 ${errors.nom ? 'border-destructive' : ''}`}
+                />
+                <VoiceInputButton
+                  fieldName="nom"
+                  onTranscript={(text) => {
+                    setFormData({ ...formData, nom: text });
+                    setErrors({ ...errors, nom: '' });
+                  }}
+                />
+              </div>
               {errors.nom && (
                 <p className="text-sm text-destructive animate-fade-in">{errors.nom}</p>
               )}
@@ -195,13 +214,22 @@ export const VehiculeUrgenceModal: React.FC<VehiculeUrgenceModalProps> = ({
 
             <div className="space-y-2">
               <Label htmlFor="prenom">Prénom du client *</Label>
-              <Input
-                id="prenom"
-                value={formData.prenom}
-                onChange={(e) => setFormData({ ...formData, prenom: e.target.value })}
-                placeholder="Prénom"
-                className={errors.prenom ? 'border-destructive' : ''}
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="prenom"
+                  value={formData.prenom}
+                  onChange={(e) => setFormData({ ...formData, prenom: e.target.value })}
+                  placeholder="Prénom"
+                  className={`flex-1 ${errors.prenom ? 'border-destructive' : ''}`}
+                />
+                <VoiceInputButton
+                  fieldName="prenom"
+                  onTranscript={(text) => {
+                    setFormData({ ...formData, prenom: text });
+                    setErrors({ ...errors, prenom: '' });
+                  }}
+                />
+              </div>
               {errors.prenom && (
                 <p className="text-sm text-destructive animate-fade-in">{errors.prenom}</p>
               )}
