@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useMessageries } from "@/hooks/use-messageries";
 import { MessageriesStats } from "./MessageriesStats";
 import { MessageriesFilters } from "./MessageriesFilters";
@@ -8,6 +8,7 @@ import { ClientHistoryModal } from "./ClientHistoryModal";
 import { MessageriesHeader } from "./MessageriesHeader";
 import { Loading } from "@/components/ui/loading";
 import { Messagerie, Client } from "@/hooks/use-messageries";
+import { clientsService } from "@/services/supabase/clients";
 
 export default function MessageriesAnalytics() {
   const {
@@ -26,19 +27,27 @@ export default function MessageriesAnalytics() {
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [clientHistoryModalOpen, setClientHistoryModalOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [allClients, setAllClients] = useState<Client[]>([]);
 
-  // Liste unique des clients
-  const uniqueClients = useMemo(() => {
-    const clientsMap = new Map<string, Client>();
-    messageries.forEach(m => {
-      if (m.client && m.client_id) {
-        clientsMap.set(m.client_id, m.client);
+  // Charger tous les clients au montage
+  useEffect(() => {
+    const loadClients = async () => {
+      try {
+        const clients = await clientsService.getAll();
+        const transformedClients = clients.map(c => ({
+          id: c.id,
+          first_name: c.first_name,
+          last_name: c.last_name,
+          email: c.email,
+          phone: c.phone,
+        }));
+        setAllClients(transformedClients);
+      } catch (error) {
+        console.error("Erreur lors du chargement des clients:", error);
       }
-    });
-    return Array.from(clientsMap.values()).sort((a, b) => 
-      `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`)
-    );
-  }, [messageries]);
+    };
+    loadClients();
+  }, []);
 
   // Filtrage des messages
   const filteredMessages = useMemo(() => {
@@ -143,7 +152,7 @@ export default function MessageriesAnalytics() {
           selectedType={selectedType}
           selectedClient={selectedClientFilter}
           selectedPeriod={selectedPeriod}
-          clients={uniqueClients}
+          clients={allClients}
           onSearchChange={setSearchTerm}
           onTypeChange={setSelectedType}
           onClientChange={setSelectedClientFilter}
