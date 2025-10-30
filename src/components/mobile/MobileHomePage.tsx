@@ -159,7 +159,7 @@ const MobileHomePage = () => {
         <div className="mb-8">
           <Button 
             onClick={() => setShowVehiculeUrgenceModal(true)}
-            className="w-full h-12 bg-warning text-white hover:bg-warning/90 font-medium transition-all duration-300"
+            className="w-full h-12 bg-amber-500 text-white hover:bg-amber-600 font-medium transition-all duration-300"
           >
             <AlertTriangle className="h-4 w-4 mr-2" />
             Véhicule d&apos;urgence
