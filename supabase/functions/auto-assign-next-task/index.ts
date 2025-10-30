@@ -38,7 +38,77 @@ serve(async (req: Request) => {
 
     console.log(`🔄 Auto-assignment triggered for task: ${taskId}, company: ${companyId}`);
 
-    // 1. Récupérer la tâche terminée
+    // 1. PRIORITÉ: Vérifier s'il y a une tâche interrompue à reprendre
+    console.log('🔍 Checking for interrupted tasks to resume...');
+    const { data: interruptedTasks, error: interruptedError } = await supabase
+      .from('employee_schedule')
+      .select('*')
+      .eq('interrupted_by', taskId)
+      .eq('company_id', companyId)
+      .eq('status', 'En attente')
+      .order('updated_at', { ascending: false })
+      .limit(1);
+
+    if (interruptedError) {
+      console.error('❌ Error checking interrupted tasks:', interruptedError);
+    }
+
+    if (interruptedTasks && interruptedTasks.length > 0) {
+      const taskToResume = interruptedTasks[0];
+      console.log(`🔄 Found interrupted task to resume: ${taskToResume.id}`);
+
+      // Reprendre la tâche interrompue
+      const { error: resumeError } = await supabase
+        .from('employee_schedule')
+        .update({
+          status: 'En cours',
+          real_start_datetime: new Date().toISOString(),
+          interrupted_by: null,
+          waiting_reason: null
+        })
+        .eq('id', taskToResume.id);
+
+      if (resumeError) {
+        console.error('❌ Error resuming interrupted task:', resumeError);
+      } else {
+        console.log('✅ Successfully resumed interrupted task');
+
+        // Créer une notification pour l'employé
+        try {
+          const { error: notifError } = await supabase
+            .from('system_alerts')
+            .insert({
+              company_id: companyId,
+              entity_type: 'task',
+              employee_id: taskToResume.user_id,
+              vehicle_id: taskToResume.vehicle_id,
+              alert_type: 'task_resumed',
+              title: 'Reprise de tâche interrompue',
+              message: `Vous pouvez reprendre votre tâche: ${taskToResume.task_type}`,
+              reason: 'Urgence terminée - reprise automatique'
+            });
+
+          if (notifError) {
+            console.error('⚠️ Error creating notification:', notifError);
+          }
+        } catch (notifError) {
+          console.error('⚠️ Error in notification creation:', notifError);
+        }
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            resumedTaskId: taskToResume.id,
+            message: 'Interrupted task resumed successfully'
+          }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    console.log('ℹ️ No interrupted tasks found, proceeding with normal workflow');
+
+    // 2. Récupérer la tâche terminée
     const { data: completedTask, error: taskError } = await supabase
       .from('employee_schedule')
       .select('*')

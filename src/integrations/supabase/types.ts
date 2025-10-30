@@ -590,6 +590,24 @@ export type Database = {
           },
         ]
       }
+      change_rapport_for_new_devis: {
+        Row: {
+          created_at: string
+          id: number
+          numero_de_dossier: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          numero_de_dossier?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          numero_de_dossier?: string | null
+        }
+        Relationships: []
+      }
       client_relances: {
         Row: {
           channel: Database["public"]["Enums"]["relance_channel"]
@@ -1281,6 +1299,7 @@ export type Database = {
           detailed_instructions: Json | null
           end_datetime: string
           id: string
+          interrupted_by: string | null
           paint_brand: string | null
           real_end_datetime: string | null
           real_start_datetime: string | null
@@ -1299,6 +1318,7 @@ export type Database = {
           detailed_instructions?: Json | null
           end_datetime: string
           id?: string
+          interrupted_by?: string | null
           paint_brand?: string | null
           real_end_datetime?: string | null
           real_start_datetime?: string | null
@@ -1317,6 +1337,7 @@ export type Database = {
           detailed_instructions?: Json | null
           end_datetime?: string
           id?: string
+          interrupted_by?: string | null
           paint_brand?: string | null
           real_end_datetime?: string | null
           real_start_datetime?: string | null
@@ -1348,6 +1369,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_schedule_interrupted_by_fkey"
+            columns: ["interrupted_by"]
+            isOneToOne: false
+            referencedRelation: "employee_schedule"
             referencedColumns: ["id"]
           },
           {

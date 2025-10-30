@@ -101,22 +101,8 @@ Deno.serve(async (req) => {
     let pausedTaskId = null;
     if (currentTask) {
       console.log(`⏸️ Employee has a task in progress: ${currentTask.task_type}`);
-      
-      // Put the current task on pause (status "En attente")
-      const { error: pauseError } = await supabase
-        .from('employee_schedule')
-        .update({
-          status: 'En attente',
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', currentTask.id);
-      
-      if (pauseError) {
-        console.error('❌ Error pausing current task:', pauseError);
-      } else {
-        console.log(`✅ Task paused: ${currentTask.task_type}`);
-        pausedTaskId = currentTask.id;
-      }
+      // Store the ID but we'll update it after creating the emergency task
+      pausedTaskId = currentTask.id;
     }
 
     // 3. Calculate the emergency time slot with working hours validation
@@ -353,6 +339,25 @@ Deno.serve(async (req) => {
     }
 
     console.log('🎯 Emergency task created successfully at exact requested time');
+
+    // Now update the paused task with the interrupted_by reference
+    if (pausedTaskId) {
+      const { error: pauseError } = await supabase
+        .from('employee_schedule')
+        .update({ 
+          status: 'En attente',
+          interrupted_by: scheduleData.id,
+          waiting_reason: `Mis en pause pour urgence: ${formattedPlaque}`
+        })
+        .eq('id', pausedTaskId);
+
+      if (pauseError) {
+        console.error('❌ Error updating paused task with interrupted_by:', pauseError);
+        // Don't fail the whole operation, just log the error
+      } else {
+        console.log(`✅ Updated paused task ${pausedTaskId} with interrupted_by: ${scheduleData.id}`);
+      }
+    }
 
     const response = {
       success: true,

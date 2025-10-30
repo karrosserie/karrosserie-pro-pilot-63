@@ -7,7 +7,7 @@ export const useWaitingTasks = () => {
   const { companyInfo } = useCompany();
 
   const {
-    data: waitingTasks = [],
+    data: allWaitingTasks = [],
     isLoading,
     error,
     refetch
@@ -47,6 +47,12 @@ export const useWaitingTasks = () => {
     enabled: !!companyInfo?.id
   });
 
+  // Séparer les tâches normales et les tâches interrompues
+  const waitingTasks = allWaitingTasks.filter(task => !task.interrupted_by);
+  const interruptedTasks = allWaitingTasks.filter(task => task.interrupted_by);
+
+  const hasInterruptedTasks = interruptedTasks.length > 0;
+
   const resumeTask = async (taskId: string) => {
     try {
       const { error } = await supabase
@@ -67,6 +73,8 @@ export const useWaitingTasks = () => {
 
   return {
     waitingTasks,
+    interruptedTasks,
+    hasInterruptedTasks,
     isLoading,
     error,
     refetch,

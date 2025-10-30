@@ -40,6 +40,8 @@ interface EmployeeViewProps {
   employeeId?: string;
 }
 
+import { useWaitingTasks } from '@/hooks/useWaitingTasks';
+
 export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   const { user } = useAuth();
   const { companyInfo } = useCompany();
@@ -61,6 +63,9 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
   
   // Récupérer les vraies données depuis Supabase (realtime temporairement désactivé)
   const { schedules, isLoading, refetch } = useEmployeeSchedule(currentUserId);
+  
+  // Récupérer les tâches interrompues
+  const { interruptedTasks } = useWaitingTasks();
 
   // Fonction pour récupérer les instructions détaillées pour une tâche
   const fetchTaskInstructions = async (taskId: string) => {
@@ -774,6 +779,55 @@ export const EmployeeView = ({ employeeId }: EmployeeViewProps) => {
             <Clock className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mx-auto mb-3 sm:mb-4" />
             <h3 className="font-semibold mb-1 text-sm sm:text-base">Aucune tâche en cours</h3>
             <p className="text-muted-foreground text-xs sm:text-sm">Commencez votre prochaine tâche</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Tâches interrompues (priorité absolue) */}
+      {interruptedTasks && interruptedTasks.length > 0 && (
+        <Card className="border-red-300 bg-red-50">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-red-800 text-base sm:text-lg">
+              <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5" />
+              Tâches interrompues (priorité)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6 pt-0 space-y-4">
+            {interruptedTasks.map((task: any) => (
+              <div key={task.id} className="border-l-4 border-red-400 pl-3 sm:pl-4 py-2">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div className="space-y-2 sm:space-y-3">
+                    <h3 className="font-semibold text-sm sm:text-base">
+                      {task.vehicles?.car_brands?.name} {task.vehicles?.car_models?.name}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
+                      {task.vehicles?.license_plate} • {task.vehicles?.clients 
+                        ? `${task.vehicles.clients.first_name} ${task.vehicles.clients.last_name}` 
+                        : 'Client inconnu'}
+                    </p>
+                    <p className="text-xs sm:text-sm font-medium text-red-700">{task.task_type}</p>
+                    {task.waiting_reason && (
+                      <p className="text-xs sm:text-sm text-red-600 italic">
+                        Raison: {task.waiting_reason}
+                      </p>
+                    )}
+                  </div>
+                  
+                  <div className="flex flex-col sm:flex-row lg:flex-col gap-2 justify-start sm:justify-end lg:justify-start">
+                    <Button 
+                      size="sm" 
+                      variant="default"
+                      onClick={() => handleStartTask(task.id)}
+                      className="flex items-center gap-2 w-full sm:w-auto bg-red-600 hover:bg-red-700"
+                      disabled={isOnBreak || isProcessingPhoto || !!currentTask}
+                    >
+                      <Play className="w-4 h-4" />
+                      <span className="text-xs sm:text-sm">Reprendre la tâche</span>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </CardContent>
         </Card>
       )}
