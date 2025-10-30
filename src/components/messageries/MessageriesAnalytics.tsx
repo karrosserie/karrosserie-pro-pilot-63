@@ -4,8 +4,6 @@ import { MessageriesStats } from "./MessageriesStats";
 import { MessageriesFilters } from "./MessageriesFilters";
 import { MessageriesTimeline } from "./MessageriesTimeline";
 import { MessageDetailModal } from "./MessageDetailModal";
-import { AddFollowUpRecordModal } from "./AddFollowUpRecordModal";
-import { AddCommunicationRecordModal } from "./AddCommunicationRecordModal";
 import { ClientHistoryModal } from "./ClientHistoryModal";
 import { MessageriesHeader } from "./MessageriesHeader";
 import { Loading } from "@/components/ui/loading";
@@ -22,16 +20,25 @@ export default function MessageriesAnalytics() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("all");
-  const [selectedCarrosserie, setSelectedCarrosserie] = useState("all");
+  const [selectedClientFilter, setSelectedClientFilter] = useState("all");
   const [selectedPeriod, setSelectedPeriod] = useState("all");
   const [selectedMessage, setSelectedMessage] = useState<Messagerie | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
-  const [replyModalOpen, setReplyModalOpen] = useState(false);
-  const [replyMessage, setReplyMessage] = useState<Messagerie | null>(null);
-  const [newMessageModalOpen, setNewMessageModalOpen] = useState(false);
   const [clientHistoryModalOpen, setClientHistoryModalOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [preselectedClientId, setPreselectedClientId] = useState<string | undefined>(undefined);
+
+  // Liste unique des clients
+  const uniqueClients = useMemo(() => {
+    const clientsMap = new Map<string, Client>();
+    messageries.forEach(m => {
+      if (m.client && m.client_id) {
+        clientsMap.set(m.client_id, m.client);
+      }
+    });
+    return Array.from(clientsMap.values()).sort((a, b) => 
+      `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`)
+    );
+  }, [messageries]);
 
   // Filtrage des messages
   const filteredMessages = useMemo(() => {
@@ -42,12 +49,17 @@ export default function MessageriesAnalytics() {
       filtered = filtered.filter(m => m.channel === selectedType);
     }
 
+    // Filtre par client
+    if (selectedClientFilter !== "all") {
+      filtered = filtered.filter(m => m.client_id === selectedClientFilter);
+    }
+
     // Filtre par période
     if (selectedPeriod !== "all") {
       const now = new Date();
       
       filtered = filtered.filter(m => {
-        const messageDate = new Date(m.created_at);
+        const messageDate = new Date(m.actual_communication_date || m.created_at);
         switch (selectedPeriod) {
           case "today":
             return messageDate.toDateString() === now.toDateString();
@@ -72,14 +84,16 @@ export default function MessageriesAnalytics() {
         m.title.toLowerCase().includes(search) ||
         m.summary.toLowerCase().includes(search) ||
         m.message.toLowerCase().includes(search) ||
-        (m.contact && m.contact.toLowerCase().includes(search))
+        (m.contact && m.contact.toLowerCase().includes(search)) ||
+        (m.client && `${m.client.first_name} ${m.client.last_name}`.toLowerCase().includes(search))
       );
     }
 
     return filtered.sort((a, b) => 
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      new Date(b.actual_communication_date || b.created_at).getTime() - 
+      new Date(a.actual_communication_date || a.created_at).getTime()
     );
-  }, [messageries, selectedType, selectedCarrosserie, selectedPeriod, searchTerm]);
+  }, [messageries, selectedType, selectedClientFilter, selectedPeriod, searchTerm]);
 
   // Calcul des statistiques
   const stats = useMemo(() => {
@@ -103,27 +117,9 @@ export default function MessageriesAnalytics() {
     setDetailModalOpen(true);
   };
 
-  const handleReply = (id: string) => {
-    const message = messageries.find(m => m.id === id);
-    if (message) {
-      setReplyMessage(message);
-      setReplyModalOpen(true);
-    }
-  };
-
   const handleViewClientHistory = (client: Client) => {
     setSelectedClient(client);
     setClientHistoryModalOpen(true);
-  };
-
-  const handleNewMessage = (clientId?: string) => {
-    setPreselectedClientId(clientId);
-    setNewMessageModalOpen(true);
-  };
-
-  const handleNewMessageSuccess = () => {
-    refetch();
-    setNewMessageModalOpen(false);
   };
 
   if (loading) {
@@ -133,7 +129,7 @@ export default function MessageriesAnalytics() {
   return (
     <div className="p-6 bg-background min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <MessageriesHeader onNewMessage={() => handleNewMessage()} />
+        <MessageriesHeader />
 
         <MessageriesStats
           totalMessages={stats.total}
@@ -145,11 +141,12 @@ export default function MessageriesAnalytics() {
         <MessageriesFilters
           searchTerm={searchTerm}
           selectedType={selectedType}
-          selectedCarrosserie={selectedCarrosserie}
+          selectedClient={selectedClientFilter}
           selectedPeriod={selectedPeriod}
+          clients={uniqueClients}
           onSearchChange={setSearchTerm}
           onTypeChange={setSelectedType}
-          onCarrosserieChange={setSelectedCarrosserie}
+          onClientChange={setSelectedClientFilter}
           onPeriodChange={setSelectedPeriod}
         />
 
@@ -163,31 +160,10 @@ export default function MessageriesAnalytics() {
           message={selectedMessage}
           open={detailModalOpen}
           onOpenChange={setDetailModalOpen}
-          onReply={handleReply}
+          onReply={() => {}}
           onResolve={toggleResolved}
           onArchive={toggleArchived}
           onViewClientHistory={handleViewClientHistory}
-        />
-
-        <AddFollowUpRecordModal
-          isOpen={replyModalOpen}
-          onClose={() => setReplyModalOpen(false)}
-          messagerie={replyMessage}
-          onSuccess={() => {
-            setReplyModalOpen(false);
-            refetch();
-            if (replyMessage) {
-              setSelectedMessage(replyMessage);
-              setDetailModalOpen(true);
-            }
-          }}
-        />
-
-        <AddCommunicationRecordModal
-          isOpen={newMessageModalOpen}
-          onClose={() => setNewMessageModalOpen(false)}
-          onSuccess={handleNewMessageSuccess}
-          preselectedClientId={preselectedClientId}
         />
 
         <ClientHistoryModal
@@ -195,7 +171,6 @@ export default function MessageriesAnalytics() {
           onClose={() => setClientHistoryModalOpen(false)}
           client={selectedClient}
           messages={messageries}
-          onNewMessage={handleNewMessage}
         />
       </div>
     </div>

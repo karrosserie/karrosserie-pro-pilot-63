@@ -285,29 +285,6 @@ export function MessageDetailModal({
           )}
 
           <div className="flex gap-2 pt-4 border-t">
-            {!message.resolved && (
-              <>
-                <Button
-                  onClick={() => {
-                    onReply(message.id);
-                    onOpenChange(false);
-                  }}
-                  className="bg-primary hover:bg-primary/90"
-                >
-                  Ajouter un échange
-                </Button>
-                <Button
-                  onClick={() => {
-                    onResolve(message.id);
-                    onOpenChange(false);
-                  }}
-                  variant="outline"
-                  className="border-green-500 text-green-700 hover:bg-green-50"
-                >
-                  Marquer comme traité
-                </Button>
-              </>
-            )}
             <Button
               onClick={() => {
                 onArchive(message.id);

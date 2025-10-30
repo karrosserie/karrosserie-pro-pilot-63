@@ -13,15 +13,13 @@ interface ClientHistoryModalProps {
   onClose: () => void;
   client: Client | null;
   messages: Messagerie[];
-  onNewMessage: (clientId: string) => void;
 }
 
 export function ClientHistoryModal({ 
   isOpen, 
   onClose, 
   client, 
-  messages,
-  onNewMessage 
+  messages 
 }: ClientHistoryModalProps) {
   const [filteredMessages, setFilteredMessages] = useState<Messagerie[]>([]);
 
@@ -65,21 +63,9 @@ export function ClientHistoryModal({
           {/* Infos client */}
           <Card className="p-4 bg-muted/50">
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">
-                  {client.first_name} {client.last_name}
-                </h3>
-                <Button 
-                  size="sm" 
-                  onClick={() => {
-                    onClose();
-                    onNewMessage(client.id);
-                  }}
-                >
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  Nouvelle communication
-                </Button>
-              </div>
+              <h3 className="text-lg font-semibold">
+                {client.first_name} {client.last_name}
+              </h3>
               <div className="flex flex-wrap gap-4 text-sm">
                 {client.email && (
                   <div className="flex items-center gap-2 text-muted-foreground">

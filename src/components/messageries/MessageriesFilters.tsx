@@ -8,25 +8,33 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+interface Client {
+  id: string;
+  first_name: string;
+  last_name: string;
+}
+
 interface MessageriesFiltersProps {
   searchTerm: string;
   selectedType: string;
-  selectedCarrosserie: string;
+  selectedClient: string;
   selectedPeriod: string;
+  clients: Client[];
   onSearchChange: (value: string) => void;
   onTypeChange: (value: string) => void;
-  onCarrosserieChange: (value: string) => void;
+  onClientChange: (value: string) => void;
   onPeriodChange: (value: string) => void;
 }
 
 export function MessageriesFilters({
   searchTerm,
   selectedType,
-  selectedCarrosserie,
+  selectedClient,
   selectedPeriod,
+  clients,
   onSearchChange,
   onTypeChange,
-  onCarrosserieChange,
+  onClientChange,
   onPeriodChange,
 }: MessageriesFiltersProps) {
   return (
@@ -45,14 +53,17 @@ export function MessageriesFilters({
           </SelectContent>
         </Select>
 
-        <Select value={selectedCarrosserie} onValueChange={onCarrosserieChange}>
+        <Select value={selectedClient} onValueChange={onClientChange}>
           <SelectTrigger>
-            <SelectValue placeholder="Toutes les carrosseries" />
+            <SelectValue placeholder="Tous les clients" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Toutes les carrosseries</SelectItem>
-            <SelectItem value="carrosserie1">Carrosserie 1</SelectItem>
-            <SelectItem value="carrosserie2">Carrosserie 2</SelectItem>
+            <SelectItem value="all">Tous les clients</SelectItem>
+            {clients.map((client) => (
+              <SelectItem key={client.id} value={client.id}>
+                {client.first_name} {client.last_name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 
