@@ -7,8 +7,13 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Messagerie } from "@/hooks/use-messageries";
-import { Phone, Mail, MessageSquare, Smartphone, Clock, Calendar, Tag } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Messagerie, Client, MessagerieReply } from "@/hooks/use-messageries";
+import { Phone, Mail, MessageSquare, Smartphone, Clock, Calendar, Tag, User, History } from "lucide-react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { formatDistanceToNow } from "date-fns";
+import { fr } from "date-fns/locale";
 
 interface MessageDetailModalProps {
   message: Messagerie | null;
@@ -17,6 +22,7 @@ interface MessageDetailModalProps {
   onReply: (id: string) => void;
   onResolve: (id: string) => void;
   onArchive: (id: string) => void;
+  onViewClientHistory?: (client: Client) => void;
 }
 
 const getChannelIcon = (channel: string) => {
@@ -45,7 +51,37 @@ export function MessageDetailModal({
   onReply,
   onResolve,
   onArchive,
+  onViewClientHistory,
 }: MessageDetailModalProps) {
+  const [replies, setReplies] = useState<MessagerieReply[]>([]);
+  const [loadingReplies, setLoadingReplies] = useState(false);
+
+  useEffect(() => {
+    if (message && open) {
+      fetchReplies();
+    }
+  }, [message, open]);
+
+  const fetchReplies = async () => {
+    if (!message) return;
+    
+    setLoadingReplies(true);
+    try {
+      const { data, error } = await supabase
+        .from('messagerie_replies')
+        .select('*')
+        .eq('messagerie_id', message.id)
+        .order('sent_at', { ascending: true });
+
+      if (error) throw error;
+      setReplies((data || []) as MessagerieReply[]);
+    } catch (error) {
+      console.error('Erreur lors du chargement des réponses:', error);
+    } finally {
+      setLoadingReplies(false);
+    }
+  };
+
   if (!message) return null;
 
   const ChannelIcon = getChannelIcon(message.channel);
@@ -71,6 +107,90 @@ export function MessageDetailModal({
         </DialogHeader>
 
         <div className="space-y-6 mt-4">
+          {/* Informations Client */}
+          {message.client && (
+            <Card className="p-4 bg-muted/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-semibold mb-1 flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Informations Client
+                  </h4>
+                  <p className="text-sm font-medium">
+                    {message.client.first_name} {message.client.last_name}
+                  </p>
+                  <div className="flex gap-3 mt-1 text-xs text-muted-foreground">
+                    {message.client.email && (
+                      <span className="flex items-center gap-1">
+                        <Mail className="h-3 w-3" />
+                        {message.client.email}
+                      </span>
+                    )}
+                    {message.client.phone && (
+                      <span className="flex items-center gap-1">
+                        <Phone className="h-3 w-3" />
+                        {message.client.phone}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                {onViewClientHistory && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      onViewClientHistory(message.client!);
+                      onOpenChange(false);
+                    }}
+                  >
+                    <History className="h-4 w-4 mr-2" />
+                    Voir l'historique
+                  </Button>
+                )}
+              </div>
+            </Card>
+          )}
+
+          {/* Fil de conversation */}
+          {replies.length > 0 && (
+            <div>
+              <h4 className="font-semibold mb-3 flex items-center gap-2">
+                <MessageSquare className="h-4 w-4" />
+                Fil de conversation ({replies.length})
+              </h4>
+              <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+                {replies.map((reply) => (
+                  <Card
+                    key={reply.id}
+                    className={`p-3 ${
+                      reply.sender_type === 'carrosserie'
+                        ? 'bg-primary/5 ml-8'
+                        : 'bg-muted/50 mr-8'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <Badge variant={reply.sender_type === 'carrosserie' ? 'default' : 'secondary'} className="text-xs">
+                        {reply.sender_type === 'carrosserie' ? 'Carrosserie' : 'Client'}
+                      </Badge>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Badge variant="outline" className="text-xs">
+                          {reply.channel}
+                        </Badge>
+                        <span>
+                          {formatDistanceToNow(new Date(reply.sent_at), {
+                            addSuffix: true,
+                            locale: fr,
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-sm whitespace-pre-wrap">{reply.content}</p>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div>
             <h4 className="font-semibold mb-2 flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />

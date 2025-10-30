@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Mail, Phone, MessageSquare, Send, MessageCircle } from 'lucide-react';
 import { Messagerie } from '@/hooks/use-messageries';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ReplyModalProps {
   isOpen: boolean;
@@ -32,7 +33,7 @@ export const ReplyModal: React.FC<ReplyModalProps> = ({
   const { toast } = useToast();
 
   const handleSend = async () => {
-    if (!selectedChannel) {
+    if (!selectedChannel || !messagerie) {
       toast({
         title: "Erreur",
         description: "Veuillez sélectionner un canal de communication",
@@ -53,9 +54,28 @@ export const ReplyModal: React.FC<ReplyModalProps> = ({
     setIsLoading(true);
 
     try {
-      // Simuler l'envoi de la réponse
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const { data: userData } = await supabase.auth.getUser();
       
+      // Enregistrer la réponse dans messagerie_replies
+      const { error: replyError } = await supabase
+        .from('messagerie_replies')
+        .insert({
+          messagerie_id: messagerie.id,
+          company_id: messagerie.company_id,
+          sender_type: 'carrosserie',
+          sender_id: userData.user?.id,
+          content: replyText,
+          channel: CHANNELS.find(c => c.value === selectedChannel)?.label || selectedChannel,
+        });
+
+      if (replyError) throw replyError;
+
+      // Optionnellement marquer comme résolu
+      // await supabase
+      //   .from('messageries')
+      //   .update({ resolved: true })
+      //   .eq('id', messagerie.id);
+
       const channelLabel = CHANNELS.find(c => c.value === selectedChannel)?.label;
       
       toast({
@@ -65,6 +85,7 @@ export const ReplyModal: React.FC<ReplyModalProps> = ({
       
       handleClose();
     } catch (error) {
+      console.error('Erreur lors de l\'envoi:', error);
       toast({
         title: "Erreur",
         description: "Impossible d'envoyer la réponse",

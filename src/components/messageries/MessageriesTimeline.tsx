@@ -1,14 +1,15 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Phone, Mail, MessageSquare, Smartphone, Clock } from "lucide-react";
-import { Messagerie } from "@/hooks/use-messageries";
+import { Phone, Mail, MessageSquare, Smartphone, Clock, User } from "lucide-react";
+import { Messagerie, Client } from "@/hooks/use-messageries";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 
 interface MessageriesTimelineProps {
   messages: Messagerie[];
   onViewMessage: (message: Messagerie) => void;
+  onViewClientHistory?: (client: Client) => void;
 }
 
 const getChannelIcon = (channel: string) => {
@@ -39,7 +40,7 @@ const getPriorityBadge = (priority: number, resolved: boolean) => {
   }
 };
 
-export function MessageriesTimeline({ messages, onViewMessage }: MessageriesTimelineProps) {
+export function MessageriesTimeline({ messages, onViewMessage, onViewClientHistory }: MessageriesTimelineProps) {
   if (messages.length === 0) {
     return (
       <Card>
@@ -90,9 +91,31 @@ export function MessageriesTimeline({ messages, onViewMessage }: MessageriesTime
 
                   <h3 className="font-semibold text-base mb-1">{message.title}</h3>
                   
-                  {message.contact && (
+                  {message.client && (
+                    <div className="flex items-center gap-2 mb-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto p-0 text-sm text-muted-foreground hover:text-primary"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (onViewClientHistory && message.client) {
+                            onViewClientHistory(message.client);
+                          }
+                        }}
+                      >
+                        <User className="h-3 w-3 mr-1" />
+                        {message.client.first_name} {message.client.last_name}
+                      </Button>
+                      {message.client.email && (
+                        <span className="text-xs text-muted-foreground">• {message.client.email}</span>
+                      )}
+                    </div>
+                  )}
+                  
+                  {!message.client && message.contact && (
                     <p className="text-sm text-muted-foreground mb-2">
-                      Client: {message.contact}
+                      Contact: {message.contact}
                     </p>
                   )}
 

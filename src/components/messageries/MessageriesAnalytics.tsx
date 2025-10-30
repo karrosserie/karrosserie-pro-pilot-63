@@ -5,8 +5,11 @@ import { MessageriesFilters } from "./MessageriesFilters";
 import { MessageriesTimeline } from "./MessageriesTimeline";
 import { MessageDetailModal } from "./MessageDetailModal";
 import { ReplyModal } from "./ReplyModal";
+import { NewMessageModal } from "./NewMessageModal";
+import { ClientHistoryModal } from "./ClientHistoryModal";
+import { MessageriesHeader } from "./MessageriesHeader";
 import { Loading } from "@/components/ui/loading";
-import { Messagerie } from "@/hooks/use-messageries";
+import { Messagerie, Client } from "@/hooks/use-messageries";
 
 export default function MessageriesAnalytics() {
   const {
@@ -14,6 +17,7 @@ export default function MessageriesAnalytics() {
     loading,
     toggleResolved,
     toggleArchived,
+    refetch,
   } = useMessageries();
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -24,6 +28,10 @@ export default function MessageriesAnalytics() {
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [replyModalOpen, setReplyModalOpen] = useState(false);
   const [replyMessage, setReplyMessage] = useState<Messagerie | null>(null);
+  const [newMessageModalOpen, setNewMessageModalOpen] = useState(false);
+  const [clientHistoryModalOpen, setClientHistoryModalOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [preselectedClientId, setPreselectedClientId] = useState<string | undefined>(undefined);
 
   // Filtrage des messages
   const filteredMessages = useMemo(() => {
@@ -103,6 +111,21 @@ export default function MessageriesAnalytics() {
     }
   };
 
+  const handleViewClientHistory = (client: Client) => {
+    setSelectedClient(client);
+    setClientHistoryModalOpen(true);
+  };
+
+  const handleNewMessage = (clientId?: string) => {
+    setPreselectedClientId(clientId);
+    setNewMessageModalOpen(true);
+  };
+
+  const handleNewMessageSuccess = () => {
+    refetch();
+    setNewMessageModalOpen(false);
+  };
+
   if (loading) {
     return <Loading text="Chargement des messages..." />;
   }
@@ -110,12 +133,7 @@ export default function MessageriesAnalytics() {
   return (
     <div className="p-6 bg-background min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <header className="mb-6">
-          <h1 className="text-2xl font-bold mb-2">Centre de Messageries</h1>
-          <p className="text-muted-foreground">
-            Gérez toutes vos communications depuis un seul endroit
-          </p>
-        </header>
+        <MessageriesHeader onNewMessage={() => handleNewMessage()} />
 
         <MessageriesStats
           totalMessages={stats.total}
@@ -138,6 +156,7 @@ export default function MessageriesAnalytics() {
         <MessageriesTimeline
           messages={filteredMessages}
           onViewMessage={handleViewMessage}
+          onViewClientHistory={handleViewClientHistory}
         />
 
         <MessageDetailModal
@@ -147,12 +166,31 @@ export default function MessageriesAnalytics() {
           onReply={handleReply}
           onResolve={toggleResolved}
           onArchive={toggleArchived}
+          onViewClientHistory={handleViewClientHistory}
         />
 
         <ReplyModal
           isOpen={replyModalOpen}
-          onClose={() => setReplyModalOpen(false)}
+          onClose={() => {
+            setReplyModalOpen(false);
+            refetch();
+          }}
           messagerie={replyMessage}
+        />
+
+        <NewMessageModal
+          isOpen={newMessageModalOpen}
+          onClose={() => setNewMessageModalOpen(false)}
+          onSuccess={handleNewMessageSuccess}
+          preselectedClientId={preselectedClientId}
+        />
+
+        <ClientHistoryModal
+          isOpen={clientHistoryModalOpen}
+          onClose={() => setClientHistoryModalOpen(false)}
+          client={selectedClient}
+          messages={messageries}
+          onNewMessage={handleNewMessage}
         />
       </div>
     </div>

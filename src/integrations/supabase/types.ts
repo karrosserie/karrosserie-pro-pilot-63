@@ -2815,18 +2815,95 @@ export type Database = {
           },
         ]
       }
+      messagerie_replies: {
+        Row: {
+          channel: string
+          company_id: string
+          content: string
+          created_at: string | null
+          id: string
+          messagerie_id: string
+          read_by_client: boolean | null
+          read_by_company: boolean | null
+          sender_id: string | null
+          sender_type: string
+          sent_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          channel: string
+          company_id: string
+          content: string
+          created_at?: string | null
+          id?: string
+          messagerie_id: string
+          read_by_client?: boolean | null
+          read_by_company?: boolean | null
+          sender_id?: string | null
+          sender_type: string
+          sent_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          channel?: string
+          company_id?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          messagerie_id?: string
+          read_by_client?: boolean | null
+          read_by_company?: boolean | null
+          sender_id?: string | null
+          sender_type?: string
+          sent_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messagerie_replies_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "messagerie_replies_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "messagerie_replies_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messagerie_replies_messagerie_id_fkey"
+            columns: ["messagerie_id"]
+            isOneToOne: false
+            referencedRelation: "messageries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messageries: {
         Row: {
           archived: boolean
           channel: string
+          client_id: string | null
           company_id: string
           contact: string | null
           created_at: string
           date: string
           eta: string
           id: string
+          last_reply_at: string | null
           message: string
           priority: number
+          replies_count: number | null
           reponse: string | null
           resolved: boolean
           summary: string
@@ -2838,14 +2915,17 @@ export type Database = {
         Insert: {
           archived?: boolean
           channel: string
+          client_id?: string | null
           company_id: string
           contact?: string | null
           created_at?: string
           date?: string
           eta: string
           id?: string
+          last_reply_at?: string | null
           message: string
           priority: number
+          replies_count?: number | null
           reponse?: string | null
           resolved?: boolean
           summary: string
@@ -2857,14 +2937,17 @@ export type Database = {
         Update: {
           archived?: boolean
           channel?: string
+          client_id?: string | null
           company_id?: string
           contact?: string | null
           created_at?: string
           date?: string
           eta?: string
           id?: string
+          last_reply_at?: string | null
           message?: string
           priority?: number
+          replies_count?: number | null
           reponse?: string | null
           resolved?: boolean
           summary?: string
@@ -2873,7 +2956,15 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "messageries_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       migration_errors: {
         Row: {
