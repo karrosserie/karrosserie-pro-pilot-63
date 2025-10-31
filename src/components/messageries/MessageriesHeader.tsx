@@ -25,9 +25,11 @@ export function MessageriesHeader({
       <div className="relative z-10 p-6 bg-card/80 backdrop-blur-sm border-2 border-primary/20 shadow-xl">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mb-2 flex items-center gap-3">
+            <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
               <MessageSquare className="h-10 w-10 text-primary" />
-              Messageries
+              <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                Messageries
+              </span>
             </h1>
             <p className="text-muted-foreground text-lg">
               Gérez vos communications clients en temps réel
