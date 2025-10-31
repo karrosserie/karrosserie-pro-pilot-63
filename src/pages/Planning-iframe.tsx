@@ -164,7 +164,7 @@ const Planning = () => {
   const recalculateFollowingSteps = async (fromStepIndex: number) => {
     if (!employees || employees.length === 0) return;
     
-    const optimalPlanning = await calculateOptimalPlanning();
+    const optimalPlanning = await calculateOptimalPlanning(selectedVehicle?.id);
     const stepKeys = ['accueil_preparation', 'remplacement_debosselage', 'controle_technique_securite', 'preparation_peinture', 'mise_en_peinture', 'finitions_remontage', 'cloture_livraison'];
     
     setTimeout(() => {
@@ -2639,7 +2639,7 @@ const Planning = () => {
                     
                     // Exécuter le calcul optimal de planification pour le véhicule sélectionné
                     if (vehicle && employees && employees.length > 0) {
-                      const optimalPlanning = await calculateOptimalPlanning();
+                      const optimalPlanning = await calculateOptimalPlanning(vehicleId);
                       setPlanningData(optimalPlanning);
                     }
                   }}

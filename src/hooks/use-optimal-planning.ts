@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { calculateDynamicDurations } from '@/services/planning/taskDurationCalculator';
 
 interface OptimalPlanningData {
   accueil_preparation: { employeeId: string; duration: string; startDateTime?: Date; endDateTime?: Date };
@@ -139,9 +140,20 @@ export function useOptimalPlanning(employees: any[] = [], companyId?: string) {
     return currentSlot; // Retourner le dernier créneau testé en cas d'échec
   };
 
-  const calculateOptimalPlanning = async (): Promise<OptimalPlanningData> => {
-    console.log(`🚀 Début de la planification automatique`);
+  const calculateOptimalPlanning = async (vehicleId?: string): Promise<OptimalPlanningData> => {
+    console.log(`🚀 Début de la planification automatique pour véhicule: ${vehicleId || 'non spécifié'}`);
     const now = new Date();
+    
+    // Récupérer les durées dynamiques basées sur le véhicule
+    let dynamicDurations: Record<string, number> | null = null;
+    if (vehicleId) {
+      try {
+        dynamicDurations = await calculateDynamicDurations(vehicleId);
+        console.log(`📊 Durées dynamiques récupérées:`, dynamicDurations);
+      } catch (error) {
+        console.error('Erreur lors du calcul des durées dynamiques, utilisation des valeurs par défaut:', error);
+      }
+    }
     
     // Calculer le prochain créneau disponible
     const nextAvailableDate = new Date(now);
@@ -202,8 +214,18 @@ export function useOptimalPlanning(employees: any[] = [], companyId?: string) {
 
       if (qualifiedEmployees.length > 0) {
         // Calculer la durée de l'étape en minutes
-        const [hours, minutes] = step.defaultDuration.split(':').map(Number);
-        const durationMinutes = hours * 60 + minutes;
+        let durationMinutes: number;
+        
+        if (dynamicDurations && dynamicDurations[step.qualification]) {
+          // Utiliser la durée dynamique calculée (déjà en minutes)
+          durationMinutes = dynamicDurations[step.qualification];
+          console.log(`⏱️ Utilisation durée dynamique pour ${step.qualification}: ${durationMinutes}min`);
+        } else {
+          // Fallback sur la durée par défaut
+          const [hours, minutes] = step.defaultDuration.split(':').map(Number);
+          durationMinutes = hours * 60 + minutes;
+          console.log(`⏱️ Utilisation durée par défaut pour ${step.qualification}: ${durationMinutes}min`);
+        }
         
         let bestEmployee = null;
         let bestStartDateTime = null;
@@ -223,9 +245,14 @@ export function useOptimalPlanning(employees: any[] = [], companyId?: string) {
         if (bestEmployee && bestStartDateTime) {
           const finalEndDateTime = new Date(bestStartDateTime.getTime() + durationMinutes * 60 * 1000);
           
+          // Formater la durée en HH:MM
+          const hours = Math.floor(durationMinutes / 60);
+          const mins = durationMinutes % 60;
+          const durationFormatted = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+          
           planning[step.key as keyof OptimalPlanningData] = {
             employeeId: bestEmployee.id,
-            duration: step.defaultDuration,
+            duration: durationFormatted,
             startDateTime: new Date(bestStartDateTime),
             endDateTime: finalEndDateTime
           };

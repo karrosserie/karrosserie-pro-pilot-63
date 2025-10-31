@@ -4958,6 +4958,7 @@ export type Database = {
           client_id: string | null
           color: string | null
           company_id: string | null
+          complexity_level: string | null
           created_at: string
           engine_number: string | null
           fuel_level: number | null
@@ -4987,6 +4988,7 @@ export type Database = {
           client_id?: string | null
           color?: string | null
           company_id?: string | null
+          complexity_level?: string | null
           created_at?: string
           engine_number?: string | null
           fuel_level?: number | null
@@ -5016,6 +5018,7 @@ export type Database = {
           client_id?: string | null
           color?: string | null
           company_id?: string | null
+          complexity_level?: string | null
           created_at?: string
           engine_number?: string | null
           fuel_level?: number | null

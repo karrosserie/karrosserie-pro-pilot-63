@@ -36,7 +36,7 @@ export function AddVehicleToWorkshopForm({ companyId, employees, onSuccess }: Ad
   const [availableVehicles, setAvailableVehicles] = useState<Vehicle[]>([]);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
-  const { calculateOptimalPlanning } = useOptimalPlanning(employees);
+  const { calculateOptimalPlanning } = useOptimalPlanning(employees, companyId);
 
   // Charger les véhicules disponibles
   useEffect(() => {
