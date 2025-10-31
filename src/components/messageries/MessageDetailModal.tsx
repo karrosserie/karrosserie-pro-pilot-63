@@ -169,42 +169,63 @@ export function MessageDetailModal({
                 Fil de conversation ({replies.length})
               </h4>
               <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
-                {replies.map((reply) => (
-                  <Card
-                    key={reply.id}
-                    className={`p-3 ${
-                      reply.sender_type === 'internal'
-                        ? 'bg-yellow-50 border-l-4 border-yellow-400'
-                        : reply.sender_type === 'client'
-                        ? 'bg-blue-50 ml-4'
-                        : 'bg-gray-50 mr-4'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2">
-                        <Badge variant={
-                          reply.sender_type === 'internal' ? 'secondary' :
-                          reply.sender_type === 'carrosserie' ? 'default' : 'secondary'
-                        } className="text-xs">
-                          {reply.sender_type === 'internal' 
-                            ? '📝 Note interne'
-                            : reply.is_inbound 
-                            ? '→ Client' 
-                            : '← Nous'}
-                        </Badge>
-                        {reply.channel && reply.sender_type !== 'internal' && (
-                          <Badge variant="outline" className="text-xs">
-                            {reply.channel}
+                {replies.map((reply) => {
+                  const isClientMessage = reply.sender_type === 'client' || reply.is_inbound;
+                  const isInternalNote = reply.sender_type === 'internal';
+                  const isCompanyMessage = reply.sender_type === 'carrosserie' && !reply.is_inbound;
+
+                  return (
+                    <Card
+                      key={reply.id}
+                      className={`p-3 ${
+                        isInternalNote
+                          ? 'bg-yellow-50 border-l-4 border-yellow-400'
+                          : isClientMessage
+                          ? 'bg-blue-50 border-l-4 border-blue-500 ml-4'
+                          : 'bg-green-50 border-l-4 border-green-500 mr-4'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-2">
+                          <Badge variant={
+                            isInternalNote ? 'secondary' :
+                            isClientMessage ? 'outline' : 'default'
+                          } className="text-xs">
+                            {isInternalNote 
+                              ? '📝 Note interne'
+                              : isClientMessage 
+                              ? '📩 Message client' 
+                              : '📤 Envoyé par nous'}
                           </Badge>
-                        )}
+                          {reply.channel && !isInternalNote && (
+                            <Badge variant="outline" className="text-xs flex items-center gap-1">
+                              {reply.channel === 'Mail' && '📧'}
+                              {reply.channel === 'WhatsApp' && '💬'}
+                              {reply.channel === 'Téléphone' && '📞'}
+                              {reply.channel === 'Message' && '💬'}
+                              {reply.channel}
+                            </Badge>
+                          )}
+                        </div>
+                        <span className="text-xs text-muted-foreground whitespace-nowrap">
+                          {formatDate(reply.actual_communication_date)}
+                        </span>
                       </div>
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">
-                        {formatDate(reply.actual_communication_date)}
-                      </span>
-                    </div>
-                    <p className="text-sm whitespace-pre-wrap">{reply.content}</p>
-                  </Card>
-                ))}
+                      <p className="text-sm whitespace-pre-wrap">{reply.content}</p>
+                      
+                      {/* Indicateur de lecture */}
+                      {!isInternalNote && (
+                        <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+                          {isClientMessage ? (
+                            reply.read_by_company ? '✓✓ Lu' : '✓ Envoyé'
+                          ) : (
+                            reply.read_by_client ? '✓✓ Lu par le client' : '✓ Envoyé au client'
+                          )}
+                        </div>
+                      )}
+                    </Card>
+                  );
+                })}
               </div>
             </div>
           )}

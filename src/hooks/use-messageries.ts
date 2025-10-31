@@ -201,6 +201,8 @@ export function useMessageries() {
     priority: number;
     message: string;
     tags?: string[];
+    category?: Messagerie['category'];
+    is_outbound?: boolean; // Distinguer messages sortants (carrosserie→client) vs entrants (client→carrosserie)
   }) => {
     try {
       const { data: userData } = await supabase.auth.getUser();
@@ -212,27 +214,45 @@ export function useMessageries() {
 
       if (!companyData) throw new Error('Company not found');
 
+      // Déterminer si c'est un message entrant ou sortant
+      const isInbound = !messageData.is_outbound; // Par défaut: message entrant (client→carrosserie)
+
       const { data, error } = await supabase
         .from('messageries')
         .insert({
-          ...messageData,
+          client_id: messageData.client_id,
+          title: messageData.title,
+          channel: messageData.channel,
+          priority: messageData.priority,
+          message: messageData.message,
+          tags: messageData.tags || [],
+          category: messageData.category || 'autre',
           company_id: companyData.company_id,
           summary: messageData.message.substring(0, 100),
           eta: '30min',
           time: new Date().toISOString(),
           date: new Date().toLocaleDateString('fr-FR'),
+          actual_communication_date: new Date().toISOString(),
           resolved: false,
           archived: false,
-          tags: messageData.tags || [],
+          is_inbound: isInbound,
+          status: 'nouveau',
         })
         .select()
         .single();
 
       if (error) throw error;
 
-      // Créer la première entrée dans messagerie_replies
+      // Créer la première entrée dans messagerie_replies avec le bon sender_type
       if (data) {
-        await addReply(data.id, messageData.message, messageData.channel, 'carrosserie');
+        await addReply(
+          data.id, 
+          messageData.message, 
+          messageData.channel, 
+          messageData.is_outbound ? 'carrosserie' : 'client', 
+          new Date().toISOString(), 
+          isInbound
+        );
       }
 
       toast({

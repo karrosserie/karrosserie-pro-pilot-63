@@ -72,6 +72,11 @@ export function MessageriesTimeline({ messages, onViewMessage, onViewClientHisto
                       <MessageriesStatusBadge status={message.status || 'nouveau'} className="text-xs" />
                       {getPriorityBadge(message.priority, message.resolved)}
                       <Badge variant="outline" className={cn("text-xs transition-all", message.is_inbound ? "bg-blue-50 dark:bg-blue-950/20 border-blue-300 dark:border-blue-800" : "bg-gray-50 dark:bg-gray-950/20")}>{message.is_inbound ? '→ Entrant' : '← Sortant'}</Badge>
+                      {(message.replies_count !== undefined && message.replies_count > 0) && (
+                        <Badge variant="outline" className="text-xs bg-purple-50 dark:bg-purple-950/20 border-purple-300 dark:border-purple-800">
+                          💬 {message.replies_count} échange{message.replies_count > 1 ? 's' : ''}
+                        </Badge>
+                      )}
                     </div>
                     <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">{message.title}</h3>
                     {message.client && (
