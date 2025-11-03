@@ -36,7 +36,7 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
 
       {/* Insurance Details - Only shown when switch is ON */}
       {formData.clientInsurance && (
-        <div className="space-y-6 border-t pt-6">
+        <div className="space-y-6 md:space-y-8 border-t pt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="insuranceCompanyName">

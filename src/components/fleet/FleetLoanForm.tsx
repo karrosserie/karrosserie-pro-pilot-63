@@ -238,7 +238,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
           />
         </TabsContent>
 
-        <TabsContent value="insurance" className="overflow-y-auto px-4 sm:px-6 py-4 mt-0 data-[state=active]:flex-1" style={{ paddingBottom: '80px' }}>
+        <TabsContent value="insurance" className="overflow-y-auto px-4 sm:px-6 py-4 mt-0 data-[state=active]:flex-1" style={{ paddingBottom: '120px' }}>
           <InsuranceTab
             formData={formData}
             onInputChange={handleInputChange}
