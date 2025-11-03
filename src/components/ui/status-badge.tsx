@@ -52,6 +52,18 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
           dotColor: 'bg-yellow-500',
           label: 'Attention'
         };
+      case 'Permis importé':
+        return {
+          variant: 'outline' as const,
+          dotColor: 'bg-green-500',
+          label: 'Permis importé'
+        };
+      case 'Pas de permis':
+        return {
+          variant: 'outline' as const,
+          dotColor: 'bg-amber-500',
+          label: 'Pas de permis'
+        };
       default:
         return {
           variant: 'secondary' as const,
