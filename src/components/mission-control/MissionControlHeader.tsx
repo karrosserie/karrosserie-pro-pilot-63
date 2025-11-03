@@ -1,6 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronDown } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface MissionControlHeaderProps {
   selectedPeriod: 'today' | 'week' | 'month';
@@ -19,9 +25,6 @@ const MissionControlHeader: React.FC<MissionControlHeaderProps> = ({
   selectedMode,
   onModeChange
 }) => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
   const modes = [
     { key: 'super_admin', label: 'Super Admin' },
     { key: 'finance', label: 'Mode Finance' },
@@ -30,19 +33,6 @@ const MissionControlHeader: React.FC<MissionControlHeaderProps> = ({
   ];
 
   const currentModeLabel = modes.find(mode => mode.key === selectedMode)?.label || 'Super Admin';
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -101,36 +91,29 @@ const MissionControlHeader: React.FC<MissionControlHeaderProps> = ({
           {isAIOn ? 'IA ON' : 'IA OFF'}
         </button>
         
-        <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 cursor-pointer"
-          >
-            <span className="hidden sm:inline">{currentModeLabel}</span>
-            <span className="sm:hidden">{modes.find(mode => mode.key === selectedMode)?.label.split(' ')[0] || 'Admin'}</span>
-            <ChevronDown className="h-3 w-3" />
-          </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 cursor-pointer"
+            >
+              <span className="hidden sm:inline">{currentModeLabel}</span>
+              <span className="sm:hidden">{modes.find(mode => mode.key === selectedMode)?.label.split(' ')[0] || 'Admin'}</span>
+              <ChevronDown className="h-3 w-3" />
+            </button>
+          </DropdownMenuTrigger>
           
-          {isDropdownOpen && (
-            <div className="absolute right-0 top-full mt-1 w-40 sm:w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-              {modes.map((mode) => (
-                <button
-                  key={mode.key}
-                  onClick={() => {
-                    onModeChange(mode.key as any);
-                    setIsDropdownOpen(false);
-                  }}
-                  className={`w-full text-left px-3 sm:px-4 py-2 text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
-                    selectedMode === mode.key ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700'
-                  }`}
-                >
-                  <span className="hidden sm:inline">{mode.label}</span>
-                  <span className="sm:hidden">{mode.label.split(' ')[0]}</span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+          <DropdownMenuContent align="end" className="w-48 z-[100]">
+            {modes.map((mode) => (
+              <DropdownMenuItem
+                key={mode.key}
+                onClick={() => onModeChange(mode.key as any)}
+                className={selectedMode === mode.key ? 'bg-blue-50 text-blue-600 font-medium' : ''}
+              >
+                {mode.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
