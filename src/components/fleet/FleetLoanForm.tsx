@@ -238,7 +238,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
           />
         </TabsContent>
 
-        <TabsContent value="insurance" className="overflow-y-auto px-4 sm:px-6 py-4 mt-0 data-[state=active]:flex-1" style={{ paddingBottom: '180px' }}>
+        <TabsContent value="insurance" className="overflow-y-auto px-4 sm:px-6 py-4 mt-0 data-[state=active]:flex-1" style={{ paddingBottom: '100px' }}>
           <InsuranceTab
             formData={formData}
             onInputChange={handleInputChange}
@@ -289,7 +289,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
         </TabsContent>
       </Tabs>
 
-      <div className="px-4 pb-4 pt-2 shrink-0 border-t bg-background sticky bottom-0 z-10">
+      <div className="px-4 pb-4 pt-2 shrink-0 border-t bg-background">
       <FleetLoanFormNavigation
         activeTab={activeTab}
         onCancel={onCancel}
