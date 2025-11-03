@@ -67,7 +67,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Company and Client Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
             <div className="space-y-4">
               <div>
                 <Label className="font-semibold">De :</Label>
@@ -97,7 +97,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
           </div>
 
           {/* Vehicle Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
             <div className="space-y-4">
               <div>
                 <Label className="font-semibold">Désignation du véhicule d'emprunt:</Label>
@@ -132,7 +132,7 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
 
           {/* Signature Section */}
           <div className="border-t pt-6" data-tour="attestation">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="clientName" className="font-semibold">Nom et prénom</Label>

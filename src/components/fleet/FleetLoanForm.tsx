@@ -215,16 +215,16 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col flex-1 min-h-0">
         <div className="px-4 shrink-0 border-b">
-          <TabsList className="grid w-full grid-cols-5 h-auto">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 h-auto gap-1">
             {tabs.map(tab => (
-              <TabsTrigger key={tab.value} value={tab.value} className="text-[10px] md:text-sm px-1 md:px-3 py-1.5 md:py-2">
+              <TabsTrigger key={tab.value} value={tab.value} className="text-xs md:text-sm px-2 md:px-3 py-2 md:py-2.5 whitespace-normal leading-tight">
                 {tab.label}
               </TabsTrigger>
             ))}
           </TabsList>
         </div>
 
-        <TabsContent value="client-info" className="overflow-y-auto px-3 md:px-4 py-4 mt-0 data-[state=active]:flex-1" style={{ paddingBottom: '80px' }}>
+        <TabsContent value="client-info" className="overflow-y-auto px-4 sm:px-6 py-4 mt-0 data-[state=active]:flex-1" style={{ paddingBottom: '80px' }}>
           <ClientInfoTab
             formData={formData}
             onInputChange={handleInputChange}
@@ -238,7 +238,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
           />
         </TabsContent>
 
-        <TabsContent value="insurance" className="overflow-y-auto px-3 md:px-4 py-4 mt-0 data-[state=active]:flex-1" style={{ paddingBottom: '80px' }}>
+        <TabsContent value="insurance" className="overflow-y-auto px-4 sm:px-6 py-4 mt-0 data-[state=active]:flex-1" style={{ paddingBottom: '80px' }}>
           <InsuranceTab
             formData={formData}
             onInputChange={handleInputChange}
@@ -248,7 +248,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
           />
         </TabsContent>
 
-        <TabsContent value="damages" className="overflow-y-auto px-3 md:px-4 py-4 mt-0 data-[state=active]:flex-1" style={{ paddingBottom: '80px' }}>
+        <TabsContent value="damages" className="overflow-y-auto px-4 sm:px-6 py-4 mt-0 data-[state=active]:flex-1" style={{ paddingBottom: '80px' }}>
           <DamageAssessmentTab
             damages={formData.damages}
             onDamageUpdate={handleDamageUpdate}
@@ -256,7 +256,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
           />
         </TabsContent>
 
-        <TabsContent value="vehicle-details" className="overflow-y-auto px-3 md:px-4 py-4 mt-0 data-[state=active]:flex-1" style={{ paddingBottom: '80px' }}>
+        <TabsContent value="vehicle-details" className="overflow-y-auto px-4 sm:px-6 py-4 mt-0 data-[state=active]:flex-1" style={{ paddingBottom: '80px' }}>
           <VehicleDetailsTab
             vehicleId={vehicle.id}
             mileage={formData.mileage}
@@ -278,7 +278,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
           />
         </TabsContent>
 
-        <TabsContent value="attestation" className="overflow-y-auto px-3 md:px-4 py-4 mt-0 data-[state=active]:flex-1" style={{ paddingBottom: '80px' }}>
+        <TabsContent value="attestation" className="overflow-y-auto px-4 sm:px-6 py-4 mt-0 data-[state=active]:flex-1" style={{ paddingBottom: '80px' }}>
           <AttestationTab
             formData={formData}
             vehicle={vehicle}

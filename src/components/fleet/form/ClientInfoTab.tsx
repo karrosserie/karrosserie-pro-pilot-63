@@ -46,8 +46,8 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
   return (
     <div className="space-y-6">
       {/* Client, Start Date, and End Date on the same line */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-        <div className="col-span-3 space-y-2" data-tour="client-select">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="md:col-span-2 lg:col-span-1 space-y-2" data-tour="client-select">
           <Label htmlFor="client">
             Client <span className="text-destructive">*</span>
           </Label>
@@ -115,8 +115,8 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
       </div>
 
       {/* License Details - First row: License Number, Issue Date, Prefecture */}
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
-        <div className="col-span-3 space-y-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="md:col-span-2 lg:col-span-1 space-y-2">
           <Label htmlFor="licenseNumber">
             Numéro de permis <span className="text-destructive">*</span>
           </Label>
@@ -145,7 +145,7 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
           />
         </div>
 
-        <div className="col-span-2 space-y-2">
+        <div className="space-y-2">
           <Label htmlFor="prefecture">
             Préfecture (N° Département) <span className="text-destructive">*</span>
           </Label>
@@ -162,8 +162,8 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
       </div>
 
       {/* License Details - Second row: Holder Info, Date of Birth, Place of Birth */}
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
-        <div className="col-span-3 space-y-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="md:col-span-2 lg:col-span-1 space-y-2">
           <Label htmlFor="holderInfo">
             Information titulaire <span className="text-destructive">*</span>
           </Label>
@@ -192,7 +192,7 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
           />
         </div>
 
-        <div className="col-span-2 space-y-2">
+        <div className="space-y-2">
           <Label htmlFor="placeOfBirth">
             Lieu de naissance <span className="text-destructive">*</span>
           </Label>
