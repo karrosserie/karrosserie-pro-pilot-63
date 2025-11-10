@@ -19,6 +19,10 @@ import ExpertiseReportHeader from '@/components/expertise/ExpertiseReportHeader'
 import ExpertiseReportFilters from '@/components/expertise/ExpertiseReportFilters';
 import ExpertiseReportTable from '@/components/expertise/ExpertiseReportTable';
 import ImportTable from '@/components/expertise/ImportTable';
+import { ClientDataMissingAlert } from '@/components/expertise/ClientDataMissingAlert';
+import { useClientValidation } from '@/hooks/use-client-validation';
+import { sendDocumentsRequest } from '@/services/documentsRequestService';
+import { useNavigate } from 'react-router-dom';
 
 const ExpertiseReports = () => {
   const { reports, isLoading, error, deleteReport } = useExpertiseReports();
@@ -34,6 +38,13 @@ const ExpertiseReports = () => {
   const [prefilledQuoteData, setPrefilledQuoteData] = useState<Partial<Quote> | null>(null);
   const { toast } = useToast();
   const { confirm } = useConfirmation();
+  const navigate = useNavigate();
+  const { checkMissingClientData } = useClientValidation();
+  
+  // État pour gérer l'alerte de données manquantes
+  const [showMissingDataAlert, setShowMissingDataAlert] = useState(false);
+  const [clientWithMissingData, setClientWithMissingData] = useState<any>(null);
+  const [missingFields, setMissingFields] = useState<string[]>([]);
   
   // Activer les notifications sonores pour les imports terminés
   useImportNotification();
@@ -95,6 +106,53 @@ const ExpertiseReports = () => {
     
     initializeReports();
   }, [reports, checkMultipleReports, initialCheckComplete]);
+
+  // Effet pour vérifier les données client manquantes sur les rapports récemment importés
+  useEffect(() => {
+    if (reports && reports.length > 0) {
+      // Trouver les rapports récemment traités (moins de 5 minutes)
+      const recentReports = reports.filter(report => {
+        if (!report.created_at) return false;
+        const reportDate = new Date(report.created_at);
+        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+        return reportDate > fiveMinutesAgo && report.status === 'Traité';
+      });
+
+      // Vérifier s'il y a un rapport récent avec un client ayant des données manquantes
+      for (const report of recentReports) {
+        if (report.clients) {
+          const validation = checkMissingClientData(report.clients as any);
+          if (validation.hasCriticalMissing) {
+            setClientWithMissingData(report.clients);
+            setMissingFields(validation.missingFields);
+            setShowMissingDataAlert(true);
+            break; // Afficher seulement une alerte à la fois
+          }
+        }
+      }
+    }
+  }, [reports, checkMissingClientData]);
+
+  const handleRequestDocuments = async () => {
+    if (!clientWithMissingData) return;
+    
+    try {
+      await sendDocumentsRequest(clientWithMissingData.id, clientWithMissingData.company_id);
+      setShowMissingDataAlert(false);
+    } catch (error) {
+      console.error('Error requesting documents:', error);
+    }
+  };
+
+  const handleManualComplete = () => {
+    if (!clientWithMissingData) return;
+    navigate(`/clients?edit=${clientWithMissingData.id}`);
+    setShowMissingDataAlert(false);
+  };
+
+  const handleDismissAlert = () => {
+    setShowMissingDataAlert(false);
+  };
 
   const handleConvertToQuote = async (report: ExpertiseReport) => {
     if (!report.client_id || !report.vehicle_id) {
@@ -171,6 +229,17 @@ const ExpertiseReports = () => {
         onSearchChange={setSearchTerm}
         onImportClick={() => setImportDialogOpen(true)}
       />
+
+      {/* Alerte pour données client manquantes */}
+      {showMissingDataAlert && clientWithMissingData && (
+        <ClientDataMissingAlert
+          client={clientWithMissingData}
+          missingFields={missingFields}
+          onRequestDocuments={handleRequestDocuments}
+          onManualComplete={handleManualComplete}
+          onDismiss={handleDismissAlert}
+        />
+      )}
       
       {/* Tableau conditionnel des imports en cours d'analyse */}
       {showImportTable && (
