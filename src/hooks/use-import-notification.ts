@@ -11,7 +11,7 @@ export function useImportNotification() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { checkMissingClientData } = useClientValidation();
+  const { checkMissingClientData, validateClientData } = useClientValidation();
 
   useEffect(() => {
     // Fonction pour jouer un son de notification simple
@@ -106,35 +106,69 @@ export function useImportNotification() {
                       .single();
                     
                     if (fullClientData) {
-                      // Vérifier les données manquantes
-                      const validation = checkMissingClientData(fullClientData);
-                      console.log('🔍 Client data validation:', validation);
+                      // 1. Vérifier les champs manquants
+                      const missingValidation = checkMissingClientData(fullClientData);
                       
-                      // N'envoyer la demande de documents QUE si des données manquent
-                      if (!validation.isComplete) {
+                      // 2. Valider la véracité des données présentes
+                      const dataValidation = await validateClientData(fullClientData);
+                      
+                      console.log('🔍 Client data validation:', { 
+                        missing: missingValidation.missingCount,
+                        errors: dataValidation.errors.length,
+                        warnings: dataValidation.warnings.length
+                      });
+                      
+                      // Récupérer le company_id du rapport pour les actions futures
+                      const { data: reportData } = await supabase
+                        .from('expertise_reports')
+                        .select('company_id')
+                        .eq('id', report.id)
+                        .single();
+                      
+                      // Si des erreurs de validation critiques
+                      if (!dataValidation.isValid) {
+                        toast({
+                          title: "⚠️ Données client invalides détectées",
+                          description: `${dataValidation.errors.length} erreur(s) critique(s) détectée(s)`,
+                          variant: "destructive",
+                        });
+                        
+                        console.error('❌ Critical validation errors:', dataValidation.errors);
+                        console.error('⚠️ Client:', fullClientData.first_name, fullClientData.last_name);
+                        console.error('📋 Errors list:', dataValidation.errors.join(' | '));
+                      }
+                      
+                      // Afficher les avertissements (non bloquants)
+                      if (dataValidation.hasWarnings) {
+                        toast({
+                          title: "⚠️ Avertissements sur les données client",
+                          description: dataValidation.warnings.join(', '),
+                        });
+                        console.warn('⚠️ Validation warnings:', dataValidation.warnings);
+                      }
+                      
+                      // N'envoyer la demande de documents QUE si :
+                      // - Des données manquent
+                      // - ET les données présentes sont valides (pas d'erreurs critiques)
+                      if (!missingValidation.isComplete && dataValidation.isValid) {
+                        console.log('📧 Sending documents request - Missing fields:', missingValidation.missingFields);
+                        
                         try {
-                          console.log('📧 Sending documents request - Missing fields:', validation.missingFields);
+                          await sendDocumentsRequest(fullClientData.id, reportData?.company_id);
                           
-                          // Récupérer la company_id du rapport d'expertise
-                          const { data: reportData } = await supabase
-                            .from('expertise_reports')
-                            .select('company_id')
-                            .eq('id', report.id)
-                            .single();
-                          
-                          await sendDocumentsRequest(report.clients.id, reportData?.company_id);
-                          console.log('✅ Documents request sent successfully');
-                          
-                          // Toast informatif avec détails
                           toast({
-                            title: "Import terminé - Documents demandés au client",
-                            description: `${validation.missingCount} information(s) manquante(s) : ${validation.missingFields.join(', ')}`,
+                            title: "Import terminé - Documents demandés",
+                            description: `${missingValidation.missingCount} information(s) manquante(s). Une demande a été envoyée : ${missingValidation.missingFields.join(', ')}`,
                           });
                         } catch (docError) {
                           console.error('❌ Error sending documents request:', docError);
                         }
-                      } else {
-                        console.log('✅ Client data is complete, no documents request needed');
+                      } else if (missingValidation.isComplete && dataValidation.isValid) {
+                        console.log('✅ Client data is complete and valid');
+                        toast({
+                          title: "✅ Import terminé - Données complètes",
+                          description: "Toutes les informations client sont présentes et validées.",
+                        });
                       }
                     }
                     
@@ -167,13 +201,15 @@ export function useImportNotification() {
                         navigate(`/documents/devis?openQuote=${newQuote.id}`);
                       }, 3000);
                       
-                      // Ne pas afficher de toast ici si déjà affiché pour les documents manquants
+                      // Message de conversion adapté selon l'état de validation
                       if (fullClientData) {
-                        const validation = checkMissingClientData(fullClientData);
-                        if (validation.isComplete) {
+                        const missingValidation = checkMissingClientData(fullClientData);
+                        const dataValidation = await validateClientData(fullClientData);
+                        
+                        if (missingValidation.isComplete && dataValidation.isValid) {
                           toast({
                             title: "Import et conversion terminés",
-                            description: "Le rapport a été converti en devis. Toutes les données client sont complètes !",
+                            description: "Le rapport a été converti en devis. Toutes les données client sont complètes et validées !",
                           });
                         }
                       }
