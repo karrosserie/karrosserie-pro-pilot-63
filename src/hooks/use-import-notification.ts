@@ -5,11 +5,13 @@ import { useQueryClient } from '@tanstack/react-query';
 import { quotesService } from '@/services/supabase/quotes';
 import { useNavigate } from 'react-router-dom';
 import { sendDocumentsRequest } from '@/services/documentsRequestService';
+import { useClientValidation } from './use-client-validation';
 
 export function useImportNotification() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { checkMissingClientData } = useClientValidation();
 
   useEffect(() => {
     // Fonction pour jouer un son de notification simple
@@ -96,20 +98,44 @@ export function useImportNotification() {
                   
                   // Vérifier si le rapport a un client et un véhicule (requis pour la conversion)
                   if (report.clients && report.vehicles) {
-                    // Envoyer automatiquement la demande de documents
-                    try {
-                      console.log('📧 Sending documents request for client:', report.clients.id);
-                      // Récupérer la company_id du rapport d'expertise
-                      const { data: reportData } = await supabase
-                        .from('expertise_reports')
-                        .select('company_id')
-                        .eq('id', report.id)
-                        .single();
+                    // Récupérer les données complètes du client pour vérifier les champs manquants
+                    const { data: fullClientData } = await supabase
+                      .from('clients')
+                      .select('*')
+                      .eq('id', report.clients.id)
+                      .single();
+                    
+                    if (fullClientData) {
+                      // Vérifier les données manquantes
+                      const validation = checkMissingClientData(fullClientData);
+                      console.log('🔍 Client data validation:', validation);
                       
-                      await sendDocumentsRequest(report.clients.id, reportData?.company_id);
-                      console.log('✅ Documents request sent successfully');
-                    } catch (docError) {
-                      console.error('❌ Error sending documents request:', docError);
+                      // N'envoyer la demande de documents QUE si des données manquent
+                      if (!validation.isComplete) {
+                        try {
+                          console.log('📧 Sending documents request - Missing fields:', validation.missingFields);
+                          
+                          // Récupérer la company_id du rapport d'expertise
+                          const { data: reportData } = await supabase
+                            .from('expertise_reports')
+                            .select('company_id')
+                            .eq('id', report.id)
+                            .single();
+                          
+                          await sendDocumentsRequest(report.clients.id, reportData?.company_id);
+                          console.log('✅ Documents request sent successfully');
+                          
+                          // Toast informatif avec détails
+                          toast({
+                            title: "Import terminé - Documents demandés au client",
+                            description: `${validation.missingCount} information(s) manquante(s) : ${validation.missingFields.join(', ')}`,
+                          });
+                        } catch (docError) {
+                          console.error('❌ Error sending documents request:', docError);
+                        }
+                      } else {
+                        console.log('✅ Client data is complete, no documents request needed');
+                      }
                     }
                     
                     // Vérifier si un devis existe déjà pour ce rapport
@@ -141,10 +167,16 @@ export function useImportNotification() {
                         navigate(`/documents/devis?openQuote=${newQuote.id}`);
                       }, 3000);
                       
-                      toast({
-                        title: "Import et conversion terminés",
-                        description: "Le rapport a été converti en devis automatiquement",
-                      });
+                      // Ne pas afficher de toast ici si déjà affiché pour les documents manquants
+                      if (fullClientData) {
+                        const validation = checkMissingClientData(fullClientData);
+                        if (validation.isComplete) {
+                          toast({
+                            title: "Import et conversion terminés",
+                            description: "Le rapport a été converti en devis. Toutes les données client sont complètes !",
+                          });
+                        }
+                      }
                     }
                   } else {
                     console.log('⚠️ Cannot convert report: missing client or vehicle data');
