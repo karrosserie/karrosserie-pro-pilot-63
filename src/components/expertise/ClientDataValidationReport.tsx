@@ -124,12 +124,12 @@ export function ClientDataValidationReport({
         
         <DialogFooter className="flex flex-col gap-4 pt-4">
           {/* Actions secondaires */}
-          <div className="flex flex-col sm:flex-row gap-2 w-full">
+          <div className="flex flex-col lg:flex-row gap-2 w-full">
             {onDismiss && (
               <Button 
                 variant="ghost" 
                 onClick={onDismiss} 
-                className="w-full sm:w-auto order-2 sm:order-1"
+                className="w-full lg:w-auto order-2 lg:order-1"
               >
                 🕐 Plus tard
               </Button>
@@ -137,21 +137,21 @@ export function ClientDataValidationReport({
             <Button 
               variant="outline" 
               onClick={onEditClient} 
-              className="w-full sm:w-auto order-1 sm:order-2"
+              className="w-full lg:w-auto order-1 lg:order-2"
             >
               ✏️ Corriger manuellement
             </Button>
           </div>
           
           {/* Actions principales */}
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:justify-end">
+          <div className="flex flex-col lg:flex-row gap-2 w-full lg:justify-end">
             <Button 
               onClick={onRequestDocuments} 
               disabled={
                 validationResults.validation.errors.length > 0 || 
                 validationResults.missing.missingCount === 0
               }
-              className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 w-full sm:w-auto"
+              className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 w-full lg:w-auto"
             >
               {validationResults.validation.errors.length > 0
                 ? "❌ Corriger les erreurs d'abord"
@@ -165,7 +165,7 @@ export function ClientDataValidationReport({
              onCreateQuoteAnyway && (
               <Button 
                 onClick={onCreateQuoteAnyway}
-                className="bg-green-600 hover:bg-green-700 w-full sm:w-auto font-semibold"
+                className="bg-green-600 hover:bg-green-700 w-full lg:w-auto font-semibold"
               >
                 📄 Créer le devis quand même
               </Button>
