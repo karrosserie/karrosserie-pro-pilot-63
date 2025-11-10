@@ -127,7 +127,7 @@ export function ClientDataValidationReport({
           <div className="flex flex-col gap-2 w-full">
             {onDismiss && (
               <Button 
-                variant="ghost" 
+                variant="outline" 
                 onClick={onDismiss} 
                 className="w-full"
               >
