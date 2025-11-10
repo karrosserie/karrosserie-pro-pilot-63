@@ -22,6 +22,7 @@ import ImportTable from '@/components/expertise/ImportTable';
 import { useClientValidationNotification } from '@/contexts/ClientValidationNotificationContext';
 import { ClientDataValidationReport } from '@/components/expertise/ClientDataValidationReport';
 import { useNavigate } from 'react-router-dom';
+import { sendDocumentsRequest } from '@/services/documentsRequestService';
 
 const ExpertiseReports = () => {
   const { reports, isLoading, error, deleteReport } = useExpertiseReports();
@@ -175,16 +176,32 @@ const ExpertiseReports = () => {
   };
   
   // Actions de la pop-up de validation
-  const handleRequestDocuments = () => {
+  const handleRequestDocuments = async () => {
     if (!notification) return;
     
-    toast({
-      title: "✅ Demande envoyée",
-      description: "Le client recevra un email avec un lien pour uploader les documents manquants.",
-    });
-    
-    setValidationDialogOpen(false);
-    clearNotification();
+    try {
+      console.log('📧 User requested to send documents for client:', notification.clientId);
+      
+      // Envoyer la demande maintenant (contrôlé par l'utilisateur)
+      await sendDocumentsRequest(notification.clientId, notification.companyId);
+      
+      console.log('✅ Documents request sent successfully');
+      
+      toast({
+        title: "✅ Demande envoyée",
+        description: `Le client ${notification.clientName} recevra un email avec un lien pour uploader les documents manquants.`,
+      });
+      
+      setValidationDialogOpen(false);
+      clearNotification();
+    } catch (error) {
+      console.error('❌ Error sending documents request:', error);
+      toast({
+        title: "❌ Erreur",
+        description: "Impossible d'envoyer la demande de documents. Vérifiez la configuration email.",
+        variant: "destructive"
+      });
+    }
   };
   
   const handleEditClient = () => {

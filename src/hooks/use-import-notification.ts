@@ -135,6 +135,7 @@ export function useImportNotification() {
                           clientId: fullClientData.id,
                           clientName: `${fullClientData.first_name} ${fullClientData.last_name}`,
                           reportId: report.id,
+                          companyId: reportData?.company_id || '',
                           validationResults: {
                             missing: {
                               missingFields: missingValidation.missingFields,
@@ -157,20 +158,13 @@ export function useImportNotification() {
                         });
                       }
                       
-                      // Envoyer la demande de documents seulement si données manquantes ET valides
+                      // Log du résultat de validation (pas d'envoi automatique)
                       if (!missingValidation.isComplete && dataValidation.isValid) {
-                        try {
-                          console.log('📧 Sending documents request for client:', fullClientData.id);
-                          
-                          await sendDocumentsRequest(fullClientData.id, reportData?.company_id);
-                          
-                          console.log('✅ Documents request sent successfully');
-                          
-                        } catch (error) {
-                          console.error('❌ Error sending documents request:', error);
-                        }
+                        console.log('⚠️ Client data incomplete but valid - waiting for user action');
+                      } else if (!dataValidation.isValid) {
+                        console.log('❌ Client data has validation errors - user must fix manually');
                       } else if (missingValidation.isComplete && dataValidation.isValid) {
-                        console.log('✅ Client data is complete and valid');
+                        console.log('✅ Client data is complete and valid - no action needed');
                       }
                     }
                     

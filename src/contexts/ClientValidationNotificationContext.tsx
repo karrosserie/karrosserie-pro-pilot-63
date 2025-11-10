@@ -4,6 +4,7 @@ export interface ValidationNotification {
   clientId: string;
   clientName: string;
   reportId: string;
+  companyId: string;
   validationResults: {
     missing: { missingFields: string[]; missingCount: number; isComplete: boolean };
     validation: { errors: string[]; warnings: string[]; isValid: boolean };

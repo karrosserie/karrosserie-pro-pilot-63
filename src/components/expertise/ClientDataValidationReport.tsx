@@ -120,15 +120,28 @@ export function ClientDataValidationReport({
           )}
         </div>
         
-        <DialogFooter className="gap-2">
+        <DialogFooter className="gap-2 sm:gap-2">
+          {onDismiss && (
+            <Button variant="ghost" onClick={onDismiss}>
+              Plus tard
+            </Button>
+          )}
           <Button variant="outline" onClick={onEditClient}>
             Corriger manuellement
           </Button>
           <Button 
             onClick={onRequestDocuments} 
-            disabled={validationResults.validation.errors.length > 0}
+            disabled={
+              validationResults.validation.errors.length > 0 ||
+              validationResults.missing.missingCount === 0
+            }
+            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
           >
-            Demander les documents au client
+            {validationResults.validation.errors.length > 0
+              ? "❌ Corriger les erreurs d'abord"
+              : validationResults.missing.missingCount === 0
+              ? "✅ Aucun document à demander"
+              : "📧 Demander les documents"}
           </Button>
         </DialogFooter>
       </DialogContent>
