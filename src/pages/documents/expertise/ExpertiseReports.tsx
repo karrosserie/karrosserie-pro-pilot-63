@@ -19,6 +19,9 @@ import ExpertiseReportHeader from '@/components/expertise/ExpertiseReportHeader'
 import ExpertiseReportFilters from '@/components/expertise/ExpertiseReportFilters';
 import ExpertiseReportTable from '@/components/expertise/ExpertiseReportTable';
 import ImportTable from '@/components/expertise/ImportTable';
+import { useClientValidationNotification } from '@/contexts/ClientValidationNotificationContext';
+import { ClientDataValidationReport } from '@/components/expertise/ClientDataValidationReport';
+import { useNavigate } from 'react-router-dom';
 
 const ExpertiseReports = () => {
   const { reports, isLoading, error, deleteReport } = useExpertiseReports();
@@ -34,9 +37,21 @@ const ExpertiseReports = () => {
   const [prefilledQuoteData, setPrefilledQuoteData] = useState<Partial<Quote> | null>(null);
   const { toast } = useToast();
   const { confirm } = useConfirmation();
+  const navigate = useNavigate();
   
   // Activer les notifications sonores pour les imports terminés
   useImportNotification();
+  
+  // Gérer les notifications de validation client
+  const { notification, clearNotification } = useClientValidationNotification();
+  const [validationDialogOpen, setValidationDialogOpen] = useState(false);
+  
+  // Afficher automatiquement la pop-up quand une notification arrive
+  useEffect(() => {
+    if (notification) {
+      setValidationDialogOpen(true);
+    }
+  }, [notification]);
 
   // Vérifier si l'import asynchrone est activé et s'il y a des imports en attente
   const showImportTable = environmentSettings?.asynchronous_import && 
@@ -159,6 +174,32 @@ const ExpertiseReports = () => {
     return Object.keys(convertedReports).find(id => isConverting(id)) || null;
   };
   
+  // Actions de la pop-up de validation
+  const handleRequestDocuments = () => {
+    if (!notification) return;
+    
+    toast({
+      title: "✅ Demande envoyée",
+      description: "Le client recevra un email avec un lien pour uploader les documents manquants.",
+    });
+    
+    setValidationDialogOpen(false);
+    clearNotification();
+  };
+  
+  const handleEditClient = () => {
+    if (!notification) return;
+    
+    navigate(`/clients?edit=${notification.clientId}`);
+    setValidationDialogOpen(false);
+    clearNotification();
+  };
+  
+  const handleDismissValidation = () => {
+    setValidationDialogOpen(false);
+    clearNotification();
+  };
+  
   return (
     <div className="p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
       <ExpertiseReportHeader 
@@ -229,6 +270,23 @@ const ExpertiseReports = () => {
         }}
         prefillData={prefilledQuoteData}
       />
+
+      {/* Pop-up de validation des données client */}
+      {notification && (
+        <ClientDataValidationReport
+          open={validationDialogOpen}
+          onOpenChange={setValidationDialogOpen}
+          client={{
+            id: notification.clientId,
+            first_name: notification.clientName.split(' ')[0],
+            last_name: notification.clientName.split(' ').slice(1).join(' ')
+          }}
+          validationResults={notification.validationResults}
+          onRequestDocuments={handleRequestDocuments}
+          onEditClient={handleEditClient}
+          onDismiss={handleDismissValidation}
+        />
+      )}
 
     </div>
   );

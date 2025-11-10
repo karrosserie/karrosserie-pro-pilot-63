@@ -12,6 +12,7 @@ import { OnboardingWatcher } from "@/components/onboarding/OnboardingWatcher";
 import { TourGuide } from "@/components/tour/TourGuide";
 import { QuoteConversionWarningDialog } from "@/components/quotes/QuoteConversionWarningDialog";
 import { useQuoteConversionWarning } from "@/hooks/use-quote-conversion-warning";
+import { ClientValidationNotificationProvider } from "@/contexts/ClientValidationNotificationContext";
 
 const queryClient = new QueryClient();
 
@@ -39,11 +40,13 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <ConfirmationProvider>
-        <BrowserRouter>
-          <AuthProvider>
-            <AppContent />
-          </AuthProvider>
-        </BrowserRouter>
+        <ClientValidationNotificationProvider>
+          <BrowserRouter>
+            <AuthProvider>
+              <AppContent />
+            </AuthProvider>
+          </BrowserRouter>
+        </ClientValidationNotificationProvider>
       </ConfirmationProvider>
     </TooltipProvider>
   </QueryClientProvider>

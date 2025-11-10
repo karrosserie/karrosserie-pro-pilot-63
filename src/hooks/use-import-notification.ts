@@ -12,6 +12,7 @@ export function useImportNotification() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { checkMissingClientData, validateClientData } = useClientValidation();
+  const { setNotification } = useClientValidationNotification();
 
   useEffect(() => {
     // Fonction pour jouer un son de notification simple

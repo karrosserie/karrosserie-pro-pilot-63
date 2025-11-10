@@ -37,7 +37,8 @@ export function ClientDataValidationReport({
   client,
   validationResults,
   onRequestDocuments,
-  onEditClient
+  onEditClient,
+  onDismiss
 }: ClientDataValidationReportProps) {
   const hasIssues = 
     validationResults.missing.missingCount > 0 ||
