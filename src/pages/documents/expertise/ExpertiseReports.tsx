@@ -217,6 +217,39 @@ const ExpertiseReports = () => {
     clearNotification();
   };
   
+  const handleCreateQuoteAnyway = async () => {
+    if (!notification) return;
+    
+    try {
+      console.log('📄 User requested to create quote anyway for report:', notification.reportId);
+      
+      // Trouver le rapport complet dans la liste
+      const report = reports?.find(r => r.id === notification.reportId);
+      
+      if (!report) {
+        toast({
+          title: "❌ Erreur",
+          description: "Rapport introuvable.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      // Utiliser la fonction existante de conversion
+      await handleConvertToQuote(report);
+      
+      setValidationDialogOpen(false);
+      clearNotification();
+    } catch (error) {
+      console.error('❌ Error creating quote:', error);
+      toast({
+        title: "❌ Erreur",
+        description: "Impossible de créer le devis.",
+        variant: "destructive"
+      });
+    }
+  };
+  
   return (
     <div className="p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
       <ExpertiseReportHeader 
@@ -302,6 +335,7 @@ const ExpertiseReports = () => {
           onRequestDocuments={handleRequestDocuments}
           onEditClient={handleEditClient}
           onDismiss={handleDismissValidation}
+          onCreateQuoteAnyway={handleCreateQuoteAnyway}
         />
       )}
 

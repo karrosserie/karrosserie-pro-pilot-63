@@ -30,6 +30,7 @@ interface ClientDataValidationReportProps {
   onRequestDocuments: () => void;
   onEditClient: () => void;
   onDismiss?: () => void;
+  onCreateQuoteAnyway?: () => void;
 }
 
 export function ClientDataValidationReport({
@@ -39,7 +40,8 @@ export function ClientDataValidationReport({
   validationResults,
   onRequestDocuments,
   onEditClient,
-  onDismiss
+  onDismiss,
+  onCreateQuoteAnyway
 }: ClientDataValidationReportProps) {
   const hasIssues = 
     validationResults.missing.missingCount > 0 ||
@@ -120,7 +122,7 @@ export function ClientDataValidationReport({
           )}
         </div>
         
-        <DialogFooter className="gap-2 sm:gap-2">
+        <DialogFooter className="gap-2 flex-col sm:flex-row">
           {onDismiss && (
             <Button variant="ghost" onClick={onDismiss}>
               Plus tard
@@ -143,6 +145,18 @@ export function ClientDataValidationReport({
               ? "✅ Aucun document à demander"
               : "📧 Demander les documents"}
           </Button>
+          
+          {validationResults.validation.errors.length === 0 && 
+           validationResults.missing.missingCount > 0 && 
+           onCreateQuoteAnyway && (
+            <Button 
+              onClick={onCreateQuoteAnyway}
+              variant="default"
+              className="bg-green-600 hover:bg-green-700"
+            >
+              📄 Créer le devis quand même
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

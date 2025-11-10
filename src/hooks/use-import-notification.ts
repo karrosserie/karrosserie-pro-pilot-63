@@ -156,16 +156,19 @@ export function useImportNotification() {
                           title: "⚠️ Validation client requise",
                           description: "Des informations manquantes ou invalides ont été détectées.",
                         });
+                        
+                        // ⛔ STOP - Ne pas créer le devis si validation échouée
+                        console.log('⏸️ Devis non créé - validation client requise');
+                        
+                        // Invalider les caches quand même
+                        queryClient.invalidateQueries({ queryKey: ['expertiseReports'] });
+                        queryClient.invalidateQueries({ queryKey: ['imports', 'pending'] });
+                        
+                        continue; // Passer à l'import suivant sans créer de devis
                       }
-                      
-                      // Log du résultat de validation (pas d'envoi automatique)
-                      if (!missingValidation.isComplete && dataValidation.isValid) {
-                        console.log('⚠️ Client data incomplete but valid - waiting for user action');
-                      } else if (!dataValidation.isValid) {
-                        console.log('❌ Client data has validation errors - user must fix manually');
-                      } else if (missingValidation.isComplete && dataValidation.isValid) {
-                        console.log('✅ Client data is complete and valid - no action needed');
-                      }
+
+                      // ✅ Code exécuté uniquement si pas de hasIssues
+                      console.log('✅ Client data is complete and valid - proceeding to quote creation');
                     }
                     
                     // Vérifier si un devis existe déjà pour ce rapport
