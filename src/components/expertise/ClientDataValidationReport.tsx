@@ -122,41 +122,55 @@ export function ClientDataValidationReport({
           )}
         </div>
         
-        <DialogFooter className="gap-2 flex-col sm:flex-row sm:flex-wrap sm:justify-end">
-          {onDismiss && (
-            <Button variant="ghost" onClick={onDismiss}>
-              Plus tard
-            </Button>
-          )}
-          <Button variant="outline" onClick={onEditClient}>
-            Corriger manuellement
-          </Button>
-          <Button 
-            onClick={onRequestDocuments} 
-            disabled={
-              validationResults.validation.errors.length > 0 ||
-              validationResults.missing.missingCount === 0
-            }
-            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
-          >
-            {validationResults.validation.errors.length > 0
-              ? "❌ Corriger les erreurs d'abord"
-              : validationResults.missing.missingCount === 0
-              ? "✅ Aucun document à demander"
-              : "📧 Demander les documents"}
-          </Button>
-          
-          {validationResults.validation.errors.length === 0 && 
-           validationResults.missing.missingCount > 0 && 
-           onCreateQuoteAnyway && (
+        <DialogFooter className="flex flex-col gap-4 pt-4">
+          {/* Actions secondaires */}
+          <div className="flex flex-col sm:flex-row gap-2 w-full">
+            {onDismiss && (
+              <Button 
+                variant="ghost" 
+                onClick={onDismiss} 
+                className="w-full sm:w-auto order-2 sm:order-1"
+              >
+                🕐 Plus tard
+              </Button>
+            )}
             <Button 
-              onClick={onCreateQuoteAnyway}
-              variant="default"
-              className="bg-green-600 hover:bg-green-700"
+              variant="outline" 
+              onClick={onEditClient} 
+              className="w-full sm:w-auto order-1 sm:order-2"
             >
-              📄 Créer le devis quand même
+              ✏️ Corriger manuellement
             </Button>
-          )}
+          </div>
+          
+          {/* Actions principales */}
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:justify-end">
+            <Button 
+              onClick={onRequestDocuments} 
+              disabled={
+                validationResults.validation.errors.length > 0 || 
+                validationResults.missing.missingCount === 0
+              }
+              className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 w-full sm:w-auto"
+            >
+              {validationResults.validation.errors.length > 0
+                ? "❌ Corriger les erreurs d'abord"
+                : validationResults.missing.missingCount === 0
+                ? "✅ Aucun document à demander"
+                : "📧 Demander les documents"}
+            </Button>
+            
+            {validationResults.validation.errors.length === 0 && 
+             validationResults.missing.missingCount > 0 && 
+             onCreateQuoteAnyway && (
+              <Button 
+                onClick={onCreateQuoteAnyway}
+                className="bg-green-600 hover:bg-green-700 w-full sm:w-auto font-semibold"
+              >
+                📄 Créer le devis quand même
+              </Button>
+            )}
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
