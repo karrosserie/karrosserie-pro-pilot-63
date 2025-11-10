@@ -25,10 +25,11 @@ interface ValidationResults {
 interface ClientDataValidationReportProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  client: Client;
+  client: Client | { id: string; first_name: string; last_name: string };
   validationResults: ValidationResults;
   onRequestDocuments: () => void;
   onEditClient: () => void;
+  onDismiss?: () => void;
 }
 
 export function ClientDataValidationReport({

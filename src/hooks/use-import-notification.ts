@@ -6,6 +6,7 @@ import { quotesService } from '@/services/supabase/quotes';
 import { useNavigate } from 'react-router-dom';
 import { sendDocumentsRequest } from '@/services/documentsRequestService';
 import { useClientValidation } from './use-client-validation';
+import { useClientValidationNotification } from '@/contexts/ClientValidationNotificationContext';
 
 export function useImportNotification() {
   const { toast } = useToast();
@@ -113,11 +114,7 @@ export function useImportNotification() {
                       // 2. Valider la véracité des données présentes
                       const dataValidation = await validateClientData(fullClientData);
                       
-                      console.log('🔍 Client data validation:', { 
-                        missing: missingValidation.missingCount,
-                        errors: dataValidation.errors.length,
-                        warnings: dataValidation.warnings.length
-                      });
+                      console.log('🔍 Client data validation:', { missingValidation, dataValidation });
                       
                       // Récupérer le company_id du rapport pour les actions futures
                       const { data: reportData } = await supabase
@@ -126,50 +123,54 @@ export function useImportNotification() {
                         .eq('id', report.id)
                         .single();
                       
-                      // Si des erreurs de validation critiques
-                      if (!dataValidation.isValid) {
-                        toast({
-                          title: "⚠️ Données client invalides détectées",
-                          description: `${dataValidation.errors.length} erreur(s) critique(s) détectée(s)`,
-                          variant: "destructive",
+                      // Si des données manquent OU si des erreurs/warnings
+                      const hasIssues = 
+                        missingValidation.missingCount > 0 ||
+                        dataValidation.errors.length > 0 ||
+                        dataValidation.warnings.length > 0;
+                      
+                      if (hasIssues) {
+                        // Publier la notification pour afficher la pop-up
+                        setNotification({
+                          clientId: fullClientData.id,
+                          clientName: `${fullClientData.first_name} ${fullClientData.last_name}`,
+                          reportId: report.id,
+                          validationResults: {
+                            missing: {
+                              missingFields: missingValidation.missingFields,
+                              missingCount: missingValidation.missingCount,
+                              isComplete: missingValidation.isComplete
+                            },
+                            validation: {
+                              errors: dataValidation.errors,
+                              warnings: dataValidation.warnings,
+                              isValid: dataValidation.isValid
+                            }
+                          },
+                          timestamp: new Date()
                         });
                         
-                        console.error('❌ Critical validation errors:', dataValidation.errors);
-                        console.error('⚠️ Client:', fullClientData.first_name, fullClientData.last_name);
-                        console.error('📋 Errors list:', dataValidation.errors.join(' | '));
-                      }
-                      
-                      // Afficher les avertissements (non bloquants)
-                      if (dataValidation.hasWarnings) {
+                        // Toast informatif (moins intrusif)
                         toast({
-                          title: "⚠️ Avertissements sur les données client",
-                          description: dataValidation.warnings.join(', '),
+                          title: "⚠️ Validation client requise",
+                          description: "Des informations manquantes ou invalides ont été détectées.",
                         });
-                        console.warn('⚠️ Validation warnings:', dataValidation.warnings);
                       }
                       
-                      // N'envoyer la demande de documents QUE si :
-                      // - Des données manquent
-                      // - ET les données présentes sont valides (pas d'erreurs critiques)
+                      // Envoyer la demande de documents seulement si données manquantes ET valides
                       if (!missingValidation.isComplete && dataValidation.isValid) {
-                        console.log('📧 Sending documents request - Missing fields:', missingValidation.missingFields);
-                        
                         try {
+                          console.log('📧 Sending documents request for client:', fullClientData.id);
+                          
                           await sendDocumentsRequest(fullClientData.id, reportData?.company_id);
                           
-                          toast({
-                            title: "Import terminé - Documents demandés",
-                            description: `${missingValidation.missingCount} information(s) manquante(s). Une demande a été envoyée : ${missingValidation.missingFields.join(', ')}`,
-                          });
-                        } catch (docError) {
-                          console.error('❌ Error sending documents request:', docError);
+                          console.log('✅ Documents request sent successfully');
+                          
+                        } catch (error) {
+                          console.error('❌ Error sending documents request:', error);
                         }
                       } else if (missingValidation.isComplete && dataValidation.isValid) {
                         console.log('✅ Client data is complete and valid');
-                        toast({
-                          title: "✅ Import terminé - Données complètes",
-                          description: "Toutes les informations client sont présentes et validées.",
-                        });
                       }
                     }
                     
