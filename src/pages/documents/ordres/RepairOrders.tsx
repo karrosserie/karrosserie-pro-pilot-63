@@ -410,7 +410,7 @@ const RepairOrders = () => {
       try {
         const effectiveCompanyId = companyData.id;
         const { error: sigError } = await supabase
-          .from('signature_requests')
+          .from('signature_requests' as any)
           .insert({
             company_id: effectiveCompanyId,
             client_id: order.client_id,

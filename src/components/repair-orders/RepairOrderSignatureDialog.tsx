@@ -116,7 +116,7 @@ const RepairOrderSignatureDialog: React.FC<RepairOrderSignatureDialogProps> = ({
       try {
         const { supabase } = await import('@/integrations/supabase/client');
         const { error: sigError } = await supabase
-          .from('signature_requests')
+          .from('signature_requests' as any)
           .insert({
             company_id: repairOrder.company_id,
             client_id: repairOrder.client_id,

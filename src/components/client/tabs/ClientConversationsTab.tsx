@@ -44,13 +44,13 @@ const ClientConversationsTab: React.FC<ClientConversationsTabProps> = ({ clientI
         
         // Récupérer les demandes de signature
         const { data: signatures, error: sigError } = await supabase
-          .from('signature_requests')
+          .from('signature_requests' as any)
           .select('*')
           .eq('client_id', clientId)
           .order('created_at', { ascending: false });
         
         if (!sigError && signatures) {
-          setSignatureRequests(signatures as SignatureRequest[]);
+          setSignatureRequests(signatures as any as SignatureRequest[]);
         }
         
         // Collecter tous les vehicle_ids (de messageries et signatures)
@@ -204,6 +204,11 @@ const ClientConversationsTab: React.FC<ClientConversationsTabProps> = ({ clientI
                       <CardTitle className="text-base">
                         {getSignatureTypeLabel(request.request_type)} - {request.document_reference}
                       </CardTitle>
+                      <CardDescription className="mt-1">
+                        {request.request_type === 'ordre_reparation' 
+                          ? 'Demande de signature de l\'ordre de réparation envoyée au client'
+                          : 'Demande de signature de la cession de créance envoyée au client'}
+                      </CardDescription>
                       {request.vehicle_id && vehicleNames[request.vehicle_id] && (
                         <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
                           <Car className="h-4 w-4" />
