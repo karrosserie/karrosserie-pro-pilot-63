@@ -112,6 +112,26 @@ const RepairOrderSignatureDialog: React.FC<RepairOrderSignatureDialogProps> = ({
         }
       });
 
+      // Ajouter un message dans la conversation
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        await supabase
+          .from('messageries')
+          .insert({
+            company_id: repairOrder.company_id,
+            client_id: repairOrder.client_id,
+            vehicle_id: repairOrder.vehicle_id,
+            priority: 3,
+            title: `Signature de l'ordre de réparation`,
+            channel: 'En personne',
+            content: `L'ordre de réparation ${repairOrder.reference} a été signé en personne par ${clientName}`,
+            tags: ['signature', 'ordre_reparation'],
+            resolved: false
+          } as any);
+      } catch (msgError) {
+        console.error('Failed to create conversation message:', msgError);
+      }
+
       toast({
         title: "Signature enregistrée",
         description: `L'ordre de réparation ${repairOrder?.reference} a été signé par le client.`
