@@ -96,6 +96,7 @@ export const sendDocumentsRequest = async (clientId: string, companyId?: string)
         const now = new Date();
         const messageResult = await supabase.from('messageries').insert({
           company_id: effectiveCompanyId,
+          client_id: clientId,
           priority: 3, // Priorité basse
           title: `Demande de justificatifs - ${clientName}`,
           channel: data.sendMode === 'sms' ? 'Message' : 'Mail',
