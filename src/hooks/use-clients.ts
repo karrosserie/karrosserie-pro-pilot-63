@@ -4,6 +4,7 @@ import { clientsService, NewClient, UpdateClient } from '@/services/supabase/cli
 import { useToast } from '@/hooks/use-toast';
 import { useImpersonation } from '@/hooks/use-impersonation';
 import { useEffect } from 'react';
+import { useDetailedTracking } from '@/hooks/tracking/useDetailedTracking';
 
 // Helper function to transform client data from database format to frontend format
 const transformClientFromDB = (client: any) => {
@@ -24,6 +25,7 @@ export function useClients() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { isImpersonating, impersonationData } = useImpersonation();
+  const { trackAction } = useDetailedTracking();
 
   // Invalider les requêtes lors du changement d'impersonation
   useEffect(() => {
@@ -47,11 +49,19 @@ export function useClients() {
       console.log('Creating client with data:', newClient);
       return clientsService.create(newClient);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       toast({
         title: "Client créé",
         description: "Le client a été créé avec succès."
+      });
+      
+      // Track client creation
+      trackAction('client_created', {
+        client_id: data?.id,
+        client_name: `${data?.first_name} ${data?.last_name}`,
+        email: data?.email,
+        phone: data?.phone
       });
     },
     onError: (error) => {
@@ -69,11 +79,17 @@ export function useClients() {
       console.log('Updating client with id and data:', id, data);
       return clientsService.update(id, data);
     },
-    onSuccess: () => {
+    onSuccess: (updatedData, { id, data }) => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       toast({
         title: "Client mis à jour",
         description: "Le client a été mis à jour avec succès."
+      });
+      
+      // Track client update
+      trackAction('client_updated', {
+        client_id: id,
+        client_name: data?.firstName && data?.lastName ? `${data.firstName} ${data.lastName}` : undefined
       });
     },
     onError: (error) => {
@@ -88,11 +104,16 @@ export function useClients() {
   
   const deleteClient = useMutation({
     mutationFn: (id: string) => clientsService.delete(id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       toast({
         title: "Client supprimé",
         description: "Le client a été supprimé avec succès."
+      });
+      
+      // Track client deletion
+      trackAction('client_deleted', {
+        client_id: id
       });
     },
     onError: (error) => {

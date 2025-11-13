@@ -5,11 +5,13 @@ import { invoicesService } from '@/services/supabase/invoices';
 import { useImpersonation } from '@/hooks/use-impersonation';
 import { useEffect } from 'react';
 import { userActionWebhookService } from '@/services/tracking/UserActionWebhookService';
+import { useDetailedTracking } from '@/hooks/tracking/useDetailedTracking';
 
 export function useInvoices(showArchived: boolean = false) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { isImpersonating, impersonationData } = useImpersonation();
+  const { trackAction } = useDetailedTracking();
 
   // Invalider les requêtes lors du changement d'impersonation
   useEffect(() => {
@@ -38,10 +40,19 @@ export function useInvoices(showArchived: boolean = false) {
         description: "La facture a été créée avec succès."
       });
       
-      // Envoyer le webhook
+      // Envoyer le webhook (existant)
       userActionWebhookService.sendUserAction('creation_facture', {
         invoice_id: data?.id,
         invoice_reference: data?.reference
+      });
+      
+      // Track invoice creation (nouveau système)
+      trackAction('invoice_created', {
+        invoice_id: data?.id,
+        invoice_reference: data?.reference,
+        client_id: data?.client_id,
+        vehicle_id: data?.vehicle_id,
+        amount: data?.amount
       });
     },
     onError: (error) => {
@@ -64,6 +75,12 @@ export function useInvoices(showArchived: boolean = false) {
         title: "Facture mise à jour",
         description: "La facture a été mise à jour avec succès."
       });
+      
+      // Track invoice update
+      trackAction('invoice_updated', {
+        invoice_id: id,
+        invoice_reference: updatedInvoice?.reference
+      });
     },
     onError: (error) => {
       toast({
@@ -78,11 +95,16 @@ export function useInvoices(showArchived: boolean = false) {
     mutationFn: async (id: string) => {
       return await invoicesService.delete(id);
     },
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
       toast({
         title: "Facture supprimée",
         description: "La facture a été supprimée avec succès."
+      });
+      
+      // Track invoice deletion
+      trackAction('invoice_deleted', {
+        invoice_id: id
       });
     },
     onError: (error) => {

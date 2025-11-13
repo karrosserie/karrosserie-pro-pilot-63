@@ -1,14 +1,15 @@
-
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tantml:react-query';
 import { useToast } from '@/hooks/use-toast';
 import { repairOrdersService } from '@/services/supabase/repair-orders';
 import { NewRepairOrder, UpdateRepairOrder } from '@/services/supabase/repair-orders/types';
 import { useCompanyId } from '@/hooks/use-company-id';
+import { useDetailedTracking } from '@/hooks/tracking/useDetailedTracking';
 
 export function useRepairOrders() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { companyId } = useCompanyId();
+  const { trackAction } = useDetailedTracking();
 
   const {
     data: orders,
@@ -36,6 +37,16 @@ export function useRepairOrders() {
           description: "L'ordre de réparation a été créé avec succès."
         });
       }
+      
+      // Track OR creation
+      trackAction('or_created', {
+        or_id: data?.id,
+        or_reference: data?.reference,
+        client_id: data?.client_id,
+        vehicle_id: data?.vehicle_id,
+        total_amount: data?.total_amount,
+        converted_from_quote: !!(variables as any)?.quote_id
+      });
     },
     onError: (error) => {
       toast({
@@ -56,6 +67,12 @@ export function useRepairOrders() {
       toast({
         title: "Ordre de réparation mis à jour",
         description: "L'ordre de réparation a été mis à jour avec succès."
+      });
+      
+      // Track OR update
+      trackAction('or_updated', {
+        or_id: id,
+        or_reference: updatedOrder?.reference
       });
     },
     onError: (error) => {

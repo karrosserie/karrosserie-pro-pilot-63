@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { v4 as uuidv4 } from 'uuid';
+import { ActionType, ACTION_CATEGORY_MAPPING } from '@/types/activity-categories';
 
 export interface TrackingEvent {
   eventType: 'page_view' | 'form_interaction' | 'business_action' | 'error' | 'abandon';
@@ -301,6 +302,41 @@ class TrackingService {
         entityId,
         ...metadata,
       },
+    });
+  }
+
+  public async trackDetailedAction(
+    actionType: ActionType,
+    metadata?: Record<string, any>
+  ) {
+    if (!this.userId || !this.isSessionActive) {
+      console.warn('Cannot track detailed action: session not active');
+      return;
+    }
+
+    const mapping = ACTION_CATEGORY_MAPPING[actionType];
+    
+    if (!mapping) {
+      console.error(`No mapping found for action type: ${actionType}`);
+      return;
+    }
+
+    // Enrichir les métadonnées avec la catégorie et sous-catégorie
+    const enrichedMetadata = {
+      ...metadata,
+      category: mapping.category,
+      subcategory: mapping.subcategory,
+      action_type: actionType,
+    };
+
+    console.log(`✅ Action tracked: ${actionType} for company ${this.companyId}`);
+
+    await this.trackEvent({
+      eventType: 'business_action',
+      eventCategory: 'business',
+      eventName: actionType,
+      pageUrl: window.location.pathname,
+      metadata: enrichedMetadata,
     });
   }
 

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -13,6 +12,7 @@ import { MovingCar } from '@/components/ui/moving-car';
 import { Button } from '@/components/ui/button';
 import { v4 as uuidv4 } from 'uuid';
 import { SuccessDialog } from '@/components/ui/success-dialog';
+import { useDetailedTracking } from '@/hooks/tracking/useDetailedTracking';
 
 interface ExpertiseReportUploaderProps {
   onSuccess?: () => void;
@@ -32,6 +32,7 @@ export const ExpertiseReportUploader = ({
   const { shouldShowExpertiseReportPrompt, markHelpAsSeen } = useUserOnboardingProgress();
   const navigate = useNavigate();
   const location = useLocation();
+  const { trackAction } = useDetailedTracking();
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
@@ -165,6 +166,14 @@ export const ExpertiseReportUploader = ({
       }
 
       console.log('Import entry created:', importData);
+
+      // Track expertise report import
+      trackAction('expertise_report_imported', {
+        report_id: newReport?.id,
+        import_id: importData.id,
+        document_name: selectedFile.name,
+        company_id: companyId
+      });
 
       // 6. Appel API externe pour traitement du document
       try {

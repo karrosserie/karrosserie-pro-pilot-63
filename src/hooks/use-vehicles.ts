@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useImpersonation } from '@/hooks/use-impersonation';
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useDetailedTracking } from '@/hooks/tracking/useDetailedTracking';
 
 export function useClientVehicles(clientId?: string) {
   const {
@@ -32,6 +33,7 @@ export function useVehicles() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { isImpersonating, impersonationData } = useImpersonation();
+  const { trackAction } = useDetailedTracking();
 
   // Invalider les requêtes lors du changement d'impersonation
   useEffect(() => {
@@ -54,11 +56,18 @@ export function useVehicles() {
     mutationFn: async (vehicleData: NewVehicle) => {
       return await vehiclesService.create(vehicleData);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['vehicles'] });
       toast({
         title: "Véhicule créé",
         description: "Le véhicule a été créé avec succès."
+      });
+      
+      // Track vehicle creation
+      trackAction('vehicle_created', {
+        vehicle_id: data?.id,
+        license_plate: data?.license_plate,
+        vin: data?.vin
       });
     },
     onError: (error) => {
@@ -74,11 +83,17 @@ export function useVehicles() {
     mutationFn: async ({ id, data }: { id: string, data: UpdateVehicle }) => {
       return await vehiclesService.update(id, data);
     },
-    onSuccess: () => {
+    onSuccess: (updatedData, { id, data }) => {
       queryClient.invalidateQueries({ queryKey: ['vehicles'] });
       toast({
         title: "Véhicule mis à jour",
         description: "Le véhicule a été mis à jour avec succès."
+      });
+      
+      // Track vehicle update
+      trackAction('vehicle_updated', {
+        vehicle_id: id,
+        license_plate: data?.license_plate || updatedData?.license_plate
       });
     },
     onError: (error) => {
@@ -94,11 +109,16 @@ export function useVehicles() {
     mutationFn: async (id: string) => {
       return await vehiclesService.delete(id);
     },
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['vehicles'] });
       toast({
         title: "Véhicule supprimé",
         description: "Le véhicule a été supprimé avec succès."
+      });
+      
+      // Track vehicle deletion
+      trackAction('vehicle_deleted', {
+        vehicle_id: id
       });
     },
     onError: (error) => {

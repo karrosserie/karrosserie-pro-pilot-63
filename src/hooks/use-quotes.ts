@@ -4,11 +4,13 @@ import { useToast } from '@/hooks/use-toast';
 import { getCurrentUserCompanyId } from '@/services/supabase/auth-company';
 import { useImpersonation } from '@/hooks/use-impersonation';
 import { useEffect } from 'react';
+import { useDetailedTracking } from '@/hooks/tracking/useDetailedTracking';
 
 export function useQuotes() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { isImpersonating, impersonationData } = useImpersonation();
+  const { trackAction } = useDetailedTracking();
 
   // Invalider les requêtes lors du changement d'impersonation
   useEffect(() => {
@@ -81,11 +83,20 @@ export function useQuotes() {
       console.log('✅ useQuotes - Quote created successfully:', data);
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
       toast({
         title: "Devis créé",
         description: "Le devis a été créé avec succès."
+      });
+      
+      // Track quote creation
+      trackAction('quote_created', {
+        quote_id: data?.id,
+        quote_reference: data?.reference,
+        client_id: data?.client_id,
+        vehicle_id: data?.vehicle_id,
+        amount: data?.amount
       });
     },
     onError: (error) => {
@@ -124,6 +135,12 @@ export function useQuotes() {
     },
     onSuccess: async (updatedQuote) => {
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
+      
+      // Track quote update
+      trackAction('quote_updated', {
+        quote_id: updatedQuote?.id,
+        quote_reference: updatedQuote?.reference
+      });
       
       // Envoyer les données au webhook N8n
       try {
