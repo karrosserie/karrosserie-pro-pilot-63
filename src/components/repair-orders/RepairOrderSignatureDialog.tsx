@@ -124,12 +124,13 @@ const RepairOrderSignatureDialog: React.FC<RepairOrderSignatureDialogProps> = ({
             priority: 3,
             title: `Signature de l'ordre de réparation`,
             channel: 'En personne',
-            content: `L'ordre de réparation ${repairOrder.reference} a été signé en personne par ${clientName}`,
+            message: `L'ordre de réparation ${repairOrder.reference} a été signé en personne par ${clientName}`,
             tags: ['signature', 'ordre_reparation'],
             resolved: false
           } as any);
+        console.log('✅ Message de conversation créé pour signature en personne OR:', repairOrder.reference);
       } catch (msgError) {
-        console.error('Failed to create conversation message:', msgError);
+        console.error('❌ Failed to create conversation message:', msgError);
       }
 
       toast({

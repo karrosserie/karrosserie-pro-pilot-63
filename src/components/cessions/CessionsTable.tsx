@@ -474,12 +474,13 @@ export const CessionsTable = ({
                 priority: 3,
                 title: `Demande de signature de la cession de créance`,
                 channel: 'Message',
-                content: `Demande de signature de la cession de créance envoyée - Référence ${cession.reference}`,
+                message: `Demande de signature de la cession de créance envoyée - Référence ${cession.reference}`,
                 tags: ['signature', 'cession'],
                 resolved: false
               } as any);
+            console.log('✅ Message de conversation créé pour cession:', cession.reference);
           } catch (msgError) {
-            console.error('Failed to create conversation message:', msgError);
+            console.error('❌ Failed to create conversation message:', msgError);
           }
 
           // Vérifier si nous avons suffisamment de recipients
