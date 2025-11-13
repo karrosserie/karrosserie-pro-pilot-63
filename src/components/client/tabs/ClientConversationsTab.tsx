@@ -207,24 +207,24 @@ const ClientConversationsTab: React.FC<ClientConversationsTabProps> = ({ clientI
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      {/* AFFICHAGE TRÈS VISIBLE DU VÉHICULE EN PREMIER */}
+                      {/* AFFICHAGE VISIBLE DU VÉHICULE */}
                       {request.vehicle_id && vehicleNames[request.vehicle_id] ? (
-                        <div className="flex items-center gap-2 mb-3 p-3 bg-primary/10 rounded-lg border border-primary/20">
-                          <Car className="h-6 w-6 text-primary flex-shrink-0" />
+                        <div className="flex items-center gap-2 mb-3 p-2 bg-primary/10 rounded-md border border-primary/20">
+                          <Car className="h-5 w-5 text-primary flex-shrink-0" />
                           <div>
-                            <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Véhicule concerné</div>
-                            <div className="text-lg font-bold text-primary">
+                            <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Véhicule</div>
+                            <div className="text-sm font-semibold text-primary">
                               {vehicleNames[request.vehicle_id]}
                             </div>
                           </div>
                         </div>
                       ) : (
-                        <div className="flex items-center gap-2 mb-3 p-3 bg-destructive/10 rounded-lg border border-destructive/20">
-                          <Car className="h-6 w-6 text-destructive flex-shrink-0" />
+                        <div className="flex items-center gap-2 mb-3 p-2 bg-destructive/10 rounded-md border border-destructive/20">
+                          <Car className="h-5 w-5 text-destructive flex-shrink-0" />
                           <div>
-                            <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Véhicule concerné</div>
-                            <div className="text-lg font-bold text-destructive">
-                              ⚠️ VÉHICULE NON TROUVÉ (ID: {request.vehicle_id || 'non défini'})
+                            <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Véhicule</div>
+                            <div className="text-sm font-semibold text-destructive">
+                              ⚠️ Non trouvé
                             </div>
                           </div>
                         </div>
@@ -297,12 +297,30 @@ const ClientConversationsTab: React.FC<ClientConversationsTabProps> = ({ clientI
                         </Badge>
                       </div>
                       <CardTitle className="text-base">{message.title}</CardTitle>
-                      {(message as any).vehicle_id && vehicleNames[(message as any).vehicle_id] && (
-                        <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
-                          <Car className="h-4 w-4" />
-                          <span>{vehicleNames[(message as any).vehicle_id]}</span>
+                      
+                      {/* AFFICHAGE VISIBLE DU VÉHICULE */}
+                      {(message as any).vehicle_id && vehicleNames[(message as any).vehicle_id] ? (
+                        <div className="flex items-center gap-2 mt-2 mb-2 p-2 bg-primary/10 rounded-md border border-primary/20">
+                          <Car className="h-5 w-5 text-primary flex-shrink-0" />
+                          <div>
+                            <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Véhicule</div>
+                            <div className="text-sm font-semibold text-primary">
+                              {vehicleNames[(message as any).vehicle_id]}
+                            </div>
+                          </div>
                         </div>
-                      )}
+                      ) : (message as any).vehicle_id ? (
+                        <div className="flex items-center gap-2 mt-2 mb-2 p-2 bg-destructive/10 rounded-md border border-destructive/20">
+                          <Car className="h-5 w-5 text-destructive flex-shrink-0" />
+                          <div>
+                            <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Véhicule</div>
+                            <div className="text-sm font-semibold text-destructive">
+                              ⚠️ Non trouvé
+                            </div>
+                          </div>
+                        </div>
+                      ) : null}
+                      
                       <CardDescription className="mt-1">
                         {message.summary}
                       </CardDescription>
