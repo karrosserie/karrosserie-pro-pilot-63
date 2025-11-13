@@ -112,25 +112,33 @@ const RepairOrderSignatureDialog: React.FC<RepairOrderSignatureDialogProps> = ({
         }
       });
 
-      // Ajouter un message dans la conversation
+      // Créer une demande de signature dans la table dédiée
       try {
         const { supabase } = await import('@/integrations/supabase/client');
-        await supabase
-          .from('messageries')
+        const { error: sigError } = await supabase
+          .from('signature_requests')
           .insert({
             company_id: repairOrder.company_id,
             client_id: repairOrder.client_id,
             vehicle_id: repairOrder.vehicle_id,
-            priority: 3,
-            title: `Signature de l'ordre de réparation`,
-            channel: 'En personne',
-            message: `L'ordre de réparation ${repairOrder.reference} a été signé en personne par ${clientName}`,
-            tags: ['signature', 'ordre_reparation'],
-            resolved: false
-          } as any);
-        console.log('✅ Message de conversation créé pour signature en personne OR:', repairOrder.reference);
-      } catch (msgError) {
-        console.error('❌ Failed to create conversation message:', msgError);
+            request_type: 'ordre_reparation',
+            repair_order_id: repairOrder.id,
+            document_reference: repairOrder.reference,
+            status: 'signe',
+            signature_mode: 'en_personne',
+            client_signature_data: clientSignature,
+            client_name: clientName,
+            sent_at: new Date().toISOString(),
+            signed_at: new Date().toISOString()
+          });
+        
+        if (sigError) {
+          console.error('❌ Failed to create signature request:', sigError);
+        } else {
+          console.log('✅ Signature request created for manual signature OR:', repairOrder.reference);
+        }
+      } catch (sigError) {
+        console.error('❌ Error creating signature request:', sigError);
       }
 
       toast({

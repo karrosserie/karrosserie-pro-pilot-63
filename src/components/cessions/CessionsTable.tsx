@@ -463,24 +463,31 @@ export const CessionsTable = ({
 
           console.log('Cession updated with contract ID');
 
-          // Ajouter un message dans la conversation
+          // Créer une demande de signature dans la table dédiée
           try {
-            await supabase
-              .from('messageries')
+            const { error: sigError } = await supabase
+              .from('signature_requests')
               .insert({
                 company_id: repairOrderData.company_id,
                 client_id: repairOrderData.clients.id,
                 vehicle_id: repairOrderData.vehicle_id,
-                priority: 3,
-                title: `Demande de signature de la cession de créance`,
-                channel: 'Message',
-                message: `Demande de signature de la cession de créance envoyée - Référence ${cession.reference}`,
-                tags: ['signature', 'cession'],
-                resolved: false
-              } as any);
-            console.log('✅ Message de conversation créé pour cession:', cession.reference);
-          } catch (msgError) {
-            console.error('❌ Failed to create conversation message:', msgError);
+                request_type: 'cession_creance',
+                cession_id: cession.id,
+                repair_order_id: cession.repair_order_id,
+                document_reference: cession.reference,
+                status: 'envoye',
+                signature_mode: 'electronique',
+                oodrive_contract_id: signatureResponse.contract.contract_id.toString(),
+                sent_at: new Date().toISOString()
+              });
+            
+            if (sigError) {
+              console.error('❌ Failed to create signature request:', sigError);
+            } else {
+              console.log('✅ Signature request created for cession:', cession.reference);
+            }
+          } catch (sigError) {
+            console.error('❌ Error creating signature request:', sigError);
           }
 
           // Vérifier si nous avons suffisamment de recipients

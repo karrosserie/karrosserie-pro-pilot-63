@@ -406,25 +406,32 @@ const RepairOrders = () => {
         });
       }
 
-      // Ajouter un message dans la conversation
+      // Créer une demande de signature dans la table dédiée
       try {
         const effectiveCompanyId = companyData.id;
-        await supabase
-          .from('messageries')
+        const { error: sigError } = await supabase
+          .from('signature_requests')
           .insert({
             company_id: effectiveCompanyId,
             client_id: order.client_id,
             vehicle_id: order.vehicle_id,
-            priority: 3,
-            title: `Demande de signature de l'ordre de réparation`,
-            channel: 'Message',
-            message: `Demande de signature de l'ordre de réparation envoyée - OR ${order.reference}`,
-            tags: ['signature', 'ordre_reparation'],
-            resolved: false
-          } as any);
-        console.log('✅ Message de conversation créé pour OR:', order.reference);
-      } catch (msgError) {
-        console.error('❌ Failed to create conversation message:', msgError);
+            request_type: 'ordre_reparation',
+            repair_order_id: order.id,
+            document_reference: order.reference,
+            status: 'envoye',
+            signature_mode: 'electronique',
+            oodrive_contract_id: signatureResponse.contract.contract_id.toString(),
+            document_url: documentUrl,
+            sent_at: new Date().toISOString()
+          });
+        
+        if (sigError) {
+          console.error('❌ Failed to create signature request:', sigError);
+        } else {
+          console.log('✅ Signature request created for OR:', order.reference);
+        }
+      } catch (sigError) {
+        console.error('❌ Error creating signature request:', sigError);
       }
       toast({
         title: "Document envoyé pour signature",
