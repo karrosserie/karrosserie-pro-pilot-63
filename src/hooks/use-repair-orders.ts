@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tantml:react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { repairOrdersService } from '@/services/supabase/repair-orders';
 import { NewRepairOrder, UpdateRepairOrder } from '@/services/supabase/repair-orders/types';
@@ -44,7 +44,6 @@ export function useRepairOrders() {
         or_reference: data?.reference,
         client_id: data?.client_id,
         vehicle_id: data?.vehicle_id,
-        total_amount: data?.total_amount,
         converted_from_quote: !!(variables as any)?.quote_id
       });
     },

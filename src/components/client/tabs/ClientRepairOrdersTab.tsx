@@ -53,7 +53,7 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
   }
 
   const clientOrders = orders?.filter(order => order.client_id === clientId) || [];
-  const { sortedData, sortConfig, handleSort } = useTableSorting(clientOrders, 'reference');
+  const { sortedData, sortConfig, handleSort } = useTableSorting<RepairOrder>(clientOrders, 'reference');
 
   const handleViewOrder = (order: RepairOrder) => {
     setSelectedOrder(order);
