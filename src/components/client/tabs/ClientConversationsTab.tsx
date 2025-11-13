@@ -6,10 +6,22 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { useMessageries } from '@/hooks/use-messageries';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { MessageSquare, Clock, ChevronDown, ChevronUp, User, Building2, Car } from 'lucide-react';
+import { MessageSquare, Clock, ChevronDown, ChevronUp, User, Building2, Car, FileSignature } from 'lucide-react';
 import { Messagerie, MessagerieReply } from '@/hooks/use-messageries';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
+
+interface SignatureRequest {
+  id: string;
+  request_type: 'ordre_reparation' | 'cession_creance';
+  document_reference: string;
+  status: string;
+  signature_mode: 'electronique' | 'en_personne';
+  vehicle_id?: string;
+  sent_at?: string;
+  signed_at?: string;
+  created_at: string;
+}
 
 interface ClientConversationsTabProps {
   clientId: string;
@@ -18,6 +30,7 @@ interface ClientConversationsTabProps {
 const ClientConversationsTab: React.FC<ClientConversationsTabProps> = ({ clientId }) => {
   const { messageries, loading, getClientHistory, fetchReplies } = useMessageries();
   const [clientMessages, setClientMessages] = useState<Messagerie[]>([]);
+  const [signatureRequests, setSignatureRequests] = useState<SignatureRequest[]>([]);
   const [expandedMessages, setExpandedMessages] = useState<Set<string>>(new Set());
   const [repliesCache, setRepliesCache] = useState<Record<string, MessagerieReply[]>>({});
   const [vehicleNames, setVehicleNames] = useState<Record<string, string>>({});
@@ -25,19 +38,37 @@ const ClientConversationsTab: React.FC<ClientConversationsTabProps> = ({ clientI
   useEffect(() => {
     const fetchClientHistory = async () => {
       if (clientId) {
+        // Récupérer les messages de messageries
         const history = await getClientHistory(clientId);
         setClientMessages(history as Messagerie[]);
         
-        // Charger les noms des véhicules pour tous les messages qui ont un vehicle_id
-        const vehicleIds = (history as any[])
+        // Récupérer les demandes de signature
+        const { data: signatures, error: sigError } = await supabase
+          .from('signature_requests')
+          .select('*')
+          .eq('client_id', clientId)
+          .order('created_at', { ascending: false });
+        
+        if (!sigError && signatures) {
+          setSignatureRequests(signatures as SignatureRequest[]);
+        }
+        
+        // Collecter tous les vehicle_ids (de messageries et signatures)
+        const messageVehicleIds = (history as any[])
           .filter((msg: any) => msg.vehicle_id)
           .map((msg: any) => msg.vehicle_id as string);
         
-        if (vehicleIds.length > 0) {
+        const signatureVehicleIds = (signatures || [])
+          .filter((sig: any) => sig.vehicle_id)
+          .map((sig: any) => sig.vehicle_id as string);
+        
+        const allVehicleIds = [...new Set([...messageVehicleIds, ...signatureVehicleIds])];
+        
+        if (allVehicleIds.length > 0) {
           const { data: vehicles } = await supabase
             .from('vehicles')
             .select('id, make, model, registration')
-            .in('id', vehicleIds);
+            .in('id', allVehicleIds);
           
           if (vehicles) {
             const vehicleMap: Record<string, string> = {};
@@ -105,7 +136,9 @@ const ClientConversationsTab: React.FC<ClientConversationsTabProps> = ({ clientI
     );
   }
 
-  if (clientMessages.length === 0) {
+  const hasContent = clientMessages.length > 0 || signatureRequests.length > 0;
+
+  if (!hasContent) {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-center">
         <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
@@ -117,19 +150,102 @@ const ClientConversationsTab: React.FC<ClientConversationsTabProps> = ({ clientI
     );
   }
 
+  const getSignatureStatusBadge = (status: string) => {
+    switch (status) {
+      case 'signe':
+        return <Badge className="bg-green-500">Signé</Badge>;
+      case 'envoye':
+        return <Badge className="bg-blue-500">Envoyé</Badge>;
+      case 'en_attente':
+        return <Badge variant="secondary">En attente</Badge>;
+      case 'refuse':
+        return <Badge variant="destructive">Refusé</Badge>;
+      case 'expire':
+        return <Badge variant="outline">Expiré</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+
+  const getSignatureTypeLabel = (type: string) => {
+    return type === 'ordre_reparation' ? 'Ordre de réparation' : 'Cession de créance';
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-lg font-semibold">Historique des conversations</h3>
           <p className="text-sm text-muted-foreground">
-            {clientMessages.length} conversation{clientMessages.length > 1 ? 's' : ''} trouvée{clientMessages.length > 1 ? 's' : ''}
+            {signatureRequests.length} demande{signatureRequests.length > 1 ? 's' : ''} de signature &bull; {clientMessages.length} conversation{clientMessages.length > 1 ? 's' : ''}
           </p>
         </div>
       </div>
 
       <div className="grid gap-4">
-        {clientMessages.map((message) => {
+        {/* Section Demandes de signature */}
+        {signatureRequests.length > 0 && (
+          <div className="space-y-3">
+            <h4 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+              <FileSignature className="h-4 w-4" />
+              Demandes de signature
+            </h4>
+            {signatureRequests.map((request) => (
+              <Card key={request.id} className="border-l-4 border-l-primary">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        {getSignatureStatusBadge(request.status)}
+                        <Badge variant="outline" className="capitalize">
+                          {request.signature_mode}
+                        </Badge>
+                      </div>
+                      <CardTitle className="text-base">
+                        {getSignatureTypeLabel(request.request_type)} - {request.document_reference}
+                      </CardTitle>
+                      {request.vehicle_id && vehicleNames[request.vehicle_id] && (
+                        <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                          <Car className="h-4 w-4" />
+                          <span>{vehicleNames[request.vehicle_id]}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2 text-sm text-muted-foreground">
+                    {request.sent_at && (
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        <span>
+                          Envoyé le {format(new Date(request.sent_at), "d MMMM yyyy 'à' HH:mm", { locale: fr })}
+                        </span>
+                      </div>
+                    )}
+                    {request.signed_at && (
+                      <div className="flex items-center gap-2 text-green-600">
+                        <FileSignature className="h-4 w-4" />
+                        <span>
+                          Signé le {format(new Date(request.signed_at), "d MMMM yyyy 'à' HH:mm", { locale: fr })}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* Section Messages de conversation */}
+        {clientMessages.length > 0 && (
+          <div className="space-y-3">
+            <h4 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              Messages
+            </h4>
+            {clientMessages.map((message) => {
           const isExpanded = expandedMessages.has(message.id);
           const replies = repliesCache[message.id] || [];
           
@@ -272,6 +388,8 @@ const ClientConversationsTab: React.FC<ClientConversationsTabProps> = ({ clientI
             </Card>
           );
         })}
+          </div>
+        )}
       </div>
     </div>
   );
