@@ -466,7 +466,7 @@ export const CessionsTable = ({
           // Créer une demande de signature dans la table dédiée
           try {
             const { error: sigError } = await supabase
-              .from('signature_requests')
+              .from('signature_requests' as any)
               .insert({
                 company_id: repairOrderData.company_id,
                 client_id: repairOrderData.clients.id,
