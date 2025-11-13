@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { sendDocumentsRequest } from '@/services/documentsRequestService';
 import { useClientValidation } from './use-client-validation';
 import { useClientValidationNotification } from '@/contexts/ClientValidationNotificationContext';
+import { clientEssentialFieldsChecker } from '@/services/clientEssentialFieldsChecker';
 
 export function useImportNotification() {
   const { toast } = useToast();
@@ -108,6 +109,20 @@ export function useImportNotification() {
                       .single();
                     
                     if (fullClientData) {
+                      // 0. Vérifier les champs essentiels (nom, prénom, email, téléphone)
+                      const { data: reportData } = await supabase
+                        .from('expertise_reports')
+                        .select('company_id')
+                        .eq('id', report.id)
+                        .single();
+                      
+                      const essentialCheck = await clientEssentialFieldsChecker.checkEssentialFields(
+                        fullClientData,
+                        reportData?.company_id || ''
+                      );
+                      
+                      console.log('📋 Essential fields check:', essentialCheck);
+                      
                       // 1. Vérifier les champs manquants
                       const missingValidation = checkMissingClientData(fullClientData);
                       
@@ -115,13 +130,6 @@ export function useImportNotification() {
                       const dataValidation = await validateClientData(fullClientData);
                       
                       console.log('🔍 Client data validation:', { missingValidation, dataValidation });
-                      
-                      // Récupérer le company_id du rapport pour les actions futures
-                      const { data: reportData } = await supabase
-                        .from('expertise_reports')
-                        .select('company_id')
-                        .eq('id', report.id)
-                        .single();
                       
                       // Si des données manquent OU si des erreurs/warnings
                       const hasIssues = 
