@@ -50,7 +50,10 @@ const ClientConversationsTab: React.FC<ClientConversationsTabProps> = ({ clientI
           .order('created_at', { ascending: false });
         
         if (!sigError && signatures) {
+          console.log('✅ Signatures récupérées:', signatures);
           setSignatureRequests(signatures as any as SignatureRequest[]);
+        } else {
+          console.error('❌ Erreur lors de la récupération des signatures:', sigError);
         }
         
         // Collecter tous les vehicle_ids (de messageries et signatures)
@@ -62,7 +65,11 @@ const ClientConversationsTab: React.FC<ClientConversationsTabProps> = ({ clientI
           .filter((sig: any) => sig.vehicle_id)
           .map((sig: any) => sig.vehicle_id as string);
         
+        console.log('🚗 Vehicle IDs des signatures:', signatureVehicleIds);
+        console.log('📧 Vehicle IDs des messages:', messageVehicleIds);
+        
         const allVehicleIds = [...new Set([...messageVehicleIds, ...signatureVehicleIds])];
+        console.log('🔍 Tous les vehicle IDs à récupérer:', allVehicleIds);
         
         if (allVehicleIds.length > 0) {
           const { data: vehicles } = await supabase
@@ -70,13 +77,18 @@ const ClientConversationsTab: React.FC<ClientConversationsTabProps> = ({ clientI
             .select('id, make, model, registration')
             .in('id', allVehicleIds);
           
+          console.log('🚙 Véhicules récupérés:', vehicles);
+          
           if (vehicles) {
             const vehicleMap: Record<string, string> = {};
             vehicles.forEach((v: any) => {
               vehicleMap[v.id] = `${v.make} ${v.model} (${v.registration})`;
             });
+            console.log('📋 VehicleMap final:', vehicleMap);
             setVehicleNames(vehicleMap);
           }
+        } else {
+          console.warn('⚠️ Aucun vehicle_id trouvé dans les données');
         }
       }
     };
@@ -195,6 +207,29 @@ const ClientConversationsTab: React.FC<ClientConversationsTabProps> = ({ clientI
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
+                      {/* AFFICHAGE TRÈS VISIBLE DU VÉHICULE EN PREMIER */}
+                      {request.vehicle_id && vehicleNames[request.vehicle_id] ? (
+                        <div className="flex items-center gap-2 mb-3 p-3 bg-primary/10 rounded-lg border border-primary/20">
+                          <Car className="h-6 w-6 text-primary flex-shrink-0" />
+                          <div>
+                            <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Véhicule concerné</div>
+                            <div className="text-lg font-bold text-primary">
+                              {vehicleNames[request.vehicle_id]}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 mb-3 p-3 bg-destructive/10 rounded-lg border border-destructive/20">
+                          <Car className="h-6 w-6 text-destructive flex-shrink-0" />
+                          <div>
+                            <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Véhicule concerné</div>
+                            <div className="text-lg font-bold text-destructive">
+                              ⚠️ VÉHICULE NON TROUVÉ (ID: {request.vehicle_id || 'non défini'})
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
                       <div className="flex items-center gap-2 mb-2">
                         {getSignatureStatusBadge(request.status)}
                         <Badge variant="outline" className="capitalize">
@@ -209,12 +244,6 @@ const ClientConversationsTab: React.FC<ClientConversationsTabProps> = ({ clientI
                           ? 'Demande de signature de l\'ordre de réparation envoyée au client'
                           : 'Demande de signature de la cession de créance envoyée au client'}
                       </CardDescription>
-                      {request.vehicle_id && vehicleNames[request.vehicle_id] && (
-                        <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
-                          <Car className="h-4 w-4" />
-                          <span>{vehicleNames[request.vehicle_id]}</span>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </CardHeader>
