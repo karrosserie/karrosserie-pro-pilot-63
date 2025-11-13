@@ -6,9 +6,10 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { useMessageries } from '@/hooks/use-messageries';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { MessageSquare, Clock, ChevronDown, ChevronUp, User, Building2 } from 'lucide-react';
+import { MessageSquare, Clock, ChevronDown, ChevronUp, User, Building2, Car } from 'lucide-react';
 import { Messagerie, MessagerieReply } from '@/hooks/use-messageries';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ClientConversationsTabProps {
   clientId: string;
@@ -19,12 +20,33 @@ const ClientConversationsTab: React.FC<ClientConversationsTabProps> = ({ clientI
   const [clientMessages, setClientMessages] = useState<Messagerie[]>([]);
   const [expandedMessages, setExpandedMessages] = useState<Set<string>>(new Set());
   const [repliesCache, setRepliesCache] = useState<Record<string, MessagerieReply[]>>({});
+  const [vehicleNames, setVehicleNames] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const fetchClientHistory = async () => {
       if (clientId) {
         const history = await getClientHistory(clientId);
         setClientMessages(history as Messagerie[]);
+        
+        // Charger les noms des véhicules pour tous les messages qui ont un vehicle_id
+        const vehicleIds = (history as any[])
+          .filter((msg: any) => msg.vehicle_id)
+          .map((msg: any) => msg.vehicle_id as string);
+        
+        if (vehicleIds.length > 0) {
+          const { data: vehicles } = await supabase
+            .from('vehicles')
+            .select('id, make, model, registration')
+            .in('id', vehicleIds);
+          
+          if (vehicles) {
+            const vehicleMap: Record<string, string> = {};
+            vehicles.forEach((v: any) => {
+              vehicleMap[v.id] = `${v.make} ${v.model} (${v.registration})`;
+            });
+            setVehicleNames(vehicleMap);
+          }
+        }
       }
     };
     fetchClientHistory();
@@ -125,6 +147,12 @@ const ClientConversationsTab: React.FC<ClientConversationsTabProps> = ({ clientI
                         </Badge>
                       </div>
                       <CardTitle className="text-base">{message.title}</CardTitle>
+                      {(message as any).vehicle_id && vehicleNames[(message as any).vehicle_id] && (
+                        <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                          <Car className="h-4 w-4" />
+                          <span>{vehicleNames[(message as any).vehicle_id]}</span>
+                        </div>
+                      )}
                       <CardDescription className="mt-1">
                         {message.summary}
                       </CardDescription>

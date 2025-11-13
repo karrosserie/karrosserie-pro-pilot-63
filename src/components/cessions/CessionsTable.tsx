@@ -463,6 +463,25 @@ export const CessionsTable = ({
 
           console.log('Cession updated with contract ID');
 
+          // Ajouter un message dans la conversation
+          try {
+            await supabase
+              .from('messageries')
+              .insert({
+                company_id: repairOrderData.company_id,
+                client_id: repairOrderData.clients.id,
+                vehicle_id: repairOrderData.vehicle_id,
+                priority: 3,
+                title: `Demande de signature de la cession de créance`,
+                channel: 'Message',
+                content: `Demande de signature de la cession de créance envoyée - Référence ${cession.reference}`,
+                tags: ['signature', 'cession'],
+                resolved: false
+              } as any);
+          } catch (msgError) {
+            console.error('Failed to create conversation message:', msgError);
+          }
+
           // Vérifier si nous avons suffisamment de recipients
           if (signatureResponse.recipients && signatureResponse.recipients.length >= 2) {
             console.log('Recipients found, updating company and client...');
