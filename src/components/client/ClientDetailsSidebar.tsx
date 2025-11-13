@@ -9,7 +9,8 @@ import {
   Receipt, 
   CreditCard, 
   Banknote,
-  ClipboardList
+  ClipboardList,
+  MessageSquare
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -90,7 +91,8 @@ export const getSidebarItems = (
   clientOrders: any[],
   clientInvoices: any[],
   clientCredits: any[],
-  clientReceipts: any[]
+  clientReceipts: any[],
+  clientConversations: any[] = []
 ): SidebarItem[] => [
   {
     id: 'details',
@@ -139,5 +141,11 @@ export const getSidebarItems = (
     label: 'Encaissements',
     icon: Banknote,
     count: clientReceipts.length
+  },
+  {
+    id: 'conversations',
+    label: 'Conversations',
+    icon: MessageSquare,
+    count: clientConversations.length
   }
 ];

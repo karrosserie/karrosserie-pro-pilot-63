@@ -16,6 +16,7 @@ import ClientRepairOrdersTab from './tabs/ClientRepairOrdersTab';
 import ClientInvoicesTab from './tabs/ClientInvoicesTab';
 import ClientCreditsTab from './tabs/ClientCreditsTab';
 import ClientReceiptsTab from './tabs/ClientReceiptsTab';
+import ClientConversationsTab from './tabs/ClientConversationsTab';
 
 import { ClientDetailsSidebar, getSidebarItems } from './ClientDetailsSidebar';
 import { useVehicles } from '@/hooks/use-vehicles';
@@ -26,6 +27,7 @@ import { useInvoices } from '@/hooks/use-invoices';
 import { useCredits } from '@/hooks/use-credits';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useMessageries } from '@/hooks/use-messageries';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 
@@ -60,6 +62,7 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
   const { invoices } = useInvoices();
   const { credits } = useCredits();
   const { receipts } = useReceiptsData();
+  const { messageries } = useMessageries();
   const isMobile = useIsMobile();
   
 
@@ -95,6 +98,7 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
     return false;
   }) || [];
   
+  const clientConversations = messageries?.filter(msg => msg.client_id === defaultValues?.id) || [];
   
 
   // État pour gérer l'onglet actif dans la sidebar
@@ -108,7 +112,8 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
     clientOrders,
     clientInvoices,
     clientCredits,
-    clientReceipts
+    clientReceipts,
+    clientConversations
   );
 
   // Fonction pour rendre le contenu selon l'onglet actif
@@ -137,6 +142,8 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
         return <ClientCreditsTab clientId={defaultValues?.id} />;
       case 'receipts':
         return <ClientReceiptsTab clientId={defaultValues?.id} />;
+      case 'conversations':
+        return <ClientConversationsTab clientId={defaultValues?.id} />;
       default:
         return null;
     }
@@ -196,6 +203,9 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
                 </TabsContent>
                 <TabsContent value="receipts" className="mt-0">
                   <ClientReceiptsTab clientId={defaultValues?.id} />
+                </TabsContent>
+                <TabsContent value="conversations" className="mt-0">
+                  <ClientConversationsTab clientId={defaultValues?.id} />
                 </TabsContent>
               </div>
             </Tabs>
