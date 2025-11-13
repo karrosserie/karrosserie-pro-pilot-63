@@ -1,19 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useMessageries } from '@/hooks/use-messageries';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { MessageSquare, Clock, AlertCircle } from 'lucide-react';
-import { Messagerie } from '@/hooks/use-messageries';
+import { MessageSquare, Clock, ChevronDown, ChevronUp, User, Building2 } from 'lucide-react';
+import { Messagerie, MessagerieReply } from '@/hooks/use-messageries';
+import { cn } from '@/lib/utils';
 
 interface ClientConversationsTabProps {
   clientId: string;
 }
 
 const ClientConversationsTab: React.FC<ClientConversationsTabProps> = ({ clientId }) => {
-  const { messageries, loading, getClientHistory } = useMessageries();
+  const { messageries, loading, getClientHistory, fetchReplies } = useMessageries();
   const [clientMessages, setClientMessages] = useState<Messagerie[]>([]);
+  const [expandedMessages, setExpandedMessages] = useState<Set<string>>(new Set());
+  const [repliesCache, setRepliesCache] = useState<Record<string, MessagerieReply[]>>({});
 
   useEffect(() => {
     const fetchClientHistory = async () => {
@@ -24,6 +29,21 @@ const ClientConversationsTab: React.FC<ClientConversationsTabProps> = ({ clientI
     };
     fetchClientHistory();
   }, [clientId, getClientHistory]);
+
+  const toggleExpanded = async (messageId: string) => {
+    const newExpanded = new Set(expandedMessages);
+    if (newExpanded.has(messageId)) {
+      newExpanded.delete(messageId);
+    } else {
+      newExpanded.add(messageId);
+      // Charger les réponses si pas déjà en cache
+      if (!repliesCache[messageId]) {
+        const replies = await fetchReplies(messageId);
+        setRepliesCache(prev => ({ ...prev, [messageId]: replies }));
+      }
+    }
+    setExpandedMessages(newExpanded);
+  };
 
   const getPriorityBadge = (priority: number) => {
     if (priority >= 8) {
@@ -87,54 +107,143 @@ const ClientConversationsTab: React.FC<ClientConversationsTabProps> = ({ clientI
       </div>
 
       <div className="grid gap-4">
-        {clientMessages.map((message) => (
-          <Card key={message.id} className="hover:shadow-md transition-shadow">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    {getStatusBadge(message.status || '', message.resolved || false)}
-                    {getPriorityBadge(message.priority || 5)}
-                    <Badge variant="outline" className="capitalize">
-                      {message.channel || 'email'}
-                    </Badge>
+        {clientMessages.map((message) => {
+          const isExpanded = expandedMessages.has(message.id);
+          const replies = repliesCache[message.id] || [];
+          
+          return (
+            <Card key={message.id} className="hover:shadow-md transition-shadow">
+              <Collapsible open={isExpanded} onOpenChange={() => toggleExpanded(message.id)}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        {getStatusBadge(message.status || '', message.resolved || false)}
+                        {getPriorityBadge(message.priority || 5)}
+                        <Badge variant="outline" className="capitalize">
+                          {message.channel || 'email'}
+                        </Badge>
+                      </div>
+                      <CardTitle className="text-base">{message.title}</CardTitle>
+                      <CardDescription className="mt-1">
+                        {message.summary}
+                      </CardDescription>
+                    </div>
+                    <CollapsibleTrigger asChild>
+                      <Button variant="ghost" size="sm" className="ml-2">
+                        {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      </Button>
+                    </CollapsibleTrigger>
                   </div>
-                  <CardTitle className="text-base">{message.title}</CardTitle>
-                  <CardDescription className="mt-1">
-                    {message.summary}
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4" />
-                  <span>
-                    {message.created_at 
-                      ? format(new Date(message.created_at), "d MMMM yyyy 'à' HH:mm", { locale: fr })
-                      : 'Date inconnue'}
-                  </span>
-                </div>
-                {message.replies_count !== undefined && message.replies_count > 0 && (
-                  <div className="flex items-center gap-2">
-                    <MessageSquare className="h-4 w-4" />
-                    <span>{message.replies_count} réponse{message.replies_count > 1 ? 's' : ''}</span>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2 text-sm text-muted-foreground mb-4">
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      <span>
+                        {message.created_at 
+                          ? format(new Date(message.created_at), "d MMMM yyyy 'à' HH:mm", { locale: fr })
+                          : 'Date inconnue'}
+                      </span>
+                    </div>
+                    {message.replies_count !== undefined && message.replies_count > 0 && (
+                      <div className="flex items-center gap-2">
+                        <MessageSquare className="h-4 w-4" />
+                        <span>{message.replies_count} réponse{message.replies_count > 1 ? 's' : ''}</span>
+                      </div>
+                    )}
+                    {message.tags && message.tags.length > 0 && (
+                      <div className="flex items-center gap-2 flex-wrap mt-2">
+                        {message.tags.map((tag, idx) => (
+                          <Badge key={idx} variant="outline" className="text-xs">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                )}
-                {message.tags && message.tags.length > 0 && (
-                  <div className="flex items-center gap-2 flex-wrap mt-2">
-                    {message.tags.map((tag, idx) => (
-                      <Badge key={idx} variant="outline" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+
+                  <CollapsibleContent>
+                    <div className="border-t pt-4 space-y-4">
+                      {/* Message initial */}
+                      <div className={cn(
+                        "flex gap-3 p-4 rounded-lg",
+                        message.is_inbound 
+                          ? "bg-muted/50" 
+                          : "bg-primary/5 border border-primary/10"
+                      )}>
+                        <div className={cn(
+                          "flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center",
+                          message.is_inbound ? "bg-muted" : "bg-primary/10"
+                        )}>
+                          {message.is_inbound ? (
+                            <User className="h-4 w-4 text-muted-foreground" />
+                          ) : (
+                            <Building2 className="h-4 w-4 text-primary" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-sm font-medium">
+                              {message.is_inbound ? 'Client' : 'Carrosserie'}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {message.created_at 
+                                ? format(new Date(message.created_at), "d MMM yyyy 'à' HH:mm", { locale: fr })
+                                : ''}
+                            </span>
+                          </div>
+                          <p className="text-sm whitespace-pre-wrap break-words">{message.message}</p>
+                        </div>
+                      </div>
+
+                      {/* Réponses */}
+                      {replies.length > 0 && (
+                        <div className="space-y-3 pl-4 border-l-2 border-border">
+                          {replies.map((reply) => (
+                            <div key={reply.id} className={cn(
+                              "flex gap-3 p-4 rounded-lg",
+                              reply.sender_type === 'client'
+                                ? "bg-muted/50"
+                                : "bg-primary/5 border border-primary/10"
+                            )}>
+                              <div className={cn(
+                                "flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center",
+                                reply.sender_type === 'client' ? "bg-muted" : "bg-primary/10"
+                              )}>
+                                {reply.sender_type === 'client' ? (
+                                  <User className="h-4 w-4 text-muted-foreground" />
+                                ) : (
+                                  <Building2 className="h-4 w-4 text-primary" />
+                                )}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="text-sm font-medium">
+                                    {reply.sender_type === 'client' ? 'Client' : 'Carrosserie'}
+                                  </span>
+                                  <span className="text-xs text-muted-foreground">
+                                    {reply.sent_at 
+                                      ? format(new Date(reply.sent_at), "d MMM yyyy 'à' HH:mm", { locale: fr })
+                                      : ''}
+                                  </span>
+                                  <Badge variant="outline" className="text-xs capitalize">
+                                    {reply.channel}
+                                  </Badge>
+                                </div>
+                                <p className="text-sm whitespace-pre-wrap break-words">{reply.content}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </CollapsibleContent>
+                </CardContent>
+              </Collapsible>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
