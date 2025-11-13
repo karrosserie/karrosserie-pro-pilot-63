@@ -418,12 +418,13 @@ const RepairOrders = () => {
             priority: 3,
             title: `Demande de signature de l'ordre de réparation`,
             channel: 'Message',
-            content: `Demande de signature de l'ordre de réparation envoyée - OR ${order.reference}`,
+            message: `Demande de signature de l'ordre de réparation envoyée - OR ${order.reference}`,
             tags: ['signature', 'ordre_reparation'],
             resolved: false
           } as any);
+        console.log('✅ Message de conversation créé pour OR:', order.reference);
       } catch (msgError) {
-        console.error('Failed to create conversation message:', msgError);
+        console.error('❌ Failed to create conversation message:', msgError);
       }
       toast({
         title: "Document envoyé pour signature",
