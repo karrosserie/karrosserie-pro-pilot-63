@@ -405,6 +405,26 @@ const RepairOrders = () => {
           oodrive_recipient_id: signatureResponse.recipients[0].id.toString()
         });
       }
+
+      // Ajouter un message dans la conversation
+      try {
+        const effectiveCompanyId = companyData.id;
+        await supabase
+          .from('messageries')
+          .insert({
+            company_id: effectiveCompanyId,
+            client_id: order.client_id,
+            vehicle_id: order.vehicle_id,
+            priority: 3,
+            title: `Demande de signature de l'ordre de réparation`,
+            channel: 'Message',
+            content: `Demande de signature de l'ordre de réparation envoyée - OR ${order.reference}`,
+            tags: ['signature', 'ordre_reparation'],
+            resolved: false
+          } as any);
+      } catch (msgError) {
+        console.error('Failed to create conversation message:', msgError);
+      }
       toast({
         title: "Document envoyé pour signature",
         description: `L'ordre de réparation ${order.reference} a été envoyé au client pour signature électronique.`
