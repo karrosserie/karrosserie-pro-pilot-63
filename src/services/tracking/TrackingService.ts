@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ActionType, ACTION_CATEGORY_MAPPING } from '@/types/activity-categories';
 
 export interface TrackingEvent {
-  eventType: 'page_view' | 'form_interaction' | 'business_action' | 'error' | 'abandon';
+  eventType: 'page_view' | 'form_interaction' | 'action' | 'error' | 'abandon';
   eventCategory: 'navigation' | 'form' | 'business' | 'system';
   eventName: string;
   pageUrl: string;
@@ -293,7 +293,7 @@ class TrackingService {
     metadata?: Record<string, any>
   ) {
     await this.trackEvent({
-      eventType: 'business_action',
+      eventType: 'action',
       eventCategory: 'business',
       eventName: actionName,
       pageUrl: window.location.pathname,
@@ -332,7 +332,7 @@ class TrackingService {
     console.log(`✅ Action tracked: ${actionType} for company ${this.companyId}`);
 
     await this.trackEvent({
-      eventType: 'business_action',
+      eventType: 'action',
       eventCategory: 'business',
       eventName: actionType,
       pageUrl: window.location.pathname,
