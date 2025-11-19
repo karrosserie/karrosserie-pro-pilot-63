@@ -25,15 +25,21 @@ export const useFleetLoanFormValidation = (formData: LoanFormData) => {
                       formData.clientSignature && 
                       formData.clientSignature.trim() !== '';
 
-    const insuranceValid = !formData.clientInsurance || (
-      formData.insuranceCompanyName &&
+    // Champs toujours obligatoires
+    const mandatoryInsuranceValid = 
+      formData.insuranceCompanyName && 
+      formData.insuranceEmail;
+
+    // Champs obligatoires uniquement si clientInsurance = true
+    const conditionalInsuranceValid = !formData.clientInsurance || (
       formData.insurancePhone &&
-      formData.insuranceEmail &&
       formData.insuranceContractNumber &&
       formData.insuranceAddress &&
       formData.insuranceCity &&
       formData.insurancePostalCode
     );
+
+    const insuranceValid = mandatoryInsuranceValid && conditionalInsuranceValid;
 
     return basicValid && insuranceValid;
   };

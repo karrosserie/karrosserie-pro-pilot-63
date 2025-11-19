@@ -39,7 +39,7 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label htmlFor="insuranceCompanyName">
-              Nom de la compagnie d'assurance {formData.clientInsurance && <span className="text-destructive">*</span>}
+              Nom de la compagnie d'assurance <span className="text-destructive">*</span>
             </Label>
             <Input
               id="insuranceCompanyName"
@@ -47,7 +47,7 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
               value={formData.insuranceCompanyName || ''}
               onChange={onInputChange}
               disabled={isViewMode}
-              required={formData.clientInsurance}
+              required={true}
             />
           </div>
 
@@ -65,7 +65,7 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
 
           <div className="space-y-2">
             <Label htmlFor="insuranceEmail">
-              Adresse e-mail {formData.clientInsurance && <span className="text-destructive">*</span>}
+              Adresse e-mail <span className="text-destructive">*</span>
             </Label>
             <Input
               id="insuranceEmail"
@@ -74,7 +74,7 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
               value={formData.insuranceEmail || ''}
               onChange={onInputChange}
               disabled={isViewMode}
-              required={formData.clientInsurance}
+              required={true}
             />
           </div>
 
