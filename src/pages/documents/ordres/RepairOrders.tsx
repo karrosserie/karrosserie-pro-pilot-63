@@ -433,6 +433,26 @@ const RepairOrders = () => {
       } catch (sigError) {
         console.error('❌ Error creating signature request:', sigError);
       }
+
+      // Insérer dans all_client_message pour traçabilité
+      try {
+        const { error: allClientError } = await supabase
+          .from('all_client_message')
+          .insert({
+            client_id: clientData.id,
+            company_id: companyData.id,
+            message: 'Demande de signature de l\'ordre de réparation envoyée au client',
+            lien: documentUrl
+          });
+
+        if (allClientError) {
+          console.error('❌ Erreur lors de l\'insertion dans all_client_message:', allClientError);
+        } else {
+          console.log('✅ Message enregistré dans all_client_message pour OR');
+        }
+      } catch (allClientError) {
+        console.error('❌ Exception lors de l\'insertion dans all_client_message:', allClientError);
+      }
       toast({
         title: "Document envoyé pour signature",
         description: `L'ordre de réparation ${order.reference} a été envoyé au client pour signature électronique.`

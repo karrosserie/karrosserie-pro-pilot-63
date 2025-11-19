@@ -14,6 +14,363 @@ export type Database = {
   }
   public: {
     Tables: {
+      abandoned_cycles_config: {
+        Row: {
+          auto_check_enabled: boolean | null
+          check_frequency: string | null
+          company_id: string
+          created_at: string | null
+          id: string
+          last_auto_check: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          auto_check_enabled?: boolean | null
+          check_frequency?: string | null
+          company_id: string
+          created_at?: string | null
+          id?: string
+          last_auto_check?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          auto_check_enabled?: boolean | null
+          check_frequency?: string | null
+          company_id?: string
+          created_at?: string | null
+          id?: string
+          last_auto_check?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "abandoned_cycles_config_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "abandoned_cycles_config_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "abandoned_cycles_config_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_agent_performance: {
+        Row: {
+          agent_id: string
+          average_response_time_ms: number | null
+          churn_risk_reduction: number | null
+          clients_impacted: number
+          company_id: string | null
+          created_at: string
+          date: string
+          health_score_improvement: number | null
+          id: string
+          period_end: string
+          period_start: string
+          success_rate: number | null
+          tasks_failed: number
+          tasks_processed: number
+          tasks_successful: number
+          total_execution_time_ms: number
+        }
+        Insert: {
+          agent_id: string
+          average_response_time_ms?: number | null
+          churn_risk_reduction?: number | null
+          clients_impacted?: number
+          company_id?: string | null
+          created_at?: string
+          date?: string
+          health_score_improvement?: number | null
+          id?: string
+          period_end: string
+          period_start: string
+          success_rate?: number | null
+          tasks_failed?: number
+          tasks_processed?: number
+          tasks_successful?: number
+          total_execution_time_ms?: number
+        }
+        Update: {
+          agent_id?: string
+          average_response_time_ms?: number | null
+          churn_risk_reduction?: number | null
+          clients_impacted?: number
+          company_id?: string | null
+          created_at?: string
+          date?: string
+          health_score_improvement?: number | null
+          id?: string
+          period_end?: string
+          period_start?: string
+          success_rate?: number | null
+          tasks_failed?: number
+          tasks_processed?: number
+          tasks_successful?: number
+          total_execution_time_ms?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_agent_performance_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "ai_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_agent_performance_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "ai_agent_performance_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "ai_agent_performance_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_agents: {
+        Row: {
+          config: Json | null
+          created_at: string
+          description: string | null
+          enabled: boolean
+          id: string
+          name: string
+          priority_order: number | null
+          status: Database["public"]["Enums"]["agent_status"]
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          config?: Json | null
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          name: string
+          priority_order?: number | null
+          status?: Database["public"]["Enums"]["agent_status"]
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          config?: Json | null
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          name?: string
+          priority_order?: number | null
+          status?: Database["public"]["Enums"]["agent_status"]
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ai_automatic_actions: {
+        Row: {
+          action_type: Database["public"]["Enums"]["action_type"]
+          agent_name: string
+          client_id: string | null
+          company_id: string
+          completed_at: string | null
+          created_at: string
+          execution_time_ms: number | null
+          expected_impact: string | null
+          id: string
+          priority: string
+          result_data: Json | null
+          scheduled_at: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["action_status"]
+          success: boolean | null
+          target_data: Json | null
+          trigger_reason: string | null
+          updated_at: string
+        }
+        Insert: {
+          action_type: Database["public"]["Enums"]["action_type"]
+          agent_name: string
+          client_id?: string | null
+          company_id: string
+          completed_at?: string | null
+          created_at?: string
+          execution_time_ms?: number | null
+          expected_impact?: string | null
+          id?: string
+          priority: string
+          result_data?: Json | null
+          scheduled_at?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["action_status"]
+          success?: boolean | null
+          target_data?: Json | null
+          trigger_reason?: string | null
+          updated_at?: string
+        }
+        Update: {
+          action_type?: Database["public"]["Enums"]["action_type"]
+          agent_name?: string
+          client_id?: string | null
+          company_id?: string
+          completed_at?: string | null
+          created_at?: string
+          execution_time_ms?: number | null
+          expected_impact?: string | null
+          id?: string
+          priority?: string
+          result_data?: Json | null
+          scheduled_at?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["action_status"]
+          success?: boolean | null
+          target_data?: Json | null
+          trigger_reason?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_automatic_actions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_automatic_actions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "ai_automatic_actions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "ai_automatic_actions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_insights: {
+        Row: {
+          action_taken: boolean | null
+          action_taken_at: string | null
+          company_id: string
+          created_at: string
+          description: string
+          dismissed: boolean | null
+          dismissed_at: string | null
+          generated_at: string
+          icon: string | null
+          id: string
+          impact: Database["public"]["Enums"]["insight_impact"]
+          impact_value: string | null
+          metadata: Json | null
+          priority: number | null
+          recommended_action: string | null
+          related_client_ids: string[] | null
+          title: string
+          type: Database["public"]["Enums"]["insight_type"]
+          valid_until: string | null
+        }
+        Insert: {
+          action_taken?: boolean | null
+          action_taken_at?: string | null
+          company_id: string
+          created_at?: string
+          description: string
+          dismissed?: boolean | null
+          dismissed_at?: string | null
+          generated_at?: string
+          icon?: string | null
+          id?: string
+          impact: Database["public"]["Enums"]["insight_impact"]
+          impact_value?: string | null
+          metadata?: Json | null
+          priority?: number | null
+          recommended_action?: string | null
+          related_client_ids?: string[] | null
+          title: string
+          type: Database["public"]["Enums"]["insight_type"]
+          valid_until?: string | null
+        }
+        Update: {
+          action_taken?: boolean | null
+          action_taken_at?: string | null
+          company_id?: string
+          created_at?: string
+          description?: string
+          dismissed?: boolean | null
+          dismissed_at?: string | null
+          generated_at?: string
+          icon?: string | null
+          id?: string
+          impact?: Database["public"]["Enums"]["insight_impact"]
+          impact_value?: string | null
+          metadata?: Json | null
+          priority?: number | null
+          recommended_action?: string | null
+          related_client_ids?: string[] | null
+          title?: string
+          type?: Database["public"]["Enums"]["insight_type"]
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_insights_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "ai_insights_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "ai_insights_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_messages_history: {
         Row: {
           created_at: string
@@ -35,6 +392,33 @@ export type Database = {
           message?: Json | null
           read?: boolean
           session_id?: string | null
+        }
+        Relationships: []
+      }
+      all_client_message: {
+        Row: {
+          client_id: string | null
+          company_id: string | null
+          created_at: string
+          id: number
+          lien: string | null
+          message: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          company_id?: string | null
+          created_at?: string
+          id?: number
+          lien?: string | null
+          message?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          company_id?: string | null
+          created_at?: string
+          id?: number
+          lien?: string | null
+          message?: string | null
         }
         Relationships: []
       }
@@ -608,11 +992,168 @@ export type Database = {
         }
         Relationships: []
       }
+      client_activity_trends: {
+        Row: {
+          activity_level: string
+          activity_score: number
+          client_id: string
+          company_id: string
+          created_at: string
+          date: string
+          id: string
+          sessions_count: number | null
+          total_duration_minutes: number | null
+          trend_direction: string | null
+          trend_value: number | null
+        }
+        Insert: {
+          activity_level: string
+          activity_score: number
+          client_id: string
+          company_id: string
+          created_at?: string
+          date?: string
+          id?: string
+          sessions_count?: number | null
+          total_duration_minutes?: number | null
+          trend_direction?: string | null
+          trend_value?: number | null
+        }
+        Update: {
+          activity_level?: string
+          activity_score?: number
+          client_id?: string
+          company_id?: string
+          created_at?: string
+          date?: string
+          id?: string
+          sessions_count?: number | null
+          total_duration_minutes?: number | null
+          trend_direction?: string | null
+          trend_value?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_activity_trends_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_activity_trends_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "client_activity_trends_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "client_activity_trends_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_predictions: {
+        Row: {
+          actual_risk_level: string | null
+          change_direction: string | null
+          client_id: string | null
+          company_id: string
+          confidence_score: number
+          created_at: string
+          current_churn_risk: number | null
+          current_health_score: number | null
+          current_risk_level: string | null
+          id: string
+          predicted_risk_level: string
+          prediction_accuracy: number | null
+          prediction_date: string
+          prediction_horizon_days: number
+          target_date: string
+          validated_at: string | null
+        }
+        Insert: {
+          actual_risk_level?: string | null
+          change_direction?: string | null
+          client_id?: string | null
+          company_id: string
+          confidence_score: number
+          created_at?: string
+          current_churn_risk?: number | null
+          current_health_score?: number | null
+          current_risk_level?: string | null
+          id?: string
+          predicted_risk_level: string
+          prediction_accuracy?: number | null
+          prediction_date?: string
+          prediction_horizon_days: number
+          target_date: string
+          validated_at?: string | null
+        }
+        Update: {
+          actual_risk_level?: string | null
+          change_direction?: string | null
+          client_id?: string | null
+          company_id?: string
+          confidence_score?: number
+          created_at?: string
+          current_churn_risk?: number | null
+          current_health_score?: number | null
+          current_risk_level?: string | null
+          id?: string
+          predicted_risk_level?: string
+          prediction_accuracy?: number | null
+          prediction_date?: string
+          prediction_horizon_days?: number
+          target_date?: string
+          validated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_predictions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_predictions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "client_predictions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "client_predictions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_relances: {
         Row: {
+          attempt_count: number | null
           channel: Database["public"]["Enums"]["relance_channel"]
           channel_data: Json | null
-          client_id: string
           client_response: string | null
           company_id: string
           created_at: string
@@ -635,9 +1176,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          attempt_count?: number | null
           channel: Database["public"]["Enums"]["relance_channel"]
           channel_data?: Json | null
-          client_id: string
           client_response?: string | null
           company_id: string
           created_at?: string
@@ -660,9 +1201,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          attempt_count?: number | null
           channel?: Database["public"]["Enums"]["relance_channel"]
           channel_data?: Json | null
-          client_id?: string
           client_response?: string | null
           company_id?: string
           created_at?: string
@@ -685,13 +1226,6 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "fk_client_relances_client_id"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "fk_client_relances_company_id"
             columns: ["company_id"]
@@ -740,9 +1274,9 @@ export type Database = {
           driver_license_back_url: string | null
           driver_license_front_url: string | null
           email: string | null
-          first_name: string
+          first_name: string | null
           id: string
-          last_name: string
+          last_name: string | null
           license_issue_date: string | null
           license_number: string | null
           oodrive_recipient_id: string | null
@@ -763,9 +1297,9 @@ export type Database = {
           driver_license_back_url?: string | null
           driver_license_front_url?: string | null
           email?: string | null
-          first_name: string
+          first_name?: string | null
           id?: string
-          last_name: string
+          last_name?: string | null
           license_issue_date?: string | null
           license_number?: string | null
           oodrive_recipient_id?: string | null
@@ -786,9 +1320,9 @@ export type Database = {
           driver_license_back_url?: string | null
           driver_license_front_url?: string | null
           email?: string | null
-          first_name?: string
+          first_name?: string | null
           id?: string
-          last_name?: string
+          last_name?: string | null
           license_issue_date?: string | null
           license_number?: string | null
           oodrive_recipient_id?: string | null
@@ -800,6 +1334,82 @@ export type Database = {
           whatsapp_consent?: boolean | null
         }
         Relationships: []
+      }
+      company_business_metrics: {
+        Row: {
+          avg_invoice_amount: number | null
+          company_id: string
+          created_at: string | null
+          date: string
+          expertise_to_quote_rate: number | null
+          id: string
+          quote_to_ro_rate: number | null
+          ro_to_completion_rate: number | null
+          total_cessions: number | null
+          total_expertises: number | null
+          total_invoices: number | null
+          total_quotes: number | null
+          total_repair_orders: number | null
+          total_revenue: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          avg_invoice_amount?: number | null
+          company_id: string
+          created_at?: string | null
+          date?: string
+          expertise_to_quote_rate?: number | null
+          id?: string
+          quote_to_ro_rate?: number | null
+          ro_to_completion_rate?: number | null
+          total_cessions?: number | null
+          total_expertises?: number | null
+          total_invoices?: number | null
+          total_quotes?: number | null
+          total_repair_orders?: number | null
+          total_revenue?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          avg_invoice_amount?: number | null
+          company_id?: string
+          created_at?: string | null
+          date?: string
+          expertise_to_quote_rate?: number | null
+          id?: string
+          quote_to_ro_rate?: number | null
+          ro_to_completion_rate?: number | null
+          total_cessions?: number | null
+          total_expertises?: number | null
+          total_invoices?: number | null
+          total_quotes?: number | null
+          total_repair_orders?: number | null
+          total_revenue?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_business_metrics_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "company_business_metrics_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "company_business_metrics_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       company_contract_documents: {
         Row: {
@@ -2690,6 +3300,42 @@ export type Database = {
         }
         Relationships: []
       }
+      loop_client_suivit_action_effectue: {
+        Row: {
+          canal: string | null
+          company_id: string | null
+          contact: string | null
+          created_at: string
+          etape: string | null
+          id: number
+          message: string | null
+          nombre_de_doc: number | null
+          nombre_de_relance: number | null
+        }
+        Insert: {
+          canal?: string | null
+          company_id?: string | null
+          contact?: string | null
+          created_at?: string
+          etape?: string | null
+          id?: number
+          message?: string | null
+          nombre_de_doc?: number | null
+          nombre_de_relance?: number | null
+        }
+        Update: {
+          canal?: string | null
+          company_id?: string | null
+          contact?: string | null
+          created_at?: string
+          etape?: string | null
+          id?: number
+          message?: string | null
+          nombre_de_doc?: number | null
+          nombre_de_relance?: number | null
+        }
+        Relationships: []
+      }
       message_erp: {
         Row: {
           agent_type: Database["public"]["Enums"]["agent_type"]
@@ -2921,6 +3567,7 @@ export type Database = {
           time: string
           title: string
           updated_at: string
+          vehicle_id: string | null
         }
         Insert: {
           actual_communication_date?: string | null
@@ -2947,6 +3594,7 @@ export type Database = {
           time?: string
           title: string
           updated_at?: string
+          vehicle_id?: string | null
         }
         Update: {
           actual_communication_date?: string | null
@@ -2973,6 +3621,7 @@ export type Database = {
           time?: string
           title?: string
           updated_at?: string
+          vehicle_id?: string | null
         }
         Relationships: [
           {
@@ -2980,6 +3629,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messageries_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
@@ -3912,6 +4568,125 @@ export type Database = {
             columns: ["job_scrap_id"]
             isOneToOne: false
             referencedRelation: "job scrap"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      signature_requests: {
+        Row: {
+          cession_id: string | null
+          client_id: string
+          client_name: string | null
+          client_signature_data: string | null
+          company_id: string
+          created_at: string
+          document_reference: string
+          document_url: string | null
+          expires_at: string | null
+          id: string
+          oodrive_contract_id: string | null
+          repair_order_id: string | null
+          request_type: string
+          sent_at: string | null
+          signature_mode: string | null
+          signed_at: string | null
+          signed_document_url: string | null
+          status: string
+          updated_at: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          cession_id?: string | null
+          client_id: string
+          client_name?: string | null
+          client_signature_data?: string | null
+          company_id: string
+          created_at?: string
+          document_reference: string
+          document_url?: string | null
+          expires_at?: string | null
+          id?: string
+          oodrive_contract_id?: string | null
+          repair_order_id?: string | null
+          request_type: string
+          sent_at?: string | null
+          signature_mode?: string | null
+          signed_at?: string | null
+          signed_document_url?: string | null
+          status?: string
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          cession_id?: string | null
+          client_id?: string
+          client_name?: string | null
+          client_signature_data?: string | null
+          company_id?: string
+          created_at?: string
+          document_reference?: string
+          document_url?: string | null
+          expires_at?: string | null
+          id?: string
+          oodrive_contract_id?: string | null
+          repair_order_id?: string | null
+          request_type?: string
+          sent_at?: string | null
+          signature_mode?: string | null
+          signed_at?: string | null
+          signed_document_url?: string | null
+          status?: string
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signature_requests_cession_id_fkey"
+            columns: ["cession_id"]
+            isOneToOne: false
+            referencedRelation: "cessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signature_requests_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signature_requests_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "signature_requests_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "signature_requests_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signature_requests_repair_order_id_fkey"
+            columns: ["repair_order_id"]
+            isOneToOne: false
+            referencedRelation: "repair_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signature_requests_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
@@ -5497,6 +6272,13 @@ export type Database = {
         Args: { repair_order_id: string }
         Returns: number
       }
+      check_recent_relance: {
+        Args: { p_company_id: string; p_days_limit?: number; p_etape: string }
+        Returns: {
+          has_recent_relance: boolean
+          last_relance_date: string
+        }[]
+      }
       check_token_for_upload: { Args: { file_path: string }; Returns: boolean }
       cleanup_expired_otp_codes: { Args: never; Returns: undefined }
       create_campaign_log: {
@@ -5534,6 +6316,27 @@ export type Database = {
           total_campaigns: number
         }[]
       }
+      get_client_business_loops: {
+        Args: { p_client_id: string; p_company_id: string }
+        Returns: {
+          cession_created_at: string
+          cession_id: string
+          cession_reference: string
+          client_id: string
+          expertise_created_at: string
+          expertise_id: string
+          expertise_number: string
+          invoice_date: string
+          invoice_id: string
+          invoice_reference: string
+          quote_created_at: string
+          quote_id: string
+          quote_reference: string
+          repair_order_created_at: string
+          repair_order_id: string
+          repair_order_reference: string
+        }[]
+      }
       get_companies_with_users: {
         Args: never
         Returns: {
@@ -5554,6 +6357,26 @@ export type Database = {
           event_type: string
           page_path: string
           unique_users: number
+        }[]
+      }
+      get_company_business_loop_stats: {
+        Args: {
+          p_company_id: string
+          p_end_date?: string
+          p_start_date?: string
+        }
+        Returns: {
+          abandoned_at_expertise: number
+          abandoned_at_quote: number
+          abandoned_at_repair_order: number
+          avg_expertise_to_quote_days: number
+          avg_quote_to_repair_order_days: number
+          avg_repair_order_to_completion_days: number
+          completed_loops: number
+          expertise_to_quote_rate: number
+          quote_to_repair_order_rate: number
+          repair_order_to_completion_rate: number
+          total_loops: number
         }[]
       }
       get_company_business_metrics: {
@@ -5774,6 +6597,20 @@ export type Database = {
       }
     }
     Enums: {
+      action_status:
+        | "scheduled"
+        | "in_progress"
+        | "completed"
+        | "failed"
+        | "cancelled"
+      action_type:
+        | "email"
+        | "sms"
+        | "whatsapp"
+        | "phone_call"
+        | "training"
+        | "alert"
+      agent_status: "active" | "idle" | "error" | "disabled"
       agent_type: "sav" | "marketing" | "system" | "client"
       communication_channel_type:
         | "email"
@@ -5781,6 +6618,8 @@ export type Database = {
         | "whatsapp"
         | "phone"
         | "internal"
+      insight_impact: "high" | "medium" | "positive"
+      insight_type: "trend" | "opportunity" | "alert" | "recommendation"
       migration_error_type:
         | "invalid_phone_number"
         | "invalid_email"
@@ -5964,6 +6803,22 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      action_status: [
+        "scheduled",
+        "in_progress",
+        "completed",
+        "failed",
+        "cancelled",
+      ],
+      action_type: [
+        "email",
+        "sms",
+        "whatsapp",
+        "phone_call",
+        "training",
+        "alert",
+      ],
+      agent_status: ["active", "idle", "error", "disabled"],
       agent_type: ["sav", "marketing", "system", "client"],
       communication_channel_type: [
         "email",
@@ -5972,6 +6827,8 @@ export const Constants = {
         "phone",
         "internal",
       ],
+      insight_impact: ["high", "medium", "positive"],
+      insight_type: ["trend", "opportunity", "alert", "recommendation"],
       migration_error_type: [
         "invalid_phone_number",
         "invalid_email",

@@ -490,6 +490,26 @@ export const CessionsTable = ({
             console.error('❌ Error creating signature request:', sigError);
           }
 
+          // Insérer dans all_client_message pour traçabilité
+          try {
+            const { error: allClientError } = await supabase
+              .from('all_client_message')
+              .insert({
+                client_id: repairOrderData.clients.id,
+                company_id: repairOrderData.company_id,
+                message: 'Demande de signature de la cession de créance envoyée au client',
+                lien: pdfUrl
+              });
+
+            if (allClientError) {
+              console.error('❌ Erreur lors de l\'insertion dans all_client_message:', allClientError);
+            } else {
+              console.log('✅ Message enregistré dans all_client_message pour cession');
+            }
+          } catch (allClientError) {
+            console.error('❌ Exception lors de l\'insertion dans all_client_message:', allClientError);
+          }
+
           // Vérifier si nous avons suffisamment de recipients
           if (signatureResponse.recipients && signatureResponse.recipients.length >= 2) {
             console.log('Recipients found, updating company and client...');
