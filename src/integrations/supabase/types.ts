@@ -1263,6 +1263,90 @@ export type Database = {
           },
         ]
       }
+      client_validation_sms: {
+        Row: {
+          client_id: string
+          company_id: string
+          created_at: string | null
+          id: string
+          is_reminder: boolean | null
+          message: string
+          missing_fields: Json
+          phone: string
+          report_id: string
+          sent_at: string | null
+          status: string | null
+          updated_at: string | null
+          webhook_response: Json | null
+        }
+        Insert: {
+          client_id: string
+          company_id: string
+          created_at?: string | null
+          id?: string
+          is_reminder?: boolean | null
+          message: string
+          missing_fields?: Json
+          phone: string
+          report_id: string
+          sent_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+          webhook_response?: Json | null
+        }
+        Update: {
+          client_id?: string
+          company_id?: string
+          created_at?: string | null
+          id?: string
+          is_reminder?: boolean | null
+          message?: string
+          missing_fields?: Json
+          phone?: string
+          report_id?: string
+          sent_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+          webhook_response?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_validation_sms_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_validation_sms_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "client_validation_sms_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "client_validation_sms_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_validation_sms_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "expertise_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           address: string | null

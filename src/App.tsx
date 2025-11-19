@@ -13,6 +13,7 @@ import { TourGuide } from "@/components/tour/TourGuide";
 import { QuoteConversionWarningDialog } from "@/components/quotes/QuoteConversionWarningDialog";
 import { useQuoteConversionWarning } from "@/hooks/use-quote-conversion-warning";
 import { ClientValidationNotificationProvider } from "@/contexts/ClientValidationNotificationContext";
+import { ClientValidationWatcher } from "@/components/expertise/ClientValidationWatcher";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const AppContent = () => {
       <OnboardingAgentMessagePopup />
       <OnboardingWatcher />
       <TourGuide />
+      <ClientValidationWatcher />
       <QuoteConversionWarningDialog
         open={shouldShowWarning}
         onClose={dismissWarning}
