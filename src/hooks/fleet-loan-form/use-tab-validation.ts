@@ -50,32 +50,33 @@ export const useTabValidation = () => {
   };
 
   const validateInsuranceTab = (formData: LoanFormData): boolean => {
-    if (!formData.clientInsurance) {
-      return true; // Si pas d'assurance client, on passe
-    }
-
     const errors: string[] = [];
     
+    // Champs TOUJOURS obligatoires
     if (!formData.insuranceCompanyName) {
       errors.push('Nom de la compagnie d\'assurance');
-    }
-    if (!formData.insurancePhone) {
-      errors.push('Téléphone de l\'assurance');
     }
     if (!formData.insuranceEmail) {
       errors.push('Email de l\'assurance');
     }
-    if (!formData.insuranceContractNumber) {
-      errors.push('Numéro de contrat');
-    }
-    if (!formData.insuranceAddress) {
-      errors.push('Adresse de l\'assurance');
-    }
-    if (!formData.insuranceCity) {
-      errors.push('Ville de l\'assurance');
-    }
-    if (!formData.insurancePostalCode) {
-      errors.push('Code postal de l\'assurance');
+    
+    // Champs obligatoires UNIQUEMENT si le switch est activé
+    if (formData.clientInsurance) {
+      if (!formData.insurancePhone) {
+        errors.push('Téléphone de l\'assurance');
+      }
+      if (!formData.insuranceContractNumber) {
+        errors.push('Numéro de contrat');
+      }
+      if (!formData.insuranceAddress) {
+        errors.push('Adresse de l\'assurance');
+      }
+      if (!formData.insuranceCity) {
+        errors.push('Ville de l\'assurance');
+      }
+      if (!formData.insurancePostalCode) {
+        errors.push('Code postal de l\'assurance');
+      }
     }
 
     if (errors.length > 0) {
