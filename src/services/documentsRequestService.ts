@@ -120,8 +120,15 @@ export const sendDocumentsRequest = async (clientId: string, companyId?: string)
       }
 
       // Insérer dans all_client_message pour traçabilité
+      console.log('🔍 [all_client_message] Préparation insertion avec:', {
+        client_id: clientId,
+        company_id: effectiveCompanyId,
+        uploadLink: data.uploadLink,
+        hasUploadLink: !!data.uploadLink
+      });
+      
       try {
-        const { error: allClientError } = await supabase
+        const insertResult = await supabase
           .from('all_client_message')
           .insert({
             client_id: clientId,
@@ -130,10 +137,17 @@ export const sendDocumentsRequest = async (clientId: string, companyId?: string)
             lien: data.uploadLink
           });
 
-        if (allClientError) {
-          console.error('❌ Erreur lors de l\'insertion dans all_client_message:', allClientError);
+        console.log('🔍 [all_client_message] Résultat insertion:', {
+          error: insertResult.error,
+          data: insertResult.data,
+          status: insertResult.status,
+          statusText: insertResult.statusText
+        });
+
+        if (insertResult.error) {
+          console.error('❌ Erreur lors de l\'insertion dans all_client_message:', insertResult.error);
         } else {
-          console.log('✅ Message enregistré dans all_client_message');
+          console.log('✅ Message enregistré dans all_client_message avec succès');
         }
       } catch (allClientError) {
         console.error('❌ Exception lors de l\'insertion dans all_client_message:', allClientError);
