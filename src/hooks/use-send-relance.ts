@@ -15,7 +15,8 @@ export const useSendRelance = () => {
     try {
       const today = new Date().toISOString().split('T')[0];
       
-      const { data, error } = await supabase
+      // @ts-ignore - Type complexity issue with Supabase client
+      const result: any = await supabase
         .from('client_relances')
         .select('id')
         .eq('company_id', companyData.id)
@@ -23,6 +24,8 @@ export const useSendRelance = () => {
         .eq('channel', channel)
         .gte('created_at', `${today}T00:00:00`)
         .lt('created_at', `${today}T23:59:59`);
+      
+      const { data, error } = result;
 
       if (error) {
         console.error('Error checking daily limit:', error);
