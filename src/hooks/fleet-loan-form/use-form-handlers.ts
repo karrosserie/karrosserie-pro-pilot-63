@@ -189,8 +189,8 @@ export const useFleetLoanFormHandlers = (
           onboardingService.updateOnboardingStep('tunnel3', 'vehicleLoanCreated', { reservationId: result.id });
         }
 
-        // Notification de l'assurance si le client a fourni une assurance
-        if (formData.clientInsurance && result?.id) {
+        // Notification de l'assurance - envoi systématique pour workflow de vérification
+        if (result?.id) {
           try {
             console.log('📧 Envoi de notification à l\'assurance du client...');
             
