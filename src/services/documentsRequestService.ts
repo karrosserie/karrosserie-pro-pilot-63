@@ -118,6 +118,26 @@ export const sendDocumentsRequest = async (clientId: string, companyId?: string)
       } catch (msgError) {
         console.error('❌ Exception lors de la création du message:', msgError);
       }
+
+      // Insérer dans all_client_message pour traçabilité
+      try {
+        const { error: allClientError } = await supabase
+          .from('all_client_message')
+          .insert({
+            client_id: clientId,
+            company_id: effectiveCompanyId,
+            message: 'Demande de pièces justificatives envoyée au client',
+            lien: data.uploadLink
+          });
+
+        if (allClientError) {
+          console.error('❌ Erreur lors de l\'insertion dans all_client_message:', allClientError);
+        } else {
+          console.log('✅ Message enregistré dans all_client_message');
+        }
+      } catch (allClientError) {
+        console.error('❌ Exception lors de l\'insertion dans all_client_message:', allClientError);
+      }
     } else {
       console.warn('⚠️ uploadLink manquant dans la réponse de l\'edge function');
     }
