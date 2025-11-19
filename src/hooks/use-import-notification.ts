@@ -108,76 +108,84 @@ export function useImportNotification() {
                       .eq('id', report.clients.id)
                       .single();
                     
-                    if (fullClientData) {
-                      // 0. Vérifier les champs essentiels (nom, prénom, email, téléphone)
-                      const { data: reportData } = await supabase
-                        .from('expertise_reports')
-                        .select('company_id')
-                        .eq('id', report.id)
-                        .single();
-                      
-                      const essentialCheck = await clientEssentialFieldsChecker.checkEssentialFields(
-                        fullClientData,
-                        reportData?.company_id || ''
-                      );
-                      
-                      console.log('📋 Essential fields check:', essentialCheck);
-                      
-                      // 1. Vérifier les champs manquants
-                      const missingValidation = checkMissingClientData(fullClientData);
-                      
-                      // 2. Valider la véracité des données présentes
-                      const dataValidation = await validateClientData(fullClientData);
-                      
-                      console.log('🔍 Client data validation:', { missingValidation, dataValidation });
-                      
-                      // Si des données manquent OU si des erreurs/warnings
-                      const hasIssues = 
-                        missingValidation.missingCount > 0 ||
-                        dataValidation.errors.length > 0 ||
-                        dataValidation.warnings.length > 0;
-                      
-                      if (hasIssues) {
-                        // Publier la notification pour afficher la pop-up
-                        setNotification({
-                          clientId: fullClientData.id,
-                          clientName: `${fullClientData.first_name} ${fullClientData.last_name}`,
-                          reportId: report.id,
-                          companyId: reportData?.company_id || '',
-                          validationResults: {
-                            missing: {
-                              missingFields: missingValidation.missingFields,
-                              missingCount: missingValidation.missingCount,
-                              isComplete: missingValidation.isComplete
-                            },
-                            validation: {
-                              errors: dataValidation.errors,
-                              warnings: dataValidation.warnings,
-                              isValid: dataValidation.isValid
-                            }
-                          },
-                          timestamp: new Date()
-                        });
-                        
-                        // Toast informatif (moins intrusif)
-                        toast({
-                          title: "⚠️ Validation client requise",
-                          description: "Des informations manquantes ou invalides ont été détectées.",
-                        });
-                        
-                        // ⛔ STOP - Ne pas créer le devis si validation échouée
-                        console.log('⏸️ Devis non créé - validation client requise');
-                        
-                        // Invalider les caches quand même
-                        queryClient.invalidateQueries({ queryKey: ['expertiseReports'] });
-                        queryClient.invalidateQueries({ queryKey: ['imports', 'pending'] });
-                        
-                        continue; // Passer à l'import suivant sans créer de devis
-                      }
-
-                      // ✅ Code exécuté uniquement si pas de hasIssues
-                      console.log('✅ Client data is complete and valid - proceeding to quote creation');
+                    // ✅ GUARD CLAUSE - Stopper si impossible de récupérer les données client
+                    if (!fullClientData) {
+                      console.log('⚠️ Cannot retrieve full client data - skipping quote conversion');
+                      queryClient.invalidateQueries({ queryKey: ['expertiseReports'] });
+                      queryClient.invalidateQueries({ queryKey: ['imports', 'pending'] });
+                      continue;
                     }
+                    
+                    console.log('📋 Full client data retrieved:', fullClientData);
+                    
+                    // 0. Vérifier les champs essentiels (nom, prénom, email, téléphone)
+                    const { data: reportData } = await supabase
+                      .from('expertise_reports')
+                      .select('company_id')
+                      .eq('id', report.id)
+                      .single();
+                    
+                    const essentialCheck = await clientEssentialFieldsChecker.checkEssentialFields(
+                      fullClientData,
+                      reportData?.company_id || ''
+                    );
+                    
+                    console.log('📋 Essential fields check:', essentialCheck);
+                    
+                    // 1. Vérifier les champs manquants
+                    const missingValidation = checkMissingClientData(fullClientData);
+                    
+                    // 2. Valider la véracité des données présentes
+                    const dataValidation = await validateClientData(fullClientData);
+                    
+                    console.log('🔍 Client data validation:', { missingValidation, dataValidation });
+                    
+                    // Si des données manquent OU si des erreurs/warnings
+                    const hasIssues = 
+                      missingValidation.missingCount > 0 ||
+                      dataValidation.errors.length > 0 ||
+                      dataValidation.warnings.length > 0;
+                    
+                    if (hasIssues) {
+                      // Publier la notification pour afficher la pop-up
+                      setNotification({
+                        clientId: fullClientData.id,
+                        clientName: `${fullClientData.first_name} ${fullClientData.last_name}`,
+                        reportId: report.id,
+                        companyId: reportData?.company_id || '',
+                        validationResults: {
+                          missing: {
+                            missingFields: missingValidation.missingFields,
+                            missingCount: missingValidation.missingCount,
+                            isComplete: missingValidation.isComplete
+                          },
+                          validation: {
+                            errors: dataValidation.errors,
+                            warnings: dataValidation.warnings,
+                            isValid: dataValidation.isValid
+                          }
+                        },
+                        timestamp: new Date()
+                      });
+                      
+                      // Toast informatif (moins intrusif)
+                      toast({
+                        title: "⚠️ Validation client requise",
+                        description: "Des informations manquantes ou invalides ont été détectées.",
+                      });
+                      
+                      // ⛔ STOP - Ne pas créer le devis si validation échouée
+                      console.log('⏸️ Devis non créé - validation client requise');
+                      
+                      // Invalider les caches quand même
+                      queryClient.invalidateQueries({ queryKey: ['expertiseReports'] });
+                      queryClient.invalidateQueries({ queryKey: ['imports', 'pending'] });
+                      
+                      continue; // Passer à l'import suivant sans créer de devis
+                    }
+
+                    // ✅ Code de conversion - S'exécute UNIQUEMENT si validation réussie
+                    console.log('✅ Client data is complete and valid - proceeding to quote creation');
                     
                     // Vérifier si un devis existe déjà pour ce rapport
                     const existingQuote = await quotesService.getByReportId(report.id);
@@ -208,19 +216,16 @@ export function useImportNotification() {
                         navigate(`/documents/devis?openQuote=${newQuote.id}`);
                       }, 3000);
                       
-                      // Message de conversion adapté selon l'état de validation
-                      if (fullClientData) {
-                        const missingValidation = checkMissingClientData(fullClientData);
-                        const dataValidation = await validateClientData(fullClientData);
-                        
-                        if (missingValidation.isComplete && dataValidation.isValid) {
-                          toast({
-                            title: "Import et conversion terminés",
-                            description: "Le rapport a été converti en devis. Toutes les données client sont complètes et validées !",
-                          });
-                        }
-                      }
+                      toast({
+                        title: "Import et conversion terminés",
+                        description: "Le rapport a été converti en devis. Toutes les données client sont complètes et validées !",
+                      });
                     }
+                    
+                    // Invalider les caches après conversion réussie
+                    queryClient.invalidateQueries({ queryKey: ['expertiseReports'] });
+                    queryClient.invalidateQueries({ queryKey: ['quotes'] });
+                    queryClient.invalidateQueries({ queryKey: ['imports', 'pending'] });
                   } else {
                     console.log('⚠️ Cannot convert report: missing client or vehicle data');
                     toast({
