@@ -131,7 +131,7 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
           onValueChange={(value) => onSelectChange('clientId', value)}
           placeholder="Sélectionner un client"
           searchPlaceholder="Rechercher un client..."
-          disabled={isViewMode}
+          disabled={isViewMode || !!formData.clientId}
         />
       </div>
 
