@@ -48,19 +48,16 @@ function generateSmsMessage(
   // Convertir les codes en labels courts et dédupliquer
   const readableFields = missingFields
     .map(field => FIELD_LABELS[field] || field)
-    .filter((value, index, self) => self.indexOf(value) === index)
-    .slice(0, 4); // Max 4 champs pour rester court
+    .filter((value, index, self) => self.indexOf(value) === index);
 
   const fieldsList = readableFields.join(', ');
-  const hasMore = missingFields.length > 4;
-  const moreInfo = hasMore ? ` (+${missingFields.length - 4})` : '';
 
   if (isReminder) {
     // SMS de rappel (plus court)
-    return `Rappel : Dossier ${clientName} incomplet (${fieldsList}${moreInfo}). Merci de finaliser. 🔔`;
+    return `Rappel : Dossier ${clientName} incomplet (${fieldsList}). Merci de finaliser. 🔔`;
   } else {
     // SMS initial (plus détaillé)
-    return `Bonjour, le dossier de ${clientName} est incomplet. Il manque : ${fieldsList}${moreInfo}. Merci de compléter pour continuer. 🚗`;
+    return `Bonjour, le dossier de ${clientName} est incomplet. Il manque : ${fieldsList}. Merci de compléter pour continuer. 🚗`;
   }
 }
 
