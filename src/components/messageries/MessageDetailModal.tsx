@@ -23,6 +23,7 @@ interface MessageDetailModalProps {
   onResolve: (id: string) => void;
   onArchive: (id: string) => void;
   onViewClientHistory?: (client: Client) => void;
+  onStatusChange?: (id: string, status: Messagerie['status']) => void;
 }
 
 const getChannelIcon = (channel: string) => {
@@ -52,6 +53,7 @@ export function MessageDetailModal({
   onResolve,
   onArchive,
   onViewClientHistory,
+  onStatusChange,
 }: MessageDetailModalProps) {
   const [replies, setReplies] = useState<MessagerieReply[]>([]);
   const [loadingReplies, setLoadingReplies] = useState(false);
@@ -59,6 +61,7 @@ export function MessageDetailModal({
   useEffect(() => {
     if (message && open) {
       fetchReplies();
+      markMessageAsRead();
     }
   }, [message, open]);
 
@@ -89,6 +92,44 @@ export function MessageDetailModal({
       console.error('Erreur lors du chargement des réponses:', error);
     } finally {
       setLoadingReplies(false);
+    }
+  };
+
+  const markMessageAsRead = async () => {
+    if (!message) return;
+    
+    try {
+      // 1. Marquer les réponses non lues comme lues
+      const { error: repliesError } = await supabase
+        .from('messagerie_replies')
+        .update({ read_by_company: true })
+        .eq('messagerie_id', message.id)
+        .eq('read_by_company', false);
+
+      if (repliesError) {
+        console.error('Erreur lors du marquage des réponses:', repliesError);
+      }
+
+      // 2. Si le message est "nouveau", le passer en "en_cours"
+      if (message.status === 'nouveau') {
+        const { error: statusError } = await supabase
+          .from('messageries')
+          .update({ status: 'en_cours' })
+          .eq('id', message.id);
+
+        if (statusError) {
+          console.error('Erreur lors de la mise à jour du statut:', statusError);
+        }
+      }
+    } catch (error) {
+      console.error('Erreur lors du marquage comme lu:', error);
+    }
+  };
+
+  const handleStatusChange = (status: Messagerie['status']) => {
+    if (message && onStatusChange) {
+      onStatusChange(message.id, status);
+      onOpenChange(false);
     }
   };
 
@@ -305,16 +346,68 @@ export function MessageDetailModal({
             </div>
           )}
 
-          <div className="flex gap-2 pt-4 border-t">
-            <Button
-              onClick={() => {
-                onArchive(message.id);
-                onOpenChange(false);
-              }}
-              variant="outline"
-            >
-              {message.archived ? "Désarchiver" : "Archiver"}
-            </Button>
+          {/* Actions de changement de statut */}
+          <div className="space-y-3 pt-4 border-t">
+            <div className="flex gap-2 flex-wrap">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => handleStatusChange('en_cours')}
+                disabled={message.status === 'en_cours'}
+              >
+                Mettre en cours
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => handleStatusChange('en_attente_client')}
+                disabled={message.status === 'en_attente_client'}
+              >
+                En attente client
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => handleStatusChange('resolu')}
+                disabled={message.status === 'resolu'}
+              >
+                Marquer comme résolu
+              </Button>
+            </div>
+
+            {/* Actions principales */}
+            <div className="flex gap-2">
+              <Button onClick={() => onReply(message.id)} className="flex-1">
+                Répondre
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  onResolve(message.id);
+                  onOpenChange(false);
+                }}
+              >
+                {message.resolved ? "Rouvrir" : "Résoudre"}
+              </Button>
+              <Button
+                onClick={() => {
+                  onArchive(message.id);
+                  onOpenChange(false);
+                }}
+                variant="outline"
+              >
+                {message.archived ? "Désarchiver" : "Archiver"}
+              </Button>
+              {onViewClientHistory && message.client && (
+                <Button 
+                  variant="outline" 
+                  onClick={() => onViewClientHistory(message.client!)}
+                >
+                  <History className="h-4 w-4 mr-2" />
+                  Historique
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </DialogContent>

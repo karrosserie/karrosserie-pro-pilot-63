@@ -273,6 +273,43 @@ export function useMessageries() {
     }
   };
 
+  // Mettre à jour le statut d'une messagerie
+  const updateStatus = async (id: string, newStatus: Messagerie['status']) => {
+    try {
+      const { error } = await supabase
+        .from('messageries')
+        .update({ 
+          status: newStatus,
+          resolved: newStatus === 'resolu',
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setMessageries(prev => 
+        prev.map(m => 
+          m.id === id 
+            ? { ...m, status: newStatus, resolved: newStatus === 'resolu' }
+            : m
+        )
+      );
+
+      await fetchMessageries();
+
+      toast({
+        title: "Statut mis à jour",
+        description: `Le message est maintenant "${newStatus}"`,
+      });
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du statut:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour le statut",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Marquer comme résolu/non résolu
   const toggleResolved = async (id: string) => {
     try {
@@ -475,6 +512,7 @@ export function useMessageries() {
   return {
     messageries,
     loading,
+    updateStatus,
     toggleResolved,
     toggleArchived,
     escalateMessage,
