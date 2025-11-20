@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fleetReservationsService, NewFleetReservation, UpdateFleetReservation } from '@/services/supabase/fleet-reservations';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export function useFleetReservations() {
   const queryClient = useQueryClient();
@@ -17,8 +18,40 @@ export function useFleetReservations() {
   
   const createReservation = useMutation({
     mutationFn: (newReservation: NewFleetReservation) => fleetReservationsService.create(newReservation),
-    onSuccess: () => {
+    onSuccess: async (newReservation) => {
       queryClient.invalidateQueries({ queryKey: ['fleetReservations'] });
+      
+      // Si le client a une assurance, envoyer la notification automatiquement
+      if (newReservation.client_insurance && newReservation.insurance_email) {
+        try {
+          const clientName = `${newReservation.clients.first_name} ${newReservation.clients.last_name}`;
+          
+          console.log('📧 Envoi notification assurance pour:', clientName);
+          
+          const { data, error } = await supabase.functions.invoke(
+            'send-insurance-loan-notification',
+            {
+              body: {
+                reservationId: newReservation.id,
+                clientName,
+                clientEmail: newReservation.clients.email || '',
+                insuranceEmail: newReservation.insurance_email,
+                insuranceCompanyName: newReservation.insurance_company_name || '',
+                insuranceContractNumber: newReservation.insurance_contract_number
+              }
+            }
+          );
+          
+          if (error) {
+            console.error('❌ Erreur notification assurance:', error);
+          } else {
+            console.log('✅ Notification envoyée à:', newReservation.insurance_email);
+          }
+        } catch (error) {
+          console.error('❌ Erreur lors de l\'envoi de la notification:', error);
+          // Ne pas bloquer la création du prêt si l'email échoue
+        }
+      }
     },
     onError: (error) => {
       toast({
