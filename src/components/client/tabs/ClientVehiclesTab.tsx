@@ -120,7 +120,11 @@ const ClientVehiclesTab: React.FC<ClientVehiclesTabProps> = ({ clientId }) => {
             ? 'Modifiez les informations du véhicule.'
             : ''
         }
-        defaultValues={selectedVehicle || {}}
+        defaultValues={
+          dialogMode === 'create' 
+            ? { client_id: clientId }
+            : selectedVehicle || {}
+        }
         onSubmit={handleVehicleSubmit}
         mode={dialogMode}
       />

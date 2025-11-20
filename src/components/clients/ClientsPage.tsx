@@ -188,7 +188,7 @@ const ClientsPage = () => {
         description={`Créer un nouveau véhicule pour ${selectedClientForVehicle?.first_name} ${selectedClientForVehicle?.last_name}`}
         onSubmit={handleVehicleSubmit}
         mode="create"
-        defaultValues={null}
+        defaultValues={{ client_id: selectedClientForVehicle?.id }}
       />
     </>
   );
