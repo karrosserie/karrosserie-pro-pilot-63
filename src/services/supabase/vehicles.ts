@@ -106,11 +106,15 @@ export const vehiclesService = {
       vehicle.status = 'En attente';
     }
 
-    console.log('Creating vehicle with data:', vehicle);
+    // Add company_id to vehicle data (handles impersonation correctly)
+    const companyId = await getCurrentUserCompanyId();
+    const vehicleWithCompany = { ...vehicle, company_id: companyId };
+
+    console.log('Creating vehicle with data:', vehicleWithCompany);
 
     const { data, error } = await supabase
       .from('vehicles')
-      .insert([vehicle])
+      .insert([vehicleWithCompany])
       .select(`
         *,
         car_brands(id, name),
