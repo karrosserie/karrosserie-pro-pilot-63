@@ -47,13 +47,8 @@ export function ClientValidationWatcher() {
         return;
       }
 
-      const message = isReminder
-        ? `🔔 RAPPEL : Il manque toujours des informations sur le dossier ${clientName}. Merci de compléter le dossier.`
-        : `⚠️ Action requise : Il manque des informations sur le dossier ${clientName}. Merci de compléter le dossier.`;
-      
       const result = await sendSmsNotification(
         phone,
-        message,
         reportId,
         clientId,
         clientName,
