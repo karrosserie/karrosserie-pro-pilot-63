@@ -119,6 +119,9 @@ export function MessageDetailModal({
 
         if (statusError) {
           console.error('Erreur lors de la mise à jour du statut:', statusError);
+        } else if (onStatusChange) {
+          // Notifier le parent pour rafraîchir l'interface
+          onStatusChange(message.id, 'en_cours');
         }
       }
     } catch (error) {
