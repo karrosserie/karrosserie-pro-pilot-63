@@ -23,10 +23,32 @@ export function useFleetReservations() {
       
       // Si un email d'assurance est renseigné, envoyer la notification automatiquement
       if (newReservation.insurance_email) {
+        console.log('🔍 Début du processus de notification assurance');
+        console.log('📦 Données reçues:', {
+          hasInsuranceEmail: !!newReservation.insurance_email,
+          insuranceEmail: newReservation.insurance_email,
+          hasClients: !!newReservation.clients,
+          reservationId: newReservation.id
+        });
+        
+        // Vérifier que les données client existent
+        if (!newReservation.clients) {
+          console.error('❌ Données client manquantes - impossible d\'envoyer la notification');
+          return;
+        }
+        
         try {
           const clientName = `${newReservation.clients.first_name} ${newReservation.clients.last_name}`;
           
           console.log('📧 Envoi notification assurance pour:', clientName);
+          console.log('🎯 Payload complet:', {
+            reservationId: newReservation.id,
+            clientName,
+            clientEmail: newReservation.clients.email || '',
+            insuranceEmail: newReservation.insurance_email,
+            insuranceCompanyName: newReservation.insurance_company_name || '',
+            insuranceContractNumber: newReservation.insurance_contract_number
+          });
           
           const { data, error } = await supabase.functions.invoke(
             'send-insurance-loan-notification',
@@ -45,12 +67,15 @@ export function useFleetReservations() {
           if (error) {
             console.error('❌ Erreur notification assurance:', error);
           } else {
-            console.log('✅ Notification envoyée à:', newReservation.insurance_email);
+            console.log('✅ Notification envoyée avec succès à:', newReservation.insurance_email);
+            console.log('📨 Réponse de l\'edge function:', data);
           }
         } catch (error) {
           console.error('❌ Erreur lors de l\'envoi de la notification:', error);
           // Ne pas bloquer la création du prêt si l'email échoue
         }
+      } else {
+        console.log('ℹ️ Pas d\'email d\'assurance - notification non envoyée');
       }
     },
     onError: (error) => {
