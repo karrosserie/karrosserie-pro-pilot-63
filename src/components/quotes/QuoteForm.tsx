@@ -223,71 +223,74 @@ export const QuoteForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 max-h-[70vh] overflow-y-auto px-1">
-      <QuoteBasicInfoSection 
-        formData={formData}
-        errors={errors}
-        onFieldChange={handleChange}
-        claimNumber={claimNumber}
-        onClaimNumberChange={handleClaimNumberChange}
-      />
-
-      <QuoteAssignmentSection 
-        formData={formData}
-        onChange={handleChange}
-        clientOptions={clientOptions}
-        isLoadingClients={isLoadingClients}
-        errors={errors}
-        onNewClientClick={handleNewClientClick}
-        onNewVehicleClick={handleNewVehicleClick}
-      />
-
-      <QuoteRepairsAndPartsSection 
-        repairs={repairs}
-        parts={parts}
-        onRepairsChange={setRepairs}
-        onPartsChange={setParts}
-        isReadOnly={isReadOnly}
-      />
-
-      <QuoteDiscountsSection 
-        discounts={discounts}
-        onDiscountsChange={setDiscounts}
-        isReadOnly={isReadOnly}
-      />
-
-      <QuoteDetailsSection 
-        notes={notes}
-        onFieldChange={handleChange}
-        globalTotals={globalTotals}
-        isReadOnly={isReadOnly}
-      />
-
-      <QuoteFormActions 
-        quote={quote}
-        isSubmitting={isSubmitting}
-        onCancel={onCancel}
-        isConversionFromReport={isConversionFromReport}
-      />
-
-      <ModificatifAlert
-        open={showModificatifAlert}
-        onOpenChange={setShowModificatifAlert}
-        onContinueWithout={handleContinueWithoutModificatif}
-        onRequestModificatif={handleRequestModificatif}
-      />
-
-      {quote && (
-        <ContactExpertDialog
-          open={showContactExpertDialog}
-          onOpenChange={setShowContactExpertDialog}
-          quote={quote}
-          onRequestSent={handleModificatifRequestSent}
-          modifiedRepairs={repairs}
-          modifiedParts={parts}
+    <>
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 max-h-[70vh] overflow-y-auto px-1">
+        <QuoteBasicInfoSection 
+          formData={formData}
+          errors={errors}
+          onFieldChange={handleChange}
+          claimNumber={claimNumber}
+          onClaimNumberChange={handleClaimNumberChange}
         />
-      )}
 
+        <QuoteAssignmentSection 
+          formData={formData}
+          onChange={handleChange}
+          clientOptions={clientOptions}
+          isLoadingClients={isLoadingClients}
+          errors={errors}
+          onNewClientClick={handleNewClientClick}
+          onNewVehicleClick={handleNewVehicleClick}
+        />
+
+        <QuoteRepairsAndPartsSection 
+          repairs={repairs}
+          parts={parts}
+          onRepairsChange={setRepairs}
+          onPartsChange={setParts}
+          isReadOnly={isReadOnly}
+        />
+
+        <QuoteDiscountsSection 
+          discounts={discounts}
+          onDiscountsChange={setDiscounts}
+          isReadOnly={isReadOnly}
+        />
+
+        <QuoteDetailsSection 
+          notes={notes}
+          onFieldChange={handleChange}
+          globalTotals={globalTotals}
+          isReadOnly={isReadOnly}
+        />
+
+        <QuoteFormActions 
+          quote={quote}
+          isSubmitting={isSubmitting}
+          onCancel={onCancel}
+          isConversionFromReport={isConversionFromReport}
+        />
+
+        <ModificatifAlert
+          open={showModificatifAlert}
+          onOpenChange={setShowModificatifAlert}
+          onContinueWithout={handleContinueWithoutModificatif}
+          onRequestModificatif={handleRequestModificatif}
+        />
+
+        {quote && (
+          <ContactExpertDialog
+            open={showContactExpertDialog}
+            onOpenChange={setShowContactExpertDialog}
+            quote={quote}
+            onRequestSent={handleModificatifRequestSent}
+            modifiedRepairs={repairs}
+            modifiedParts={parts}
+          />
+        )}
+      </form>
+
+      {/* Dialogs moved outside form to prevent nested form submission */}
       <ClientDialog
         open={isClientDialogOpen}
         onOpenChange={setIsClientDialogOpen}
@@ -308,6 +311,6 @@ export const QuoteForm = ({
           client_id: formData.client_id
         }}
       />
-    </form>
+    </>
   );
 };
