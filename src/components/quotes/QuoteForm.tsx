@@ -283,6 +283,9 @@ export const QuoteForm = ({
         description="Créer un nouveau véhicule pour ce client"
         onSubmit={handleNewVehicleSubmit}
         mode="create"
+        defaultValues={{
+          client_id: formData.client_id
+        }}
       />
     </form>
   );
