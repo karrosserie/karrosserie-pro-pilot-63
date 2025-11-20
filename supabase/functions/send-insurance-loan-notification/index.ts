@@ -26,9 +26,14 @@ Deno.serve(async (req) => {
     const payload: NotificationPayload = await req.json();
     console.log('📦 Received payload:', JSON.stringify(payload, null, 2));
 
-    // Validate required fields
-    if (!payload.clientName || !payload.clientEmail || !payload.insuranceEmail || !payload.insuranceCompanyName) {
-      throw new Error('Missing required fields');
+    // Validate required fields (clientEmail is optional)
+    if (!payload.clientName || !payload.insuranceEmail || !payload.insuranceCompanyName) {
+      console.error('❌ Validation failed:', {
+        hasClientName: !!payload.clientName,
+        hasInsuranceEmail: !!payload.insuranceEmail,
+        hasInsuranceCompanyName: !!payload.insuranceCompanyName
+      });
+      throw new Error('Missing required fields: clientName, insuranceEmail, and insuranceCompanyName are mandatory');
     }
 
     // Format the exact payload expected by n8n webhook
