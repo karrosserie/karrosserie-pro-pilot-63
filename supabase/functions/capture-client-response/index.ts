@@ -86,11 +86,23 @@ serve(async (req) => {
         console.error('Error inserting reply:', replyError);
       }
 
-      // 4. Mettre à jour le statut
+      // 4. Déterminer le nouveau statut selon le contexte
+      let newStatus = 'nouveau';
+      if (messagerie.status === 'en_attente_client' || messagerie.status === 'en_cours') {
+        // Le client répond à une demande → résolu
+        newStatus = 'resolu';
+      } else if (messagerie.status === 'resolu') {
+        // Le client relance une conversation résolue → en cours
+        newStatus = 'en_cours';
+      }
+      // Sinon (nouveau/planifie), on laisse "nouveau" pour attirer l'attention
+
+      // 5. Mettre à jour le statut intelligemment
       await supabase
         .from('messageries')
         .update({
-          status: 'nouveau', // À traiter
+          status: newStatus,
+          resolved: newStatus === 'resolu',
           last_reply_at: new Date().toISOString(),
           replies_count: (messagerie.replies_count || 0) + 1,
         })

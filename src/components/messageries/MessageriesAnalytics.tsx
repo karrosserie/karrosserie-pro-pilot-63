@@ -15,6 +15,7 @@ export default function MessageriesAnalytics() {
   const {
     messageries,
     loading,
+    updateStatus,
     toggleResolved,
     toggleArchived,
     refetch,
