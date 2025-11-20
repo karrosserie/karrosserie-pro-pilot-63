@@ -21,8 +21,8 @@ export function useFleetReservations() {
     onSuccess: async (newReservation) => {
       queryClient.invalidateQueries({ queryKey: ['fleetReservations'] });
       
-      // Si le client a une assurance, envoyer la notification automatiquement
-      if (newReservation.client_insurance && newReservation.insurance_email) {
+      // Si un email d'assurance est renseigné, envoyer la notification automatiquement
+      if (newReservation.insurance_email) {
         try {
           const clientName = `${newReservation.clients.first_name} ${newReservation.clients.last_name}`;
           
