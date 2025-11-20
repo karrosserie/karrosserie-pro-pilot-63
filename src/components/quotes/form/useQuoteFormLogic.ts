@@ -17,8 +17,8 @@ export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps
     // Initialiser immédiatement avec les données préfillées si disponibles
     const initialData = {
       reference: '',
-      client_id: '',
-      vehicle_id: '',
+      client_id: undefined,
+      vehicle_id: undefined,
       status: 'En attente',
       valid_until: '',
       notes: ''
@@ -28,9 +28,9 @@ export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps
     if (prefillData) {
       return {
         ...initialData,
-        client_id: prefillData.client_id || '',
-        vehicle_id: prefillData.vehicle_id || '',
-        report_id: prefillData.report_id || '',
+        client_id: prefillData.client_id || undefined,
+        vehicle_id: prefillData.vehicle_id || undefined,
+        report_id: prefillData.report_id || undefined,
         report_number: prefillData.report_number || '',
         policy_number: prefillData.policy_number || '',
         report_date: prefillData.report_date || '',

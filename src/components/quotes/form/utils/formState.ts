@@ -31,6 +31,10 @@ export const prepareSubmitData = (
 
   return {
     ...formData,
+    // Convertir les UUIDs vides en null pour PostgreSQL
+    client_id: formData.client_id || null,
+    vehicle_id: formData.vehicle_id || null,
+    report_id: formData.report_id || null,
     claim_number: claimNumber,
     repairs_data: JSON.stringify(normalizedRepairs),
     parts_data: JSON.stringify(normalizedParts),
