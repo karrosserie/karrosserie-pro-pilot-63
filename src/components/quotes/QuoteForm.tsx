@@ -175,10 +175,31 @@ export const QuoteForm = ({
 
   const handleNewVehicleSubmit = async (vehicleData: any) => {
     try {
-      // Ajouter le client_id au véhicule
+      console.log('Creating new vehicle from quote form:', vehicleData);
+      
+      // Convert camelCase to snake_case for database
       const vehicleWithClient = {
-        ...vehicleData,
-        client_id: formData.client_id
+        client_id: formData.client_id,
+        vin: vehicleData.vin,
+        brand_id: vehicleData.brandId,
+        model_id: vehicleData.modelId,
+        license_plate: vehicleData.licensePlate,
+        engine_number: vehicleData.engineNumber || null,
+        year: vehicleData.year ? parseInt(vehicleData.year) : null,
+        color: vehicleData.color || null,
+        mileage: vehicleData.mileage ? parseInt(vehicleData.mileage) : null,
+        insurance_company_id: vehicleData.insuranceCompanyId || null,
+        insurance_expiry_date: vehicleData.insuranceExpiryDate || null,
+        status: vehicleData.status || 'En attente',
+        road_test: vehicleData.roadTest || null,
+        road_test_notes: vehicleData.roadTestNotes || null,
+        fuel_level: vehicleData.fuelLevel || null,
+        pre_accident_defects: vehicleData.preAccidentDefects || null,
+        work_items: vehicleData.workItems || null,
+        registration_document_front_url: vehicleData.registrationDocumentFrontUrl || null,
+        registration_document_back_url: vehicleData.registrationDocumentBackUrl || null,
+        vehicle_image_url: vehicleData.vehicleImageUrl || null,
+        vehicle_images: vehicleData.vehicleImages || null
       };
       
       const newVehicle = await createVehicle.mutateAsync(vehicleWithClient);
