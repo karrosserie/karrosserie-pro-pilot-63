@@ -255,6 +255,7 @@ export default function MessageriesAnalytics() {
           onResolve={toggleResolved}
           onArchive={toggleArchived}
           onViewClientHistory={handleViewClientHistory}
+          onStatusChange={updateStatus}
         />
 
         <ClientHistoryModal
