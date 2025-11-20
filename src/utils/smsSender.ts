@@ -7,6 +7,64 @@ export interface SmsResult {
 }
 
 /**
+ * Mapping des codes de champs vers des labels courts pour SMS
+ */
+const FIELD_LABELS: Record<string, string> = {
+  // Identité
+  'prenom': 'Prénom',
+  'nom': 'Nom',
+  'telephone': 'Tél',
+  'email': 'Email',
+  'adresse': 'Adresse',
+  'code_postal': 'CP',
+  'ville': 'Ville',
+  'date_naissance': 'Date naiss.',
+  
+  // Permis
+  'permis_recto': 'Permis R°',
+  'permis_verso': 'Permis V°',
+  'driver_license_front_url': 'Permis R°',
+  'driver_license_back_url': 'Permis V°',
+  
+  // Carte grise
+  'carte_grise_recto': 'CG R°',
+  'carte_grise_verso': 'CG V°',
+  'registration_document_front_url': 'CG R°',
+  'registration_document_back_url': 'CG V°',
+  
+  // Autres
+  'iban': 'RIB',
+  'assurance': 'Assurance',
+};
+
+/**
+ * Génère un message SMS poli et contextualisé avec les champs manquants
+ */
+function generateSmsMessage(
+  clientName: string,
+  missingFields: string[],
+  isReminder: boolean
+): string {
+  // Convertir les codes en labels courts et dédupliquer
+  const readableFields = missingFields
+    .map(field => FIELD_LABELS[field] || field)
+    .filter((value, index, self) => self.indexOf(value) === index)
+    .slice(0, 4); // Max 4 champs pour rester court
+
+  const fieldsList = readableFields.join(', ');
+  const hasMore = missingFields.length > 4;
+  const moreInfo = hasMore ? ` (+${missingFields.length - 4})` : '';
+
+  if (isReminder) {
+    // SMS de rappel (plus court)
+    return `Rappel : Dossier ${clientName} incomplet (${fieldsList}${moreInfo}). Merci de finaliser. 🔔`;
+  } else {
+    // SMS initial (plus détaillé)
+    return `Bonjour, le dossier de ${clientName} est incomplet. Il manque : ${fieldsList}${moreInfo}. Merci de compléter pour continuer. 🚗`;
+  }
+}
+
+/**
  * Vérifie si un SMS a déjà été envoyé pour ce rapport dans les dernières 24h
  */
 export async function checkSmsAlreadySent(
@@ -86,7 +144,6 @@ export async function recordSms(params: {
  */
 export async function sendSmsNotification(
   phone: string,
-  message: string,
   reportId: string,
   clientId: string,
   clientName: string,
@@ -94,10 +151,13 @@ export async function sendSmsNotification(
   missingFields: string[],
   isReminder: boolean = false
 ): Promise<SmsResult> {
+  // Générer le message personnalisé avec les champs manquants (avant le try pour qu'il soit accessible dans le catch)
+  const message = generateSmsMessage(clientName, missingFields, isReminder);
+
   try {
-    if (!phone || !message) {
-      console.error('SMS Error: Phone and message are required');
-      return { success: false, error: 'Phone and message are required' };
+    if (!phone) {
+      console.error('SMS Error: Phone is required');
+      return { success: false, error: 'Phone is required' };
     }
 
     const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
