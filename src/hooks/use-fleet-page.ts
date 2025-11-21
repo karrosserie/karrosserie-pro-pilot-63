@@ -38,7 +38,7 @@ export const useFleetPage = () => {
 
   // Convert reservations to current loans format
   const currentLoans = (reservations || [])
-    .filter(reservation => reservation.status === 'active')
+    .filter(reservation => ['active', 'en_attente'].includes(reservation.status))
     .map(reservation => {
       const vehicleDisplay = reservation.fleet_vehicles?.car_brands?.name && reservation.fleet_vehicles?.car_models?.name
         ? `${reservation.fleet_vehicles.car_brands.name} ${reservation.fleet_vehicles.car_models.name}`
@@ -49,7 +49,9 @@ export const useFleetPage = () => {
         vehicle: `${vehicleDisplay} - ${reservation.fleet_vehicles?.license_plate || 'N/A'}`,
         client: `${reservation.clients?.first_name || ''} ${reservation.clients?.last_name || ''}`,
         startDate: new Date(reservation.start_date).toLocaleDateString('fr-FR'),
-        expectedReturnDate: new Date(reservation.expected_return_date).toLocaleDateString('fr-FR')
+        expectedReturnDate: new Date(reservation.expected_return_date).toLocaleDateString('fr-FR'),
+        status: reservation.status,
+        quote: reservation.quotes
       };
     });
 

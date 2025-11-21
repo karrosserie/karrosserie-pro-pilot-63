@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Car, Calendar, User, Trash, FileText, Download } from 'lucide-react';
 
 interface CurrentLoan {
@@ -9,6 +10,13 @@ interface CurrentLoan {
   client: string;
   startDate: string;
   expectedReturnDate: string;
+  status: string;
+  quote?: {
+    id: string;
+    reference: string;
+    status: string;
+    amount: number;
+  } | null;
 }
 
 interface FleetCurrentLoansProps {
@@ -40,9 +48,21 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
             key={loan.id}
             className="border border-gray-200 rounded-lg p-4"
           >
-            <div className="flex items-center mb-2">
-              <Car className="h-4 w-4 text-gray-600 mr-2" />
-              <h4 className="font-medium">{loan.vehicle}</h4>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center">
+                <Car className="h-4 w-4 text-gray-600 mr-2" />
+                <h4 className="font-medium">{loan.vehicle}</h4>
+              </div>
+              {loan.status === 'en_attente' && (
+                <Badge variant="outline" className="text-orange-600 border-orange-600">
+                  ⏳ En attente de devis
+                </Badge>
+              )}
+              {loan.quote && (
+                <Badge variant="secondary">
+                  📄 {loan.quote.reference}
+                </Badge>
+              )}
             </div>
             
             <div className="space-y-2 text-sm text-gray-600 ml-6">
