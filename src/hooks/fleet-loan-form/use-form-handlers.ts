@@ -202,13 +202,14 @@ export const useFleetLoanFormHandlers = (
           try {
             console.log('📧 Envoi de notification à l\'assurance du client...');
             
-            const webhookPayload = {
-              // IDs
-              reservation_id: result.id,
-              claim_id: result.id,
-              company_id: companyId,
-              
-              // Client
+        const webhookPayload = {
+          // IDs
+          reservation_id: result.id,
+          claim_id: result.id,
+          company_id: companyId,
+          vehicle_id: formData.vehicleId,
+          
+          // Client
               client_name: formData.clientName,
               client_email: formData.clientEmail,
               client_phone: formData.clientPhone,
