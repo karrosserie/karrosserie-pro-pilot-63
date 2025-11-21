@@ -38,7 +38,7 @@ export const useFleetPage = () => {
 
   // Convert reservations to current loans format
   const currentLoans = (reservations || [])
-    .filter(reservation => ['active', 'en_attente'].includes(reservation.status))
+    .filter(reservation => reservation.status === 'active')
     .map(reservation => {
       const vehicleDisplay = reservation.fleet_vehicles?.car_brands?.name && reservation.fleet_vehicles?.car_models?.name
         ? `${reservation.fleet_vehicles.car_brands.name} ${reservation.fleet_vehicles.car_models.name}`

@@ -25,13 +25,12 @@ export const useQuoteToReservationLinker = ({
 
     const checkPendingReservations = async () => {
       try {
-        const pendingReservations = await fleetReservationsService.getByClientIdAndStatus(
-          createdQuote.client_id,
-          'en_attente'
+        const activeReservationsWithoutQuote = await fleetReservationsService.getActiveWithoutQuote(
+          createdQuote.client_id
         );
 
-        if (pendingReservations.length > 0) {
-          const reservation = pendingReservations[0];
+        if (activeReservationsWithoutQuote.length > 0) {
+          const reservation = activeReservationsWithoutQuote[0];
           const vehicleDisplay = reservation.fleet_vehicles?.car_brands?.name && reservation.fleet_vehicles?.car_models?.name
             ? `${reservation.fleet_vehicles.car_brands.name} ${reservation.fleet_vehicles.car_models.name} - ${reservation.fleet_vehicles.license_plate}`
             : `Véhicule ${reservation.fleet_vehicles?.license_plate || ''}`;
@@ -39,8 +38,7 @@ export const useQuoteToReservationLinker = ({
           const handleLink = async () => {
             try {
               await fleetReservationsService.update(reservation.id, {
-                quote_id: createdQuote.id,
-                status: 'active'
+                quote_id: createdQuote.id
               });
               
               toast({
@@ -60,8 +58,8 @@ export const useQuoteToReservationLinker = ({
           };
 
           toast({
-            title: "Prêt en attente détecté",
-            description: `Ce client a un prêt en attente (${vehicleDisplay}). Voulez-vous lier ce devis ?`,
+            title: "Prêt actif sans devis détecté",
+            description: `Ce client a un prêt actif sans devis de facturation (${vehicleDisplay}). Voulez-vous lier ce devis ?`,
             action: (
               <ToastAction altText="Lier maintenant" onClick={handleLink}>
                 Lier maintenant

@@ -263,5 +263,39 @@ export const fleetReservationsService = {
     }
     
     return data || [];
+  },
+
+  getActiveWithoutQuote: async (clientId: string) => {
+    const { data, error } = await supabase
+      .from('fleet_reservations')
+      .select(`
+        id,
+        start_date,
+        expected_return_date,
+        quote_id,
+        fleet_vehicles (
+          id,
+          license_plate,
+          car_brands (
+            id,
+            name
+          ),
+          car_models (
+            id,
+            name
+          )
+        )
+      `)
+      .eq('client_id', clientId)
+      .eq('status', 'active')
+      .is('quote_id', null)
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching active reservations without quote:', error);
+      throw new Error(error.message);
+    }
+    
+    return data || [];
   }
 };
