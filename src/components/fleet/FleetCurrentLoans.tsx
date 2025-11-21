@@ -53,14 +53,14 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
                 <Car className="h-4 w-4 text-gray-600 mr-2" />
                 <h4 className="font-medium">{loan.vehicle}</h4>
               </div>
-              {loan.status === 'en_attente' && (
+              {!loan.quote && (
                 <Badge variant="outline" className="text-orange-600 border-orange-600">
-                  ⏳ En attente de devis
+                  ⚠️ Sans devis assurance
                 </Badge>
               )}
               {loan.quote && (
-                <Badge variant="secondary">
-                  📄 {loan.quote.reference}
+                <Badge variant="secondary" className="text-green-700 border-green-700">
+                  ✅ Devis {loan.quote.reference}
                 </Badge>
               )}
             </div>

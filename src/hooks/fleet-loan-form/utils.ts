@@ -22,8 +22,8 @@ export const getCurrentDateTime = () => {
 export const prepareReservationData = async (formData: LoanFormData, vehicleId: string, companyId: string) => {
   console.log('Preparing reservation data for form:', formData);
   
-  // Determine the status based on quote presence
-  const status = formData.quoteId ? 'active' : 'en_attente';
+  // Le prêt est toujours actif dès sa création (le devis sert uniquement à la facturation)
+  const status = 'active';
   
   // First, update the client with license information
   if (formData.clientId) {
