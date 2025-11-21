@@ -28,6 +28,7 @@ interface FleetLoanFormProps {
 export interface LoanFormData {
   vehicleId: string;
   clientId: string;
+  quoteId?: string;
   clientName: string;
   clientPhone: string;
   clientEmail: string;
@@ -88,6 +89,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     createReservation,
     handleInputChange,
     handleClientSelect,
+    handleQuoteSelect,
     handleFreeTextClientChange,
     handleMileageChange,
     handleFuelLevelChange,
@@ -229,6 +231,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
             formData={formData}
             onInputChange={handleInputChange}
             onClientSelect={handleClientSelect}
+            onQuoteSelect={handleQuoteSelect}
             onFreeTextClientChange={handleFreeTextClientChange}
             onDriverLicenseFrontUpload={handleDriverLicenseFrontUpload}
             onDriverLicenseBackUpload={handleDriverLicenseBackUpload}

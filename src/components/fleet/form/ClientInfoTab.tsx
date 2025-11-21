@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { SearchableSelect } from '@/components/ui/searchable-select';
 import { useClients } from '@/hooks/use-clients';
+import { useQuotes } from '@/hooks/use-quotes';
 import { LoanFormData } from '../FleetLoanForm';
 import { DrivingLicenseUpload } from '../DrivingLicenseUpload';
 
@@ -11,6 +12,7 @@ interface ClientInfoTabProps {
   formData: LoanFormData;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onClientSelect: (clientId: string) => void;
+  onQuoteSelect: (quoteId: string) => void;
   onFreeTextClientChange: (text: string) => void;
   onDriverLicenseFrontUpload: (url: string) => void;
   onDriverLicenseBackUpload: (url: string) => void;
@@ -23,6 +25,7 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
   formData,
   onInputChange,
   onClientSelect,
+  onQuoteSelect,
   onFreeTextClientChange,
   onDriverLicenseFrontUpload,
   onDriverLicenseBackUpload,
@@ -31,11 +34,19 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
   onNewClientClick
 }) => {
   const { clients } = useClients();
+  const { quotes } = useQuotes();
 
   const clientOptions = (clients || []).map(client => ({
     value: client.id,
     label: `${client.first_name} ${client.last_name}`
   }));
+
+  const quoteOptions = (quotes || [])
+    .filter(quote => formData.clientId && quote.client_id === formData.clientId)
+    .map(quote => ({
+      value: quote.id,
+      label: `${quote.reference}${quote.status ? ` - ${quote.status}` : ''}`
+    }));
 
   // Validation des dates
   const validateEndDate = (endDate: string, startDate: string) => {
@@ -45,8 +56,8 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Client, Start Date, and End Date on the same line */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Client, Quote, Start Date, and End Date */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="md:col-span-2 lg:col-span-1 space-y-2" data-tour="client-select">
           <Label htmlFor="client">
             Client <span className="text-destructive">*</span>
@@ -63,6 +74,25 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
             showNewClientOption={true}
             onNewClientClick={onNewClientClick}
           />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="quote">
+            Devis associé <span className="text-muted-foreground text-xs">(optionnel)</span>
+          </Label>
+          <SearchableSelect
+            options={quoteOptions}
+            value={formData.quoteId || ''}
+            onValueChange={onQuoteSelect}
+            placeholder={formData.clientId ? "Sélectionner un devis" : "Sélectionnez d'abord un client"}
+            disabled={isViewMode || !formData.clientId}
+            searchPlaceholder="Rechercher un devis..."
+          />
+          {!formData.quoteId && formData.clientId && (
+            <p className="text-xs text-muted-foreground">
+              Sans devis, le statut sera "En attente"
+            </p>
+          )}
         </div>
 
         <div className="space-y-2">

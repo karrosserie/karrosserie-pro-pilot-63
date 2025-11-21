@@ -73,6 +73,14 @@ export const useFleetLoanFormHandlers = (
     }));
   };
 
+  const handleQuoteSelect = (quoteId: string) => {
+    console.log('Quote selected:', quoteId);
+    setFormData(prev => ({
+      ...prev,
+      quoteId: quoteId || undefined
+    }));
+  };
+
   const handleMileageChange = (mileage: number) => {
     setFormData(prev => ({ ...prev, mileage }));
   };
@@ -272,6 +280,7 @@ export const useFleetLoanFormHandlers = (
     createReservation: isEditing ? updateReservation : createReservation,
     handleInputChange,
     handleClientSelect,
+    handleQuoteSelect,
     handleFreeTextClientChange,
     handleMileageChange,
     handleFuelLevelChange,

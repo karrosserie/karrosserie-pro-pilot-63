@@ -32,6 +32,12 @@ export type FleetReservation = Database['public']['Tables']['fleet_reservations'
       name: string;
     } | null;
   } | null;
+  quotes?: {
+    id: string;
+    reference: string;
+    status?: string;
+    amount?: number;
+  } | null;
 };
 
 export type NewFleetReservation = Database['public']['Tables']['fleet_reservations']['Insert'];
@@ -58,7 +64,8 @@ export const fleetReservationsService = {
           insurance_card_url,
           car_brands(id, name),
           car_models(id, name)
-        )
+        ),
+        quotes(id, reference, status, amount)
       `)
       .order('created_at', { ascending: false });
     
@@ -91,7 +98,8 @@ export const fleetReservationsService = {
           insurance_card_url,
           car_brands(id, name),
           car_models(id, name)
-        )
+        ),
+        quotes(id, reference, status, amount)
       `)
       .eq('id', id)
       .single();
@@ -125,7 +133,8 @@ export const fleetReservationsService = {
           insurance_card_url,
           car_brands(id, name),
           car_models(id, name)
-        )
+        ),
+        quotes(id, reference, status, amount)
       `)
       .eq('fleet_vehicle_id', vehicleId)
       .order('created_at', { ascending: false });
@@ -160,7 +169,8 @@ export const fleetReservationsService = {
           insurance_card_url,
           car_brands(id, name),
           car_models(id, name)
-        )
+        ),
+        quotes(id, reference, status, amount)
       `)
       .single();
     
@@ -195,7 +205,8 @@ export const fleetReservationsService = {
           insurance_card_url,
           car_brands(id, name),
           car_models(id, name)
-        )
+        ),
+        quotes(id, reference, status, amount)
       `)
       .single();
     
