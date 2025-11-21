@@ -231,5 +231,37 @@ export const fleetReservationsService = {
     }
     
     return true;
+  },
+
+  getByClientIdAndStatus: async (clientId: string, status: string) => {
+    const { data, error } = await supabase
+      .from('fleet_reservations')
+      .select(`
+        id,
+        start_date,
+        expected_return_date,
+        fleet_vehicles (
+          id,
+          license_plate,
+          car_brands (
+            id,
+            name
+          ),
+          car_models (
+            id,
+            name
+          )
+        )
+      `)
+      .eq('client_id', clientId)
+      .eq('status', status)
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching fleet reservations by client and status:', error);
+      throw new Error(error.message);
+    }
+    
+    return data || [];
   }
 };

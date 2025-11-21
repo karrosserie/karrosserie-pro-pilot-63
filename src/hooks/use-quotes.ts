@@ -3,20 +3,31 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { getCurrentUserCompanyId } from '@/services/supabase/auth-company';
 import { useImpersonation } from '@/hooks/use-impersonation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDetailedTracking } from '@/hooks/tracking/useDetailedTracking';
+import { useQuoteToReservationLinker } from './use-quote-to-reservation-linker';
 
 export function useQuotes() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { isImpersonating, impersonationData } = useImpersonation();
   const { trackAction } = useDetailedTracking();
+  const [createdQuote, setCreatedQuote] = useState<{ id: string; client_id: string; reference: string } | null>(null);
 
   // Invalider les requêtes lors du changement d'impersonation
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ['quotes'] });
     queryClient.invalidateQueries({ queryKey: ['invoices'] });
   }, [isImpersonating, impersonationData?.company_id, queryClient]);
+
+  // Use quote-to-reservation linker
+  useQuoteToReservationLinker({
+    createdQuote,
+    onLinkComplete: () => {
+      queryClient.invalidateQueries({ queryKey: ['fleet-reservations'] });
+      setCreatedQuote(null);
+    }
+  });
 
   const {
     data: quotes,
@@ -98,6 +109,15 @@ export function useQuotes() {
         vehicle_id: data?.vehicle_id,
         amount: data?.amount
       });
+
+      // Set created quote for reservation linker
+      if (data?.id && data?.client_id && data?.reference) {
+        setCreatedQuote({
+          id: data.id,
+          client_id: data.client_id,
+          reference: data.reference
+        });
+      }
     },
     onError: (error) => {
       toast({
