@@ -22,6 +22,9 @@ export const getCurrentDateTime = () => {
 export const prepareReservationData = async (formData: LoanFormData, vehicleId: string, companyId: string) => {
   console.log('Preparing reservation data for form:', formData);
   
+  // Determine the status based on quote presence
+  const status = formData.quoteId ? 'active' : 'en_attente';
+  
   // First, update the client with license information
   if (formData.clientId) {
     const clientUpdateData = {
@@ -56,6 +59,8 @@ export const prepareReservationData = async (formData: LoanFormData, vehicleId: 
   const reservationData = {
     fleet_vehicle_id: vehicleId,
     client_id: formData.clientId,
+    quote_id: formData.quoteId || null,
+    status: status,
     start_date: formData.startDate,
     expected_return_date: formData.expectedReturnDate || null,
     start_mileage: formData.mileage,

@@ -11,6 +11,7 @@ export const useFleetLoanFormState = (vehicle: FleetVehicle, defaultValues?: any
   const [formData, setFormData] = useState<LoanFormData>({
     vehicleId: vehicle.id,
     clientId: defaultValues?.client_id || '',
+    quoteId: defaultValues?.quote_id || '',
     clientName: defaultValues?.clients ? `${defaultValues.clients.first_name} ${defaultValues.clients.last_name}` : '',
     clientPhone: defaultValues?.clients?.phone || '',
     clientEmail: defaultValues?.clients?.email || '',

@@ -2439,6 +2439,7 @@ export type Database = {
           insurance_phone: string | null
           insurance_postal_code: string | null
           notes: string | null
+          quote_id: string | null
           start_date: string
           start_mileage: number
           status: string
@@ -2469,6 +2470,7 @@ export type Database = {
           insurance_phone?: string | null
           insurance_postal_code?: string | null
           notes?: string | null
+          quote_id?: string | null
           start_date: string
           start_mileage?: number
           status?: string
@@ -2499,6 +2501,7 @@ export type Database = {
           insurance_phone?: string | null
           insurance_postal_code?: string | null
           notes?: string | null
+          quote_id?: string | null
           start_date?: string
           start_mileage?: number
           status?: string
@@ -2518,6 +2521,13 @@ export type Database = {
             columns: ["fleet_vehicle_id"]
             isOneToOne: false
             referencedRelation: "fleet_vehicles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_reservations_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
             referencedColumns: ["id"]
           },
         ]
