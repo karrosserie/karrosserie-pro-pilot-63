@@ -59,6 +59,20 @@ export const ExpertiseReportUploader = ({
     }
   };
 
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        // Supprimer le préfixe "data:application/pdf;base64,"
+        const base64 = result.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
   const uploadExpertiseReport = async () => {
     if (!selectedFile || !user) {
       toast({
@@ -72,6 +86,11 @@ export const ExpertiseReportUploader = ({
     setIsUploading(true);
 
     try {
+      // 0. Convertir le fichier en base64 dès le début
+      console.log('📄 Conversion du fichier en base64...');
+      const fileBase64 = await fileToBase64(selectedFile);
+      console.log('✅ Fichier converti en base64, taille:', fileBase64.length, 'caractères');
+
       console.log('Starting expertise report upload...', { 
         fileName: selectedFile.name, 
         fileSize: selectedFile.size, 
@@ -177,7 +196,13 @@ export const ExpertiseReportUploader = ({
 
       // 6. Appel API externe pour traitement du document
       try {
-        console.log('Calling external API for document processing...');
+        console.log('📤 Envoi au webhook n8n:', {
+          url: publicUrlData.publicUrl,
+          companyId,
+          importId: importData.id,
+          filename: selectedFile.name,
+          base64Size: fileBase64.length
+        });
         const apiResponse = await fetch('https://n8n.karrosserie.pro/webhook/38917be3-c64c-46ff-82f9-7959ece86242', {
           method: 'POST',
           headers: {
@@ -186,7 +211,9 @@ export const ExpertiseReportUploader = ({
           body: JSON.stringify({
             URL: publicUrlData.publicUrl,
             companyId: companyId,
-            importId: importData.id
+            importId: importData.id,
+            fileBase64: fileBase64,
+            filename: selectedFile.name
           }),
         });
 
