@@ -63,20 +63,18 @@ const CompanyFormFields = ({ control, setValue }: CompanyFormFieldsProps) => {
           newAutoFilledFields.add('legalForm');
         }
         
-        // Construire l'adresse complète
-        let fullAddress = '';
+        // Remplir l'adresse, code postal et ville séparément
         if (companyData.address) {
-          fullAddress = companyData.address;
-          if (companyData.postalCode && companyData.city) {
-            fullAddress += `, ${companyData.postalCode} ${companyData.city}`;
-          }
-        } else if (companyData.postalCode && companyData.city) {
-          fullAddress = `${companyData.postalCode} ${companyData.city}`;
-        }
-        
-        if (fullAddress) {
-          setValue('address', fullAddress);
+          setValue('address', companyData.address);
           newAutoFilledFields.add('address');
+        }
+        if (companyData.postalCode) {
+          setValue('postalCode', companyData.postalCode);
+          newAutoFilledFields.add('postalCode');
+        }
+        if (companyData.city) {
+          setValue('city', companyData.city);
+          newAutoFilledFields.add('city');
         }
         
         // Créer un numéro de TVA automatique basé sur le SIREN
@@ -255,27 +253,75 @@ const CompanyFormFields = ({ control, setValue }: CompanyFormFieldsProps) => {
         name="address"
         render={({ field }) => (
           <FormItem className="space-y-2">
-            <FormLabel>Adresse complète *</FormLabel>
+            <FormLabel>Adresse (rue et numéro) *</FormLabel>
             <FormControl>
               <Input
                 type="text"
-                placeholder="123 Rue de la République, 75001 Paris"
+                placeholder="123 Rue de la République"
                 className={autoFilledFields.has('address') ? 'bg-green-50 border-green-200' : ''}
                 {...field}
               />
             </FormControl>
-            <p className="text-sm text-muted-foreground">
-              Autocomplétion Google Places disponible (à implémenter)
-            </p>
             {!autoFilledFields.has('address') && (
               <p className="text-sm text-red-600">
-                L'adresse complète est requise
+                L'adresse est requise
               </p>
             )}
             <FormMessage />
           </FormItem>
         )}
       />
+
+      <div className="grid grid-cols-2 gap-4">
+        <FormField
+          control={control}
+          name="postalCode"
+          render={({ field }) => (
+            <FormItem className="space-y-2">
+              <FormLabel>Code postal *</FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder="75001"
+                  maxLength={5}
+                  className={autoFilledFields.has('postalCode') ? 'bg-green-50 border-green-200' : ''}
+                  {...field}
+                />
+              </FormControl>
+              {!autoFilledFields.has('postalCode') && (
+                <p className="text-sm text-red-600">
+                  Code postal requis
+                </p>
+              )}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={control}
+          name="city"
+          render={({ field }) => (
+            <FormItem className="space-y-2">
+              <FormLabel>Ville *</FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder="Paris"
+                  className={autoFilledFields.has('city') ? 'bg-green-50 border-green-200' : ''}
+                  {...field}
+                />
+              </FormControl>
+              {!autoFilledFields.has('city') && (
+                <p className="text-sm text-red-600">
+                  Ville requise
+                </p>
+              )}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
 
       <FormField
         control={control}
