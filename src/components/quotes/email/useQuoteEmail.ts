@@ -127,22 +127,6 @@ AUTO PAINT`;
         title: "E-mail envoyé",
         description: `Le devis ${quote?.reference} a été envoyé à ${emailData.to}`,
       });
-
-      // Créer une entrée dans messageries pour tracer l'envoi
-      await supabase.from('messageries').insert({
-        company_id: quote.company_id,
-        client_id: quote.client_id,
-        vehicle_id: quote.vehicle_id,
-        title: `Devis ${quote.reference} envoyé par email`,
-        channel: 'Mail',
-        eta: new Date().toISOString(),
-        message: `Devis n°${quote.reference} envoyé à ${emailData.to}`,
-        summary: 'Envoi de devis par email',
-        priority: 3,
-        resolved: true,
-        is_inbound: false,
-        tags: ['devis', 'email']
-      });
       
       return true;
     } catch (error) {

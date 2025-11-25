@@ -130,22 +130,6 @@ AUTO PAINT`;
         title: "E-mail envoyé",
         description: `La facture ${invoice?.reference} a été envoyée à ${emailData.to}`,
       });
-
-      // Créer une entrée dans messageries pour tracer l'envoi
-      await supabase.from('messageries').insert({
-        company_id: invoice.company_id,
-        client_id: invoice.client_id,
-        vehicle_id: invoice.vehicle_id,
-        title: `Facture ${invoice.reference} envoyée par email`,
-        channel: 'Mail',
-        eta: new Date().toISOString(),
-        message: `Facture n°${invoice.reference} envoyée à ${emailData.to}`,
-        summary: 'Envoi de facture par email',
-        priority: 3,
-        resolved: true,
-        is_inbound: false,
-        tags: ['facture', 'email']
-      });
       
       return true;
     } catch (error) {
