@@ -1,7 +1,8 @@
 import * as pdfjsLib from 'pdfjs-dist';
+import PdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
-// Configurer le worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+// Configurer le worker avec l'URL importée par Vite
+pdfjsLib.GlobalWorkerOptions.workerSrc = PdfWorker;
 
 interface PDFPageImage {
   pageNumber: number;
