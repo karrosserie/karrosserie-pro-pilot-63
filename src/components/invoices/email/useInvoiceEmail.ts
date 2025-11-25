@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { InvoiceEmailFormData } from './types';
 import { Invoice } from '@/services/supabase/invoices';
 import { clientsService } from '@/services/supabase/clients';
+import { companyService } from '@/services/supabase/company';
 import { prepareInvoiceDataForPDF } from '@/utils/invoicePDFGeneration';
 import { pdf } from '@react-pdf/renderer';
 import InvoicePDF from '@/components/invoices/InvoicePDF';
@@ -41,6 +42,9 @@ export const useInvoiceEmail = (invoice: Invoice | null) => {
       vehicleInfo = `${brand}${model ? ` ${model}` : ''} - ${licensePlate}`;
     }
 
+    // Récupérer les informations de l'entreprise pour la signature
+    const companyInfo = await companyService.getCompanyInfo();
+
     const subject = `Facture n°${invoice?.reference || ''} - ${clientName}`;
     
     const message = `Bonjour ${clientName},
@@ -48,7 +52,7 @@ export const useInvoiceEmail = (invoice: Invoice | null) => {
 Veuillez trouver en pièce jointe la facture n°${invoice?.reference || ''} pour votre véhicule ${vehicleInfo}.
 
 Cordialement,
-AUTO PAINT`;
+${companyInfo?.name || 'L\'équipe'}`;
 
     return {
       to: clientEmail,

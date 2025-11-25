@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { InvoiceEmailFormData } from '../../invoices/email/types';
 import { Quote } from '@/services/supabase/quotes';
 import { clientsService } from '@/services/supabase/clients';
+import { companyService } from '@/services/supabase/company';
 import { prepareQuoteDataForPDF } from '@/utils/quotePDFGeneration';
 import { pdf } from '@react-pdf/renderer';
 import InvoicePDF from '@/components/invoices/InvoicePDF';
@@ -52,6 +53,9 @@ export const useQuoteEmail = (quote: Quote | null) => {
       }
     }
 
+    // Récupérer les informations de l'entreprise pour la signature
+    const companyInfo = await companyService.getCompanyInfo();
+
     const subject = `Devis n°${quote?.reference || ''} - ${clientName}`;
     
     const message = `Bonjour ${clientName},
@@ -59,7 +63,7 @@ export const useQuoteEmail = (quote: Quote | null) => {
 Veuillez trouver en pièce jointe le devis n°${quote?.reference || ''} pour votre véhicule ${vehicleInfo}.
 
 Cordialement,
-AUTO PAINT`;
+${companyInfo?.name || 'L\'équipe'}`;
 
     return {
       to: clientEmail,
