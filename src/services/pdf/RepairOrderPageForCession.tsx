@@ -313,7 +313,9 @@ export const RepairOrderMainPage = ({ cession, companyData }: RepairOrderPageFor
 
       {/* Signature section */}
       <View style={styles.signatureSection}>
-        <Text style={[styles.sectionTitle, { textAlign: 'center', marginBottom: 15, fontSize: 14 }]}>Signature du client</Text>
+        <Text style={[styles.sectionTitle, { textAlign: 'center', marginBottom: 15, fontSize: 14 }]}>
+          Signature du client - Ordre de Réparation
+        </Text>
         {(cession.repair_orders as any).client_signature ? (
           <View style={{ alignItems: 'center', marginBottom: 20 }}>
             <Image 
@@ -328,10 +330,13 @@ export const RepairOrderMainPage = ({ cession, companyData }: RepairOrderPageFor
             </Text>
           </View>
         ) : (
-          <View style={[styles.signatureBox, { alignSelf: 'center', marginBottom: 20 }]}>
-            <Text style={{ fontSize: 10, color: '#666', textAlign: 'center' }}>Signature du client</Text>
-            <Text style={{ fontSize: 8, color: '#999', textAlign: 'center', marginTop: 5 }}>
-              (Espace réservé à la signature)
+          <View style={{ alignItems: 'center', marginBottom: 20 }}>
+            <Text style={{ fontSize: 10, fontWeight: 'bold', marginBottom: 8 }}>
+              {clientName}
+            </Text>
+            <Text style={{ fontSize: 12, marginBottom: 10 }}>[Signature3/]</Text>
+            <Text style={{ fontSize: 9, color: '#666' }}>
+              En signant, j'accepte les travaux décrits dans cet ordre de réparation
             </Text>
           </View>
         )}

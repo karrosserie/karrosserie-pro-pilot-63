@@ -101,6 +101,46 @@ Deno.serve(async (req) => {
 
     console.log(`Document signé téléchargé et stocké avec succès: ${urlData.publicUrl}`);
 
+    // Récupérer la cession complète pour obtenir le repair_order_id
+    const { data: fullCession, error: fullCessionError } = await supabase
+      .from('cessions')
+      .select('repair_order_id')
+      .eq('id', cessionId)
+      .single();
+
+    if (fullCession?.repair_order_id) {
+      // Récupérer l'ordre de réparation associé
+      const { data: repairOrder, error: roError } = await supabase
+        .from('repair_orders')
+        .select('id, client_signature, status, clients(first_name, last_name)')
+        .eq('id', fullCession.repair_order_id)
+        .single();
+
+      // Si l'OR n'était pas signé, le marquer comme signé via la cession
+      if (repairOrder && !repairOrder.client_signature && repairOrder.status !== 'Signé') {
+        const clientName = repairOrder.clients 
+          ? `${repairOrder.clients.first_name} ${repairOrder.clients.last_name}`
+          : '';
+          
+        const { error: roUpdateError } = await supabase
+          .from('repair_orders')
+          .update({
+            status: 'Signé',
+            signature_date: new Date().toISOString(),
+            client_name_signature: clientName,
+            // Note: client_signature restera null car on n'extrait pas l'image
+            // mais le statut "Signé" indique que l'OR a été signé via la cession
+          })
+          .eq('id', repairOrder.id);
+          
+        if (roUpdateError) {
+          console.error(`Erreur lors de la mise à jour de l'OR: ${roUpdateError.message}`);
+        } else {
+          console.log(`OR ${repairOrder.id} marqué comme signé via la cession`);
+        }
+      }
+    }
+
     return new Response(
       JSON.stringify({ 
         success: true, 

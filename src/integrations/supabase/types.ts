@@ -2347,6 +2347,7 @@ export type Database = {
           company_id: string | null
           created_at: string
           document_url: string | null
+          expert_mail: string | null
           expert_name: string | null
           id: string
           incident_date: string | null
@@ -2366,6 +2367,7 @@ export type Database = {
           company_id?: string | null
           created_at?: string
           document_url?: string | null
+          expert_mail?: string | null
           expert_name?: string | null
           id?: string
           incident_date?: string | null
@@ -2385,6 +2387,7 @@ export type Database = {
           company_id?: string | null
           created_at?: string
           document_url?: string | null
+          expert_mail?: string | null
           expert_name?: string | null
           id?: string
           incident_date?: string | null
