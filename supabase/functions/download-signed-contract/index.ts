@@ -24,10 +24,10 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Récupérer la cession pour obtenir l'oodrive_contract_id
+    // Récupérer la cession pour obtenir l'oodrive_contract_id et repair_order_id
     const { data: cession, error: cessionError } = await supabase
       .from('cessions')
-      .select('oodrive_contract_id, reference, company_id')
+      .select('oodrive_contract_id, reference, company_id, repair_order_id')
       .eq('id', cessionId)
       .single();
 
@@ -101,19 +101,13 @@ Deno.serve(async (req) => {
 
     console.log(`Document signé téléchargé et stocké avec succès: ${urlData.publicUrl}`);
 
-    // Récupérer la cession complète pour obtenir le repair_order_id
-    const { data: fullCession, error: fullCessionError } = await supabase
-      .from('cessions')
-      .select('repair_order_id')
-      .eq('id', cessionId)
-      .single();
-
-    if (fullCession?.repair_order_id) {
+    // Si la cession a un repair_order_id associé, vérifier et mettre à jour l'OR si nécessaire
+    if (cession.repair_order_id) {
       // Récupérer l'ordre de réparation associé
       const { data: repairOrder, error: roError } = await supabase
         .from('repair_orders')
         .select('id, client_signature, status, clients(first_name, last_name)')
-        .eq('id', fullCession.repair_order_id)
+        .eq('id', cession.repair_order_id)
         .single();
 
       // Si l'OR n'était pas signé, le marquer comme signé via la cession
