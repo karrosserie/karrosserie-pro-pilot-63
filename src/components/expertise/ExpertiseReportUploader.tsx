@@ -13,7 +13,6 @@ import { Button } from '@/components/ui/button';
 import { v4 as uuidv4 } from 'uuid';
 import { SuccessDialog } from '@/components/ui/success-dialog';
 import { useDetailedTracking } from '@/hooks/tracking/useDetailedTracking';
-import { convertPDFToImages, extractBase64FromDataUrl } from '@/utils/pdfToImages';
 
 interface ExpertiseReportUploaderProps {
   onSuccess?: () => void;
@@ -92,16 +91,7 @@ export const ExpertiseReportUploader = ({
       const fileBase64 = await fileToBase64(selectedFile);
       console.log('✅ Fichier converti en base64, taille:', fileBase64.length, 'caractères');
 
-      // 0.5 Convertir le PDF en images (uniquement si c'est un PDF)
-      let pagesAsImages: string[] = [];
-      if (selectedFile.type === 'application/pdf') {
-        console.log('🖼️ Conversion du PDF en images...');
-        const images = await convertPDFToImages(selectedFile, { scale: 2, format: 'png' });
-        pagesAsImages = images.map(img => extractBase64FromDataUrl(img.dataUrl));
-        console.log(`✅ ${pagesAsImages.length} page(s) convertie(s) en images`);
-      }
-
-      console.log('Starting expertise report upload...', { 
+      console.log('Starting expertise report upload...', {
         fileName: selectedFile.name, 
         fileSize: selectedFile.size, 
         userId: user.id 
@@ -223,9 +213,7 @@ export const ExpertiseReportUploader = ({
             companyId: companyId,
             importId: importData.id,
             fileBase64: fileBase64,
-            filename: selectedFile.name,
-            pagesImages: pagesAsImages,
-            totalPages: pagesAsImages.length
+            filename: selectedFile.name
           }),
         });
 
