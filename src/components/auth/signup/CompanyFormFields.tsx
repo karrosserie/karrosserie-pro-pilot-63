@@ -63,20 +63,20 @@ const CompanyFormFields = ({ control, setValue }: CompanyFormFieldsProps) => {
           newAutoFilledFields.add('legalForm');
         }
         
-        // Construire l'adresse complète
-        let fullAddress = '';
+        // Remplir l'adresse (rue uniquement), ville et code postal séparément
         if (companyData.address) {
-          fullAddress = companyData.address;
-          if (companyData.postalCode && companyData.city) {
-            fullAddress += `, ${companyData.postalCode} ${companyData.city}`;
-          }
-        } else if (companyData.postalCode && companyData.city) {
-          fullAddress = `${companyData.postalCode} ${companyData.city}`;
+          setValue('address', companyData.address);
+          newAutoFilledFields.add('address');
         }
         
-        if (fullAddress) {
-          setValue('address', fullAddress);
-          newAutoFilledFields.add('address');
+        if (companyData.city) {
+          setValue('city', companyData.city);
+          newAutoFilledFields.add('city');
+        }
+        
+        if (companyData.postalCode) {
+          setValue('zipcode', companyData.postalCode);
+          newAutoFilledFields.add('zipcode');
         }
         
         // Créer un numéro de TVA automatique basé sur le SIREN
@@ -255,27 +255,75 @@ const CompanyFormFields = ({ control, setValue }: CompanyFormFieldsProps) => {
         name="address"
         render={({ field }) => (
           <FormItem className="space-y-2">
-            <FormLabel>Adresse complète *</FormLabel>
+            <FormLabel>Adresse (rue et numéro) *</FormLabel>
             <FormControl>
               <Input
                 type="text"
-                placeholder="123 Rue de la République, 75001 Paris"
+                placeholder="123 Rue de la République"
                 className={autoFilledFields.has('address') ? 'bg-green-50 border-green-200' : ''}
                 {...field}
               />
             </FormControl>
-            <p className="text-sm text-muted-foreground">
-              Autocomplétion Google Places disponible (à implémenter)
-            </p>
             {!autoFilledFields.has('address') && (
               <p className="text-sm text-red-600">
-                L'adresse complète est requise
+                L'adresse est requise
               </p>
             )}
             <FormMessage />
           </FormItem>
         )}
       />
+
+      <div className="grid grid-cols-2 gap-4">
+        <FormField
+          control={control}
+          name="zipcode"
+          render={({ field }) => (
+            <FormItem className="space-y-2">
+              <FormLabel>Code postal *</FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder="75001"
+                  maxLength={5}
+                  className={autoFilledFields.has('zipcode') ? 'bg-green-50 border-green-200' : ''}
+                  {...field}
+                />
+              </FormControl>
+              {!autoFilledFields.has('zipcode') && (
+                <p className="text-sm text-red-600">
+                  Requis
+                </p>
+              )}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={control}
+          name="city"
+          render={({ field }) => (
+            <FormItem className="space-y-2">
+              <FormLabel>Ville *</FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder="Paris"
+                  className={autoFilledFields.has('city') ? 'bg-green-50 border-green-200' : ''}
+                  {...field}
+                />
+              </FormControl>
+              {!autoFilledFields.has('city') && (
+                <p className="text-sm text-red-600">
+                  Requise
+                </p>
+              )}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
 
       <FormField
         control={control}
