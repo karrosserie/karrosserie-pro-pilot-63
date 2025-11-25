@@ -48,6 +48,8 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
       siret: "",
       vatNumber: "",
       address: "",
+      postalCode: "",
+      city: "",
       nafCode: "",
     },
   });
@@ -107,7 +109,7 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
 
   const handleCompanyNext = async () => {
     // Validate company info fields before proceeding
-    const companyFields = ['siren', 'companyName', 'legalForm', 'siret', 'vatNumber', 'address', 'nafCode'];
+    const companyFields = ['siren', 'companyName', 'legalForm', 'siret', 'vatNumber', 'address', 'postalCode', 'city', 'nafCode'];
     const isCompanyInfoValid = await form.trigger(companyFields as any);
     
     if (isCompanyInfoValid) {
@@ -135,6 +137,8 @@ const SignupForm = ({ onToggleMode }: SignupFormProps) => {
         siret: data.siret,
         vatNumber: data.vatNumber,
         address: data.address,
+        postalCode: data.postalCode,
+        city: data.city,
         nafCode: data.nafCode,
       };
       
