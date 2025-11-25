@@ -16,6 +16,8 @@ export interface AuthSignUpData {
   siret?: string;
   vatNumber?: string;
   address?: string;
+  city?: string;
+  zipcode?: string;
   nafCode?: string;
 }
 
@@ -64,6 +66,8 @@ export const authService = {
     siret,
     vatNumber,
     address,
+    city,
+    zipcode,
     nafCode
   }: AuthSignUpData) => {
     const { data, error } = await supabase.auth.signUp({
@@ -82,6 +86,8 @@ export const authService = {
           company_siret: siret,
           company_vat_number: vatNumber,
           company_address: address,
+          company_city: city,
+          company_zipcode: zipcode,
           company_naf_code: nafCode,
         },
         emailRedirectTo: `${window.location.origin}/auth`,

@@ -19,6 +19,8 @@ export const signupSchema = z.object({
   siret: z.string().min(14, "Le SIRET doit contenir exactement 14 chiffres").max(14, "Le SIRET doit contenir exactement 14 chiffres"),
   vatNumber: z.string().min(1, "Le numéro de TVA est requis"),
   address: z.string().min(1, "L'adresse complète est requise"),
+  city: z.string().min(1, "La ville est requise"),
+  zipcode: z.string().min(1, "Le code postal est requis"),
   nafCode: z.string().min(1, "Le code NAF est requis"),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Les mots de passe ne correspondent pas",
