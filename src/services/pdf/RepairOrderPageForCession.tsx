@@ -334,7 +334,7 @@ export const RepairOrderMainPage = ({ cession, companyData }: RepairOrderPageFor
             <Text style={{ fontSize: 10, fontWeight: 'bold', marginBottom: 8 }}>
               {clientName}
             </Text>
-            <Text style={{ fontSize: 12, marginBottom: 10 }}>[Signature3/]</Text>
+            <Text style={{ fontSize: 12, marginBottom: 10 }}>[Signature2/]</Text>
             <Text style={{ fontSize: 9, color: '#666' }}>
               En signant, j'accepte les travaux décrits dans cet ordre de réparation
             </Text>
