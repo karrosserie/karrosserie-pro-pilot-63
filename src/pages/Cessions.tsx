@@ -95,6 +95,22 @@ const Cessions = () => {
                   data: { status: 'signee' }
                 });
                 
+                // Télécharger le document signé depuis Oodrive et mettre à jour l'OR si nécessaire
+                console.log('Téléchargement du document signé et mise à jour de l\'OR');
+                try {
+                  const { error: downloadError } = await supabase.functions.invoke('download-signed-contract', {
+                    body: { cessionId: cession.id }
+                  });
+                  
+                  if (downloadError) {
+                    console.error('Erreur lors du téléchargement du document signé:', downloadError);
+                  } else {
+                    console.log('Document signé téléchargé et OR mis à jour avec succès');
+                  }
+                } catch (downloadErr) {
+                  console.error('Exception lors du téléchargement:', downloadErr);
+                }
+                
                 // Déclencher automatiquement l'envoi du courrier électronique
                 console.log('Déclenchement automatique de l\'envoi du courrier électronique');
                 
