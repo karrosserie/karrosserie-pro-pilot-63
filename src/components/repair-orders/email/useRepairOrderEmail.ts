@@ -148,6 +148,22 @@ ${companyName}`
         title: "Email envoyé",
         description: `L'ordre de réparation ${repairOrder?.reference || ''} a été envoyé par email à ${formData.recipient}.`
       });
+
+      // Créer une entrée dans messageries pour tracer l'envoi
+      await supabase.from('messageries').insert({
+        company_id: fullRepairOrder.company_id,
+        client_id: repairOrder.clients?.id || null,
+        vehicle_id: repairOrder.vehicles?.id || null,
+        title: `Ordre de réparation ${repairOrder.reference} envoyé par email`,
+        channel: 'Mail',
+        eta: new Date().toISOString(),
+        message: `OR n°${repairOrder.reference} envoyé à ${formData.recipient}`,
+        summary: 'Envoi d\'ordre de réparation par email',
+        priority: 3,
+        resolved: true,
+        is_inbound: false,
+        tags: ['ordre_reparation', 'email']
+      });
       
       return true;
     } catch (error) {
