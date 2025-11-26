@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Camera, Upload, File, Trash2, Eye } from 'lucide-react';
+import { Camera, Upload, File, Trash2, Eye, ScanLine } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,6 +10,8 @@ import { Camera as CapCamera, CameraResultType, CameraSource } from '@capacitor/
 import { Capacitor } from '@capacitor/core';
 import { ViolationValidationModal } from './ViolationValidationModal';
 import { AIAnalysisModal } from './AIAnalysisModal';
+import { DocumentScanner } from '@/components/shared/document-scanner/DocumentScanner';
+import { useMobileDetection } from '@/hooks/use-mobile-detection';
 
 interface ViolationDocumentUploadProps {
   documentUrl?: string;
@@ -28,6 +30,8 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
   violationId,
   companyId
 }) => {
+  const isMobile = useMobileDetection();
+  const [showScanner, setShowScanner] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showValidationModal, setShowValidationModal] = useState(false);
@@ -324,6 +328,49 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
     return <Eye className="h-4 w-4" />;
   };
 
+  const handleScanCapture = async (blob: Blob) => {
+    setShowScanner(false);
+    
+    if (!user) return;
+    
+    try {
+      setIsUploading(true);
+      
+      const fileName = `${user.id}/${Date.now()}.jpg`;
+      
+      const { data, error } = await supabase.storage
+        .from('violations')
+        .upload(fileName, blob, { contentType: 'image/jpeg' });
+
+      if (error) throw error;
+
+      const { data: urlData } = supabase.storage
+        .from('violations')
+        .getPublicUrl(data.path);
+
+      onDocumentChange(urlData.publicUrl);
+      
+      toast({
+        title: "Document scanné",
+        description: "Le document a été scanné et uploadé avec succès."
+      });
+
+      // Déclencher l'analyse IA automatiquement
+      if (companyId) {
+        await analyzeViolation(urlData.publicUrl);
+      }
+    } catch (error) {
+      console.error('Error uploading scanned document:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'uploader le document scanné.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleContinueAnyway = () => {
     if (pendingAnalysisData && onDocumentAnalyzed) {
       console.log('User chose to continue anyway, using analysis data:', pendingAnalysisData);
@@ -336,6 +383,10 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
     setPendingAnalysisData(null);
     setValidationError(null);
   };
+
+  if (showScanner) {
+    return <DocumentScanner onCapture={handleScanCapture} onClose={() => setShowScanner(false)} />;
+  }
 
   return (
     <>
@@ -351,6 +402,19 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
         {!documentUrl ? (
           <div className="space-y-2">
             <div className="flex flex-col sm:flex-row gap-2">
+              {isMobile && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowScanner(true)}
+                  disabled={isUploading || isAnalyzing}
+                  className="flex-1"
+                >
+                  <ScanLine className="h-4 w-4 mr-2" />
+                  Scanner le document
+                </Button>
+              )}
+              
               <Button
                 type="button"
                 variant="outline"
