@@ -48,15 +48,12 @@ export const ScannerOverlay: React.FC<ScannerOverlayProps> = ({
         </div>
       )}
 
-      {/* Top instruction bar */}
+      {/* Top title bar only */}
       <div className="absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/80 to-transparent">
         <div className="text-center">
           <h2 className="text-white text-lg font-semibold">
             Scanner de document
           </h2>
-          <p className="text-white/80 text-sm mt-1">
-            Alignez le document avec les repères
-          </p>
         </div>
       </div>
     </div>
