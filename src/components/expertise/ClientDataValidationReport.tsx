@@ -120,7 +120,7 @@ export function ClientDataValidationReport({
           )}
         </div>
         
-        <DialogFooter className="flex flex-row flex-wrap gap-3 pt-4 justify-center">
+        <div className="flex flex-row flex-wrap gap-3 pt-4 justify-center">
           {onDismiss && (
             <Button 
               variant="outline" 
@@ -147,7 +147,7 @@ export function ClientDataValidationReport({
               📄 Créer le devis
             </Button>
           )}
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
