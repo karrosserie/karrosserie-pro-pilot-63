@@ -58,7 +58,7 @@ const findDocumentContour = (src: any) => {
     
     return bestContour;
   } catch (err) {
-    console.error('Error finding contour:', err);
+    console.error('[OpenCV] Contour detection error:', err);
     gray.delete();
     blur.delete();
     edges.delete();
@@ -91,32 +91,28 @@ export const useDocumentScanner = () => {
   const streamRef = useRef<MediaStream | null>(null);
   const animationFrameRef = useRef<number | null>(null);
 
-  // Initialize OpenCV
+  // Initialize OpenCV on mount (independent of camera)
   useEffect(() => {
-    const initialize = async () => {
+    console.log('[OpenCV] Initializing...');
+    const initOpenCV = async () => {
       try {
-        setStatus('loading');
         await loadOpenCV();
-        
-        if (isOpenCVAvailable()) {
-          setStatus('ready');
-        } else {
-          throw new Error('OpenCV not available');
-        }
+        console.log('[OpenCV] ✓ Loaded');
+        setStatus('ready');
       } catch (err) {
-        console.error('Failed to initialize scanner:', err);
-        setError('Impossible de charger le scanner de documents');
-        setStatus('error');
+        console.error('[OpenCV] Load error:', err);
+        setError('OpenCV non disponible - mode photo simple activé');
+        // Don't set status to 'error', allow camera to work in fallback mode
       }
     };
 
-    initialize();
+    initOpenCV();
   }, []);
 
-  // Start camera
+  // Start camera (independent of OpenCV)
   const startCamera = useCallback(async () => {
+    console.log('[Camera] Requesting access...');
     try {
-      console.log('🎥 Requesting camera access...');
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { 
           facingMode: 'environment',
@@ -124,30 +120,54 @@ export const useDocumentScanner = () => {
           height: { ideal: 1080 }
         }
       });
+      console.log('[Camera] ✓ Stream obtained');
 
-      console.log('✅ Camera stream obtained');
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        streamRef.current = stream;
-        
-        // Wait for video to be ready before starting detection
-        videoRef.current.onloadedmetadata = () => {
-          console.log('📹 Video metadata loaded, starting playback');
-          videoRef.current?.play().then(() => {
-            console.log('▶️ Video playing, switching to searching mode');
-            setStatus('searching');
-          }).catch(err => {
-            console.error('Video play error:', err);
-          });
-        };
+      if (!videoRef.current) {
+        console.error('[Camera] Video element not found');
+        throw new Error('Video element not available');
       }
+
+      videoRef.current.srcObject = stream;
+      streamRef.current = stream;
+      
+      // Wait for video to be ready
+      return new Promise<void>((resolve, reject) => {
+        if (!videoRef.current) {
+          reject(new Error('Video ref lost'));
+          return;
+        }
+
+        videoRef.current.onloadedmetadata = () => {
+          console.log('[Camera] Metadata loaded');
+          if (!videoRef.current) return;
+          
+          videoRef.current.play()
+            .then(() => {
+              console.log('[Camera] ✓ Playing');
+              setStatus('searching');
+              resolve();
+            })
+            .catch(err => {
+              console.error('[Camera] Play error:', err);
+              reject(err);
+            });
+        };
+
+        // Timeout for metadata loading
+        setTimeout(() => {
+          if (status !== 'searching') {
+            console.error('[Camera] Metadata timeout');
+            reject(new Error('Camera initialization timeout'));
+          }
+        }, 5000);
+      });
     } catch (err) {
-      console.error('❌ Camera access error:', err);
-      setError('Impossible d\'accéder à la caméra. Veuillez autoriser l\'accès.');
+      console.error('[Camera] Access error:', err);
+      setError('Impossible d\'accéder à la caméra');
       setStatus('error');
+      throw err;
     }
-  }, []);
+  }, [status]);
 
   // Stop camera
   const stopCamera = useCallback(() => {
@@ -171,18 +191,15 @@ export const useDocumentScanner = () => {
   // Detect document in frame
   const detectDocument = useCallback(() => {
     if (!videoRef.current || !canvasRef.current) {
-      console.log('🔍 Detection skipped - missing refs');
       return null;
     }
 
     if (videoRef.current.readyState !== videoRef.current.HAVE_ENOUGH_DATA) {
-      console.log('🔍 Detection skipped - video not ready');
       return null;
     }
 
     const cv = (window as any).cv;
     if (!cv) {
-      console.log('🔍 Detection skipped - OpenCV not available');
       return null;
     }
 
@@ -237,7 +254,7 @@ export const useDocumentScanner = () => {
         return canvas;
       }
     } catch (err) {
-      console.error('Detection error:', err);
+      console.error('[Detection] Error:', err);
       setDetectedCorners(null);
       return null;
     }
@@ -328,7 +345,7 @@ export const useDocumentScanner = () => {
         }, 'image/jpeg', 0.95);
       });
     } catch (err) {
-      console.error('Extraction error:', err);
+      console.error('[Extraction] Error:', err);
       return null;
     }
   }, [detectedCorners]);

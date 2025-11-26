@@ -1,7 +1,7 @@
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Camera, X, Loader2, AlertCircle } from 'lucide-react';
+import { Camera, X, AlertCircle, RefreshCw } from 'lucide-react';
 import { useDocumentScanner } from './hooks/useDocumentScanner';
 import { ScannerOverlay } from './ScannerOverlay';
 import { useToast } from '@/hooks/use-toast';
@@ -33,50 +33,89 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
   const [videoWidth, setVideoWidth] = useState(0);
   const [videoHeight, setVideoHeight] = useState(0);
   const [fallbackMode, setFallbackMode] = useState(false);
+  const [cameraError, setCameraError] = useState(false);
   const animationFrameRef = useRef<number | null>(null);
+  const retryTimeoutRef = useRef<NodeJS.Timeout>();
 
-  // Start camera when ready
-  useEffect(() => {
-    if (status === 'ready') {
-      console.log('📸 Status ready, starting camera...');
-      startCamera();
-    }
-
-    return () => {
-      stopCamera();
+  // Start camera IMMEDIATELY when component mounts (independent of OpenCV)
+  const initializeCamera = useCallback(async () => {
+    console.log('[Camera] Initializing...');
+    
+    // Retry mechanism if videoRef not ready
+    const attemptStart = async (attempts = 0): Promise<void> => {
+      if (attempts > 10) {
+        console.error('[Camera] Failed after 10 attempts');
+        setCameraError(true);
+        return;
+      }
+      
+      if (!videoRef.current) {
+        console.log(`[Camera] VideoRef not ready, retrying... (${attempts + 1})`);
+        await new Promise(resolve => requestAnimationFrame(() => resolve(null)));
+        return attemptStart(attempts + 1);
+      }
+      
+      try {
+        await startCamera();
+        console.log('[Camera] ✓ Started');
+        
+        // Set timeout to check if video displays
+        retryTimeoutRef.current = setTimeout(() => {
+          if (videoWidth === 0 || videoHeight === 0) {
+            console.warn('[Camera] No video dimensions after 3s');
+            setCameraError(true);
+          }
+        }, 3000);
+      } catch (err) {
+        console.error('[Camera] Start error:', err);
+        setCameraError(true);
+      }
     };
-  }, [status, startCamera, stopCamera]);
+    
+    await attemptStart();
+  }, [startCamera, videoWidth, videoHeight]);
 
-  // Fallback timeout if OpenCV fails to load
-  useEffect(() => {
-    const timeout = setTimeout(() => {
+  useLayoutEffect(() => {
+    console.log('[Scanner] Mounted');
+    initializeCamera();
+    
+    // Fallback mode if OpenCV doesn't load within 5 seconds
+    const fallbackTimeout = setTimeout(() => {
       if (status === 'loading') {
-        console.warn('⚠️ OpenCV timeout, switching to fallback mode');
+        console.log('[OpenCV] Timeout, activating fallback mode');
         setFallbackMode(true);
       }
     }, 5000);
-    return () => clearTimeout(timeout);
-  }, [status]);
+
+    return () => {
+      console.log('[Scanner] Unmounting');
+      clearTimeout(fallbackTimeout);
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+      stopCamera();
+    };
+  }, [initializeCamera, stopCamera, status]);
 
   // Video metadata handler
   const handleVideoMetadata = () => {
     if (videoRef.current && videoRef.current.videoWidth > 0) {
-      console.log('📹 Video metadata loaded:', {
-        width: videoRef.current.videoWidth,
-        height: videoRef.current.videoHeight
-      });
+      console.log('[Video] Metadata loaded:', videoRef.current.videoWidth, 'x', videoRef.current.videoHeight);
       setVideoWidth(videoRef.current.videoWidth);
       setVideoHeight(videoRef.current.videoHeight);
     }
   };
 
-  const handleVideoCanPlay = () => {
-    console.log('▶️ Video can play');
-  };
-
-  // Detection loop
-  useEffect(() => {
+  // Detection loop (only if OpenCV is ready)
+  useLayoutEffect(() => {
     if (status !== 'searching' && status !== 'found') {
+      return;
+    }
+
+    if (fallbackMode) {
       return;
     }
 
@@ -102,7 +141,7 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [status, detectDocument, detectedCorners]);
+  }, [status, detectDocument, detectedCorners, fallbackMode]);
 
   const handleCapture = async () => {
     setIsCapturing(true);
@@ -110,7 +149,7 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
     try {
       // Fallback mode: simple photo capture
       if (fallbackMode) {
-        console.log('📷 Fallback capture mode');
+        console.log('[Capture] Fallback mode');
         if (videoRef.current && canvasRef.current) {
           const canvas = canvasRef.current;
           const video = videoRef.current;
@@ -147,7 +186,7 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
         throw new Error('Extraction failed');
       }
     } catch (err) {
-      console.error('Capture error:', err);
+      console.error('[Capture] Error:', err);
       toast({
         title: "Erreur",
         description: "Impossible de scanner le document",
@@ -163,25 +202,49 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
     onClose();
   };
 
-  if (status === 'loading') {
+  // Camera error state with retry
+  if (cameraError) {
     return (
-      <div className="fixed inset-0 z-50 bg-background flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground">Chargement du scanner...</p>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
+        <div className="text-center p-6 max-w-md">
+          <AlertCircle className="w-16 h-16 mx-auto mb-4 text-red-500" />
+          <p className="text-white text-lg mb-2">
+            Impossible d'accéder à la caméra
+          </p>
+          <p className="text-white/70 text-sm mb-6">
+            Vérifiez les permissions de la caméra dans les paramètres de votre navigateur
+          </p>
+          <div className="flex gap-3 justify-center">
+            <Button 
+              onClick={() => {
+                setCameraError(false);
+                initializeCamera();
+              }} 
+              variant="outline"
+              className="gap-2 bg-white/10 border-white/20 text-white hover:bg-white/20"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Réessayer
+            </Button>
+            <Button onClick={handleClose} variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+              Fermer
+            </Button>
+          </div>
         </div>
       </div>
     );
   }
 
-  if (status === 'error') {
+  // Generic error state
+  if (status === 'error' || error) {
     return (
-      <div className="fixed inset-0 z-50 bg-background flex items-center justify-center p-4">
-        <div className="text-center max-w-md">
-          <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Erreur</h3>
-          <p className="text-muted-foreground mb-4">{error}</p>
-          <Button onClick={handleClose} variant="outline">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
+        <div className="text-center p-6">
+          <AlertCircle className="w-16 h-16 mx-auto mb-4 text-red-500" />
+          <p className="text-white text-lg mb-4">
+            {error || 'Erreur lors de l\'initialisation'}
+          </p>
+          <Button onClick={handleClose} variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
             Fermer
           </Button>
         </div>
@@ -198,7 +261,6 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
         playsInline
         muted
         onLoadedMetadata={handleVideoMetadata}
-        onCanPlay={handleVideoCanPlay}
         className="absolute inset-0 w-full h-full object-cover"
       />
 
@@ -233,30 +295,18 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
             size="lg"
             className="bg-primary hover:bg-primary/90"
           >
-            {isCapturing ? (
-              <>
-                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                Capture...
-              </>
-            ) : (
-              <>
-                <Camera className="h-5 w-5 mr-2" />
-                Capturer
-              </>
-            )}
+            <Camera className="h-5 w-5 mr-2" />
+            Capturer
           </Button>
         </div>
 
         {/* Status message */}
         <div className="text-center mt-4">
-          <p className="text-white text-sm">
-            {fallbackMode ? (
-              <span className="text-yellow-400">Mode photo simple</span>
-            ) : isDetected ? (
-              <span className="text-green-400">✓ Document détecté</span>
-            ) : (
-              <span>Positionnez le document dans le cadre</span>
-            )}
+          <p className="text-white text-sm bg-black/70 inline-block px-4 py-2 rounded-full backdrop-blur-sm">
+            {!fallbackMode && status === 'searching' && 'Recherche automatique...'}
+            {!fallbackMode && status === 'found' && '✓ Document détecté'}
+            {!fallbackMode && isDetected && '✓ Document détecté'}
+            {fallbackMode && 'Mode photo - Cadrez et capturez'}
           </p>
         </div>
       </div>
