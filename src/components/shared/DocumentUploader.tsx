@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { FileUpload } from '@/components/ui/file-upload';
 import { ImageCropper } from './ImageCropper';
 import { useDocumentUpload } from './document-uploader/hooks/useDocumentUpload';
@@ -8,6 +8,10 @@ import { DocumentDisplay } from './document-uploader/DocumentDisplay';
 import { DocumentUploadLoading } from './document-uploader/DocumentUploadLoading';
 import { DocumentAnalysisLoading } from './document-uploader/DocumentAnalysisLoading';
 import { DocumentEmptyState } from './document-uploader/DocumentEmptyState';
+import { DocumentScanner } from './document-scanner/DocumentScanner';
+import { Button } from '@/components/ui/button';
+import { Camera, Upload } from 'lucide-react';
+import { useMobileDetection } from '@/hooks/use-mobile-detection';
 
 interface DocumentUploaderProps {
   documentType: string;
@@ -32,6 +36,10 @@ export function DocumentUploader({
   customContent,
   allowDeleteInViewMode = false
 }: DocumentUploaderProps) {
+  const isMobile = useMobileDetection();
+  const [showScanner, setShowScanner] = useState(false);
+  const [uploadMode, setUploadMode] = useState<'choice' | 'upload' | 'scan'>('choice');
+
   const { isUploading, isDeleting, isAnalyzing, uploadFile, handleDelete } = useDocumentUpload({
     documentType,
     documentId,
@@ -52,6 +60,18 @@ export function DocumentUploader({
     documentType,
     onFileUpload: uploadFile
   });
+
+  const handleScanCapture = async (blob: Blob) => {
+    const file = new File([blob], `scan-${Date.now()}.jpg`, { type: 'image/jpeg' });
+    await handleFileUpload(file);
+    setShowScanner(false);
+    setUploadMode('choice');
+  };
+
+  const handleScanClose = () => {
+    setShowScanner(false);
+    setUploadMode('choice');
+  };
 
   // Ne pas afficher le spinner pendant le crop, laisser l'ImageCropper s'afficher
 
@@ -80,6 +100,40 @@ export function DocumentUploader({
   if (isViewMode) {
     return <DocumentEmptyState />;
   }
+
+  // Show scanner
+  if (showScanner) {
+    return <DocumentScanner onCapture={handleScanCapture} onClose={handleScanClose} />;
+  }
+
+  // Show upload mode choice on mobile
+  if (isMobile && uploadMode === 'choice') {
+    return (
+      <div className="space-y-3">
+        <Button
+          onClick={() => {
+            setShowScanner(true);
+            setUploadMode('scan');
+          }}
+          className="w-full h-20 text-lg"
+          size="lg"
+        >
+          <Camera className="h-6 w-6 mr-3" />
+          Scanner le document
+        </Button>
+        
+        <Button
+          onClick={() => setUploadMode('upload')}
+          variant="outline"
+          className="w-full h-20 text-lg"
+          size="lg"
+        >
+          <Upload className="h-6 w-6 mr-3" />
+          Choisir un fichier
+        </Button>
+      </div>
+    );
+  }
   
   return (
     <>
@@ -88,6 +142,17 @@ export function DocumentUploader({
         accept=".pdf,.jpg,.jpeg,.png"
         maxSize={10}
       />
+      
+      {isMobile && uploadMode === 'upload' && (
+        <Button
+          onClick={() => setUploadMode('choice')}
+          variant="ghost"
+          className="w-full mt-2"
+          size="sm"
+        >
+          Retour
+        </Button>
+      )}
       
       {imageToProcess && (
         <ImageCropper
