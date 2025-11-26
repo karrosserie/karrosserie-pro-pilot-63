@@ -36,6 +36,7 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
   const [cameraError, setCameraError] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showManualPlayButton, setShowManualPlayButton] = useState(false);
   const animationFrameRef = useRef<number | null>(null);
   const retryTimeoutRef = useRef<NodeJS.Timeout>();
 
@@ -63,14 +64,13 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
         await startCamera();
         console.log('[Camera] ✓ Started');
         
-        // Set timeout to check if video actually plays
+        // Set timeout to check if video actually plays (3s pour détecter autoplay bloqué)
         retryTimeoutRef.current = setTimeout(() => {
           if (!isVideoPlaying) {
-            console.warn('[Camera] No video playing after 5s');
-            setFallbackMode(true);
-            setIsLoading(false);
+            console.warn('[Camera] No video playing after 3s - showing manual play button');
+            setShowManualPlayButton(true);
           }
-        }, 5000);
+        }, 3000);
       } catch (err) {
         console.error('[Camera] Start error:', err);
         setCameraError(true);
@@ -116,11 +116,33 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
   };
 
   const handleVideoPlay = () => {
-    console.log('[Video] ✓ Playing');
-    // Vérifier que la vidéo a réellement des données avant de la considérer comme "jouant"
+    console.log('[Video] ✓ onPlay event fired');
+    setIsVideoPlaying(true);
+    setIsLoading(false);
+    setShowManualPlayButton(false);
+    if (retryTimeoutRef.current) {
+      clearTimeout(retryTimeoutRef.current);
+    }
+  };
+
+  const handleVideoLoadedData = () => {
+    console.log('[Video] ✓ onLoadedData - Video has data');
     if (videoRef.current && videoRef.current.readyState >= 2) {
       setIsVideoPlaying(true);
       setIsLoading(false);
+      setShowManualPlayButton(false);
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
+    }
+  };
+
+  const handleVideoTimeUpdate = () => {
+    if (!isVideoPlaying && videoRef.current && videoRef.current.currentTime > 0) {
+      console.log('[Video] ✓ onTimeUpdate - Video actually playing');
+      setIsVideoPlaying(true);
+      setIsLoading(false);
+      setShowManualPlayButton(false);
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current);
       }
@@ -129,6 +151,26 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
 
   const handleVideoCanPlay = () => {
     console.log('[Video] Can play');
+  };
+
+  const handleManualPlayClick = async () => {
+    console.log('[Video] Manual play button clicked');
+    if (videoRef.current) {
+      try {
+        await videoRef.current.play();
+        console.log('[Video] ✓ Manual play successful');
+        setIsVideoPlaying(true);
+        setIsLoading(false);
+        setShowManualPlayButton(false);
+      } catch (err) {
+        console.error('[Video] Manual play failed:', err);
+        toast({
+          title: "Erreur",
+          description: "Impossible de démarrer la vidéo",
+          variant: "destructive"
+        });
+      }
+    }
   };
 
   // Detection loop (only if OpenCV is ready)
@@ -285,6 +327,8 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
         onLoadedMetadata={handleVideoMetadata}
         onCanPlay={handleVideoCanPlay}
         onPlay={handleVideoPlay}
+        onLoadedData={handleVideoLoadedData}
+        onTimeUpdate={handleVideoTimeUpdate}
         className="absolute inset-0 w-full h-full object-cover"
       />
 
@@ -294,6 +338,27 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
           <div className="text-center">
             <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4" />
             <p className="text-white text-sm">Démarrage de la caméra...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Manual play button if autoplay is blocked */}
+      {showManualPlayButton && !isVideoPlaying && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/80">
+          <div className="text-center p-6">
+            <Camera className="w-16 h-16 mx-auto mb-4 text-white" />
+            <p className="text-white text-lg mb-2">Caméra prête</p>
+            <p className="text-white/70 text-sm mb-6">
+              Appuyez sur le bouton pour démarrer
+            </p>
+            <Button 
+              onClick={handleManualPlayClick}
+              size="lg"
+              className="bg-primary hover:bg-primary/90"
+            >
+              <Camera className="h-5 w-5 mr-2" />
+              Démarrer la caméra
+            </Button>
           </div>
         </div>
       )}

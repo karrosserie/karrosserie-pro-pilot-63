@@ -130,6 +130,14 @@ export const useDocumentScanner = () => {
       videoRef.current.srcObject = stream;
       streamRef.current = stream;
       
+      // Forcer le play explicitement pour éviter les problèmes d'autoplay bloqué sur mobile
+      try {
+        await videoRef.current.play();
+        console.log('[Camera] ✓ Video.play() called successfully');
+      } catch (playErr) {
+        console.warn('[Camera] Autoplay blocked, will require user interaction:', playErr);
+      }
+      
       // Enable OpenCV detection when ready
       if (isOpenCVAvailable()) {
         setStatus('searching');
