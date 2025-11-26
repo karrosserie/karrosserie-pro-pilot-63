@@ -159,6 +159,17 @@ export function ClientValidationWatcher() {
       setIsDialogOpen(true);
 
       await sendSms(reportId, clientId, clientName, missingFields, false);
+
+      // Envoyer automatiquement la demande de documents au client
+      if (missingFields.length > 0 && companyData?.id) {
+        try {
+          const { sendDocumentsRequest } = await import('@/services/documentsRequestService');
+          await sendDocumentsRequest(clientId, companyData.id);
+          console.log('✅ Demande de documents envoyée automatiquement au client');
+        } catch (error) {
+          console.error('❌ Erreur envoi demande documents:', error);
+        }
+      }
     };
 
     fetchClientData();
@@ -180,22 +191,6 @@ export function ClientValidationWatcher() {
         notification.clientName
       );
     }
-    setIsDialogOpen(false);
-    clearNotification();
-  };
-
-  const handleRequestDocuments = async () => {
-    if (!clientData?.id) return;
-    
-    try {
-      const { sendDocumentsRequest } = await import('@/services/documentsRequestService');
-      await sendDocumentsRequest(clientData.id, companyData?.id);
-      toast.success('Demande de documents envoyée au client');
-    } catch (error) {
-      console.error('Error sending documents request:', error);
-      toast.error('Erreur lors de l\'envoi de la demande');
-    }
-    
     setIsDialogOpen(false);
     clearNotification();
   };
@@ -246,7 +241,6 @@ export function ClientValidationWatcher() {
       onOpenChange={setIsDialogOpen}
       client={clientData}
       validationResults={notification.validationResults}
-      onRequestDocuments={handleRequestDocuments}
       onEditClient={handleEditClient}
       onDismiss={handleDismiss}
       onCreateQuoteAnyway={handleCreateQuoteAnyway}

@@ -27,7 +27,6 @@ interface ClientDataValidationReportProps {
   onOpenChange: (open: boolean) => void;
   client: Client | { id: string; first_name: string; last_name: string };
   validationResults: ValidationResults;
-  onRequestDocuments: () => void;
   onEditClient: () => void;
   onDismiss?: () => void;
   onCreateQuoteAnyway?: () => void;
@@ -38,7 +37,6 @@ export function ClientDataValidationReport({
   onOpenChange,
   client,
   validationResults,
-  onRequestDocuments,
   onEditClient,
   onDismiss,
   onCreateQuoteAnyway
@@ -143,34 +141,17 @@ export function ClientDataValidationReport({
             </Button>
           </div>
           
-          {/* Actions principales */}
-          <div className="flex flex-col gap-2 w-full">
+          {/* Action principale : Créer le devis quand même */}
+          {validationResults.validation.errors.length === 0 && 
+           validationResults.missing.missingCount > 0 && 
+           onCreateQuoteAnyway && (
             <Button 
-              onClick={onRequestDocuments} 
-              disabled={
-                validationResults.validation.errors.length > 0 || 
-                validationResults.missing.missingCount === 0
-              }
-              className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 w-full"
+              onClick={onCreateQuoteAnyway}
+              className="bg-green-600 hover:bg-green-700 w-full font-semibold"
             >
-              {validationResults.validation.errors.length > 0
-                ? "❌ Corriger les erreurs d'abord"
-                : validationResults.missing.missingCount === 0
-                ? "✅ Aucun document à demander"
-                : "📧 Demander les documents"}
+              📄 Créer le devis quand même
             </Button>
-            
-            {validationResults.validation.errors.length === 0 && 
-             validationResults.missing.missingCount > 0 && 
-             onCreateQuoteAnyway && (
-              <Button 
-                onClick={onCreateQuoteAnyway}
-                className="bg-green-600 hover:bg-green-700 w-full font-semibold"
-              >
-                📄 Créer le devis quand même
-              </Button>
-            )}
-          </div>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
