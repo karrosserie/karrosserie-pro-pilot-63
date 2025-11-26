@@ -120,11 +120,13 @@ export function ClientDataValidationReport({
           )}
         </div>
         
-        <div className="flex flex-row flex-wrap gap-3 pt-4 justify-center">
+        <div className="flex flex-row flex-wrap gap-4 pt-4 justify-center">
           {onDismiss && (
             <Button 
               variant="outline" 
               onClick={onDismiss}
+              size="lg"
+              className="px-8"
             >
               🕐 Plus tard
             </Button>
@@ -132,6 +134,8 @@ export function ClientDataValidationReport({
           <Button 
             variant="outline" 
             onClick={onEditClient}
+            size="lg"
+            className="px-8"
           >
             ✏️ Corriger
           </Button>
@@ -142,7 +146,8 @@ export function ClientDataValidationReport({
            onCreateQuoteAnyway && (
             <Button 
               onClick={onCreateQuoteAnyway}
-              className="bg-green-600 hover:bg-green-700 font-semibold"
+              size="lg"
+              className="bg-green-600 hover:bg-green-700 font-semibold px-8"
             >
               📄 Créer le devis
             </Button>
