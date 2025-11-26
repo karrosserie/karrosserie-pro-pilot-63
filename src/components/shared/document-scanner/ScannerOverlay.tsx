@@ -1,0 +1,62 @@
+
+import React from 'react';
+
+interface ScannerOverlayProps {
+  isDetected: boolean;
+  status: 'loading' | 'ready' | 'searching' | 'found' | 'error';
+}
+
+export const ScannerOverlay: React.FC<ScannerOverlayProps> = ({
+  isDetected
+}) => {
+  return (
+    <div className="absolute inset-0 pointer-events-none">
+      {/* Corner guides */}
+      <div className="absolute inset-8 border-2 border-dashed rounded-lg transition-colors duration-300"
+        style={{
+          borderColor: isDetected ? 'rgba(34, 197, 94, 0.8)' : 'rgba(255, 255, 255, 0.4)'
+        }}
+      >
+        {/* Top-left corner */}
+        <div className="absolute -top-1 -left-1 w-8 h-8 border-t-4 border-l-4 rounded-tl-lg transition-colors duration-300"
+          style={{
+            borderColor: isDetected ? 'rgb(34, 197, 94)' : 'rgb(255, 255, 255)'
+          }}
+        />
+        
+        {/* Top-right corner */}
+        <div className="absolute -top-1 -right-1 w-8 h-8 border-t-4 border-r-4 rounded-tr-lg transition-colors duration-300"
+          style={{
+            borderColor: isDetected ? 'rgb(34, 197, 94)' : 'rgb(255, 255, 255)'
+          }}
+        />
+        
+        {/* Bottom-left corner */}
+        <div className="absolute -bottom-1 -left-1 w-8 h-8 border-b-4 border-l-4 rounded-bl-lg transition-colors duration-300"
+          style={{
+            borderColor: isDetected ? 'rgb(34, 197, 94)' : 'rgb(255, 255, 255)'
+          }}
+        />
+        
+        {/* Bottom-right corner */}
+        <div className="absolute -bottom-1 -right-1 w-8 h-8 border-b-4 border-r-4 rounded-br-lg transition-colors duration-300"
+          style={{
+            borderColor: isDetected ? 'rgb(34, 197, 94)' : 'rgb(255, 255, 255)'
+          }}
+        />
+      </div>
+
+      {/* Top instruction bar */}
+      <div className="absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/80 to-transparent">
+        <div className="text-center">
+          <h2 className="text-white text-lg font-semibold">
+            Scanner de document
+          </h2>
+          <p className="text-white/80 text-sm mt-1">
+            Alignez le document avec les repères
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
