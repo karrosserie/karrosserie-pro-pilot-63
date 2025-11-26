@@ -32,11 +32,13 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
   const [isCapturing, setIsCapturing] = useState(false);
   const [videoWidth, setVideoWidth] = useState(0);
   const [videoHeight, setVideoHeight] = useState(0);
+  const [fallbackMode, setFallbackMode] = useState(false);
   const animationFrameRef = useRef<number | null>(null);
 
   // Start camera when ready
   useEffect(() => {
     if (status === 'ready') {
+      console.log('📸 Status ready, starting camera...');
       startCamera();
     }
 
@@ -45,13 +47,32 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
     };
   }, [status, startCamera, stopCamera]);
 
-  // Update video dimensions when available
+  // Fallback timeout if OpenCV fails to load
   useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (status === 'loading') {
+        console.warn('⚠️ OpenCV timeout, switching to fallback mode');
+        setFallbackMode(true);
+      }
+    }, 5000);
+    return () => clearTimeout(timeout);
+  }, [status]);
+
+  // Video metadata handler
+  const handleVideoMetadata = () => {
     if (videoRef.current && videoRef.current.videoWidth > 0) {
+      console.log('📹 Video metadata loaded:', {
+        width: videoRef.current.videoWidth,
+        height: videoRef.current.videoHeight
+      });
       setVideoWidth(videoRef.current.videoWidth);
       setVideoHeight(videoRef.current.videoHeight);
     }
-  }, [status]);
+  };
+
+  const handleVideoCanPlay = () => {
+    console.log('▶️ Video can play');
+  };
 
   // Detection loop
   useEffect(() => {
@@ -87,6 +108,32 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
     setIsCapturing(true);
 
     try {
+      // Fallback mode: simple photo capture
+      if (fallbackMode) {
+        console.log('📷 Fallback capture mode');
+        if (videoRef.current && canvasRef.current) {
+          const canvas = canvasRef.current;
+          const video = videoRef.current;
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(video, 0, 0);
+            canvas.toBlob((blob) => {
+              if (blob) {
+                stopCamera();
+                onCapture(blob);
+                toast({
+                  title: "Photo capturée",
+                  description: "La photo a été prise avec succès"
+                });
+              }
+            }, 'image/jpeg', 0.95);
+            return;
+          }
+        }
+      }
+
       const blob = await extractDocument();
       
       if (blob) {
@@ -150,6 +197,8 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
         autoPlay
         playsInline
         muted
+        onLoadedMetadata={handleVideoMetadata}
+        onCanPlay={handleVideoCanPlay}
         className="absolute inset-0 w-full h-full object-cover"
       />
 
@@ -180,7 +229,7 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
 
           <Button
             onClick={handleCapture}
-            disabled={!isDetected || isCapturing}
+            disabled={(!isDetected && !fallbackMode) || isCapturing}
             size="lg"
             className="bg-primary hover:bg-primary/90"
           >
@@ -201,7 +250,9 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
         {/* Status message */}
         <div className="text-center mt-4">
           <p className="text-white text-sm">
-            {isDetected ? (
+            {fallbackMode ? (
+              <span className="text-yellow-400">Mode photo simple</span>
+            ) : isDetected ? (
               <span className="text-green-400">✓ Document détecté</span>
             ) : (
               <span>Positionnez le document dans le cadre</span>
