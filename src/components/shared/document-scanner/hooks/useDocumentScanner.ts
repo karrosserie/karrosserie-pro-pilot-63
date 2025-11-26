@@ -40,8 +40,8 @@ const findDocumentContour = (src: any) => {
       
       cv.approxPolyDP(contour, approx, 0.02 * peri, true);
       
-      // Check if contour has 4 points (rectangle) and is large enough
-      if (approx.rows === 4 && area > maxArea && area > (src.rows * src.cols * 0.1)) {
+      // Check if contour has 4 points (rectangle) and is large enough (5% of image)
+      if (approx.rows === 4 && area > maxArea && area > (src.rows * src.cols * 0.05)) {
         maxArea = area;
         if (bestContour) bestContour.delete();
         bestContour = approx.clone();
