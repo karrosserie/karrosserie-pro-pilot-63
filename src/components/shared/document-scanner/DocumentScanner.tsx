@@ -34,18 +34,22 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
   const [videoHeight, setVideoHeight] = useState(0);
   const [fallbackMode, setFallbackMode] = useState(false);
   const [cameraError, setCameraError] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const animationFrameRef = useRef<number | null>(null);
   const retryTimeoutRef = useRef<NodeJS.Timeout>();
 
   // Start camera IMMEDIATELY when component mounts (independent of OpenCV)
   const initializeCamera = useCallback(async () => {
     console.log('[Camera] Initializing...');
+    setIsLoading(true);
     
     // Retry mechanism if videoRef not ready
     const attemptStart = async (attempts = 0): Promise<void> => {
       if (attempts > 10) {
         console.error('[Camera] Failed after 10 attempts');
         setCameraError(true);
+        setIsLoading(false);
         return;
       }
       
@@ -59,21 +63,23 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
         await startCamera();
         console.log('[Camera] ✓ Started');
         
-        // Set timeout to check if video displays
+        // Set timeout to check if video actually plays
         retryTimeoutRef.current = setTimeout(() => {
-          if (videoWidth === 0 || videoHeight === 0) {
-            console.warn('[Camera] No video dimensions after 3s');
-            setCameraError(true);
+          if (!isVideoPlaying) {
+            console.warn('[Camera] No video playing after 5s');
+            setFallbackMode(true);
+            setIsLoading(false);
           }
-        }, 3000);
+        }, 5000);
       } catch (err) {
         console.error('[Camera] Start error:', err);
         setCameraError(true);
+        setIsLoading(false);
       }
     };
     
     await attemptStart();
-  }, [startCamera, videoWidth, videoHeight]);
+  }, [startCamera, isVideoPlaying]);
 
   useLayoutEffect(() => {
     console.log('[Scanner] Mounted');
@@ -100,13 +106,26 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
     };
   }, [initializeCamera, stopCamera, status]);
 
-  // Video metadata handler
+  // Video event handlers
   const handleVideoMetadata = () => {
     if (videoRef.current && videoRef.current.videoWidth > 0) {
       console.log('[Video] Metadata loaded:', videoRef.current.videoWidth, 'x', videoRef.current.videoHeight);
       setVideoWidth(videoRef.current.videoWidth);
       setVideoHeight(videoRef.current.videoHeight);
     }
+  };
+
+  const handleVideoPlay = () => {
+    console.log('[Video] ✓ Playing');
+    setIsVideoPlaying(true);
+    setIsLoading(false);
+    if (retryTimeoutRef.current) {
+      clearTimeout(retryTimeoutRef.current);
+    }
+  };
+
+  const handleVideoCanPlay = () => {
+    console.log('[Video] Can play');
   };
 
   // Detection loop (only if OpenCV is ready)
@@ -261,8 +280,20 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
         playsInline
         muted
         onLoadedMetadata={handleVideoMetadata}
+        onCanPlay={handleVideoCanPlay}
+        onPlay={handleVideoPlay}
         className="absolute inset-0 w-full h-full object-cover"
       />
+
+      {/* Loading indicator */}
+      {isLoading && !isVideoPlaying && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/80">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-white text-sm">Démarrage de la caméra...</p>
+          </div>
+        </div>
+      )}
 
       {/* Hidden canvas for detection */}
       <canvas ref={canvasRef} className="hidden" />
@@ -274,6 +305,7 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
         detectedCorners={detectedCorners}
         videoWidth={videoWidth}
         videoHeight={videoHeight}
+        isVideoPlaying={isVideoPlaying}
       />
 
       {/* Controls */}
