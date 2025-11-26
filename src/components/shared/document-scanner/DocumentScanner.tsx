@@ -30,7 +30,8 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
 
   const [isDetected, setIsDetected] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
-  const detectionCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [videoWidth, setVideoWidth] = useState(0);
+  const [videoHeight, setVideoHeight] = useState(0);
   const animationFrameRef = useRef<number | null>(null);
 
   // Start camera when ready
@@ -44,6 +45,14 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
     };
   }, [status, startCamera, stopCamera]);
 
+  // Update video dimensions when available
+  useEffect(() => {
+    if (videoRef.current && videoRef.current.videoWidth > 0) {
+      setVideoWidth(videoRef.current.videoWidth);
+      setVideoHeight(videoRef.current.videoHeight);
+    }
+  }, [status]);
+
   // Detection loop
   useEffect(() => {
     if (status !== 'searching' && status !== 'found') {
@@ -51,21 +60,16 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
     }
 
     const detectLoop = () => {
-      const resultCanvas = detectDocument();
+      detectDocument();
       
-      if (resultCanvas && detectionCanvasRef.current) {
-        const ctx = detectionCanvasRef.current.getContext('2d');
-        if (ctx) {
-          detectionCanvasRef.current.width = resultCanvas.width;
-          detectionCanvasRef.current.height = resultCanvas.height;
-          ctx.drawImage(resultCanvas, 0, 0);
-          
-          // Check if document corners are detected
-          setIsDetected(!!detectedCorners);
-        }
-      } else {
-        setIsDetected(false);
+      // Update video dimensions
+      if (videoRef.current && videoRef.current.videoWidth > 0) {
+        setVideoWidth(videoRef.current.videoWidth);
+        setVideoHeight(videoRef.current.videoHeight);
       }
+      
+      // Check if document corners are detected
+      setIsDetected(!!detectedCorners);
 
       animationFrameRef.current = requestAnimationFrame(detectLoop);
     };
@@ -152,14 +156,14 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
       {/* Hidden canvas for detection */}
       <canvas ref={canvasRef} className="hidden" />
 
-      {/* Detection overlay */}
-      <canvas
-        ref={detectionCanvasRef}
-        className="absolute inset-0 w-full h-full object-cover"
-      />
-
       {/* Overlay UI */}
-      <ScannerOverlay isDetected={isDetected} status={status} />
+      <ScannerOverlay 
+        isDetected={isDetected} 
+        status={status}
+        detectedCorners={detectedCorners}
+        videoWidth={videoWidth}
+        videoHeight={videoHeight}
+      />
 
       {/* Controls */}
       <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
