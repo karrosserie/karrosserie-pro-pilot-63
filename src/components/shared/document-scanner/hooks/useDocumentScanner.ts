@@ -116,6 +116,7 @@ export const useDocumentScanner = () => {
   // Start camera
   const startCamera = useCallback(async () => {
     try {
+      console.log('🎥 Requesting camera access...');
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { 
           facingMode: 'environment',
@@ -124,14 +125,26 @@ export const useDocumentScanner = () => {
         }
       });
 
+      console.log('✅ Camera stream obtained');
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
-        setStatus('searching');
+        
+        // Wait for video to be ready before starting detection
+        videoRef.current.onloadedmetadata = () => {
+          console.log('📹 Video metadata loaded, starting playback');
+          videoRef.current?.play().then(() => {
+            console.log('▶️ Video playing, switching to searching mode');
+            setStatus('searching');
+          }).catch(err => {
+            console.error('Video play error:', err);
+          });
+        };
       }
     } catch (err) {
-      console.error('Failed to start camera:', err);
-      setError('Impossible d\'accéder à la caméra');
+      console.error('❌ Camera access error:', err);
+      setError('Impossible d\'accéder à la caméra. Veuillez autoriser l\'accès.');
       setStatus('error');
     }
   }, []);
@@ -158,15 +171,20 @@ export const useDocumentScanner = () => {
   // Detect document in frame
   const detectDocument = useCallback(() => {
     if (!videoRef.current || !canvasRef.current) {
+      console.log('🔍 Detection skipped - missing refs');
       return null;
     }
 
     if (videoRef.current.readyState !== videoRef.current.HAVE_ENOUGH_DATA) {
+      console.log('🔍 Detection skipped - video not ready');
       return null;
     }
 
     const cv = (window as any).cv;
-    if (!cv) return null;
+    if (!cv) {
+      console.log('🔍 Detection skipped - OpenCV not available');
+      return null;
+    }
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
