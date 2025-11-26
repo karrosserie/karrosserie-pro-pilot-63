@@ -39,11 +39,24 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
   const [showManualPlayButton, setShowManualPlayButton] = useState(false);
   const animationFrameRef = useRef<number | null>(null);
   const retryTimeoutRef = useRef<NodeJS.Timeout>();
+  const isVideoPlayingRef = useRef(false);
+  const isCameraInitialized = useRef(false);
+
+  // Sync ref with state
+  useLayoutEffect(() => {
+    isVideoPlayingRef.current = isVideoPlaying;
+  }, [isVideoPlaying]);
 
   // Start camera IMMEDIATELY when component mounts (independent of OpenCV)
   const initializeCamera = useCallback(async () => {
+    if (isCameraInitialized.current) {
+      console.log('[Camera] Already initialized, skipping');
+      return;
+    }
+
     console.log('[Camera] Initializing...');
     setIsLoading(true);
+    setShowManualPlayButton(false);
     
     // Retry mechanism if videoRef not ready
     const attemptStart = async (attempts = 0): Promise<void> => {
@@ -61,12 +74,14 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
       }
       
       try {
+        isCameraInitialized.current = true;
         await startCamera();
         console.log('[Camera] ✓ Started');
         
         // Set timeout to check if video actually plays (3s pour détecter autoplay bloqué)
         retryTimeoutRef.current = setTimeout(() => {
-          if (!isVideoPlaying) {
+          console.log('[Camera] Timeout check - isVideoPlaying:', isVideoPlayingRef.current);
+          if (!isVideoPlayingRef.current) {
             console.warn('[Camera] No video playing after 3s - showing manual play button');
             setShowManualPlayButton(true);
           }
@@ -79,10 +94,10 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
     };
     
     await attemptStart();
-  }, [startCamera, isVideoPlaying]);
+  }, [startCamera]);
 
   useLayoutEffect(() => {
-    console.log('[Scanner] Mounted');
+    console.log('[Scanner] useLayoutEffect running');
     initializeCamera();
     
     // Fallback mode if OpenCV doesn't load within 5 seconds
@@ -94,7 +109,7 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
     }, 5000);
 
     return () => {
-      console.log('[Scanner] Unmounting');
+      console.log('[Scanner] useLayoutEffect cleanup');
       clearTimeout(fallbackTimeout);
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current);
@@ -103,6 +118,7 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
         cancelAnimationFrame(animationFrameRef.current);
       }
       stopCamera();
+      isCameraInitialized.current = false;
     };
   }, [initializeCamera, stopCamera, status]);
 
@@ -138,8 +154,8 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
   };
 
   const handleVideoTimeUpdate = () => {
-    if (!isVideoPlaying && videoRef.current && videoRef.current.currentTime > 0) {
-      console.log('[Video] ✓ onTimeUpdate - Video actually playing');
+    if (!isVideoPlayingRef.current && videoRef.current && videoRef.current.currentTime > 0) {
+      console.log('[Video] ✓ onTimeUpdate - Video actually playing (currentTime:', videoRef.current.currentTime, ')');
       setIsVideoPlaying(true);
       setIsLoading(false);
       setShowManualPlayButton(false);
