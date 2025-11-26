@@ -130,44 +130,17 @@ export const useDocumentScanner = () => {
       videoRef.current.srcObject = stream;
       streamRef.current = stream;
       
-      // Wait for video to be ready
-      return new Promise<void>((resolve, reject) => {
-        if (!videoRef.current) {
-          reject(new Error('Video ref lost'));
-          return;
-        }
-
-        videoRef.current.onloadedmetadata = () => {
-          console.log('[Camera] Metadata loaded');
-          if (!videoRef.current) return;
-          
-          videoRef.current.play()
-            .then(() => {
-              console.log('[Camera] ✓ Playing');
-              setStatus('searching');
-              resolve();
-            })
-            .catch(err => {
-              console.error('[Camera] Play error:', err);
-              reject(err);
-            });
-        };
-
-        // Timeout for metadata loading
-        setTimeout(() => {
-          if (status !== 'searching') {
-            console.error('[Camera] Metadata timeout');
-            reject(new Error('Camera initialization timeout'));
-          }
-        }, 5000);
-      });
+      // Enable OpenCV detection when ready
+      if (isOpenCVAvailable()) {
+        setStatus('searching');
+      }
     } catch (err) {
       console.error('[Camera] Access error:', err);
       setError('Impossible d\'accéder à la caméra');
       setStatus('error');
       throw err;
     }
-  }, [status]);
+  }, []);
 
   // Stop camera
   const stopCamera = useCallback(() => {

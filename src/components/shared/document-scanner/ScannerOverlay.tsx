@@ -7,13 +7,15 @@ interface ScannerOverlayProps {
   detectedCorners?: Array<{x: number, y: number}> | null;
   videoWidth: number;
   videoHeight: number;
+  isVideoPlaying: boolean;
 }
 
 export const ScannerOverlay: React.FC<ScannerOverlayProps> = ({
   isDetected,
   detectedCorners,
   videoWidth,
-  videoHeight
+  videoHeight,
+  isVideoPlaying
 }) => {
   return (
     <div className="absolute inset-0 pointer-events-none">
@@ -31,8 +33,8 @@ export const ScannerOverlay: React.FC<ScannerOverlayProps> = ({
         </svg>
       )}
 
-      {/* Static corner guides - only when video is ready but no document detected */}
-      {!isDetected && videoWidth > 0 && videoHeight > 0 && (
+      {/* Static corner guides - only when video is playing and no document detected */}
+      {!isDetected && isVideoPlaying && (
         <div className="absolute inset-8 border-2 border-dashed rounded-lg transition-colors duration-300 border-white/40">
           {/* Top-left corner */}
           <div className="absolute -top-1 -left-1 w-8 h-8 border-t-4 border-l-4 rounded-tl-lg border-white" />
