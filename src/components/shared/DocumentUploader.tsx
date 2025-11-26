@@ -13,6 +13,14 @@ import { Button } from '@/components/ui/button';
 import { Camera, Upload } from 'lucide-react';
 import { useMobileDetection } from '@/hooks/use-mobile-detection';
 
+const SCANNABLE_DOCUMENT_TYPES = [
+  'driver-license',
+  'registration',
+  'insurance',
+  'payment-proof',
+  'expense-proof'
+];
+
 interface DocumentUploaderProps {
   documentType: string;
   documentId: string;
@@ -37,6 +45,7 @@ export function DocumentUploader({
   allowDeleteInViewMode = false
 }: DocumentUploaderProps) {
   const isMobile = useMobileDetection();
+  const isScannable = SCANNABLE_DOCUMENT_TYPES.includes(documentType);
   const [showScanner, setShowScanner] = useState(false);
   const [uploadMode, setUploadMode] = useState<'choice' | 'upload' | 'scan'>('choice');
 
@@ -106,8 +115,8 @@ export function DocumentUploader({
     return <DocumentScanner onCapture={handleScanCapture} onClose={handleScanClose} />;
   }
 
-  // Show upload mode choice on mobile
-  if (isMobile && uploadMode === 'choice') {
+  // Show upload mode choice on mobile (only for scannable documents)
+  if (isMobile && isScannable && uploadMode === 'choice') {
     return (
       <div className="space-y-3">
         <Button
