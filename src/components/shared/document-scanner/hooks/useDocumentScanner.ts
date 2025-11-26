@@ -1,20 +1,97 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import jscanify from 'jscanify';
 import { loadOpenCV, isOpenCVAvailable } from '@/utils/opencvLoader';
 
 type ScannerStatus = 'loading' | 'ready' | 'searching' | 'found' | 'error';
 
+// OpenCV helper functions for document detection
+const findDocumentContour = (src: any) => {
+  const cv = (window as any).cv;
+  if (!cv) return null;
+
+  const gray = new cv.Mat();
+  const blur = new cv.Mat();
+  const edges = new cv.Mat();
+  const contours = new cv.MatVector();
+  const hierarchy = new cv.Mat();
+
+  try {
+    // Convert to grayscale
+    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+    
+    // Apply Gaussian blur
+    cv.GaussianBlur(gray, blur, new cv.Size(5, 5), 0);
+    
+    // Detect edges
+    cv.Canny(blur, edges, 50, 150);
+    
+    // Find contours
+    cv.findContours(edges, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+    
+    // Find largest rectangular contour
+    let maxArea = 0;
+    let bestContour = null;
+    
+    for (let i = 0; i < contours.size(); i++) {
+      const contour = contours.get(i);
+      const area = cv.contourArea(contour);
+      const peri = cv.arcLength(contour, true);
+      const approx = new cv.Mat();
+      
+      cv.approxPolyDP(contour, approx, 0.02 * peri, true);
+      
+      // Check if contour has 4 points (rectangle) and is large enough
+      if (approx.rows === 4 && area > maxArea && area > (src.rows * src.cols * 0.1)) {
+        maxArea = area;
+        if (bestContour) bestContour.delete();
+        bestContour = approx.clone();
+      }
+      
+      approx.delete();
+    }
+    
+    gray.delete();
+    blur.delete();
+    edges.delete();
+    contours.delete();
+    hierarchy.delete();
+    
+    return bestContour;
+  } catch (err) {
+    console.error('Error finding contour:', err);
+    gray.delete();
+    blur.delete();
+    edges.delete();
+    contours.delete();
+    hierarchy.delete();
+    return null;
+  }
+};
+
+const orderPoints = (pts: any) => {
+  // Order points: top-left, top-right, bottom-right, bottom-left
+  const rect = new Array(4);
+  const sum = pts.map((p: any) => p.x + p.y);
+  const diff = pts.map((p: any) => p.y - p.x);
+  
+  rect[0] = pts[sum.indexOf(Math.min(...sum))]; // top-left
+  rect[2] = pts[sum.indexOf(Math.max(...sum))]; // bottom-right
+  rect[1] = pts[diff.indexOf(Math.min(...diff))]; // top-right
+  rect[3] = pts[diff.indexOf(Math.max(...diff))]; // bottom-left
+  
+  return rect;
+};
+
 export const useDocumentScanner = () => {
   const [status, setStatus] = useState<ScannerStatus>('loading');
   const [error, setError] = useState<string | null>(null);
-  const scannerRef = useRef<any>(null);
+  const [detectedCorners, setDetectedCorners] = useState<any>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const animationFrameRef = useRef<number | null>(null);
 
-  // Initialize OpenCV and scanner
+  // Initialize OpenCV
   useEffect(() => {
     const initialize = async () => {
       try {
@@ -22,7 +99,6 @@ export const useDocumentScanner = () => {
         await loadOpenCV();
         
         if (isOpenCVAvailable()) {
-          scannerRef.current = new jscanify();
           setStatus('ready');
         } else {
           throw new Error('OpenCV not available');
@@ -81,13 +157,16 @@ export const useDocumentScanner = () => {
 
   // Detect document in frame
   const detectDocument = useCallback(() => {
-    if (!videoRef.current || !canvasRef.current || !scannerRef.current) {
+    if (!videoRef.current || !canvasRef.current) {
       return null;
     }
 
     if (videoRef.current.readyState !== videoRef.current.HAVE_ENOUGH_DATA) {
       return null;
     }
+
+    const cv = (window as any).cv;
+    if (!cv) return null;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -101,20 +180,59 @@ export const useDocumentScanner = () => {
     ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
     try {
-      // Detect paper corners
-      const resultCanvas = scannerRef.current.highlightPaper(canvas);
-      return resultCanvas;
+      // Convert canvas to OpenCV Mat
+      const src = cv.imread(canvas);
+      
+      // Find document contour
+      const contour = findDocumentContour(src);
+      
+      if (contour && contour.rows === 4) {
+        // Draw contour on canvas
+        const points = [];
+        for (let i = 0; i < 4; i++) {
+          points.push({
+            x: contour.data32S[i * 2],
+            y: contour.data32S[i * 2 + 1]
+          });
+        }
+        
+        setDetectedCorners(points);
+        
+        // Draw the detected rectangle
+        ctx.strokeStyle = '#22C55E';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < 4; i++) {
+          ctx.lineTo(points[i].x, points[i].y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+        
+        contour.delete();
+        src.delete();
+        return canvas;
+      } else {
+        setDetectedCorners(null);
+        if (contour) contour.delete();
+        src.delete();
+        return canvas;
+      }
     } catch (err) {
       console.error('Detection error:', err);
+      setDetectedCorners(null);
       return null;
     }
   }, []);
 
   // Extract and crop document
   const extractDocument = useCallback(async (): Promise<Blob | null> => {
-    if (!videoRef.current || !canvasRef.current || !scannerRef.current) {
+    if (!videoRef.current || !canvasRef.current || !detectedCorners) {
       return null;
     }
+
+    const cv = (window as any).cv;
+    if (!cv) return null;
 
     try {
       const canvas = canvasRef.current;
@@ -126,12 +244,68 @@ export const useDocumentScanner = () => {
       canvas.height = videoRef.current.videoHeight;
       ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
-      // Extract and straighten document
-      const extractedCanvas = scannerRef.current.extractPaper(canvas, canvas.width, canvas.height);
+      // Convert to OpenCV Mat
+      const src = cv.imread(canvas);
+      
+      // Order the corner points
+      const orderedPts = orderPoints(detectedCorners);
+      
+      // Calculate width and height of the new image
+      const widthA = Math.sqrt(
+        Math.pow(orderedPts[2].x - orderedPts[3].x, 2) +
+        Math.pow(orderedPts[2].y - orderedPts[3].y, 2)
+      );
+      const widthB = Math.sqrt(
+        Math.pow(orderedPts[1].x - orderedPts[0].x, 2) +
+        Math.pow(orderedPts[1].y - orderedPts[0].y, 2)
+      );
+      const maxWidth = Math.max(widthA, widthB);
+      
+      const heightA = Math.sqrt(
+        Math.pow(orderedPts[1].x - orderedPts[2].x, 2) +
+        Math.pow(orderedPts[1].y - orderedPts[2].y, 2)
+      );
+      const heightB = Math.sqrt(
+        Math.pow(orderedPts[0].x - orderedPts[3].x, 2) +
+        Math.pow(orderedPts[0].y - orderedPts[3].y, 2)
+      );
+      const maxHeight = Math.max(heightA, heightB);
+      
+      // Create destination points
+      const dsize = new cv.Size(maxWidth, maxHeight);
+      const dstPoints = cv.matFromArray(4, 1, cv.CV_32FC2, [
+        0, 0,
+        maxWidth - 1, 0,
+        maxWidth - 1, maxHeight - 1,
+        0, maxHeight - 1
+      ]);
+      
+      const srcPoints = cv.matFromArray(4, 1, cv.CV_32FC2, [
+        orderedPts[0].x, orderedPts[0].y,
+        orderedPts[1].x, orderedPts[1].y,
+        orderedPts[2].x, orderedPts[2].y,
+        orderedPts[3].x, orderedPts[3].y
+      ]);
+      
+      // Apply perspective transform
+      const M = cv.getPerspectiveTransform(srcPoints, dstPoints);
+      const dst = new cv.Mat();
+      cv.warpPerspective(src, dst, M, dsize);
+      
+      // Convert back to canvas
+      const outputCanvas = document.createElement('canvas');
+      cv.imshow(outputCanvas, dst);
+      
+      // Clean up
+      src.delete();
+      dst.delete();
+      M.delete();
+      srcPoints.delete();
+      dstPoints.delete();
       
       // Convert to blob
       return new Promise((resolve) => {
-        extractedCanvas.toBlob((blob: Blob | null) => {
+        outputCanvas.toBlob((blob: Blob | null) => {
           resolve(blob);
         }, 'image/jpeg', 0.95);
       });
@@ -139,13 +313,14 @@ export const useDocumentScanner = () => {
       console.error('Extraction error:', err);
       return null;
     }
-  }, []);
+  }, [detectedCorners]);
 
   return {
     status,
     error,
     videoRef,
     canvasRef,
+    detectedCorners,
     startCamera,
     stopCamera,
     detectDocument,

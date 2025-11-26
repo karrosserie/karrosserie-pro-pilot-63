@@ -21,6 +21,7 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
     error,
     videoRef,
     canvasRef,
+    detectedCorners,
     startCamera,
     stopCamera,
     detectDocument,
@@ -59,8 +60,8 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
           detectionCanvasRef.current.height = resultCanvas.height;
           ctx.drawImage(resultCanvas, 0, 0);
           
-          // Check if document is detected (jscanify adds green borders when detected)
-          setIsDetected(true);
+          // Check if document corners are detected
+          setIsDetected(!!detectedCorners);
         }
       } else {
         setIsDetected(false);
@@ -76,7 +77,7 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [status, detectDocument]);
+  }, [status, detectDocument, detectedCorners]);
 
   const handleCapture = async () => {
     setIsCapturing(true);
