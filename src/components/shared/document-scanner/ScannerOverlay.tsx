@@ -33,22 +33,6 @@ export const ScannerOverlay: React.FC<ScannerOverlayProps> = ({
         </svg>
       )}
 
-      {/* Static corner guides - only when video is playing and no document detected */}
-      {!isDetected && isVideoPlaying && (
-        <div className="absolute inset-8 border-2 border-dashed rounded-lg transition-colors duration-300 border-white/40">
-          {/* Top-left corner */}
-          <div className="absolute -top-1 -left-1 w-8 h-8 border-t-4 border-l-4 rounded-tl-lg border-white" />
-          
-          {/* Top-right corner */}
-          <div className="absolute -top-1 -right-1 w-8 h-8 border-t-4 border-r-4 rounded-tr-lg border-white" />
-          
-          {/* Bottom-left corner */}
-          <div className="absolute -bottom-1 -left-1 w-8 h-8 border-b-4 border-l-4 rounded-bl-lg border-white" />
-          
-          {/* Bottom-right corner */}
-          <div className="absolute -bottom-1 -right-1 w-8 h-8 border-b-4 border-r-4 rounded-br-lg border-white" />
-        </div>
-      )}
 
       {/* Top title bar only */}
       <div className="absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/80 to-transparent">

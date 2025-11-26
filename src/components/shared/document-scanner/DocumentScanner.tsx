@@ -117,10 +117,13 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
 
   const handleVideoPlay = () => {
     console.log('[Video] ✓ Playing');
-    setIsVideoPlaying(true);
-    setIsLoading(false);
-    if (retryTimeoutRef.current) {
-      clearTimeout(retryTimeoutRef.current);
+    // Vérifier que la vidéo a réellement des données avant de la considérer comme "jouant"
+    if (videoRef.current && videoRef.current.readyState >= 2) {
+      setIsVideoPlaying(true);
+      setIsLoading(false);
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
     }
   };
 
