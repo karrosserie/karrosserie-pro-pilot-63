@@ -120,26 +120,23 @@ export function ClientDataValidationReport({
           )}
         </div>
         
-        <DialogFooter className="flex flex-col gap-4 pt-4">
-          {/* Actions secondaires */}
-          <div className="flex flex-col gap-2 w-full">
-            {onDismiss && (
-              <Button 
-                variant="outline" 
-                onClick={onDismiss} 
-                className="w-full"
-              >
-                🕐 Plus tard
-              </Button>
-            )}
+        <DialogFooter className="flex flex-row flex-wrap gap-3 pt-4 justify-end">
+          {onDismiss && (
             <Button 
               variant="outline" 
-              onClick={onEditClient} 
-              className="w-full"
+              onClick={onDismiss}
+              size="sm"
             >
-              ✏️ Corriger manuellement
+              🕐 Plus tard
             </Button>
-          </div>
+          )}
+          <Button 
+            variant="outline" 
+            onClick={onEditClient}
+            size="sm"
+          >
+            ✏️ Corriger
+          </Button>
           
           {/* Action principale : Créer le devis quand même */}
           {validationResults.validation.errors.length === 0 && 
@@ -147,9 +144,10 @@ export function ClientDataValidationReport({
            onCreateQuoteAnyway && (
             <Button 
               onClick={onCreateQuoteAnyway}
-              className="bg-green-600 hover:bg-green-700 w-full font-semibold"
+              className="bg-green-600 hover:bg-green-700 font-semibold"
+              size="sm"
             >
-              📄 Créer le devis quand même
+              📄 Créer le devis
             </Button>
           )}
         </DialogFooter>
