@@ -3,6 +3,13 @@ import { Button } from '@/components/ui/button';
 import { Camera, X, RotateCcw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+// Declare OpenCV on window
+declare global {
+  interface Window {
+    cv: any;
+  }
+}
+
 interface SimpleDocumentScannerProps {
   onCapture: (blob: Blob) => void;
   onClose: () => void;
@@ -20,23 +27,83 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   const scannerRef = useRef<any>(null);
   const animationFrameRef = useRef<number | null>(null);
   
+  // Ref to track isVideoReady for timeout closure fix
+  const isVideoReadyRef = useRef(false);
+  
   const [isLoading, setIsLoading] = useState(true);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [isScannerReady, setIsScannerReady] = useState(false);
   const [showManualStart, setShowManualStart] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize jscanify (async, doesn't block video)
+  // Keep ref in sync with state
   useEffect(() => {
-    console.log('[Scanner] Loading jscanify...');
-    import('jscanify').then(module => {
-      scannerRef.current = new module.default();
-      setIsScannerReady(true);
-      console.log('[Scanner] jscanify loaded successfully');
-    }).catch(err => {
-      console.error('[Scanner] Failed to load jscanify:', err);
-      setIsScannerReady(true); // Allow raw capture
-    });
+    isVideoReadyRef.current = isVideoReady;
+  }, [isVideoReady]);
+
+  // Load OpenCV.js then jscanify
+  useEffect(() => {
+    console.log('[Scanner] Loading OpenCV.js...');
+    
+    const loadOpenCV = (): Promise<void> => {
+      return new Promise((resolve, reject) => {
+        // Check if already loaded
+        if (window.cv && window.cv.Mat) {
+          console.log('[OpenCV] Already loaded');
+          resolve();
+          return;
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://docs.opencv.org/4.7.0/opencv.js';
+        script.async = true;
+
+        script.onload = () => {
+          console.log('[OpenCV] Script loaded, waiting for runtime...');
+          
+          // OpenCV needs time to initialize
+          const checkCV = () => {
+            if (window.cv && window.cv.Mat) {
+              console.log('[OpenCV] Runtime ready');
+              resolve();
+            } else if (window.cv) {
+              // cv exists but not fully initialized
+              window.cv.onRuntimeInitialized = () => {
+                console.log('[OpenCV] onRuntimeInitialized fired');
+                resolve();
+              };
+            } else {
+              // Retry check
+              setTimeout(checkCV, 100);
+            }
+          };
+          
+          checkCV();
+        };
+
+        script.onerror = (err) => {
+          console.error('[OpenCV] Failed to load script:', err);
+          reject(err);
+        };
+
+        document.head.appendChild(script);
+      });
+    };
+
+    loadOpenCV()
+      .then(() => {
+        console.log('[Scanner] OpenCV loaded, now loading jscanify...');
+        return import('jscanify');
+      })
+      .then(module => {
+        scannerRef.current = new module.default();
+        setIsScannerReady(true);
+        console.log('[Scanner] jscanify ready with OpenCV support');
+      })
+      .catch(err => {
+        console.error('[Scanner] Failed to load dependencies:', err);
+        setIsScannerReady(true); // Allow raw capture mode
+      });
   }, []);
 
   // Stop camera
@@ -147,7 +214,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
 
     if (!ctx || !displayCtx) return;
 
-    console.log('[Loop] Starting detection loop');
+    console.log('[Loop] Starting detection loop, OpenCV available:', !!window.cv);
 
     const detectLoop = () => {
       if (!video.paused && !video.ended && video.readyState >= 2) {
@@ -162,11 +229,12 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
 
           ctx.drawImage(video, 0, 0, width, height);
 
-          if (scannerRef.current) {
+          if (scannerRef.current && window.cv) {
             try {
               const highlighted = scannerRef.current.highlightPaper(canvas);
               displayCtx.drawImage(highlighted, 0, 0);
             } catch (e) {
+              // Fallback to raw video
               displayCtx.drawImage(canvas, 0, 0);
             }
           } else {
@@ -191,9 +259,9 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   useEffect(() => {
     startCamera();
     
-    // Safety timeout: if video not ready after 5s, show manual button
+    // Safety timeout: use ref to check current value (fixes closure issue)
     const timeout = setTimeout(() => {
-      if (!isVideoReady && !showManualStart && !error) {
+      if (!isVideoReadyRef.current && !showManualStart && !error) {
         console.log('[Timeout] Video not ready after 5s, showing manual start');
         setIsLoading(false);
         setShowManualStart(true);
@@ -220,7 +288,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       return;
     }
 
-    if (scannerRef.current) {
+    if (scannerRef.current && window.cv) {
       try {
         const resultCanvas = scannerRef.current.extractPaper(canvas, canvas.width, canvas.height);
 
