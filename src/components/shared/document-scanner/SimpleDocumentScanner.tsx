@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Camera, X, RotateCcw, CheckCircle, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import cv from '@techstark/opencv-js';
+import cvModule from '@techstark/opencv-js';
 
 // Declare OpenCV on window for jscanify compatibility
 declare global {
@@ -15,6 +15,69 @@ interface SimpleDocumentScannerProps {
   onCapture: (blob: Blob) => void;
   onClose: () => void;
 }
+
+// Initialize OpenCV according to official @techstark/opencv-js README pattern
+const initializeOpenCV = async (): Promise<any> => {
+  console.log('[OpenCV] Starting initialization...');
+  console.log('[OpenCV] cvModule type:', typeof cvModule);
+  console.log('[OpenCV] cvModule instanceof Promise:', cvModule instanceof Promise);
+  
+  // If already initialized on window
+  if (window.cv && typeof window.cv.Mat === 'function') {
+    console.log('[OpenCV] Already initialized on window.cv');
+    return window.cv;
+  }
+
+  let cv: any;
+
+  try {
+    // Pattern from official README: handle both Promise and callback cases
+    if (cvModule instanceof Promise) {
+      // Case 1: Module is a Promise (common with Vite/Webpack bundlers)
+      console.log('[OpenCV] Module is a Promise, awaiting...');
+      cv = await cvModule;
+      console.log('[OpenCV] Promise resolved');
+    } else {
+      // Case 2: Module needs onRuntimeInitialized callback
+      console.log('[OpenCV] Checking if module is ready...');
+      
+      if (cvModule.Mat && typeof cvModule.Mat === 'function') {
+        console.log('[OpenCV] Module already ready');
+        cv = cvModule;
+      } else {
+        console.log('[OpenCV] Waiting for onRuntimeInitialized...');
+        await new Promise<void>((resolve, reject) => {
+          const timeout = setTimeout(() => {
+            reject(new Error('OpenCV onRuntimeInitialized timeout (15s)'));
+          }, 15000);
+          
+          cvModule.onRuntimeInitialized = () => {
+            clearTimeout(timeout);
+            console.log('[OpenCV] onRuntimeInitialized fired');
+            resolve();
+          };
+        });
+        cv = cvModule;
+      }
+    }
+
+    // Final verification
+    if (!cv || typeof cv.Mat !== 'function') {
+      throw new Error('OpenCV loaded but cv.Mat is not a function');
+    }
+
+    // Assign to window BEFORE importing jscanify
+    window.cv = cv;
+    console.log('[OpenCV] ✓ Assigned to window.cv');
+    console.log('[OpenCV] cv.Mat:', typeof cv.Mat);
+    console.log('[OpenCV] cv.imread:', typeof cv.imread);
+    
+    return cv;
+  } catch (error) {
+    console.error('[OpenCV] Initialization FAILED:', error);
+    throw error;
+  }
+};
 
 export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   onCapture,
@@ -41,125 +104,80 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     isVideoReadyRef.current = isVideoReady;
   }, [isVideoReady]);
 
-  // Test jscanify by checking cv.imread works (no synthetic document test)
-  const testJscanify = useCallback((scanner: any): boolean => {
-    console.log('[Scanner] Testing jscanify functionality...');
-    
-    try {
-      // Check jscanify methods exist
-      if (typeof scanner.highlightPaper !== 'function') {
-        console.error('[Scanner] ✗ highlightPaper is not a function');
-        return false;
-      }
-      if (typeof scanner.extractPaper !== 'function') {
-        console.error('[Scanner] ✗ extractPaper is not a function');
-        return false;
-      }
-      console.log('[Scanner] ✓ jscanify methods available');
-
-      // Test cv.imread works with a minimal canvas
-      const testCanvas = document.createElement('canvas');
-      testCanvas.width = 10;
-      testCanvas.height = 10;
-      const testCtx = testCanvas.getContext('2d');
-      if (testCtx) {
-        testCtx.fillStyle = 'black';
-        testCtx.fillRect(0, 0, 10, 10);
-      }
-
-      const mat = window.cv.imread(testCanvas);
-      if (mat && mat.rows > 0) {
-        console.log('[Scanner] ✓ cv.imread test passed:', mat.rows, 'x', mat.cols);
-        mat.delete(); // Clean up
-        return true;
-      } else {
-        console.error('[Scanner] ✗ cv.imread returned invalid mat');
-        return false;
-      }
-    } catch (testError) {
-      console.error('[Scanner] ✗ Test failed with exception:', testError);
-      return false;
-    }
-  }, []);
-
-  // Load OpenCV from npm package then jscanify
+  // Load OpenCV then jscanify (browser version)
   useEffect(() => {
-    console.log('[Scanner] Starting dependency loading...');
-    setScannerStatus('loading');
-    
-    const loadOpenCV = (): Promise<void> => {
-      return new Promise((resolve, reject) => {
-        // If already initialized on window
-        if (window.cv && window.cv.Mat) {
-          console.log('[OpenCV] Already initialized on window');
-          resolve();
-          return;
-        }
+    let mounted = true;
 
-        // Check if npm package cv is ready
-        if (cv && cv.Mat) {
-          window.cv = cv;
-          console.log('[OpenCV] ✓ npm package ready immediately');
-          resolve();
-          return;
-        }
+    const initScanner = async () => {
+      console.log('[Scanner] ========== INITIALIZATION START ==========');
+      setScannerStatus('loading');
 
-        // Wait for WASM runtime initialization
-        console.log('[OpenCV] Waiting for WASM runtime...');
+      try {
+        // STEP 1: Initialize OpenCV (MUST be done BEFORE jscanify)
+        console.log('[Scanner] Step 1: Initializing OpenCV...');
+        await initializeOpenCV();
+        if (!mounted) return;
+        console.log('[Scanner] Step 1: ✓ OpenCV ready');
+
+        // STEP 2: Import BROWSER version of jscanify
+        // CRITICAL: jscanify/src/jscanify.js uses global cv (window.cv)
+        // jscanify (default) = jscanify-node.js which does NOT work in browser
+        console.log('[Scanner] Step 2: Importing jscanify browser version...');
+        const jscanifyModule = await import('jscanify/src/jscanify.js');
+        if (!mounted) return;
         
-        // Set callback for when runtime is ready
-        cv.onRuntimeInitialized = () => {
-          window.cv = cv;
-          console.log('[OpenCV] ✓ Runtime initialized from npm package');
-          resolve();
-        };
+        const JscanifyClass = jscanifyModule.default || jscanifyModule;
+        console.log('[Scanner] Step 2: ✓ jscanify loaded:', typeof JscanifyClass);
 
-        // Safety timeout
-        setTimeout(() => {
-          if (!window.cv || !window.cv.Mat) {
-            console.error('[OpenCV] Initialization timeout');
-            reject(new Error('OpenCV initialization timeout'));
-          }
-        }, 10000);
-      });
-    };
-
-    loadOpenCV()
-      .then(() => {
-        console.log('[Scanner] OpenCV loaded, importing jscanify...');
-        return import('jscanify');
-      })
-      .then(module => {
-        console.log('[Scanner] jscanify module loaded:', module);
-        console.log('[Scanner] jscanify default export:', module.default);
-        
-        const scanner = new module.default();
+        // STEP 3: Create scanner instance
+        const scanner = new JscanifyClass();
         scannerRef.current = scanner;
-        
-        console.log('[Scanner] jscanify instance:', scanner);
-        console.log('[Scanner] Available methods:', Object.keys(scanner));
-        console.log('[Scanner] highlightPaper:', typeof scanner.highlightPaper);
-        console.log('[Scanner] extractPaper:', typeof scanner.extractPaper);
+        console.log('[Scanner] Step 3: ✓ Scanner instance created');
+        console.log('[Scanner] Methods:', {
+          highlightPaper: typeof scanner.highlightPaper,
+          extractPaper: typeof scanner.extractPaper
+        });
 
-        // Test jscanify immediately
-        const testPassed = testJscanify(scanner);
-        
-        if (testPassed) {
-          setScannerStatus('ready');
-          console.log('[Scanner] ✓ Scanner fully operational');
-        } else {
-          setScannerStatus('error');
-          console.warn('[Scanner] ✗ Scanner test failed - contours may not work');
+        // STEP 4: Test cv.imread to confirm everything works
+        console.log('[Scanner] Step 4: Testing cv.imread...');
+        const testCanvas = document.createElement('canvas');
+        testCanvas.width = 10;
+        testCanvas.height = 10;
+        const testCtx = testCanvas.getContext('2d');
+        if (testCtx) {
+          testCtx.fillStyle = '#000000';
+          testCtx.fillRect(0, 0, 10, 10);
         }
         
+        const testMat = window.cv.imread(testCanvas);
+        if (!testMat || testMat.rows === 0) {
+          throw new Error('cv.imread test failed - returned empty mat');
+        }
+        console.log('[Scanner] Step 4: ✓ cv.imread works:', testMat.rows, 'x', testMat.cols);
+        testMat.delete();
+
+        if (!mounted) return;
+
+        // SUCCESS
+        setScannerStatus('ready');
         setIsScannerReady(true);
-      })
-      .catch(err => {
-        console.error('[Scanner] Failed to load dependencies:', err);
+        console.log('[Scanner] ========== INITIALIZATION SUCCESS ==========');
+
+      } catch (err) {
+        console.error('[Scanner] ========== INITIALIZATION FAILED ==========');
+        console.error('[Scanner] Error:', err);
+        if (!mounted) return;
         setScannerStatus('error');
         setIsScannerReady(true); // Allow raw capture mode
-      });
-  }, [testJscanify]);
+      }
+    };
+
+    initScanner();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // Stop camera
   const stopCamera = useCallback(() => {
@@ -240,7 +258,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     setIsLoading(false);
   }, []);
 
-  // Real-time detection loop - ALWAYS LOG ERRORS
+  // Real-time detection loop
   useEffect(() => {
     if (!isVideoReady) return;
 
@@ -258,6 +276,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     console.log('[Loop] Starting detection loop');
     console.log('[Loop] Scanner ref:', !!scannerRef.current);
     console.log('[Loop] window.cv:', !!window.cv);
+    console.log('[Loop] cv.imread:', window.cv ? typeof window.cv.imread : 'N/A');
     console.log('[Loop] Scanner status:', scannerStatus);
 
     let frameCount = 0;
@@ -276,7 +295,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
           ctx.drawImage(video, 0, 0, width, height);
 
           // Try to use jscanify for contour detection
-          if (scannerRef.current && window.cv) {
+          if (scannerRef.current && window.cv && typeof window.cv.imread === 'function') {
             try {
               const highlighted = scannerRef.current.highlightPaper(canvas, {
                 color: 'lime',
@@ -286,12 +305,10 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
               if (highlighted && highlighted.width > 0) {
                 displayCtx.drawImage(highlighted, 0, 0);
                 
-                // Log success occasionally
                 if (frameCount % 120 === 0) {
                   console.log('[Loop] ✓ Frame', frameCount, '- Contours rendered');
                 }
               } else {
-                // No document detected - just show raw video
                 displayCtx.drawImage(canvas, 0, 0);
                 
                 if (frameCount % 120 === 0) {
@@ -299,16 +316,18 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
                 }
               }
             } catch (e) {
-              // ALWAYS LOG ERRORS - no throttling!
               console.error('[Loop] highlightPaper ERROR at frame', frameCount, ':', e);
               displayCtx.drawImage(canvas, 0, 0);
             }
           } else {
-            // Scanner not ready - show raw video
             displayCtx.drawImage(canvas, 0, 0);
             
             if (frameCount % 180 === 0) {
-              console.log('[Loop] Frame', frameCount, '- Scanner not ready. scanner:', !!scannerRef.current, 'cv:', !!window.cv);
+              console.log('[Loop] Frame', frameCount, '- Scanner not ready:',
+                'scanner:', !!scannerRef.current,
+                'cv:', !!window.cv,
+                'imread:', window.cv ? typeof window.cv.imread : 'N/A'
+              );
             }
           }
         }
@@ -359,7 +378,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       return;
     }
 
-    if (scannerRef.current && window.cv) {
+    if (scannerRef.current && window.cv && typeof window.cv.imread === 'function') {
       try {
         const resultCanvas = scannerRef.current.extractPaper(canvas, canvas.width, canvas.height);
 
@@ -484,7 +503,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
               ) : scannerStatus === 'error' ? (
                 <>
                   <XCircle className="h-3 w-3" />
-                  Mode simple (OpenCV non dispo)
+                  Mode simple
                 </>
               ) : (
                 <>
@@ -498,11 +517,11 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
 
         {/* Instructions */}
         {isVideoReady && (
-          <div className="absolute bottom-4 left-4 right-4 text-center">
-            <p className="text-white text-sm bg-black/50 backdrop-blur-sm rounded-lg px-4 py-2 inline-block">
+          <div className="absolute bottom-32 left-0 right-0 text-center">
+            <p className="text-white text-sm bg-black/50 inline-block px-4 py-2 rounded-full">
               {scannerStatus === 'ready' 
-                ? 'Cadrez le document • Les contours verts indiquent la détection'
-                : 'Cadrez le document • Capturez quand prêt'
+                ? "Cadrez le document - contours verts = détecté"
+                : "Cadrez le document et appuyez sur le bouton"
               }
             </p>
           </div>
@@ -510,17 +529,15 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       </div>
 
       {/* Capture button */}
-      <div className="p-6 bg-black/50 backdrop-blur-sm">
-        <div className="flex justify-center">
-          <Button
-            onClick={handleCapture}
-            disabled={!isVideoReady}
-            size="lg"
-            className="h-16 w-16 rounded-full bg-white hover:bg-gray-200 text-black"
-          >
-            <Camera className="h-8 w-8" />
-          </Button>
-        </div>
+      <div className="p-6 flex justify-center bg-black/50 backdrop-blur-sm">
+        <Button
+          onClick={handleCapture}
+          size="lg"
+          className="w-20 h-20 rounded-full bg-white hover:bg-gray-200 text-black"
+          disabled={!isVideoReady}
+        >
+          <Camera className="h-8 w-8" />
+        </Button>
       </div>
     </div>
   );
