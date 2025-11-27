@@ -10,7 +10,7 @@ import { Camera as CapCamera, CameraResultType, CameraSource } from '@capacitor/
 import { Capacitor } from '@capacitor/core';
 import { ViolationValidationModal } from './ViolationValidationModal';
 import { AIAnalysisModal } from './AIAnalysisModal';
-import { DocumentScanner } from '@/components/shared/document-scanner/DocumentScanner';
+import { SimpleDocumentScanner } from '@/components/shared/document-scanner/SimpleDocumentScanner';
 import { useMobileDetection } from '@/hooks/use-mobile-detection';
 
 interface ViolationDocumentUploadProps {
@@ -385,7 +385,7 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
   };
 
   if (showScanner) {
-    return <DocumentScanner onCapture={handleScanCapture} onClose={() => setShowScanner(false)} />;
+    return <SimpleDocumentScanner onCapture={handleScanCapture} onClose={() => setShowScanner(false)} />;
   }
 
   return (
