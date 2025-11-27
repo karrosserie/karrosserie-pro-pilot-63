@@ -22,16 +22,21 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   
   const [isLoading, setIsLoading] = useState(true);
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [isScannerReady, setIsScannerReady] = useState(false);
   const [showManualStart, setShowManualStart] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize jscanify
+  // Initialize jscanify (async, doesn't block video)
   useEffect(() => {
+    console.log('[Scanner] Loading jscanify...');
     import('jscanify').then(module => {
       scannerRef.current = new module.default();
-      console.log('[Scanner] jscanify loaded');
+      setIsScannerReady(true);
+      console.log('[Scanner] jscanify loaded successfully');
     }).catch(err => {
       console.error('[Scanner] Failed to load jscanify:', err);
+      // Continue without jscanify - allow raw capture
+      setIsScannerReady(true);
     });
   }, []);
 
@@ -105,9 +110,10 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     setIsVideoReady(false);
   }, []);
 
-  // Real-time detection loop
+  // Real-time detection loop - starts as soon as video is ready
   useEffect(() => {
-    if (!isVideoReady || !scannerRef.current) return;
+    // Only require video to be ready, NOT jscanify
+    if (!isVideoReady) return;
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -120,9 +126,10 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
 
     if (!ctx || !displayCtx) return;
 
+    console.log('[Loop] Starting detection loop, scanner ready:', !!scannerRef.current);
+
     const detectLoop = () => {
       if (!video.paused && !video.ended && video.readyState >= 2) {
-        // Set canvas dimensions to match video
         const width = video.videoWidth;
         const height = video.videoHeight;
 
@@ -135,12 +142,17 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
           // Draw video frame to hidden canvas
           ctx.drawImage(video, 0, 0, width, height);
 
-          try {
-            // Apply highlightPaper for visual feedback
-            const highlighted = scannerRef.current.highlightPaper(canvas);
-            displayCtx.drawImage(highlighted, 0, 0);
-          } catch (e) {
-            // If highlighting fails, just show the video frame
+          // Try to highlight document if jscanify is available
+          if (scannerRef.current) {
+            try {
+              const highlighted = scannerRef.current.highlightPaper(canvas);
+              displayCtx.drawImage(highlighted, 0, 0);
+            } catch (e) {
+              // If highlighting fails, just show the video frame
+              displayCtx.drawImage(canvas, 0, 0);
+            }
+          } else {
+            // jscanify not loaded yet, show raw video
             displayCtx.drawImage(canvas, 0, 0);
           }
         }
@@ -164,56 +176,60 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     return () => stopCamera();
   }, [startCamera, stopCamera]);
 
-  // Capture document
+  // Capture document - works with or without jscanify
   const handleCapture = useCallback(() => {
     const canvas = canvasRef.current;
-    const video = videoRef.current;
 
-    if (!canvas || !video || !scannerRef.current) {
+    // Only check canvas has content, not scanner
+    if (!canvas || canvas.width === 0 || canvas.height === 0) {
       toast({
         title: "Erreur",
-        description: "Scanner non prêt",
+        description: "Caméra non prête, veuillez patienter",
         variant: "destructive"
       });
       return;
     }
 
-    try {
-      // Try to extract the document
-      const resultCanvas = scannerRef.current.extractPaper(canvas, canvas.width, canvas.height);
+    // If jscanify is available, try to extract document
+    if (scannerRef.current) {
+      try {
+        const resultCanvas = scannerRef.current.extractPaper(canvas, canvas.width, canvas.height);
 
-      if (resultCanvas && resultCanvas.width > 0 && resultCanvas.height > 0) {
-        resultCanvas.toBlob((blob: Blob | null) => {
-          if (blob) {
-            stopCamera();
-            onCapture(blob);
-          } else {
-            throw new Error('Failed to create blob');
-          }
-        }, 'image/jpeg', 0.9);
-      } else {
-        // Fallback: capture raw frame if no document detected
-        canvas.toBlob((blob) => {
-          if (blob) {
-            stopCamera();
-            onCapture(blob);
-            toast({
-              title: "Photo capturée",
-              description: "Aucun document détecté, image brute utilisée."
-            });
-          }
-        }, 'image/jpeg', 0.9);
-      }
-    } catch (err) {
-      console.error('Extract error:', err);
-      // Fallback to raw capture
-      canvas.toBlob((blob) => {
-        if (blob) {
-          stopCamera();
-          onCapture(blob);
+        if (resultCanvas && resultCanvas.width > 0 && resultCanvas.height > 0) {
+          resultCanvas.toBlob((blob: Blob | null) => {
+            if (blob) {
+              stopCamera();
+              onCapture(blob);
+            } else {
+              // Fallback to raw capture
+              captureRaw();
+            }
+          }, 'image/jpeg', 0.9);
+          return;
         }
-      }, 'image/jpeg', 0.9);
+      } catch (err) {
+        console.log('[Capture] extractPaper failed, using raw capture:', err);
+      }
     }
+
+    // Fallback: capture raw frame
+    captureRaw();
+  }, [onCapture, stopCamera, toast]);
+
+  const captureRaw = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    canvas.toBlob((blob) => {
+      if (blob) {
+        stopCamera();
+        onCapture(blob);
+        toast({
+          title: "Photo capturée",
+          description: "Image brute utilisée."
+        });
+      }
+    }, 'image/jpeg', 0.9);
   }, [onCapture, stopCamera, toast]);
 
   const handleClose = useCallback(() => {
@@ -288,6 +304,15 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
           className="w-full h-full object-contain"
           style={{ display: isVideoReady ? 'block' : 'none' }}
         />
+
+        {/* Scanner loading indicator */}
+        {isVideoReady && !isScannerReady && (
+          <div className="absolute top-20 left-4 right-4 text-center">
+            <p className="text-yellow-400 text-xs bg-black/50 rounded px-2 py-1 inline-block">
+              Chargement de la détection...
+            </p>
+          </div>
+        )}
 
         {/* Instructions overlay */}
         {isVideoReady && (
