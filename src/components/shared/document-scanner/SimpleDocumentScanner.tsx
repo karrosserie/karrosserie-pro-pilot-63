@@ -308,7 +308,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between p-4 bg-black/80">
           <h2 className="text-white font-medium">Aperçu du document</h2>
-          <Button variant="ghost" size="icon" onClick={handleClose} className="text-white">
+          <Button type="button" variant="ghost" size="icon" onClick={handleClose} className="text-white">
             <X className="h-6 w-6" />
           </Button>
         </div>
@@ -325,6 +325,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         {/* Action buttons */}
         <div className="p-4 bg-black/80 flex gap-4">
           <Button
+            type="button"
             variant="outline"
             onClick={handleRetake}
             className="flex-1 h-14 text-lg border-white/30 text-white hover:bg-white/10"
@@ -333,6 +334,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
             Reprendre
           </Button>
           <Button
+            type="button"
             onClick={handleValidate}
             className="flex-1 h-14 text-lg bg-green-600 hover:bg-green-700 text-white"
           >
@@ -350,7 +352,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between p-4 bg-black/80 z-10">
         <h2 className="text-white font-medium">Scanner un document</h2>
-        <Button variant="ghost" size="icon" onClick={handleClose} className="text-white">
+        <Button type="button" variant="ghost" size="icon" onClick={handleClose} className="text-white">
           <X className="h-6 w-6" />
         </Button>
       </div>
@@ -385,7 +387,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         {error && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-20 p-6">
             <p className="text-red-400 text-lg text-center mb-4">{error}</p>
-            <Button onClick={startCamera} variant="outline" className="text-white border-white">
+            <Button type="button" onClick={startCamera} variant="outline" className="text-white border-white">
               Réessayer
             </Button>
           </div>
@@ -412,6 +414,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       {/* Capture button */}
       <div className="p-4 bg-black/80">
         <Button
+          type="button"
           onClick={handleCapture}
           disabled={!isVideoPlaying || isLoading}
           className="w-full h-16 text-xl bg-white text-black hover:bg-white/90 disabled:opacity-50"
