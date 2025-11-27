@@ -1,6 +1,6 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Camera, RotateCcw, Check, X, Crop, Image as ImageIcon } from 'lucide-react';
+import { Camera, X, RotateCcw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface SimpleDocumentScannerProps {
@@ -13,222 +13,256 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   onClose
 }) => {
   const { toast } = useToast();
-  const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const [processedImage, setProcessedImage] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [useProcessed, setUseProcessed] = useState(true);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const displayCanvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const scannerRef = useRef<any>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  
+  const [isLoading, setIsLoading] = useState(true);
+  const [isVideoReady, setIsVideoReady] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const imageUrl = event.target?.result as string;
-      setCapturedImage(imageUrl);
-      setProcessedImage(null);
-      processImage(imageUrl);
-    };
-    reader.readAsDataURL(file);
+  // Initialize jscanify
+  useEffect(() => {
+    import('jscanify').then(module => {
+      scannerRef.current = new module.default();
+    }).catch(err => {
+      console.error('Failed to load jscanify:', err);
+    });
   }, []);
 
-  const processImage = async (imageUrl: string) => {
-    setIsProcessing(true);
-    
+  // Start camera
+  const startCamera = useCallback(async () => {
     try {
-      // Dynamically import jscanify
-      const jscanify = (await import('jscanify')).default;
-      const scanner = new jscanify();
+      setIsLoading(true);
+      setError(null);
 
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      
-      img.onload = () => {
-        try {
-          // Try to extract the document
-          const resultCanvas = scanner.extractPaper(img, img.naturalWidth, img.naturalHeight);
-          
-          if (resultCanvas && resultCanvas.width > 0 && resultCanvas.height > 0) {
-            const processedUrl = resultCanvas.toDataURL('image/jpeg', 0.9);
-            setProcessedImage(processedUrl);
-            toast({
-              title: "Document détecté",
-              description: "Le document a été automatiquement recadré."
-            });
-          } else {
-            // No document detected, use original
-            setProcessedImage(null);
-            toast({
-              title: "Aucun document détecté",
-              description: "Utilisez l'image originale ou reprenez la photo."
-            });
-          }
-        } catch (error) {
-          console.error('jscanify processing error:', error);
-          setProcessedImage(null);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'environment',
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
         }
-        setIsProcessing(false);
-      };
+      });
 
-      img.onerror = () => {
-        console.error('Failed to load image for processing');
-        setProcessedImage(null);
-        setIsProcessing(false);
-      };
+      streamRef.current = stream;
 
-      img.src = imageUrl;
-    } catch (error) {
-      console.error('Error loading jscanify:', error);
-      setProcessedImage(null);
-      setIsProcessing(false);
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+        setIsVideoReady(true);
+        setIsLoading(false);
+      }
+    } catch (err) {
+      console.error('Camera error:', err);
+      setError("Impossible d'accéder à la caméra. Vérifiez les permissions.");
+      setIsLoading(false);
     }
-  };
+  }, []);
 
-  const handleConfirm = useCallback(async () => {
-    const imageToUse = useProcessed && processedImage ? processedImage : capturedImage;
-    if (!imageToUse) return;
+  // Stop camera
+  const stopCamera = useCallback(() => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    setIsVideoReady(false);
+  }, []);
 
-    try {
-      // Convert data URL to blob
-      const response = await fetch(imageToUse);
-      const blob = await response.blob();
-      onCapture(blob);
-    } catch (error) {
-      console.error('Error converting image to blob:', error);
+  // Real-time detection loop
+  useEffect(() => {
+    if (!isVideoReady || !scannerRef.current) return;
+
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const displayCanvas = displayCanvasRef.current;
+
+    if (!video || !canvas || !displayCanvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const displayCtx = displayCanvas.getContext('2d');
+
+    if (!ctx || !displayCtx) return;
+
+    const detectLoop = () => {
+      if (!video.paused && !video.ended && video.readyState >= 2) {
+        // Set canvas dimensions to match video
+        const width = video.videoWidth;
+        const height = video.videoHeight;
+
+        if (width > 0 && height > 0) {
+          canvas.width = width;
+          canvas.height = height;
+          displayCanvas.width = width;
+          displayCanvas.height = height;
+
+          // Draw video frame to hidden canvas
+          ctx.drawImage(video, 0, 0, width, height);
+
+          try {
+            // Apply highlightPaper for visual feedback
+            const highlighted = scannerRef.current.highlightPaper(canvas);
+            displayCtx.drawImage(highlighted, 0, 0);
+          } catch (e) {
+            // If highlighting fails, just show the video frame
+            displayCtx.drawImage(canvas, 0, 0);
+          }
+        }
+      }
+
+      animationFrameRef.current = requestAnimationFrame(detectLoop);
+    };
+
+    detectLoop();
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [isVideoReady]);
+
+  // Initialize on mount
+  useEffect(() => {
+    startCamera();
+    return () => stopCamera();
+  }, [startCamera, stopCamera]);
+
+  // Capture document
+  const handleCapture = useCallback(() => {
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
+
+    if (!canvas || !video || !scannerRef.current) {
       toast({
         title: "Erreur",
-        description: "Impossible de traiter l'image.",
+        description: "Scanner non prêt",
         variant: "destructive"
       });
+      return;
     }
-  }, [capturedImage, processedImage, useProcessed, onCapture, toast]);
 
-  const handleRetake = useCallback(() => {
-    setCapturedImage(null);
-    setProcessedImage(null);
-    setUseProcessed(true);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+    try {
+      // Try to extract the document
+      const resultCanvas = scannerRef.current.extractPaper(canvas, canvas.width, canvas.height);
+
+      if (resultCanvas && resultCanvas.width > 0 && resultCanvas.height > 0) {
+        resultCanvas.toBlob((blob: Blob | null) => {
+          if (blob) {
+            stopCamera();
+            onCapture(blob);
+          } else {
+            throw new Error('Failed to create blob');
+          }
+        }, 'image/jpeg', 0.9);
+      } else {
+        // Fallback: capture raw frame if no document detected
+        canvas.toBlob((blob) => {
+          if (blob) {
+            stopCamera();
+            onCapture(blob);
+            toast({
+              title: "Photo capturée",
+              description: "Aucun document détecté, image brute utilisée."
+            });
+          }
+        }, 'image/jpeg', 0.9);
+      }
+    } catch (err) {
+      console.error('Extract error:', err);
+      // Fallback to raw capture
+      canvas.toBlob((blob) => {
+        if (blob) {
+          stopCamera();
+          onCapture(blob);
+        }
+      }, 'image/jpeg', 0.9);
     }
-  }, []);
+  }, [onCapture, stopCamera, toast]);
 
-  const openCamera = useCallback(() => {
-    fileInputRef.current?.click();
-  }, []);
-
-  // Initial state - show capture button
-  if (!capturedImage) {
-    return (
-      <div className="fixed inset-0 z-50 bg-background flex flex-col">
-        <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold">Scanner un document</h2>
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <X className="h-5 w-5" />
-          </Button>
-        </div>
-
-        <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6">
-          <div className="text-center space-y-2">
-            <Camera className="h-16 w-16 mx-auto text-muted-foreground" />
-            <p className="text-muted-foreground">
-              Prenez une photo du document à scanner
-            </p>
-          </div>
-
-          <Button size="lg" className="h-16 px-8 text-lg" onClick={openCamera}>
-            <Camera className="h-6 w-6 mr-3" />
-            Prendre une photo
-          </Button>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={handleFileSelect}
-            className="hidden"
-          />
-        </div>
-
-        <div className="p-4 border-t">
-          <Button variant="outline" className="w-full" onClick={onClose}>
-            Annuler
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  // Preview state - show captured/processed image
-  const displayImage = useProcessed && processedImage ? processedImage : capturedImage;
+  const handleClose = useCallback(() => {
+    stopCamera();
+    onClose();
+  }, [stopCamera, onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col">
-      <div className="flex items-center justify-between p-4 border-b">
-        <h2 className="text-lg font-semibold">Aperçu du document</h2>
-        <Button variant="ghost" size="icon" onClick={onClose}>
+    <div className="fixed inset-0 z-50 bg-black flex flex-col">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 bg-black/50 backdrop-blur-sm">
+        <h2 className="text-white text-lg font-semibold">Scanner un document</h2>
+        <Button variant="ghost" size="icon" onClick={handleClose} className="text-white hover:bg-white/20">
           <X className="h-5 w-5" />
         </Button>
       </div>
 
-      <div className="flex-1 overflow-auto p-4">
-        {isProcessing ? (
-          <div className="h-full flex flex-col items-center justify-center gap-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
-            <p className="text-muted-foreground">Détection du document...</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="relative rounded-lg overflow-hidden border bg-muted">
-              <img
-                src={displayImage}
-                alt="Document capturé"
-                className="w-full h-auto max-h-[60vh] object-contain"
-              />
+      {/* Camera view */}
+      <div className="flex-1 relative overflow-hidden">
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black">
+            <div className="text-center text-white">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4" />
+              <p>Initialisation de la caméra...</p>
             </div>
+          </div>
+        )}
 
-            {/* Toggle between original and processed */}
-            {processedImage && (
-              <div className="flex gap-2">
-                <Button
-                  variant={useProcessed ? "default" : "outline"}
-                  className="flex-1"
-                  onClick={() => setUseProcessed(true)}
-                >
-                  <Crop className="h-4 w-4 mr-2" />
-                  Recadré
-                </Button>
-                <Button
-                  variant={!useProcessed ? "default" : "outline"}
-                  className="flex-1"
-                  onClick={() => setUseProcessed(false)}
-                >
-                  <ImageIcon className="h-4 w-4 mr-2" />
-                  Original
-                </Button>
-              </div>
-            )}
+        {error && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black p-6">
+            <div className="text-center text-white">
+              <p className="mb-4">{error}</p>
+              <Button onClick={startCamera} variant="outline" className="text-white border-white">
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Réessayer
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Hidden video element */}
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className="hidden"
+        />
+
+        {/* Hidden processing canvas */}
+        <canvas ref={canvasRef} className="hidden" />
+
+        {/* Display canvas with highlighted document */}
+        <canvas
+          ref={displayCanvasRef}
+          className="w-full h-full object-contain"
+          style={{ display: isVideoReady ? 'block' : 'none' }}
+        />
+
+        {/* Instructions overlay */}
+        {isVideoReady && (
+          <div className="absolute bottom-4 left-4 right-4 text-center">
+            <p className="text-white text-sm bg-black/50 backdrop-blur-sm rounded-lg px-4 py-2 inline-block">
+              Cadrez le document • Les contours verts indiquent la détection
+            </p>
           </div>
         )}
       </div>
 
-      <canvas ref={canvasRef} className="hidden" />
-
-      <div className="p-4 border-t space-y-2">
-        <div className="flex gap-2">
-          <Button variant="outline" className="flex-1" onClick={handleRetake}>
-            <RotateCcw className="h-4 w-4 mr-2" />
-            Reprendre
-          </Button>
-          <Button 
-            className="flex-1" 
-            onClick={handleConfirm}
-            disabled={isProcessing}
+      {/* Capture button */}
+      <div className="p-6 bg-black/50 backdrop-blur-sm">
+        <div className="flex justify-center">
+          <Button
+            onClick={handleCapture}
+            disabled={!isVideoReady}
+            size="lg"
+            className="h-16 w-16 rounded-full bg-white hover:bg-gray-200 text-black"
           >
-            <Check className="h-4 w-4 mr-2" />
-            Confirmer
+            <Camera className="h-8 w-8" />
           </Button>
         </div>
       </div>
