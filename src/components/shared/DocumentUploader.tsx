@@ -8,7 +8,7 @@ import { DocumentDisplay } from './document-uploader/DocumentDisplay';
 import { DocumentUploadLoading } from './document-uploader/DocumentUploadLoading';
 import { DocumentAnalysisLoading } from './document-uploader/DocumentAnalysisLoading';
 import { DocumentEmptyState } from './document-uploader/DocumentEmptyState';
-import { DocumentScanner } from './document-scanner/DocumentScanner';
+import { SimpleDocumentScanner } from './document-scanner/SimpleDocumentScanner';
 import { Button } from '@/components/ui/button';
 import { Camera, Upload } from 'lucide-react';
 import { useMobileDetection } from '@/hooks/use-mobile-detection';
@@ -112,7 +112,7 @@ export function DocumentUploader({
 
   // Show scanner
   if (showScanner) {
-    return <DocumentScanner onCapture={handleScanCapture} onClose={handleScanClose} />;
+    return <SimpleDocumentScanner onCapture={handleScanCapture} onClose={handleScanClose} />;
   }
 
   // Show upload mode choice on mobile (only for scannable documents)
