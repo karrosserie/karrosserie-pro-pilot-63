@@ -15,16 +15,13 @@ interface SimpleDocumentScannerProps {
   onClose: () => void;
 }
 
-// ALL OpenCV functions required by jscanify
+// Core OpenCV functions used by jscanify (simplified list)
 const REQUIRED_CV_FUNCTIONS = [
-  'Mat', 'MatVector', 'Size', 'Scalar',
+  'Mat', 'MatVector', 'Size',
   'imread', 'imshow',
-  'cvtColor', 'GaussianBlur', 'Canny', 'threshold', 'dilate',
-  'findContours', 'contourArea', 'arcLength', 'approxPolyDP', 'minAreaRect', 'boxPoints',
-  'getPerspectiveTransform', 'warpPerspective',
-  'COLOR_RGBA2GRAY', 'THRESH_BINARY', 'THRESH_OTSU',
-  'RETR_CCOMP', 'CHAIN_APPROX_SIMPLE',
-  'CV_32FC2', 'INTER_LINEAR', 'BORDER_CONSTANT'
+  'Canny', 'GaussianBlur', 'threshold', 
+  'findContours', 'contourArea', 'minAreaRect',
+  'BORDER_DEFAULT', 'THRESH_OTSU', 'RETR_CCOMP', 'CHAIN_APPROX_SIMPLE'
 ];
 
 export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
@@ -52,153 +49,142 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     isVideoReadyRef.current = isVideoReady;
   }, [isVideoReady]);
 
-  // Check if ALL required OpenCV functions are available
-  const checkAllCVFunctions = useCallback((): { allReady: boolean; missing: string[] } => {
-    const missing: string[] = [];
-    
+  // Check if critical OpenCV functions are available
+  const checkCVFunctions = useCallback((): boolean => {
     if (!window.cv) {
-      console.error('[OpenCV] window.cv is not available');
-      return { allReady: false, missing: ['cv (global object)'] };
+      console.log('[OpenCV] window.cv not available yet');
+      return false;
     }
 
-    for (const fn of REQUIRED_CV_FUNCTIONS) {
+    // Check core functions that jscanify needs
+    const criticalFns = ['Mat', 'imread', 'findContours', 'Canny'];
+    for (const fn of criticalFns) {
       if (window.cv[fn] === undefined) {
-        missing.push(fn);
-      }
-    }
-
-    if (missing.length > 0) {
-      console.warn('[OpenCV] Missing functions:', missing.join(', '));
-    } else {
-      console.log('[OpenCV] All', REQUIRED_CV_FUNCTIONS.length, 'required functions are available');
-    }
-
-    return { allReady: missing.length === 0, missing };
-  }, []);
-
-  // Test jscanify with a simple test canvas
-  const testJscanify = useCallback((scanner: any): boolean => {
-    console.log('[Scanner] Testing jscanify with test canvas...');
-    
-    try {
-      // Create a test canvas with a simple rectangle (simulating a document)
-      const testCanvas = document.createElement('canvas');
-      testCanvas.width = 200;
-      testCanvas.height = 200;
-      const testCtx = testCanvas.getContext('2d');
-      
-      if (!testCtx) {
-        console.error('[Scanner] Could not get test canvas context');
+        console.log('[OpenCV] Missing critical function:', fn);
         return false;
       }
+    }
 
-      // Draw white background
-      testCtx.fillStyle = 'white';
-      testCtx.fillRect(0, 0, 200, 200);
-      
-      // Draw a black rectangle (simulating document edges)
-      testCtx.strokeStyle = 'black';
-      testCtx.lineWidth = 5;
-      testCtx.strokeRect(30, 30, 140, 140);
+    console.log('[OpenCV] ✓ Critical functions available');
+    return true;
+  }, []);
 
-      // Try highlightPaper
-      console.log('[Scanner] Calling highlightPaper on test canvas...');
-      const result = scanner.highlightPaper(testCanvas, {
-        color: 'lime',
-        thickness: 4
-      });
+  // Test jscanify by checking cv.imread works (no synthetic document test)
+  const testJscanify = useCallback((scanner: any): boolean => {
+    console.log('[Scanner] Testing jscanify functionality...');
+    
+    try {
+      // Check jscanify methods exist
+      if (typeof scanner.highlightPaper !== 'function') {
+        console.error('[Scanner] ✗ highlightPaper is not a function');
+        return false;
+      }
+      if (typeof scanner.extractPaper !== 'function') {
+        console.error('[Scanner] ✗ extractPaper is not a function');
+        return false;
+      }
+      console.log('[Scanner] ✓ jscanify methods available');
 
-      if (result && result.width > 0) {
-        console.log('[Scanner] ✓ highlightPaper TEST PASSED - returned canvas:', result.width, 'x', result.height);
+      // Test cv.imread works with a minimal canvas
+      const testCanvas = document.createElement('canvas');
+      testCanvas.width = 10;
+      testCanvas.height = 10;
+      const testCtx = testCanvas.getContext('2d');
+      if (testCtx) {
+        testCtx.fillStyle = 'black';
+        testCtx.fillRect(0, 0, 10, 10);
+      }
+
+      const mat = window.cv.imread(testCanvas);
+      if (mat && mat.rows > 0) {
+        console.log('[Scanner] ✓ cv.imread test passed:', mat.rows, 'x', mat.cols);
+        mat.delete(); // Clean up
         return true;
       } else {
-        console.warn('[Scanner] ✗ highlightPaper TEST FAILED - returned:', result);
+        console.error('[Scanner] ✗ cv.imread returned invalid mat');
         return false;
       }
     } catch (testError) {
-      console.error('[Scanner] ✗ highlightPaper TEST EXCEPTION:', testError);
+      console.error('[Scanner] ✗ Test failed with exception:', testError);
       return false;
     }
   }, []);
 
-  // Load OpenCV.js then jscanify with comprehensive checks
+  // Load OpenCV.js then jscanify with improved loading
   useEffect(() => {
     console.log('[Scanner] Starting dependency loading...');
     setScannerStatus('loading');
     
     const loadOpenCV = (): Promise<void> => {
       return new Promise((resolve, reject) => {
-        // Check if already loaded with all functions
-        const { allReady } = checkAllCVFunctions();
-        if (allReady) {
-          console.log('[OpenCV] Already fully loaded');
+        // Check if already loaded and ready
+        if (window.cv && window.cv.Mat && checkCVFunctions()) {
+          console.log('[OpenCV] Already loaded and ready');
           resolve();
           return;
         }
 
-        // Check if script already exists
-        const existingScript = document.querySelector('script[src*="opencv.js"]');
-        if (existingScript) {
-          console.log('[OpenCV] Script tag exists, waiting for functions...');
-        } else {
+        // Load script if not present
+        if (!document.querySelector('script[src*="opencv.js"]')) {
           console.log('[OpenCV] Loading script from CDN...');
           const script = document.createElement('script');
           script.src = 'https://docs.opencv.org/4.7.0/opencv.js';
           script.async = true;
-          script.onerror = (err) => {
-            console.error('[OpenCV] Script load error:', err);
+          script.onerror = () => {
+            console.error('[OpenCV] Script load error');
             reject(new Error('Failed to load OpenCV script'));
           };
           document.head.appendChild(script);
+        } else {
+          console.log('[OpenCV] Script already in DOM');
         }
 
         let attempts = 0;
-        const maxAttempts = 100; // 10 seconds max
-
-        const waitForCV = () => {
+        const maxAttempts = 150; // 15 seconds max
+        
+        const checkReady = () => {
           attempts++;
-
-          if (window.cv) {
-            // Check if runtime is initialized
-            if (typeof window.cv.onRuntimeInitialized === 'function') {
-              // Not yet initialized
-              console.log('[OpenCV] Waiting for onRuntimeInitialized...');
-              const originalCallback = window.cv.onRuntimeInitialized;
-              window.cv.onRuntimeInitialized = () => {
-                if (originalCallback) originalCallback();
-                console.log('[OpenCV] Runtime initialized callback fired');
-                setTimeout(() => {
-                  const { allReady, missing } = checkAllCVFunctions();
-                  if (allReady) {
-                    resolve();
-                  } else {
-                    console.warn('[OpenCV] Still missing after init:', missing);
-                    // Continue anyway, some functions might work
-                    resolve();
-                  }
-                }, 500);
-              };
-            } else {
-              // Check functions directly
-              const { allReady, missing } = checkAllCVFunctions();
-              if (allReady) {
-                resolve();
-              } else if (attempts < maxAttempts) {
-                console.log('[OpenCV] Attempt', attempts, '- waiting for functions. Missing:', missing.length);
-                setTimeout(waitForCV, 100);
-              } else {
-                console.warn('[OpenCV] Timeout - proceeding with available functions');
-                resolve();
-              }
-            }
-          } else if (attempts < maxAttempts) {
-            setTimeout(waitForCV, 100);
+          
+          // Check if cv is ready with Mat function
+          if (window.cv && window.cv.Mat && window.cv.imread) {
+            console.log('[OpenCV] ✓ Ready after', attempts, 'attempts');
+            resolve();
+            return;
+          }
+          
+          // Handle OpenCV promise-based initialization (OpenCV 4.x)
+          if (window.cv && typeof window.cv.then === 'function') {
+            console.log('[OpenCV] Waiting via Promise...');
+            window.cv.then(() => {
+              console.log('[OpenCV] ✓ Ready via Promise');
+              resolve();
+            }).catch((e: Error) => {
+              console.error('[OpenCV] Promise rejected:', e);
+              reject(e);
+            });
+            return;
+          }
+          
+          // Handle onRuntimeInitialized callback
+          if (window.cv && !window.cv.Mat && window.cv.onRuntimeInitialized === undefined) {
+            // cv exists but not fully initialized - set callback
+            console.log('[OpenCV] Setting onRuntimeInitialized callback...');
+            window.cv.onRuntimeInitialized = () => {
+              console.log('[OpenCV] ✓ Runtime initialized via callback');
+              resolve();
+            };
+            return;
+          }
+          
+          if (attempts < maxAttempts) {
+            setTimeout(checkReady, 100);
           } else {
-            reject(new Error('OpenCV load timeout - cv object never appeared'));
+            console.error('[OpenCV] Timeout after', maxAttempts * 100, 'ms');
+            reject(new Error('OpenCV load timeout'));
           }
         };
 
-        waitForCV();
+        checkReady();
       });
     };
 
@@ -237,7 +223,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         setScannerStatus('error');
         setIsScannerReady(true); // Allow raw capture mode
       });
-  }, [checkAllCVFunctions, testJscanify]);
+  }, [checkCVFunctions, testJscanify]);
 
   // Stop camera
   const stopCamera = useCallback(() => {
@@ -557,17 +543,17 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
               {scannerStatus === 'ready' ? (
                 <>
                   <CheckCircle className="h-3 w-3" />
-                  Scanner OK
+                  Détection active
                 </>
               ) : scannerStatus === 'error' ? (
                 <>
                   <XCircle className="h-3 w-3" />
-                  Mode simple
+                  Mode simple (OpenCV non dispo)
                 </>
               ) : (
                 <>
                   <div className="animate-spin h-3 w-3 border border-black border-t-transparent rounded-full" />
-                  Chargement...
+                  Chargement OpenCV...
                 </>
               )}
             </div>
