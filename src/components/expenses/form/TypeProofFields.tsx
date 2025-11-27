@@ -8,10 +8,18 @@ import { Expense } from './types';
 interface TypeProofFieldsProps {
   formData: Expense;
   onChange: (field: keyof Expense, value: any) => void;
+  onProofUpload?: (url: string) => void;
   onAnalysisComplete?: (data: any) => void;
 }
 
-export const TypeProofFields = ({ formData, onChange, onAnalysisComplete }: TypeProofFieldsProps) => {
+export const TypeProofFields = ({ formData, onChange, onProofUpload, onAnalysisComplete }: TypeProofFieldsProps) => {
+  const handleProofUpload = (url: string) => {
+    onChange('proof_url', url);
+    if (onProofUpload) {
+      onProofUpload(url);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div>
@@ -38,7 +46,7 @@ export const TypeProofFields = ({ formData, onChange, onAnalysisComplete }: Type
           documentType="expense-proof"
           documentId={formData.id || 'new-expense'}
           currentDocumentUrl={formData.proof_url || ''}
-          onUploadComplete={(url) => onChange('proof_url', url)}
+          onUploadComplete={handleProofUpload}
           onAnalysisComplete={onAnalysisComplete}
           isViewMode={false}
         />
