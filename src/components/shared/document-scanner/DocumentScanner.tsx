@@ -142,19 +142,15 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
   };
 
   const handleVideoLoadedData = () => {
-    console.log('[Video] ✓ onLoadedData - Video has data');
-    if (videoRef.current && videoRef.current.readyState >= 2) {
-      setIsVideoPlaying(true);
-      setIsLoading(false);
-      setShowManualPlayButton(false);
-      if (retryTimeoutRef.current) {
-        clearTimeout(retryTimeoutRef.current);
-      }
-    }
+    console.log('[Video] ✓ onLoadedData - Video has data (readyState:', videoRef.current?.readyState, ')');
+    // Ne PAS setter isVideoPlaying ici - attendre onPlay ou onTimeUpdate
+    // qui confirment que la vidéo joue vraiment
   };
 
   const handleVideoTimeUpdate = () => {
-    if (!isVideoPlayingRef.current && videoRef.current && videoRef.current.currentTime > 0) {
+    // Vérifier que la vidéo joue vraiment (currentTime > 0 ET pas en pause)
+    if (!isVideoPlayingRef.current && videoRef.current && 
+        videoRef.current.currentTime > 0 && !videoRef.current.paused) {
       console.log('[Video] ✓ onTimeUpdate - Video actually playing (currentTime:', videoRef.current.currentTime, ')');
       setIsVideoPlaying(true);
       setIsLoading(false);
