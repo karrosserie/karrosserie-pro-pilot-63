@@ -220,6 +220,17 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     setIsVideoReady(false);
   }, []);
 
+  // Mark video as ready (called from multiple detection methods)
+  const markVideoReady = useCallback(() => {
+    if (!isVideoReadyRef.current) {
+      console.log('[Video] ✓ READY - Video is now playing');
+      isVideoReadyRef.current = true;
+      setIsVideoReady(true);
+      setIsLoading(false);
+      setShowManualStart(false);
+    }
+  }, []);
+
   // Start camera
   const startCamera = useCallback(async () => {
     try {
@@ -227,6 +238,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       setError(null);
       setShowManualStart(false);
       setIsVideoReady(false);
+      isVideoReadyRef.current = false;
 
       console.log('[Camera] Requesting getUserMedia...');
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -247,13 +259,25 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
           setIsLoading(false);
           setShowManualStart(true);
         });
+
+        // Manual readyState polling as fallback
+        const checkInterval = setInterval(() => {
+          if (videoRef.current && videoRef.current.readyState >= 3) {
+            console.log('[Camera] Manual check: readyState =', videoRef.current.readyState);
+            markVideoReady();
+            clearInterval(checkInterval);
+          }
+        }, 100);
+
+        // Stop polling after 5 seconds
+        setTimeout(() => clearInterval(checkInterval), 5000);
       }
     } catch (err) {
       console.error('[Camera] Error:', err);
       setError("Impossible d'accéder à la caméra. Vérifiez les permissions.");
       setIsLoading(false);
     }
-  }, []);
+  }, [markVideoReady]);
 
   const handleManualStart = useCallback(async () => {
     if (!videoRef.current) return;
@@ -274,10 +298,33 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
 
   const handleVideoCanPlay = useCallback(() => {
     console.log('[Video] canplay event');
-    setIsVideoReady(true);
-    setIsLoading(false);
-    setShowManualStart(false);
-  }, []);
+    markVideoReady();
+  }, [markVideoReady]);
+
+  const handleVideoPlay = useCallback(() => {
+    console.log('[Video] play event');
+    markVideoReady();
+  }, [markVideoReady]);
+
+  const handleVideoPlaying = useCallback(() => {
+    console.log('[Video] playing event');
+    markVideoReady();
+  }, [markVideoReady]);
+
+  const handleVideoTimeUpdate = useCallback(() => {
+    // Only log once, but always try to mark ready
+    if (!isVideoReadyRef.current) {
+      console.log('[Video] timeupdate event (first)');
+      markVideoReady();
+    }
+  }, [markVideoReady]);
+
+  const handleVideoLoadedData = useCallback(() => {
+    console.log('[Video] loadeddata event, readyState:', videoRef.current?.readyState);
+    if (videoRef.current && videoRef.current.readyState >= 3) {
+      markVideoReady();
+    }
+  }, [markVideoReady]);
 
   const handleVideoError = useCallback((e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
     console.error('[Video] error:', e);
@@ -501,12 +548,16 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
           muted
           className="absolute overflow-hidden pointer-events-none"
           style={{ 
-            width: '1px',
-            height: '1px',
-            opacity: 0,
+            width: '10px',
+            height: '10px',
+            opacity: 0.01,
             zIndex: -1
           }}
           onCanPlay={handleVideoCanPlay}
+          onPlay={handleVideoPlay}
+          onPlaying={handleVideoPlaying}
+          onTimeUpdate={handleVideoTimeUpdate}
+          onLoadedData={handleVideoLoadedData}
           onError={handleVideoError}
         />
 
