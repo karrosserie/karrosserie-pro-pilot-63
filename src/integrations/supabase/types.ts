@@ -5978,6 +5978,33 @@ export type Database = {
           },
         ]
       }
+      verif_doc_client: {
+        Row: {
+          client_id: string | null
+          company_id: string | null
+          created_at: string
+          id: number
+          nombre_relance: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          company_id?: string | null
+          created_at?: string
+          id?: number
+          nombre_relance?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          company_id?: string | null
+          created_at?: string
+          id?: number
+          nombre_relance?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       webhook_configurations: {
         Row: {
           company_id: string | null
