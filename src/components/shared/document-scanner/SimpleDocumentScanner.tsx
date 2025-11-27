@@ -1,233 +1,96 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Camera, X, RotateCcw, CheckCircle, XCircle } from 'lucide-react';
+import { X, Camera, Check, RotateCcw, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import cvModule from '@techstark/opencv-js';
 import { Jscanify } from '@/lib/jscanify';
-// Declare OpenCV on window for jscanify compatibility
-declare global {
-  interface Window {
-    cv: any;
-  }
-}
 
 interface SimpleDocumentScannerProps {
   onCapture: (blob: Blob) => void;
   onClose: () => void;
 }
 
-// Initialize OpenCV with robust polling fallback and multi-scope assignment
-const initializeOpenCV = async (): Promise<any> => {
-  console.log('[OpenCV] ========== INIT START ==========');
-  console.log('[OpenCV] cvModule:', cvModule);
-  console.log('[OpenCV] typeof cvModule:', typeof cvModule);
-  console.log('[OpenCV] cvModule instanceof Promise:', cvModule instanceof Promise);
-  console.log('[OpenCV] cvModule.Mat:', (cvModule as any)?.Mat);
-  console.log('[OpenCV] cvModule.onRuntimeInitialized:', (cvModule as any)?.onRuntimeInitialized);
-  
-  // Check if already initialized on window
-  if (window.cv && typeof window.cv.Mat === 'function') {
-    console.log('[OpenCV] Already initialized on window.cv');
-    return window.cv;
+declare global {
+  interface Window {
+    cv: any;
   }
+}
 
-  let cv: any;
+// Load OpenCV via CDN (more reliable than npm)
+const loadOpenCV = (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    // Check if already loaded
+    if (window.cv && window.cv.Mat) {
+      console.log('[OpenCV] Already loaded');
+      resolve();
+      return;
+    }
 
-  try {
-    // CASE 1: Module is a Promise
-    if (cvModule instanceof Promise) {
-      console.log('[OpenCV] Case 1: Module is Promise, awaiting...');
-      cv = await cvModule;
-      console.log('[OpenCV] Promise resolved, cv:', cv);
-      console.log('[OpenCV] cv.Mat after resolve:', typeof cv?.Mat);
-    }
-    // CASE 2: Module is already ready (has Mat function)
-    else if (cvModule && typeof (cvModule as any).Mat === 'function') {
-      console.log('[OpenCV] Case 2: Module already ready');
-      cv = cvModule;
-    }
-    // CASE 3: Module needs onRuntimeInitialized - with polling fallback
-    else {
-      console.log('[OpenCV] Case 3: Waiting for runtime initialization...');
+    console.log('[OpenCV] Loading from CDN...');
+    const script = document.createElement('script');
+    script.src = 'https://docs.opencv.org/4.7.0/opencv.js';
+    script.async = true;
+
+    script.onload = () => {
+      console.log('[OpenCV] Script loaded, waiting for runtime...');
       
-      cv = await new Promise<any>((resolve, reject) => {
-        const startTime = Date.now();
-        const timeout = 10000; // 10 seconds max
-        
-        // Polling check every 100ms as fallback
-        const pollInterval = setInterval(() => {
-          const elapsed = Date.now() - startTime;
-          
-          if (cvModule && typeof (cvModule as any).Mat === 'function') {
-            console.log('[OpenCV] Polling: Mat became available after', elapsed, 'ms');
-            clearInterval(pollInterval);
-            resolve(cvModule);
-          } else if (elapsed > timeout) {
-            console.error('[OpenCV] Polling timeout after', timeout, 'ms');
-            clearInterval(pollInterval);
-            reject(new Error(`OpenCV timeout after ${timeout}ms`));
-          } else if (elapsed % 1000 < 100) {
-            console.log('[OpenCV] Polling...', elapsed, 'ms elapsed');
-          }
-        }, 100);
-        
-        // Also listen for onRuntimeInitialized callback
-        if (cvModule && typeof (cvModule as any).onRuntimeInitialized !== 'undefined') {
-          const originalCallback = (cvModule as any).onRuntimeInitialized;
-          (cvModule as any).onRuntimeInitialized = () => {
-            console.log('[OpenCV] onRuntimeInitialized fired!');
-            clearInterval(pollInterval);
-            if (originalCallback && typeof originalCallback === 'function') {
-              originalCallback();
-            }
-            resolve(cvModule);
+      const checkReady = () => {
+        if (window.cv && window.cv.Mat) {
+          console.log('[OpenCV] Runtime ready');
+          resolve();
+        } else if (window.cv) {
+          window.cv.onRuntimeInitialized = () => {
+            console.log('[OpenCV] Runtime initialized');
+            resolve();
           };
+        } else {
+          setTimeout(checkReady, 100);
         }
-      });
-    }
+      };
+      checkReady();
+    };
 
-    // Final verification
-    if (!cv || typeof cv.Mat !== 'function') {
-      console.error('[OpenCV] FAILED: cv.Mat is not a function after init');
-      console.error('[OpenCV] cv:', cv);
-      console.error('[OpenCV] cv.Mat:', cv?.Mat);
-      throw new Error('OpenCV loaded but cv.Mat is not available');
-    }
+    script.onerror = () => {
+      console.error('[OpenCV] Failed to load from CDN');
+      reject(new Error('Échec du chargement OpenCV'));
+    };
 
-    // Assign to ALL global scopes for maximum compatibility with jscanify
-    window.cv = cv;
-    if (typeof globalThis !== 'undefined') (globalThis as any).cv = cv;
-    if (typeof self !== 'undefined') (self as any).cv = cv;
-    
-    console.log('[OpenCV] ========== INIT SUCCESS ==========');
-    console.log('[OpenCV] cv.Mat:', typeof cv.Mat);
-    console.log('[OpenCV] cv.imread:', typeof cv.imread);
-    console.log('[OpenCV] cv.Canny:', typeof cv.Canny);
-    console.log('[OpenCV] cv.findContours:', typeof cv.findContours);
-    console.log('[OpenCV] window.cv === cv:', window.cv === cv);
-    
-    return cv;
-  } catch (error) {
-    console.error('[OpenCV] ========== INIT FAILED ==========');
-    console.error('[OpenCV] Error:', error);
-    throw error;
-  }
+    document.head.appendChild(script);
+  });
 };
 
 export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   onCapture,
-  onClose
+  onClose,
 }) => {
   const { toast } = useToast();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const displayCanvasRef = useRef<HTMLCanvasElement>(null);
+  const animationRef = useRef<number | null>(null);
+  const scannerRef = useRef<Jscanify | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const scannerRef = useRef<any>(null);
-  const animationFrameRef = useRef<number | null>(null);
-  
-  const isVideoReadyRef = useRef(false);
-  
+
   const [isLoading, setIsLoading] = useState(true);
-  const [isVideoReady, setIsVideoReady] = useState(false);
-  const [isScannerReady, setIsScannerReady] = useState(false);
-  const [showManualStart, setShowManualStart] = useState(false);
+  const [isOpenCVReady, setIsOpenCVReady] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [scannerStatus, setScannerStatus] = useState<'loading' | 'ready' | 'error'>('loading');
-
-  useEffect(() => {
-    isVideoReadyRef.current = isVideoReady;
-  }, [isVideoReady]);
-
-  // Load OpenCV then jscanify (browser version)
-  useEffect(() => {
-    let mounted = true;
-
-    const initScanner = async () => {
-      console.log('[Scanner] ========== INITIALIZATION START ==========');
-      setScannerStatus('loading');
-
-      try {
-        // STEP 1: Initialize OpenCV (MUST be done BEFORE jscanify)
-        console.log('[Scanner] Step 1: Initializing OpenCV...');
-        await initializeOpenCV();
-        if (!mounted) return;
-        console.log('[Scanner] Step 1: ✓ OpenCV ready');
-
-        // STEP 2: Create scanner instance using our ES module
-        console.log('[Scanner] Step 2: Creating Jscanify instance...');
-        const scanner = new Jscanify();
-        scannerRef.current = scanner;
-        if (!mounted) return;
-        console.log('[Scanner] Step 2: ✓ Scanner instance created');
-        console.log('[Scanner] Methods:', {
-          highlightPaper: typeof scanner.highlightPaper,
-          extractPaper: typeof scanner.extractPaper
-        });
-
-        // STEP 3: Test cv.imread to confirm everything works
-        console.log('[Scanner] Step 3: Testing cv.imread...');
-        const testCanvas = document.createElement('canvas');
-        testCanvas.width = 10;
-        testCanvas.height = 10;
-        const testCtx = testCanvas.getContext('2d');
-        if (testCtx) {
-          testCtx.fillStyle = '#000000';
-          testCtx.fillRect(0, 0, 10, 10);
-        }
-        
-        const testMat = window.cv.imread(testCanvas);
-        if (!testMat || testMat.rows === 0) {
-          throw new Error('cv.imread test failed - returned empty mat');
-        }
-        console.log('[Scanner] Step 3: ✓ cv.imread works:', testMat.rows, 'x', testMat.cols);
-        testMat.delete();
-
-        if (!mounted) return;
-
-        // SUCCESS
-        setScannerStatus('ready');
-        setIsScannerReady(true);
-        console.log('[Scanner] ========== INITIALIZATION SUCCESS ==========');
-
-      } catch (err) {
-        console.error('[Scanner] ========== INITIALIZATION FAILED ==========');
-        console.error('[Scanner] Error:', err);
-        if (!mounted) return;
-        setScannerStatus('error');
-        setIsScannerReady(true); // Allow raw capture mode
-      }
-    };
-
-    initScanner();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const [previewDataUrl, setPreviewDataUrl] = useState<string | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
+  const [statusMessage, setStatusMessage] = useState('Chargement...');
 
   // Stop camera
   const stopCamera = useCallback(() => {
     console.log('[Camera] Stopping...');
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-      animationFrameRef.current = null;
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
     }
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
-    setIsVideoReady(false);
-  }, []);
-
-  // Mark video as ready (called from multiple detection methods)
-  const markVideoReady = useCallback(() => {
-    if (!isVideoReadyRef.current) {
-      console.log('[Video] ✓ READY - Video is now playing');
-      isVideoReadyRef.current = true;
-      setIsVideoReady(true);
-      setIsLoading(false);
-      setShowManualStart(false);
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
     }
   }, []);
 
@@ -236,393 +99,329 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     try {
       setIsLoading(true);
       setError(null);
-      setShowManualStart(false);
-      setIsVideoReady(false);
-      isVideoReadyRef.current = false;
+      setStatusMessage('Accès caméra...');
 
       console.log('[Camera] Requesting getUserMedia...');
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'environment',
           width: { ideal: 1920 },
-          height: { ideal: 1080 }
-        }
+          height: { ideal: 1080 },
+        },
+        audio: false,
       });
-      console.log('[Camera] Stream obtained');
 
       streamRef.current = stream;
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play().catch((playError) => {
-          console.warn('[Camera] Autoplay blocked:', playError);
-          setIsLoading(false);
-          setShowManualStart(true);
-        });
-
-        // Manual readyState polling as fallback
-        const checkInterval = setInterval(() => {
-          if (videoRef.current && videoRef.current.readyState >= 3) {
-            console.log('[Camera] Manual check: readyState =', videoRef.current.readyState);
-            markVideoReady();
-            clearInterval(checkInterval);
-          }
-        }, 100);
-
-        // Stop polling after 5 seconds
-        setTimeout(() => clearInterval(checkInterval), 5000);
+        console.log('[Camera] Stream attached to video');
+        
+        try {
+          await videoRef.current.play();
+          console.log('[Camera] Video playing');
+        } catch (playErr) {
+          console.warn('[Camera] Autoplay failed:', playErr);
+        }
       }
     } catch (err) {
       console.error('[Camera] Error:', err);
       setError("Impossible d'accéder à la caméra. Vérifiez les permissions.");
       setIsLoading(false);
     }
-  }, [markVideoReady]);
-
-  const handleManualStart = useCallback(async () => {
-    if (!videoRef.current) return;
-
-    if (!streamRef.current || !streamRef.current.active) {
-      startCamera();
-      return;
-    }
-
-    try {
-      await videoRef.current.play();
-    } catch (err) {
-      console.error('[Manual] Play failed:', err);
-      setError("Impossible de démarrer la caméra. Rechargez la page.");
-      setShowManualStart(false);
-    }
-  }, [startCamera]);
-
-  const handleVideoCanPlay = useCallback(() => {
-    console.log('[Video] canplay event');
-    markVideoReady();
-  }, [markVideoReady]);
-
-  const handleVideoPlay = useCallback(() => {
-    console.log('[Video] play event');
-    markVideoReady();
-  }, [markVideoReady]);
-
-  const handleVideoPlaying = useCallback(() => {
-    console.log('[Video] playing event');
-    markVideoReady();
-  }, [markVideoReady]);
-
-  const handleVideoTimeUpdate = useCallback(() => {
-    // Only log once, but always try to mark ready
-    if (!isVideoReadyRef.current) {
-      console.log('[Video] timeupdate event (first)');
-      markVideoReady();
-    }
-  }, [markVideoReady]);
-
-  const handleVideoLoadedData = useCallback(() => {
-    console.log('[Video] loadeddata event, readyState:', videoRef.current?.readyState);
-    if (videoRef.current && videoRef.current.readyState >= 3) {
-      markVideoReady();
-    }
-  }, [markVideoReady]);
-
-  const handleVideoError = useCallback((e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
-    console.error('[Video] error:', e);
-    setError("Erreur vidéo. Vérifiez les permissions caméra.");
-    setIsLoading(false);
   }, []);
 
-  // Real-time detection loop
+  // Handle video play event
+  const handleVideoPlay = useCallback(() => {
+    console.log('[Video] Playing');
+    setIsVideoPlaying(true);
+    setIsLoading(false);
+    setStatusMessage('Détection active');
+  }, []);
+
+  // Initialize OpenCV and camera on mount
   useEffect(() => {
-    if (!isVideoReady) return;
+    let mounted = true;
+
+    const initialize = async () => {
+      try {
+        // Load OpenCV first
+        setStatusMessage('Chargement OpenCV...');
+        await loadOpenCV();
+        
+        if (!mounted) return;
+        
+        setIsOpenCVReady(true);
+        console.log('[Init] OpenCV ready');
+
+        // Then start camera
+        await startCamera();
+      } catch (err) {
+        console.error('[Init] Error:', err);
+        if (mounted) {
+          setError('Erreur initialisation. Réessayez.');
+          setIsLoading(false);
+        }
+      }
+    };
+
+    initialize();
+
+    return () => {
+      mounted = false;
+      stopCamera();
+    };
+  }, [startCamera, stopCamera]);
+
+  // Detection loop
+  useEffect(() => {
+    if (!isVideoPlaying || !isOpenCVReady) return;
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    const displayCanvas = displayCanvasRef.current;
-
-    if (!video || !canvas || !displayCanvas) return;
+    if (!video || !canvas) return;
 
     const ctx = canvas.getContext('2d');
-    const displayCtx = displayCanvas.getContext('2d');
+    if (!ctx) return;
 
-    if (!ctx || !displayCtx) return;
+    // Initialize scanner
+    const scanner = new Jscanify();
+    scannerRef.current = scanner;
+    console.log('[Detection] Starting loop');
 
-    console.log('[Loop] Starting detection loop');
-    console.log('[Loop] Scanner ref:', !!scannerRef.current);
-    console.log('[Loop] window.cv:', !!window.cv);
-    console.log('[Loop] cv.imread:', window.cv ? typeof window.cv.imread : 'N/A');
-    console.log('[Loop] Scanner status:', scannerStatus);
-
-    let frameCount = 0;
-    
     const detectLoop = () => {
-      if (!video.paused && !video.ended && video.readyState >= 2) {
-        const width = video.videoWidth;
-        const height = video.videoHeight;
+      if (video.readyState >= 2 && video.videoWidth > 0) {
+        // Match canvas size to video
+        if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+        }
 
-        if (width > 0 && height > 0) {
-          canvas.width = width;
-          canvas.height = height;
-          displayCanvas.width = width;
-          displayCanvas.height = height;
+        // Draw video frame
+        ctx.drawImage(video, 0, 0);
 
-          ctx.drawImage(video, 0, 0, width, height);
-
-          // Try to use jscanify for contour detection
-          if (scannerRef.current && window.cv && typeof window.cv.imread === 'function') {
-            try {
-              const highlighted = scannerRef.current.highlightPaper(canvas, {
-                color: 'lime',
-                thickness: 8
-              });
-
-              if (highlighted && highlighted.width > 0) {
-                displayCtx.drawImage(highlighted, 0, 0);
-                
-                if (frameCount % 120 === 0) {
-                  console.log('[Loop] ✓ Frame', frameCount, '- Contours rendered');
-                }
-              } else {
-                displayCtx.drawImage(canvas, 0, 0);
-                
-                if (frameCount % 120 === 0) {
-                  console.log('[Loop] Frame', frameCount, '- No document detected');
-                }
-              }
-            } catch (e) {
-              console.error('[Loop] highlightPaper ERROR at frame', frameCount, ':', e);
-              displayCtx.drawImage(canvas, 0, 0);
-            }
-          } else {
-            displayCtx.drawImage(canvas, 0, 0);
-            
-            if (frameCount % 180 === 0) {
-              console.log('[Loop] Frame', frameCount, '- Scanner not ready:',
-                'scanner:', !!scannerRef.current,
-                'cv:', !!window.cv,
-                'imread:', window.cv ? typeof window.cv.imread : 'N/A'
-              );
-            }
-          }
+        // Highlight detected document (green contours)
+        try {
+          scanner.highlightPaper(canvas, { color: 'lime', thickness: 6 });
+        } catch (err) {
+          // Silent fail - detection continues
         }
       }
 
-      frameCount++;
-      animationFrameRef.current = requestAnimationFrame(detectLoop);
+      animationRef.current = requestAnimationFrame(detectLoop);
     };
 
     detectLoop();
 
     return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
       }
     };
-  }, [isVideoReady, scannerStatus]);
-
-  // Initialize on mount
-  useEffect(() => {
-    startCamera();
-    
-    const timeout = setTimeout(() => {
-      if (!isVideoReadyRef.current && !showManualStart && !error) {
-        console.log('[Timeout] Video not ready after 5s');
-        setIsLoading(false);
-        setShowManualStart(true);
-      }
-    }, 5000);
-
-    return () => {
-      clearTimeout(timeout);
-      stopCamera();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isVideoPlaying, isOpenCVReady]);
 
   // Capture document
   const handleCapture = useCallback(() => {
     const canvas = canvasRef.current;
+    const scanner = scannerRef.current;
 
-    if (!canvas || canvas.width === 0) {
+    if (!canvas || !scanner) {
       toast({
         title: "Erreur",
-        description: "Caméra non prête",
+        description: "Scanner non prêt",
         variant: "destructive"
       });
       return;
     }
 
-    if (scannerRef.current && window.cv && typeof window.cv.imread === 'function') {
-      try {
-        const resultCanvas = scannerRef.current.extractPaper(canvas, canvas.width, canvas.height);
+    console.log('[Capture] Extracting paper...');
 
-        if (resultCanvas && resultCanvas.width > 0) {
-          resultCanvas.toBlob((blob: Blob | null) => {
-            if (blob) {
-              stopCamera();
-              onCapture(blob);
-            } else {
-              captureRaw();
-            }
-          }, 'image/jpeg', 0.9);
-          return;
-        }
-      } catch (err) {
-        console.log('[Capture] extractPaper failed:', err);
+    try {
+      // Extract with A4 ratio (595x842)
+      const extracted = scanner.extractPaper(canvas, 595, 842);
+
+      if (extracted && extracted.width > 0) {
+        console.log('[Capture] Extraction successful:', extracted.width, 'x', extracted.height);
+        const dataUrl = extracted.toDataURL('image/jpeg', 0.92);
+        setPreviewDataUrl(dataUrl);
+        setShowPreview(true);
+      } else {
+        console.warn('[Capture] No document detected, using raw capture');
+        // Fallback: capture raw canvas
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+        setPreviewDataUrl(dataUrl);
+        setShowPreview(true);
+        toast({
+          title: "Aucun document détecté",
+          description: "Image brute capturée. Assurez-vous que le document est visible avec un fond contrasté.",
+        });
       }
+    } catch (err) {
+      console.error('[Capture] Error:', err);
+      // Fallback: capture raw canvas
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+      setPreviewDataUrl(dataUrl);
+      setShowPreview(true);
     }
+  }, [toast]);
 
-    captureRaw();
-  }, [onCapture, stopCamera, toast]);
+  // Validate captured document
+  const handleValidate = useCallback(() => {
+    if (!previewDataUrl) return;
 
-  const captureRaw = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    canvas.toBlob((blob) => {
-      if (blob) {
+    console.log('[Validate] Converting to blob...');
+    
+    fetch(previewDataUrl)
+      .then(res => res.blob())
+      .then(blob => {
+        console.log('[Validate] Blob created:', blob.size, 'bytes');
         stopCamera();
         onCapture(blob);
-      }
-    }, 'image/jpeg', 0.9);
-  }, [onCapture, stopCamera]);
+      })
+      .catch(err => {
+        console.error('[Validate] Error:', err);
+        toast({
+          title: "Erreur",
+          description: "Impossible de sauvegarder l'image",
+          variant: "destructive"
+        });
+      });
+  }, [previewDataUrl, stopCamera, onCapture, toast]);
 
+  // Retake photo
+  const handleRetake = useCallback(() => {
+    setShowPreview(false);
+    setPreviewDataUrl(null);
+  }, []);
+
+  // Handle close
   const handleClose = useCallback(() => {
     stopCamera();
     onClose();
   }, [stopCamera, onClose]);
 
+  // Preview screen
+  if (showPreview && previewDataUrl) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 bg-black/80">
+          <h2 className="text-white font-medium">Aperçu du document</h2>
+          <Button variant="ghost" size="icon" onClick={handleClose} className="text-white">
+            <X className="h-6 w-6" />
+          </Button>
+        </div>
+
+        {/* Preview image */}
+        <div className="flex-1 flex items-center justify-center p-4 overflow-auto">
+          <img
+            src={previewDataUrl}
+            alt="Document scanné"
+            className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+          />
+        </div>
+
+        {/* Action buttons */}
+        <div className="p-4 bg-black/80 flex gap-4">
+          <Button
+            variant="outline"
+            onClick={handleRetake}
+            className="flex-1 h-14 text-lg border-white/30 text-white hover:bg-white/10"
+          >
+            <RotateCcw className="mr-2 h-5 w-5" />
+            Reprendre
+          </Button>
+          <Button
+            onClick={handleValidate}
+            className="flex-1 h-14 text-lg bg-green-600 hover:bg-green-700 text-white"
+          >
+            <Check className="mr-2 h-5 w-5" />
+            Valider
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Main scanner view
   return (
     <div className="fixed inset-0 z-50 bg-black flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 bg-black/50 backdrop-blur-sm">
-        <h2 className="text-white text-lg font-semibold">Scanner un document</h2>
-        <Button variant="ghost" size="icon" onClick={handleClose} className="text-white hover:bg-white/20">
-          <X className="h-5 w-5" />
+      <div className="flex items-center justify-between p-4 bg-black/80 z-10">
+        <h2 className="text-white font-medium">Scanner un document</h2>
+        <Button variant="ghost" size="icon" onClick={handleClose} className="text-white">
+          <X className="h-6 w-6" />
         </Button>
       </div>
 
       {/* Camera view */}
       <div className="flex-1 relative overflow-hidden">
-        {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black">
-            <div className="text-center text-white">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4" />
-              <p>Initialisation de la caméra...</p>
-            </div>
-          </div>
-        )}
-
-        {showManualStart && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
-            <div className="text-center">
-              <p className="text-white mb-4">Appuyez pour démarrer la caméra</p>
-              <Button 
-                onClick={handleManualStart} 
-                size="lg" 
-                className="bg-white text-black hover:bg-gray-200"
-              >
-                <Camera className="h-6 w-6 mr-2" />
-                Démarrer la caméra
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {error && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black p-6">
-            <div className="text-center text-white">
-              <p className="mb-4">{error}</p>
-              <Button onClick={startCamera} variant="outline" className="text-white border-white">
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Réessayer
-              </Button>
-            </div>
-          </div>
-        )}
-
+        {/* Video element - visible */}
         <video
           ref={videoRef}
           autoPlay
           playsInline
           muted
-          className="absolute overflow-hidden pointer-events-none"
-          style={{ 
-            width: '10px',
-            height: '10px',
-            opacity: 0.01,
-            zIndex: -1
-          }}
-          onCanPlay={handleVideoCanPlay}
+          className="absolute inset-0 w-full h-full object-cover"
           onPlay={handleVideoPlay}
-          onPlaying={handleVideoPlaying}
-          onTimeUpdate={handleVideoTimeUpdate}
-          onLoadedData={handleVideoLoadedData}
-          onError={handleVideoError}
         />
 
-        <canvas ref={canvasRef} className="hidden" />
-
+        {/* Canvas overlay for detection contours */}
         <canvas
-          ref={displayCanvasRef}
-          className="w-full h-full object-contain"
-          style={{ display: isVideoReady ? 'block' : 'none' }}
+          ref={canvasRef}
+          className="absolute inset-0 w-full h-full object-cover"
         />
 
-        {/* Scanner status indicator */}
-        {isVideoReady && (
-          <div className="absolute top-4 left-4">
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
-              scannerStatus === 'ready' 
-                ? 'bg-green-500/80 text-white' 
-                : scannerStatus === 'error'
-                ? 'bg-red-500/80 text-white'
-                : 'bg-yellow-500/80 text-black'
-            }`}>
-              {scannerStatus === 'ready' ? (
-                <>
-                  <CheckCircle className="h-3 w-3" />
-                  Détection active
-                </>
-              ) : scannerStatus === 'error' ? (
-                <>
-                  <XCircle className="h-3 w-3" />
-                  Mode simple
-                </>
-              ) : (
-                <>
-                  <div className="animate-spin h-3 w-3 border border-black border-t-transparent rounded-full" />
-                  Chargement OpenCV...
-                </>
-              )}
-            </div>
+        {/* Loading overlay */}
+        {isLoading && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 z-20">
+            <Loader2 className="h-12 w-12 text-white animate-spin mb-4" />
+            <p className="text-white text-lg">{statusMessage}</p>
           </div>
         )}
 
-        {/* Instructions */}
-        {isVideoReady && (
-          <div className="absolute bottom-32 left-0 right-0 text-center">
-            <p className="text-white text-sm bg-black/50 inline-block px-4 py-2 rounded-full">
-              {scannerStatus === 'ready' 
-                ? "Cadrez le document - contours verts = détecté"
-                : "Cadrez le document et appuyez sur le bouton"
-              }
-            </p>
+        {/* Error overlay */}
+        {error && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-20 p-6">
+            <p className="text-red-400 text-lg text-center mb-4">{error}</p>
+            <Button onClick={startCamera} variant="outline" className="text-white border-white">
+              Réessayer
+            </Button>
+          </div>
+        )}
+
+        {/* Status indicator */}
+        {isVideoPlaying && !isLoading && (
+          <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-black/50 rounded-full px-3 py-1.5">
+            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            <span className="text-white text-sm">{statusMessage}</span>
           </div>
         )}
       </div>
 
+      {/* Instructions */}
+      {isVideoPlaying && !isLoading && (
+        <div className="bg-black/80 px-4 py-2 text-center">
+          <p className="text-white/80 text-sm">
+            Cadrez le document • Les contours verts s'affichent quand détecté
+          </p>
+        </div>
+      )}
+
       {/* Capture button */}
-      <div className="p-6 flex justify-center bg-black/50 backdrop-blur-sm">
+      <div className="p-4 bg-black/80">
         <Button
           onClick={handleCapture}
-          size="lg"
-          className="w-20 h-20 rounded-full bg-white hover:bg-gray-200 text-black"
-          disabled={!isVideoReady}
+          disabled={!isVideoPlaying || isLoading}
+          className="w-full h-16 text-xl bg-white text-black hover:bg-white/90 disabled:opacity-50"
         >
-          <Camera className="h-8 w-8" />
+          <Camera className="mr-3 h-6 w-6" />
+          SCANNER
         </Button>
       </div>
     </div>
   );
 };
+
+export default SimpleDocumentScanner;
