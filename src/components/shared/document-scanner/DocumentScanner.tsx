@@ -78,14 +78,14 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
         await startCamera();
         console.log('[Camera] ✓ Started');
         
-        // Set timeout to check if video actually plays (3s pour détecter autoplay bloqué)
+        // Set timeout to check if video actually plays (1.5s pour détecter autoplay bloqué)
         retryTimeoutRef.current = setTimeout(() => {
           console.log('[Camera] Timeout check - isVideoPlaying:', isVideoPlayingRef.current);
           if (!isVideoPlayingRef.current) {
-            console.warn('[Camera] No video playing after 3s - showing manual play button');
+            console.warn('[Camera] No video playing after 1.5s - showing manual play button');
             setShowManualPlayButton(true);
           }
-        }, 3000);
+        }, 1500);
       } catch (err) {
         console.error('[Camera] Start error:', err);
         setCameraError(true);
@@ -334,12 +334,15 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black">
-      {/* Video feed */}
+      {/* Video feed - toujours visible */}
       <video
         ref={videoRef}
         autoPlay
         playsInline
         muted
+        // @ts-ignore - iOS Safari specific attributes
+        webkit-playsinline="true"
+        x5-playsinline="true"
         onLoadedMetadata={handleVideoMetadata}
         onCanPlay={handleVideoCanPlay}
         onPlay={handleVideoPlay}
@@ -348,32 +351,29 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
         className="absolute inset-0 w-full h-full object-cover"
       />
 
-      {/* Loading indicator */}
+      {/* Loading indicator - semi-transparent pour laisser voir la vidéo */}
       {isLoading && !isVideoPlaying && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/80">
-          <div className="text-center">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="bg-black/60 rounded-lg p-6 text-center">
             <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-white text-sm">Démarrage de la caméra...</p>
+            <p className="text-white text-sm">Démarrage...</p>
           </div>
         </div>
       )}
 
-      {/* Manual play button if autoplay is blocked */}
+      {/* Manual play button if autoplay is blocked - sans fond opaque */}
       {showManualPlayButton && !isVideoPlaying && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/80">
-          <div className="text-center p-6">
-            <Camera className="w-16 h-16 mx-auto mb-4 text-white" />
-            <p className="text-white text-lg mb-2">Caméra prête</p>
-            <p className="text-white/70 text-sm mb-6">
-              Appuyez sur le bouton pour démarrer
-            </p>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="bg-black/70 rounded-xl p-6 text-center">
+            <Camera className="w-12 h-12 mx-auto mb-3 text-white" />
+            <p className="text-white text-base mb-4">Appuyez pour démarrer</p>
             <Button 
               onClick={handleManualPlayClick}
               size="lg"
               className="bg-primary hover:bg-primary/90"
             >
               <Camera className="h-5 w-5 mr-2" />
-              Démarrer la caméra
+              Démarrer
             </Button>
           </div>
         </div>
