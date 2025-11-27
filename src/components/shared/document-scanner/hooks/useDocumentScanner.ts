@@ -138,6 +138,19 @@ export const useDocumentScanner = () => {
         console.warn('[Camera] Autoplay blocked, will require user interaction:', playErr);
       }
       
+      // Deuxième tentative de play après 500ms (fallback pour autoplay bloqué)
+      setTimeout(async () => {
+        if (videoRef.current && videoRef.current.paused) {
+          console.log('[Camera] Attempting delayed play...');
+          try {
+            await videoRef.current.play();
+            console.log('[Camera] ✓ Delayed play successful');
+          } catch (e) {
+            console.warn('[Camera] Delayed play also blocked, requires user interaction');
+          }
+        }
+      }, 500);
+      
       // Enable OpenCV detection when ready
       if (isOpenCVAvailable()) {
         setStatus('searching');
