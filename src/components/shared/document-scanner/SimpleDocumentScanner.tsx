@@ -22,14 +22,16 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   
   const [isLoading, setIsLoading] = useState(true);
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [showManualStart, setShowManualStart] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Initialize jscanify
   useEffect(() => {
     import('jscanify').then(module => {
       scannerRef.current = new module.default();
+      console.log('[Scanner] jscanify loaded');
     }).catch(err => {
-      console.error('Failed to load jscanify:', err);
+      console.error('[Scanner] Failed to load jscanify:', err);
     });
   }, []);
 
@@ -38,7 +40,9 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     try {
       setIsLoading(true);
       setError(null);
+      setShowManualStart(false);
 
+      console.log('[Camera] Requesting getUserMedia...');
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'environment',
@@ -46,19 +50,45 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
           height: { ideal: 1080 }
         }
       });
+      console.log('[Camera] Stream obtained:', stream.active);
 
       streamRef.current = stream;
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-        setIsVideoReady(true);
-        setIsLoading(false);
+        console.log('[Camera] srcObject assigned, attempting play...');
+        
+        try {
+          await videoRef.current.play();
+          console.log('[Camera] Play succeeded');
+          setIsVideoReady(true);
+          setIsLoading(false);
+        } catch (playError) {
+          console.warn('[Camera] Autoplay blocked, showing manual button:', playError);
+          setIsLoading(false);
+          setShowManualStart(true);
+        }
       }
     } catch (err) {
-      console.error('Camera error:', err);
+      console.error('[Camera] Error:', err);
       setError("Impossible d'accéder à la caméra. Vérifiez les permissions.");
       setIsLoading(false);
+    }
+  }, []);
+
+  // Manual start for autoplay-blocked cases
+  const handleManualStart = useCallback(async () => {
+    if (videoRef.current) {
+      try {
+        await videoRef.current.play();
+        console.log('[Camera] Manual play succeeded');
+        setIsVideoReady(true);
+        setShowManualStart(false);
+      } catch (err) {
+        console.error('[Camera] Manual play failed:', err);
+        setError("Impossible de démarrer la caméra.");
+        setShowManualStart(false);
+      }
     }
   }, []);
 
@@ -208,6 +238,22 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
             <div className="text-center text-white">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4" />
               <p>Initialisation de la caméra...</p>
+            </div>
+          </div>
+        )}
+
+        {showManualStart && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
+            <div className="text-center">
+              <p className="text-white mb-4">Appuyez pour démarrer la caméra</p>
+              <Button 
+                onClick={handleManualStart} 
+                size="lg" 
+                className="bg-white text-black hover:bg-gray-200"
+              >
+                <Camera className="h-6 w-6 mr-2" />
+                Démarrer la caméra
+              </Button>
             </div>
           </div>
         )}
