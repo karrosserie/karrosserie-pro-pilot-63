@@ -35,70 +35,13 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       console.log('[Scanner] jscanify loaded successfully');
     }).catch(err => {
       console.error('[Scanner] Failed to load jscanify:', err);
-      // Continue without jscanify - allow raw capture
-      setIsScannerReady(true);
+      setIsScannerReady(true); // Allow raw capture
     });
-  }, []);
-
-  // Start camera
-  const startCamera = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      setShowManualStart(false);
-
-      console.log('[Camera] Requesting getUserMedia...');
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: 'environment',
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
-        }
-      });
-      console.log('[Camera] Stream obtained:', stream.active);
-
-      streamRef.current = stream;
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        console.log('[Camera] srcObject assigned, attempting play...');
-        
-        try {
-          await videoRef.current.play();
-          console.log('[Camera] Play succeeded');
-          setIsVideoReady(true);
-          setIsLoading(false);
-        } catch (playError) {
-          console.warn('[Camera] Autoplay blocked, showing manual button:', playError);
-          setIsLoading(false);
-          setShowManualStart(true);
-        }
-      }
-    } catch (err) {
-      console.error('[Camera] Error:', err);
-      setError("Impossible d'accéder à la caméra. Vérifiez les permissions.");
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Manual start for autoplay-blocked cases
-  const handleManualStart = useCallback(async () => {
-    if (videoRef.current) {
-      try {
-        await videoRef.current.play();
-        console.log('[Camera] Manual play succeeded');
-        setIsVideoReady(true);
-        setShowManualStart(false);
-      } catch (err) {
-        console.error('[Camera] Manual play failed:', err);
-        setError("Impossible de démarrer la caméra.");
-        setShowManualStart(false);
-      }
-    }
   }, []);
 
   // Stop camera
   const stopCamera = useCallback(() => {
+    console.log('[Camera] Stopping...');
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
       animationFrameRef.current = null;
@@ -110,9 +53,87 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     setIsVideoReady(false);
   }, []);
 
-  // Real-time detection loop - starts as soon as video is ready
+  // Start camera - simplified, relies on video events
+  const startCamera = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      setShowManualStart(false);
+      setIsVideoReady(false);
+
+      console.log('[Camera] Requesting getUserMedia...');
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'environment',
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        }
+      });
+      console.log('[Camera] Stream obtained, active:', stream.active);
+
+      streamRef.current = stream;
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        console.log('[Camera] srcObject assigned');
+        
+        // Try to play - don't await, let video events handle state
+        videoRef.current.play().catch((playError) => {
+          console.warn('[Camera] Autoplay blocked:', playError);
+          setIsLoading(false);
+          setShowManualStart(true);
+        });
+      }
+    } catch (err) {
+      console.error('[Camera] Error:', err);
+      setError("Impossible d'accéder à la caméra. Vérifiez les permissions.");
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Manual start for autoplay-blocked cases
+  const handleManualStart = useCallback(async () => {
+    console.log('[Manual] Button pressed');
+    
+    if (!videoRef.current) {
+      console.error('[Manual] No video ref');
+      return;
+    }
+
+    // Check if stream is still active
+    if (!streamRef.current || !streamRef.current.active) {
+      console.log('[Manual] Stream inactive, restarting camera');
+      startCamera();
+      return;
+    }
+
+    try {
+      await videoRef.current.play();
+      console.log('[Manual] Play succeeded');
+      // onCanPlay event will handle the rest
+    } catch (err) {
+      console.error('[Manual] Play failed:', err);
+      setError("Impossible de démarrer la caméra. Rechargez la page.");
+      setShowManualStart(false);
+    }
+  }, [startCamera]);
+
+  // Video event handlers
+  const handleVideoCanPlay = useCallback(() => {
+    console.log('[Video Event] canplay - video ready to play');
+    setIsVideoReady(true);
+    setIsLoading(false);
+    setShowManualStart(false);
+  }, []);
+
+  const handleVideoError = useCallback((e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+    console.error('[Video Event] error:', e);
+    setError("Erreur vidéo. Vérifiez les permissions caméra.");
+    setIsLoading(false);
+  }, []);
+
+  // Real-time detection loop
   useEffect(() => {
-    // Only require video to be ready, NOT jscanify
     if (!isVideoReady) return;
 
     const video = videoRef.current;
@@ -126,7 +147,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
 
     if (!ctx || !displayCtx) return;
 
-    console.log('[Loop] Starting detection loop, scanner ready:', !!scannerRef.current);
+    console.log('[Loop] Starting detection loop');
 
     const detectLoop = () => {
       if (!video.paused && !video.ended && video.readyState >= 2) {
@@ -139,20 +160,16 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
           displayCanvas.width = width;
           displayCanvas.height = height;
 
-          // Draw video frame to hidden canvas
           ctx.drawImage(video, 0, 0, width, height);
 
-          // Try to highlight document if jscanify is available
           if (scannerRef.current) {
             try {
               const highlighted = scannerRef.current.highlightPaper(canvas);
               displayCtx.drawImage(highlighted, 0, 0);
             } catch (e) {
-              // If highlighting fails, just show the video frame
               displayCtx.drawImage(canvas, 0, 0);
             }
           } else {
-            // jscanify not loaded yet, show raw video
             displayCtx.drawImage(canvas, 0, 0);
           }
         }
@@ -170,17 +187,30 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     };
   }, [isVideoReady]);
 
-  // Initialize on mount
+  // Initialize on mount - NO dependencies to prevent re-runs
   useEffect(() => {
     startCamera();
-    return () => stopCamera();
-  }, [startCamera, stopCamera]);
+    
+    // Safety timeout: if video not ready after 5s, show manual button
+    const timeout = setTimeout(() => {
+      if (!isVideoReady && !showManualStart && !error) {
+        console.log('[Timeout] Video not ready after 5s, showing manual start');
+        setIsLoading(false);
+        setShowManualStart(true);
+      }
+    }, 5000);
 
-  // Capture document - works with or without jscanify
+    return () => {
+      clearTimeout(timeout);
+      stopCamera();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Capture document
   const handleCapture = useCallback(() => {
     const canvas = canvasRef.current;
 
-    // Only check canvas has content, not scanner
     if (!canvas || canvas.width === 0 || canvas.height === 0) {
       toast({
         title: "Erreur",
@@ -190,7 +220,6 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       return;
     }
 
-    // If jscanify is available, try to extract document
     if (scannerRef.current) {
       try {
         const resultCanvas = scannerRef.current.extractPaper(canvas, canvas.width, canvas.height);
@@ -201,18 +230,16 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
               stopCamera();
               onCapture(blob);
             } else {
-              // Fallback to raw capture
               captureRaw();
             }
           }, 'image/jpeg', 0.9);
           return;
         }
       } catch (err) {
-        console.log('[Capture] extractPaper failed, using raw capture:', err);
+        console.log('[Capture] extractPaper failed, using raw:', err);
       }
     }
 
-    // Fallback: capture raw frame
     captureRaw();
   }, [onCapture, stopCamera, toast]);
 
@@ -224,13 +251,9 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       if (blob) {
         stopCamera();
         onCapture(blob);
-        toast({
-          title: "Photo capturée",
-          description: "Image brute utilisée."
-        });
       }
     }, 'image/jpeg', 0.9);
-  }, [onCapture, stopCamera, toast]);
+  }, [onCapture, stopCamera]);
 
   const handleClose = useCallback(() => {
     stopCamera();
@@ -286,19 +309,23 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
           </div>
         )}
 
-        {/* Hidden video element */}
+        {/* Video element with event handlers */}
         <video
           ref={videoRef}
           autoPlay
           playsInline
           muted
           className="hidden"
+          onCanPlay={handleVideoCanPlay}
+          onLoadedMetadata={() => console.log('[Video Event] loadedmetadata')}
+          onPlay={() => console.log('[Video Event] play')}
+          onError={handleVideoError}
         />
 
         {/* Hidden processing canvas */}
         <canvas ref={canvasRef} className="hidden" />
 
-        {/* Display canvas with highlighted document */}
+        {/* Display canvas */}
         <canvas
           ref={displayCanvasRef}
           className="w-full h-full object-contain"
@@ -314,7 +341,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
           </div>
         )}
 
-        {/* Instructions overlay */}
+        {/* Instructions */}
         {isVideoReady && (
           <div className="absolute bottom-4 left-4 right-4 text-center">
             <p className="text-white text-sm bg-black/50 backdrop-blur-sm rounded-lg px-4 py-2 inline-block">
