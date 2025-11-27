@@ -178,30 +178,38 @@ export class Jscanify {
       }
     }
     
+    // Declare all OpenCV matrices outside try block for guaranteed cleanup
+    let img: any = null;
+    let contour: any = null;
+    let srcTri: any = null;
+    let dstTri: any = null;
+    let M: any = null;
+    let result: any = null;
+    let localContour = false;
+    
     try {
-      const img = cv.imread(canvas);
-      let contour = cornerPoints;
+      img = cv.imread(canvas);
       
-      if (!contour) {
+      if (cornerPoints) {
+        contour = cornerPoints;
+      } else {
         contour = this.findPaperContour(img);
+        localContour = true;
       }
       
       if (!contour) {
         console.warn('[Jscanify] No paper contour found, returning original');
-        img.delete();
         return canvas;
       }
       
       const points = this.getCornerPoints(contour);
       if (!points) {
         console.warn('[Jscanify] Could not get corner points');
-        img.delete();
-        if (!cornerPoints) contour.delete();
         return canvas;
       }
       
       // Source points
-      const srcTri = cv.matFromArray(4, 1, cv.CV_32FC2, [
+      srcTri = cv.matFromArray(4, 1, cv.CV_32FC2, [
         points.topLeft.x, points.topLeft.y,
         points.topRight.x, points.topRight.y,
         points.bottomRight.x, points.bottomRight.y,
@@ -209,7 +217,7 @@ export class Jscanify {
       ]);
       
       // Destination points
-      const dstTri = cv.matFromArray(4, 1, cv.CV_32FC2, [
+      dstTri = cv.matFromArray(4, 1, cv.CV_32FC2, [
         0, 0,
         resultWidth, 0,
         resultWidth, resultHeight,
@@ -217,10 +225,10 @@ export class Jscanify {
       ]);
       
       // Get perspective transform
-      const M = cv.getPerspectiveTransform(srcTri, dstTri);
+      M = cv.getPerspectiveTransform(srcTri, dstTri);
       
       // Apply transform
-      const result = new cv.Mat();
+      result = new cv.Mat();
       const dsize = new cv.Size(resultWidth, resultHeight);
       cv.warpPerspective(img, result, M, dsize);
       
@@ -230,18 +238,18 @@ export class Jscanify {
       outputCanvas.height = resultHeight;
       cv.imshow(outputCanvas, result);
       
-      // Cleanup
-      img.delete();
-      srcTri.delete();
-      dstTri.delete();
-      M.delete();
-      result.delete();
-      if (!cornerPoints) contour.delete();
-      
       return outputCanvas;
     } catch (error) {
       console.error('[Jscanify] extractPaper error:', error);
       return null;
+    } finally {
+      // GUARANTEED CLEANUP - prevents WebAssembly memory leaks
+      if (img) img.delete();
+      if (srcTri) srcTri.delete();
+      if (dstTri) dstTri.delete();
+      if (M) M.delete();
+      if (result) result.delete();
+      if (localContour && contour) contour.delete();
     }
   }
 }
