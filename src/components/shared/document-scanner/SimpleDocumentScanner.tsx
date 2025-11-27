@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Camera, X, RotateCcw, CheckCircle, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import cvModule from '@techstark/opencv-js';
-
+import { Jscanify } from '@/lib/jscanify';
 // Declare OpenCV on window for jscanify compatibility
 declare global {
   interface Window {
@@ -154,27 +154,19 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         if (!mounted) return;
         console.log('[Scanner] Step 1: ✓ OpenCV ready');
 
-        // STEP 2: Import BROWSER version of jscanify
-        // CRITICAL: jscanify/src/jscanify.js uses global cv (window.cv)
-        // jscanify (default) = jscanify-node.js which does NOT work in browser
-        console.log('[Scanner] Step 2: Importing jscanify browser version...');
-        const jscanifyModule = await import('jscanify/src/jscanify.js');
-        if (!mounted) return;
-        
-        const JscanifyClass = jscanifyModule.default || jscanifyModule;
-        console.log('[Scanner] Step 2: ✓ jscanify loaded:', typeof JscanifyClass);
-
-        // STEP 3: Create scanner instance
-        const scanner = new JscanifyClass();
+        // STEP 2: Create scanner instance using our ES module
+        console.log('[Scanner] Step 2: Creating Jscanify instance...');
+        const scanner = new Jscanify();
         scannerRef.current = scanner;
-        console.log('[Scanner] Step 3: ✓ Scanner instance created');
+        if (!mounted) return;
+        console.log('[Scanner] Step 2: ✓ Scanner instance created');
         console.log('[Scanner] Methods:', {
           highlightPaper: typeof scanner.highlightPaper,
           extractPaper: typeof scanner.extractPaper
         });
 
-        // STEP 4: Test cv.imread to confirm everything works
-        console.log('[Scanner] Step 4: Testing cv.imread...');
+        // STEP 3: Test cv.imread to confirm everything works
+        console.log('[Scanner] Step 3: Testing cv.imread...');
         const testCanvas = document.createElement('canvas');
         testCanvas.width = 10;
         testCanvas.height = 10;
@@ -188,7 +180,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         if (!testMat || testMat.rows === 0) {
           throw new Error('cv.imread test failed - returned empty mat');
         }
-        console.log('[Scanner] Step 4: ✓ cv.imread works:', testMat.rows, 'x', testMat.cols);
+        console.log('[Scanner] Step 3: ✓ cv.imread works:', testMat.rows, 'x', testMat.cols);
         testMat.delete();
 
         if (!mounted) return;
