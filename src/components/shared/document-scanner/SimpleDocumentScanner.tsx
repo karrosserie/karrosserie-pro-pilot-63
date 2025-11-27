@@ -499,7 +499,13 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
           autoPlay
           playsInline
           muted
-          className="hidden"
+          className="absolute overflow-hidden pointer-events-none"
+          style={{ 
+            width: '1px',
+            height: '1px',
+            opacity: 0,
+            zIndex: -1
+          }}
           onCanPlay={handleVideoCanPlay}
           onError={handleVideoError}
         />
