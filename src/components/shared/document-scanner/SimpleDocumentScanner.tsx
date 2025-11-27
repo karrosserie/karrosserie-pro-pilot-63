@@ -16,13 +16,16 @@ interface SimpleDocumentScannerProps {
   onClose: () => void;
 }
 
-// Initialize OpenCV according to official @techstark/opencv-js README pattern
+// Initialize OpenCV with robust polling fallback and multi-scope assignment
 const initializeOpenCV = async (): Promise<any> => {
-  console.log('[OpenCV] Starting initialization...');
-  console.log('[OpenCV] cvModule type:', typeof cvModule);
+  console.log('[OpenCV] ========== INIT START ==========');
+  console.log('[OpenCV] cvModule:', cvModule);
+  console.log('[OpenCV] typeof cvModule:', typeof cvModule);
   console.log('[OpenCV] cvModule instanceof Promise:', cvModule instanceof Promise);
+  console.log('[OpenCV] cvModule.Mat:', (cvModule as any)?.Mat);
+  console.log('[OpenCV] cvModule.onRuntimeInitialized:', (cvModule as any)?.onRuntimeInitialized);
   
-  // If already initialized on window
+  // Check if already initialized on window
   if (window.cv && typeof window.cv.Mat === 'function') {
     console.log('[OpenCV] Already initialized on window.cv');
     return window.cv;
@@ -31,50 +34,82 @@ const initializeOpenCV = async (): Promise<any> => {
   let cv: any;
 
   try {
-    // Pattern from official README: handle both Promise and callback cases
+    // CASE 1: Module is a Promise
     if (cvModule instanceof Promise) {
-      // Case 1: Module is a Promise (common with Vite/Webpack bundlers)
-      console.log('[OpenCV] Module is a Promise, awaiting...');
+      console.log('[OpenCV] Case 1: Module is Promise, awaiting...');
       cv = await cvModule;
-      console.log('[OpenCV] Promise resolved');
-    } else {
-      // Case 2: Module needs onRuntimeInitialized callback
-      console.log('[OpenCV] Checking if module is ready...');
+      console.log('[OpenCV] Promise resolved, cv:', cv);
+      console.log('[OpenCV] cv.Mat after resolve:', typeof cv?.Mat);
+    }
+    // CASE 2: Module is already ready (has Mat function)
+    else if (cvModule && typeof (cvModule as any).Mat === 'function') {
+      console.log('[OpenCV] Case 2: Module already ready');
+      cv = cvModule;
+    }
+    // CASE 3: Module needs onRuntimeInitialized - with polling fallback
+    else {
+      console.log('[OpenCV] Case 3: Waiting for runtime initialization...');
       
-      if (cvModule.Mat && typeof cvModule.Mat === 'function') {
-        console.log('[OpenCV] Module already ready');
-        cv = cvModule;
-      } else {
-        console.log('[OpenCV] Waiting for onRuntimeInitialized...');
-        await new Promise<void>((resolve, reject) => {
-          const timeout = setTimeout(() => {
-            reject(new Error('OpenCV onRuntimeInitialized timeout (15s)'));
-          }, 15000);
+      cv = await new Promise<any>((resolve, reject) => {
+        const startTime = Date.now();
+        const timeout = 10000; // 10 seconds max
+        
+        // Polling check every 100ms as fallback
+        const pollInterval = setInterval(() => {
+          const elapsed = Date.now() - startTime;
           
-          cvModule.onRuntimeInitialized = () => {
-            clearTimeout(timeout);
-            console.log('[OpenCV] onRuntimeInitialized fired');
-            resolve();
+          if (cvModule && typeof (cvModule as any).Mat === 'function') {
+            console.log('[OpenCV] Polling: Mat became available after', elapsed, 'ms');
+            clearInterval(pollInterval);
+            resolve(cvModule);
+          } else if (elapsed > timeout) {
+            console.error('[OpenCV] Polling timeout after', timeout, 'ms');
+            clearInterval(pollInterval);
+            reject(new Error(`OpenCV timeout after ${timeout}ms`));
+          } else if (elapsed % 1000 < 100) {
+            console.log('[OpenCV] Polling...', elapsed, 'ms elapsed');
+          }
+        }, 100);
+        
+        // Also listen for onRuntimeInitialized callback
+        if (cvModule && typeof (cvModule as any).onRuntimeInitialized !== 'undefined') {
+          const originalCallback = (cvModule as any).onRuntimeInitialized;
+          (cvModule as any).onRuntimeInitialized = () => {
+            console.log('[OpenCV] onRuntimeInitialized fired!');
+            clearInterval(pollInterval);
+            if (originalCallback && typeof originalCallback === 'function') {
+              originalCallback();
+            }
+            resolve(cvModule);
           };
-        });
-        cv = cvModule;
-      }
+        }
+      });
     }
 
     // Final verification
     if (!cv || typeof cv.Mat !== 'function') {
-      throw new Error('OpenCV loaded but cv.Mat is not a function');
+      console.error('[OpenCV] FAILED: cv.Mat is not a function after init');
+      console.error('[OpenCV] cv:', cv);
+      console.error('[OpenCV] cv.Mat:', cv?.Mat);
+      throw new Error('OpenCV loaded but cv.Mat is not available');
     }
 
-    // Assign to window BEFORE importing jscanify
+    // Assign to ALL global scopes for maximum compatibility with jscanify
     window.cv = cv;
-    console.log('[OpenCV] ✓ Assigned to window.cv');
+    if (typeof globalThis !== 'undefined') (globalThis as any).cv = cv;
+    if (typeof self !== 'undefined') (self as any).cv = cv;
+    
+    console.log('[OpenCV] ========== INIT SUCCESS ==========');
     console.log('[OpenCV] cv.Mat:', typeof cv.Mat);
     console.log('[OpenCV] cv.imread:', typeof cv.imread);
+    console.log('[OpenCV] cv.Canny:', typeof cv.Canny);
+    console.log('[OpenCV] cv.findContours:', typeof cv.findContours);
+    console.log('[OpenCV] window.cv === cv:', window.cv === cv);
     
     return cv;
   } catch (error) {
-    console.error('[OpenCV] Initialization FAILED:', error);
+    console.error('[OpenCV] ========== INIT FAILED ==========');
+    console.error('[OpenCV] Error:', error);
     throw error;
   }
 };
