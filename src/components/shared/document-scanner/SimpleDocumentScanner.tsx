@@ -2,8 +2,9 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Camera, X, RotateCcw, CheckCircle, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import cv from '@techstark/opencv-js';
 
-// Declare OpenCV on window
+// Declare OpenCV on window for jscanify compatibility
 declare global {
   interface Window {
     cv: any;
@@ -14,15 +15,6 @@ interface SimpleDocumentScannerProps {
   onCapture: (blob: Blob) => void;
   onClose: () => void;
 }
-
-// Core OpenCV functions used by jscanify (simplified list)
-const REQUIRED_CV_FUNCTIONS = [
-  'Mat', 'MatVector', 'Size',
-  'imread', 'imshow',
-  'Canny', 'GaussianBlur', 'threshold', 
-  'findContours', 'contourArea', 'minAreaRect',
-  'BORDER_DEFAULT', 'THRESH_OTSU', 'RETR_CCOMP', 'CHAIN_APPROX_SIMPLE'
-];
 
 export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   onCapture,
@@ -48,26 +40,6 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   useEffect(() => {
     isVideoReadyRef.current = isVideoReady;
   }, [isVideoReady]);
-
-  // Check if critical OpenCV functions are available
-  const checkCVFunctions = useCallback((): boolean => {
-    if (!window.cv) {
-      console.log('[OpenCV] window.cv not available yet');
-      return false;
-    }
-
-    // Check core functions that jscanify needs
-    const criticalFns = ['Mat', 'imread', 'findContours', 'Canny'];
-    for (const fn of criticalFns) {
-      if (window.cv[fn] === undefined) {
-        console.log('[OpenCV] Missing critical function:', fn);
-        return false;
-      }
-    }
-
-    console.log('[OpenCV] ✓ Critical functions available');
-    return true;
-  }, []);
 
   // Test jscanify by checking cv.imread works (no synthetic document test)
   const testJscanify = useCallback((scanner: any): boolean => {
@@ -110,81 +82,45 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     }
   }, []);
 
-  // Load OpenCV.js then jscanify with improved loading
+  // Load OpenCV from npm package then jscanify
   useEffect(() => {
     console.log('[Scanner] Starting dependency loading...');
     setScannerStatus('loading');
     
     const loadOpenCV = (): Promise<void> => {
       return new Promise((resolve, reject) => {
-        // Check if already loaded and ready
-        if (window.cv && window.cv.Mat && checkCVFunctions()) {
-          console.log('[OpenCV] Already loaded and ready');
+        // If already initialized on window
+        if (window.cv && window.cv.Mat) {
+          console.log('[OpenCV] Already initialized on window');
           resolve();
           return;
         }
 
-        // Load script if not present
-        if (!document.querySelector('script[src*="opencv.js"]')) {
-          console.log('[OpenCV] Loading script from CDN...');
-          const script = document.createElement('script');
-          script.src = 'https://docs.opencv.org/4.7.0/opencv.js';
-          script.async = true;
-          script.onerror = () => {
-            console.error('[OpenCV] Script load error');
-            reject(new Error('Failed to load OpenCV script'));
-          };
-          document.head.appendChild(script);
-        } else {
-          console.log('[OpenCV] Script already in DOM');
+        // Check if npm package cv is ready
+        if (cv && cv.Mat) {
+          window.cv = cv;
+          console.log('[OpenCV] ✓ npm package ready immediately');
+          resolve();
+          return;
         }
 
-        let attempts = 0;
-        const maxAttempts = 150; // 15 seconds max
+        // Wait for WASM runtime initialization
+        console.log('[OpenCV] Waiting for WASM runtime...');
         
-        const checkReady = () => {
-          attempts++;
-          
-          // Check if cv is ready with Mat function
-          if (window.cv && window.cv.Mat && window.cv.imread) {
-            console.log('[OpenCV] ✓ Ready after', attempts, 'attempts');
-            resolve();
-            return;
-          }
-          
-          // Handle OpenCV promise-based initialization (OpenCV 4.x)
-          if (window.cv && typeof window.cv.then === 'function') {
-            console.log('[OpenCV] Waiting via Promise...');
-            window.cv.then(() => {
-              console.log('[OpenCV] ✓ Ready via Promise');
-              resolve();
-            }).catch((e: Error) => {
-              console.error('[OpenCV] Promise rejected:', e);
-              reject(e);
-            });
-            return;
-          }
-          
-          // Handle onRuntimeInitialized callback
-          if (window.cv && !window.cv.Mat && window.cv.onRuntimeInitialized === undefined) {
-            // cv exists but not fully initialized - set callback
-            console.log('[OpenCV] Setting onRuntimeInitialized callback...');
-            window.cv.onRuntimeInitialized = () => {
-              console.log('[OpenCV] ✓ Runtime initialized via callback');
-              resolve();
-            };
-            return;
-          }
-          
-          if (attempts < maxAttempts) {
-            setTimeout(checkReady, 100);
-          } else {
-            console.error('[OpenCV] Timeout after', maxAttempts * 100, 'ms');
-            reject(new Error('OpenCV load timeout'));
-          }
+        // Set callback for when runtime is ready
+        cv.onRuntimeInitialized = () => {
+          window.cv = cv;
+          console.log('[OpenCV] ✓ Runtime initialized from npm package');
+          resolve();
         };
 
-        checkReady();
+        // Safety timeout
+        setTimeout(() => {
+          if (!window.cv || !window.cv.Mat) {
+            console.error('[OpenCV] Initialization timeout');
+            reject(new Error('OpenCV initialization timeout'));
+          }
+        }, 10000);
       });
     };
 
@@ -223,7 +159,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         setScannerStatus('error');
         setIsScannerReady(true); // Allow raw capture mode
       });
-  }, [checkCVFunctions, testJscanify]);
+  }, [testJscanify]);
 
   // Stop camera
   const stopCamera = useCallback(() => {
