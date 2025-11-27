@@ -6,6 +6,7 @@ import { SupplierCategoryFields } from './form/SupplierCategoryFields';
 import { VehicleAssignmentFields } from './form/VehicleAssignmentFields';
 import { FormActions } from './form/FormActions';
 import { ExpenseWithRelations } from '@/services/supabase/expenses';
+import { useToast } from '@/hooks/use-toast';
 
 interface ExpenseFormData {
   type: string;
@@ -33,6 +34,8 @@ export const ExpenseForm = ({
   onCancel,
   isSubmitting
 }: ExpenseFormProps) => {
+  const { toast } = useToast();
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [formData, setFormData] = useState<ExpenseFormData>({
     type: 'Note de frais',
     proof_url: '',
@@ -77,6 +80,7 @@ export const ExpenseForm = ({
 
   const handleAnalysisComplete = (analysisData: any) => {
     console.log('Received analysis data:', analysisData);
+    setIsAnalyzing(false);
     
     // Mapper les données de l'API aux champs du formulaire
     if (analysisData) {
@@ -84,7 +88,6 @@ export const ExpenseForm = ({
       
       // Date
       if (analysisData.date) {
-        // Convertir la date au format YYYY-MM-DD si nécessaire
         const date = new Date(analysisData.date);
         if (!isNaN(date.getTime())) {
           updates.date = date.toISOString().split('T')[0];
@@ -123,7 +126,19 @@ export const ExpenseForm = ({
           ...prev,
           ...updates
         }));
+        
+        toast({
+          title: "Document analysé",
+          description: "Les informations ont été extraites. Vérifiez avant de créer.",
+        });
       }
+    }
+  };
+
+  const handleProofUpload = (url: string) => {
+    handleChange('proof_url', url);
+    if (url) {
+      setIsAnalyzing(true);
     }
   };
 
@@ -132,6 +147,7 @@ export const ExpenseForm = ({
       <TypeProofFields
         formData={formData}
         onChange={handleChange}
+        onProofUpload={handleProofUpload}
         onAnalysisComplete={handleAnalysisComplete}
       />
 
@@ -153,6 +169,7 @@ export const ExpenseForm = ({
       <FormActions
         onCancel={onCancel}
         isSubmitting={isSubmitting}
+        isAnalyzing={isAnalyzing}
         expense={expense}
       />
     </form>

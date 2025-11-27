@@ -72,7 +72,8 @@ export function DocumentUploader({
 
   const handleScanCapture = async (blob: Blob) => {
     const file = new File([blob], `scan-${Date.now()}.jpg`, { type: 'image/jpeg' });
-    await handleFileUpload(file);
+    // Bypass cropper - image already cropped/corrected by jscanify
+    await uploadFile(file);
     setShowScanner(false);
     setUploadMode('choice');
   };
