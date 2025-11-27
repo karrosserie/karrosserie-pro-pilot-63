@@ -47,9 +47,9 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     
     const loadOpenCV = (): Promise<void> => {
       return new Promise((resolve, reject) => {
-        // Check if already loaded
-        if (window.cv && window.cv.Mat) {
-          console.log('[OpenCV] Already loaded');
+        // Check if already loaded with all critical functions
+        if (window.cv && window.cv.Mat && window.cv.imread && window.cv.Canny) {
+          console.log('[OpenCV] Already loaded with all functions');
           resolve();
           return;
         }
@@ -61,20 +61,46 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         script.onload = () => {
           console.log('[OpenCV] Script loaded, waiting for runtime...');
           
-          // OpenCV needs time to initialize
+          let attempts = 0;
+          const maxAttempts = 50; // 5 seconds max
+          
+          // OpenCV needs time to initialize - check multiple critical functions
           const checkCV = () => {
-            if (window.cv && window.cv.Mat) {
-              console.log('[OpenCV] Runtime ready');
+            attempts++;
+            
+            if (window.cv && window.cv.Mat && window.cv.imread && window.cv.Canny) {
+              console.log('[OpenCV] Runtime ready with all critical functions after', attempts, 'attempts');
               resolve();
+            } else if (window.cv && window.cv.onRuntimeInitialized === undefined) {
+              // cv exists but onRuntimeInitialized already fired - wait for functions
+              if (attempts < maxAttempts) {
+                setTimeout(checkCV, 100);
+              } else {
+                console.warn('[OpenCV] Timeout waiting for functions, continuing anyway');
+                resolve();
+              }
             } else if (window.cv) {
               // cv exists but not fully initialized
               window.cv.onRuntimeInitialized = () => {
                 console.log('[OpenCV] onRuntimeInitialized fired');
-                resolve();
+                // Still wait a bit for all functions to be available
+                setTimeout(() => {
+                  console.log('[OpenCV] Functions available:', {
+                    Mat: !!window.cv?.Mat,
+                    imread: !!window.cv?.imread,
+                    Canny: !!window.cv?.Canny
+                  });
+                  resolve();
+                }, 200);
               };
             } else {
               // Retry check
-              setTimeout(checkCV, 100);
+              if (attempts < maxAttempts) {
+                setTimeout(checkCV, 100);
+              } else {
+                console.warn('[OpenCV] Timeout waiting for cv object');
+                reject(new Error('OpenCV load timeout'));
+              }
             }
           };
           
@@ -98,7 +124,8 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       .then(module => {
         scannerRef.current = new module.default();
         setIsScannerReady(true);
-        console.log('[Scanner] jscanify ready with OpenCV support');
+        console.log('[Scanner] jscanify instance created:', scannerRef.current);
+        console.log('[Scanner] highlightPaper method:', typeof scannerRef.current?.highlightPaper);
       })
       .catch(err => {
         console.error('[Scanner] Failed to load dependencies:', err);
@@ -216,6 +243,8 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
 
     console.log('[Loop] Starting detection loop, OpenCV available:', !!window.cv);
 
+    let loopCount = 0;
+    
     const detectLoop = () => {
       if (!video.paused && !video.ended && video.readyState >= 2) {
         const width = video.videoWidth;
@@ -231,18 +260,45 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
 
           if (scannerRef.current && window.cv) {
             try {
-              const highlighted = scannerRef.current.highlightPaper(canvas);
-              displayCtx.drawImage(highlighted, 0, 0);
+              // Log every 60 frames (~1 per second at 60fps)
+              if (loopCount % 60 === 0) {
+                console.log('[Loop] Frame', loopCount, '- OpenCV ready:', !!window.cv?.Mat, '- Scanner ready:', !!scannerRef.current);
+              }
+              
+              // Pass explicit color options - GREEN (lime) with thick lines
+              const highlighted = scannerRef.current.highlightPaper(canvas, {
+                color: 'lime',
+                thickness: 8
+              });
+              
+              if (highlighted && highlighted.width > 0) {
+                if (loopCount % 60 === 0) {
+                  console.log('[Loop] highlightPaper returned canvas:', highlighted.width, 'x', highlighted.height);
+                }
+                displayCtx.drawImage(highlighted, 0, 0);
+              } else {
+                if (loopCount % 60 === 0) {
+                  console.warn('[Loop] highlightPaper returned invalid canvas:', highlighted);
+                }
+                displayCtx.drawImage(canvas, 0, 0);
+              }
             } catch (e) {
-              // Fallback to raw video
+              // LOG THE ERROR instead of silently ignoring
+              if (loopCount % 60 === 0) {
+                console.error('[Loop] highlightPaper error:', e);
+              }
               displayCtx.drawImage(canvas, 0, 0);
             }
           } else {
+            if (loopCount % 120 === 0) {
+              console.log('[Loop] Scanner or cv not ready - scanner:', !!scannerRef.current, '- cv:', !!window.cv);
+            }
             displayCtx.drawImage(canvas, 0, 0);
           }
         }
       }
 
+      loopCount++;
       animationFrameRef.current = requestAnimationFrame(detectLoop);
     };
 
