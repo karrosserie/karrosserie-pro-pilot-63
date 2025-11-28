@@ -215,7 +215,11 @@ export const prepareQuoteDataForPDF = async (quote: Quote, companyData: any) => 
         totals: {
           totalHT: `${totals.subtotalHT.toFixed(2).replace('.', ',')} €`,
           totalVAT: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`,
-          totalDiscount: `${items.reduce((sum, item) => sum + (parseFloat(item.discount) || 0), 0).toFixed(2).replace('.', ',')} €`,
+          totalDiscount: `${items.reduce((sum, item) => {
+            const subtotal = (parseFloat(item.quantity) || 1) * (parseFloat(item.unitCost) || 0);
+            const discountPercent = parseFloat(item.discount) || 0;
+            return sum + (subtotal * discountPercent / 100);
+          }, 0).toFixed(2).replace('.', ',')} €`,
           globalDiscount: globalDiscountTotal > 0 ? `${globalDiscountTotal.toFixed(2).replace('.', ',')} €` : undefined,
           totalTTC: `${totals.total.toFixed(2).replace('.', ',')} €`,
           subtotal: `${totals.subtotalHT.toFixed(2).replace('.', ',')} €`,
