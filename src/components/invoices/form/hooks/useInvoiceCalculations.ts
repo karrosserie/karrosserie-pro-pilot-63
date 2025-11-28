@@ -34,7 +34,10 @@ export const calculateGlobalTotals = (
     };
   }, { subtotal: 0, vatTotal: 0, discountTotal: 0, total: 0 });
 
-  const globalDiscounts = discounts.reduce((sum, discount) => sum + discount.amount, 0);
+  const globalDiscounts = discounts.reduce((sum, discount) => {
+    const discountAmount = discount.amount ?? discount.finalAmount ?? 0;
+    return sum + discountAmount;
+  }, 0);
 
   return {
     subtotal: repairTotals.subtotal + partTotals.subtotal,
