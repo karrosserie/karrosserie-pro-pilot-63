@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Camera, Image as ImageIcon } from "lucide-react";
+import { ArrowLeft, Camera, Image as ImageIcon, Scan } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { ImageCropper } from "@/components/shared/ImageCropper";
 import { useImageCropping } from "@/components/shared/document-uploader/hooks/useImageCropping";
+import { SimpleDocumentScanner } from "@/components/shared/document-scanner/SimpleDocumentScanner";
+import { useMobileDetection } from "@/hooks/use-mobile-detection";
 
 interface DocumentUploadStepProps {
   step: number;
@@ -28,6 +30,8 @@ export default function DocumentUploadStep({
 }: DocumentUploadStepProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [showScanner, setShowScanner] = useState(false);
+  const isMobile = useMobileDetection();
 
   // Hook pour gérer le système de crop
   const {
@@ -60,12 +64,28 @@ export default function DocumentUploadStep({
     e.preventDefault();
     e.stopPropagation();
     if (selectedFile) {
-      onImageUpload(selectedFile); // Appeler onImageUpload seulement quand l'utilisateur clique
+      onImageUpload(selectedFile);
       onNext(selectedFile);
     }
   };
 
+  const handleScanCapture = (blob: Blob) => {
+    setShowScanner(false);
+    const file = new File([blob], `scan_${Date.now()}.jpg`, { type: 'image/jpeg' });
+    handleFileUpload(file);
+  };
+
   const progress = (step / totalSteps) * 100;
+
+  // Affichage plein écran du scanner
+  if (showScanner) {
+    return (
+      <SimpleDocumentScanner 
+        onCapture={handleScanCapture} 
+        onClose={() => setShowScanner(false)} 
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background p-4">
@@ -129,15 +149,34 @@ export default function DocumentUploadStep({
 
         {/* Upload Buttons */}
         <div className="space-y-4">
+          {/* Scanner intelligent - mobile uniquement */}
+          {isMobile && (
+            <Button
+              type="button"
+              variant={selectedFile ? "ghost" : "default"}
+              onClick={() => setShowScanner(true)}
+              className={`w-full ${
+                selectedFile 
+                  ? "text-muted-foreground hover:text-foreground hover:bg-muted/50" 
+                  : "bg-green-600 hover:bg-green-700 text-white"
+              }`}
+            >
+              <Scan className="w-4 h-4 mr-2" />
+              {selectedFile ? "Re-scanner" : "Scanner intelligent"}
+            </Button>
+          )}
+
           <div>
             <label htmlFor="camera-input">
               <Button
                 type="button"
-                variant={selectedFile ? "ghost" : "default"}
+                variant={selectedFile ? "ghost" : (isMobile ? "outline" : "default")}
                 className={`w-full ${
                   selectedFile 
                     ? "text-muted-foreground hover:text-foreground hover:bg-muted/50" 
-                    : "bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
+                    : isMobile
+                      ? "border-karrosserie-orange text-karrosserie-orange hover:bg-karrosserie-orange hover:text-white"
+                      : "bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
                 }`}
                 asChild
               >
@@ -161,12 +200,8 @@ export default function DocumentUploadStep({
             <label htmlFor="gallery-input">
               <Button
                 type="button"
-                variant={selectedFile ? "ghost" : "outline"}
-                className={`w-full ${
-                  selectedFile 
-                    ? "text-muted-foreground hover:text-foreground hover:bg-muted/50" 
-                    : "border-karrosserie-orange text-karrosserie-orange hover:bg-karrosserie-orange hover:text-white"
-                }`}
+                variant="ghost"
+                className="w-full text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 asChild
               >
                 <span className="flex items-center justify-center gap-2 cursor-pointer">
