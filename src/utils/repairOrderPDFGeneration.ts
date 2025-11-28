@@ -124,10 +124,14 @@ export const prepareRepairOrderDataForPDF = async (repairOrder: RepairOrder, com
       console.error('Error parsing repair order items:', error);
     }
 
-    // Parser les remises globales
+    // Parser les remises globales - support string et array
     let discounts: any[] = [];
     try {
-      discounts = (repairOrder as any).discounts_data ? JSON.parse((repairOrder as any).discounts_data as string) : [];
+      if (typeof (repairOrder as any).discounts_data === 'string') {
+        discounts = JSON.parse((repairOrder as any).discounts_data);
+      } else if (Array.isArray((repairOrder as any).discounts_data)) {
+        discounts = (repairOrder as any).discounts_data;
+      }
       console.log('Repair order discounts parsed:', discounts);
     } catch (error) {
       console.error('Error parsing repair order discounts:', error);
