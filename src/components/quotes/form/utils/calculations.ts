@@ -56,8 +56,11 @@ export const calculateGlobalTotals = (
     };
   }, { subTotal: 0, totalVat: 0, totalDiscount: 0, total: 0 });
 
-  // Calculer le total des remises additionnelles
-  const additionalDiscounts = discounts.reduce((sum, discount) => sum + discount.amount, 0);
+  // Calculer le total des remises additionnelles (supporte amount OU finalAmount)
+  const additionalDiscounts = discounts.reduce((sum, discount) => {
+    const discountAmount = safeNumber(discount.amount ?? discount.finalAmount ?? 0);
+    return sum + discountAmount;
+  }, 0);
 
   return {
     subTotal: Math.round((repairTotals.subTotal + partTotals.subTotal) * 100) / 100,
