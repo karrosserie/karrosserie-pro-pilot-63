@@ -21,8 +21,10 @@ export interface QuotePartItem {
 
 export interface QuoteDiscountItem {
   id: string;
-  description: string;
-  amount: number;
+  description?: string;
+  label?: string;  // Format n8n
+  amount?: number;
+  finalAmount?: number;  // Format n8n
 }
 
 export interface GlobalTotals {
