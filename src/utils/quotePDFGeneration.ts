@@ -122,6 +122,17 @@ export const prepareQuoteDataForPDF = async (quote: Quote, companyData: any) => 
       console.error('Error parsing quote items:', error);
     }
 
+    // Parser les remises globales
+    let discounts: any[] = [];
+    try {
+      discounts = quote.discounts_data ? JSON.parse(quote.discounts_data as string) : [];
+    } catch (error) {
+      console.error('Error parsing quote discounts:', error);
+    }
+
+    // Calculer le total des remises globales
+    const globalDiscountTotal = discounts.reduce((sum, d) => sum + (parseFloat(d.amount) || 0), 0);
+
     // Calculer les totaux - utiliser directement le total calculé de chaque item
     const totals = items.reduce((acc, item) => {
       const itemTotal = parseFloat(item.total) || 0;
@@ -142,8 +153,11 @@ export const prepareQuoteDataForPDF = async (quote: Quote, companyData: any) => 
 
       return acc;
     }, { subtotalHT: 0, totalVAT: 0, total: 0 });
+
+    // Appliquer les remises globales au total
+    totals.total = totals.total - globalDiscountTotal;
     
-    console.log('Quote totals calculated:', totals);
+    console.log('Quote totals calculated:', totals, 'Global discounts:', globalDiscountTotal);
 
     return {
       quote: {
@@ -199,6 +213,7 @@ export const prepareQuoteDataForPDF = async (quote: Quote, companyData: any) => 
           totalHT: `${totals.subtotalHT.toFixed(2).replace('.', ',')} €`,
           totalVAT: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`,
           totalDiscount: `${items.reduce((sum, item) => sum + (parseFloat(item.discount) || 0), 0).toFixed(2).replace('.', ',')} €`,
+          globalDiscount: globalDiscountTotal > 0 ? `${globalDiscountTotal.toFixed(2).replace('.', ',')} €` : undefined,
           totalTTC: `${totals.total.toFixed(2).replace('.', ',')} €`,
           subtotal: `${totals.subtotalHT.toFixed(2).replace('.', ',')} €`,
           vat: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`,

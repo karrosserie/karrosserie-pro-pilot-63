@@ -4,6 +4,7 @@ interface DefaultRepairOrderTotalsProps {
   totals: {
     subtotal?: string;
     vat?: string;
+    globalDiscount?: string;
     total?: string;
   };
   clientData?: {
@@ -25,6 +26,12 @@ const DefaultRepairOrderTotals = ({ totals, clientData }: DefaultRepairOrderTota
               <span>TVA</span>
               <span>{totals.vat}</span>
             </div>
+            {totals.globalDiscount && (
+              <div className="flex justify-between text-red-600">
+                <span>Remise</span>
+                <span>-{totals.globalDiscount}</span>
+              </div>
+            )}
             <div className="flex justify-between font-bold text-lg bg-blue-600 text-white p-2">
               <span>TOTAL</span>
               <span>{totals.total}</span>
