@@ -1,18 +1,17 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Camera, Image as ImageIcon, Scan } from "lucide-react";
+import { ArrowLeft, Camera, Image as ImageIcon } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { ImageCropper } from "@/components/shared/ImageCropper";
 import { useImageCropping } from "@/components/shared/document-uploader/hooks/useImageCropping";
 import { SimpleDocumentScanner } from "@/components/shared/document-scanner/SimpleDocumentScanner";
-import { useMobileDetection } from "@/hooks/use-mobile-detection";
 
 interface DocumentUploadStepProps {
   step: number;
   totalSteps: number;
   title: string;
   description: string;
-  documentType: string;  // Type de document pour le crop (driver-license, vehicle-registration)
+  documentType: string;
   onNext: (file: File) => void;
   onBack: () => void;
   onImageUpload: (file: File) => void;
@@ -31,9 +30,8 @@ export default function DocumentUploadStep({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [showScanner, setShowScanner] = useState(false);
-  const isMobile = useMobileDetection();
 
-  // Hook pour gérer le système de crop
+  // Hook pour gérer le système de crop (uniquement pour galerie)
   const {
     imageToProcess,
     cropDialogOpen,
@@ -47,8 +45,6 @@ export default function DocumentUploadStep({
       setSelectedFile(file);
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
-      // Ne pas appeler onImageUpload automatiquement
-      // L'utilisateur doit cliquer sur "Suivant" pour valider
     }
   });
 
@@ -56,7 +52,7 @@ export default function DocumentUploadStep({
     event.preventDefault();
     const file = event.target.files?.[0];
     if (file) {
-      handleFileUpload(file); // Utilise le système de crop
+      handleFileUpload(file); // Passe par le cropper pour la galerie
     }
   };
 
@@ -69,10 +65,16 @@ export default function DocumentUploadStep({
     }
   };
 
+  // Capture depuis le scanner - bypass le cropper (déjà fait par le scanner)
   const handleScanCapture = (blob: Blob) => {
     setShowScanner(false);
-    const file = new File([blob], `scan_${Date.now()}.jpg`, { type: 'image/jpeg' });
-    handleFileUpload(file);
+    
+    const file = new File([blob], `scan-client-${Date.now()}.jpg`, { type: 'image/jpeg' });
+    
+    // Mise à jour directe sans passer par le cropper
+    setSelectedFile(file);
+    const url = URL.createObjectURL(blob);
+    setPreviewUrl(url);
   };
 
   const progress = (step / totalSteps) * 100;
@@ -149,53 +151,22 @@ export default function DocumentUploadStep({
 
         {/* Upload Buttons */}
         <div className="space-y-4">
-          {/* Scanner intelligent - mobile uniquement */}
-          {isMobile && (
-            <Button
-              type="button"
-              variant={selectedFile ? "ghost" : "default"}
-              onClick={() => setShowScanner(true)}
-              className={`w-full ${
-                selectedFile 
-                  ? "text-muted-foreground hover:text-foreground hover:bg-muted/50" 
-                  : "bg-green-600 hover:bg-green-700 text-white"
-              }`}
-            >
-              <Scan className="w-4 h-4 mr-2" />
-              {selectedFile ? "Re-scanner" : "Scanner intelligent"}
-            </Button>
-          )}
+          {/* Bouton principal - ouvre le scanner intelligent */}
+          <Button
+            type="button"
+            variant={selectedFile ? "ghost" : "default"}
+            onClick={() => setShowScanner(true)}
+            className={`w-full ${
+              selectedFile 
+                ? "text-muted-foreground hover:text-foreground hover:bg-muted/50" 
+                : "bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
+            }`}
+          >
+            <Camera className="w-4 h-4 mr-2" />
+            {selectedFile ? "Reprendre une photo" : "Prendre une photo"}
+          </Button>
 
-          <div>
-            <label htmlFor="camera-input">
-              <Button
-                type="button"
-                variant={selectedFile ? "ghost" : (isMobile ? "outline" : "default")}
-                className={`w-full ${
-                  selectedFile 
-                    ? "text-muted-foreground hover:text-foreground hover:bg-muted/50" 
-                    : isMobile
-                      ? "border-karrosserie-orange text-karrosserie-orange hover:bg-karrosserie-orange hover:text-white"
-                      : "bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-white"
-                }`}
-                asChild
-              >
-                <span className="flex items-center justify-center gap-2 cursor-pointer">
-                  <Camera className="w-4 h-4" />
-                  {selectedFile ? "Reprendre une photo" : "Prendre une photo"}
-                </span>
-              </Button>
-            </label>
-            <input
-              id="camera-input"
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handleFileSelect}
-              className="hidden"
-            />
-          </div>
-
+          {/* Bouton secondaire - galerie (passe par le cropper) */}
           <div>
             <label htmlFor="gallery-input">
               <Button
@@ -220,7 +191,7 @@ export default function DocumentUploadStep({
           </div>
         </div>
 
-        {/* Image Cropper Dialog */}
+        {/* Image Cropper Dialog - uniquement pour galerie */}
         {imageToProcess && (
           <ImageCropper
             open={cropDialogOpen}
