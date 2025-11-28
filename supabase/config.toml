@@ -77,3 +77,6 @@ verify_jwt = false
 
 [functions.insee-sirene]
 verify_jwt = false
+
+[functions.trigger-document-reminder]
+verify_jwt = false
