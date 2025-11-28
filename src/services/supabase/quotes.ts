@@ -343,6 +343,17 @@ export const quotesService = {
         parts = [];
       }
     }
+
+    // Parser les remises globales du rapport si elles existent
+    let discounts = [];
+    if (expertiseReport.global_discount_data) {
+      try {
+        discounts = JSON.parse(expertiseReport.global_discount_data);
+      } catch (error) {
+        console.error('Error parsing global_discount_data:', error);
+        discounts = [];
+      }
+    }
     
     const quoteData: any = {
       reference,
@@ -353,6 +364,7 @@ export const quotesService = {
       notes: '',
       repairs_data: repairs.length > 0 ? JSON.stringify(repairs) : null,
       parts_data: parts.length > 0 ? JSON.stringify(parts) : null,
+      discounts_data: discounts.length > 0 ? JSON.stringify(discounts) : null,
       claim_number: expertiseReport.claim_number || '',
       report_number: expertiseReport.report_number || '',
       policy_number: expertiseReport.policy_number || '',

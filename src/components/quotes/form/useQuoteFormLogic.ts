@@ -184,6 +184,18 @@ export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps
           console.error('Error parsing prefilled parts_data:', error);
         }
       }
+
+      // Charger les remises globales depuis prefillData
+      if (prefillData?.global_discount_data) {
+        try {
+          const discountsData = typeof prefillData.global_discount_data === 'string' 
+            ? JSON.parse(prefillData.global_discount_data) 
+            : prefillData.global_discount_data;
+          setDiscounts(discountsData);
+        } catch (error) {
+          console.error('Error parsing prefilled global_discount_data:', error);
+        }
+      }
       
       if (prefillData?.claim_number) {
         setClaimNumber(prefillData.claim_number);

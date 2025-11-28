@@ -10,6 +10,7 @@ export type ExpertiseReport = Database['public']['Tables']['expertise_reports'][
   policy_number?: string | null;
   repairs_data?: string | null;
   parts_data?: string | null;
+  global_discount_data?: string | null;
   // Add joined relations
   clients?: {
     first_name: string;
@@ -35,6 +36,7 @@ export type NewExpertiseReport = Database['public']['Tables']['expertise_reports
   policy_number?: string | null;
   repairs_data?: string | null;
   parts_data?: string | null;
+  global_discount_data?: string | null;
 };
 
 export type UpdateExpertiseReport = Database['public']['Tables']['expertise_reports']['Update'] & {
@@ -45,6 +47,7 @@ export type UpdateExpertiseReport = Database['public']['Tables']['expertise_repo
   policy_number?: string | null;
   repairs_data?: string | null;
   parts_data?: string | null;
+  global_discount_data?: string | null;
 };
 
 export const expertiseReportsService = {
@@ -117,9 +120,20 @@ export const expertiseReportsService = {
       }
     }
 
+    // Soustraire les remises globales du total
+    let globalDiscounts = 0;
+    if (report.global_discount_data) {
+      try {
+        const discounts = JSON.parse(report.global_discount_data);
+        globalDiscounts = discounts.reduce((sum: number, d: any) => sum + (d.amount || 0), 0);
+      } catch (e) {
+        console.error('Error parsing global_discount_data:', e);
+      }
+    }
+
     const reportWithAmount = {
       ...report,
-      amount: totalAmount,
+      amount: totalAmount - globalDiscounts,
       status: report.status || 'Importé'
     };
 
@@ -159,9 +173,20 @@ export const expertiseReportsService = {
       }
     }
 
+    // Soustraire les remises globales du total
+    let globalDiscounts = 0;
+    if (report.global_discount_data) {
+      try {
+        const discounts = JSON.parse(report.global_discount_data);
+        globalDiscounts = discounts.reduce((sum: number, d: any) => sum + (d.amount || 0), 0);
+      } catch (e) {
+        console.error('Error parsing global_discount_data:', e);
+      }
+    }
+
     const reportWithAmount = {
       ...report,
-      amount: totalAmount
+      amount: totalAmount - globalDiscounts
     };
 
     const { data, error } = await supabase

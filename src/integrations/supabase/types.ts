@@ -2349,6 +2349,7 @@ export type Database = {
           document_url: string | null
           expert_mail: string | null
           expert_name: string | null
+          global_discount_data: string | null
           id: string
           incident_date: string | null
           parts_data: string | null
@@ -2369,6 +2370,7 @@ export type Database = {
           document_url?: string | null
           expert_mail?: string | null
           expert_name?: string | null
+          global_discount_data?: string | null
           id?: string
           incident_date?: string | null
           parts_data?: string | null
@@ -2389,6 +2391,7 @@ export type Database = {
           document_url?: string | null
           expert_mail?: string | null
           expert_name?: string | null
+          global_discount_data?: string | null
           id?: string
           incident_date?: string | null
           parts_data?: string | null
