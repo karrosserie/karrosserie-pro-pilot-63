@@ -85,8 +85,7 @@ export function useImportNotification() {
                   .select(`
                     report_id,
                     expertise_reports (
-                      id,
-                      report_number,
+                      *,
                       clients (id, first_name, last_name),
                       vehicles (id, license_plate, car_brands(name), car_models(name))
                     )
@@ -98,6 +97,16 @@ export function useImportNotification() {
 
                 if (importData?.expertise_reports) {
                   const report = importData.expertise_reports;
+                  
+                  console.log('📦 Report data for quote creation:', {
+                    id: report.id,
+                    global_discount_data: report.global_discount_data,
+                    repairs_data: !!report.repairs_data,
+                    parts_data: !!report.parts_data,
+                    amount: report.amount,
+                    client_id: report.client_id,
+                    vehicle_id: report.vehicle_id
+                  });
                   
                   // Vérifier si le rapport a un client et un véhicule (requis pour la conversion)
                   if (report.clients && report.vehicles) {
