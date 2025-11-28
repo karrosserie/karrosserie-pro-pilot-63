@@ -139,20 +139,32 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
       })));
     }
 
+    // Parser les remises globales
+    let discounts: any[] = [];
+    let globalDiscountTotal = 0;
+    try {
+      discounts = (invoice as any).discounts_data ? JSON.parse((invoice as any).discounts_data as string) : [];
+      globalDiscountTotal = discounts.reduce((sum, d) => sum + (parseFloat(d.amount) || 0), 0);
+      console.log('Invoice discounts parsed:', discounts, 'Total:', globalDiscountTotal);
+    } catch (error) {
+      console.error('Error parsing invoice discounts:', error);
+    }
+
     const totals = calculateInvoiceTotals(invoice.repairs_data, invoice.parts_data);
     
     // Calculer le montant total payé
     const totalPaidAmount = receiptsData.reduce((sum, receipt) => sum + receipt.amount, 0);
-    const remainingAmount = invoice.amount - totalPaidAmount;
+    const remainingAmount = invoice.amount - totalPaidAmount - globalDiscountTotal;
     
     const totalsData = {
       subtotal: `${totals.subtotalAfterDiscount.toFixed(2).replace('.', ',')} €`,
       vat: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`,
-      total: `${totals.finalTotal.toFixed(2).replace('.', ',')} €`,
+      globalDiscount: globalDiscountTotal > 0 ? `${globalDiscountTotal.toFixed(2).replace('.', ',')} €` : undefined,
+      total: `${(totals.finalTotal - globalDiscountTotal).toFixed(2).replace('.', ',')} €`,
       totalHT: `${totals.subtotalAfterDiscount.toFixed(2).replace('.', ',')} €`,
       totalVAT: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`,
       totalDiscount: `${totals.totalDiscount.toFixed(2).replace('.', ',')} €`,
-      totalTTC: `${totals.finalTotal.toFixed(2).replace('.', ',')} €`
+      totalTTC: `${(totals.finalTotal - globalDiscountTotal).toFixed(2).replace('.', ',')} €`
     };
 
     return {
