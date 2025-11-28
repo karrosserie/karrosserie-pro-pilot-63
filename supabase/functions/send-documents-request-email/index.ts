@@ -303,6 +303,56 @@ const handler = async (req: Request): Promise<Response> => {
       // Envoyer par SMS
       console.log('Envoi du SMS à:', recipient);
       result = await sendSMS(recipient, uploadLink);
+      
+      // Après l'envoi SMS réussi, enregistrer/mettre à jour dans verif_doc_client
+      if (result?.success) {
+        console.log('📊 Enregistrement dans verif_doc_client pour client:', clientData.id);
+        
+        // Vérifier si un enregistrement existe déjà pour ce client/company
+        const { data: existingRecord, error: checkError } = await supabase
+          .from('verif_doc_client')
+          .select('id, nombre_relance')
+          .eq('client_id', clientData.id)
+          .eq('company_id', tokenData.company_id)
+          .single();
+
+        if (checkError && checkError.code !== 'PGRST116') {
+          console.error('❌ Erreur vérification verif_doc_client:', checkError);
+        }
+
+        if (existingRecord) {
+          // Mise à jour : incrémenter le compteur de relances
+          const { error: updateError } = await supabase
+            .from('verif_doc_client')
+            .update({ 
+              nombre_relance: (existingRecord.nombre_relance || 0) + 1,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', existingRecord.id);
+
+          if (updateError) {
+            console.error('❌ Erreur mise à jour verif_doc_client:', updateError);
+          } else {
+            console.log('✅ verif_doc_client mis à jour, relance n°', (existingRecord.nombre_relance || 0) + 1);
+          }
+        } else {
+          // Nouvel enregistrement
+          const { error: insertError } = await supabase
+            .from('verif_doc_client')
+            .insert({
+              client_id: clientData.id,
+              company_id: tokenData.company_id,
+              nombre_relance: 1,
+              updated_at: new Date().toISOString()
+            });
+
+          if (insertError) {
+            console.error('❌ Erreur insertion verif_doc_client:', insertError);
+          } else {
+            console.log('✅ verif_doc_client créé pour client:', clientData.id);
+          }
+        }
+      }
     }
 
     console.log('Demande de justificatifs envoyée avec succès via', sendMode);
