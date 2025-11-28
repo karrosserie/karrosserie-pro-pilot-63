@@ -44,16 +44,18 @@ serve(async (req: Request): Promise<Response> => {
       );
     }
 
+    // Créer le client Supabase une seule fois
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
     let phone = payload.phone;
     let link = payload.link;
 
     // Si phone ou link ne sont pas fournis, les récupérer depuis la base
     if (!phone || !link) {
       console.log('🔍 Fetching missing data from database...');
-      const supabase = createClient(
-        Deno.env.get('SUPABASE_URL') ?? '',
-        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-      );
 
       // Récupérer le téléphone du client
       if (!phone) {
@@ -132,6 +134,57 @@ serve(async (req: Request): Promise<Response> => {
       ok: n8nResponse.ok,
       result: n8nResult 
     });
+
+    // Mise à jour verif_doc_client après appel n8n réussi
+    if (n8nResponse.ok) {
+      console.log('📊 Mise à jour verif_doc_client pour client:', payload.client_id);
+      
+      // Vérifier si un enregistrement existe déjà
+      const { data: existingRecord, error: checkError } = await supabase
+        .from('verif_doc_client')
+        .select('id, nombre_relance')
+        .eq('client_id', payload.client_id)
+        .eq('company_id', payload.company_id)
+        .single();
+
+      if (checkError && checkError.code !== 'PGRST116') {
+        console.error('❌ Erreur vérification verif_doc_client:', checkError);
+      }
+
+      if (existingRecord) {
+        // Incrémenter le compteur de relances
+        const newCount = (existingRecord.nombre_relance || 0) + 1;
+        const { error: updateError } = await supabase
+          .from('verif_doc_client')
+          .update({ 
+            nombre_relance: newCount,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existingRecord.id);
+
+        if (updateError) {
+          console.error('❌ Erreur mise à jour verif_doc_client:', updateError);
+        } else {
+          console.log('✅ verif_doc_client mis à jour, relance n°', newCount);
+        }
+      } else {
+        // Créer un nouvel enregistrement
+        const { error: insertError } = await supabase
+          .from('verif_doc_client')
+          .insert({
+            client_id: payload.client_id,
+            company_id: payload.company_id,
+            nombre_relance: 1,
+            updated_at: new Date().toISOString()
+          });
+
+        if (insertError) {
+          console.error('❌ Erreur insertion verif_doc_client:', insertError);
+        } else {
+          console.log('✅ verif_doc_client créé, première relance');
+        }
+      }
+    }
 
     return new Response(
       JSON.stringify({ 
