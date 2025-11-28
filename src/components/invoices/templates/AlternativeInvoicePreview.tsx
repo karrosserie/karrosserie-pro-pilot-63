@@ -33,6 +33,7 @@ interface AlternativeInvoicePreviewProps {
     totalHT?: string;
     totalVAT?: string;
     totalDiscount?: string;
+    globalDiscount?: string;
     totalTTC?: string;
   };
   payments?: any[];
@@ -144,7 +145,7 @@ const AlternativeInvoicePreview = ({ companyData, invoiceData, clientData, items
       )}
 
       {/* Totaux */}
-      {(totalsToUse.totalHT || totalsToUse.totalVAT || totalsToUse.totalDiscount || totalsToUse.totalTTC) && (
+      {(totalsToUse.totalHT || totalsToUse.totalVAT || totalsToUse.totalDiscount || totalsToUse.globalDiscount || totalsToUse.totalTTC) && (
         <div className="flex justify-end">
           <div className="border-2 border-black rounded-lg overflow-hidden">
             <table className="text-sm border-collapse">
@@ -153,12 +154,18 @@ const AlternativeInvoicePreview = ({ companyData, invoiceData, clientData, items
                   <td className="border-r-2 border-black p-2 font-bold text-center">Total HT</td>
                   <td className="border-r-2 border-black p-2 font-bold text-center">Total TVA</td>
                   <td className="border-r-2 border-black p-2 font-bold text-center">Total Remise</td>
+                  {totalsToUse.globalDiscount && (
+                    <td className="border-r-2 border-black p-2 font-bold text-center">Remise Globale</td>
+                  )}
                   <td className="p-2 font-bold text-center">Total TTC</td>
                 </tr>
                 <tr>
                   <td className="border-r-2 border-black border-t-2 border-black p-2 font-bold">{totalsToUse.totalHT || '0,00 €'}</td>
                   <td className="border-r-2 border-black border-t-2 border-black p-2 font-bold">{totalsToUse.totalVAT || '0,00 €'}</td>
                   <td className="border-r-2 border-black border-t-2 border-black p-2 font-bold">{totalsToUse.totalDiscount || '0,00 €'}</td>
+                  {totalsToUse.globalDiscount && (
+                    <td className="border-r-2 border-black border-t-2 border-black p-2 font-bold text-red-600">-{totalsToUse.globalDiscount}</td>
+                  )}
                   <td className="border-t-2 border-black p-2 font-bold">{totalsToUse.totalTTC || '0,00 €'}</td>
                 </tr>
               </tbody>

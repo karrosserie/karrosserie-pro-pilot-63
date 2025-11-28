@@ -144,7 +144,10 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
     let globalDiscountTotal = 0;
     try {
       discounts = (invoice as any).discounts_data ? JSON.parse((invoice as any).discounts_data as string) : [];
-      globalDiscountTotal = discounts.reduce((sum, d) => sum + (parseFloat(d.amount) || 0), 0);
+      globalDiscountTotal = discounts.reduce((sum, d) => {
+        const discountAmount = parseFloat(d.amount ?? d.finalAmount ?? 0);
+        return sum + discountAmount;
+      }, 0);
       console.log('Invoice discounts parsed:', discounts, 'Total:', globalDiscountTotal);
     } catch (error) {
       console.error('Error parsing invoice discounts:', error);

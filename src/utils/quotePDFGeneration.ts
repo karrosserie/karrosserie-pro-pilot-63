@@ -130,8 +130,11 @@ export const prepareQuoteDataForPDF = async (quote: Quote, companyData: any) => 
       console.error('Error parsing quote discounts:', error);
     }
 
-    // Calculer le total des remises globales
-    const globalDiscountTotal = discounts.reduce((sum, d) => sum + (parseFloat(d.amount) || 0), 0);
+    // Calculer le total des remises globales (supporte amount OU finalAmount)
+    const globalDiscountTotal = discounts.reduce((sum, d) => {
+      const discountAmount = parseFloat(d.amount ?? d.finalAmount ?? 0);
+      return sum + discountAmount;
+    }, 0);
 
     // Calculer les totaux - utiliser directement le total calculé de chaque item
     const totals = items.reduce((acc, item) => {
