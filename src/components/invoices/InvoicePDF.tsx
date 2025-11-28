@@ -925,6 +925,12 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
               <Text>TVA</Text>
               <Text>{clientData?.totals?.vat || '0,00 €'}</Text>
             </View>
+            {clientData?.totals?.globalDiscount && (
+              <View style={defaultStyles.totalRow}>
+                <Text style={{ color: '#dc2626' }}>Remise Globale</Text>
+                <Text style={{ color: '#dc2626' }}>-{clientData.totals.globalDiscount}</Text>
+              </View>
+            )}
             <View style={defaultStyles.finalTotal}>
               <Text>TOTAL</Text>
               <Text>{clientData?.totals?.total || '0,00 €'}</Text>

@@ -139,11 +139,15 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
       })));
     }
 
-    // Parser les remises globales
+    // Parser les remises globales - support string et array
     let discounts: any[] = [];
     let globalDiscountTotal = 0;
     try {
-      discounts = (invoice as any).discounts_data ? JSON.parse((invoice as any).discounts_data as string) : [];
+      if (typeof (invoice as any).discounts_data === 'string') {
+        discounts = JSON.parse((invoice as any).discounts_data);
+      } else if (Array.isArray((invoice as any).discounts_data)) {
+        discounts = (invoice as any).discounts_data;
+      }
       globalDiscountTotal = discounts.reduce((sum, d) => {
         const discountAmount = parseFloat(d.amount ?? d.finalAmount ?? 0);
         return sum + discountAmount;

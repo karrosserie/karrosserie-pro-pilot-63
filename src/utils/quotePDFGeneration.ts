@@ -122,10 +122,14 @@ export const prepareQuoteDataForPDF = async (quote: Quote, companyData: any) => 
       console.error('Error parsing quote items:', error);
     }
 
-    // Parser les remises globales
+    // Parser les remises globales - support string et array
     let discounts: any[] = [];
     try {
-      discounts = quote.discounts_data ? JSON.parse(quote.discounts_data as string) : [];
+      if (typeof quote.discounts_data === 'string') {
+        discounts = JSON.parse(quote.discounts_data);
+      } else if (Array.isArray(quote.discounts_data)) {
+        discounts = quote.discounts_data;
+      }
     } catch (error) {
       console.error('Error parsing quote discounts:', error);
     }
