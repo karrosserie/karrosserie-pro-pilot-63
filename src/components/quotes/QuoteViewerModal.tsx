@@ -184,10 +184,17 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
   }
   
   try {
-    const parsedDiscounts = currentQuote.discounts_data ? JSON.parse(currentQuote.discounts_data as string) : [];
+    let parsedDiscounts;
+    if (typeof currentQuote.discounts_data === 'string') {
+      parsedDiscounts = JSON.parse(currentQuote.discounts_data);
+    } else if (Array.isArray(currentQuote.discounts_data)) {
+      parsedDiscounts = currentQuote.discounts_data;
+    } else {
+      parsedDiscounts = [];
+    }
     discounts = Array.isArray(parsedDiscounts) ? parsedDiscounts.map(item => ({
       ...item,
-      amount: cleanNumericValue(item.amount)
+      amount: cleanNumericValue(item.amount ?? item.finalAmount)
     })) : [];
   } catch (e) {
     console.error('Error parsing discounts data:', e);
@@ -249,9 +256,15 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
     totalTTC: (part.unitCost || part.price || 0) * (part.quantity || 1) * (1 - (part.discount || 0) / 100) * (1 + (part.vat || 20) / 100)
   })));
 
+  // Calculer le montant total des remises globales
+  const globalDiscountAmount = discounts.reduce((sum, d) => {
+    return sum + cleanNumericValue(d.amount ?? d.finalAmount);
+  }, 0);
+
   const totalsData = {
     subtotal: `${totals.subTotal.toFixed(2).replace('.', ',')} €`,
     vat: `${totals.totalVat.toFixed(2).replace('.', ',')} €`,
+    globalDiscount: globalDiscountAmount > 0 ? `${globalDiscountAmount.toFixed(2).replace('.', ',')} €` : undefined,
     total: `${totals.total.toFixed(2).replace('.', ',')} €`,
     totalHT: `${totals.subTotal.toFixed(2).replace('.', ',')} €`,
     totalVAT: `${totals.totalVat.toFixed(2).replace('.', ',')} €`,
