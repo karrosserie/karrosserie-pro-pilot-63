@@ -124,6 +124,18 @@ export const prepareRepairOrderDataForPDF = async (repairOrder: RepairOrder, com
       console.error('Error parsing repair order items:', error);
     }
 
+    // Parser les remises globales
+    let discounts: any[] = [];
+    try {
+      discounts = (repairOrder as any).discounts_data ? JSON.parse((repairOrder as any).discounts_data as string) : [];
+      console.log('Repair order discounts parsed:', discounts);
+    } catch (error) {
+      console.error('Error parsing repair order discounts:', error);
+    }
+
+    // Calculer le total des remises globales
+    const globalDiscountTotal = discounts.reduce((sum, d) => sum + (parseFloat(d.amount) || 0), 0);
+
     // Calculer les totaux - utiliser directement le total calculé de chaque item
     const totals = items.reduce((acc, item) => {
       const itemTotal = parseFloat(item.total) || 0;
@@ -144,8 +156,11 @@ export const prepareRepairOrderDataForPDF = async (repairOrder: RepairOrder, com
 
       return acc;
     }, { subtotalHT: 0, totalVAT: 0, total: 0 });
+
+    // Appliquer les remises globales au total
+    totals.total = totals.total - globalDiscountTotal;
     
-    console.log('Repair order totals calculated:', totals);
+    console.log('Repair order totals calculated:', totals, 'Global discounts:', globalDiscountTotal);
 
     return {
       repairOrder: {
@@ -206,6 +221,7 @@ export const prepareRepairOrderDataForPDF = async (repairOrder: RepairOrder, com
           totalHT: `${totals.subtotalHT.toFixed(2).replace('.', ',')} €`,
           totalVAT: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`,
           totalDiscount: `${items.reduce((sum, item) => sum + (parseFloat(item.discount) || 0), 0).toFixed(2).replace('.', ',')} €`,
+          globalDiscount: globalDiscountTotal > 0 ? `${globalDiscountTotal.toFixed(2).replace('.', ',')} €` : undefined,
           totalTTC: `${totals.total.toFixed(2).replace('.', ',')} €`,
           subtotal: `${totals.subtotalHT.toFixed(2).replace('.', ',')} €`,
           vat: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`,
