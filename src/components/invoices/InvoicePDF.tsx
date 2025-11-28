@@ -509,12 +509,18 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
                 <Text style={alternativeStyles.totalsHeaderCell}>Total HT</Text>
                 <Text style={alternativeStyles.totalsHeaderCell}>Total TVA</Text>
                 <Text style={alternativeStyles.totalsHeaderCell}>Total Remise</Text>
+                {clientData?.totals?.globalDiscount && (
+                  <Text style={alternativeStyles.totalsHeaderCell}>Remise Globale</Text>
+                )}
                 <Text style={alternativeStyles.totalsHeaderCellLast}>Total TTC</Text>
               </View>
               <View style={alternativeStyles.totalsValueRow}>
                 <Text style={alternativeStyles.totalsCell}>{clientData?.totals?.totalHT || '0,00 €'}</Text>
                 <Text style={alternativeStyles.totalsCell}>{clientData?.totals?.totalVAT || '0,00 €'}</Text>
                 <Text style={alternativeStyles.totalsCell}>{clientData?.totals?.totalDiscount || '0,00 €'}</Text>
+                {clientData?.totals?.globalDiscount && (
+                  <Text style={[alternativeStyles.totalsCell, { color: '#dc2626' }]}>-{clientData.totals.globalDiscount}</Text>
+                )}
                 <Text style={alternativeStyles.totalsCellLast}>{clientData?.totals?.totalTTC || '0,00 €'}</Text>
               </View>
             </View>
