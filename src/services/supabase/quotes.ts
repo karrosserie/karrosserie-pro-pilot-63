@@ -376,6 +376,14 @@ export const quotesService = {
       company_id: userCompany.company_id,
       valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
     };
+    
+    console.log('📄 Quote data being created from report:', {
+      report_id: expertiseReport.id,
+      discounts_data: quoteData.discounts_data,
+      global_discount_from_report: expertiseReport.global_discount_data,
+      discounts_array: discounts,
+      amount: quoteData.amount
+    });
 
     const { data, error } = await supabase
       .from('quotes')
