@@ -115,6 +115,9 @@ const Index = () => {
         <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">Vue synthétique</h1>
         <p className="text-sm sm:text-base text-gray-600 mt-1">Bienvenue sur Karrosserie Pro, votre outil de gestion automobile.</p>
       </div>
+
+      {/* Carré noir bien visible */}
+      <div className="w-48 h-48 bg-black rounded-lg shadow-2xl border-4 border-red-500"></div>
       
       {/* Grille principale des KPI */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
