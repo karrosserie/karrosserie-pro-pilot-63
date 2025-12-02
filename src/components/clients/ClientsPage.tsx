@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ClientsHeader from './ClientsHeader';
 import ClientsTable from './ClientsTable';
-import ClientsFilters from './ClientsFilters';
+import ClientsFilters, { ClientSortOption } from './ClientsFilters';
 import ClientDialogs from './ClientDialogs';
 import VehicleDialog from '@/components/vehicle/VehicleDialog';
 import { useClients } from '@/hooks/use-clients';
@@ -19,6 +19,7 @@ import { Client } from '@/services/supabase/clients';
 const ClientsPage = () => {
   const { clients, isLoading, error } = useClients();
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortOption, setSortOption] = useState<ClientSortOption>('alphabetical-asc');
   const [searchParams, setSearchParams] = useSearchParams();
   const [highlightedClientId, setHighlightedClientId] = useState<string | null>(null);
   
@@ -153,6 +154,8 @@ const ClientsPage = () => {
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         onCreateClient={handleCreateClient}
+        sortOption={sortOption}
+        onSortChange={setSortOption}
       />
       
       <ClientsTable 
@@ -163,6 +166,7 @@ const ClientsPage = () => {
         onCreateVehicle={handleCreateVehicle}
         onRequestDocuments={handleRequestDocuments}
         highlightedClientId={highlightedClientId}
+        sortOption={sortOption}
       />
 
       <ClientDialogs
