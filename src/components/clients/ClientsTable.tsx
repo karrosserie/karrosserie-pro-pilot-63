@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/table";
 import { Eye, Pencil, Trash, UserPlus, Car } from 'lucide-react';
 import { StatusBadge } from '@/components/ui/status-badge';
-import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { useTableSorting, SortDirection } from '@/hooks/use-table-sorting';
 import { Client } from '@/services/supabase/clients';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -66,7 +65,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
     }));
   }, [clients]);
   
-  const { sortedData: sortedClients, sortConfig, handleSort } = useTableSorting(clientsWithFullName, sortKey, sortDirection);
+  const { sortedData: sortedClients } = useTableSorting(clientsWithFullName, sortKey, sortDirection);
   const isMobile = useIsMobile();
   const highlightedRef = useRef<HTMLTableRowElement>(null);
   const highlightedMobileRef = useRef<HTMLDivElement>(null);
@@ -117,18 +116,10 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <SortableTableHeader sortKey="fullName" sortConfig={sortConfig} onSort={handleSort}>
-              Nom
-            </SortableTableHeader>
-            <SortableTableHeader sortKey="email" sortConfig={sortConfig} onSort={handleSort}>
-              Email
-            </SortableTableHeader>
-            <SortableTableHeader sortKey="phone" sortConfig={sortConfig} onSort={handleSort}>
-              Téléphone
-            </SortableTableHeader>
-            <SortableTableHeader sortKey="city" sortConfig={sortConfig} onSort={handleSort}>
-              Ville
-            </SortableTableHeader>
+            <TableHead>Nom</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Téléphone</TableHead>
+            <TableHead>Ville</TableHead>
             <TableHead>Permis de conduire</TableHead>
           </TableRow>
         </TableHeader>
