@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   Table, 
@@ -9,16 +9,15 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Eye, Pencil, Trash, UserPlus, MoreVertical, Send, Car } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Eye, Pencil, Trash, UserPlus, Car } from 'lucide-react';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
-import { useTableSorting } from '@/hooks/use-table-sorting';
+import { useTableSorting, SortDirection } from '@/hooks/use-table-sorting';
 import { Client } from '@/services/supabase/clients';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ClientMobileCard } from './ClientMobileCard';
-import { useClientVehicleCheck } from '@/hooks/use-client-vehicle-check';
 import { RequestDocumentsButton } from './RequestDocumentsButton';
+import { ClientSortOption } from './ClientsFilters';
 
 interface ClientsTableProps {
   clients: Client[];
@@ -28,7 +27,24 @@ interface ClientsTableProps {
   onCreateVehicle?: (client: Client) => void;
   onRequestDocuments?: (client: Client) => void;
   highlightedClientId?: string | null;
+  sortOption: ClientSortOption;
 }
+
+// Convertir l'option de tri en clé et direction
+const getSortConfig = (sortOption: ClientSortOption): { key: string; direction: SortDirection } => {
+  switch (sortOption) {
+    case 'alphabetical-asc':
+      return { key: 'last_name', direction: 'asc' };
+    case 'alphabetical-desc':
+      return { key: 'last_name', direction: 'desc' };
+    case 'recent-first':
+      return { key: 'created_at', direction: 'desc' };
+    case 'oldest-first':
+      return { key: 'created_at', direction: 'asc' };
+    default:
+      return { key: 'last_name', direction: 'asc' };
+  }
+};
 
 const ClientsTable: React.FC<ClientsTableProps> = ({
   clients,
@@ -37,9 +53,11 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
   onDeleteClient,
   onCreateVehicle,
   onRequestDocuments,
-  highlightedClientId
+  highlightedClientId,
+  sortOption
 }) => {
-  const { sortedData: sortedClients, sortConfig, handleSort } = useTableSorting(clients, 'last_name');
+  const { key: sortKey, direction: sortDirection } = useMemo(() => getSortConfig(sortOption), [sortOption]);
+  const { sortedData: sortedClients, sortConfig, handleSort } = useTableSorting(clients, sortKey, sortDirection);
   const isMobile = useIsMobile();
   const highlightedRef = useRef<HTMLTableRowElement>(null);
   const highlightedMobileRef = useRef<HTMLDivElement>(null);
