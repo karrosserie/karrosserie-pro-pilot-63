@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -26,6 +26,33 @@ export const RepairOrderRepairsAndPartsSection = ({
   isReadOnly = false 
 }: RepairOrderRepairsAndPartsSectionProps) => {
   const { data: partDesignations = [] } = useAutomotivePartNames();
+
+  // Initialize with one empty item on mount if arrays are empty
+  useEffect(() => {
+    if (repairs.length === 0 && !isReadOnly) {
+      onRepairsChange([{
+        id: `repair_${Date.now()}`,
+        description: '',
+        quantity: 1,
+        unitCost: 0,
+        discount: 0,
+        vat: 20,
+        total: 0
+      }]);
+    }
+    if (parts.length === 0 && !isReadOnly) {
+      onPartsChange([{
+        id: `part_${Date.now()}`,
+        reference: '',
+        description: '',
+        quantity: 1,
+        unitCost: 0,
+        discount: 0,
+        vat: 20,
+        total: 0
+      }]);
+    }
+  }, []);
 
   // Repair functions
   const addRepair = () => {
@@ -143,11 +170,6 @@ export const RepairOrderRepairsAndPartsSection = ({
     const total = parts.reduce((sum, part) => sum + (part.total || 0), 0);
     return { subTotal, totalVat, totalDiscount, total };
   };
-
-  // Always show at least one empty item for each tab
-  const repairsToShow = repairs.length > 0 ? repairs : [{ id: 'temp_repair', description: '', quantity: 1, unitCost: 0, discount: 0, vat: 20, total: 0 }];
-  const partsToShow = parts.length > 0 ? parts : [{ id: 'temp_part', reference: '', description: '', quantity: 1, unitCost: 0, discount: 0, vat: 20, total: 0 }];
-
   const repairTotals = calculateRepairTotals();
   const partTotals = calculatePartTotals();
   const combinedTotals = {
@@ -201,7 +223,7 @@ export const RepairOrderRepairsAndPartsSection = ({
               </div>
 
               {/* Repair items */}
-              {repairsToShow.map((repair) => (
+              {repairs.map((repair) => (
                 <div key={repair.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
                   <AutocompleteInput
                     value={repair.description}
@@ -298,7 +320,7 @@ export const RepairOrderRepairsAndPartsSection = ({
               </div>
 
               {/* Part items */}
-              {partsToShow.map((part) => (
+              {parts.map((part) => (
                 <div key={part.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
                   <AutocompleteInput
                     value={part.description}
