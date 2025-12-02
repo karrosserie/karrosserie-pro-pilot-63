@@ -5,6 +5,22 @@ export const sendDocumentsRequest = async (clientId: string, companyId?: string)
   try {
     console.log('🔍 [sendDocumentsRequest] Début - clientId:', clientId, 'companyId:', companyId);
     
+    // Vérifier si un token récent (< 5 minutes) existe déjà pour ce client
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const { data: recentToken } = await supabase
+      .from('tokens')
+      .select('id, created_at')
+      .eq('client_id', clientId)
+      .gte('created_at', fiveMinutesAgo)
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if (recentToken && recentToken.length > 0) {
+      console.log('⏭️ Demande de documents déjà envoyée récemment (< 5 min), ignoré. Token:', recentToken[0].id, 'créé à:', recentToken[0].created_at);
+      toast.info('Une demande de documents a déjà été envoyée récemment à ce client');
+      return { skipped: true, reason: 'recent_token_exists' };
+    }
+    
     // Récupérer les informations du client
     const { data: clientData, error: clientError } = await supabase
       .from('clients')

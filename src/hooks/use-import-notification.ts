@@ -17,6 +17,29 @@ export function useImportNotification() {
   const { setNotification } = useClientValidationNotification();
 
   useEffect(() => {
+    // Fonction pour récupérer les imports déjà traités depuis sessionStorage
+    const getProcessedImportIds = (): Set<string> => {
+      try {
+        const stored = sessionStorage.getItem('processed_import_ids');
+        return stored ? new Set(JSON.parse(stored)) : new Set();
+      } catch (error) {
+        console.error('Error reading processed imports from sessionStorage:', error);
+        return new Set();
+      }
+    };
+
+    // Fonction pour ajouter un import traité dans sessionStorage
+    const addProcessedImportId = (id: string) => {
+      try {
+        const ids = getProcessedImportIds();
+        ids.add(id);
+        sessionStorage.setItem('processed_import_ids', JSON.stringify([...ids]));
+        console.log('✅ Import ID persisted in sessionStorage:', id);
+      } catch (error) {
+        console.error('Error saving processed import to sessionStorage:', error);
+      }
+    };
+
     // Fonction pour jouer un son de notification simple
     const playNotificationSound = () => {
       try {
@@ -43,8 +66,8 @@ export function useImportNotification() {
 
     // Polling pour vérifier les changements de statut
     let intervalId: NodeJS.Timeout;
-    let lastImportIds = new Set<string>();
-    let isInitialized = false;
+    const processedIds = getProcessedImportIds();
+    console.log('🔧 Initialized with processed imports from sessionStorage:', Array.from(processedIds));
 
     const checkImports = async () => {
       try {
@@ -59,21 +82,17 @@ export function useImportNotification() {
 
         if (imports) {
           const currentImportIds = new Set(imports.map(imp => imp.id));
+          const processedIds = getProcessedImportIds();
           console.log('🆔 Current import IDs:', Array.from(currentImportIds));
-          console.log('🆔 Last import IDs:', Array.from(lastImportIds));
+          console.log('🆔 Processed import IDs (from sessionStorage):', Array.from(processedIds));
           
-          // Au premier chargement, initialiser sans notification
-          if (!isInitialized) {
-            lastImportIds = currentImportIds;
-            isInitialized = true;
-            console.log('🔧 Initialized with existing imports, no notifications sent');
-            return;
-          }
-          
-          // Vérifier s'il y a de nouveaux imports terminés
+          // Vérifier s'il y a de nouveaux imports terminés qui n'ont pas encore été traités
           for (const id of currentImportIds) {
-            if (!lastImportIds.has(id)) {
+            if (!processedIds.has(id)) {
               console.log('🎉 New import completed:', id);
+              
+              // Marquer l'import comme traité IMMÉDIATEMENT pour éviter le double traitement
+              addProcessedImportId(id);
               
               // Jouer le signal sonore
               playNotificationSound();
@@ -263,8 +282,6 @@ export function useImportNotification() {
               queryClient.invalidateQueries({ queryKey: ['quotes'] });
             }
           }
-          
-          lastImportIds = currentImportIds;
         }
       } catch (error) {
         console.error('❌ Error checking imports:', error);

@@ -18,6 +18,7 @@ export function ClientValidationWatcher() {
   const [clientData, setClientData] = useState<any>(null);
   
   const processingReportIds = useRef<Set<string>>(new Set());
+  const processedDocRequestsRef = useRef<Set<string>>(new Set());
 
   const sendSms = async (
     reportId: string, 
@@ -160,15 +161,22 @@ export function ClientValidationWatcher() {
 
       await sendSms(reportId, clientId, clientName, missingFields, false);
 
-      // Envoyer automatiquement la demande de documents au client
-      if (missingFields.length > 0 && companyData?.id) {
+      // Envoyer automatiquement la demande de documents au client (avec protection contre les doublons)
+      if (missingFields.length > 0 && companyData?.id && !processedDocRequestsRef.current.has(reportId)) {
         try {
+          processedDocRequestsRef.current.add(reportId);
+          console.log('🔒 Report marked for document request processing:', reportId);
+          
           const { sendDocumentsRequest } = await import('@/services/documentsRequestService');
           await sendDocumentsRequest(clientId, companyData.id);
           console.log('✅ Demande de documents envoyée automatiquement au client');
         } catch (error) {
           console.error('❌ Erreur envoi demande documents:', error);
+          // Retirer du set en cas d'erreur pour permettre une nouvelle tentative
+          processedDocRequestsRef.current.delete(reportId);
         }
+      } else if (processedDocRequestsRef.current.has(reportId)) {
+        console.log('⏭️ Demande de documents déjà envoyée pour ce rapport, ignoré');
       }
     };
 
