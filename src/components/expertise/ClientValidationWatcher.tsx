@@ -283,37 +283,6 @@ export function ClientValidationWatcher() {
     clearNotification();
   };
 
-  const handleCreateQuoteAnyway = async () => {
-    if (!notification?.reportId) return;
-    
-    markNotificationAsSeen(notification.reportId);
-    
-    try {
-      const { quotesService } = await import('@/services/supabase/quotes');
-      
-      const { data: report } = await supabase
-        .from('expertise_reports')
-        .select('*')
-        .eq('id', notification.reportId)
-        .single();
-      
-      if (report) {
-        const newQuote = await quotesService.createFromReport(report);
-        toast.success('Devis créé malgré les informations manquantes');
-        
-        setTimeout(() => {
-          window.location.href = `/documents/devis?openQuote=${newQuote.id}`;
-        }, 1000);
-      }
-    } catch (error) {
-      console.error('Error creating quote:', error);
-      toast.error('Erreur lors de la création du devis');
-    }
-    
-    setIsDialogOpen(false);
-    clearNotification();
-  };
-
   if (!notification || !clientData) {
     return null;
   }
@@ -326,7 +295,6 @@ export function ClientValidationWatcher() {
       validationResults={notification.validationResults}
       onEditClient={handleEditClient}
       onDismiss={handleDismiss}
-      onCreateQuoteAnyway={handleCreateQuoteAnyway}
     />
   );
 }
