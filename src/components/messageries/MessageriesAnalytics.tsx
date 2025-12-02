@@ -173,7 +173,7 @@ export default function MessageriesAnalytics() {
     setClientHistoryModalOpen(true);
   };
 
-  if (loading) {
+  if (loading && !detailModalOpen) {
     return <Loading text="Chargement des messages..." />;
   }
 

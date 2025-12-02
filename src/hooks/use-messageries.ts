@@ -294,8 +294,6 @@ export function useMessageries() {
         )
       );
 
-      await fetchMessageries();
-
       toast({
         title: "Statut mis à jour",
         description: `Le message est maintenant "${newStatus}"`,
