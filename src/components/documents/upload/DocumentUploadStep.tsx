@@ -84,7 +84,8 @@ export default function DocumentUploadStep({
     return (
       <SimpleDocumentScanner 
         onCapture={handleScanCapture} 
-        onClose={() => setShowScanner(false)} 
+        onClose={() => setShowScanner(false)}
+        documentType={documentType}
       />
     );
   }

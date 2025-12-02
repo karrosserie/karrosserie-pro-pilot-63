@@ -27,6 +27,9 @@ const getExtractionDimensions = (documentType?: string): { width: number; height
     case 'expense-proof':
       // Tickets, reçus - format variable, ratio plus carré
       return { width: 600, height: 800 };
+    case 'violation':
+      // PV/contravention - format A5 horizontal
+      return { width: 595, height: 420 };
     default:
       // Par défaut : A4
       return { width: 595, height: 842 };
@@ -277,19 +280,19 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
         setPreviewDataUrl(dataUrl);
         setShowPreview(true);
-      toast({
-        title: "Aucun document détecté",
-        description: "Image brute capturée. Assurez-vous que le document est visible avec un fond contrasté.",
-      });
+        toast({
+          title: "Aucun document détecté",
+          description: "Image brute capturée. Assurez-vous que le document est visible avec un fond contrasté.",
+        });
+      }
+    } catch (err) {
+      console.error('[Capture] Error:', err);
+      // Fallback: capture raw canvas
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+      setPreviewDataUrl(dataUrl);
+      setShowPreview(true);
     }
-  } catch (err) {
-    console.error('[Capture] Error:', err);
-    // Fallback: capture raw canvas
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
-    setPreviewDataUrl(dataUrl);
-    setShowPreview(true);
-  }
-}, [toast, documentType]);
+  }, [toast, documentType]);
 
   // Validate captured document
   const handleValidate = useCallback(() => {
