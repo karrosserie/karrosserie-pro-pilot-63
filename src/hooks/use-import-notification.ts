@@ -17,26 +17,55 @@ export function useImportNotification() {
   const { setNotification } = useClientValidationNotification();
 
   useEffect(() => {
-    // Fonction pour récupérer les imports déjà traités depuis sessionStorage
+    // Fonction pour nettoyer les IDs de plus de 7 jours
+    const cleanOldProcessedIds = () => {
+      try {
+        const stored = localStorage.getItem('processed_import_ids_timestamps');
+        if (!stored) return;
+        
+        const timestamps = JSON.parse(stored);
+        const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+        
+        const validEntries = Object.entries(timestamps)
+          .filter(([_, timestamp]) => (timestamp as number) > oneWeekAgo);
+        
+        const validIds = validEntries.map(([id, _]) => id);
+        const validTimestamps = Object.fromEntries(validEntries);
+        
+        localStorage.setItem('processed_import_ids', JSON.stringify(validIds));
+        localStorage.setItem('processed_import_ids_timestamps', JSON.stringify(validTimestamps));
+      } catch (error) {
+        console.error('Error cleaning old processed IDs:', error);
+      }
+    };
+
+    // Fonction pour récupérer les imports déjà traités depuis localStorage
     const getProcessedImportIds = (): Set<string> => {
       try {
-        const stored = sessionStorage.getItem('processed_import_ids');
+        cleanOldProcessedIds(); // Nettoyer les anciens IDs à chaque récupération
+        const stored = localStorage.getItem('processed_import_ids');
         return stored ? new Set(JSON.parse(stored)) : new Set();
       } catch (error) {
-        console.error('Error reading processed imports from sessionStorage:', error);
+        console.error('Error reading processed imports from localStorage:', error);
         return new Set();
       }
     };
 
-    // Fonction pour ajouter un import traité dans sessionStorage
+    // Fonction pour ajouter un import traité dans localStorage avec timestamp
     const addProcessedImportId = (id: string) => {
       try {
         const ids = getProcessedImportIds();
         ids.add(id);
-        sessionStorage.setItem('processed_import_ids', JSON.stringify([...ids]));
-        console.log('✅ Import ID persisted in sessionStorage:', id);
+        localStorage.setItem('processed_import_ids', JSON.stringify([...ids]));
+        
+        // Stocker également le timestamp pour le nettoyage futur
+        const timestamps = JSON.parse(localStorage.getItem('processed_import_ids_timestamps') || '{}');
+        timestamps[id] = Date.now();
+        localStorage.setItem('processed_import_ids_timestamps', JSON.stringify(timestamps));
+        
+        console.log('✅ Import ID persisted in localStorage:', id);
       } catch (error) {
-        console.error('Error saving processed import to sessionStorage:', error);
+        console.error('Error saving processed import to localStorage:', error);
       }
     };
 
@@ -67,24 +96,28 @@ export function useImportNotification() {
     // Polling pour vérifier les changements de statut
     let intervalId: NodeJS.Timeout;
     const processedIds = getProcessedImportIds();
-    console.log('🔧 Initialized with processed imports from sessionStorage:', Array.from(processedIds));
+    console.log('🔧 Initialized with processed imports from localStorage:', Array.from(processedIds));
 
     const checkImports = async () => {
       try {
         console.log('🔍 useImportNotification - Checking for completed imports...');
         
+        // Filtrer les imports des 2 dernières heures pour éviter le flood sur anciens comptes
+        const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+        
         const { data: imports } = await supabase
           .from('imports')
-          .select('id, status')
-          .in('status', ['Importé', 'Terminé']);
+          .select('id, status, created_at')
+          .in('status', ['Importé', 'Terminé'])
+          .gte('created_at', twoHoursAgo);
 
         console.log('📊 useImportNotification - Found imports:', imports);
 
         if (imports) {
           const currentImportIds = new Set(imports.map(imp => imp.id));
           const processedIds = getProcessedImportIds();
-          console.log('🆔 Current import IDs:', Array.from(currentImportIds));
-          console.log('🆔 Processed import IDs (from sessionStorage):', Array.from(processedIds));
+          console.log('🆔 Current import IDs (< 2h):', Array.from(currentImportIds));
+          console.log('🆔 Processed import IDs (from localStorage):', Array.from(processedIds));
           
           // Vérifier s'il y a de nouveaux imports terminés qui n'ont pas encore été traités
           for (const id of currentImportIds) {
