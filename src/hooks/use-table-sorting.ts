@@ -45,13 +45,19 @@ export function useTableSorting<T>(
       const aCompare = getComparableValue(aValue);
       const bCompare = getComparableValue(bValue);
 
-      if (aCompare < bCompare) {
-        return sortConfig.direction === 'asc' ? -1 : 1;
+      let comparison = 0;
+      
+      // Utiliser localeCompare pour les chaînes (tri français naturel)
+      if (typeof aCompare === 'string' && typeof bCompare === 'string') {
+        comparison = aCompare.localeCompare(bCompare, 'fr', { 
+          sensitivity: 'base'  // Ignore casse ET accents
+        });
+      } else {
+        if (aCompare < bCompare) comparison = -1;
+        if (aCompare > bCompare) comparison = 1;
       }
-      if (aCompare > bCompare) {
-        return sortConfig.direction === 'asc' ? 1 : -1;
-      }
-      return 0;
+
+      return sortConfig.direction === 'asc' ? comparison : -comparison;
     });
   }, [data, sortConfig]);
 
