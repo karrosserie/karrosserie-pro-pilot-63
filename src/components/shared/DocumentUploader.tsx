@@ -113,7 +113,7 @@ export function DocumentUploader({
 
   // Show scanner
   if (showScanner) {
-    return <SimpleDocumentScanner onCapture={handleScanCapture} onClose={handleScanClose} />;
+    return <SimpleDocumentScanner onCapture={handleScanCapture} onClose={handleScanClose} documentType={documentType} />;
   }
 
   // Show upload mode choice on mobile (only for scannable documents)

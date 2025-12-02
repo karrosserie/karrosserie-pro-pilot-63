@@ -8,7 +8,30 @@ import { Jscanify } from '@/lib/jscanify';
 interface SimpleDocumentScannerProps {
   onCapture: (blob: Blob) => void;
   onClose: () => void;
+  documentType?: string;
 }
+
+// Dimensions d'extraction selon le type de document
+const getExtractionDimensions = (documentType?: string): { width: number; height: number } => {
+  switch (documentType) {
+    case 'driver-license':
+      // Format carte de crédit (CR80) : 85.6mm × 54mm → ratio ~1.59:1
+      return { width: 856, height: 540 };
+    case 'registration':
+      // Carte grise française - format A4 ou proche
+      return { width: 595, height: 842 };
+    case 'insurance':
+      // Carte d'assurance - souvent format carte ou petit document
+      return { width: 800, height: 600 };
+    case 'payment-proof':
+    case 'expense-proof':
+      // Tickets, reçus - format variable, ratio plus carré
+      return { width: 600, height: 800 };
+    default:
+      // Par défaut : A4
+      return { width: 595, height: 842 };
+  }
+};
 
 declare global {
   interface Window {
@@ -62,6 +85,7 @@ const loadOpenCV = (): Promise<void> => {
 export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   onCapture,
   onClose,
+  documentType,
 }) => {
   const { toast } = useToast();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -235,11 +259,12 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       return;
     }
 
-    console.log('[Capture] Extracting paper...');
+    // Get dimensions based on document type
+    const { width, height } = getExtractionDimensions(documentType);
+    console.log('[Capture] Extracting paper with dimensions:', width, 'x', height, 'for type:', documentType);
 
     try {
-      // Extract with A4 ratio (595x842)
-      const extracted = scanner.extractPaper(canvas, 595, 842);
+      const extracted = scanner.extractPaper(canvas, width, height);
 
       if (extracted && extracted.width > 0) {
         console.log('[Capture] Extraction successful:', extracted.width, 'x', extracted.height);
@@ -252,19 +277,19 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
         setPreviewDataUrl(dataUrl);
         setShowPreview(true);
-        toast({
-          title: "Aucun document détecté",
-          description: "Image brute capturée. Assurez-vous que le document est visible avec un fond contrasté.",
-        });
-      }
-    } catch (err) {
-      console.error('[Capture] Error:', err);
-      // Fallback: capture raw canvas
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
-      setPreviewDataUrl(dataUrl);
-      setShowPreview(true);
+      toast({
+        title: "Aucun document détecté",
+        description: "Image brute capturée. Assurez-vous que le document est visible avec un fond contrasté.",
+      });
     }
-  }, [toast]);
+  } catch (err) {
+    console.error('[Capture] Error:', err);
+    // Fallback: capture raw canvas
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+    setPreviewDataUrl(dataUrl);
+    setShowPreview(true);
+  }
+}, [toast, documentType]);
 
   // Validate captured document
   const handleValidate = useCallback(() => {
