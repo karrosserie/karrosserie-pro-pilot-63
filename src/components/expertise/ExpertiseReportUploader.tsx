@@ -203,7 +203,7 @@ export const ExpertiseReportUploader = ({
           filename: selectedFile.name,
           base64Size: fileBase64.length
         });
-        const apiResponse = await fetch('https://n8n.karrosserie.pro/webhook/38917be3-c64c-46ff-82f9-7959ece86242', {
+        const apiResponse = await fetch('https://n8n.karrosserie.pro/webhook/aef3a1de-8b92-46bd-8ae4-3e5e11dc554b', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
