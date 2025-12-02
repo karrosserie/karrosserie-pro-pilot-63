@@ -115,6 +115,9 @@ const RepairOrders = () => {
   // Vérifier si un ordre est passé en "Signé" pour afficher la pop-up de félicitation
   useEffect(() => {
     const checkSignedOrders = () => {
+      // Skip if tab is not focused
+      if (!document.hasFocus()) return;
+      
       const checkedOrders = JSON.parse(localStorage.getItem('checked-signed-orders') || '[]');
       orders?.forEach(order => {
         if (order.status === 'Signé' && !checkedOrders.includes(order.id)) {
@@ -126,7 +129,8 @@ const RepairOrders = () => {
     };
     if (orders && orders.length > 0) {
       checkSignedOrders();
-      const interval = setInterval(checkSignedOrders, 5000);
+      // Increased polling interval from 5s to 30s
+      const interval = setInterval(checkSignedOrders, 30000);
       return () => clearInterval(interval);
     }
   }, [orders]);

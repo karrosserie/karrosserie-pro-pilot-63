@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -54,8 +54,8 @@ export const RepairOrderRepairsAndPartsSection = ({
     }
   }, []);
 
-  // Repair functions
-  const addRepair = () => {
+  // Repair functions - memoized with useCallback
+  const addRepair = useCallback(() => {
     if (isReadOnly) return;
     const newRepair: RepairOrderRepairItem = {
       id: `repair_${Date.now()}`,
@@ -67,14 +67,14 @@ export const RepairOrderRepairsAndPartsSection = ({
       total: 0
     };
     onRepairsChange([...repairs, newRepair]);
-  };
+  }, [isReadOnly, repairs, onRepairsChange]);
 
-  const removeRepair = (id: string) => {
+  const removeRepair = useCallback((id: string) => {
     if (isReadOnly) return;
     onRepairsChange(repairs.filter(repair => repair.id !== id));
-  };
+  }, [isReadOnly, repairs, onRepairsChange]);
 
-  const updateRepair = (id: string, field: keyof RepairOrderRepairItem, value: string | number) => {
+  const updateRepair = useCallback((id: string, field: keyof RepairOrderRepairItem, value: string | number) => {
     if (isReadOnly) return;
     const updatedRepairs = repairs.map(repair => {
       if (repair.id === id) {
@@ -90,10 +90,10 @@ export const RepairOrderRepairsAndPartsSection = ({
       return repair;
     });
     onRepairsChange(updatedRepairs);
-  };
+  }, [isReadOnly, repairs, onRepairsChange]);
 
-  // Part functions
-  const addPart = () => {
+  // Part functions - memoized with useCallback
+  const addPart = useCallback(() => {
     if (isReadOnly) return;
     const newPart: RepairOrderPartItem = {
       id: `part_${Date.now()}`,
@@ -106,14 +106,14 @@ export const RepairOrderRepairsAndPartsSection = ({
       total: 0
     };
     onPartsChange([...parts, newPart]);
-  };
+  }, [isReadOnly, parts, onPartsChange]);
 
-  const removePart = (id: string) => {
+  const removePart = useCallback((id: string) => {
     if (isReadOnly) return;
     onPartsChange(parts.filter(part => part.id !== id));
-  };
+  }, [isReadOnly, parts, onPartsChange]);
 
-  const updatePart = (id: string, field: keyof RepairOrderPartItem, value: string | number) => {
+  const updatePart = useCallback((id: string, field: keyof RepairOrderPartItem, value: string | number) => {
     if (isReadOnly) return;
     const updatedParts = parts.map(part => {
       if (part.id === id) {
@@ -129,55 +129,56 @@ export const RepairOrderRepairsAndPartsSection = ({
       return part;
     });
     onPartsChange(updatedParts);
-  };
+  }, [isReadOnly, parts, onPartsChange]);
 
   // Formatting functions
-  const formatForDisplay = (value: number) => {
+  const formatForDisplay = useCallback((value: number) => {
     return (value || 0).toString().replace('.', ',');
-  };
+  }, []);
 
-  const parseFromDisplay = (value: string) => {
+  const parseFromDisplay = useCallback((value: string) => {
     return parseFloat(value.replace(',', '.')) || 0;
-  };
+  }, []);
 
-  // Calculate totals
-  const calculateRepairTotals = () => {
-    const subTotal = repairs.reduce((sum, repair) => sum + (repair.quantity * repair.unitCost), 0);
-    const totalVat = repairs.reduce((sum, repair) => {
-      const subtotal = repair.quantity * repair.unitCost;
-      const discountAmount = subtotal * (repair.discount / 100);
-      const afterDiscount = subtotal - discountAmount;
-      return sum + (afterDiscount * (repair.vat / 100));
-    }, 0);
-    const totalDiscount = repairs.reduce((sum, repair) => {
-      const subtotal = repair.quantity * repair.unitCost;
-      return sum + (subtotal * (repair.discount / 100));
-    }, 0);
-    const total = repairs.reduce((sum, repair) => sum + repair.total, 0);
-    return { subTotal, totalVat, totalDiscount, total };
-  };
+  // Memoized totals calculation
+  const { repairTotals, partTotals, combinedTotals } = useMemo(() => {
+    const repairTotals = {
+      subTotal: repairs.reduce((sum, repair) => sum + (repair.quantity * repair.unitCost), 0),
+      totalVat: repairs.reduce((sum, repair) => {
+        const subtotal = repair.quantity * repair.unitCost;
+        const discountAmount = subtotal * (repair.discount / 100);
+        const afterDiscount = subtotal - discountAmount;
+        return sum + (afterDiscount * (repair.vat / 100));
+      }, 0),
+      totalDiscount: repairs.reduce((sum, repair) => {
+        const subtotal = repair.quantity * repair.unitCost;
+        return sum + (subtotal * (repair.discount / 100));
+      }, 0),
+      total: repairs.reduce((sum, repair) => sum + repair.total, 0)
+    };
 
-  const calculatePartTotals = () => {
-    const subTotal = parts.reduce((sum, part) => sum + ((part.quantity || 0) * (part.unitCost || 0)), 0);
-    const totalVat = parts.reduce((sum, part) => {
-      const subtotal = (part.quantity || 0) * (part.unitCost || 0);
-      return sum + (subtotal * ((part.vat || 20) / 100));
-    }, 0);
-    const totalDiscount = parts.reduce((sum, part) => {
-      const subtotal = (part.quantity || 0) * (part.unitCost || 0);
-      return sum + (subtotal * ((part.discount || 0) / 100));
-    }, 0);
-    const total = parts.reduce((sum, part) => sum + (part.total || 0), 0);
-    return { subTotal, totalVat, totalDiscount, total };
-  };
-  const repairTotals = calculateRepairTotals();
-  const partTotals = calculatePartTotals();
-  const combinedTotals = {
-    subTotal: repairTotals.subTotal + partTotals.subTotal,
-    totalVat: repairTotals.totalVat + partTotals.totalVat,
-    totalDiscount: repairTotals.totalDiscount + partTotals.totalDiscount,
-    total: repairTotals.total + partTotals.total
-  };
+    const partTotals = {
+      subTotal: parts.reduce((sum, part) => sum + ((part.quantity || 0) * (part.unitCost || 0)), 0),
+      totalVat: parts.reduce((sum, part) => {
+        const subtotal = (part.quantity || 0) * (part.unitCost || 0);
+        return sum + (subtotal * ((part.vat || 20) / 100));
+      }, 0),
+      totalDiscount: parts.reduce((sum, part) => {
+        const subtotal = (part.quantity || 0) * (part.unitCost || 0);
+        return sum + (subtotal * ((part.discount || 0) / 100));
+      }, 0),
+      total: parts.reduce((sum, part) => sum + (part.total || 0), 0)
+    };
+
+    const combinedTotals = {
+      subTotal: repairTotals.subTotal + partTotals.subTotal,
+      totalVat: repairTotals.totalVat + partTotals.totalVat,
+      totalDiscount: repairTotals.totalDiscount + partTotals.totalDiscount,
+      total: repairTotals.total + partTotals.total
+    };
+
+    return { repairTotals, partTotals, combinedTotals };
+  }, [repairs, parts]);
 
   return (
     <Card>

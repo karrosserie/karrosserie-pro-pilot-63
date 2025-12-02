@@ -9,33 +9,13 @@ export function useImports() {
   } = useQuery({
     queryKey: ['imports', 'pending'],
     queryFn: importsService.getPendingImports,
-    refetchInterval: 5000, // Refresh every 5 seconds to track progress
-    staleTime: 0, // Considérer les données comme obsolètes immédiatement
-    refetchOnWindowFocus: true, // Refetch quand la fenêtre reprend le focus
+    refetchInterval: (query) => {
+      // Only poll when window is focused, and use 15s interval instead of 5s
+      return document.hasFocus() ? 15000 : false;
+    },
+    staleTime: 10000, // Consider data fresh for 10 seconds to reduce refetches
+    refetchOnWindowFocus: true,
   });
-
-  // Temporairement désactivé - la fonctionnalité temps réel sera réimplémentée plus tard
-  // useEffect(() => {
-  //   const channel = supabase
-  //     .channel('imports-realtime')
-  //     .on(
-  //       'postgres_changes',
-  //       {
-  //         event: '*',
-  //         schema: 'public',
-  //         table: 'imports'
-  //       },
-  //       (payload) => {
-  //         console.log('Import updated:', payload);
-  //         queryClient.invalidateQueries({ queryKey: ['imports'] });
-  //       }
-  //     )
-  //     .subscribe();
-
-  //   return () => {
-  //     supabase.removeChannel(channel);
-  //   };
-  // }, [queryClient]);
   
   return {
     pendingImports,
