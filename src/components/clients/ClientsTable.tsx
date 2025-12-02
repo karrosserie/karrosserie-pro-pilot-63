@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useMemo } from 'react';
+import React, { useEffect, useRef, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   Table, 
@@ -9,7 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Eye, Pencil, Trash, UserPlus, Car } from 'lucide-react';
+import { Eye, Pencil, Trash, UserPlus, Car, ChevronLeft, ChevronRight } from 'lucide-react';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { useTableSorting, SortDirection } from '@/hooks/use-table-sorting';
 import { Client } from '@/services/supabase/clients';
@@ -17,6 +17,8 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { ClientMobileCard } from './ClientMobileCard';
 import { RequestDocumentsButton } from './RequestDocumentsButton';
 import { ClientSortOption } from './ClientsFilters';
+
+const ITEMS_PER_PAGE = 30;
 
 interface ClientsTableProps {
   clients: Client[];
@@ -55,6 +57,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
   highlightedClientId,
   sortOption
 }) => {
+  const [currentPage, setCurrentPage] = useState(1);
   const { key: sortKey, direction: sortDirection } = useMemo(() => getSortConfig(sortOption), [sortOption]);
   
   // Ajouter un champ fullName calculé pour le tri alphabétique sur nom complet
@@ -70,8 +73,28 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
   const highlightedRef = useRef<HTMLTableRowElement>(null);
   const highlightedMobileRef = useRef<HTMLDivElement>(null);
 
+  // Pagination
+  const totalPages = Math.ceil(sortedClients.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedClients = sortedClients.slice(startIndex, endIndex);
+
+  // Reset page when clients or sort changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [clients.length, sortOption]);
+
+  // Scroll to highlighted client and adjust page if needed
   useEffect(() => {
     if (highlightedClientId) {
+      const clientIndex = sortedClients.findIndex(c => c.id === highlightedClientId);
+      if (clientIndex !== -1) {
+        const targetPage = Math.floor(clientIndex / ITEMS_PER_PAGE) + 1;
+        if (targetPage !== currentPage) {
+          setCurrentPage(targetPage);
+        }
+      }
+      
       const ref = isMobile ? highlightedMobileRef : highlightedRef;
       if (ref.current) {
         setTimeout(() => {
@@ -79,25 +102,63 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
         }, 100);
       }
     }
-  }, [highlightedClientId, isMobile]);
+  }, [highlightedClientId, isMobile, sortedClients, currentPage]);
+
+  const PaginationControls = () => {
+    if (totalPages <= 1) return null;
+    
+    return (
+      <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/30">
+        <div className="text-sm text-muted-foreground">
+          {sortedClients.length} client{sortedClients.length > 1 ? 's' : ''} au total
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Précédent
+          </Button>
+          <span className="text-sm text-muted-foreground px-2">
+            Page {currentPage} sur {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+          >
+            Suivant
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    );
+  };
   
   if (isMobile) {
     return (
       <div className="space-y-4">
-        {sortedClients.length > 0 ? (
-          sortedClients.map((client) => (
-            <ClientMobileCard
-              key={client.id}
-              client={client}
-              onViewClient={onViewClient}
-              onEditClient={onEditClient}
-              onDeleteClient={onDeleteClient}
-              onCreateVehicle={onCreateVehicle}
-              onRequestDocuments={onRequestDocuments}
-              isHighlighted={highlightedClientId === client.id}
-              highlightedRef={highlightedClientId === client.id ? highlightedMobileRef : undefined}
-            />
-          ))
+        {paginatedClients.length > 0 ? (
+          <>
+            {paginatedClients.map((client) => (
+              <ClientMobileCard
+                key={client.id}
+                client={client}
+                onViewClient={onViewClient}
+                onEditClient={onEditClient}
+                onDeleteClient={onDeleteClient}
+                onCreateVehicle={onCreateVehicle}
+                onRequestDocuments={onRequestDocuments}
+                isHighlighted={highlightedClientId === client.id}
+                highlightedRef={highlightedClientId === client.id ? highlightedMobileRef : undefined}
+              />
+            ))}
+            <PaginationControls />
+          </>
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <UserPlus className="h-16 w-16 text-gray-300 mb-4" />
@@ -124,8 +185,8 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sortedClients.length > 0 ? (
-            sortedClients.map((client) => {
+          {paginatedClients.length > 0 ? (
+            paginatedClients.map((client) => {
               const clientData = client as any;
               const hasFrontLicense = clientData.driver_license_front_url;
               const hasBackLicense = clientData.driver_license_back_url;
@@ -198,6 +259,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
           )}
         </TableBody>
       </Table>
+      <PaginationControls />
     </div>
   );
 };
