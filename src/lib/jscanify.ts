@@ -2,10 +2,17 @@
  * jscanify - Document scanner library
  * Adapted from https://github.com/nicksypark/jscanify (MIT License)
  * Converted to ES module with explicit window.cv access
+ * Enhanced with adaptive detection for small documents (licenses, cards)
  */
 
 function distance(p1: { x: number; y: number }, p2: { x: number; y: number }): number {
   return Math.hypot(p1.x - p2.x, p1.y - p2.y);
+}
+
+export interface ScanOptions {
+  color?: string;
+  thickness?: number;
+  isSmallFormat?: boolean;
 }
 
 export class Jscanify {
@@ -19,61 +26,161 @@ export class Jscanify {
 
   /**
    * Finds the contour of the paper in the image
+   * @param img OpenCV Mat image
+   * @param isSmallFormat Use relaxed detection for small documents (licenses, cards)
    */
-  findPaperContour(img: any): any {
+  findPaperContour(img: any, isSmallFormat: boolean = false): any {
     const cv = this.getCV();
     
-    const imgGray = new cv.Mat();
-    cv.cvtColor(img, imgGray, cv.COLOR_RGBA2GRAY);
+    // Matrices to clean up
+    let imgGray: any = null;
+    let imgBlur: any = null;
+    let kernel: any = null;
+    let imgDilated: any = null;
+    let imgThresh: any = null;
+    let contours: any = null;
+    let hierarchy: any = null;
     
-    const imgBlur = new cv.Mat();
-    cv.GaussianBlur(imgGray, imgBlur, new cv.Size(5, 5), 0);
-    
-    const imgThresh = new cv.Mat();
-    cv.Canny(imgBlur, imgThresh, 75, 200);
-    
-    const contours = new cv.MatVector();
-    const hierarchy = new cv.Mat();
-    cv.findContours(imgThresh, contours, hierarchy, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE);
-    
-    let maxArea = 0;
-    let maxContourIndex = -1;
-    
-    for (let i = 0; i < contours.size(); i++) {
-      const contour = contours.get(i);
-      const area = cv.contourArea(contour);
-      if (area > maxArea) {
-        maxArea = area;
-        maxContourIndex = i;
-      }
-    }
-    
-    let paperContour = null;
-    if (maxContourIndex !== -1) {
-      const contour = contours.get(maxContourIndex);
-      const peri = cv.arcLength(contour, true);
-      const approx = new cv.Mat();
-      cv.approxPolyDP(contour, approx, 0.02 * peri, true);
+    try {
+      imgGray = new cv.Mat();
+      cv.cvtColor(img, imgGray, cv.COLOR_RGBA2GRAY);
       
-      if (approx.rows === 4) {
-        paperContour = approx;
-      } else {
-        approx.delete();
+      imgBlur = new cv.Mat();
+      cv.GaussianBlur(imgGray, imgBlur, new cv.Size(5, 5), 0);
+      
+      // Morphological dilation to reinforce contours (especially for small documents)
+      kernel = cv.Mat.ones(3, 3, cv.CV_8U);
+      imgDilated = new cv.Mat();
+      cv.dilate(imgBlur, imgDilated, kernel);
+      
+      imgThresh = new cv.Mat();
+      // Adaptive Canny thresholds - lower for small documents with less contrast
+      const lowThreshold = isSmallFormat ? 30 : 75;
+      const highThreshold = isSmallFormat ? 100 : 200;
+      cv.Canny(imgDilated, imgThresh, lowThreshold, highThreshold);
+      
+      contours = new cv.MatVector();
+      hierarchy = new cv.Mat();
+      cv.findContours(imgThresh, contours, hierarchy, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE);
+      
+      // Minimum area filtering
+      const imgArea = img.rows * img.cols;
+      const minAreaRatio = isSmallFormat ? 0.03 : 0.08; // Lower threshold for small docs
+      
+      let maxArea = 0;
+      let maxContourIndex = -1;
+      
+      for (let i = 0; i < contours.size(); i++) {
+        const contour = contours.get(i);
+        const area = cv.contourArea(contour);
+        
+        // Skip contours that are too small
+        if (area < imgArea * minAreaRatio) continue;
+        
+        if (area > maxArea) {
+          maxArea = area;
+          maxContourIndex = i;
+        }
       }
+      
+      let paperContour = null;
+      if (maxContourIndex !== -1) {
+        const contour = contours.get(maxContourIndex);
+        const peri = cv.arcLength(contour, true);
+        const approx = new cv.Mat();
+        
+        // Relaxed approximation for small formats (more tolerant of rounded corners)
+        const approxFactor = isSmallFormat ? 0.04 : 0.02;
+        cv.approxPolyDP(contour, approx, approxFactor * peri, true);
+        
+        // Accept 4 points exactly, or 4-6 points for small formats (rounded corners)
+        const acceptablePointCount = isSmallFormat 
+          ? (approx.rows >= 4 && approx.rows <= 6)
+          : (approx.rows === 4);
+        
+        if (acceptablePointCount) {
+          // For small formats with more than 4 points, reduce to 4 corners
+          if (approx.rows > 4) {
+            const reducedContour = this.reduceToFourCorners(approx, cv);
+            if (reducedContour) {
+              approx.delete();
+              paperContour = reducedContour;
+            } else {
+              paperContour = approx;
+            }
+          } else {
+            paperContour = approx;
+          }
+        } else {
+          approx.delete();
+        }
+      }
+      
+      return paperContour;
+    } finally {
+      // Cleanup
+      if (imgGray) imgGray.delete();
+      if (imgBlur) imgBlur.delete();
+      if (kernel) kernel.delete();
+      if (imgDilated) imgDilated.delete();
+      if (imgThresh) imgThresh.delete();
+      if (hierarchy) hierarchy.delete();
+      if (contours) contours.delete();
     }
-    
-    // Cleanup
-    imgGray.delete();
-    imgBlur.delete();
-    imgThresh.delete();
-    hierarchy.delete();
-    
-    // Don't delete contours yet if we're returning one
-    if (paperContour === null) {
-      contours.delete();
+  }
+
+  /**
+   * Reduce a polygon with more than 4 points to 4 corners
+   */
+  private reduceToFourCorners(approx: any, cv: any): any {
+    try {
+      const points: Array<{ x: number; y: number; index: number }> = [];
+      for (let i = 0; i < approx.rows; i++) {
+        points.push({
+          x: approx.data32S[i * 2],
+          y: approx.data32S[i * 2 + 1],
+          index: i
+        });
+      }
+      
+      // Find bounding box corners
+      const minX = Math.min(...points.map(p => p.x));
+      const maxX = Math.max(...points.map(p => p.x));
+      const minY = Math.min(...points.map(p => p.y));
+      const maxY = Math.max(...points.map(p => p.y));
+      
+      // Find closest point to each corner
+      const findClosest = (targetX: number, targetY: number) => {
+        let closest = points[0];
+        let minDist = Infinity;
+        for (const p of points) {
+          const dist = Math.hypot(p.x - targetX, p.y - targetY);
+          if (dist < minDist) {
+            minDist = dist;
+            closest = p;
+          }
+        }
+        return closest;
+      };
+      
+      const topLeft = findClosest(minX, minY);
+      const topRight = findClosest(maxX, minY);
+      const bottomRight = findClosest(maxX, maxY);
+      const bottomLeft = findClosest(minX, maxY);
+      
+      // Create new 4-point contour
+      const newContour = cv.matFromArray(4, 1, cv.CV_32SC2, [
+        topLeft.x, topLeft.y,
+        topRight.x, topRight.y,
+        bottomRight.x, bottomRight.y,
+        bottomLeft.x, bottomLeft.y
+      ]);
+      
+      return newContour;
+    } catch (err) {
+      console.error('[Jscanify] reduceToFourCorners error:', err);
+      return null;
     }
-    
-    return paperContour;
   }
 
   /**
@@ -111,9 +218,9 @@ export class Jscanify {
   /**
    * Highlights the paper on the image/canvas
    */
-  highlightPaper(image: HTMLCanvasElement | HTMLImageElement, options?: { color?: string; thickness?: number }): HTMLCanvasElement | null {
+  highlightPaper(image: HTMLCanvasElement | HTMLImageElement, options?: ScanOptions): HTMLCanvasElement | null {
     const cv = this.getCV();
-    const { color = 'lime', thickness = 8 } = options || {};
+    const { color = 'lime', thickness = 8, isSmallFormat = false } = options || {};
     
     let canvas: HTMLCanvasElement;
     if (image instanceof HTMLCanvasElement) {
@@ -128,9 +235,12 @@ export class Jscanify {
       }
     }
     
+    let img: any = null;
+    let contour: any = null;
+    
     try {
-      const img = cv.imread(canvas);
-      const contour = this.findPaperContour(img);
+      img = cv.imread(canvas);
+      contour = this.findPaperContour(img, isSmallFormat);
       
       if (contour) {
         const ctx = canvas.getContext('2d');
@@ -148,21 +258,28 @@ export class Jscanify {
             ctx.stroke();
           }
         }
-        contour.delete();
       }
       
-      img.delete();
       return canvas;
     } catch (error) {
       console.error('[Jscanify] highlightPaper error:', error);
       return null;
+    } finally {
+      if (img) img.delete();
+      if (contour) contour.delete();
     }
   }
 
   /**
    * Extracts and transforms the paper from the image
    */
-  extractPaper(image: HTMLCanvasElement | HTMLImageElement, resultWidth: number, resultHeight: number, cornerPoints?: any): HTMLCanvasElement | null {
+  extractPaper(
+    image: HTMLCanvasElement | HTMLImageElement, 
+    resultWidth: number, 
+    resultHeight: number, 
+    cornerPoints?: any,
+    isSmallFormat: boolean = false
+  ): HTMLCanvasElement | null {
     const cv = this.getCV();
     
     let canvas: HTMLCanvasElement;
@@ -193,19 +310,19 @@ export class Jscanify {
       if (cornerPoints) {
         contour = cornerPoints;
       } else {
-        contour = this.findPaperContour(img);
+        contour = this.findPaperContour(img, isSmallFormat);
         localContour = true;
       }
       
       if (!contour) {
-        console.warn('[Jscanify] No paper contour found, returning original');
-        return canvas;
+        console.warn('[Jscanify] No paper contour found, returning null');
+        return null;
       }
       
       const points = this.getCornerPoints(contour);
       if (!points) {
         console.warn('[Jscanify] Could not get corner points');
-        return canvas;
+        return null;
       }
       
       // Source points
