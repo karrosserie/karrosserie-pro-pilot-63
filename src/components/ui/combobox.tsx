@@ -79,9 +79,20 @@ export function Combobox({
             value={inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
             onKeyDown={(e) => {
-              // Empêcher l'espace de déclencher le bouton parent
+              // Empêcher l'espace de déclencher le bouton parent (click natif)
               if (e.key === ' ') {
+                e.preventDefault();
                 e.stopPropagation();
+                // Insérer manuellement l'espace dans l'input
+                const input = e.currentTarget;
+                const start = input.selectionStart || 0;
+                const end = input.selectionEnd || 0;
+                const newValue = inputValue.slice(0, start) + ' ' + inputValue.slice(end);
+                handleInputChange(newValue);
+                // Repositionner le curseur après l'espace
+                setTimeout(() => {
+                  input.setSelectionRange(start + 1, start + 1);
+                }, 0);
               }
             }}
             placeholder={placeholder}
