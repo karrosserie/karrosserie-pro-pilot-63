@@ -7,7 +7,8 @@ import { AmountInput } from '@/components/ui/amount-input';
 import { Wrench, Settings, Plus, Trash } from 'lucide-react';
 import { QuoteRepairItem, QuotePartItem } from './types';
 import { calculateLineTotal } from './utils/calculations';
-import { REPAIR_DESIGNATIONS, PART_DESIGNATIONS } from '@/constants/predefined-values';
+import { REPAIR_DESIGNATIONS } from '@/constants/predefined-values';
+import { useAutomotivePartNames } from '@/hooks/use-automotive-parts';
 
 interface QuoteRepairsAndPartsSectionProps {
   repairs: QuoteRepairItem[];
@@ -24,6 +25,7 @@ export const QuoteRepairsAndPartsSection = ({
   onPartsChange, 
   isReadOnly = false 
 }: QuoteRepairsAndPartsSectionProps) => {
+  const { data: partDesignations = [] } = useAutomotivePartNames();
   const [activeTab, setActiveTab] = useState<'repairs' | 'parts'>('repairs');
 
   // Ensure there's always at least one item on mount
@@ -366,7 +368,7 @@ export const QuoteRepairsAndPartsSection = ({
                   <Combobox
                     value={part.description}
                     onChange={(value) => updatePart(part.id, 'description', value)}
-                    options={PART_DESIGNATIONS}
+                    options={partDesignations}
                     placeholder="Désignation de la pièce"
                     disabled={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}

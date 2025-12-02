@@ -443,6 +443,33 @@ export type Database = {
         }
         Relationships: []
       }
+      automotive_parts: {
+        Row: {
+          category: string
+          created_at: string | null
+          id: string
+          name: string
+          subcategory: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          id?: string
+          name: string
+          subcategory?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          id?: string
+          name?: string
+          subcategory?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       bad_user_after_call: {
         Row: {
           company_id: string | null

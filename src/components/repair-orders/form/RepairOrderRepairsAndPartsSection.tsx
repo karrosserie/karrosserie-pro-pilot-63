@@ -7,7 +7,8 @@ import { Combobox } from '@/components/ui/combobox';
 import { AmountInput } from '@/components/ui/amount-input';
 import { Wrench, Settings, Plus, Trash } from 'lucide-react';
 import { RepairOrderRepairItem, RepairOrderPartItem } from './types';
-import { REPAIR_DESIGNATIONS, PART_DESIGNATIONS } from '@/constants/predefined-values';
+import { REPAIR_DESIGNATIONS } from '@/constants/predefined-values';
+import { useAutomotivePartNames } from '@/hooks/use-automotive-parts';
 
 interface RepairOrderRepairsAndPartsSectionProps {
   repairs: RepairOrderRepairItem[];
@@ -24,6 +25,8 @@ export const RepairOrderRepairsAndPartsSection = ({
   onPartsChange, 
   isReadOnly = false 
 }: RepairOrderRepairsAndPartsSectionProps) => {
+  const { data: partDesignations = [] } = useAutomotivePartNames();
+
   // Repair functions
   const addRepair = () => {
     if (isReadOnly) return;
@@ -299,7 +302,7 @@ export const RepairOrderRepairsAndPartsSection = ({
                   <Combobox
                     value={part.description}
                     onChange={(value) => updatePart(part.id, 'description', value)}
-                    options={PART_DESIGNATIONS}
+                    options={partDesignations}
                     placeholder="Désignation de la pièce"
                     disabled={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
