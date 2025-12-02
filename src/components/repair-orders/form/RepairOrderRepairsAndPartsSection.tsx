@@ -3,9 +3,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Combobox } from '@/components/ui/combobox';
+import { AutocompleteInput } from '@/components/ui/autocomplete-input';
 import { AmountInput } from '@/components/ui/amount-input';
-import { Wrench, Settings, Plus, Trash } from 'lucide-react';
+import { Wrench, Plus, Trash } from 'lucide-react';
 import { RepairOrderRepairItem, RepairOrderPartItem } from './types';
 import { REPAIR_DESIGNATIONS } from '@/constants/predefined-values';
 import { useAutomotivePartNames } from '@/hooks/use-automotive-parts';
@@ -203,12 +203,13 @@ export const RepairOrderRepairsAndPartsSection = ({
               {/* Repair items */}
               {repairsToShow.map((repair) => (
                 <div key={repair.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
-                  <Combobox
+                  <AutocompleteInput
                     value={repair.description}
                     onChange={(value) => updateRepair(repair.id, 'description', value)}
                     options={REPAIR_DESIGNATIONS}
                     placeholder="Désignation de la réparation"
                     disabled={isReadOnly}
+                    readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
                   <Input
@@ -299,12 +300,13 @@ export const RepairOrderRepairsAndPartsSection = ({
               {/* Part items */}
               {partsToShow.map((part) => (
                 <div key={part.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
-                  <Combobox
+                  <AutocompleteInput
                     value={part.description}
                     onChange={(value) => updatePart(part.id, 'description', value)}
                     options={partDesignations}
                     placeholder="Désignation de la pièce"
                     disabled={isReadOnly}
+                    readOnly={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
                   <Input
