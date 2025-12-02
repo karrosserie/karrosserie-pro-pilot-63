@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
 export type SortDirection = 'asc' | 'desc' | null;
 
@@ -16,6 +16,16 @@ export function useTableSorting<T>(
     key: initialSortKey || '',
     direction: initialSortKey ? (initialDirection ?? 'asc') : null
   });
+
+  // Synchroniser quand les props initiales changent (tri externe)
+  useEffect(() => {
+    if (initialSortKey) {
+      setSortConfig({
+        key: initialSortKey,
+        direction: initialDirection ?? 'asc'
+      });
+    }
+  }, [initialSortKey, initialDirection]);
 
   const sortedData = useMemo(() => {
     if (!sortConfig.key || !sortConfig.direction || !data) {
