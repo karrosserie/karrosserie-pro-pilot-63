@@ -78,6 +78,12 @@ export function Combobox({
             type="text"
             value={inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
+            onKeyDown={(e) => {
+              // Empêcher l'espace de déclencher le bouton parent
+              if (e.key === ' ') {
+                e.stopPropagation();
+              }
+            }}
             placeholder={placeholder}
             className="flex-1 bg-transparent border-0 outline-none text-left"
             disabled={disabled}
@@ -90,6 +96,11 @@ export function Combobox({
           <CommandInput 
             value={inputValue}
             onValueChange={handleInputChange}
+            onKeyDown={(e) => {
+              if (e.key === ' ') {
+                e.stopPropagation();
+              }
+            }}
             placeholder="Rechercher ou saisir..."
             className="h-9"
           />
