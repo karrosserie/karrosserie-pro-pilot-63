@@ -385,7 +385,13 @@ export const ViolationDocumentUpload: React.FC<ViolationDocumentUploadProps> = (
   };
 
   if (showScanner) {
-    return <SimpleDocumentScanner onCapture={handleScanCapture} onClose={() => setShowScanner(false)} />;
+    return (
+      <SimpleDocumentScanner 
+        onCapture={handleScanCapture} 
+        onClose={() => setShowScanner(false)} 
+        documentType="violation"
+      />
+    );
   }
 
   return (
