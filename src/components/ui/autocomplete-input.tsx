@@ -12,7 +12,8 @@ interface AutocompleteInputProps {
   readOnly?: boolean
 }
 
-export function AutocompleteInput({
+// Optimized AutocompleteInput with debounce and memoization
+export const AutocompleteInput = React.memo(function AutocompleteInput({
   value,
   onChange,
   options,
@@ -23,31 +24,52 @@ export function AutocompleteInput({
 }: AutocompleteInputProps) {
   const [isOpen, setIsOpen] = React.useState(false)
   const [highlightedIndex, setHighlightedIndex] = React.useState(-1)
+  const [localValue, setLocalValue] = React.useState(value)
+  const [debouncedValue, setDebouncedValue] = React.useState(value)
   const inputRef = React.useRef<HTMLInputElement>(null)
   const listRef = React.useRef<HTMLUListElement>(null)
+  const containerRef = React.useRef<HTMLDivElement>(null)
 
-  // Filtrer les options en fonction de la saisie
+  // Sync local value with prop value when it changes externally
+  React.useEffect(() => {
+    setLocalValue(value)
+    setDebouncedValue(value)
+  }, [value])
+
+  // Debounce filtering - wait 150ms after typing stops
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(localValue)
+    }, 150)
+    return () => clearTimeout(timer)
+  }, [localValue])
+
+  // Memoized filtered options based on debounced value
   const filteredOptions = React.useMemo(() => {
-    if (!value.trim()) return options.slice(0, 10) // Afficher les 10 premières si vide
+    if (!debouncedValue.trim()) return options.slice(0, 10)
+    const lowerValue = debouncedValue.toLowerCase()
     return options.filter((option) =>
-      option.toLowerCase().includes(value.toLowerCase())
-    ).slice(0, 15) // Limiter à 15 résultats
-  }, [value, options])
+      option.toLowerCase().includes(lowerValue)
+    ).slice(0, 15)
+  }, [debouncedValue, options])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(e.target.value)
+  const handleInputChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value
+    setLocalValue(newValue)
+    onChange(newValue)
     setIsOpen(true)
     setHighlightedIndex(-1)
-  }
+  }, [onChange])
 
-  const handleSelect = (option: string) => {
+  const handleSelect = React.useCallback((option: string) => {
+    setLocalValue(option)
     onChange(option)
     setIsOpen(false)
     setHighlightedIndex(-1)
     inputRef.current?.focus()
-  }
+  }, [onChange])
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = React.useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!isOpen || filteredOptions.length === 0) {
       if (e.key === 'ArrowDown' && filteredOptions.length > 0) {
         setIsOpen(true)
@@ -82,23 +104,26 @@ export function AutocompleteInput({
         setIsOpen(false)
         break
     }
-  }
+  }, [isOpen, filteredOptions, highlightedIndex, handleSelect])
 
-  // Fermer quand on clique ailleurs
+  const handleFocus = React.useCallback(() => {
+    setIsOpen(true)
+  }, [])
+
+  // Use a single click outside handler with container ref
   React.useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (
-        inputRef.current &&
-        !inputRef.current.contains(e.target as Node) &&
-        listRef.current &&
-        !listRef.current.contains(e.target as Node)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setIsOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    
+    // Only add listener when dropdown is open
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen])
 
   // Scroll vers l'élément surligné
   React.useEffect(() => {
@@ -111,13 +136,13 @@ export function AutocompleteInput({
   }, [highlightedIndex])
 
   return (
-    <div className="relative w-full">
+    <div ref={containerRef} className="relative w-full">
       <Input
         ref={inputRef}
         type="text"
-        value={value}
+        value={localValue}
         onChange={handleInputChange}
-        onFocus={() => setIsOpen(true)}
+        onFocus={handleFocus}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         className={className}
@@ -148,4 +173,14 @@ export function AutocompleteInput({
       )}
     </div>
   )
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison for React.memo - only re-render when these props change
+  return (
+    prevProps.value === nextProps.value &&
+    prevProps.disabled === nextProps.disabled &&
+    prevProps.readOnly === nextProps.readOnly &&
+    prevProps.className === nextProps.className &&
+    prevProps.placeholder === nextProps.placeholder &&
+    prevProps.options === nextProps.options
+  )
+})

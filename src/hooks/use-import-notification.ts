@@ -95,10 +95,18 @@ export function useImportNotification() {
 
     // Polling pour vérifier les changements de statut
     let intervalId: NodeJS.Timeout;
+    let isChecking = false; // Prevent concurrent checks
     const processedIds = getProcessedImportIds();
     console.log('🔧 Initialized with processed imports from localStorage:', Array.from(processedIds));
 
     const checkImports = async () => {
+      // Skip if tab is not focused or already checking
+      if (!document.hasFocus() || isChecking) {
+        return;
+      }
+      
+      isChecking = true;
+      
       try {
         console.log('🔍 useImportNotification - Checking for completed imports...');
         
@@ -238,9 +246,12 @@ export function useImportNotification() {
                       // ⛔ STOP - Ne pas créer le devis si validation échouée
                       console.log('⏸️ Devis non créé - validation client requise');
                       
-                      // Invalider les caches quand même
-                      queryClient.invalidateQueries({ queryKey: ['expertiseReports'] });
-                      queryClient.invalidateQueries({ queryKey: ['imports', 'pending'] });
+                      // Invalider les caches après conversion réussie - grouper les invalidations
+                      queryClient.invalidateQueries({ 
+                        predicate: (query) => 
+                          query.queryKey[0] === 'expertiseReports' || 
+                          query.queryKey[0] === 'imports'
+                      });
                       
                       continue; // Passer à l'import suivant sans créer de devis
                     }
@@ -283,10 +294,13 @@ export function useImportNotification() {
                       });
                     }
                     
-                    // Invalider les caches après conversion réussie
-                    queryClient.invalidateQueries({ queryKey: ['expertiseReports'] });
-                    queryClient.invalidateQueries({ queryKey: ['quotes'] });
-                    queryClient.invalidateQueries({ queryKey: ['imports', 'pending'] });
+                    // Invalider les caches après conversion réussie - grouper les invalidations
+                    queryClient.invalidateQueries({ 
+                      predicate: (query) => 
+                        query.queryKey[0] === 'expertiseReports' || 
+                        query.queryKey[0] === 'quotes' ||
+                        query.queryKey[0] === 'imports'
+                    });
                   } else {
                     console.log('⚠️ Cannot convert report: missing client or vehicle data');
                     toast({
@@ -309,26 +323,40 @@ export function useImportNotification() {
                 });
               }
               
-              // Invalider les caches pour rafraîchir les données
-              queryClient.invalidateQueries({ queryKey: ['expertiseReports'] });
-              queryClient.invalidateQueries({ queryKey: ['imports', 'pending'] });
-              queryClient.invalidateQueries({ queryKey: ['quotes'] });
+              // Invalider les caches pour rafraîchir les données - grouper les invalidations
+              queryClient.invalidateQueries({ 
+                predicate: (query) => 
+                  query.queryKey[0] === 'expertiseReports' || 
+                  query.queryKey[0] === 'quotes' ||
+                  query.queryKey[0] === 'imports'
+              });
             }
           }
         }
       } catch (error) {
         console.error('❌ Error checking imports:', error);
+      } finally {
+        isChecking = false;
       }
     };
 
-    // Vérifier immédiatement puis toutes les 5 secondes
+    // Vérifier immédiatement puis toutes les 20 secondes (au lieu de 5s)
     checkImports();
-    intervalId = setInterval(checkImports, 5000);
+    intervalId = setInterval(checkImports, 20000);
+
+    // Pause polling when tab is not visible
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkImports(); // Check immediately when tab becomes visible
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       if (intervalId) {
         clearInterval(intervalId);
       }
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [toast, queryClient]);
 

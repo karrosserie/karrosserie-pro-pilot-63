@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,8 +38,8 @@ export const QuoteRepairsAndPartsSection = ({
     }
   }, []);
 
-  // Repairs functions
-  const addRepair = () => {
+  // Repairs functions - memoized with useCallback
+  const addRepair = useCallback(() => {
     if (isReadOnly) return;
     const newRepair: QuoteRepairItem = {
       id: `repair_${Date.now()}`,
@@ -51,14 +51,14 @@ export const QuoteRepairsAndPartsSection = ({
       total: 0
     };
     onRepairsChange([...repairs, newRepair]);
-  };
+  }, [isReadOnly, repairs, onRepairsChange]);
 
-  const removeRepair = (id: string) => {
+  const removeRepair = useCallback((id: string) => {
     if (isReadOnly) return;
     onRepairsChange(repairs.filter(repair => repair.id !== id));
-  };
+  }, [isReadOnly, repairs, onRepairsChange]);
 
-  const updateRepair = (id: string, field: keyof QuoteRepairItem, value: string | number) => {
+  const updateRepair = useCallback((id: string, field: keyof QuoteRepairItem, value: string | number) => {
     if (isReadOnly) return;
     const updatedRepairs = repairs.map(repair => {
       if (repair.id === id) {
@@ -92,10 +92,10 @@ export const QuoteRepairsAndPartsSection = ({
       return repair;
     });
     onRepairsChange(updatedRepairs);
-  };
+  }, [isReadOnly, repairs, onRepairsChange]);
 
-  // Parts functions
-  const addPart = () => {
+  // Parts functions - memoized with useCallback
+  const addPart = useCallback(() => {
     if (isReadOnly) return;
     const newPart: QuotePartItem = {
       id: `part_${Date.now()}`,
@@ -107,14 +107,14 @@ export const QuoteRepairsAndPartsSection = ({
       total: 0
     };
     onPartsChange([...parts, newPart]);
-  };
+  }, [isReadOnly, parts, onPartsChange]);
 
-  const removePart = (id: string) => {
+  const removePart = useCallback((id: string) => {
     if (isReadOnly) return;
     onPartsChange(parts.filter(part => part.id !== id));
-  };
+  }, [isReadOnly, parts, onPartsChange]);
 
-  const updatePart = (id: string, field: keyof QuotePartItem, value: string | number) => {
+  const updatePart = useCallback((id: string, field: keyof QuotePartItem, value: string | number) => {
     if (isReadOnly) return;
     const updatedParts = parts.map(part => {
       if (part.id === id) {
@@ -148,10 +148,10 @@ export const QuoteRepairsAndPartsSection = ({
       return part;
     });
     onPartsChange(updatedParts);
-  };
+  }, [isReadOnly, parts, onPartsChange]);
 
-  // Combined calculations
-  const calculateTotals = () => {
+  // Memoized totals calculation
+  const totals = useMemo(() => {
     const repairTotals = {
       subTotal: repairs.reduce((sum, repair) => sum + (repair.quantity * repair.unitCost), 0),
       totalVat: repairs.reduce((sum, repair) => {
@@ -210,9 +210,8 @@ export const QuoteRepairsAndPartsSection = ({
       repairs: repairTotals,
       parts: partTotals
     };
-  };
+  }, [repairs, parts]);
 
-  const totals = calculateTotals();
   const hasItems = repairs.length > 0 || parts.length > 0;
 
   return (
@@ -444,12 +443,12 @@ export const QuoteRepairsAndPartsSection = ({
         {hasItems && (
           <div className="border-t pt-4 space-y-2">
             <div className="flex justify-end space-x-8 text-sm">
-              <div>Sous-total : <span className="font-medium">{totals.combined.subTotal.toFixed(2)} €</span></div>
-              <div>TVA : <span className="font-medium">{totals.combined.totalVat.toFixed(2)} €</span></div>
-              <div>Remise TTC : <span className="font-medium">{totals.combined.totalDiscount.toFixed(2)} €</span></div>
+              <div>Sous-total : <span className="font-medium">{totals.combined.subTotal.toFixed(2).replace('.', ',')} €</span></div>
+              <div>TVA : <span className="font-medium">{totals.combined.totalVat.toFixed(2).replace('.', ',')} €</span></div>
+              <div>Remise TTC : <span className="font-medium">{totals.combined.totalDiscount.toFixed(2).replace('.', ',')} €</span></div>
             </div>
             <div className="flex justify-end text-lg font-bold">
-              Total : <span className="ml-2">{totals.combined.total.toFixed(2)} €</span>
+              Total : <span className="ml-2">{totals.combined.total.toFixed(2).replace('.', ',')} €</span>
             </div>
           </div>
         )}
