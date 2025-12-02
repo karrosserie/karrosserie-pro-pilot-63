@@ -25,6 +25,7 @@ import { RepairOrder } from '@/services/supabase/repair-orders';
 import { Invoice } from '@/services/supabase/invoices';
 import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
+import { UnsignedRepairOrderWarningDialog } from '@/components/repair-orders/UnsignedRepairOrderWarningDialog';
 
 interface ClientRepairOrdersTabProps {
   clientId: string;
@@ -43,6 +44,8 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
   const [selectedOrderForEmail, setSelectedOrderForEmail] = useState<RepairOrder | null>(null);
   const [selectedOrderForSignature, setSelectedOrderForSignature] = useState<RepairOrder | null>(null);
   const [prefilledInvoice, setPrefilledInvoice] = useState<Partial<Invoice> | null>(null);
+  const [showUnsignedWarning, setShowUnsignedWarning] = useState(false);
+  const [orderToConvert, setOrderToConvert] = useState<RepairOrder | null>(null);
 
   if (isLoading) {
     return (
@@ -176,7 +179,17 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
     }
   };
 
-  const handleConvertToInvoice = async (order: RepairOrder) => {
+  const handleConvertToInvoice = (order: RepairOrder) => {
+    // Si l'OR n'est pas signé, afficher l'avertissement
+    if (order.status !== 'Signé') {
+      setOrderToConvert(order);
+      setShowUnsignedWarning(true);
+      return;
+    }
+    proceedWithConversion(order);
+  };
+
+  const proceedWithConversion = async (order: RepairOrder) => {
     const today = new Date().toISOString().split('T')[0];
     
     const prefilledData: Partial<Invoice> = {
@@ -385,6 +398,19 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
           }
         }}
         invoice={prefilledInvoice as Invoice}
+      />
+
+      <UnsignedRepairOrderWarningDialog
+        open={showUnsignedWarning}
+        onOpenChange={setShowUnsignedWarning}
+        orderReference={orderToConvert?.reference}
+        onConfirm={() => {
+          if (orderToConvert) {
+            proceedWithConversion(orderToConvert);
+          }
+          setShowUnsignedWarning(false);
+          setOrderToConvert(null);
+        }}
       />
     </>
   );

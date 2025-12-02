@@ -20,6 +20,7 @@ import RepairOrderDialog from './RepairOrderDialog';
 import RepairOrderEmailDialog from './RepairOrderEmailDialog';
 import RepairOrderSignatureDialog from './RepairOrderSignatureDialog';
 import InvoiceDialog from '../invoices/InvoiceDialog';
+import { UnsignedRepairOrderWarningDialog } from './UnsignedRepairOrderWarningDialog';
 
 interface RepairOrderViewerModalProps {
   repairOrder: RepairOrder | null;
@@ -43,6 +44,7 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
   const [signatureDialogOpen, setSignatureDialogOpen] = useState(false);
   const [prefilledInvoice, setPrefilledInvoice] = useState<any>(null);
+  const [showUnsignedWarning, setShowUnsignedWarning] = useState(false);
 
   // Mettre à jour l'ordre de réparation actuel quand la prop change
   useEffect(() => {
@@ -348,6 +350,15 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
   };
 
   const handleConvertToInvoice = () => {
+    // Si l'OR n'est pas signé, afficher l'avertissement
+    if (currentRepairOrder.status !== 'Signé') {
+      setShowUnsignedWarning(true);
+      return;
+    }
+    proceedWithConversion();
+  };
+
+  const proceedWithConversion = () => {
     // Préparer les données de la facture à partir de l'ordre de réparation
     const today = new Date().toISOString().split('T')[0];
     
@@ -505,6 +516,16 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
         repairOrder={currentRepairOrder}
         open={signatureDialogOpen}
         onOpenChange={setSignatureDialogOpen}
+      />
+
+      <UnsignedRepairOrderWarningDialog
+        open={showUnsignedWarning}
+        onOpenChange={setShowUnsignedWarning}
+        orderReference={currentRepairOrder.reference}
+        onConfirm={() => {
+          proceedWithConversion();
+          setShowUnsignedWarning(false);
+        }}
       />
     </>
   );

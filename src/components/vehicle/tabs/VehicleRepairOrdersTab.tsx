@@ -24,6 +24,7 @@ import { RepairOrder } from '@/services/supabase/repair-orders';
 import { Invoice } from '@/services/supabase/invoices';
 import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
+import { UnsignedRepairOrderWarningDialog } from '@/components/repair-orders/UnsignedRepairOrderWarningDialog';
 
 interface VehicleRepairOrdersTabProps {
   vehicleId: string;
@@ -42,6 +43,8 @@ const VehicleRepairOrdersTab: React.FC<VehicleRepairOrdersTabProps> = ({ vehicle
   const [selectedOrderForEmail, setSelectedOrderForEmail] = useState<RepairOrder | null>(null);
   const [selectedOrderForSignature, setSelectedOrderForSignature] = useState<RepairOrder | null>(null);
   const [prefilledInvoice, setPrefilledInvoice] = useState<Partial<Invoice> | null>(null);
+  const [showUnsignedWarning, setShowUnsignedWarning] = useState(false);
+  const [orderToConvert, setOrderToConvert] = useState<RepairOrder | null>(null);
 
   if (isLoading) {
     return (
@@ -177,6 +180,16 @@ const VehicleRepairOrdersTab: React.FC<VehicleRepairOrdersTabProps> = ({ vehicle
   };
 
   const handleConvertToInvoice = (order: RepairOrder) => {
+    // Si l'OR n'est pas signé, afficher l'avertissement
+    if (order.status !== 'Signé') {
+      setOrderToConvert(order);
+      setShowUnsignedWarning(true);
+      return;
+    }
+    proceedWithConversion(order);
+  };
+
+  const proceedWithConversion = (order: RepairOrder) => {
     const today = new Date().toISOString().split('T')[0];
     
     const prefilledData: Partial<Invoice> = {
@@ -385,6 +398,19 @@ const VehicleRepairOrdersTab: React.FC<VehicleRepairOrdersTabProps> = ({ vehicle
           }
         }}
         invoice={prefilledInvoice as Invoice}
+      />
+
+      <UnsignedRepairOrderWarningDialog
+        open={showUnsignedWarning}
+        onOpenChange={setShowUnsignedWarning}
+        orderReference={orderToConvert?.reference}
+        onConfirm={() => {
+          if (orderToConvert) {
+            proceedWithConversion(orderToConvert);
+          }
+          setShowUnsignedWarning(false);
+          setOrderToConvert(null);
+        }}
       />
     </>
   );
