@@ -401,9 +401,14 @@ const RepairOrders = () => {
 
       // Mettre à jour le client avec l'ID Oodrive si pas encore fait
       if (!clientData.oodrive_recipient_id && signatureResponse.recipients.length > 0) {
-        await clientsService.update(clientData.id, {
-          oodrive_recipient_id: signatureResponse.recipients[0].id.toString()
-        });
+        const { error: updateError } = await supabase
+          .from('clients')
+          .update({ oodrive_recipient_id: signatureResponse.recipients[0].id.toString() })
+          .eq('id', clientData.id);
+        
+        if (updateError) {
+          console.error('Error updating client oodrive_recipient_id:', updateError);
+        }
       }
 
       // Créer une demande de signature dans la table dédiée

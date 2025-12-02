@@ -107,19 +107,21 @@ export const clientsService = {
   update: async (id: string, client: any) => {
     // Extract company field and create clientData without it
     const company = client.company;
-    const clientData = {
-      first_name: client.firstName,
-      last_name: client.lastName,
-      email: client.email,
-      phone: client.phone,
-      address: client.address,
-      city: client.city,
-      postal_code: client.zipCode,
-      driver_license_front_url: client.driverLicenseFrontUrl || null,
-      driver_license_back_url: client.driverLicenseBackUrl || null,
-      auto_relances_disabled: client.autoRelancesDisabled || false,
-      oodrive_recipient_id: client.oodrive_recipient_id || null
-    };
+    
+    // Ne construire que les champs explicitement fournis (pas undefined)
+    const clientData: Record<string, any> = {};
+    
+    if (client.firstName !== undefined) clientData.first_name = client.firstName;
+    if (client.lastName !== undefined) clientData.last_name = client.lastName;
+    if (client.email !== undefined) clientData.email = client.email;
+    if (client.phone !== undefined) clientData.phone = client.phone;
+    if (client.address !== undefined) clientData.address = client.address;
+    if (client.city !== undefined) clientData.city = client.city;
+    if (client.zipCode !== undefined) clientData.postal_code = client.zipCode;
+    if (client.driverLicenseFrontUrl !== undefined) clientData.driver_license_front_url = client.driverLicenseFrontUrl || null;
+    if (client.driverLicenseBackUrl !== undefined) clientData.driver_license_back_url = client.driverLicenseBackUrl || null;
+    if (client.autoRelancesDisabled !== undefined) clientData.auto_relances_disabled = client.autoRelancesDisabled;
+    if (client.oodrive_recipient_id !== undefined) clientData.oodrive_recipient_id = client.oodrive_recipient_id || null;
 
     console.log('📝 Client Service - Updating client with data:', clientData);
     console.log('📝 Client Service - auto_relances_disabled value:', clientData.auto_relances_disabled);
