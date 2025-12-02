@@ -6,7 +6,6 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
 } from "@/components/ui/command"
@@ -52,13 +51,17 @@ export function Combobox({
   const handleInputChange = (newValue: string) => {
     setInputValue(newValue)
     onChange(newValue)
+    // Ouvrir automatiquement le popover quand l'utilisateur tape
+    if (newValue.length > 0 && !open) {
+      setOpen(true)
+    }
   }
 
   const filteredOptions = options.filter((option) =>
     option.toLowerCase().includes(inputValue.toLowerCase())
   )
 
-  const showOptions = filteredOptions.length > 0 && inputValue !== ""
+  const showOptions = filteredOptions.length > 0
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -78,6 +81,12 @@ export function Combobox({
             type="text"
             value={inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
+            onFocus={() => {
+              // Ouvrir le popover au focus si il y a des options
+              if (options.length > 0) {
+                setOpen(true)
+              }
+            }}
             onKeyDown={(e) => {
               // Empêcher l'espace de déclencher le bouton parent (click natif)
               if (e.key === ' ') {
@@ -94,6 +103,10 @@ export function Combobox({
                   input.setSelectionRange(start + 1, start + 1);
                 }, 0);
               }
+              // Fermer avec Escape
+              if (e.key === 'Escape') {
+                setOpen(false);
+              }
             }}
             placeholder={placeholder}
             className="flex-1 bg-transparent border-0 outline-none text-left"
@@ -104,23 +117,12 @@ export function Combobox({
       </PopoverTrigger>
       <PopoverContent className="w-full p-0" align="start">
         <Command>
-          <CommandInput 
-            value={inputValue}
-            onValueChange={handleInputChange}
-            onKeyDown={(e) => {
-              if (e.key === ' ') {
-                e.stopPropagation();
-              }
-            }}
-            placeholder="Rechercher ou saisir..."
-            className="h-9"
-          />
           <ScrollArea className="max-h-80">
             <CommandList>
               <CommandEmpty>{emptyMessage}</CommandEmpty>
               {showOptions && (
                 <CommandGroup>
-                  {filteredOptions.map((option) => (
+                  {filteredOptions.slice(0, 20).map((option) => (
                     <CommandItem
                       key={option}
                       value={option}
@@ -135,6 +137,11 @@ export function Combobox({
                       {option}
                     </CommandItem>
                   ))}
+                  {filteredOptions.length > 20 && (
+                    <div className="px-2 py-1.5 text-xs text-muted-foreground text-center">
+                      +{filteredOptions.length - 20} autres résultats...
+                    </div>
+                  )}
                 </CommandGroup>
               )}
             </CommandList>
