@@ -9,6 +9,52 @@ import { useCompany } from '@/hooks/use-company';
 
 const REMINDER_DELAY_MS = 2 * 60 * 60 * 1000; // 2 heures
 const STORAGE_KEY_PREFIX = 'client_validation_reminder_';
+const SEEN_NOTIFICATIONS_KEY = 'seen_validation_notifications';
+const SEEN_NOTIFICATIONS_TIMESTAMPS_KEY = 'seen_validation_notifications_timestamps';
+
+// Nettoyer les anciennes notifications vues (plus de 24h)
+const cleanOldSeenNotifications = () => {
+  try {
+    const timestamps = JSON.parse(localStorage.getItem(SEEN_NOTIFICATIONS_TIMESTAMPS_KEY) || '{}');
+    const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
+    
+    const validEntries = Object.entries(timestamps)
+      .filter(([_, ts]) => (ts as number) > oneDayAgo);
+    
+    const validIds = validEntries.map(([id]) => id);
+    localStorage.setItem(SEEN_NOTIFICATIONS_KEY, JSON.stringify(validIds));
+    localStorage.setItem(SEEN_NOTIFICATIONS_TIMESTAMPS_KEY, JSON.stringify(Object.fromEntries(validEntries)));
+  } catch (error) {
+    console.error('Error cleaning old seen notifications:', error);
+  }
+};
+
+// Marquer une notification comme vue
+const markNotificationAsSeen = (reportId: string) => {
+  try {
+    const seen = JSON.parse(localStorage.getItem(SEEN_NOTIFICATIONS_KEY) || '[]');
+    const timestamps = JSON.parse(localStorage.getItem(SEEN_NOTIFICATIONS_TIMESTAMPS_KEY) || '{}');
+    
+    if (!seen.includes(reportId)) {
+      seen.push(reportId);
+      timestamps[reportId] = Date.now();
+      localStorage.setItem(SEEN_NOTIFICATIONS_KEY, JSON.stringify(seen));
+      localStorage.setItem(SEEN_NOTIFICATIONS_TIMESTAMPS_KEY, JSON.stringify(timestamps));
+    }
+  } catch (error) {
+    console.error('Error marking notification as seen:', error);
+  }
+};
+
+// Vérifier si une notification a déjà été vue
+const hasNotificationBeenSeen = (reportId: string): boolean => {
+  try {
+    const seen = JSON.parse(localStorage.getItem(SEEN_NOTIFICATIONS_KEY) || '[]');
+    return seen.includes(reportId);
+  } catch {
+    return false;
+  }
+};
 
 export function ClientValidationWatcher() {
   const { notification, clearNotification } = useClientValidationNotification();
@@ -138,10 +184,23 @@ export function ClientValidationWatcher() {
     }
   };
 
+  // Nettoyer les anciennes notifications au montage
+  useEffect(() => {
+    cleanOldSeenNotifications();
+  }, []);
+
   useEffect(() => {
     if (!notification) return;
 
     const { reportId, clientId, clientName, validationResults } = notification;
+    
+    // Vérifier si cette notification a déjà été vue
+    if (hasNotificationBeenSeen(reportId)) {
+      console.log('⏭️ Notification already seen, skipping:', reportId);
+      clearNotification();
+      return;
+    }
+
     const missingFields = validationResults.missing?.missingFields || [];
 
     const fetchClientData = async () => {
@@ -181,7 +240,7 @@ export function ClientValidationWatcher() {
     };
 
     fetchClientData();
-  }, [notification, profile, companyData]);
+  }, [notification, profile, companyData, clearNotification]);
 
   useEffect(() => {
     checkPendingReminders();
@@ -193,6 +252,7 @@ export function ClientValidationWatcher() {
 
   const handleDismiss = () => {
     if (notification) {
+      markNotificationAsSeen(notification.reportId);
       scheduleReminder(
         notification.reportId, 
         notification.clientId,
@@ -203,8 +263,21 @@ export function ClientValidationWatcher() {
     clearNotification();
   };
 
+  // Handler pour onOpenChange : traite toute fermeture comme "Plus tard"
+  const handleDialogOpenChange = (open: boolean) => {
+    if (!open && isDialogOpen) {
+      // Le dialogue se ferme (X, clic extérieur, ESC) → traiter comme "Plus tard"
+      handleDismiss();
+      return;
+    }
+    setIsDialogOpen(open);
+  };
+
   const handleEditClient = () => {
     if (!clientData?.id) return;
+    if (notification) {
+      markNotificationAsSeen(notification.reportId);
+    }
     window.location.href = `/clients?edit=${clientData.id}`;
     setIsDialogOpen(false);
     clearNotification();
@@ -212,6 +285,8 @@ export function ClientValidationWatcher() {
 
   const handleCreateQuoteAnyway = async () => {
     if (!notification?.reportId) return;
+    
+    markNotificationAsSeen(notification.reportId);
     
     try {
       const { quotesService } = await import('@/services/supabase/quotes');
@@ -246,7 +321,7 @@ export function ClientValidationWatcher() {
   return (
     <ClientDataValidationReport
       open={isDialogOpen}
-      onOpenChange={setIsDialogOpen}
+      onOpenChange={handleDialogOpenChange}
       client={clientData}
       validationResults={notification.validationResults}
       onEditClient={handleEditClient}
