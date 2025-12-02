@@ -34,15 +34,15 @@ interface ClientsTableProps {
 const getSortConfig = (sortOption: ClientSortOption): { key: string; direction: SortDirection } => {
   switch (sortOption) {
     case 'alphabetical-asc':
-      return { key: 'last_name', direction: 'asc' };
+      return { key: 'fullName', direction: 'asc' };
     case 'alphabetical-desc':
-      return { key: 'last_name', direction: 'desc' };
+      return { key: 'fullName', direction: 'desc' };
     case 'recent-first':
       return { key: 'created_at', direction: 'desc' };
     case 'oldest-first':
       return { key: 'created_at', direction: 'asc' };
     default:
-      return { key: 'last_name', direction: 'asc' };
+      return { key: 'fullName', direction: 'asc' };
   }
 };
 
@@ -57,7 +57,16 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
   sortOption
 }) => {
   const { key: sortKey, direction: sortDirection } = useMemo(() => getSortConfig(sortOption), [sortOption]);
-  const { sortedData: sortedClients, sortConfig, handleSort } = useTableSorting(clients, sortKey, sortDirection);
+  
+  // Ajouter un champ fullName calculé pour le tri alphabétique sur nom complet
+  const clientsWithFullName = useMemo(() => {
+    return clients.map(client => ({
+      ...client,
+      fullName: `${client.first_name || ''} ${client.last_name || ''}`.trim().toLowerCase()
+    }));
+  }, [clients]);
+  
+  const { sortedData: sortedClients, sortConfig, handleSort } = useTableSorting(clientsWithFullName, sortKey, sortDirection);
   const isMobile = useIsMobile();
   const highlightedRef = useRef<HTMLTableRowElement>(null);
   const highlightedMobileRef = useRef<HTMLDivElement>(null);
@@ -108,7 +117,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <SortableTableHeader sortKey="last_name" sortConfig={sortConfig} onSort={handleSort}>
+            <SortableTableHeader sortKey="fullName" sortConfig={sortConfig} onSort={handleSort}>
               Nom
             </SortableTableHeader>
             <SortableTableHeader sortKey="email" sortConfig={sortConfig} onSort={handleSort}>
