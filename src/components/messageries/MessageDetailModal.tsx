@@ -14,6 +14,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
+import { useRef } from "react";
 
 interface MessageDetailModalProps {
   message: Messagerie | null;
@@ -57,11 +58,18 @@ export function MessageDetailModal({
 }: MessageDetailModalProps) {
   const [replies, setReplies] = useState<MessagerieReply[]>([]);
   const [loadingReplies, setLoadingReplies] = useState(false);
+  const processedMessageIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (message && open) {
+    if (message && open && message.id !== processedMessageIdRef.current) {
+      processedMessageIdRef.current = message.id;
       fetchReplies();
       markMessageAsRead();
+    }
+    
+    // Reset quand le modal se ferme
+    if (!open) {
+      processedMessageIdRef.current = null;
     }
   }, [message, open]);
 
