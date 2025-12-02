@@ -29,7 +29,6 @@ interface ClientDataValidationReportProps {
   validationResults: ValidationResults;
   onEditClient: () => void;
   onDismiss?: () => void;
-  onCreateQuoteAnyway?: () => void;
 }
 
 export function ClientDataValidationReport({
@@ -38,8 +37,7 @@ export function ClientDataValidationReport({
   client,
   validationResults,
   onEditClient,
-  onDismiss,
-  onCreateQuoteAnyway
+  onDismiss
 }: ClientDataValidationReportProps) {
   const hasIssues = 
     validationResults.missing.missingCount > 0 ||
@@ -139,19 +137,6 @@ export function ClientDataValidationReport({
           >
             ✏️ Corriger
           </Button>
-          
-          {/* Action principale : Créer le devis quand même */}
-          {validationResults.validation.errors.length === 0 && 
-           validationResults.missing.missingCount > 0 && 
-           onCreateQuoteAnyway && (
-            <Button 
-              onClick={onCreateQuoteAnyway}
-              size="lg"
-              className="bg-green-600 hover:bg-green-700 font-semibold px-8"
-            >
-              📄 Créer le devis
-            </Button>
-          )}
         </div>
       </DialogContent>
     </Dialog>
