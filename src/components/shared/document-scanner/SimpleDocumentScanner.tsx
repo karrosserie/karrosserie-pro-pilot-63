@@ -200,6 +200,9 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     };
   }, [startCamera, stopCamera]);
 
+  // Determine if this is a small format document (license, card, etc.)
+  const isSmallFormat = ['driver-license', 'insurance', 'violation'].includes(documentType || '');
+
   // Detection loop
   useEffect(() => {
     if (!isVideoPlaying || !isOpenCVReady) return;
@@ -214,7 +217,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     // Initialize scanner
     const scanner = new Jscanify();
     scannerRef.current = scanner;
-    console.log('[Detection] Starting loop');
+    console.log('[Detection] Starting loop, isSmallFormat:', isSmallFormat);
 
     const detectLoop = () => {
       if (video.readyState >= 2 && video.videoWidth > 0) {
@@ -227,9 +230,13 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         // Draw video frame
         ctx.drawImage(video, 0, 0);
 
-        // Highlight detected document (green contours)
+        // Highlight detected document (green contours) with adaptive detection
         try {
-          scanner.highlightPaper(canvas, { color: 'lime', thickness: 6 });
+          scanner.highlightPaper(canvas, { 
+            color: 'lime', 
+            thickness: 6,
+            isSmallFormat 
+          });
         } catch (err) {
           // Silent fail - detection continues
         }
@@ -246,7 +253,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         animationRef.current = null;
       }
     };
-  }, [isVideoPlaying, isOpenCVReady]);
+  }, [isVideoPlaying, isOpenCVReady, isSmallFormat]);
 
   // Capture document
   const handleCapture = useCallback(() => {
@@ -264,10 +271,11 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
 
     // Get dimensions based on document type
     const { width, height } = getExtractionDimensions(documentType);
-    console.log('[Capture] Extracting paper with dimensions:', width, 'x', height, 'for type:', documentType);
+    console.log('[Capture] Extracting paper with dimensions:', width, 'x', height, 'for type:', documentType, 'isSmallFormat:', isSmallFormat);
 
     try {
-      const extracted = scanner.extractPaper(canvas, width, height);
+      // Pass isSmallFormat for adaptive extraction
+      const extracted = scanner.extractPaper(canvas, width, height, undefined, isSmallFormat);
 
       if (extracted && extracted.width > 0) {
         console.log('[Capture] Extraction successful:', extracted.width, 'x', extracted.height);
@@ -292,7 +300,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       setPreviewDataUrl(dataUrl);
       setShowPreview(true);
     }
-  }, [toast, documentType]);
+  }, [toast, documentType, isSmallFormat]);
 
   // Validate captured document
   const handleValidate = useCallback(() => {
