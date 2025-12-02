@@ -16,6 +16,7 @@ import { ErrorMessage } from '@/components/ui/error-message';
 import { useToast } from '@/hooks/use-toast';
 import RepairOrderViewerModal from '@/components/repair-orders/RepairOrderViewerModal';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { UnsignedRepairOrderWarningDialog } from '@/components/repair-orders/UnsignedRepairOrderWarningDialog';
 import { useIsMobile } from '@/hooks/use-mobile';
 import RepairOrderMobileCard from '@/components/repair-orders/RepairOrderMobileCard';
 import { supabase } from '@/integrations/supabase/client';
@@ -39,6 +40,8 @@ const RepairOrders = () => {
   const [showArchived, setShowArchived] = useState(false);
   const [showInfoDialog, setShowInfoDialog] = useState(false);
   const [showSignedDialog, setShowSignedDialog] = useState(false);
+  const [showUnsignedWarning, setShowUnsignedWarning] = useState(false);
+  const [orderToConvert, setOrderToConvert] = useState<RepairOrder | null>(null);
   const {
     toast
   } = useToast();
@@ -499,6 +502,16 @@ const RepairOrders = () => {
     }
   };
   const handleConvertToInvoice = (order: RepairOrder) => {
+    // Si l'OR n'est pas signé, afficher l'avertissement
+    if (order.status !== 'Signé') {
+      setOrderToConvert(order);
+      setShowUnsignedWarning(true);
+      return;
+    }
+    proceedWithConversion(order);
+  };
+
+  const proceedWithConversion = (order: RepairOrder) => {
     // Préparer les données de la facture à partir de l'ordre de réparation
     const today = new Date().toISOString().split('T')[0];
     const prefilledData: Partial<Invoice> = {
@@ -738,6 +751,19 @@ const RepairOrders = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <UnsignedRepairOrderWarningDialog
+        open={showUnsignedWarning}
+        onOpenChange={setShowUnsignedWarning}
+        orderReference={orderToConvert?.reference}
+        onConfirm={() => {
+          if (orderToConvert) {
+            proceedWithConversion(orderToConvert);
+          }
+          setShowUnsignedWarning(false);
+          setOrderToConvert(null);
+        }}
+      />
     </div>;
 };
 export default RepairOrders;
