@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Combobox } from '@/components/ui/combobox';
+import { AutocompleteInput } from '@/components/ui/autocomplete-input';
 import { AmountInput } from '@/components/ui/amount-input';
 import { Wrench, Settings, Plus, Trash } from 'lucide-react';
 import { QuoteRepairItem, QuotePartItem } from './types';
@@ -273,11 +273,11 @@ export const QuoteRepairsAndPartsSection = ({
               {/* Repair items */}
               {repairs.map((repair) => (
                 <div key={repair.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
-                  <Combobox
+                  <AutocompleteInput
                     value={repair.description}
                     onChange={(value) => updateRepair(repair.id, 'description', value)}
                     options={REPAIR_DESIGNATIONS}
-                    placeholder="Désignation de la réparation"
+                    placeholder="Tapez pour rechercher une réparation..."
                     disabled={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
@@ -365,11 +365,11 @@ export const QuoteRepairsAndPartsSection = ({
               {/* Part items */}
               {parts.map((part) => (
                 <div key={part.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
-                  <Combobox
+                  <AutocompleteInput
                     value={part.description}
                     onChange={(value) => updatePart(part.id, 'description', value)}
                     options={partDesignations}
-                    placeholder="Désignation de la pièce"
+                    placeholder="Tapez pour rechercher une pièce..."
                     disabled={isReadOnly}
                     className={isReadOnly ? 'bg-gray-50' : ''}
                   />
