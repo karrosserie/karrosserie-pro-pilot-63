@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Combobox } from '@/components/ui/combobox';
 import { Settings, Plus, Trash } from 'lucide-react';
 import { PartItem } from './types';
-import { PART_DESIGNATIONS } from '@/constants/predefined-values';
+import { useAutomotivePartNames } from '@/hooks/use-automotive-parts';
 
 interface PartsSectionProps {
   parts: PartItem[];
@@ -14,6 +14,8 @@ interface PartsSectionProps {
 }
 
 export const PartsSection = ({ parts, onPartsChange, isReadOnly = false }: PartsSectionProps) => {
+  const { data: partDesignations = [] } = useAutomotivePartNames();
+
   const addPart = () => {
     if (isReadOnly) return;
     const newPart: PartItem = {
@@ -105,7 +107,7 @@ export const PartsSection = ({ parts, onPartsChange, isReadOnly = false }: Parts
                 <Combobox
                   value={part.description}
                   onChange={(value) => updatePart(part.id, 'description', value)}
-                  options={PART_DESIGNATIONS}
+                  options={partDesignations}
                   placeholder="Désignation de la pièce"
                   disabled={isReadOnly}
                   className={isReadOnly ? 'bg-gray-50' : ''}

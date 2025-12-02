@@ -7,23 +7,5 @@ export const REPAIR_DESIGNATIONS = [
   'Ingredients'
 ]
 
-// Valeurs prédéfinies pour les désignations de pièces
-export const PART_DESIGNATIONS = [
-  'Capot',
-  'Ailes avant',
-  'Phares',
-  'Calandre',
-  'Pare-chocs avant',
-  'Portières',
-  'Rétroviseurs extérieurs',
-  'Bas de caisse',
-  'Montants de portières',
-  'Hayon',
-  'Pare-chocs arrière',
-  'Feux arrière',
-  'Ailes arrière',
-  'Toit',
-  'Vitres latérales',
-  'Lunette arrière',
-  'Pare-brise'
-]
+// Note: Les désignations de pièces sont maintenant stockées dans la table automotive_parts
+// Utiliser le hook useAutomotivePartNames() pour les récupérer
