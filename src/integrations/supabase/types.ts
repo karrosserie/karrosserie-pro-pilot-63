@@ -1387,6 +1387,7 @@ export type Database = {
           email: string | null
           first_name: string | null
           id: string
+          insurance_representation_consent: boolean | null
           last_name: string | null
           license_issue_date: string | null
           license_number: string | null
@@ -1410,6 +1411,7 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id?: string
+          insurance_representation_consent?: boolean | null
           last_name?: string | null
           license_issue_date?: string | null
           license_number?: string | null
@@ -1433,6 +1435,7 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id?: string
+          insurance_representation_consent?: boolean | null
           last_name?: string | null
           license_issue_date?: string | null
           license_number?: string | null
@@ -2493,6 +2496,8 @@ export type Database = {
           insurance_email: string | null
           insurance_phone: string | null
           insurance_postal_code: string | null
+          insurance_status: string | null
+          last_reminder_at: string | null
           notes: string | null
           quote_id: string | null
           start_date: string
@@ -2524,6 +2529,8 @@ export type Database = {
           insurance_email?: string | null
           insurance_phone?: string | null
           insurance_postal_code?: string | null
+          insurance_status?: string | null
+          last_reminder_at?: string | null
           notes?: string | null
           quote_id?: string | null
           start_date: string
@@ -2555,6 +2562,8 @@ export type Database = {
           insurance_email?: string | null
           insurance_phone?: string | null
           insurance_postal_code?: string | null
+          insurance_status?: string | null
+          last_reminder_at?: string | null
           notes?: string | null
           quote_id?: string | null
           start_date?: string
@@ -5908,10 +5917,12 @@ export type Database = {
           color: string | null
           company_id: string | null
           complexity_level: string | null
+          constat_url: string | null
           created_at: string
           engine_number: string | null
           fuel_level: number | null
           id: string
+          insurance_card_url: string | null
           insurance_company_id: string | null
           insurance_expiry_date: string | null
           license_plate: string
@@ -5938,10 +5949,12 @@ export type Database = {
           color?: string | null
           company_id?: string | null
           complexity_level?: string | null
+          constat_url?: string | null
           created_at?: string
           engine_number?: string | null
           fuel_level?: number | null
           id?: string
+          insurance_card_url?: string | null
           insurance_company_id?: string | null
           insurance_expiry_date?: string | null
           license_plate: string
@@ -5968,10 +5981,12 @@ export type Database = {
           color?: string | null
           company_id?: string | null
           complexity_level?: string | null
+          constat_url?: string | null
           created_at?: string
           engine_number?: string | null
           fuel_level?: number | null
           id?: string
+          insurance_card_url?: string | null
           insurance_company_id?: string | null
           insurance_expiry_date?: string | null
           license_plate?: string

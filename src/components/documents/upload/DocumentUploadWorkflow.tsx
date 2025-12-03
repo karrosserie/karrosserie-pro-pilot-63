@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import DocumentUploadStep from "./DocumentUploadStep";
 import WhatsAppConsentStep from "./WhatsAppConsentStep";
+import InsuranceRepresentationConsentStep from "./InsuranceRepresentationConsentStep";
 import DocumentSkipInfoStep from "./DocumentSkipInfoStep";
 
 const ALL_DOCUMENT_STEPS = [
@@ -28,12 +29,28 @@ const ALL_DOCUMENT_STEPS = [
     description: "Veuillez photographier le verso de votre carte grise",
     documentType: "vehicle-registration",
     key: "registration_back"
+  },
+  {
+    title: "Carte verte d'assurance",
+    description: "Veuillez photographier votre carte verte d'assurance véhicule",
+    documentType: "insurance",
+    key: "insurance_card"
+  },
+  {
+    title: "Constat amiable",
+    description: "Veuillez photographier votre constat amiable d'accident",
+    documentType: "constat",
+    key: "constat"
   }
 ];
 
 interface DocumentUploadWorkflowProps {
   onBack: () => void;
-  onComplete: (documents: { [key: string]: File }, whatsappConsent: boolean) => void;
+  onComplete: (
+    documents: { [key: string]: File }, 
+    whatsappConsent: boolean,
+    insuranceRepresentationConsent: boolean
+  ) => void;
   missingDocuments: string[];
   availableDocuments: string[];
   tokenData: {
@@ -53,50 +70,78 @@ export default function DocumentUploadWorkflow({
   const [documents, setDocuments] = useState<{ [key: string]: File }>({});
   const [documentBlobs, setDocumentBlobs] = useState<{ [key: string]: ArrayBuffer }>({});
   const [whatsappConsent, setWhatsappConsent] = useState<boolean | null>(null);
+  const [insuranceConsent, setInsuranceConsent] = useState<boolean | null>(null);
 
   // Filtrer les étapes selon les documents manquants
   const documentSteps = useMemo(() => {
     return ALL_DOCUMENT_STEPS.filter(step => missingDocuments.includes(step.key));
   }, [missingDocuments]);
 
-  // Calculer le nombre total d'étapes (info skip + documents + WhatsApp)
+  // Calculer le nombre total d'étapes (info skip + documents + WhatsApp + Insurance consent)
   const hasSkippedDocuments = availableDocuments.length > 0;
-  const totalSteps = documentSteps.length + 1 + (hasSkippedDocuments ? 1 : 0);
+  // 2 étapes de consentement : WhatsApp + Insurance
+  const totalSteps = documentSteps.length + 2 + (hasSkippedDocuments ? 1 : 0);
 
-  // Si aucun document n'est manquant, mais qu'il y a des documents disponibles, afficher l'info puis WhatsApp
+  // Si aucun document n'est manquant, mais qu'il y a des documents disponibles, afficher l'info puis les consentements
   if (documentSteps.length === 0 && hasSkippedDocuments) {
     if (currentStep === 0) {
       return (
         <DocumentSkipInfoStep
           step={1}
-          totalSteps={2}
+          totalSteps={3}
           availableDocuments={availableDocuments}
           onNext={() => setCurrentStep(1)}
           onBack={onBack}
         />
       );
-    } else {
+    } else if (currentStep === 1) {
       return (
         <WhatsAppConsentStep
           step={2}
-          totalSteps={2}
-          onNext={(consent) => onComplete({}, consent)}
+          totalSteps={3}
+          onNext={(consent) => {
+            setWhatsappConsent(consent);
+            setCurrentStep(2);
+          }}
           onBack={() => setCurrentStep(0)}
+        />
+      );
+    } else {
+      return (
+        <InsuranceRepresentationConsentStep
+          step={3}
+          totalSteps={3}
+          onNext={(consent) => onComplete({}, whatsappConsent ?? false, consent)}
+          onBack={() => setCurrentStep(1)}
         />
       );
     }
   }
 
-  // Si aucun document n'est manquant et aucun document disponible, afficher directement l'étape WhatsApp
+  // Si aucun document n'est manquant et aucun document disponible, afficher les étapes de consentement
   if (documentSteps.length === 0) {
-    return (
-      <WhatsAppConsentStep
-        step={1}
-        totalSteps={1}
-        onNext={(consent) => onComplete({}, consent)}
-        onBack={onBack}
-      />
-    );
+    if (currentStep === 0) {
+      return (
+        <WhatsAppConsentStep
+          step={1}
+          totalSteps={2}
+          onNext={(consent) => {
+            setWhatsappConsent(consent);
+            setCurrentStep(1);
+          }}
+          onBack={onBack}
+        />
+      );
+    } else {
+      return (
+        <InsuranceRepresentationConsentStep
+          step={2}
+          totalSteps={2}
+          onNext={(consent) => onComplete({}, whatsappConsent ?? false, consent)}
+          onBack={() => setCurrentStep(0)}
+        />
+      );
+    }
   }
 
   const handleNext = async (file: File) => {
@@ -147,9 +192,16 @@ export default function DocumentUploadWorkflow({
 
   const handleWhatsAppConsent = (consent: boolean) => {
     setWhatsappConsent(consent);
+    // Passer à l'étape Insurance consent
+    setCurrentStep(currentStep + 1);
+  };
+
+  const handleInsuranceConsent = (consent: boolean) => {
+    setInsuranceConsent(consent);
     
-    console.log('[UPLOAD DEBUG] handleWhatsAppConsent called', {
-      consent,
+    console.log('[UPLOAD DEBUG] handleInsuranceConsent called', {
+      insuranceConsent: consent,
+      whatsappConsent,
       documentBlobsKeys: Object.keys(documentBlobs),
       documentsKeys: Object.keys(documents)
     });
@@ -186,7 +238,7 @@ export default function DocumentUploadWorkflow({
       }))
     });
     
-    onComplete(validDocuments, consent);
+    onComplete(validDocuments, whatsappConsent ?? false, consent);
   };
 
   const handleBack = () => {
@@ -219,12 +271,24 @@ export default function DocumentUploadWorkflow({
   const adjustedStep = hasSkippedDocuments ? currentStep - 1 : currentStep;
 
   // Vérifier si nous sommes à l'étape WhatsApp (après tous les documents)
-  if (adjustedStep >= documentSteps.length) {
+  if (adjustedStep === documentSteps.length) {
     return (
       <WhatsAppConsentStep
         step={currentStep + 1}
         totalSteps={totalSteps}
         onNext={handleWhatsAppConsent}
+        onBack={handleBack}
+      />
+    );
+  }
+
+  // Vérifier si nous sommes à l'étape Insurance consent (après WhatsApp)
+  if (adjustedStep === documentSteps.length + 1) {
+    return (
+      <InsuranceRepresentationConsentStep
+        step={currentStep + 1}
+        totalSteps={totalSteps}
+        onNext={handleInsuranceConsent}
         onBack={handleBack}
       />
     );
