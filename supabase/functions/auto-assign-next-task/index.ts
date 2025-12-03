@@ -12,6 +12,67 @@ interface TaskType {
   vehicle_id: string;
   company_id: string;
   user_id: string;
+  parent_task_id?: string | null;
+  part_number?: number;
+  total_parts?: number;
+  total_duration_minutes?: number;
+  is_splittable?: boolean;
+}
+
+// Tâches fractionnables
+const SPLITTABLE_TASKS = [
+  'Accueil & Préparation du dossier',
+  'Remplacement ou débosselage',
+  'Contrôle technique de sécurité',
+  'Finitions & remontage'
+];
+
+// Durée minimum d'une partie fractionnée (en minutes)
+const MIN_SPLIT_DURATION = 60;
+
+/**
+ * Vérifie si un type de tâche est fractionnable
+ */
+function isSplittableTask(taskType: string): boolean {
+  return SPLITTABLE_TASKS.includes(taskType);
+}
+
+/**
+ * Calcule les minutes restantes avant la fin de journée (17h)
+ */
+function getRemainingMinutesToday(currentTime: Date): number {
+  const workEnd = new Date(currentTime);
+  workEnd.setHours(17, 0, 0, 0);
+  
+  if (currentTime >= workEnd) {
+    return 0;
+  }
+  
+  return Math.floor((workEnd.getTime() - currentTime.getTime()) / (60 * 1000));
+}
+
+/**
+ * Vérifie si une tâche doit être fractionnée
+ */
+function shouldSplitTask(taskType: string, availableMinutes: number, totalDuration: number): boolean {
+  if (!isSplittableTask(taskType)) {
+    return false;
+  }
+  
+  // Fractionner si:
+  // - Le temps disponible est insuffisant pour la tâche complète
+  // - MAIS le temps disponible est >= 60 minutes (minimum pour une partie)
+  return availableMinutes < totalDuration && availableMinutes >= MIN_SPLIT_DURATION;
+}
+
+/**
+ * Calcule la répartition des parties d'une tâche fractionnée
+ */
+function calculateSplitParts(totalDuration: number, availableMinutes: number): { part1: number; part2: number } {
+  const part1 = Math.min(availableMinutes, totalDuration);
+  const part2 = totalDuration - part1;
+  
+  return { part1, part2 };
 }
 
 serve(async (req: Request) => {
@@ -124,7 +185,153 @@ serve(async (req: Request) => {
       );
     }
 
-    // 2. VÉRIFICATION CRITIQUE: Si c'est une tâche d'urgence, NE PAS continuer le workflow
+    // 2.1 VÉRIFIER SI C'EST UNE PARTIE D'UNE TÂCHE FRACTIONNÉE
+    if (completedTask.part_number && completedTask.total_parts && completedTask.part_number < completedTask.total_parts) {
+      console.log(`🔗 Task is part ${completedTask.part_number}/${completedTask.total_parts} - checking for next part`);
+      
+      const parentId = completedTask.parent_task_id || completedTask.id;
+      
+      // Chercher la partie suivante
+      const { data: nextParts, error: nextPartError } = await supabase
+        .from('employee_schedule')
+        .select('*')
+        .or(`parent_task_id.eq.${parentId},id.eq.${parentId}`)
+        .eq('company_id', companyId)
+        .eq('part_number', completedTask.part_number + 1)
+        .neq('status', 'Terminé')
+        .limit(1);
+      
+      if (nextPartError) {
+        console.error('❌ Error fetching next part:', nextPartError);
+      }
+      
+      if (nextParts && nextParts.length > 0) {
+        const nextPart = nextParts[0];
+        const now = new Date();
+        const remainingMinutes = getRemainingMinutesToday(now);
+        
+        // Calculer la durée de la partie suivante en minutes
+        const nextPartStart = new Date(nextPart.start_datetime);
+        const nextPartEnd = new Date(nextPart.end_datetime);
+        const nextPartDuration = Math.floor((nextPartEnd.getTime() - nextPartStart.getTime()) / (60 * 1000));
+        
+        console.log(`⏱️ Remaining time today: ${remainingMinutes}min, Next part duration: ${nextPartDuration}min`);
+        
+        if (remainingMinutes >= nextPartDuration) {
+          // Assez de temps - remonter la partie suivante immédiatement
+          console.log(`✅ Enough time to move up Part ${nextPart.part_number} - starting now`);
+          
+          const newEndTime = new Date(now.getTime() + nextPartDuration * 60 * 1000);
+          
+          const { error: updateError } = await supabase
+            .from('employee_schedule')
+            .update({
+              start_datetime: now.toISOString(),
+              end_datetime: newEndTime.toISOString(),
+              status: 'En cours',
+              real_start_datetime: now.toISOString()
+            })
+            .eq('id', nextPart.id);
+          
+          if (updateError) {
+            console.error('❌ Error moving up next part:', updateError);
+          } else {
+            console.log(`✅ Part ${nextPart.part_number} moved up and started`);
+            
+            return new Response(
+              JSON.stringify({
+                success: true,
+                movedUpPartId: nextPart.id,
+                partNumber: nextPart.part_number,
+                message: `Part ${nextPart.part_number} started immediately`
+              }),
+              { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+        } else if (remainingMinutes >= MIN_SPLIT_DURATION) {
+          // Temps insuffisant mais >= 60min - fractionner à nouveau
+          console.log(`⚡ Partially moving up Part ${nextPart.part_number} (${remainingMinutes}min available)`);
+          
+          const newPart2Duration = nextPartDuration - remainingMinutes;
+          
+          // Mettre à jour la partie actuelle pour utiliser le temps disponible
+          const newEndTime = new Date(now.getTime() + remainingMinutes * 60 * 1000);
+          
+          await supabase
+            .from('employee_schedule')
+            .update({
+              start_datetime: now.toISOString(),
+              end_datetime: newEndTime.toISOString(),
+              status: 'En cours',
+              real_start_datetime: now.toISOString(),
+              total_parts: nextPart.total_parts + 1
+            })
+            .eq('id', nextPart.id);
+          
+          // Créer une nouvelle partie pour le reste demain
+          const tomorrow = new Date(now);
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          tomorrow.setHours(8, 0, 0, 0);
+          
+          // Éviter le weekend
+          if (tomorrow.getDay() === 0) tomorrow.setDate(tomorrow.getDate() + 1);
+          if (tomorrow.getDay() === 6) tomorrow.setDate(tomorrow.getDate() + 2);
+          
+          const newPartEnd = new Date(tomorrow.getTime() + newPart2Duration * 60 * 1000);
+          
+          await supabase
+            .from('employee_schedule')
+            .insert({
+              company_id: companyId,
+              user_id: nextPart.user_id, // Même employé obligatoire
+              vehicle_id: nextPart.vehicle_id,
+              task_type: nextPart.task_type,
+              start_datetime: tomorrow.toISOString(),
+              end_datetime: newPartEnd.toISOString(),
+              status: 'En attente',
+              parent_task_id: nextPart.parent_task_id || completedTask.id,
+              part_number: nextPart.part_number + 1,
+              total_parts: nextPart.total_parts + 1,
+              total_duration_minutes: nextPart.total_duration_minutes,
+              is_splittable: true
+            });
+          
+          // Mettre à jour total_parts sur toutes les parties liées
+          await supabase
+            .from('employee_schedule')
+            .update({ total_parts: nextPart.total_parts + 1 })
+            .or(`parent_task_id.eq.${nextPart.parent_task_id || completedTask.id},id.eq.${nextPart.parent_task_id || completedTask.id}`)
+            .eq('company_id', companyId);
+          
+          console.log(`✅ Part ${nextPart.part_number} partially started, Part ${nextPart.part_number + 1} created for tomorrow`);
+          
+          return new Response(
+            JSON.stringify({
+              success: true,
+              movedUpPartId: nextPart.id,
+              newPartCreated: true,
+              message: `Part ${nextPart.part_number} partially moved up, new part created for tomorrow`
+            }),
+            { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        } else {
+          // Pas assez de temps (<60min) - la partie suivante reste programmée pour demain
+          console.log(`⏳ Not enough time today (${remainingMinutes}min < ${MIN_SPLIT_DURATION}min) - Part ${nextPart.part_number} stays scheduled for tomorrow`);
+          
+          return new Response(
+            JSON.stringify({
+              success: true,
+              nextPartId: nextPart.id,
+              scheduledFor: nextPart.start_datetime,
+              message: `Part ${nextPart.part_number} will continue tomorrow as scheduled`
+            }),
+            { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      }
+    }
+
+    // 2.2 VÉRIFICATION CRITIQUE: Si c'est une tâche d'urgence, NE PAS continuer le workflow
     if (completedTask.is_emergency === true) {
       console.log('🚨 EMERGENCY TASK COMPLETED - Workflow will NOT continue (emergency tasks are standalone)');
       
@@ -285,7 +492,8 @@ serve(async (req: Request) => {
           start_datetime: startTime.toISOString(),
           end_datetime: endTime.toISOString(),
           status: 'En attente',
-          waiting_reason: `Aucun employé qualifié disponible pour: ${nextTaskType}`
+          waiting_reason: `Aucun employé qualifié disponible pour: ${nextTaskType}`,
+          is_splittable: isSplittableTask(nextTaskType)
         })
         .select()
         .single();
@@ -373,12 +581,140 @@ serve(async (req: Request) => {
       );
     }
 
-    // Pour les autres étapes, assigner automatiquement comme avant
+    // 5. LOGIQUE DE FRACTIONNEMENT INTELLIGENT
+    // Calculer la durée estimée de la tâche (en minutes)
+    const estimatedDurationMinutes = 2 * 60; // 2 heures par défaut, peut être ajusté dynamiquement
+    
+    const now = new Date();
+    const remainingMinutesToday = getRemainingMinutesToday(now);
+    
+    console.log(`⏱️ Task duration: ${estimatedDurationMinutes}min, Remaining today: ${remainingMinutesToday}min, Splittable: ${isSplittableTask(nextTaskType)}`);
+    
+    // Vérifier si on doit fractionner
+    if (shouldSplitTask(nextTaskType, remainingMinutesToday, estimatedDurationMinutes)) {
+      console.log(`🔀 SPLITTING TASK: ${nextTaskType} into multiple parts`);
+      
+      const { part1, part2 } = calculateSplitParts(estimatedDurationMinutes, remainingMinutesToday);
+      
+      console.log(`📊 Split calculation: Part 1 = ${part1}min, Part 2 = ${part2}min`);
+      
+      // Créer la Partie 1 pour aujourd'hui
+      const part1Start = new Date();
+      const part1End = new Date(part1Start.getTime() + part1 * 60 * 1000);
+      
+      const { data: part1Task, error: part1Error } = await supabase
+        .from('employee_schedule')
+        .insert({
+          company_id: companyId,
+          user_id: selectedEmployee.user_id,
+          vehicle_id: completedTask.vehicle_id,
+          task_type: nextTaskType,
+          start_datetime: part1Start.toISOString(),
+          end_datetime: part1End.toISOString(),
+          status: 'En attente',
+          part_number: 1,
+          total_parts: 2,
+          total_duration_minutes: estimatedDurationMinutes,
+          is_splittable: true
+        })
+        .select()
+        .single();
+      
+      if (part1Error) {
+        console.error('❌ Error creating Part 1:', part1Error);
+        return new Response(
+          JSON.stringify({ error: 'Failed to create Part 1' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      console.log(`✅ Part 1 created: ${part1Task.id}`);
+      
+      // Créer la Partie 2 pour demain
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(8, 0, 0, 0);
+      
+      // Éviter le weekend
+      if (tomorrow.getDay() === 0) tomorrow.setDate(tomorrow.getDate() + 1);
+      if (tomorrow.getDay() === 6) tomorrow.setDate(tomorrow.getDate() + 2);
+      
+      const part2Start = new Date(tomorrow);
+      const part2End = new Date(part2Start.getTime() + part2 * 60 * 1000);
+      
+      const { data: part2Task, error: part2Error } = await supabase
+        .from('employee_schedule')
+        .insert({
+          company_id: companyId,
+          user_id: selectedEmployee.user_id, // MÊME EMPLOYÉ obligatoire
+          vehicle_id: completedTask.vehicle_id,
+          task_type: nextTaskType,
+          start_datetime: part2Start.toISOString(),
+          end_datetime: part2End.toISOString(),
+          status: 'En attente',
+          parent_task_id: part1Task.id, // Lier à la Partie 1
+          part_number: 2,
+          total_parts: 2,
+          total_duration_minutes: estimatedDurationMinutes,
+          is_splittable: true
+        })
+        .select()
+        .single();
+      
+      if (part2Error) {
+        console.error('❌ Error creating Part 2:', part2Error);
+        // Nettoyer Part 1 si Part 2 échoue
+        await supabase.from('employee_schedule').delete().eq('id', part1Task.id);
+        return new Response(
+          JSON.stringify({ error: 'Failed to create Part 2' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      console.log(`✅ Part 2 created: ${part2Task.id}`);
+      
+      // Créer une notification
+      try {
+        await supabase
+          .from('system_alerts')
+          .insert({
+            company_id: companyId,
+            entity_type: 'task',
+            employee_id: selectedEmployee.user_id,
+            vehicle_id: completedTask.vehicle_id,
+            alert_type: 'task_split',
+            title: 'Tâche fractionnée',
+            message: `${nextTaskType} divisée en 2 parties: ${part1}min aujourd'hui, ${part2}min demain`,
+            reason: 'Temps insuffisant pour compléter en une fois'
+          });
+      } catch (notifError) {
+        console.error('⚠️ Error creating notification:', notifError);
+      }
+      
+      return new Response(
+        JSON.stringify({
+          success: true,
+          taskSplit: true,
+          part1TaskId: part1Task.id,
+          part2TaskId: part2Task.id,
+          nextTaskType,
+          assignedEmployeeId: selectedEmployee.user_id,
+          splitDetails: {
+            part1Duration: part1,
+            part2Duration: part2,
+            totalDuration: estimatedDurationMinutes
+          }
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Pas de fractionnement nécessaire - créer la tâche normalement
     const { startTime, endTime } = await findNextAvailableSlotForEmployee(
       supabase, 
       selectedEmployee.user_id, 
       companyId, 
-      2 * 60 * 60 * 1000 // 2 heures en millisecondes
+      estimatedDurationMinutes * 60 * 1000 // Convertir en millisecondes
     );
     
     const { data: newTask, error: createError } = await supabase
@@ -390,7 +726,8 @@ serve(async (req: Request) => {
         task_type: nextTaskType,
         start_datetime: startTime.toISOString(),
         end_datetime: endTime.toISOString(),
-        status: 'En attente'
+        status: 'En attente',
+        is_splittable: isSplittableTask(nextTaskType)
       })
       .select()
       .single();
