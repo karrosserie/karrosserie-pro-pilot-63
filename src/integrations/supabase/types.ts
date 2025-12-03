@@ -2022,12 +2022,17 @@ export type Database = {
           id: string
           interrupted_by: string | null
           is_emergency: boolean | null
+          is_splittable: boolean | null
           paint_brand: string | null
+          parent_task_id: string | null
+          part_number: number | null
           real_end_datetime: string | null
           real_start_datetime: string | null
           start_datetime: string
           status: Database["public"]["Enums"]["task_status"]
           task_type: Database["public"]["Enums"]["schedule_task_type"]
+          total_duration_minutes: number | null
+          total_parts: number | null
           updated_at: string
           urgency_notes: string | null
           user_id: string
@@ -2043,12 +2048,17 @@ export type Database = {
           id?: string
           interrupted_by?: string | null
           is_emergency?: boolean | null
+          is_splittable?: boolean | null
           paint_brand?: string | null
+          parent_task_id?: string | null
+          part_number?: number | null
           real_end_datetime?: string | null
           real_start_datetime?: string | null
           start_datetime: string
           status?: Database["public"]["Enums"]["task_status"]
           task_type: Database["public"]["Enums"]["schedule_task_type"]
+          total_duration_minutes?: number | null
+          total_parts?: number | null
           updated_at?: string
           urgency_notes?: string | null
           user_id: string
@@ -2064,12 +2074,17 @@ export type Database = {
           id?: string
           interrupted_by?: string | null
           is_emergency?: boolean | null
+          is_splittable?: boolean | null
           paint_brand?: string | null
+          parent_task_id?: string | null
+          part_number?: number | null
           real_end_datetime?: string | null
           real_start_datetime?: string | null
           start_datetime?: string
           status?: Database["public"]["Enums"]["task_status"]
           task_type?: Database["public"]["Enums"]["schedule_task_type"]
+          total_duration_minutes?: number | null
+          total_parts?: number | null
           updated_at?: string
           urgency_notes?: string | null
           user_id?: string
@@ -2101,6 +2116,13 @@ export type Database = {
           {
             foreignKeyName: "employee_schedule_interrupted_by_fkey"
             columns: ["interrupted_by"]
+            isOneToOne: false
+            referencedRelation: "employee_schedule"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_schedule_parent_task_id_fkey"
+            columns: ["parent_task_id"]
             isOneToOne: false
             referencedRelation: "employee_schedule"
             referencedColumns: ["id"]

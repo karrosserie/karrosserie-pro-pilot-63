@@ -22,6 +22,12 @@ export interface PlanningTache {
   user_id?: string;
   waiting_reason?: string;
   updated_at?: string;
+  // Champs pour le fractionnement des tâches
+  parent_task_id?: string | null;
+  part_number?: number;
+  total_parts?: number;
+  total_duration_minutes?: number;
+  is_splittable?: boolean;
 }
 
 export const usePlanningTasks = (companyId: string | null) => {
@@ -93,7 +99,13 @@ export const usePlanningTasks = (companyId: string | null) => {
             dateCreation: task.dateCreation || new Date(), // Date par défaut si manquante
             dateAssignation: task.dateAssignation || new Date().toISOString().split('T')[0], // Date par défaut si manquante
             jour: dayKey, // Utiliser la clé du jour comme jour
-            user_id: task.user_id // Garder le user_id pour l'association
+            user_id: task.user_id, // Garder le user_id pour l'association
+            // Champs de fractionnement
+            parent_task_id: task.parent_task_id,
+            part_number: task.part_number,
+            total_parts: task.total_parts,
+            total_duration_minutes: task.total_duration_minutes,
+            is_splittable: task.is_splittable
           };
           
           console.log('📝 Converting task:', {
@@ -164,7 +176,13 @@ export const usePlanningTasks = (companyId: string | null) => {
             jour: dayKey,
             user_id: task.user_id,
             waiting_reason: task.waiting_reason,
-            updated_at: task.updated_at
+            updated_at: task.updated_at,
+            // Champs de fractionnement
+            parent_task_id: task.parent_task_id,
+            part_number: task.part_number,
+            total_parts: task.total_parts,
+            total_duration_minutes: task.total_duration_minutes,
+            is_splittable: task.is_splittable
           };
           
           allTasks.push(planningTache);

@@ -21,6 +21,12 @@ export interface PlanningTask {
   vehicle_id?: string; // Ajout du vehicle_id pour les jointures
   waiting_reason?: string; // Ajout de la raison d'attente
   updated_at?: string; // Ajout de la date de mise à jour
+  // Champs pour le fractionnement des tâches
+  parent_task_id?: string | null;
+  part_number?: number;
+  total_parts?: number;
+  total_duration_minutes?: number;
+  is_splittable?: boolean;
 }
 
 export interface PlanningDay {
@@ -173,13 +179,19 @@ export const useRealPlanningData = (companyId: string | null) => {
           vehicle
         });
         
+        // Générer le nom de la tâche avec info de partie si fractionnée
+        let taskName = getTaskName(item.task_type);
+        if (item.total_parts && item.total_parts > 1) {
+          taskName = `${taskName} (Partie ${item.part_number || 1}/${item.total_parts})`;
+        }
+        
         const task: PlanningTask = {
           id: item.id,
           vehicule: vehicle?.license_plate || `Véhicule-${item.id}`,
           modele: `${brandName} ${modelName}`.trim() || 'Véhicule',
           heure: `${startDate.getHours()}h${startDate.getMinutes() > 0 ? startDate.getMinutes() : ''}-${endDate.getHours()}h${endDate.getMinutes() > 0 ? endDate.getMinutes() : ''}`,
           technicien: technicienName,
-          tache: getTaskName(item.task_type),
+          tache: taskName,
           etape: item.task_type || 'accueil',
           client: clientName || 'Client non défini',
           status: mapTaskStatus(item.status),
@@ -190,7 +202,13 @@ export const useRealPlanningData = (companyId: string | null) => {
           duree: Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60)), // Durée en heures
           jour: dayOfWeek,
           user_id: item.user_id, // Important : conserver le user_id pour l'association
-          vehicle_id: item.vehicle_id // IMPORTANT: Ajouter le vehicle_id pour les jointures
+          vehicle_id: item.vehicle_id, // IMPORTANT: Ajouter le vehicle_id pour les jointures
+          // Champs de fractionnement
+          parent_task_id: item.parent_task_id,
+          part_number: item.part_number,
+          total_parts: item.total_parts,
+          total_duration_minutes: item.total_duration_minutes,
+          is_splittable: item.is_splittable
         };
 
         if (planningByDay[dayOfWeek]) {

@@ -3,6 +3,24 @@ import { supabase } from '@/integrations/supabase/client';
 // Types de complexité
 export type ComplexityLevel = 'leger' | 'moyen' | 'lourd';
 
+// Tâches fractionnables - peuvent être divisées sur plusieurs jours
+export const SPLITTABLE_TASKS = [
+  'Accueil & Préparation du dossier',
+  'Remplacement ou débosselage',
+  'Contrôle technique de sécurité',
+  'Finitions & remontage'
+];
+
+// Durée minimum d'une partie fractionnée (en minutes)
+export const MIN_SPLIT_DURATION = 60; // 1 heure minimum
+
+/**
+ * Vérifie si un type de tâche est fractionnable
+ */
+export function isSplittableTask(taskType: string): boolean {
+  return SPLITTABLE_TASKS.includes(taskType);
+}
+
 // Durées de base par phase (en minutes) basées sur le PDF - Sinistre MOYEN (18h total)
 const BASE_DURATIONS = {
   'Accueil & Préparation du dossier': 108,  // 10% = 1h48
