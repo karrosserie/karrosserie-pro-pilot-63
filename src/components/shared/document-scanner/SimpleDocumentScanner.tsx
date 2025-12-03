@@ -327,14 +327,19 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   }, [previewDataUrl, stopCamera, onCapture, toast]);
 
   // Retake photo
-  const handleRetake = useCallback(() => {
+  const handleRetake = useCallback(async () => {
     setShowPreview(false);
     setPreviewDataUrl(null);
+    setIsVideoPlaying(false);
+    
     // Reset stabilizer for fresh detection on retake
     if (scannerRef.current) {
       scannerRef.current.resetStabilizer();
     }
-  }, []);
+    
+    // Restart camera to reconnect stream
+    await startCamera();
+  }, [startCamera]);
 
   // Handle close
   const handleClose = useCallback(() => {
