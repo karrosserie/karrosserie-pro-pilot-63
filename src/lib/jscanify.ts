@@ -3,6 +3,7 @@
  * Adapted from https://github.com/nicksypark/jscanify (MIT License)
  * Converted to ES module with explicit window.cv access
  * Enhanced with adaptive detection for small documents (licenses, cards)
+ * Added temporal stabilization for smooth contour display
  */
 
 function distance(p1: { x: number; y: number }, p2: { x: number; y: number }): number {
@@ -15,7 +16,144 @@ export interface ScanOptions {
   isSmallFormat?: boolean;
 }
 
+export interface CornerPoints {
+  topLeft: { x: number; y: number };
+  topRight: { x: number; y: number };
+  bottomLeft: { x: number; y: number };
+  bottomRight: { x: number; y: number };
+}
+
+/**
+ * ContourStabilizer - Temporal smoothing for stable contour display
+ * Uses weighted averaging over multiple frames with hysteresis
+ */
+class ContourStabilizer {
+  private history: CornerPoints[] = [];
+  private lastDrawnPoints: CornerPoints | null = null;
+  private framesWithoutDetection = 0;
+  
+  // Configuration
+  private readonly HISTORY_SIZE = 5;
+  private readonly MIN_MOVEMENT_THRESHOLD = 8; // pixels
+  private readonly DISAPPEAR_THRESHOLD = 3; // frames before contour disappears
+  
+  /**
+   * Add a new detection to the history
+   */
+  addDetection(points: CornerPoints | null): void {
+    if (points) {
+      this.framesWithoutDetection = 0;
+      this.history.push(points);
+      
+      // Keep only the last HISTORY_SIZE frames
+      if (this.history.length > this.HISTORY_SIZE) {
+        this.history.shift();
+      }
+    } else {
+      this.framesWithoutDetection++;
+    }
+  }
+  
+  /**
+   * Get stabilized corner points with weighted average
+   * Returns null if no stable detection or if detection disappeared
+   */
+  getStabilizedPoints(): CornerPoints | null {
+    // If too many frames without detection, clear and return null
+    if (this.framesWithoutDetection >= this.DISAPPEAR_THRESHOLD) {
+      this.lastDrawnPoints = null;
+      this.history = [];
+      return null;
+    }
+    
+    // If no history but within hysteresis window, return last drawn points
+    if (this.history.length === 0) {
+      return this.lastDrawnPoints;
+    }
+    
+    // Calculate weighted average (recent frames have more weight)
+    const weights = this.history.map((_, i) => i + 1); // 1, 2, 3, 4, 5
+    const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+    
+    const averaged: CornerPoints = {
+      topLeft: { x: 0, y: 0 },
+      topRight: { x: 0, y: 0 },
+      bottomLeft: { x: 0, y: 0 },
+      bottomRight: { x: 0, y: 0 }
+    };
+    
+    const corners: (keyof CornerPoints)[] = ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'];
+    
+    for (const corner of corners) {
+      let weightedX = 0;
+      let weightedY = 0;
+      
+      for (let i = 0; i < this.history.length; i++) {
+        weightedX += this.history[i][corner].x * weights[i];
+        weightedY += this.history[i][corner].y * weights[i];
+      }
+      
+      averaged[corner] = {
+        x: Math.round(weightedX / totalWeight),
+        y: Math.round(weightedY / totalWeight)
+      };
+    }
+    
+    // Check if movement exceeds threshold (only redraw if significant change)
+    if (this.lastDrawnPoints && !this.hasSignificantMovement(this.lastDrawnPoints, averaged)) {
+      return this.lastDrawnPoints;
+    }
+    
+    this.lastDrawnPoints = averaged;
+    return averaged;
+  }
+  
+  /**
+   * Check if the movement between two sets of corners exceeds the threshold
+   */
+  private hasSignificantMovement(prev: CornerPoints, curr: CornerPoints): boolean {
+    const corners: (keyof CornerPoints)[] = ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'];
+    
+    for (const corner of corners) {
+      const dist = distance(prev[corner], curr[corner]);
+      if (dist > this.MIN_MOVEMENT_THRESHOLD) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+  
+  /**
+   * Get confidence level based on detection stability (0-1)
+   */
+  getConfidence(): number {
+    if (this.history.length === 0) {
+      return this.lastDrawnPoints ? 0.3 : 0;
+    }
+    
+    // Higher confidence with more consecutive detections
+    const detectionConfidence = Math.min(this.history.length / this.HISTORY_SIZE, 1);
+    
+    // Lower confidence if we're in hysteresis (no recent detection)
+    const hysteresisConfidence = this.framesWithoutDetection === 0 ? 1 : 0.5;
+    
+    return detectionConfidence * hysteresisConfidence;
+  }
+  
+  /**
+   * Reset the stabilizer state
+   */
+  reset(): void {
+    this.history = [];
+    this.lastDrawnPoints = null;
+    this.framesWithoutDetection = 0;
+  }
+}
+
 export class Jscanify {
+  private stabilizer: ContourStabilizer = new ContourStabilizer();
+  
   private getCV(): any {
     const cv = (window as any).cv;
     if (!cv) {
@@ -186,7 +324,7 @@ export class Jscanify {
   /**
    * Get corner points from a contour
    */
-  getCornerPoints(contour: any): { topLeft: any; topRight: any; bottomLeft: any; bottomRight: any } | null {
+  getCornerPoints(contour: any): CornerPoints | null {
     if (!contour || contour.rows !== 4) {
       return null;
     }
@@ -216,7 +354,7 @@ export class Jscanify {
   }
 
   /**
-   * Highlights the paper on the image/canvas
+   * Highlights the paper on the image/canvas with temporal stabilization
    */
   highlightPaper(image: HTMLCanvasElement | HTMLImageElement, options?: ScanOptions): HTMLCanvasElement | null {
     const cv = this.getCV();
@@ -242,21 +380,33 @@ export class Jscanify {
       img = cv.imread(canvas);
       contour = this.findPaperContour(img, isSmallFormat);
       
-      if (contour) {
+      // Get raw corner points from current frame
+      const rawPoints = contour ? this.getCornerPoints(contour) : null;
+      
+      // Add to stabilizer and get smoothed points
+      this.stabilizer.addDetection(rawPoints);
+      const stabilizedPoints = this.stabilizer.getStabilizedPoints();
+      const confidence = this.stabilizer.getConfidence();
+      
+      if (stabilizedPoints) {
         const ctx = canvas.getContext('2d');
         if (ctx) {
-          const points = this.getCornerPoints(contour);
-          if (points) {
-            ctx.strokeStyle = color;
-            ctx.lineWidth = thickness;
-            ctx.beginPath();
-            ctx.moveTo(points.topLeft.x, points.topLeft.y);
-            ctx.lineTo(points.topRight.x, points.topRight.y);
-            ctx.lineTo(points.bottomRight.x, points.bottomRight.y);
-            ctx.lineTo(points.bottomLeft.x, points.bottomLeft.y);
-            ctx.closePath();
-            ctx.stroke();
-          }
+          // Adjust visual style based on confidence
+          ctx.strokeStyle = color;
+          ctx.lineWidth = thickness;
+          // Higher confidence = more opaque
+          ctx.globalAlpha = 0.5 + (confidence * 0.5); // Range: 0.5 to 1.0
+          
+          ctx.beginPath();
+          ctx.moveTo(stabilizedPoints.topLeft.x, stabilizedPoints.topLeft.y);
+          ctx.lineTo(stabilizedPoints.topRight.x, stabilizedPoints.topRight.y);
+          ctx.lineTo(stabilizedPoints.bottomRight.x, stabilizedPoints.bottomRight.y);
+          ctx.lineTo(stabilizedPoints.bottomLeft.x, stabilizedPoints.bottomLeft.y);
+          ctx.closePath();
+          ctx.stroke();
+          
+          // Reset alpha
+          ctx.globalAlpha = 1.0;
         }
       }
       
@@ -268,6 +418,13 @@ export class Jscanify {
       if (img) img.delete();
       if (contour) contour.delete();
     }
+  }
+
+  /**
+   * Reset the contour stabilizer (call when starting a new scan session)
+   */
+  resetStabilizer(): void {
+    this.stabilizer.reset();
   }
 
   /**
