@@ -90,15 +90,16 @@ export default function DocumentUploadFlow() {
           }
         }
 
-        // Vérifier les documents du véhicule (carte grise)
+        // Vérifier les documents du véhicule (carte grise, carte verte, constat)
         if (tokenResult.vehicule_id) {
           const { data: vehicleData, error: vehicleError } = await supabase
             .from('vehicles')
-            .select('registration_document_front_url, registration_document_back_url')
+            .select('registration_document_front_url, registration_document_back_url, insurance_card_url, constat_url')
             .eq('id', tokenResult.vehicule_id)
             .single();
 
           if (!vehicleError && vehicleData) {
+            // Carte grise
             if (!vehicleData.registration_document_front_url) {
               missing.push('registration_front');
             } else {
@@ -109,9 +110,21 @@ export default function DocumentUploadFlow() {
             } else {
               available.push('registration_back');
             }
+            // Carte verte d'assurance
+            if (!vehicleData.insurance_card_url) {
+              missing.push('insurance_card');
+            } else {
+              available.push('insurance_card');
+            }
+            // Constat
+            if (!vehicleData.constat_url) {
+              missing.push('constat');
+            } else {
+              available.push('constat');
+            }
           } else {
-            // Si erreur ou pas de véhicule, on considère que les deux documents manquent
-            missing.push('registration_front', 'registration_back');
+            // Si erreur ou pas de véhicule, on considère que tous les documents manquent
+            missing.push('registration_front', 'registration_back', 'insurance_card', 'constat');
           }
         }
 
@@ -141,9 +154,14 @@ export default function DocumentUploadFlow() {
     setShowWorkflow(false);
   };
 
-  const handleComplete = async (documents: { [key: string]: File }, whatsappConsent: boolean) => {
+  const handleComplete = async (
+    documents: { [key: string]: File }, 
+    whatsappConsent: boolean,
+    insuranceRepresentationConsent: boolean
+  ) => {
     console.log("[MOBILE DEBUG] Documents uploaded:", documents);
     console.log("[MOBILE DEBUG] WhatsApp consent:", whatsappConsent);
+    console.log("[MOBILE DEBUG] Insurance representation consent:", insuranceRepresentationConsent);
     console.log("[MOBILE DEBUG] Token data:", tokenData);
     
     if (!tokenData) {
@@ -154,17 +172,18 @@ export default function DocumentUploadFlow() {
     try {
       setLoading(true);
 
-      // Toujours sauvegarder le consentement WhatsApp même sans documents
       const updatePromises = [];
 
-      // Forcer la mise à jour du consentement WhatsApp pour le client
+      // Mise à jour des données du client
       if (tokenData.client_id) {
         const clientUpdates: { 
           driver_license_front_url?: string; 
           driver_license_back_url?: string;
-          whatsapp_consent: boolean; // Toujours inclure
+          whatsapp_consent: boolean;
+          insurance_representation_consent: boolean;
         } = {
-          whatsapp_consent: whatsappConsent
+          whatsapp_consent: whatsappConsent,
+          insurance_representation_consent: insuranceRepresentationConsent
         };
 
         // Upload des documents du permis si présents
@@ -236,8 +255,14 @@ export default function DocumentUploadFlow() {
 
       // Upload et mise à jour des documents du véhicule
       if (tokenData.vehicule_id) {
-        const vehicleUpdates: { registration_document_front_url?: string; registration_document_back_url?: string } = {};
+        const vehicleUpdates: { 
+          registration_document_front_url?: string; 
+          registration_document_back_url?: string;
+          insurance_card_url?: string;
+          constat_url?: string;
+        } = {};
 
+        // Carte grise recto
         if (documents.registration_front) {
           try {
             const frontFilePath = `${tokenData.vehicule_id}/registration/front_${Date.now()}.jpg`;
@@ -264,6 +289,7 @@ export default function DocumentUploadFlow() {
           }
         }
 
+        // Carte grise verso
         if (documents.registration_back) {
           try {
             const backFilePath = `${tokenData.vehicule_id}/registration/back_${Date.now()}.jpg`;
@@ -286,6 +312,60 @@ export default function DocumentUploadFlow() {
             console.log("[MOBILE DEBUG] Back registration URL:", backUrl.publicUrl);
           } catch (error) {
             console.error("[MOBILE DEBUG] Back registration upload failed:", error);
+            throw error;
+          }
+        }
+
+        // Carte verte d'assurance
+        if (documents.insurance_card) {
+          try {
+            const insuranceFilePath = `${tokenData.vehicule_id}/insurance/card_${Date.now()}.jpg`;
+            console.log("[MOBILE DEBUG] Uploading insurance card to:", insuranceFilePath);
+            
+            const { error: uploadError } = await supabase.storage
+              .from('documents')
+              .upload(insuranceFilePath, documents.insurance_card);
+            
+            if (uploadError) {
+              console.error("[MOBILE DEBUG] Insurance card upload error:", uploadError);
+              throw uploadError;
+            }
+            
+            const { data: insuranceUrl } = supabase.storage
+              .from('documents')
+              .getPublicUrl(insuranceFilePath);
+            
+            vehicleUpdates.insurance_card_url = insuranceUrl.publicUrl;
+            console.log("[MOBILE DEBUG] Insurance card URL:", insuranceUrl.publicUrl);
+          } catch (error) {
+            console.error("[MOBILE DEBUG] Insurance card upload failed:", error);
+            throw error;
+          }
+        }
+
+        // Constat amiable
+        if (documents.constat) {
+          try {
+            const constatFilePath = `${tokenData.vehicule_id}/constat/constat_${Date.now()}.jpg`;
+            console.log("[MOBILE DEBUG] Uploading constat to:", constatFilePath);
+            
+            const { error: uploadError } = await supabase.storage
+              .from('documents')
+              .upload(constatFilePath, documents.constat);
+            
+            if (uploadError) {
+              console.error("[MOBILE DEBUG] Constat upload error:", uploadError);
+              throw uploadError;
+            }
+            
+            const { data: constatUrl } = supabase.storage
+              .from('documents')
+              .getPublicUrl(constatFilePath);
+            
+            vehicleUpdates.constat_url = constatUrl.publicUrl;
+            console.log("[MOBILE DEBUG] Constat URL:", constatUrl.publicUrl);
+          } catch (error) {
+            console.error("[MOBILE DEBUG] Constat upload failed:", error);
             throw error;
           }
         }
@@ -454,6 +534,8 @@ export default function DocumentUploadFlow() {
               {(() => {
                 const hasDriverLicense = availableDocuments.includes('driver_license_front') && availableDocuments.includes('driver_license_back');
                 const hasRegistration = availableDocuments.includes('registration_front') && availableDocuments.includes('registration_back');
+                const hasInsuranceCard = availableDocuments.includes('insurance_card');
+                const hasConstat = availableDocuments.includes('constat');
 
                 return (
                   <>
@@ -463,49 +545,51 @@ export default function DocumentUploadFlow() {
                     {hasRegistration && (
                       <p className="text-green-700 text-sm">• Carte grise</p>
                     )}
+                    {hasInsuranceCard && (
+                      <p className="text-green-700 text-sm">• Carte verte d'assurance</p>
+                    )}
+                    {hasConstat && (
+                      <p className="text-green-700 text-sm">• Constat amiable</p>
+                    )}
                   </>
                 );
               })()}
             </div>
-            <p className="text-green-600 text-sm mt-2 italic">
-              Ces documents seront automatiquement ignorés lors de l'upload.
-            </p>
           </div>
         )}
 
-        {/* Document list - Only show if there are missing documents */}
+        {/* Missing documents message */}
         {missingDocuments.length > 0 && (
-          <div className="space-y-4 text-left">
-            <h3 className="font-semibold text-foreground">
-              Veuillez préparer :
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 text-left">
+            <h3 className="font-semibold text-orange-800 mb-2">
+              📋 Documents à fournir :
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-1">
               {(() => {
-                const needsDriverLicense = missingDocuments.includes('driver_license_front') || missingDocuments.includes('driver_license_back');
-                const needsRegistration = missingDocuments.includes('registration_front') || missingDocuments.includes('registration_back');
-                let counter = 0;
+                const needsDriverLicenseFront = missingDocuments.includes('driver_license_front');
+                const needsDriverLicenseBack = missingDocuments.includes('driver_license_back');
+                const needsRegistrationFront = missingDocuments.includes('registration_front');
+                const needsRegistrationBack = missingDocuments.includes('registration_back');
+                const needsInsuranceCard = missingDocuments.includes('insurance_card');
+                const needsConstat = missingDocuments.includes('constat');
 
                 return (
                   <>
-                    {needsDriverLicense && (
-                      <div className="flex items-start gap-3">
-                        <span className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 shadow-sm">
-                          {++counter}
-                        </span>
-                        <span className="text-muted-foreground">
-                          Votre permis de conduire
-                        </span>
-                      </div>
+                    {(needsDriverLicenseFront || needsDriverLicenseBack) && (
+                      <p className="text-orange-700 text-sm">
+                        • Permis de conduire {needsDriverLicenseFront && needsDriverLicenseBack ? '(recto et verso)' : needsDriverLicenseFront ? '(recto)' : '(verso)'}
+                      </p>
                     )}
-                    {needsRegistration && (
-                      <div className="flex items-start gap-3">
-                        <span className="w-6 h-6 bg-karrosserie-orange text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 shadow-sm">
-                          {++counter}
-                        </span>
-                        <span className="text-muted-foreground">
-                          Votre carte grise
-                        </span>
-                      </div>
+                    {(needsRegistrationFront || needsRegistrationBack) && (
+                      <p className="text-orange-700 text-sm">
+                        • Carte grise {needsRegistrationFront && needsRegistrationBack ? '(recto et verso)' : needsRegistrationFront ? '(recto)' : '(verso)'}
+                      </p>
+                    )}
+                    {needsInsuranceCard && (
+                      <p className="text-orange-700 text-sm">• Carte verte d'assurance</p>
+                    )}
+                    {needsConstat && (
+                      <p className="text-orange-700 text-sm">• Constat amiable</p>
                     )}
                   </>
                 );
@@ -514,21 +598,10 @@ export default function DocumentUploadFlow() {
           </div>
         )}
 
-        {/* Footer note - Only show if there are missing documents */}
-        {missingDocuments.length > 0 && (
-          <p className="text-muted-foreground text-sm italic">
-            Assurez-vous d'être dans un endroit bien éclairé pour prendre des photos nettes.
-          </p>
-        )}
-
-        {/* Success message if no documents are missing */}
-        {missingDocuments.length === 0 && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <p className="text-green-800 text-sm">
-              ✅ Tous vos documents sont déjà enregistrés dans notre système. Aucune action supplémentaire n'est requise.
-            </p>
-          </div>
-        )}
+        {/* Privacy note */}
+        <p className="text-muted-foreground text-xs">
+          Vos documents sont sécurisés et traités conformément à la réglementation RGPD.
+        </p>
       </div>
     </div>
   );
