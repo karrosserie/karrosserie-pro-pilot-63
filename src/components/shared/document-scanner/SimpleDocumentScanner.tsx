@@ -214,8 +214,9 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Initialize scanner
+    // Initialize scanner and reset stabilizer for fresh detection
     const scanner = new Jscanify();
+    scanner.resetStabilizer();
     scannerRef.current = scanner;
     console.log('[Detection] Starting loop, isSmallFormat:', isSmallFormat);
 
@@ -329,6 +330,10 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   const handleRetake = useCallback(() => {
     setShowPreview(false);
     setPreviewDataUrl(null);
+    // Reset stabilizer for fresh detection on retake
+    if (scannerRef.current) {
+      scannerRef.current.resetStabilizer();
+    }
   }, []);
 
   // Handle close
