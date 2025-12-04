@@ -3,6 +3,7 @@ import { useToast } from '@/hooks/use-toast';
 import { GeneratedReport } from '@/hooks/use-generated-reports';
 import { supabase } from '@/integrations/supabase/client';
 import { useAccountingData } from '@/hooks/use-accounting-data';
+import { useCompany } from '@/hooks/use-company';
 import { parseISO, isWithinInterval, format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import jsPDF from 'jspdf';
@@ -17,6 +18,7 @@ export const useReportEmail = (report: GeneratedReport | null) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const { transactions } = useAccountingData();
+  const { companyData } = useCompany();
 
   const getDefaultEmailData = async (): Promise<ReportEmailFormData> => {
     if (!report) {
@@ -39,6 +41,7 @@ export const useReportEmail = (report: GeneratedReport | null) => {
       'csv': 'l\'export au format CSV'
     };
 
+    const companyName = companyData?.name || 'Notre entreprise';
     const subject = `${report.name} - Période du ${fromDateStr} au ${toDateStr}`;
     
     const message = `Bonjour,
@@ -49,7 +52,7 @@ Ce document a été généré automatiquement le ${report.generatedAt.toLocaleDa
 
 Cordialement,
 L'équipe comptabilité
-AUTO PAINT`;
+${companyName}`;
 
     return {
       to: '',
