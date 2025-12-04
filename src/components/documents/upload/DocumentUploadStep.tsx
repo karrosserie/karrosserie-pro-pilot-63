@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Camera, Image as ImageIcon } from "lucide-react";
+import { ArrowLeft, Camera, Image as ImageIcon, SkipForward } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { ImageCropper } from "@/components/shared/ImageCropper";
 import { useImageCropping } from "@/components/shared/document-uploader/hooks/useImageCropping";
@@ -15,6 +15,7 @@ interface DocumentUploadStepProps {
   onNext: (file: File) => void;
   onBack: () => void;
   onImageUpload: (file: File) => void;
+  onSkip?: () => void;
 }
 
 export default function DocumentUploadStep({
@@ -25,7 +26,8 @@ export default function DocumentUploadStep({
   documentType,
   onNext,
   onBack,
-  onImageUpload
+  onImageUpload,
+  onSkip
 }: DocumentUploadStepProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -190,6 +192,19 @@ export default function DocumentUploadStep({
               className="hidden"
             />
           </div>
+
+          {/* Skip Button */}
+          {onSkip && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onSkip}
+              className="w-full text-muted-foreground hover:text-foreground border-dashed"
+            >
+              <SkipForward className="w-4 h-4 mr-2" />
+              Je n'ai pas ce document pour le moment
+            </Button>
+          )}
         </div>
 
         {/* Image Cropper Dialog - uniquement pour galerie */}
