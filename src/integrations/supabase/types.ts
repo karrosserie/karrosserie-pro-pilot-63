@@ -2476,6 +2476,8 @@ export type Database = {
         Row: {
           actual_return_date: string | null
           attestation_accepted: boolean | null
+          claim_number: string | null
+          client_email: string | null
           client_id: string
           client_insurance: boolean | null
           client_signature: string | null
@@ -2509,6 +2511,8 @@ export type Database = {
         Insert: {
           actual_return_date?: string | null
           attestation_accepted?: boolean | null
+          claim_number?: string | null
+          client_email?: string | null
           client_id: string
           client_insurance?: boolean | null
           client_signature?: string | null
@@ -2542,6 +2546,8 @@ export type Database = {
         Update: {
           actual_return_date?: string | null
           attestation_accepted?: boolean | null
+          claim_number?: string | null
+          client_email?: string | null
           client_id?: string
           client_insurance?: boolean | null
           client_signature?: string | null

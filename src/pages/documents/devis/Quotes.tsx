@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { calculateGlobalTotals } from '@/components/quotes/form/utils/calculations';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useConfirmation } from '@/hooks/use-confirmation';
@@ -13,9 +13,8 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Search, FileText, Plus, Filter, Eye, Pencil, Trash, Download, Printer, Mail, FileCheck, ArrowRight, RotateCcw, ShoppingCart, Paperclip } from 'lucide-react';
-import { SortableTableHeader } from '@/components/ui/sortable-table-header';
-import { useTableSorting } from '@/hooks/use-table-sorting';
+import { FileText, Plus, Eye, Pencil, Trash, Download, Printer, Mail, FileCheck, ArrowRight, RotateCcw, ShoppingCart, Paperclip } from 'lucide-react';
+import { useTableSorting, SortDirection } from '@/hooks/use-table-sorting';
 import { useQuotes } from '@/hooks/use-quotes';
 import { useToast } from '@/hooks/use-toast';
 import QuoteViewerModal from '@/components/quotes/QuoteViewerModal';
@@ -39,14 +38,15 @@ import {
   DrawerTitle,
   DrawerDescription,
 } from '@/components/ui/drawer';
+import { QuotesFilters, QuoteSortOption } from '@/components/quotes/QuotesFilters';
 
 const Quotes = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { confirm } = useConfirmation();
   const { quotes, isLoading, error, deleteQuote, archiveQuote, restoreQuote } = useQuotes();
-  const { sortedData: sortedQuotes, sortConfig, handleSort } = useTableSorting(quotes || [], 'reference');
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortOption, setSortOption] = useState<QuoteSortOption>('recent-first');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [repairOrderDialogOpen, setRepairOrderDialogOpen] = useState(false);
@@ -63,6 +63,35 @@ const Quotes = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const { shouldShowQuoteConvertHelp, markHelpAsSeen } = useUserOnboardingProgress();
+
+  // Ajouter le nom complet du client pour le tri alphabétique
+  const quotesWithClientName = useMemo(() => {
+    return (quotes || []).map(quote => ({
+      ...quote,
+      clientFullName: quote.clients 
+        ? `${quote.clients.first_name || ''} ${quote.clients.last_name || ''}`.trim().toLowerCase()
+        : ''
+    }));
+  }, [quotes]);
+
+  // Convertir l'option de tri en clé/direction
+  const getSortConfig = (option: QuoteSortOption): { key: string; direction: SortDirection } => {
+    switch (option) {
+      case 'alphabetical-asc':
+        return { key: 'clientFullName', direction: 'asc' };
+      case 'alphabetical-desc':
+        return { key: 'clientFullName', direction: 'desc' };
+      case 'recent-first':
+        return { key: 'created_at', direction: 'desc' };
+      case 'oldest-first':
+        return { key: 'created_at', direction: 'asc' };
+      default:
+        return { key: 'created_at', direction: 'desc' };
+    }
+  };
+
+  const { key: sortKey, direction: sortDirection } = useMemo(() => getSortConfig(sortOption), [sortOption]);
+  const { sortedData: sortedQuotes } = useTableSorting(quotesWithClientName, sortKey, sortDirection);
   
   const filteredQuotes = sortedQuotes?.filter(quote => {
     const matchesSearch = quote.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -411,33 +440,13 @@ const Quotes = () => {
         </div>
       </div>
       
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">      
-        <div className="flex-1" />
-        
-        <div className="flex items-center w-full md:w-auto space-x-2">
-          <div className="relative flex-1 md:w-60">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input 
-              placeholder="Rechercher un devis..." 
-              className="pl-10 bg-white border border-gray-200 focus:outline-none"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          
-          <Button variant="outline" size="icon" className="bg-white">
-            <Filter className="h-4 w-4" />
-          </Button>
-          
-          <Button 
-            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
-            onClick={handleCreateQuote}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Nouveau devis
-          </Button>
-        </div>
-      </div>
+      <QuotesFilters
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onCreateQuote={handleCreateQuote}
+        sortOption={sortOption}
+        onSortChange={setSortOption}
+      />
       
       {isMobile ? (
         <div className="space-y-3">
@@ -474,24 +483,12 @@ const Quotes = () => {
           <Table>
           <TableHeader>
             <TableRow>
-              <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
-                Numéro
-              </SortableTableHeader>
-              <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>
-                Date
-              </SortableTableHeader>
-              <SortableTableHeader sortKey="clients.last_name" sortConfig={sortConfig} onSort={handleSort}>
-                Client
-              </SortableTableHeader>
-              <SortableTableHeader sortKey="vehicles.license_plate" sortConfig={sortConfig} onSort={handleSort}>
-                Véhicule
-              </SortableTableHeader>
-              <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
-                Montant
-              </SortableTableHeader>
-              <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
-                Statut
-              </SortableTableHeader>
+              <TableHead>Numéro</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Client</TableHead>
+              <TableHead>Véhicule</TableHead>
+              <TableHead>Montant</TableHead>
+              <TableHead>Statut</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
