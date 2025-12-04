@@ -11,8 +11,14 @@ const N8N_WEBHOOK_URL = 'https://n8n.karrosserie.pro/webhook/edb07668-2f9a-4815-
 interface TriggerPayload {
   client_id: string;
   company_id: string;
-  phone?: string;  // Optionnel - si fourni, utilisé directement
-  link?: string;   // Optionnel - si fourni, utilisé directement
+  phone?: string;
+  link?: string;
+}
+
+interface ClientData {
+  phone: string | null;
+  first_name: string | null;
+  last_name: string | null;
 }
 
 serve(async (req: Request): Promise<Response> => {
@@ -52,49 +58,49 @@ serve(async (req: Request): Promise<Response> => {
 
     let phone = payload.phone;
     let link = payload.link;
+    let clientData: ClientData = { phone: null, first_name: null, last_name: null };
 
-    // Si phone ou link ne sont pas fournis, les récupérer depuis la base
-    if (!phone || !link) {
-      console.log('🔍 Fetching missing data from database...');
-
-      // Récupérer le téléphone du client
+    // Toujours récupérer les informations du client pour le nom
+    console.log('🔍 Fetching client data...');
+    const { data: client, error: clientError } = await supabase
+      .from('clients')
+      .select('phone, first_name, last_name')
+      .eq('id', payload.client_id)
+      .single();
+    
+    if (clientError) {
+      console.error('❌ Error fetching client:', clientError);
+    } else {
+      clientData = client;
       if (!phone) {
-        console.log('📞 Fetching client phone...');
-        const { data: client, error: clientError } = await supabase
-          .from('clients')
-          .select('phone')
-          .eq('id', payload.client_id)
-          .single();
-        
-        if (clientError) {
-          console.error('❌ Error fetching client:', clientError);
-        } else {
-          phone = client?.phone;
-          console.log('✅ Client phone retrieved:', phone ? 'yes' : 'no');
-        }
+        phone = client?.phone;
       }
+      console.log('✅ Client data retrieved:', { 
+        has_phone: !!phone, 
+        name: `${client?.first_name} ${client?.last_name}` 
+      });
+    }
 
-      // Générer le lien si non fourni
-      if (!link) {
-        console.log('🔗 Fetching or generating token link...');
-        const { data: token, error: tokenError } = await supabase
-          .from('tokens')
-          .select('id')
-          .eq('client_id', payload.client_id)
-          .eq('company_id', payload.company_id)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
+    // Générer le lien si non fourni
+    if (!link) {
+      console.log('🔗 Fetching or generating token link...');
+      const { data: token, error: tokenError } = await supabase
+        .from('tokens')
+        .select('id')
+        .eq('client_id', payload.client_id)
+        .eq('company_id', payload.company_id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
 
-        if (tokenError) {
-          console.error('❌ Error fetching token:', tokenError);
-        } else if (token) {
-          const baseUrl = Deno.env.get('FRONTEND_BASE_URL') || 'https://appli.karrosserie.pro';
-          link = `${baseUrl}/documents/upload/${token.id}`;
-          console.log('✅ Token link generated');
-        } else {
-          console.warn('⚠️ No token found for client');
-        }
+      if (tokenError) {
+        console.error('❌ Error fetching token:', tokenError);
+      } else if (token) {
+        const baseUrl = Deno.env.get('FRONTEND_BASE_URL') || 'https://appli.karrosserie.pro';
+        link = `${baseUrl}/documents/upload/${token.id}`;
+        console.log('✅ Token link generated');
+      } else {
+        console.warn('⚠️ No token found for client');
       }
     }
 
@@ -135,11 +141,14 @@ serve(async (req: Request): Promise<Response> => {
       result: n8nResult 
     });
 
-    // Mise à jour verif_doc_client après appel n8n réussi
+    // Mise à jour verif_doc_client et création des messages après appel n8n réussi
     if (n8nResponse.ok) {
+      const clientName = `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim() || 'Client';
+      const now = new Date();
+
+      // 1. Mise à jour verif_doc_client
       console.log('📊 Mise à jour verif_doc_client pour client:', payload.client_id);
       
-      // Vérifier si un enregistrement existe déjà
       const { data: existingRecord, error: checkError } = await supabase
         .from('verif_doc_client')
         .select('id, nombre_relance')
@@ -151,31 +160,30 @@ serve(async (req: Request): Promise<Response> => {
         console.error('❌ Erreur vérification verif_doc_client:', checkError);
       }
 
+      let nombreRelance = 1;
       if (existingRecord) {
-        // Incrémenter le compteur de relances
-        const newCount = (existingRecord.nombre_relance || 0) + 1;
+        nombreRelance = (existingRecord.nombre_relance || 0) + 1;
         const { error: updateError } = await supabase
           .from('verif_doc_client')
           .update({ 
-            nombre_relance: newCount,
-            updated_at: new Date().toISOString()
+            nombre_relance: nombreRelance,
+            updated_at: now.toISOString()
           })
           .eq('id', existingRecord.id);
 
         if (updateError) {
           console.error('❌ Erreur mise à jour verif_doc_client:', updateError);
         } else {
-          console.log('✅ verif_doc_client mis à jour, relance n°', newCount);
+          console.log('✅ verif_doc_client mis à jour, relance n°', nombreRelance);
         }
       } else {
-        // Créer un nouvel enregistrement
         const { error: insertError } = await supabase
           .from('verif_doc_client')
           .insert({
             client_id: payload.client_id,
             company_id: payload.company_id,
             nombre_relance: 1,
-            updated_at: new Date().toISOString()
+            updated_at: now.toISOString()
           });
 
         if (insertError) {
@@ -183,6 +191,50 @@ serve(async (req: Request): Promise<Response> => {
         } else {
           console.log('✅ verif_doc_client créé, première relance');
         }
+      }
+
+      // 2. Créer une entrée dans messageries pour l'onglet Conversations
+      console.log('💬 Création message dans messageries...');
+      const { error: messagerieError } = await supabase
+        .from('messageries')
+        .insert({
+          company_id: payload.company_id,
+          client_id: payload.client_id,
+          priority: 3,
+          title: `Relance demande de justificatifs - ${clientName}`,
+          channel: 'Message',
+          eta: 'N/A',
+          time: now.toTimeString().split(' ')[0],
+          date: now.toISOString().split('T')[0],
+          summary: `Relance automatique n°${nombreRelance} - Demande de pièces justificatives`,
+          message: `Relance envoyée automatiquement au client ${clientName} pour demande de pièces justificatives.\n\nLien envoyé : ${link || 'Non disponible'}`,
+          tags: ['documents', 'relance', 'automatique'],
+          resolved: true,
+          archived: false,
+          is_inbound: false
+        });
+
+      if (messagerieError) {
+        console.error('❌ Erreur création messagerie:', messagerieError);
+      } else {
+        console.log('✅ Message créé dans messageries');
+      }
+
+      // 3. Créer une entrée dans all_client_message pour traçabilité
+      console.log('📝 Création entrée dans all_client_message...');
+      const { error: allMessageError } = await supabase
+        .from('all_client_message')
+        .insert({
+          client_id: payload.client_id,
+          company_id: payload.company_id,
+          message: `Relance automatique n°${nombreRelance} - Demande de pièces justificatives envoyée au client`,
+          lien: link || null
+        });
+
+      if (allMessageError) {
+        console.error('❌ Erreur création all_client_message:', allMessageError);
+      } else {
+        console.log('✅ Entrée créée dans all_client_message');
       }
     }
 
