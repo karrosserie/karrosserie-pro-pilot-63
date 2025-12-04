@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ValidationErrorDialog } from '@/components/cessions/form/components/ValidationErrorDialog';
 import { CessionEmailConfirmationDialog } from './CessionEmailConfirmationDialog';
+import { PhoneValidationErrorModal } from '@/components/shared/PhoneValidationErrorModal';
 import { FileText, Download, Eye, Pencil, Trash, Play, Loader2, Mail, BarChart3 } from 'lucide-react';
 import { Cession } from '@/services/supabase/cessions';
 import { format } from 'date-fns';
@@ -82,6 +83,12 @@ export const CessionsTable = ({
   const [selectedCessionForProgress, setSelectedCessionForProgress] = useState<Cession | null>(null);
   const [showInitializeHelpDialog, setShowInitializeHelpDialog] = useState(false);
   const [showInitializeDrawer, setShowInitializeDrawer] = useState(false);
+  const [phoneErrorModal, setPhoneErrorModal] = useState<{
+    isOpen: boolean;
+    message: string;
+    clientId?: string;
+    clientName?: string;
+  } | null>(null);
   
   const { companyData } = useCompany();
   const { insuranceCompanies } = useInsuranceCompanies();
@@ -594,13 +601,32 @@ export const CessionsTable = ({
           });
         }
 
-      } catch (signatureError) {
+      } catch (signatureError: any) {
         console.error('Error sending for signature:', signatureError);
-        toast({
-          title: "Erreur d'envoi",
-          description: `Erreur lors de l'envoi pour signature: ${signatureError.message}`,
-          variant: "destructive",
-        });
+        
+        // Vérifier si c'est une erreur de validation de téléphone
+        const isPhoneError = signatureError.message?.includes('numéro mobile français') || 
+                             signatureError.message?.includes('Téléphone du client invalide') ||
+                             signatureError.message?.includes('Téléphone de l\'entreprise invalide');
+        
+        if (isPhoneError) {
+          const clientName = repairOrderData.clients 
+            ? `${repairOrderData.clients.first_name || ''} ${repairOrderData.clients.last_name || ''}`.trim()
+            : 'Client';
+          
+          setPhoneErrorModal({
+            isOpen: true,
+            message: signatureError.message,
+            clientId: repairOrderData.clients?.id,
+            clientName
+          });
+        } else {
+          toast({
+            title: "Erreur d'envoi",
+            description: `Erreur lors de l'envoi pour signature: ${signatureError.message}`,
+            variant: "destructive",
+          });
+        }
       }
       
     } catch (error) {
@@ -939,6 +965,17 @@ export const CessionsTable = ({
           </div>
         </DrawerContent>
       </Drawer>
+
+      <PhoneValidationErrorModal
+        isOpen={phoneErrorModal?.isOpen || false}
+        onClose={() => setPhoneErrorModal(null)}
+        errorMessage={phoneErrorModal?.message || ''}
+        clientName={phoneErrorModal?.clientName}
+        onEditClient={phoneErrorModal?.clientId ? () => {
+          // Ouvrir le client en mode édition - on passe juste l'ID pour que la page clients le trouve
+          window.location.href = `/clients?clientId=${phoneErrorModal.clientId}`;
+        } : undefined}
+      />
     </div>
   );
 };

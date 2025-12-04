@@ -6,6 +6,7 @@ import ClientsTable from './ClientsTable';
 import ClientsFilters, { ClientSortOption } from './ClientsFilters';
 import ClientDialogs from './ClientDialogs';
 import VehicleDialog from '@/components/vehicle/VehicleDialog';
+import { PhoneValidationErrorModal } from '@/components/shared/PhoneValidationErrorModal';
 import { useClients } from '@/hooks/use-clients';
 import { useClientActions } from '@/hooks/use-client-actions';
 import { useVehicles } from '@/hooks/use-vehicles';
@@ -26,6 +27,14 @@ const ClientsPage = () => {
   // Vehicle dialog state
   const [vehicleDialogOpen, setVehicleDialogOpen] = useState(false);
   const [selectedClientForVehicle, setSelectedClientForVehicle] = useState<Client | null>(null);
+  
+  // Phone validation error modal state
+  const [phoneErrorModal, setPhoneErrorModal] = useState<{
+    isOpen: boolean;
+    message: string;
+    clientId?: string;
+    clientName?: string;
+  } | null>(null);
 
   // Handle highlighting client from URL parameter
   useEffect(() => {
@@ -80,6 +89,23 @@ const ClientsPage = () => {
     handleRequestDocuments,
     handleClientSubmit
   } = useClientActions();
+
+  // Wrapper pour handleRequestDocuments avec gestion des erreurs de téléphone
+  const handleRequestDocumentsWithModal = async (client: Client) => {
+    const result = await handleRequestDocuments(client);
+    if (!result.success && result.error) {
+      const isPhoneError = result.error.includes('numéro mobile français') || 
+                           result.error.includes('Téléphone');
+      if (isPhoneError) {
+        setPhoneErrorModal({
+          isOpen: true,
+          message: result.error,
+          clientId: client.id,
+          clientName: `${client.first_name || ''} ${client.last_name || ''}`.trim()
+        });
+      }
+    }
+  };
 
   const filteredClients = clients?.filter(client => {
     const matchesSearch = 
@@ -164,7 +190,7 @@ const ClientsPage = () => {
         onEditClient={handleEditClient}
         onDeleteClient={handleDeleteClient}
         onCreateVehicle={handleCreateVehicle}
-        onRequestDocuments={handleRequestDocuments}
+        onRequestDocuments={handleRequestDocumentsWithModal}
         highlightedClientId={highlightedClientId}
         sortOption={sortOption}
       />
@@ -193,6 +219,21 @@ const ClientsPage = () => {
         onSubmit={handleVehicleSubmit}
         mode="create"
         defaultValues={{ client_id: selectedClientForVehicle?.id }}
+      />
+
+      <PhoneValidationErrorModal
+        isOpen={phoneErrorModal?.isOpen || false}
+        onClose={() => setPhoneErrorModal(null)}
+        errorMessage={phoneErrorModal?.message || ''}
+        clientName={phoneErrorModal?.clientName}
+        onEditClient={phoneErrorModal?.clientId ? () => {
+          // Fermer la modal et ouvrir le client en mode édition
+          const clientToEdit = clients?.find(c => c.id === phoneErrorModal.clientId);
+          if (clientToEdit) {
+            handleEditClient(clientToEdit);
+          }
+          setPhoneErrorModal(null);
+        } : undefined}
       />
     </>
   );
