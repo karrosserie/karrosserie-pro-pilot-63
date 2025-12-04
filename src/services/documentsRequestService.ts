@@ -75,9 +75,16 @@ export const sendDocumentsRequest = async (clientId: string, companyId?: string)
 
     console.log('🔍 Réponse edge function:', { data, error });
 
+    // Gérer les erreurs SDK Supabase
     if (error) {
       console.error('Erreur edge function:', error);
       throw error;
+    }
+
+    // Gérer les erreurs retournées dans la réponse (status 200 avec success: false)
+    if (data && data.success === false) {
+      console.error('Erreur retournée par edge function:', data.error);
+      throw new Error(data.error || 'Erreur lors de l\'envoi de la demande');
     }
 
     // Appeler le webhook n8n

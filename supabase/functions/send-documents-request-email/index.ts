@@ -402,13 +402,15 @@ const handler = async (req: Request): Promise<Response> => {
 
   } catch (error: any) {
     console.error('Erreur dans send-documents-request-email:', error);
+    
+    // Retourner status 200 avec success: false pour que le message d'erreur soit récupérable côté client
     return new Response(
       JSON.stringify({ 
         error: error.message,
         success: false 
       }),
       {
-        status: 500,
+        status: 200,
         headers: { 
           'Content-Type': 'application/json', 
           ...corsHeaders 
