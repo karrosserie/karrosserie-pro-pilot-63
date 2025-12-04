@@ -249,6 +249,21 @@ export default function DocumentUploadWorkflow({
     }
   };
 
+  const handleSkip = () => {
+    const adjustedStep = hasSkippedDocuments ? currentStep - 1 : currentStep;
+    const stepKey = documentSteps[adjustedStep].key;
+    
+    console.log(`[UPLOAD DEBUG] Skipping document: ${stepKey}`);
+    
+    // Passer à l'étape suivante sans sauvegarder le document
+    if (adjustedStep < documentSteps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      // Dernier document, passer aux étapes de consentement
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
   const handleImageUpload = (file: File) => {
     // Handle immediate image upload if needed
     console.log("Image uploaded:", file.name);
@@ -305,6 +320,7 @@ export default function DocumentUploadWorkflow({
       onNext={handleNext}
       onBack={handleBack}
       onImageUpload={handleImageUpload}
+      onSkip={handleSkip}
     />
   );
 }
