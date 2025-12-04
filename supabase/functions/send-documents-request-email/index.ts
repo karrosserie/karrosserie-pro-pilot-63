@@ -65,10 +65,34 @@ const sendEmail = async (to: string, subject: string, html: string) => {
   }
 };
 
+// Fonctions de validation de téléphone
+const formatToInternational = (phone: string): string => {
+  if (!phone) return '';
+  const cleanPhone = phone.replace(/[\s.-]/g, '');
+  
+  if (cleanPhone.startsWith('+33')) return cleanPhone;
+  if (cleanPhone.startsWith('0033')) return `+33${cleanPhone.substring(4)}`;
+  if (cleanPhone.match(/^0[67]\d{8}$/)) return `+33${cleanPhone.substring(1)}`;
+  
+  return cleanPhone;
+};
+
+const isValidInternationalFormat = (phone: string): boolean => {
+  return /^\+33[67]\d{8}$/.test(phone);
+};
+
 const sendSMS = async (phone: string, link: string) => {
   try {
     console.log('📱 Début de sendSMS');
-    console.log('📱 Envoi SMS vers:', phone);
+    
+    // Formater et valider le numéro AVANT l'envoi
+    const formattedPhone = formatToInternational(phone);
+    
+    if (!isValidInternationalFormat(formattedPhone)) {
+      throw new Error(`Le numéro de téléphone "${phone}" n'est pas un numéro mobile français valide (format attendu : +336XXXXXXXX ou +337XXXXXXXX)`);
+    }
+    
+    console.log('📱 Envoi SMS vers:', formattedPhone);
     console.log('📱 Lien:', link);
 
     const response = await fetch('https://n8n.karrosserie.pro/webhook/edb07668-2f9a-4815-b4f9-2e1b64ba2a7f', {
@@ -77,7 +101,7 @@ const sendSMS = async (phone: string, link: string) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        phone: phone,
+        phone: formattedPhone,
         link: link
       })
     });
