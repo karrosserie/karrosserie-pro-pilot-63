@@ -1,5 +1,4 @@
-
-import { formatToInternational } from '@/utils/phoneValidation';
+import { formatToInternational, validateAndFormatForWebhook } from '@/utils/phoneValidation';
 
 interface SignatureData {
   firstname: string;
@@ -61,18 +60,30 @@ export const sendForSignature = async (
       fullClientData: clientData
     });
 
+    // Valider le téléphone du client AVANT de construire la requête
+    const clientPhone = clientData?.phone || '';
+    const clientPhoneValidation = validateAndFormatForWebhook(clientPhone);
+    if (!clientPhoneValidation.valid) {
+      throw new Error(`Téléphone du client invalide : ${clientPhoneValidation.error}`);
+    }
+    console.log('✅ Téléphone client validé:', clientPhoneValidation.formatted);
+
+    // Valider le téléphone de l'entreprise AVANT de construire la requête
+    const companyPhone = companyData?.phone || '';
+    const companyPhoneValidation = validateAndFormatForWebhook(companyPhone);
+    if (!companyPhoneValidation.valid) {
+      throw new Error(`Téléphone de l'entreprise invalide : ${companyPhoneValidation.error}`);
+    }
+    console.log('✅ Téléphone entreprise validé:', companyPhoneValidation.formatted);
+
+    const formattedClientPhone = clientPhoneValidation.formatted!;
+    const formattedCompanyPhone = companyPhoneValidation.formatted!;
+
     // Préparer les données de l'entreprise
     const companyName = companyData?.name || '';
-    const companyWords = companyName.split(' ').filter(word => word.trim());
+    const companyWords = companyName.split(' ').filter((word: string) => word.trim());
     const companyFirstName = companyWords.length >= 2 ? companyWords[0] : 'Société';
     const companyLastName = companyWords.length >= 2 ? companyWords.slice(1).join(' ') : companyName || '';
-
-    // Préparer les données avec formatage automatique des téléphones
-    const clientPhone = clientData?.phone || '';
-    const formattedClientPhone = formatToInternational(clientPhone);
-
-    const companyPhone = companyData?.phone || '';
-    const formattedCompanyPhone = formatToInternational(companyPhone);
 
     // Préparer les données de l'entreprise avec l'ID Oodrive si disponible
     const companySignatureData: SignatureData = {

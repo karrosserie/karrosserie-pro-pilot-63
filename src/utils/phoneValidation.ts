@@ -77,3 +77,39 @@ export const formatForDisplay = (phone: string): string => {
 
   return phone; // Retourner tel quel si format non reconnu
 };
+
+/**
+ * Vérifie si un numéro est au format international strict +33[67]XXXXXXXX
+ * Cette fonction doit être appelée APRÈS formatToInternational()
+ */
+export const isValidInternationalFormat = (phone: string | null | undefined): boolean => {
+  if (!phone) return false;
+  // Exactement : +33 suivi de 6 ou 7 puis 8 chiffres = 12 caractères total
+  return /^\+33[67]\d{8}$/.test(phone);
+};
+
+/**
+ * Valide et formate un numéro de téléphone pour les webhooks
+ * Retourne le numéro formaté ou une erreur si invalide
+ */
+export const validateAndFormatForWebhook = (phone: string | null | undefined): { 
+  valid: boolean; 
+  formatted: string | null; 
+  error?: string 
+} => {
+  if (!phone) {
+    return { valid: false, formatted: null, error: 'Numéro de téléphone manquant' };
+  }
+  
+  const formatted = formatToInternational(phone);
+  
+  if (!isValidInternationalFormat(formatted)) {
+    return { 
+      valid: false, 
+      formatted: null, 
+      error: `Le numéro "${phone}" n'est pas un numéro mobile français valide. Format attendu : 06/07 ou +336/+337 suivi de 8 chiffres.` 
+    };
+  }
+  
+  return { valid: true, formatted };
+};

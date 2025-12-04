@@ -1,4 +1,4 @@
-import { formatToInternational } from '@/utils/phoneValidation';
+import { formatToInternational, validateAndFormatForWebhook } from '@/utils/phoneValidation';
 
 interface SignatureData {
   firstname: string;
@@ -52,9 +52,16 @@ export const sendRepairOrderForSignature = async (
       fullClientData: clientData
     });
 
-    // Préparer les données du client avec formatage automatique
+    // Valider le téléphone du client AVANT de construire la requête
     const clientPhone = clientData?.phone || '';
-    const formattedClientPhone = formatToInternational(clientPhone);
+    const phoneValidation = validateAndFormatForWebhook(clientPhone);
+
+    if (!phoneValidation.valid) {
+      throw new Error(`Impossible d'envoyer la signature : ${phoneValidation.error}`);
+    }
+
+    const formattedClientPhone = phoneValidation.formatted!;
+    console.log('✅ Téléphone client validé:', formattedClientPhone);
 
     // Préparer les données du client avec l'ID Oodrive si disponible
     const clientSignatureData: SignatureData = {
@@ -63,7 +70,7 @@ export const sendRepairOrderForSignature = async (
       address_1: clientData?.address || '',
       postal_code: clientData?.postal_code || '',
       city: clientData?.city || '',
-      cell_phone: formattedClientPhone || '',
+      cell_phone: formattedClientPhone,
       email: 'karrosserie.p@gmail.com', // Email de test comme pour les cessions
       signature_mode: 15,
       transport_mode: 2
