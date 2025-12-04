@@ -74,12 +74,13 @@ export const useClientActions = () => {
     setInterventionDialogOpen(true);
   };
 
-  const handleRequestDocuments = async (client: Client) => {
+  const handleRequestDocuments = async (client: Client): Promise<{ success: boolean; error?: string }> => {
     try {
       await sendDocumentsRequest(client.id, companyId);
-    } catch (error) {
-      // L'erreur est déjà gérée dans le service
+      return { success: true };
+    } catch (error: any) {
       console.error('Erreur lors de la demande de documents:', error);
+      return { success: false, error: error.message };
     }
   };
 

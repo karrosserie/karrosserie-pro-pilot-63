@@ -17,6 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 import RepairOrderViewerModal from '@/components/repair-orders/RepairOrderViewerModal';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { UnsignedRepairOrderWarningDialog } from '@/components/repair-orders/UnsignedRepairOrderWarningDialog';
+import { PhoneValidationErrorModal } from '@/components/shared/PhoneValidationErrorModal';
 import { useIsMobile } from '@/hooks/use-mobile';
 import RepairOrderMobileCard from '@/components/repair-orders/RepairOrderMobileCard';
 import { supabase } from '@/integrations/supabase/client';
@@ -42,6 +43,12 @@ const RepairOrders = () => {
   const [showSignedDialog, setShowSignedDialog] = useState(false);
   const [showUnsignedWarning, setShowUnsignedWarning] = useState(false);
   const [orderToConvert, setOrderToConvert] = useState<RepairOrder | null>(null);
+  const [phoneErrorModal, setPhoneErrorModal] = useState<{
+    isOpen: boolean;
+    message: string;
+    clientId?: string;
+    clientName?: string;
+  } | null>(null);
   const {
     toast
   } = useToast();
@@ -471,11 +478,30 @@ const RepairOrders = () => {
       });
     } catch (error: any) {
       console.error('Error sending repair order for signature:', error);
-      toast({
-        title: "Erreur",
-        description: `Impossible d'envoyer l'ordre de réparation pour signature: ${error.message}`,
-        variant: "destructive"
-      });
+      
+      // Vérifier si c'est une erreur de validation de téléphone
+      const isPhoneError = error.message?.includes('numéro mobile français') || 
+                           error.message?.includes('Téléphone du client invalide');
+      
+      if (isPhoneError) {
+        // Récupérer les infos du client pour la modal
+        const clientName = order.clients 
+          ? `${order.clients.first_name || ''} ${order.clients.last_name || ''}`.trim()
+          : 'Client';
+        
+        setPhoneErrorModal({
+          isOpen: true,
+          message: error.message,
+          clientId: order.client_id,
+          clientName
+        });
+      } else {
+        toast({
+          title: "Erreur",
+          description: `Impossible d'envoyer l'ordre de réparation pour signature: ${error.message}`,
+          variant: "destructive"
+        });
+      }
     }
   };
   const handleRequestDocuments = async (order: RepairOrder) => {
@@ -763,6 +789,17 @@ const RepairOrders = () => {
           setShowUnsignedWarning(false);
           setOrderToConvert(null);
         }}
+      />
+
+      <PhoneValidationErrorModal
+        isOpen={phoneErrorModal?.isOpen || false}
+        onClose={() => setPhoneErrorModal(null)}
+        errorMessage={phoneErrorModal?.message || ''}
+        clientName={phoneErrorModal?.clientName}
+        onEditClient={phoneErrorModal?.clientId ? () => {
+          // Naviguer vers la fiche client en mode édition
+          navigate(`/clients?clientId=${phoneErrorModal.clientId}`);
+        } : undefined}
       />
     </div>;
 };
