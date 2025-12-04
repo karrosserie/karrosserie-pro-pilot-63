@@ -98,14 +98,15 @@ export const CustomPhoneInput: React.FC<CustomPhoneInputProps> = ({
   };
 
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const number = e.target.value;
-    setPhoneNumber(number);
+    // Supprimer automatiquement les espaces, points et tirets
+    const cleanNumber = e.target.value.replace(/[\s.-]/g, '');
+    setPhoneNumber(cleanNumber);
     // Mettre à jour la valeur complète
-    const fullNumber = number ? `${selectedCountry.dialCode}${number}` : selectedCountry.dialCode;
+    const fullNumber = cleanNumber ? `${selectedCountry.dialCode}${cleanNumber}` : selectedCountry.dialCode;
     onChange(fullNumber);
     
     // Valider le numéro français
-    const isValid = validateFrenchMobile(number, selectedCountry.code);
+    const isValid = validateFrenchMobile(cleanNumber, selectedCountry.code);
     onValidationChange?.(isValid);
   };
 
