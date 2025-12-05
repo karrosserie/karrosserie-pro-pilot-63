@@ -12,6 +12,7 @@ interface NotificationPayload {
   insuranceEmail: string;
   insuranceCompanyName: string;
   insuranceContractNumber: string | null;
+  companyEmail: string;
 }
 
 Deno.serve(async (req) => {
@@ -40,12 +41,14 @@ Deno.serve(async (req) => {
     const webhookPayload = [
       {
         body: {
+          id: payload.reservationId,
           client_name: payload.clientName,
           client_email: payload.clientEmail,
           client_contract_id: payload.insuranceContractNumber || null,
-          claim_id: null, // Pas de sinistre pour un prêt de véhicule
+          claim_id: null,
           insurance_email: payload.insuranceEmail,
-          insurance_name: payload.insuranceCompanyName
+          insurance_name: payload.insuranceCompanyName,
+          compagny_email: payload.companyEmail
         }
       }
     ];

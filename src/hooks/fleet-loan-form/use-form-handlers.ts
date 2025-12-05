@@ -2,11 +2,13 @@
 import { useFleetReservations } from '@/hooks/use-fleet-reservations';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompanyId } from '@/hooks/use-company-id';
+import { useCompany } from '@/hooks/use-company';
 import { useClients } from '@/hooks/use-clients';
 import { DamageItem, LoanFormData } from '@/components/fleet/FleetLoanForm';
 import { prepareReservationData } from './utils';
 import { FleetLoanFormState } from './types';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useFleetLoanFormHandlers = (
   state: FleetLoanFormState,
@@ -17,6 +19,7 @@ export const useFleetLoanFormHandlers = (
   const { createReservation, updateReservation } = useFleetReservations();
   const { user } = useAuth();
   const { companyId } = useCompanyId();
+  const { companyData } = useCompany();
   const { clients } = useClients();
   const { formData, setFormData } = state;
   
@@ -197,73 +200,30 @@ export const useFleetLoanFormHandlers = (
           onboardingService.updateOnboardingStep('tunnel3', 'vehicleLoanCreated', { reservationId: result.id });
         }
 
-        // Notification de l'assurance - envoi systématique pour workflow de vérification
+        // Notification de l'assurance via edge function
         if (result?.id) {
           try {
-            console.log('📧 Envoi de notification à l\'assurance du client...');
+            console.log('📧 Envoi de notification à l\'assurance du client via edge function...');
             
-        const webhookPayload = {
-          // IDs
-          reservation_id: result.id,
-          claim_id: result.id,
-          company_id: companyId,
-          vehicle_id: formData.vehicleId,
-          
-          // Client
-              client_name: formData.clientName,
-              client_email: formData.clientEmail,
-              client_phone: formData.clientPhone,
-              client_license_number: formData.licenseNumber,
-              client_license_issue_date: formData.licenseIssueDate,
-              client_date_of_birth: formData.dateOfBirth,
-              client_place_of_birth: formData.placeOfBirth,
-              
-              // Assurance
-              insurance_email: formData.insuranceEmail,
-              insurance_company_name: formData.insuranceCompanyName,
-              insurance_phone: formData.insurancePhone,
-              client_contract_id: formData.insuranceContractNumber,
-              insurance_address: formData.insuranceAddress,
-              insurance_city: formData.insuranceCity,
-              insurance_postal_code: formData.insurancePostalCode,
-              
-              // Véhicule de prêt
-              vehicle_brand: vehicle.car_brands?.name || '',
-              vehicle_model: vehicle.car_models?.name || '',
-              vehicle_license_plate: vehicle.license_plate,
-              vehicle_color: vehicle.color,
-              vehicle_year: vehicle.year,
-              
-              // Dates du prêt
-              loan_start_date: formData.startDate,
-              loan_expected_return_date: formData.expectedReturnDate,
-              
-              // Timestamp
-              timestamp: new Date().toISOString()
-            };
-
-            console.log('📦 Payload webhook assurance:', webhookPayload);
-
-            const webhookResponse = await fetch('https://n8n.karrosserie.pro/webhook-test/reponse-assurance', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(webhookPayload)
+            const { data, error } = await supabase.functions.invoke('send-insurance-loan-notification', {
+              body: {
+                reservationId: result.id,
+                clientName: formData.clientName,
+                clientEmail: formData.clientEmail || '',
+                insuranceEmail: formData.insuranceEmail || '',
+                insuranceCompanyName: formData.insuranceCompanyName || '',
+                insuranceContractNumber: formData.insuranceContractNumber || null,
+                companyEmail: companyData?.email || ''
+              }
             });
 
-            if (!webhookResponse.ok) {
-              const responseText = await webhookResponse.text();
-              console.error('❌ Erreur lors de la notification de l\'assurance:', {
-                status: webhookResponse.status,
-                statusText: webhookResponse.statusText,
-                body: responseText
-              });
+            if (error) {
+              console.error('❌ Erreur lors de la notification de l\'assurance:', error);
             } else {
-              console.log('✅ Notification d\'assurance envoyée avec succès');
+              console.log('✅ Notification d\'assurance envoyée avec succès:', data);
             }
           } catch (webhookError) {
-            console.error('❌ Erreur lors de l\'appel du webhook d\'assurance:', webhookError);
+            console.error('❌ Erreur lors de l\'appel de l\'edge function:', webhookError);
             // Ne pas faire échouer la création de la réservation si le webhook échoue
           }
         }
