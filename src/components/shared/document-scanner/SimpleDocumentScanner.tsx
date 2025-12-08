@@ -30,6 +30,9 @@ const getExtractionDimensions = (documentType?: string): { width: number; height
     case 'violation':
       // PV/contravention - format A5 horizontal
       return { width: 595, height: 420 };
+    case 'check':
+      // Chèque français standard : 175mm × 80mm → ratio ~2.19:1
+      return { width: 875, height: 400 };
     default:
       // Par défaut : A4
       return { width: 595, height: 842 };
