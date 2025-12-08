@@ -23,19 +23,23 @@ export interface CornerPoints {
   bottomRight: { x: number; y: number };
 }
 
+// Detect mobile for adaptive stabilizer settings
+const isMobileDevice = typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
 /**
  * ContourStabilizer - Temporal smoothing for stable contour display
  * Uses weighted averaging over multiple frames with hysteresis
+ * Reduced history on mobile to save memory
  */
 class ContourStabilizer {
   private history: CornerPoints[] = [];
   private lastDrawnPoints: CornerPoints | null = null;
   private framesWithoutDetection = 0;
   
-  // Configuration
-  private readonly HISTORY_SIZE = 5;
+  // Configuration - reduced history on mobile to save memory
+  private readonly HISTORY_SIZE = isMobileDevice ? 3 : 5;
   private readonly MIN_MOVEMENT_THRESHOLD = 8; // pixels
-  private readonly DISAPPEAR_THRESHOLD = 3; // frames before contour disappears
+  private readonly DISAPPEAR_THRESHOLD = isMobileDevice ? 2 : 3; // frames before contour disappears
   
   /**
    * Add a new detection to the history
