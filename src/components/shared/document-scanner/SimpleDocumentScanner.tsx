@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { X, Camera, Check, RotateCcw, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Jscanify } from '@/lib/jscanify';
+import SimpleCaptureMode from './SimpleCaptureMode';
 
 interface SimpleDocumentScannerProps {
   onCapture: (blob: Blob) => void;
@@ -15,26 +16,20 @@ interface SimpleDocumentScannerProps {
 const getExtractionDimensions = (documentType?: string): { width: number; height: number } => {
   switch (documentType) {
     case 'driver-license':
-      // Format carte de crédit (CR80) : 85.6mm × 54mm → ratio ~1.59:1
       return { width: 856, height: 540 };
     case 'registration':
-      // Carte grise française - format A4 ou proche
       return { width: 595, height: 842 };
     case 'insurance':
-      // Carte d'assurance - souvent format carte ou petit document
       return { width: 800, height: 600 };
     case 'payment-proof':
     case 'expense-proof':
-      // Tickets, reçus - format variable, ratio plus carré
       return { width: 600, height: 800 };
     case 'violation':
-      // PV/contravention - format A5 horizontal
       return { width: 595, height: 420 };
     case 'check':
-      // Chèque français standard : 175mm × 80mm → ratio ~2.19:1
+    case 'cheque':
       return { width: 875, height: 400 };
     default:
-      // Par défaut : A4
       return { width: 595, height: 842 };
   }
 };
@@ -48,7 +43,6 @@ declare global {
 // Load OpenCV via CDN (more reliable than npm)
 const loadOpenCV = (): Promise<void> => {
   return new Promise((resolve, reject) => {
-    // Check if already loaded
     if (window.cv && window.cv.Mat) {
       console.log('[OpenCV] Already loaded');
       resolve();
@@ -88,14 +82,27 @@ const loadOpenCV = (): Promise<void> => {
   });
 };
 
-// Detect mobile device for adaptive performance
-const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+// Detect mobile device
+const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
 export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   onCapture,
   onClose,
   documentType,
 }) => {
+  // On mobile, use SimpleCaptureMode (NO OpenCV) to prevent OOM crashes
+  if (isMobileDevice) {
+    console.log('[Scanner] Mobile detected - using SimpleCaptureMode (no OpenCV)');
+    return (
+      <SimpleCaptureMode
+        onCapture={onCapture}
+        onClose={onClose}
+        documentType={documentType}
+      />
+    );
+  }
+
+  // Desktop mode with OpenCV detection (rest of the component)
   const { toast } = useToast();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -117,12 +124,12 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   const [showPreview, setShowPreview] = useState(false);
   const [statusMessage, setStatusMessage] = useState('Chargement...');
   
-  // Adaptive constants based on device - DRASTICALLY reduced for mobile to prevent OOM crashes
-  const DETECTION_INTERVAL = isMobile ? 200 : 66; // ~5 FPS mobile, ~15 FPS desktop
-  const SCANNER_TIMEOUT = isMobile ? 20000 : 60000; // 20s mobile, 60s desktop
-  const GC_PAUSE_INTERVAL = isMobile ? 3000 : 5000; // 3s mobile, 5s desktop
-  const GC_PAUSE_DURATION = isMobile ? 800 : 500; // 800ms pause for GC on mobile
-  const MAX_CONSECUTIVE_ERRORS = isMobile ? 3 : 5; // Faster fallback on mobile
+  // Desktop-only constants (mobile uses SimpleCaptureMode, no OpenCV)
+  const DETECTION_INTERVAL = 66; // ~15 FPS desktop
+  const SCANNER_TIMEOUT = 60000; // 60s desktop
+  const GC_PAUSE_INTERVAL = 5000; // 5s desktop
+  const GC_PAUSE_DURATION = 500; // 500ms pause for GC
+  const MAX_CONSECUTIVE_ERRORS = 5;
 
   // Release canvas memory explicitly (critical for iOS Safari)
   const releaseCanvas = useCallback((canvas: HTMLCanvasElement | null) => {
@@ -168,14 +175,13 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       consecutiveErrorsRef.current = 0;
       setStatusMessage('Accès caméra...');
 
-      console.log('[Camera] Requesting getUserMedia, isMobile:', isMobile);
+      console.log('[Camera] Requesting getUserMedia (desktop mode)');
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'environment',
-          // DRASTICALLY reduced resolution on mobile to prevent OOM crashes
-          // 640x480 = 307K pixels vs 1920x1080 = 2M pixels (85% reduction)
-          width: { ideal: isMobile ? 640 : 1920 },
-          height: { ideal: isMobile ? 480 : 1080 },
+          // Full resolution for desktop
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
         },
         audio: false,
       });
