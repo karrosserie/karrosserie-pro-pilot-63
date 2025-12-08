@@ -85,24 +85,20 @@ const loadOpenCV = (): Promise<void> => {
 // Detect mobile device
 const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
+// Adaptive constants for mobile vs desktop
+const DETECTION_INTERVAL = isMobileDevice ? 120 : 66; // 8 FPS mobile, 15 FPS desktop
+const SCANNER_TIMEOUT = isMobileDevice ? 30000 : 60000; // 30s mobile, 60s desktop
+const GC_PAUSE_INTERVAL = isMobileDevice ? 3000 : 5000; // 3s mobile, 5s desktop
+const GC_PAUSE_DURATION = isMobileDevice ? 300 : 500; // 300ms mobile, 500ms desktop
+const MAX_CONSECUTIVE_ERRORS = 5;
+const VIDEO_WIDTH = isMobileDevice ? 1280 : 1920;
+const VIDEO_HEIGHT = isMobileDevice ? 720 : 1080;
+
 export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   onCapture,
   onClose,
   documentType,
 }) => {
-  // On mobile, use SimpleCaptureMode (NO OpenCV) to prevent OOM crashes
-  if (isMobileDevice) {
-    console.log('[Scanner] Mobile detected - using SimpleCaptureMode (no OpenCV)');
-    return (
-      <SimpleCaptureMode
-        onCapture={onCapture}
-        onClose={onClose}
-        documentType={documentType}
-      />
-    );
-  }
-
-  // Desktop mode with OpenCV detection (rest of the component)
   const { toast } = useToast();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -123,13 +119,6 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   const [previewDataUrl, setPreviewDataUrl] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [statusMessage, setStatusMessage] = useState('Chargement...');
-  
-  // Desktop-only constants (mobile uses SimpleCaptureMode, no OpenCV)
-  const DETECTION_INTERVAL = 66; // ~15 FPS desktop
-  const SCANNER_TIMEOUT = 60000; // 60s desktop
-  const GC_PAUSE_INTERVAL = 5000; // 5s desktop
-  const GC_PAUSE_DURATION = 500; // 500ms pause for GC
-  const MAX_CONSECUTIVE_ERRORS = 5;
 
   // Release canvas memory explicitly (critical for iOS Safari)
   const releaseCanvas = useCallback((canvas: HTMLCanvasElement | null) => {
@@ -175,13 +164,12 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       consecutiveErrorsRef.current = 0;
       setStatusMessage('Accès caméra...');
 
-      console.log('[Camera] Requesting getUserMedia (desktop mode)');
+      console.log('[Camera] Requesting getUserMedia, isMobile:', isMobileDevice);
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'environment',
-          // Full resolution for desktop
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
+          width: { ideal: VIDEO_WIDTH },
+          height: { ideal: VIDEO_HEIGHT },
         },
         audio: false,
       });
