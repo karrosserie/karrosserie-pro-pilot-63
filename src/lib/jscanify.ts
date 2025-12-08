@@ -36,10 +36,10 @@ class ContourStabilizer {
   private lastDrawnPoints: CornerPoints | null = null;
   private framesWithoutDetection = 0;
   
-  // Configuration - reduced history on mobile to save memory
-  private readonly HISTORY_SIZE = isMobileDevice ? 3 : 5;
-  private readonly MIN_MOVEMENT_THRESHOLD = 8; // pixels
-  private readonly DISAPPEAR_THRESHOLD = isMobileDevice ? 2 : 3; // frames before contour disappears
+  // Configuration - DRASTICALLY reduced history on mobile to prevent OOM crashes
+  private readonly HISTORY_SIZE = isMobileDevice ? 2 : 5; // Minimal history on mobile
+  private readonly MIN_MOVEMENT_THRESHOLD = isMobileDevice ? 12 : 8; // Less sensitive on mobile
+  private readonly DISAPPEAR_THRESHOLD = isMobileDevice ? 1 : 3; // Immediate disappear on mobile
   
   /**
    * Add a new detection to the history
