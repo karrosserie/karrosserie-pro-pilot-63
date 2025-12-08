@@ -4432,6 +4432,7 @@ export type Database = {
         Row: {
           amount: number
           bank_account: string
+          check_scan_date: string | null
           company_id: string | null
           created_at: string
           date: string
@@ -4447,6 +4448,7 @@ export type Database = {
         Insert: {
           amount: number
           bank_account: string
+          check_scan_date?: string | null
           company_id?: string | null
           created_at?: string
           date: string
@@ -4462,6 +4464,7 @@ export type Database = {
         Update: {
           amount?: number
           bank_account?: string
+          check_scan_date?: string | null
           company_id?: string | null
           created_at?: string
           date?: string

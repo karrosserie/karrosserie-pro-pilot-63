@@ -11,6 +11,7 @@ export interface Receipt {
   notes?: string;
   payment_proofs?: string[];
   invoice_id?: string | null;
+  check_scan_date?: string | null;
 }
 
 export interface ReceiptFormProps {
