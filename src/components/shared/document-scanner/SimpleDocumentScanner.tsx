@@ -88,6 +88,9 @@ const loadOpenCV = (): Promise<void> => {
   });
 };
 
+// Detect mobile device for adaptive performance
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
 export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   onCapture,
   onClose,
@@ -101,19 +104,25 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   const streamRef = useRef<MediaStream | null>(null);
   const lastDetectionTimeRef = useRef<number>(0);
   const scannerStartTimeRef = useRef<number>(0);
+  const lastGCPauseRef = useRef<number>(0);
+  const consecutiveErrorsRef = useRef<number>(0);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isOpenCVReady, setIsOpenCVReady] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [useFallbackMode, setUseFallbackMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewDataUrl, setPreviewDataUrl] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [statusMessage, setStatusMessage] = useState('Chargement...');
   
-  // Constants for optimization
-  const DETECTION_INTERVAL = 66; // ~15 FPS instead of 60 FPS
-  const SCANNER_TIMEOUT = 60000; // 60 seconds auto-stop
+  // Adaptive constants based on device
+  const DETECTION_INTERVAL = isMobile ? 120 : 66; // ~8 FPS mobile, ~15 FPS desktop
+  const SCANNER_TIMEOUT = isMobile ? 30000 : 60000; // 30s mobile, 60s desktop
+  const GC_PAUSE_INTERVAL = 5000; // 5 seconds
+  const GC_PAUSE_DURATION = 500; // 500ms pause for garbage collection
+  const MAX_CONSECUTIVE_ERRORS = 5;
 
   // Stop camera
   const stopCamera = useCallback(() => {
@@ -131,19 +140,22 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     }
   }, []);
 
-  // Start camera
+  // Start camera with adaptive resolution for mobile
   const startCamera = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
+      setUseFallbackMode(false);
+      consecutiveErrorsRef.current = 0;
       setStatusMessage('Accès caméra...');
 
-      console.log('[Camera] Requesting getUserMedia...');
+      console.log('[Camera] Requesting getUserMedia, isMobile:', isMobile);
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'environment',
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
+          // Lower resolution on mobile to reduce memory pressure
+          width: { ideal: isMobile ? 1280 : 1920 },
+          height: { ideal: isMobile ? 720 : 1080 },
         },
         audio: false,
       });
@@ -232,8 +244,10 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     console.log('[Detection] Starting loop, isSmallFormat:', isSmallFormat);
 
     const detectLoop = (timestamp: number) => {
-      // Security timeout - stop detection after 60 seconds to prevent memory leaks
-      if (timestamp - scannerStartTimeRef.current > SCANNER_TIMEOUT) {
+      const elapsedTime = timestamp - scannerStartTimeRef.current;
+      
+      // Security timeout - stop detection to prevent memory leaks
+      if (elapsedTime > SCANNER_TIMEOUT) {
         console.warn('[Detection] Timeout reached, stopping detection loop');
         if (animationRef.current) {
           cancelAnimationFrame(animationRef.current);
@@ -241,12 +255,23 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         }
         toast({
           title: "Scanner arrêté",
-          description: "Le scanner s'est arrêté après 60 secondes. Appuyez sur SCANNER pour capturer.",
+          description: `Le scanner s'est arrêté après ${SCANNER_TIMEOUT / 1000}s. Appuyez sur SCANNER pour capturer.`,
         });
         return;
       }
 
-      // Throttle detection to ~15 FPS instead of 60 FPS
+      // Periodic GC pause - skip detection every 5 seconds for 500ms to let garbage collector work
+      const timeSinceLastGCPause = timestamp - lastGCPauseRef.current;
+      if (timeSinceLastGCPause >= GC_PAUSE_INTERVAL && timeSinceLastGCPause < GC_PAUSE_INTERVAL + GC_PAUSE_DURATION) {
+        // In GC pause window - skip detection
+        animationRef.current = requestAnimationFrame(detectLoop);
+        return;
+      }
+      if (timeSinceLastGCPause >= GC_PAUSE_INTERVAL + GC_PAUSE_DURATION) {
+        lastGCPauseRef.current = timestamp;
+      }
+
+      // Throttle detection - 8 FPS on mobile, 15 FPS on desktop
       if (timestamp - lastDetectionTimeRef.current >= DETECTION_INTERVAL) {
         lastDetectionTimeRef.current = timestamp;
         
@@ -261,14 +286,29 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
           ctx.drawImage(video, 0, 0);
 
           // Highlight detected document (green contours) with adaptive detection
-          try {
-            scanner.highlightPaper(canvas, { 
-              color: 'lime', 
-              thickness: 6,
-              isSmallFormat 
-            });
-          } catch (err) {
-            // Silent fail - detection continues
+          // Skip OpenCV detection in fallback mode
+          if (!useFallbackMode) {
+            try {
+              scanner.highlightPaper(canvas, { 
+                color: 'lime', 
+                thickness: 6,
+                isSmallFormat 
+              });
+              consecutiveErrorsRef.current = 0; // Reset on success
+            } catch (err) {
+              consecutiveErrorsRef.current++;
+              console.warn('[Detection] Error count:', consecutiveErrorsRef.current);
+              
+              // Switch to fallback mode after too many errors
+              if (consecutiveErrorsRef.current >= MAX_CONSECUTIVE_ERRORS) {
+                console.warn('[Detection] Switching to fallback mode (no OpenCV)');
+                setUseFallbackMode(true);
+                toast({
+                  title: "Mode simplifié activé",
+                  description: "Détection désactivée. Cadrez manuellement le document.",
+                });
+              }
+            }
           }
         }
       }
@@ -284,7 +324,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         animationRef.current = null;
       }
     };
-  }, [isVideoPlaying, isOpenCVReady, isSmallFormat, toast, DETECTION_INTERVAL, SCANNER_TIMEOUT]);
+  }, [isVideoPlaying, isOpenCVReady, isSmallFormat, useFallbackMode, toast]);
 
   // Capture document with double-click protection
   const handleCapture = useCallback(() => {
