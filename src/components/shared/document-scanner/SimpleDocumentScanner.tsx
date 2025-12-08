@@ -99,14 +99,21 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   const animationRef = useRef<number | null>(null);
   const scannerRef = useRef<Jscanify | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const lastDetectionTimeRef = useRef<number>(0);
+  const scannerStartTimeRef = useRef<number>(0);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isOpenCVReady, setIsOpenCVReady] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [isCapturing, setIsCapturing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewDataUrl, setPreviewDataUrl] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [statusMessage, setStatusMessage] = useState('Chargement...');
+  
+  // Constants for optimization
+  const DETECTION_INTERVAL = 66; // ~15 FPS instead of 60 FPS
+  const SCANNER_TIMEOUT = 60000; // 60 seconds auto-stop
 
   // Stop camera
   const stopCamera = useCallback(() => {
@@ -204,9 +211,9 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   }, [startCamera, stopCamera]);
 
   // Determine if this is a small format document (license, card, etc.)
-  const isSmallFormat = ['driver-license', 'insurance', 'violation'].includes(documentType || '');
+  const isSmallFormat = ['driver-license', 'insurance', 'violation', 'check'].includes(documentType || '');
 
-  // Detection loop
+  // Detection loop with throttling and timeout
   useEffect(() => {
     if (!isVideoPlaying || !isOpenCVReady) return;
 
@@ -221,35 +228,55 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     const scanner = new Jscanify();
     scanner.resetStabilizer();
     scannerRef.current = scanner;
+    scannerStartTimeRef.current = performance.now();
     console.log('[Detection] Starting loop, isSmallFormat:', isSmallFormat);
 
-    const detectLoop = () => {
-      if (video.readyState >= 2 && video.videoWidth > 0) {
-        // Match canvas size to video
-        if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
+    const detectLoop = (timestamp: number) => {
+      // Security timeout - stop detection after 60 seconds to prevent memory leaks
+      if (timestamp - scannerStartTimeRef.current > SCANNER_TIMEOUT) {
+        console.warn('[Detection] Timeout reached, stopping detection loop');
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current);
+          animationRef.current = null;
         }
+        toast({
+          title: "Scanner arrêté",
+          description: "Le scanner s'est arrêté après 60 secondes. Appuyez sur SCANNER pour capturer.",
+        });
+        return;
+      }
 
-        // Draw video frame
-        ctx.drawImage(video, 0, 0);
+      // Throttle detection to ~15 FPS instead of 60 FPS
+      if (timestamp - lastDetectionTimeRef.current >= DETECTION_INTERVAL) {
+        lastDetectionTimeRef.current = timestamp;
+        
+        if (video.readyState >= 2 && video.videoWidth > 0) {
+          // Match canvas size to video
+          if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+          }
 
-        // Highlight detected document (green contours) with adaptive detection
-        try {
-          scanner.highlightPaper(canvas, { 
-            color: 'lime', 
-            thickness: 6,
-            isSmallFormat 
-          });
-        } catch (err) {
-          // Silent fail - detection continues
+          // Draw video frame
+          ctx.drawImage(video, 0, 0);
+
+          // Highlight detected document (green contours) with adaptive detection
+          try {
+            scanner.highlightPaper(canvas, { 
+              color: 'lime', 
+              thickness: 6,
+              isSmallFormat 
+            });
+          } catch (err) {
+            // Silent fail - detection continues
+          }
         }
       }
 
       animationRef.current = requestAnimationFrame(detectLoop);
     };
 
-    detectLoop();
+    animationRef.current = requestAnimationFrame(detectLoop);
 
     return () => {
       if (animationRef.current) {
@@ -257,10 +284,16 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         animationRef.current = null;
       }
     };
-  }, [isVideoPlaying, isOpenCVReady, isSmallFormat]);
+  }, [isVideoPlaying, isOpenCVReady, isSmallFormat, toast, DETECTION_INTERVAL, SCANNER_TIMEOUT]);
 
-  // Capture document
+  // Capture document with double-click protection
   const handleCapture = useCallback(() => {
+    // Double-click protection
+    if (isCapturing) {
+      console.log('[Capture] Already capturing, ignoring');
+      return;
+    }
+    
     const canvas = canvasRef.current;
     const scanner = scannerRef.current;
 
@@ -272,6 +305,8 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       });
       return;
     }
+
+    setIsCapturing(true);
 
     // Get dimensions based on document type
     const { width, height } = getExtractionDimensions(documentType);
@@ -303,8 +338,10 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
       setPreviewDataUrl(dataUrl);
       setShowPreview(true);
+    } finally {
+      setIsCapturing(false);
     }
-  }, [toast, documentType, isSmallFormat]);
+  }, [toast, documentType, isSmallFormat, isCapturing]);
 
   // Validate captured document
   const handleValidate = useCallback(() => {

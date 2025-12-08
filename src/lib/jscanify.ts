@@ -355,9 +355,17 @@ export class Jscanify {
 
   /**
    * Highlights the paper on the image/canvas with temporal stabilization
+   * Optimized with improved memory cleanup
    */
   highlightPaper(image: HTMLCanvasElement | HTMLImageElement, options?: ScanOptions): HTMLCanvasElement | null {
-    const cv = this.getCV();
+    let cv: any;
+    try {
+      cv = this.getCV();
+    } catch (err) {
+      console.warn('[Jscanify] OpenCV not ready');
+      return null;
+    }
+    
     const { color = 'lime', thickness = 8, isSmallFormat = false } = options || {};
     
     let canvas: HTMLCanvasElement;
@@ -378,6 +386,13 @@ export class Jscanify {
     
     try {
       img = cv.imread(canvas);
+      
+      // Validate imread result
+      if (!img || img.empty || img.empty()) {
+        console.warn('[Jscanify] Failed to read canvas - empty image');
+        return null;
+      }
+      
       contour = this.findPaperContour(img, isSmallFormat);
       
       // Get raw corner points from current frame
@@ -415,8 +430,21 @@ export class Jscanify {
       console.error('[Jscanify] highlightPaper error:', error);
       return null;
     } finally {
-      if (img) img.delete();
-      if (contour) contour.delete();
+      // Guaranteed cleanup with null checks and isDeleted verification
+      try {
+        if (img && typeof img.delete === 'function' && !img.isDeleted?.()) {
+          img.delete();
+        }
+      } catch (e) {
+        console.warn('[Jscanify] Error cleaning img:', e);
+      }
+      try {
+        if (contour && typeof contour.delete === 'function' && !contour.isDeleted?.()) {
+          contour.delete();
+        }
+      } catch (e) {
+        console.warn('[Jscanify] Error cleaning contour:', e);
+      }
     }
   }
 
