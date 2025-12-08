@@ -117,16 +117,33 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   const [showPreview, setShowPreview] = useState(false);
   const [statusMessage, setStatusMessage] = useState('Chargement...');
   
-  // Adaptive constants based on device
-  const DETECTION_INTERVAL = isMobile ? 120 : 66; // ~8 FPS mobile, ~15 FPS desktop
-  const SCANNER_TIMEOUT = isMobile ? 30000 : 60000; // 30s mobile, 60s desktop
-  const GC_PAUSE_INTERVAL = 5000; // 5 seconds
-  const GC_PAUSE_DURATION = 500; // 500ms pause for garbage collection
-  const MAX_CONSECUTIVE_ERRORS = 5;
+  // Adaptive constants based on device - DRASTICALLY reduced for mobile to prevent OOM crashes
+  const DETECTION_INTERVAL = isMobile ? 200 : 66; // ~5 FPS mobile, ~15 FPS desktop
+  const SCANNER_TIMEOUT = isMobile ? 20000 : 60000; // 20s mobile, 60s desktop
+  const GC_PAUSE_INTERVAL = isMobile ? 3000 : 5000; // 3s mobile, 5s desktop
+  const GC_PAUSE_DURATION = isMobile ? 800 : 500; // 800ms pause for GC on mobile
+  const MAX_CONSECUTIVE_ERRORS = isMobile ? 3 : 5; // Faster fallback on mobile
 
-  // Stop camera
+  // Release canvas memory explicitly (critical for iOS Safari)
+  const releaseCanvas = useCallback((canvas: HTMLCanvasElement | null) => {
+    if (!canvas) return;
+    try {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      // Setting dimensions to 0 forces memory release on iOS
+      canvas.width = 0;
+      canvas.height = 0;
+      console.log('[Memory] Canvas released');
+    } catch (e) {
+      console.warn('[Memory] Canvas release error:', e);
+    }
+  }, []);
+
+  // Stop camera with explicit memory cleanup
   const stopCamera = useCallback(() => {
-    console.log('[Camera] Stopping...');
+    console.log('[Camera] Stopping with memory cleanup...');
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
@@ -138,7 +155,9 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
-  }, []);
+    // Release canvas memory
+    releaseCanvas(canvasRef.current);
+  }, [releaseCanvas]);
 
   // Start camera with adaptive resolution for mobile
   const startCamera = useCallback(async () => {
@@ -153,9 +172,10 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'environment',
-          // Lower resolution on mobile to reduce memory pressure
-          width: { ideal: isMobile ? 1280 : 1920 },
-          height: { ideal: isMobile ? 720 : 1080 },
+          // DRASTICALLY reduced resolution on mobile to prevent OOM crashes
+          // 640x480 = 307K pixels vs 1920x1080 = 2M pixels (85% reduction)
+          width: { ideal: isMobile ? 640 : 1920 },
+          height: { ideal: isMobile ? 480 : 1080 },
         },
         audio: false,
       });
