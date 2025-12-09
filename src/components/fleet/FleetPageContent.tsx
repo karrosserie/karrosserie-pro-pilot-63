@@ -14,6 +14,7 @@ import FleetCurrentLoans from './FleetCurrentLoans';
 import FleetLoansHistory from './FleetLoansHistory';
 import FleetAttestationDialog from './FleetAttestationDialog';
 import FleetViolations from './FleetViolations';
+import LinkQuoteDialog from './LinkQuoteDialog';
 import { Loading } from '@/components/ui/loading';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useUserOnboardingProgress } from '@/hooks/use-user-onboarding-progress';
@@ -34,6 +35,11 @@ const FleetPageContent = () => {
   const [isAttestationDialogOpen, setIsAttestationDialogOpen] = useState(false);
   const [selectedLoanForAttestation, setSelectedLoanForAttestation] = useState<string | null>(null);
   const [showGuideDialog, setShowGuideDialog] = useState(false);
+  
+  // État pour le dialog de liaison de devis
+  const [isLinkQuoteDialogOpen, setIsLinkQuoteDialogOpen] = useState(false);
+  const [linkQuoteLoanId, setLinkQuoteLoanId] = useState<string | null>(null);
+  const [linkQuoteClientId, setLinkQuoteClientId] = useState<string | null>(null);
 
   const {
     vehicles,
@@ -152,6 +158,20 @@ const FleetPageContent = () => {
   const handleCloseAttestationDialog = () => {
     setIsAttestationDialogOpen(false);
     setSelectedLoanForAttestation(null);
+  };
+
+  // Fonction pour ouvrir le dialog de liaison de devis
+  const handleLinkQuote = (loanId: string, clientId: string) => {
+    setLinkQuoteLoanId(loanId);
+    setLinkQuoteClientId(clientId);
+    setIsLinkQuoteDialogOpen(true);
+  };
+
+  // Fonction pour fermer le dialog de liaison de devis
+  const handleCloseLinkQuoteDialog = () => {
+    setIsLinkQuoteDialogOpen(false);
+    setLinkQuoteLoanId(null);
+    setLinkQuoteClientId(null);
   };
 
   // Trouver les données complètes du prêt sélectionné pour l'attestation
@@ -294,6 +314,7 @@ const FleetPageContent = () => {
             onDeleteLoan={handleDeleteLoan}
             onViewAttestation={handleViewAttestation}
             onDownloadAttestation={handleDownloadAttestation}
+            onLinkQuote={handleLinkQuote}
           />
 
           <FleetLoansHistory 
@@ -338,6 +359,7 @@ const FleetPageContent = () => {
               onDeleteLoan={handleDeleteLoan}
               onViewAttestation={handleViewAttestation}
               onDownloadAttestation={handleDownloadAttestation}
+              onLinkQuote={handleLinkQuote}
             />
 
             <FleetViolations />
@@ -374,6 +396,13 @@ const FleetPageContent = () => {
         onOpenChange={handleCloseAttestationDialog}
         loanId={selectedLoanForAttestation}
         loanData={reservations?.find(r => r.id === selectedLoanForAttestation)}
+      />
+
+      <LinkQuoteDialog
+        isOpen={isLinkQuoteDialogOpen}
+        onClose={handleCloseLinkQuoteDialog}
+        reservationId={linkQuoteLoanId}
+        clientId={linkQuoteClientId}
       />
 
       <AlertDialog open={showGuideDialog} onOpenChange={setShowGuideDialog}>

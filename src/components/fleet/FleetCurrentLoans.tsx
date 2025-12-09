@@ -1,13 +1,13 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Car, Calendar, User, Trash, FileText, Download } from 'lucide-react';
+import { Car, Calendar, User, Trash, FileText, Download, Link } from 'lucide-react';
 
 interface CurrentLoan {
   id: string;
   vehicle: string;
   client: string;
+  clientId: string;
   startDate: string;
   expectedReturnDate: string;
   status: string;
@@ -27,6 +27,7 @@ interface FleetCurrentLoansProps {
   onNewLoan?: () => void;
   onViewAttestation?: (loanId: string) => void;
   onDownloadAttestation?: (loanId: string) => void;
+  onLinkQuote?: (loanId: string, clientId: string) => void;
 }
 
 const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({ 
@@ -36,7 +37,8 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
   onDeleteLoan,
   onNewLoan,
   onViewAttestation,
-  onDownloadAttestation
+  onDownloadAttestation,
+  onLinkQuote,
 }) => {
   return (
     <div className="card-container transition-all duration-300" id="fleet-current-loans-section">
@@ -53,16 +55,29 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
                 <Car className="h-4 w-4 text-gray-600 mr-2" />
                 <h4 className="font-medium">{loan.vehicle}</h4>
               </div>
-              {!loan.quote && (
-                <Badge variant="outline" className="text-orange-600 border-orange-600">
-                  ⚠️ Sans devis assurance
-                </Badge>
-              )}
-              {loan.quote && (
-                <Badge variant="secondary" className="text-green-700 border-green-700">
-                  ✅ Devis {loan.quote.reference}
-                </Badge>
-              )}
+              <div className="flex items-center gap-2">
+                {!loan.quote && (
+                  <>
+                    <Badge variant="outline" className="text-orange-600 border-orange-600">
+                      ⚠️ Sans devis
+                    </Badge>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onLinkQuote?.(loan.id, loan.clientId)}
+                      className="text-xs h-6 px-2"
+                    >
+                      <Link className="h-3 w-3 mr-1" />
+                      Lier un devis
+                    </Button>
+                  </>
+                )}
+                {loan.quote && (
+                  <Badge variant="secondary" className="text-green-700 border-green-700">
+                    ✅ Devis {loan.quote.reference}
+                  </Badge>
+                )}
+              </div>
             </div>
             
             <div className="space-y-2 text-sm text-gray-600 ml-6">
