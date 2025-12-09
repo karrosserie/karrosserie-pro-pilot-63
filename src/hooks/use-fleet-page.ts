@@ -48,6 +48,7 @@ export const useFleetPage = () => {
         id: reservation.id,
         vehicle: `${vehicleDisplay} - ${reservation.fleet_vehicles?.license_plate || 'N/A'}`,
         client: `${reservation.clients?.first_name || ''} ${reservation.clients?.last_name || ''}`,
+        clientId: reservation.client_id || '',
         startDate: new Date(reservation.start_date).toLocaleDateString('fr-FR'),
         expectedReturnDate: new Date(reservation.expected_return_date).toLocaleDateString('fr-FR'),
         status: reservation.status,
