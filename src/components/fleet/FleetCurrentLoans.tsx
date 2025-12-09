@@ -50,9 +50,8 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
               <div className="flex items-center gap-2">
                 {!loan.quote && <>
                     <Badge className="bg-orange-100 text-orange-700 border border-orange-200 flex items-center gap-1.5">
-
-Sans devis<span className="h-2 w-2 rounded-full bg-orange-500 animate-pulse"></span>
-                      Sans devis assurance
+                      <span className="h-2 w-2 rounded-full bg-orange-500 animate-pulse"></span>
+                      Sans devis
                     </Badge>
                     <Button variant="outline" size="sm" onClick={() => onLinkQuote?.(loan.id, loan.clientId)} className="text-xs h-7 px-3 text-orange-600 border-orange-300 hover:bg-orange-50 hover:border-orange-400">
                       <Link className="h-3 w-3 mr-1" />
