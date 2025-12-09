@@ -1019,6 +1019,76 @@ export type Database = {
         }
         Relationships: []
       }
+      churn_predictions: {
+        Row: {
+          actual_churned_at: string | null
+          calculated_at: string | null
+          churn_probability: number | null
+          company_id: string
+          confidence_score: number | null
+          created_at: string | null
+          factor_breakdown: Json | null
+          id: string
+          intervention_urgency: string | null
+          predicted_churn_window: string | null
+          top_risk_factors: Json | null
+          updated_at: string | null
+          validated_outcome: boolean | null
+        }
+        Insert: {
+          actual_churned_at?: string | null
+          calculated_at?: string | null
+          churn_probability?: number | null
+          company_id: string
+          confidence_score?: number | null
+          created_at?: string | null
+          factor_breakdown?: Json | null
+          id?: string
+          intervention_urgency?: string | null
+          predicted_churn_window?: string | null
+          top_risk_factors?: Json | null
+          updated_at?: string | null
+          validated_outcome?: boolean | null
+        }
+        Update: {
+          actual_churned_at?: string | null
+          calculated_at?: string | null
+          churn_probability?: number | null
+          company_id?: string
+          confidence_score?: number | null
+          created_at?: string | null
+          factor_breakdown?: Json | null
+          id?: string
+          intervention_urgency?: string | null
+          predicted_churn_window?: string | null
+          top_risk_factors?: Json | null
+          updated_at?: string | null
+          validated_outcome?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "churn_predictions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "churn_predictions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "churn_predictions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_activity_trends: {
         Row: {
           activity_level: string
@@ -1286,6 +1356,70 @@ export type Database = {
             columns: ["quote_id"]
             isOneToOne: false
             referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_segments: {
+        Row: {
+          calculated_at: string | null
+          company_id: string
+          confidence_score: number | null
+          created_at: string | null
+          id: string
+          primary_characteristics: Json | null
+          secondary_segment: string | null
+          segment_code: string
+          segment_name: string
+          updated_at: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          calculated_at?: string | null
+          company_id: string
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string
+          primary_characteristics?: Json | null
+          secondary_segment?: string | null
+          segment_code: string
+          segment_name: string
+          updated_at?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          calculated_at?: string | null
+          company_id?: string
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string
+          primary_characteristics?: Json | null
+          secondary_segment?: string | null
+          segment_code?: string
+          segment_name?: string
+          updated_at?: string | null
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_segments_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "client_segments_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "client_segments_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
         ]
@@ -1952,6 +2086,73 @@ export type Database = {
           is_answer?: boolean | null
         }
         Relationships: []
+      }
+      detected_patterns: {
+        Row: {
+          company_id: string
+          created_at: string | null
+          detected_at: string | null
+          detection_confidence: number | null
+          id: string
+          intervention_result: string | null
+          intervention_triggered_at: string | null
+          pattern_resolved_at: string | null
+          pattern_type: string
+          recommended_intervention: string | null
+          signals: Json | null
+          urgency: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string | null
+          detected_at?: string | null
+          detection_confidence?: number | null
+          id?: string
+          intervention_result?: string | null
+          intervention_triggered_at?: string | null
+          pattern_resolved_at?: string | null
+          pattern_type: string
+          recommended_intervention?: string | null
+          signals?: Json | null
+          urgency?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string | null
+          detected_at?: string | null
+          detection_confidence?: number | null
+          id?: string
+          intervention_result?: string | null
+          intervention_triggered_at?: string | null
+          pattern_resolved_at?: string | null
+          pattern_type?: string
+          recommended_intervention?: string | null
+          signals?: Json | null
+          urgency?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "detected_patterns_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "detected_patterns_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "detected_patterns_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       document_sav: {
         Row: {
@@ -3859,6 +4060,73 @@ export type Database = {
           },
         ]
       }
+      module_recommendations: {
+        Row: {
+          adoption_potential: number | null
+          business_impact_score: number | null
+          calculated_at: string | null
+          company_id: string
+          created_at: string | null
+          current_usage_score: number | null
+          id: string
+          module_id: string
+          module_name: string
+          priority: string | null
+          similar_companies: Json | null
+          suggested_actions: Json | null
+        }
+        Insert: {
+          adoption_potential?: number | null
+          business_impact_score?: number | null
+          calculated_at?: string | null
+          company_id: string
+          created_at?: string | null
+          current_usage_score?: number | null
+          id?: string
+          module_id: string
+          module_name: string
+          priority?: string | null
+          similar_companies?: Json | null
+          suggested_actions?: Json | null
+        }
+        Update: {
+          adoption_potential?: number | null
+          business_impact_score?: number | null
+          calculated_at?: string | null
+          company_id?: string
+          created_at?: string | null
+          current_usage_score?: number | null
+          id?: string
+          module_id?: string
+          module_name?: string
+          priority?: string | null
+          similar_companies?: Json | null
+          suggested_actions?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "module_recommendations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "module_recommendations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "module_recommendations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       n8n_chat_histories: {
         Row: {
           created_at: string
@@ -3924,6 +4192,67 @@ export type Database = {
           mail_id?: string | null
         }
         Relationships: []
+      }
+      optimal_send_times: {
+        Row: {
+          activity_heatmap: Json | null
+          best_day_of_week: number | null
+          best_hour: number | null
+          calculated_at: string | null
+          company_id: string
+          confidence_score: number | null
+          created_at: string | null
+          id: string
+          response_rates: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          activity_heatmap?: Json | null
+          best_day_of_week?: number | null
+          best_hour?: number | null
+          calculated_at?: string | null
+          company_id: string
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string
+          response_rates?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          activity_heatmap?: Json | null
+          best_day_of_week?: number | null
+          best_hour?: number | null
+          calculated_at?: string | null
+          company_id?: string
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string
+          response_rates?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "optimal_send_times_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "optimal_send_times_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "optimal_send_times_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       otp_codes: {
         Row: {
@@ -4147,6 +4476,76 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      personalized_messages: {
+        Row: {
+          channel: string | null
+          clicked_at: string | null
+          company_id: string
+          converted_at: string | null
+          created_at: string | null
+          generated_at: string | null
+          id: string
+          opened_at: string | null
+          personalized_body: string | null
+          personalized_subject: string | null
+          sent_at: string | null
+          template_id: string
+          variables_used: Json | null
+        }
+        Insert: {
+          channel?: string | null
+          clicked_at?: string | null
+          company_id: string
+          converted_at?: string | null
+          created_at?: string | null
+          generated_at?: string | null
+          id?: string
+          opened_at?: string | null
+          personalized_body?: string | null
+          personalized_subject?: string | null
+          sent_at?: string | null
+          template_id: string
+          variables_used?: Json | null
+        }
+        Update: {
+          channel?: string | null
+          clicked_at?: string | null
+          company_id?: string
+          converted_at?: string | null
+          created_at?: string | null
+          generated_at?: string | null
+          id?: string
+          opened_at?: string | null
+          personalized_body?: string | null
+          personalized_subject?: string | null
+          sent_at?: string | null
+          template_id?: string
+          variables_used?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "personalized_messages_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "personalized_messages_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "personalized_messages_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       planning_patron: {
         Row: {

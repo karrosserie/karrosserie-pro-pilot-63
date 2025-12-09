@@ -58,14 +58,15 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
               <div className="flex items-center gap-2">
                 {!loan.quote && (
                   <>
-                    <Badge variant="outline" className="text-orange-600 border-orange-600">
-                      ⚠️ Sans devis
+                    <Badge className="bg-orange-100 text-orange-700 border border-orange-200 flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full bg-orange-500 animate-pulse"></span>
+                      Sans devis assurance
                     </Badge>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => onLinkQuote?.(loan.id, loan.clientId)}
-                      className="text-xs h-6 px-2"
+                      className="text-xs h-7 px-3 text-orange-600 border-orange-300 hover:bg-orange-50 hover:border-orange-400"
                     >
                       <Link className="h-3 w-3 mr-1" />
                       Lier un devis
@@ -73,8 +74,9 @@ const FleetCurrentLoans: React.FC<FleetCurrentLoansProps> = ({
                   </>
                 )}
                 {loan.quote && (
-                  <Badge variant="secondary" className="text-green-700 border-green-700">
-                    ✅ Devis {loan.quote.reference}
+                  <Badge className="bg-green-100 text-green-700 border border-green-200 flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-green-500"></span>
+                    Devis {loan.quote.reference}
                   </Badge>
                 )}
               </div>
