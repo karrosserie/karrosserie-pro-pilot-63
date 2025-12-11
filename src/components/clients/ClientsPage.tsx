@@ -20,7 +20,7 @@ import { Client } from '@/services/supabase/clients';
 const ClientsPage = () => {
   const { clients, isLoading, error } = useClients();
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortOption, setSortOption] = useState<ClientSortOption>('alphabetical-asc');
+  const [sortOption, setSortOption] = useState<ClientSortOption>('recent-first');
   const [searchParams, setSearchParams] = useSearchParams();
   const [highlightedClientId, setHighlightedClientId] = useState<string | null>(null);
   
