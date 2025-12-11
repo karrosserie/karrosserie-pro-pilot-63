@@ -204,11 +204,20 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
         showProgress
         showSkipButton
         spotlightClicks
+        scrollToFirstStep
+        scrollOffset={100}
+        disableScrollParentFix={false}
         callback={handleJoyrideCallback}
+        floaterProps={{
+          disableAnimation: false,
+        }}
         styles={{
           options: {
             zIndex: 10000,
             primaryColor: 'hsl(var(--primary))',
+          },
+          spotlight: {
+            borderRadius: 8,
           },
         }}
         locale={{

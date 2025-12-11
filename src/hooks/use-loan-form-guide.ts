@@ -12,22 +12,42 @@ export const useLoanFormGuide = (
   const [runTour, setRunTour] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const isInteractingRef = useRef(false);
   const previousLicenseRef = useRef({ front: '', back: '' });
 
+  // Mapping direct : 1 étape = 1 onglet
+  const tabToStep: { [key: string]: number } = {
+    'client-info': 0,
+    'insurance': 1,
+    'damages': 2,
+    'vehicle-details': 3,
+    'attestation': 4
+  };
+
+  const stepToTab: { [key: number]: string } = {
+    0: 'client-info',
+    1: 'insurance',
+    2: 'damages',
+    3: 'vehicle-details',
+    4: 'attestation'
+  };
+
+  // Scroll vers l'élément cible
+  const scrollToTarget = (targetSelector: string) => {
+    setTimeout(() => {
+      const element = document.querySelector(targetSelector);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+  };
+
+  // Initialiser le tour
   useEffect(() => {
     if (!isViewMode && isOpen) {
       setTimeout(() => {
-        const firstElement = document.querySelector('[data-tour="client-select"]');
-        if (firstElement) {
-          setCurrentStep(0);
-          setRunTour(true);
-        } else {
-          setTimeout(() => {
-            setCurrentStep(0);
-            setRunTour(true);
-          }, 500);
-        }
+        setCurrentStep(0);
+        setRunTour(true);
+        scrollToTarget('[data-tour="client-select"]');
       }, 1000);
     } else {
       setRunTour(false);
@@ -35,36 +55,24 @@ export const useLoanFormGuide = (
     }
   }, [isViewMode, isOpen]);
 
-  // Suivre les changements d'onglets et mettre à jour le guide
+  // Synchroniser le guide avec les changements d'onglets manuels
   useEffect(() => {
     if (!isOpen || isViewMode || !activeTab) return;
 
-    const tabToStep: { [key: string]: number } = {
-      'client-info': 0,
-      'insurance': 2,
-      'damages': 3,
-      'vehicle-details': 4,
-      'attestation': 7
-    };
-
     const newStep = tabToStep[activeTab];
     if (newStep !== undefined && newStep !== currentStep) {
-      console.log('Tab changed to:', activeTab, '- Setting guide step to:', newStep);
       setCurrentStep(newStep);
+      setRunTour(true);
       
-      // Désactiver complètement le guide sur l'onglet damages
-      if (activeTab === 'damages') {
-        setRunTour(false);
-      } else {
-        // Réafficher le guide pour les autres onglets
-        setTimeout(() => {
-          setRunTour(true);
-        }, 500);
+      // Scroll vers l'élément cible de l'onglet
+      const steps = getSteps();
+      if (steps[newStep]) {
+        scrollToTarget(steps[newStep].target as string);
       }
     }
   }, [activeTab, isOpen, isViewMode]);
 
-  // Nettoyer le timer à la destruction du composant
+  // Nettoyer le timer à la destruction
   useEffect(() => {
     return () => {
       if (inactivityTimerRef.current) {
@@ -73,44 +81,14 @@ export const useLoanFormGuide = (
     };
   }, []);
 
-  // Réinitialiser le timer d'inactivité
-  const resetInactivityTimer = () => {
-    if (inactivityTimerRef.current) {
-      clearTimeout(inactivityTimerRef.current);
-    }
-
-    // Après 2 secondes sans activité, réafficher le guide à l'étape suivante
-    inactivityTimerRef.current = setTimeout(() => {
-      if (isInteractingRef.current) {
-        isInteractingRef.current = false;
-        setCurrentStep(prev => Math.min(prev + 1, 7));
-        setRunTour(true);
-      }
-    }, 2000);
-  };
-
-  // Détecter quand le permis de conduire est uploadé
+  // Détecter l'upload du permis pour avancer automatiquement
   useEffect(() => {
-    console.log('License Upload Detection - Step:', currentStep, 'Front:', driverLicenseFrontUrl, 'Back:', driverLicenseBackUrl);
-    
-    if (!isOpen || isViewMode) {
-      console.log('License Upload Detection - Skipped (dialog closed or view mode)');
-      return;
-    }
-
-    // Détecter l'upload uniquement si on est aux premières étapes (0, 1 ou 2)
-    if (currentStep > 2) {
-      console.log('License Upload Detection - Already past license step');
-      return;
-    }
+    if (!isOpen || isViewMode || currentStep !== 0) return;
 
     const hasNewFrontUrl = driverLicenseFrontUrl && driverLicenseFrontUrl !== previousLicenseRef.current.front;
     const hasNewBackUrl = driverLicenseBackUrl && driverLicenseBackUrl !== previousLicenseRef.current.back;
     const hasBothSides = driverLicenseFrontUrl && driverLicenseBackUrl;
 
-    console.log('License Upload Detection - Has new front?', hasNewFrontUrl, 'Has new back?', hasNewBackUrl, 'Has both?', hasBothSides);
-
-    // Mettre à jour les références si un nouveau fichier est détecté
     if (hasNewFrontUrl || hasNewBackUrl) {
       previousLicenseRef.current = {
         front: driverLicenseFrontUrl || '',
@@ -118,92 +96,23 @@ export const useLoanFormGuide = (
       };
     }
 
-    // Ne passer à l'étape suivante que si les DEUX côtés sont uploadés
+    // Avancer à l'onglet assurance quand les deux côtés sont uploadés
     if (hasBothSides && (hasNewFrontUrl || hasNewBackUrl)) {
-      console.log('License Upload Detection - Both sides detected! Advancing to next step...');
-      
-      // Si les deux côtés du permis sont uploadés, passer à l'étape suivante
       if (inactivityTimerRef.current) {
         clearTimeout(inactivityTimerRef.current);
       }
-      isInteractingRef.current = false;
       
-      // Changer d'onglet vers "insurance" puis afficher le guide
       if (setActiveTab) {
         setActiveTab('insurance');
       }
       
-      // Attendre que l'élément cible soit dans le DOM puis passer à l'étape suivante
       setTimeout(() => {
-        const nextElement = document.querySelector('[data-tour="insurance-switch"]');
-        if (nextElement) {
-          console.log('License Upload Detection - Target found, showing tour at step 2');
-          setCurrentStep(2);
-          setRunTour(true);
-        } else {
-          console.log('License Upload Detection - Target not found, retrying...');
-          setTimeout(() => {
-            console.log('License Upload Detection - Setting step to 2 and showing tour');
-            setCurrentStep(2);
-            setRunTour(true);
-          }, 500);
-        }
-      }, 1500);
+        setCurrentStep(1);
+        setRunTour(true);
+        scrollToTarget('[data-tour="insurance-switch"]');
+      }, 500);
     }
-  }, [driverLicenseFrontUrl, driverLicenseBackUrl, currentStep, isOpen, isViewMode]);
-
-  // Détecter les interactions avec les champs du formulaire
-  useEffect(() => {
-    if (!isOpen || isViewMode) return;
-
-    const handleClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const tourElement = target.closest('[data-tour]');
-      
-      if (tourElement) {
-        const isFormElement = target.matches('input, select, button, textarea, [role="combobox"]') ||
-                             target.closest('input, select, button, textarea, [role="combobox"]');
-        
-        if (isFormElement && runTour) {
-          // Ne pas démarrer le timer pour l'étape du permis (step 1) et des dommages (step 3)
-          const isLicenseStep = tourElement.getAttribute('data-tour') === 'driver-license';
-          const isDamageStep = tourElement.getAttribute('data-tour') === 'damage-assessment';
-          
-          isInteractingRef.current = true;
-          setRunTour(false);
-          
-          // Ne démarrer le timer que si ce n'est pas l'étape du permis ou des dommages
-          if (!isLicenseStep && !isDamageStep && currentStep !== 1 && currentStep !== 3) {
-            resetInactivityTimer();
-          }
-        }
-      }
-    };
-
-    const handleInput = () => {
-      // Ne pas réinitialiser le timer pour l'étape du permis et des dommages
-      if (isInteractingRef.current && currentStep !== 1 && currentStep !== 3) {
-        resetInactivityTimer();
-      }
-    };
-
-    const handleChange = () => {
-      // Ne pas réinitialiser le timer pour l'étape du permis et des dommages
-      if (isInteractingRef.current && currentStep !== 1 && currentStep !== 3) {
-        resetInactivityTimer();
-      }
-    };
-
-    document.addEventListener('mousedown', handleClick, true);
-    document.addEventListener('input', handleInput, true);
-    document.addEventListener('change', handleChange, true);
-    
-    return () => {
-      document.removeEventListener('mousedown', handleClick, true);
-      document.removeEventListener('input', handleInput, true);
-      document.removeEventListener('change', handleChange, true);
-    };
-  }, [isOpen, isViewMode, runTour]);
+  }, [driverLicenseFrontUrl, driverLicenseBackUrl, currentStep, isOpen, isViewMode, setActiveTab]);
 
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status, action, index, type } = data;
@@ -212,63 +121,78 @@ export const useLoanFormGuide = (
     if (finishedStatuses.includes(status)) {
       setRunTour(false);
       setCurrentStep(0);
-    } else if (type === 'step:after') {
+      return;
+    }
+
+    if (type === 'step:after') {
       if (action === 'next') {
-        setCurrentStep(index + 1);
+        const nextStep = index + 1;
+        const nextTab = stepToTab[nextStep];
+        
+        if (nextTab && setActiveTab) {
+          // Changer d'onglet puis mettre à jour le step
+          setActiveTab(nextTab);
+          setTimeout(() => {
+            setCurrentStep(nextStep);
+            setRunTour(true);
+            const steps = getSteps();
+            if (steps[nextStep]) {
+              scrollToTarget(steps[nextStep].target as string);
+            }
+          }, 300);
+        }
       } else if (action === 'prev') {
-        setCurrentStep(Math.max(0, index - 1));
+        const prevStep = Math.max(0, index - 1);
+        const prevTab = stepToTab[prevStep];
+        
+        if (prevTab && setActiveTab) {
+          setActiveTab(prevTab);
+          setTimeout(() => {
+            setCurrentStep(prevStep);
+            setRunTour(true);
+          }, 300);
+        }
       }
     }
   };
 
-  const steps: Step[] = [
+  const getSteps = (): Step[] => [
     {
       target: '[data-tour="client-select"]',
-      content: 'Commencez par sélectionner le client qui va emprunter le véhicule. Vous pouvez chercher un client existant ou en créer un nouveau.',
+      content: 'Sélectionnez le client et téléchargez son permis de conduire (recto et verso).',
       placement: 'bottom',
       disableBeacon: true,
     },
     {
-      target: '[data-tour="driver-license"]',
-      content: 'Téléchargez le permis de conduire du client (recto et verso). L\'analyse automatique remplira les informations nécessaires.',
-      placement: 'bottom',
-    },
-    {
       target: '[data-tour="insurance-switch"]',
-      content: 'Indiquez si le client possède une assurance. Si oui, renseignez les informations de l\'assurance.',
+      content: 'Indiquez si le client possède une assurance et renseignez les informations si nécessaire.',
       placement: 'bottom',
+      disableBeacon: true,
     },
     {
       target: '[data-tour="damage-assessment"]',
       content: 'Inspectez le véhicule et signalez tous les chocs et rayures existants avant le prêt.',
       placement: 'top',
+      disableBeacon: true,
     },
     {
       target: '[data-tour="vehicle-mileage"]',
-      content: 'Renseignez le kilométrage actuel du véhicule au moment du prêt.',
+      content: 'Renseignez le kilométrage, le niveau de carburant et prenez des photos du véhicule.',
       placement: 'bottom',
-    },
-    {
-      target: '[data-tour="fuel-level"]',
-      content: 'Indiquez le niveau de carburant du véhicule (en pourcentage).',
-      placement: 'bottom',
-    },
-    {
-      target: '[data-tour="vehicle-photos"]',
-      content: 'Prenez des photos du véhicule avant le prêt. Cela servira de preuve de l\'état initial.',
-      placement: 'top',
+      disableBeacon: true,
     },
     {
       target: '[data-tour="attestation"]',
-      content: 'Enfin, faites lire et signer l\'attestation de prêt au client.',
+      content: 'Faites lire et signer l\'attestation de prêt au client pour finaliser.',
       placement: 'top',
+      disableBeacon: true,
     },
   ];
 
   return {
     runTour,
     stepIndex: currentStep,
-    steps,
+    steps: getSteps(),
     handleJoyrideCallback,
   };
 };
