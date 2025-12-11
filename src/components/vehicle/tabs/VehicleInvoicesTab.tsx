@@ -219,9 +219,10 @@ const VehicleInvoicesTab: React.FC<VehicleInvoicesTabProps> = ({ vehicleId }) =>
 
   return (
     <>
-      <div className="card-container p-0">
-        <div className="overflow-x-auto">
-          <Table className="min-w-[600px]">
+      <div className="w-full max-w-full overflow-hidden">
+        <div className="card-container p-0">
+          <div className="overflow-x-auto">
+            <Table className="min-w-[500px] w-full">
             <TableHeader>
               <TableRow>
                 <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
@@ -340,7 +341,8 @@ const VehicleInvoicesTab: React.FC<VehicleInvoicesTabProps> = ({ vehicleId }) =>
                 </TableRow>
               )}
             </TableBody>
-          </Table>
+            </Table>
+          </div>
         </div>
       </div>
 

@@ -205,19 +205,19 @@ const VehicleDetailsDialog: React.FC<VehicleDetailsDialogProps> = ({
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="w-[95vw] max-w-7xl h-[95vh] md:h-[90vh] max-h-[95vh] md:max-h-[90vh] overflow-hidden p-0">
-          <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4">
-            <DialogTitle className="text-lg sm:text-xl">{title}</DialogTitle>
-            {description && <DialogDescription className="text-sm">{description}</DialogDescription>}
+          <DialogHeader className="px-3 sm:px-4 md:px-6 pt-3 sm:pt-4 md:pt-6 pb-2 sm:pb-3 md:pb-4 flex-shrink-0">
+            <DialogTitle className="text-base sm:text-lg md:text-xl truncate">{title}</DialogTitle>
+            {description && <DialogDescription className="text-xs sm:text-sm truncate">{description}</DialogDescription>}
           </DialogHeader>
           
-          <div className="flex flex-col md:flex-row h-[calc(95vh-80px)] md:h-[calc(90vh-120px)]">
+          <div className="flex flex-col md:flex-row h-[calc(95vh-60px)] sm:h-[calc(95vh-70px)] md:h-[calc(90vh-120px)] w-full max-w-full overflow-hidden">
             <VehicleDetailsSidebar
               activeTab={activeTab}
               onTabChange={setActiveTab}
               sidebarItems={sidebarItems}
             />
             
-            <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 sm:p-3 md:p-4 lg:p-6 w-full max-w-full">
               {renderActiveContent()}
             </div>
           </div>

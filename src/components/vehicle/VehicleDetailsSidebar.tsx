@@ -35,8 +35,8 @@ export const VehicleDetailsSidebar: React.FC<VehicleDetailsSidebarProps> = ({
   return (
     <>
       {/* Version mobile - onglets horizontaux scrollables */}
-      <div className="md:hidden w-full border-b border-gray-200 bg-gray-50 overflow-x-auto">
-        <div className="flex p-2 gap-1 min-w-max">
+      <div className="md:hidden w-full max-w-full border-b border-gray-200 bg-gray-50 overflow-hidden flex-shrink-0">
+        <div className="flex p-1.5 gap-0.5 overflow-x-auto scrollbar-hide">
           {sidebarItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -46,10 +46,10 @@ export const VehicleDetailsSidebar: React.FC<VehicleDetailsSidebarProps> = ({
                 key={item.id}
                 onClick={() => onTabChange(item.id)}
                 className={cn(
-                  "flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-md transition-colors whitespace-nowrap",
+                  "flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-medium rounded-md transition-colors flex-shrink-0",
                   isActive
                     ? "bg-karrosserie-orange/10 text-karrosserie-orange border border-karrosserie-orange/20"
-                    : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    : "text-gray-700 hover:bg-gray-100"
                 )}
               >
                 <Icon 
@@ -58,10 +58,9 @@ export const VehicleDetailsSidebar: React.FC<VehicleDetailsSidebarProps> = ({
                     isActive ? "text-karrosserie-orange" : "text-gray-500"
                   )}
                 />
-                <span className="hidden sm:inline">{item.label}</span>
                 {item.count > 0 && (
                   <Badge 
-                    className="text-[10px] min-w-[18px] h-4 flex items-center justify-center bg-karrosserie-orange text-white font-medium"
+                    className="text-[9px] min-w-[16px] h-3.5 px-1 flex items-center justify-center bg-karrosserie-orange text-white font-medium"
                   >
                     {item.count}
                   </Badge>
