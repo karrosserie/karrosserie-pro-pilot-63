@@ -497,11 +497,15 @@ const Invoices = () => {
                                <Eye className="mr-2 h-4 w-4" />
                                Voir
                              </DropdownMenuItem>
-                             <DropdownMenuSeparator />
-                             <DropdownMenuItem onClick={() => handlePrint(invoice)}>
-                               <Printer className="mr-2 h-4 w-4" />
-                               Imprimer
-                             </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={() => handleDownload(invoice)}>
+                                <Download className="mr-2 h-4 w-4" />
+                                Télécharger PDF
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handlePrint(invoice)}>
+                                <Printer className="mr-2 h-4 w-4" />
+                                Imprimer
+                              </DropdownMenuItem>
                              <DropdownMenuItem onClick={() => handleSendEmail(invoice)}>
                                <Mail className="mr-2 h-4 w-4" />
                                Envoyer par email
