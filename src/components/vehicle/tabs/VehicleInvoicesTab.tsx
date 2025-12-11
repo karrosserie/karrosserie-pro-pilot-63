@@ -220,174 +220,132 @@ const VehicleInvoicesTab: React.FC<VehicleInvoicesTabProps> = ({ vehicleId }) =>
   return (
     <>
       <div className="w-full max-w-full overflow-hidden">
-        <div className="card-container p-0">
+        {/* Mobile: Cards empilées */}
+        <div className="md:hidden space-y-3 p-2">
+          {sortedData.map((invoice) => (
+            <div key={invoice.id} className="bg-white border rounded-lg p-3 shadow-sm">
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <p className="font-medium text-sm">{invoice.reference}</p>
+                  <p className="text-xs text-gray-500">{formatDate(invoice.created_at)}</p>
+                </div>
+                <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status || 'En attente de paiement')}`}>
+                  {invoice.status || 'En attente'}
+                </span>
+              </div>
+              <p className="text-sm font-semibold text-karrosserie-orange mb-3">{formatAmount(invoice.amount || 0)}</p>
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" size="sm" className="h-8 w-8 p-0" onClick={() => handleView(invoice)}>
+                  <Eye className="h-4 w-4" />
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-background border shadow-lg z-50">
+                    <DropdownMenuItem onClick={() => handleDownload(invoice)}><Download className="h-4 w-4 mr-2" />Télécharger</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handlePrint(invoice)}><Printer className="h-4 w-4 mr-2" />Imprimer</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleSendEmail(invoice)}><Mail className="h-4 w-4 mr-2" />Envoyer</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => handleAddPayment(invoice)}><CreditCard className="h-4 w-4 mr-2" />Paiement</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleAddCredit(invoice)}><FileX className="h-4 w-4 mr-2" />Avoir</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => handleArchive(invoice)} className="text-orange-600"><Archive className="h-4 w-4 mr-2" />Archiver</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+          ))}
+          {sortedData.length === 0 && (
+            <div className="text-center py-8">
+              <Receipt className="mx-auto h-10 w-10 text-gray-400 mb-2" />
+              <h3 className="font-medium text-gray-900 text-sm">Aucune facture</h3>
+              <p className="text-gray-500 text-xs mt-1">Ce véhicule n'a pas encore de facture.</p>
+            </div>
+          )}
+        </div>
+
+        {/* Desktop: Table */}
+        <div className="hidden md:block card-container p-0">
           <div className="overflow-x-auto">
-            <Table className="min-w-[500px] w-full">
-            <TableHeader>
-              <TableRow>
-                <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
-                  Numéro
-                </SortableTableHeader>
-                <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>
-                  Date
-                </SortableTableHeader>
-                <SortableTableHeader sortKey="clients.first_name" sortConfig={sortConfig} onSort={handleSort} className="hidden md:table-cell">
-                  Client
-                </SortableTableHeader>
-                <TableHead className="hidden lg:table-cell">Véhicule</TableHead>
-                <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
-                  Montant
-                </SortableTableHeader>
-                <TableHead className="hidden md:table-cell">Avoirs</TableHead>
-                <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
-                  Statut
-                </SortableTableHeader>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sortedData.length > 0 ? (
-                sortedData.map((invoice) => {
+            <Table className="w-full">
+              <TableHeader>
+                <TableRow>
+                  <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>Numéro</SortableTableHeader>
+                  <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>Date</SortableTableHeader>
+                  <SortableTableHeader sortKey="clients.first_name" sortConfig={sortConfig} onSort={handleSort}>Client</SortableTableHeader>
+                  <TableHead>Véhicule</TableHead>
+                  <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>Montant</SortableTableHeader>
+                  <TableHead>Avoirs</TableHead>
+                  <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>Statut</SortableTableHeader>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sortedData.length > 0 ? sortedData.map((invoice) => {
                   const invoiceCredits = getInvoiceCredits(invoice.id);
                   return (
-                    <React.Fragment key={invoice.id}>
-                      <TableRow className="hover:bg-gray-50 border-b-0">
-                        <TableCell className="font-medium text-xs sm:text-sm py-2 sm:py-4">{invoice.reference}</TableCell>
-                        <TableCell className="text-xs sm:text-sm py-2 sm:py-4">{formatDate(invoice.created_at)}</TableCell>
-                        <TableCell className="hidden md:table-cell text-xs sm:text-sm py-2 sm:py-4">
-                          {invoice.clients 
-                            ? `${invoice.clients.first_name} ${invoice.clients.last_name}`
-                            : '-'
-                          }
-                        </TableCell>
-                        <TableCell className="hidden lg:table-cell text-xs sm:text-sm py-2 sm:py-4">
-                          {invoice.vehicles 
-                            ? `${invoice.vehicles.car_brands?.name || 'Marque inconnue'} ${invoice.vehicles.car_models?.name || 'Modèle inconnu'} - ${invoice.vehicles.license_plate}`
-                            : '-'
-                          }
-                        </TableCell>
-                        <TableCell className="text-xs sm:text-sm py-2 sm:py-4">{formatAmount(invoice.amount || 0)}</TableCell>
-                        <TableCell className="hidden md:table-cell py-2 sm:py-4">
-                          {renderCreditsBadges(invoiceCredits)}
-                        </TableCell>
-                        <TableCell className="py-2 sm:py-4">
-                          <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status || 'En attente de paiement')}`}>
-                            {invoice.status || 'En attente de paiement'}
-                          </span>
-                        </TableCell>
-                      </TableRow>
-                      <TableRow className="border-t-0">
-                        <TableCell colSpan={7} className="py-2 sm:py-3 border-t-0">
-                          <div className="flex flex-wrap gap-1 sm:gap-2 justify-end px-2 sm:px-4">
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3"
-                              onClick={() => handleView(invoice)}
-                            >
-                              <Eye className="h-4 w-4" />
-                              <span className="hidden sm:inline sm:ml-1">Voir</span>
-                            </Button>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="sm" className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3">
-                                  <MoreVertical className="h-4 w-4" />
-                                  <span className="hidden sm:inline sm:ml-1">Plus</span>
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="bg-background border shadow-lg z-50">
-                                <DropdownMenuItem onClick={() => handleDownload(invoice)}>
-                                  <Download className="h-4 w-4 mr-2" />
-                                  Télécharger
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handlePrint(invoice)}>
-                                  <Printer className="h-4 w-4 mr-2" />
-                                  Imprimer
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleSendEmail(invoice)}>
-                                  <Mail className="h-4 w-4 mr-2" />
-                                  Envoyer
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={() => handleAddPayment(invoice)}>
-                                  <CreditCard className="h-4 w-4 mr-2" />
-                                  Créer un paiement
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleAddCredit(invoice)}>
-                                  <FileX className="h-4 w-4 mr-2" />
-                                  Créer un avoir
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={() => handleArchive(invoice)} className="text-orange-600">
-                                  <Archive className="h-4 w-4 mr-2" />
-                                  Archiver
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    </React.Fragment>
+                    <TableRow key={invoice.id}>
+                      <TableCell className="font-medium">{invoice.reference}</TableCell>
+                      <TableCell>{formatDate(invoice.created_at)}</TableCell>
+                      <TableCell>{invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : '-'}</TableCell>
+                      <TableCell>{invoice.vehicles ? `${invoice.vehicles.car_brands?.name || ''} ${invoice.vehicles.car_models?.name || ''} - ${invoice.vehicles.license_plate}` : '-'}</TableCell>
+                      <TableCell>{formatAmount(invoice.amount || 0)}</TableCell>
+                      <TableCell>{renderCreditsBadges(invoiceCredits)}</TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(invoice.status || 'En attente de paiement')}`}>
+                          {invoice.status || 'En attente de paiement'}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm" onClick={() => handleView(invoice)}><Eye className="h-4 w-4 mr-1" />Voir</Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="outline" size="sm"><MoreVertical className="h-4 w-4" /></Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-background border shadow-lg z-50">
+                              <DropdownMenuItem onClick={() => handleDownload(invoice)}><Download className="h-4 w-4 mr-2" />Télécharger</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handlePrint(invoice)}><Printer className="h-4 w-4 mr-2" />Imprimer</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleSendEmail(invoice)}><Mail className="h-4 w-4 mr-2" />Envoyer</DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={() => handleAddPayment(invoice)}><CreditCard className="h-4 w-4 mr-2" />Paiement</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleAddCredit(invoice)}><FileX className="h-4 w-4 mr-2" />Avoir</DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={() => handleArchive(invoice)} className="text-orange-600"><Archive className="h-4 w-4 mr-2" />Archiver</DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </TableCell>
+                    </TableRow>
                   );
-                })
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-4">
-                    <div className="flex flex-col items-center justify-center py-8">
-                      <Receipt className="h-10 w-10 text-gray-400 mb-2" />
+                }) : (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center py-8">
+                      <Receipt className="mx-auto h-10 w-10 text-gray-400 mb-2" />
                       <h3 className="font-medium text-gray-900">Aucune facture</h3>
                       <p className="text-gray-500 mt-1">Ce véhicule n'a pas encore de facture.</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
             </Table>
           </div>
         </div>
       </div>
 
-      <InvoiceDialog
-        invoice={selectedInvoice}
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-      />
-
-      <InvoiceViewerModal
-        invoice={selectedInvoice}
-        open={viewerModalOpen}
-        onOpenChange={setViewerModalOpen}
-      />
-
-      <InvoiceEmailDialog
-        invoice={selectedInvoice}
-        open={emailDialogOpen}
-        onOpenChange={setEmailDialogOpen}
-      />
-
+      <InvoiceDialog invoice={selectedInvoice} open={dialogOpen} onOpenChange={setDialogOpen} />
+      <InvoiceViewerModal invoice={selectedInvoice} open={viewerModalOpen} onOpenChange={setViewerModalOpen} />
+      <InvoiceEmailDialog invoice={selectedInvoice} open={emailDialogOpen} onOpenChange={setEmailDialogOpen} />
       <ReceiptDialog
-        receipt={selectedInvoice ? {
-          invoice: selectedInvoice.id,
-          reference: '',
-          date: new Date().toISOString().split('T')[0],
-          amount: selectedInvoice.amount || 0,
-          status: 'Encaissé',
-          payment_method: 'Virement',
-          bank_account: '',
-          notes: '',
-          payment_proofs: []
-        } : null}
+        receipt={selectedInvoice ? { invoice: selectedInvoice.id, reference: '', date: new Date().toISOString().split('T')[0], amount: selectedInvoice.amount || 0, status: 'Encaissé', payment_method: 'Virement', bank_account: '', notes: '', payment_proofs: [] } : null}
         open={receiptDialogOpen}
         onOpenChange={setReceiptDialogOpen}
       />
-
       <CreditDialog
-        credit={selectedInvoice ? {
-          invoice_id: selectedInvoice.id,
-          reference: '',
-          status: 'Émis',
-          amount: 0,
-          notes: ''
-        } : null}
+        credit={selectedInvoice ? { invoice_id: selectedInvoice.id, reference: '', status: 'Émis', amount: 0, notes: '' } : null}
         open={creditDialogOpen}
         onOpenChange={setCreditDialogOpen}
       />

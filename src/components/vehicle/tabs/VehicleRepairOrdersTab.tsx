@@ -216,180 +216,127 @@ const VehicleRepairOrdersTab: React.FC<VehicleRepairOrdersTabProps> = ({ vehicle
   return (
     <>
       <div className="w-full max-w-full overflow-hidden">
-        <div className="card-container p-0">
+        {/* Mobile: Cards empilées */}
+        <div className="md:hidden space-y-3 p-2">
+          {sortedData.map((order) => (
+            <div key={order.id} className="bg-white border rounded-lg p-3 shadow-sm">
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <p className="font-medium text-sm">{order.reference}</p>
+                  <p className="text-xs text-gray-500">{formatDate(order.created_at)}</p>
+                </div>
+                <StatusBadge status={order.status || 'En cours'} />
+              </div>
+              <p className="text-sm font-semibold text-karrosserie-orange mb-3">{formatAmount(calculateOrderAmount(order))}</p>
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" size="sm" className="h-8 w-8 p-0" onClick={() => handleViewOrder(order)}>
+                  <Eye className="h-4 w-4" />
+                </Button>
+                {(!order.invoices || order.invoices.length === 0) && (
+                  <Button size="sm" className="h-8 px-2 bg-karrosserie-orange hover:bg-karrosserie-orange/90" onClick={() => handleConvertToInvoice(order)}>
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                )}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-background border shadow-lg z-50">
+                    <DropdownMenuItem onClick={() => handleEditOrder(order)}><Pencil className="h-4 w-4 mr-2" />Modifier</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleDownload(order)}><Download className="h-4 w-4 mr-2" />Télécharger</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handlePrint(order)}><Printer className="h-4 w-4 mr-2" />Imprimer</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleSendEmail(order)}><Mail className="h-4 w-4 mr-2" />Envoyer</DropdownMenuItem>
+                    {order.status !== 'Signé' && <DropdownMenuItem onClick={() => handleSignOrder(order)}><Signature className="h-4 w-4 mr-2" />Signature</DropdownMenuItem>}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => handleArchiveOrder(order)} className="text-orange-600"><Archive className="h-4 w-4 mr-2" />Archiver</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+          ))}
+          {sortedData.length === 0 && (
+            <div className="text-center py-8">
+              <Wrench className="mx-auto h-10 w-10 text-gray-400 mb-2" />
+              <h3 className="font-medium text-gray-900 text-sm">Aucun ordre de réparation</h3>
+              <p className="text-gray-500 text-xs mt-1">Ce véhicule n'a pas encore d'ordre de réparation.</p>
+            </div>
+          )}
+        </div>
+
+        {/* Desktop: Table */}
+        <div className="hidden md:block card-container p-0">
           <div className="overflow-x-auto">
-            <Table className="min-w-[500px] w-full">
-            <TableHeader>
-              <TableRow>
-                <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
-                  Numéro
-                </SortableTableHeader>
-                <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>
-                  Date
-                </SortableTableHeader>
-                <SortableTableHeader sortKey="clients.first_name" sortConfig={sortConfig} onSort={handleSort} className="hidden md:table-cell">
-                  Client
-                </SortableTableHeader>
-                <TableHead className="hidden lg:table-cell">Véhicule</TableHead>
-                <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
-                  Montant
-                </SortableTableHeader>
-                <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
-                  Statut
-                </SortableTableHeader>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sortedData.length > 0 ? (
-                sortedData.map((order) => (
-                  <React.Fragment key={order.id}>
-                    <TableRow className="border-b-0">
-                      <TableCell className="font-medium text-xs sm:text-sm py-2 sm:py-4">{order.reference}</TableCell>
-                      <TableCell className="text-xs sm:text-sm py-2 sm:py-4">{formatDate(order.created_at)}</TableCell>
-                      <TableCell className="hidden md:table-cell text-xs sm:text-sm py-2 sm:py-4">
-                        {order.clients 
-                          ? `${order.clients.first_name} ${order.clients.last_name}`
-                          : '-'
-                        }
-                      </TableCell>
-                      <TableCell className="hidden lg:table-cell text-xs sm:text-sm py-2 sm:py-4">
-                        {order.vehicles 
-                          ? `${order.vehicles.car_brands?.name || 'Marque inconnue'} ${order.vehicles.car_models?.name || 'Modèle inconnu'} - ${order.vehicles.license_plate}`
-                          : '-'
-                        }
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm py-2 sm:py-4">{formatAmount(calculateOrderAmount(order))}</TableCell>
-                      <TableCell className="py-2 sm:py-4">
-                        <StatusBadge status={order.status || 'En cours'} />
-                      </TableCell>
-                    </TableRow>
-                    <TableRow className="border-t-0">
-                      <TableCell colSpan={6} className="py-2 sm:py-3 border-t-0">
-                        <div className="flex flex-wrap gap-1 sm:gap-2 justify-end px-2 sm:px-4">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3"
-                            onClick={() => handleViewOrder(order)}
-                          >
-                            <Eye className="h-4 w-4" />
-                            <span className="hidden sm:inline sm:ml-1">Voir</span>
-                          </Button>
-                          {(!order.invoices || order.invoices.length === 0) && (
-                            <Button 
-                              size="sm"
-                              className="h-8 px-2 sm:h-9 sm:px-3 bg-karrosserie-orange hover:bg-karrosserie-orange/90"
-                              onClick={() => handleConvertToInvoice(order)}
-                            >
-                              <ArrowRight className="h-4 w-4" />
-                              <span className="hidden sm:inline sm:ml-1">Convertir</span>
-                            </Button>
-                          )}
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="outline" size="sm" className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3">
-                                <MoreVertical className="h-4 w-4" />
-                                <span className="hidden sm:inline sm:ml-1">Plus</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="bg-background border shadow-lg z-50">
-                              <DropdownMenuItem onClick={() => handleEditOrder(order)}>
-                                <Pencil className="h-4 w-4 mr-2" />
-                                Modifier
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleDownload(order)}>
-                                <Download className="h-4 w-4 mr-2" />
-                                Télécharger
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handlePrint(order)}>
-                                <Printer className="h-4 w-4 mr-2" />
-                                Imprimer
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleSendEmail(order)}>
-                                <Mail className="h-4 w-4 mr-2" />
-                                Envoyer
-                              </DropdownMenuItem>
-                              {order.status !== 'Signé' && (
-                                <DropdownMenuItem onClick={() => handleSignOrder(order)}>
-                                  <Signature className="h-4 w-4 mr-2" />
-                                  Signature du client
-                                </DropdownMenuItem>
-                              )}
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem onClick={() => handleArchiveOrder(order)} className="text-orange-600">
-                                <Archive className="h-4 w-4 mr-2" />
-                                Archiver
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  </React.Fragment>
-                ))
-              ) : (
+            <Table className="w-full">
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-4">
-                    <div className="flex flex-col items-center justify-center py-8">
-                      <Wrench className="h-10 w-10 text-gray-400 mb-2" />
+                  <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>Numéro</SortableTableHeader>
+                  <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>Date</SortableTableHeader>
+                  <SortableTableHeader sortKey="clients.first_name" sortConfig={sortConfig} onSort={handleSort}>Client</SortableTableHeader>
+                  <TableHead>Véhicule</TableHead>
+                  <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>Montant</SortableTableHeader>
+                  <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>Statut</SortableTableHeader>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sortedData.length > 0 ? sortedData.map((order) => (
+                  <TableRow key={order.id}>
+                    <TableCell className="font-medium">{order.reference}</TableCell>
+                    <TableCell>{formatDate(order.created_at)}</TableCell>
+                    <TableCell>{order.clients ? `${order.clients.first_name} ${order.clients.last_name}` : '-'}</TableCell>
+                    <TableCell>{order.vehicles ? `${order.vehicles.car_brands?.name || ''} ${order.vehicles.car_models?.name || ''} - ${order.vehicles.license_plate}` : '-'}</TableCell>
+                    <TableCell>{formatAmount(calculateOrderAmount(order))}</TableCell>
+                    <TableCell><StatusBadge status={order.status || 'En cours'} /></TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={() => handleViewOrder(order)}><Eye className="h-4 w-4 mr-1" />Voir</Button>
+                        {(!order.invoices || order.invoices.length === 0) && (
+                          <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90" onClick={() => handleConvertToInvoice(order)}><ArrowRight className="h-4 w-4 mr-1" />Convertir</Button>
+                        )}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm"><MoreVertical className="h-4 w-4" /></Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="bg-background border shadow-lg z-50">
+                            <DropdownMenuItem onClick={() => handleEditOrder(order)}><Pencil className="h-4 w-4 mr-2" />Modifier</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDownload(order)}><Download className="h-4 w-4 mr-2" />Télécharger</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handlePrint(order)}><Printer className="h-4 w-4 mr-2" />Imprimer</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleSendEmail(order)}><Mail className="h-4 w-4 mr-2" />Envoyer</DropdownMenuItem>
+                            {order.status !== 'Signé' && <DropdownMenuItem onClick={() => handleSignOrder(order)}><Signature className="h-4 w-4 mr-2" />Signature</DropdownMenuItem>}
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => handleArchiveOrder(order)} className="text-orange-600"><Archive className="h-4 w-4 mr-2" />Archiver</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )) : (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-8">
+                      <Wrench className="mx-auto h-10 w-10 text-gray-400 mb-2" />
                       <h3 className="font-medium text-gray-900">Aucun ordre de réparation</h3>
                       <p className="text-gray-500 mt-1">Ce véhicule n'a pas encore d'ordre de réparation.</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
             </Table>
           </div>
         </div>
       </div>
 
-      <RepairOrderDialog
-        order={selectedOrder}
-        open={editDialogOpen}
-        onOpenChange={setEditDialogOpen}
-      />
-
-      <RepairOrderViewerModal
-        repairOrder={selectedOrder}
-        open={viewerModalOpen}
-        onOpenChange={setViewerModalOpen}
-      />
-
-      <RepairOrderEmailDialog
-        repairOrder={selectedOrderForEmail}
-        open={emailDialogOpen}
-        onOpenChange={setEmailDialogOpen}
-      />
-
-      <RepairOrderSignatureDialog
-        repairOrder={selectedOrderForSignature}
-        open={signatureDialogOpen}
-        onOpenChange={setSignatureDialogOpen}
-      />
-
-      <InvoiceDialog
-        open={invoiceDialogOpen}
-        onOpenChange={(open) => {
-          setInvoiceDialogOpen(open);
-          if (!open) {
-            setPrefilledInvoice(null);
-          }
-        }}
-        invoice={prefilledInvoice as Invoice}
-      />
-
+      <RepairOrderDialog order={selectedOrder} open={editDialogOpen} onOpenChange={setEditDialogOpen} />
+      <RepairOrderViewerModal repairOrder={selectedOrder} open={viewerModalOpen} onOpenChange={setViewerModalOpen} />
+      <RepairOrderEmailDialog repairOrder={selectedOrderForEmail} open={emailDialogOpen} onOpenChange={setEmailDialogOpen} />
+      <RepairOrderSignatureDialog repairOrder={selectedOrderForSignature} open={signatureDialogOpen} onOpenChange={setSignatureDialogOpen} />
+      <InvoiceDialog open={invoiceDialogOpen} onOpenChange={(open) => { setInvoiceDialogOpen(open); if (!open) setPrefilledInvoice(null); }} invoice={prefilledInvoice as Invoice} />
       <UnsignedRepairOrderWarningDialog
         open={showUnsignedWarning}
         onOpenChange={setShowUnsignedWarning}
         orderReference={orderToConvert?.reference}
-        onConfirm={() => {
-          if (orderToConvert) {
-            proceedWithConversion(orderToConvert);
-          }
-          setShowUnsignedWarning(false);
-          setOrderToConvert(null);
-        }}
+        onConfirm={() => { if (orderToConvert) proceedWithConversion(orderToConvert); setShowUnsignedWarning(false); setOrderToConvert(null); }}
       />
     </>
   );

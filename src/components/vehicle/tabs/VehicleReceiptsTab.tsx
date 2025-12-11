@@ -121,99 +121,91 @@ const VehicleReceiptsTab: React.FC<VehicleReceiptsTabProps> = ({ vehicleId }) =>
   return (
     <>
       <div className="w-full max-w-full overflow-hidden">
-        <div className="card-container p-0">
+        {/* Mobile: Cards empilées */}
+        <div className="md:hidden space-y-3 p-2">
+          {sortedData.map((receipt) => (
+            <div key={receipt.id} className="bg-white border rounded-lg p-3 shadow-sm">
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <p className="font-medium text-sm">{receipt.reference || 'N/A'}</p>
+                  <p className="text-xs text-gray-500">{formatDate(receipt.date)}</p>
+                </div>
+                <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(receipt.status)}`}>
+                  {receipt.status}
+                </span>
+              </div>
+              <p className="text-sm font-semibold text-karrosserie-orange mb-1">{formatAmount(receipt.amount)}</p>
+              <p className="text-xs text-gray-500 mb-3">{receipt.payment_method}</p>
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" size="sm" className="h-8 w-8 p-0" onClick={() => handleEdit(receipt)}>
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="sm" className="h-8 w-8 p-0 text-red-500 border-red-500" onClick={() => handleDelete(receipt)}>
+                  <Trash className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          ))}
+          {sortedData.length === 0 && (
+            <div className="text-center py-8">
+              <Banknote className="mx-auto h-10 w-10 text-gray-400 mb-2" />
+              <h3 className="font-medium text-gray-900 text-sm">Aucun encaissement</h3>
+              <p className="text-gray-500 text-xs mt-1">Ce véhicule n'a pas encore d'encaissement.</p>
+            </div>
+          )}
+        </div>
+
+        {/* Desktop: Table */}
+        <div className="hidden md:block card-container p-0">
           <div className="overflow-x-auto">
-            <Table className="min-w-[450px] w-full">
-            <TableHeader>
-              <TableRow>
-                <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
-                  Numéro
-                </SortableTableHeader>
-                <SortableTableHeader sortKey="date" sortConfig={sortConfig} onSort={handleSort}>
-                  Date
-                </SortableTableHeader>
-                <TableHead className="hidden md:table-cell">Facture</TableHead>
-                <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
-                  Montant
-                </SortableTableHeader>
-                <SortableTableHeader sortKey="payment_method" sortConfig={sortConfig} onSort={handleSort} className="hidden sm:table-cell">
-                  Méthode
-                </SortableTableHeader>
-                <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
-                  Statut
-                </SortableTableHeader>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sortedData.length > 0 ? (
-                sortedData.map((receipt) => (
-                  <React.Fragment key={receipt.id}>
-                    <TableRow className="hover:bg-gray-50 border-b-0">
-                      <TableCell className="text-xs sm:text-sm py-2 sm:py-4">{receipt.reference || 'N/A'}</TableCell>
-                      <TableCell className="text-xs sm:text-sm py-2 sm:py-4">{formatDate(receipt.date)}</TableCell>
-                      <TableCell className="hidden md:table-cell text-xs sm:text-sm py-2 sm:py-4">
-                        {getInvoiceDisplay(receipt.invoice_id)}
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm py-2 sm:py-4">
-                        {formatAmount(receipt.amount)}
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell text-xs sm:text-sm py-2 sm:py-4">{receipt.payment_method}</TableCell>
-                      <TableCell className="py-2 sm:py-4">
-                        <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(receipt.status)}`}>
-                          {receipt.status}
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow className="border-t-0">
-                      <TableCell colSpan={6} className="py-2 sm:py-3 border-t-0">
-                        <div className="flex flex-wrap gap-1 sm:gap-2 justify-end px-2 sm:px-4">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3"
-                            onClick={() => handleEdit(receipt)}
-                          >
-                            <Pencil className="h-4 w-4" />
-                            <span className="hidden sm:inline sm:ml-1">Modifier</span>
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3 text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
-                            onClick={() => handleDelete(receipt)}
-                          >
-                            <Trash className="h-4 w-4" />
-                            <span className="hidden sm:inline sm:ml-1">Supprimer</span>
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  </React.Fragment>
-                ))
-              ) : (
+            <Table className="w-full">
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-4">
-                    <div className="flex flex-col items-center justify-center py-8">
-                      <Banknote className="h-10 w-10 text-gray-400 mb-2" />
+                  <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>Numéro</SortableTableHeader>
+                  <SortableTableHeader sortKey="date" sortConfig={sortConfig} onSort={handleSort}>Date</SortableTableHeader>
+                  <TableHead>Facture</TableHead>
+                  <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>Montant</SortableTableHeader>
+                  <SortableTableHeader sortKey="payment_method" sortConfig={sortConfig} onSort={handleSort}>Méthode</SortableTableHeader>
+                  <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>Statut</SortableTableHeader>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sortedData.length > 0 ? sortedData.map((receipt) => (
+                  <TableRow key={receipt.id}>
+                    <TableCell>{receipt.reference || 'N/A'}</TableCell>
+                    <TableCell>{formatDate(receipt.date)}</TableCell>
+                    <TableCell>{getInvoiceDisplay(receipt.invoice_id)}</TableCell>
+                    <TableCell>{formatAmount(receipt.amount)}</TableCell>
+                    <TableCell>{receipt.payment_method}</TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(receipt.status)}`}>
+                        {receipt.status}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={() => handleEdit(receipt)}><Pencil className="h-4 w-4 mr-1" />Modifier</Button>
+                        <Button variant="outline" size="sm" className="text-red-500 border-red-500" onClick={() => handleDelete(receipt)}><Trash className="h-4 w-4 mr-1" />Supprimer</Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )) : (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-8">
+                      <Banknote className="mx-auto h-10 w-10 text-gray-400 mb-2" />
                       <h3 className="font-medium text-gray-900">Aucun encaissement</h3>
                       <p className="text-gray-500 mt-1">Ce véhicule n'a pas encore d'encaissement.</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
             </Table>
           </div>
         </div>
       </div>
 
-      {selectedReceipt && (
-        <ReceiptDialog
-          open={editDialogOpen}
-          onOpenChange={setEditDialogOpen}
-          receipt={selectedReceipt}
-        />
-      )}
+      {selectedReceipt && <ReceiptDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} receipt={selectedReceipt} />}
     </>
   );
 };
