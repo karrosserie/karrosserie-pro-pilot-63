@@ -138,28 +138,28 @@ const VehicleDetailsDialog: React.FC<VehicleDetailsDialogProps> = ({
     switch (activeTab) {
       case 'details':
         return (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Section du temps de travail */}
             {workTimeData && (
-              <div className="p-4 bg-gray-50 rounded-lg space-y-2">
+              <div className="p-3 sm:p-4 bg-gray-50 rounded-lg space-y-2">
                 <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
                   <Clock className="h-4 w-4" />
                   Temps de travail effectif
                 </h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <p className="text-xs text-gray-500">Temps total</p>
-                    <p className="text-lg font-semibold">{workTimeData.formatted_duration}</p>
+                    <p className="text-base sm:text-lg font-semibold">{workTimeData.formatted_duration}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">Statut</p>
                     <div className="mt-1">
                       {workTimeData.is_currently_working ? (
-                        <Badge className="bg-green-500 text-white hover:bg-green-600">
+                        <Badge className="bg-green-500 text-white hover:bg-green-600 text-xs">
                           🔄 En cours
                         </Badge>
                       ) : (
-                        <Badge variant="secondary">Aucune tâche en cours</Badge>
+                        <Badge variant="secondary" className="text-xs">Aucune tâche en cours</Badge>
                       )}
                     </div>
                   </div>
@@ -204,20 +204,20 @@ const VehicleDetailsDialog: React.FC<VehicleDetailsDialogProps> = ({
   if (mode === 'view') {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-7xl max-h-[90vh] overflow-hidden p-0">
-          <DialogHeader className="px-6 pt-6 pb-4">
-            <DialogTitle>{title}</DialogTitle>
-            {description && <DialogDescription>{description}</DialogDescription>}
+        <DialogContent className="w-[95vw] max-w-7xl h-[95vh] md:h-[90vh] max-h-[95vh] md:max-h-[90vh] overflow-hidden p-0">
+          <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4">
+            <DialogTitle className="text-lg sm:text-xl">{title}</DialogTitle>
+            {description && <DialogDescription className="text-sm">{description}</DialogDescription>}
           </DialogHeader>
           
-          <div className="flex h-[calc(90vh-120px)]">
+          <div className="flex flex-col md:flex-row h-[calc(95vh-80px)] md:h-[calc(90vh-120px)]">
             <VehicleDetailsSidebar
               activeTab={activeTab}
               onTabChange={setActiveTab}
               sidebarItems={sidebarItems}
             />
             
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6">
               {renderActiveContent()}
             </div>
           </div>
@@ -229,10 +229,10 @@ const VehicleDetailsDialog: React.FC<VehicleDetailsDialogProps> = ({
   // Pour les modes create et edit, on garde l'ancien comportement
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="w-[95vw] max-w-4xl max-h-[95vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          {description && <DialogDescription>{description}</DialogDescription>}
+          <DialogTitle className="text-lg sm:text-xl">{title}</DialogTitle>
+          {description && <DialogDescription className="text-sm">{description}</DialogDescription>}
         </DialogHeader>
         <VehicleForm 
           onSubmit={handleSubmit}
