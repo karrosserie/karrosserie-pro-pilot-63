@@ -15,7 +15,8 @@ export function useReceiptsData() {
   // Invalider les requêtes lors du changement d'impersonation
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ['receipts'] });
-  }, [isImpersonating, impersonationData?.company_id, queryClient]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isImpersonating, impersonationData?.company_id]);
   
   const {
     data: receiptsData,
@@ -23,7 +24,8 @@ export function useReceiptsData() {
     error
   } = useQuery({
     queryKey: ['receipts', impersonationData?.company_id || 'normal'],
-    queryFn: receiptsService.getAll
+    queryFn: receiptsService.getAll,
+    staleTime: 5000 // 5 secondes avant de considérer les données comme obsolètes
   });
 
   // Transform receipts data to include client names and invoice references

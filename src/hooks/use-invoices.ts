@@ -16,7 +16,8 @@ export function useInvoices(showArchived: boolean = false) {
   // Invalider les requêtes lors du changement d'impersonation
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ['invoices'] });
-  }, [isImpersonating, impersonationData?.company_id, queryClient]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isImpersonating, impersonationData?.company_id]);
 
   const {
     data: invoices,
@@ -26,7 +27,8 @@ export function useInvoices(showArchived: boolean = false) {
     queryKey: ['invoices', impersonationData?.company_id || 'normal', showArchived],
     queryFn: async () => {
       return await invoicesService.getAll(showArchived);
-    }
+    },
+    staleTime: 5000 // 5 secondes avant de considérer les données comme obsolètes
   });
 
   const createInvoice = useMutation({

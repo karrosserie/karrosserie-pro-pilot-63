@@ -78,13 +78,6 @@ const ReceiptDialog = ({
         await receiptMutations.create(dataToSubmit);
       }
 
-      // Invalider le cache pour mettre à jour les tableaux (attendre que tout soit rafraîchi)
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['receipts'] }),
-        queryClient.invalidateQueries({ queryKey: ['invoices'] }),
-        queryClient.invalidateQueries({ queryKey: ['accounting-data'] })
-      ]);
-      
       toast({
         title: receipt ? "Encaissement modifié" : "Encaissement créé",
         description: receipt 
@@ -92,7 +85,17 @@ const ReceiptDialog = ({
           : "Le nouvel encaissement a été créé avec succès."
       });
       
+      // Fermer le dialog AVANT d'invalider pour éviter le freeze
       onOpenChange(false);
+      
+      // Invalider les queries séquentiellement après fermeture du dialog
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['receipts'] });
+        setTimeout(() => {
+          queryClient.invalidateQueries({ queryKey: ['invoices'] });
+          queryClient.invalidateQueries({ queryKey: ['accounting-data'] });
+        }, 50);
+      }, 50);
     } catch (error) {
       console.error('Error saving receipt:', error);
       toast({
