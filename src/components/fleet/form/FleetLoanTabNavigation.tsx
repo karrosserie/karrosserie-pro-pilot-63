@@ -15,6 +15,7 @@ interface FleetLoanTabNavigationProps {
   onTabChange: (tab: string) => void;
   formData: LoanFormData;
   isViewMode?: boolean;
+  validatedTabs: Set<string>;
 }
 
 const tabs: TabConfig[] = [
@@ -29,29 +30,14 @@ const FleetLoanTabNavigation: React.FC<FleetLoanTabNavigationProps> = ({
   activeTab,
   onTabChange,
   formData,
-  isViewMode = false
+  isViewMode = false,
+  validatedTabs
 }) => {
   const currentTabIndex = tabs.findIndex(tab => tab.value === activeTab);
 
-  // Validation simple par onglet
+  // Un onglet est "complet" uniquement s'il a été validé via "Suivant"
   const isTabComplete = (tabValue: string): boolean => {
-    switch (tabValue) {
-      case 'client-info':
-        return !!(formData.clientId || formData.clientName) && 
-               !!formData.driverLicenseFrontUrl && 
-               !!formData.driverLicenseBackUrl;
-      case 'insurance':
-        if (!formData.clientInsurance) return true;
-        return !!formData.insuranceCompanyName && !!formData.insuranceEmail;
-      case 'damages':
-        return true; // Toujours valide (optionnel)
-      case 'vehicle-details':
-        return formData.mileage > 0 && formData.vehicleImages.length > 0;
-      case 'attestation':
-        return !!formData.attestationAccepted && !!formData.clientSignature;
-      default:
-        return false;
-    }
+    return validatedTabs.has(tabValue);
   };
 
   return (
