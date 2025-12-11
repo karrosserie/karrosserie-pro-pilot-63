@@ -78,9 +78,12 @@ const ReceiptDialog = ({
         await receiptMutations.create(dataToSubmit);
       }
 
-      // Invalider le cache pour mettre à jour les tableaux
-      await queryClient.invalidateQueries({ queryKey: ['receipts'] });
-      await queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      // Invalider le cache pour mettre à jour les tableaux (attendre que tout soit rafraîchi)
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['receipts'] }),
+        queryClient.invalidateQueries({ queryKey: ['invoices'] }),
+        queryClient.invalidateQueries({ queryKey: ['accounting-data'] })
+      ]);
       
       toast({
         title: receipt ? "Encaissement modifié" : "Encaissement créé",
