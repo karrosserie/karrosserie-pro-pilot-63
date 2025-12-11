@@ -39,9 +39,10 @@ interface AlternativeInvoicePreviewProps {
   payments?: any[];
   totalPaidAmount?: number;
   remainingAmount?: number;
+  isPaid?: boolean;
 }
 
-const AlternativeInvoicePreview = ({ companyData, invoiceData, clientData, items, totals, payments, totalPaidAmount, remainingAmount }: AlternativeInvoicePreviewProps) => {
+const AlternativeInvoicePreview = ({ companyData, invoiceData, clientData, items, totals, payments, totalPaidAmount, remainingAmount, isPaid = false }: AlternativeInvoicePreviewProps) => {
   // Utiliser uniquement les données réelles, pas de valeurs par défaut
   const invoiceDataToUse = invoiceData || {};
   const clientDataToUse = clientData || {};
@@ -49,7 +50,15 @@ const AlternativeInvoicePreview = ({ companyData, invoiceData, clientData, items
   const totalsToUse = totals || {};
 
   return (
-    <div className="bg-white p-6 rounded shadow-sm h-full" style={{ fontFamily: 'Arial, sans-serif', backgroundColor: 'white', minHeight: '100%' }}>
+    <div className="bg-white p-6 rounded shadow-sm h-full relative" style={{ fontFamily: 'Arial, sans-serif', backgroundColor: 'white', minHeight: '100%' }}>
+      {/* Tampon ACQUITTÉ pour les factures payées */}
+      {isPaid && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+          <div className="transform -rotate-[30deg] border-4 border-green-500 text-green-500 text-5xl font-bold px-8 py-4 rounded-lg opacity-40">
+            ACQUITTÉ
+          </div>
+        </div>
+      )}
       {/* En-tête avec entreprise et FACTURE */}
       <div className="flex justify-between items-start mb-8">
         <div>

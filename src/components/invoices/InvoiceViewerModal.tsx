@@ -225,6 +225,9 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
   // Calculer les montants de paiement
   const totalPaidAmount = receiptsData.reduce((sum, receipt) => sum + receipt.amount, 0);
   const remainingAmount = currentInvoice.amount - totalPaidAmount;
+  
+  // Vérifier si la facture est entièrement payée
+  const isPaid = remainingAmount <= 0 && totalPaidAmount > 0;
 
   // Action handlers
   const handleEdit = () => {
@@ -365,6 +368,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
                 payments={receiptsData}
                 totalPaidAmount={totalPaidAmount}
                 remainingAmount={remainingAmount}
+                isPaid={isPaid}
               />
             ) : (
               <AlternativeInvoicePreview 
@@ -376,6 +380,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
                 payments={receiptsData}
                 totalPaidAmount={totalPaidAmount}
                 remainingAmount={remainingAmount}
+                isPaid={isPaid}
               />
             )}
           </div>
