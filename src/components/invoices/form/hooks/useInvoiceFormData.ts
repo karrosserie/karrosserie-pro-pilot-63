@@ -21,8 +21,8 @@ export const useInvoiceFormData = () => {
   const [discounts, setDiscounts] = useState<InvoiceDiscountItem[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Déterminer si le formulaire est en lecture seule
-  const isReadOnly = formData.status === 'Payée';
+  // Permettre la modification de toutes les factures
+  const isReadOnly = false;
 
   return {
     formData,
