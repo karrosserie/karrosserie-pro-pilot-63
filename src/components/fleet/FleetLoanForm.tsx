@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
 import Joyride from 'react-joyride';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { FleetVehicle } from '@/services/supabase/fleet-vehicles';
 import { useFleetLoanForm } from '@/hooks/use-fleet-loan-form';
 import { useFleetLoanFormValidation } from './form/FleetLoanFormValidation';
 import { useTabValidation } from '@/hooks/fleet-loan-form/use-tab-validation';
 import FleetLoanFormNavigation from './form/FleetLoanFormNavigation';
+import FleetLoanTabNavigation from './form/FleetLoanTabNavigation';
 import DamageAssessmentTab from './form/DamageAssessmentTab';
 import VehicleDetailsTab from './form/VehicleDetailsTab';
 import ClientInfoTab from './form/ClientInfoTab';
@@ -221,14 +222,13 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col flex-1 min-h-0">
-        <div className="px-4 shrink-0 border-b">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 h-auto gap-1">
-            {tabs.map(tab => (
-              <TabsTrigger key={tab.value} value={tab.value} className="text-xs md:text-sm px-2 md:px-3 py-2 md:py-2.5 whitespace-normal leading-tight">
-                {tab.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+        <div className="px-4 shrink-0 border-b bg-muted/30">
+          <FleetLoanTabNavigation
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            formData={formData}
+            isViewMode={isViewMode}
+          />
         </div>
 
         <TabsContent value="client-info" className="overflow-y-auto px-4 sm:px-6 py-4 mt-0 data-[state=active]:flex-1" style={{ paddingBottom: '80px' }}>
