@@ -89,6 +89,7 @@ export const InvoiceForm = ({
         onFieldChange={handleChange}
         claimNumber={claimNumber}
         onClaimNumberChange={handleClaimNumberChange}
+        isNewInvoice={!invoice?.id}
       />
 
       <InvoiceAssignmentSection 
