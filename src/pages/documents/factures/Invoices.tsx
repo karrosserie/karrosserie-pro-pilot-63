@@ -493,10 +493,14 @@ const Invoices = () => {
                              </Button>
                            </DropdownMenuTrigger>
                            <DropdownMenuContent align="end">
-                             <DropdownMenuItem onClick={() => handleViewInvoice(invoice)}>
-                               <Eye className="mr-2 h-4 w-4" />
-                               Voir
-                             </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleViewInvoice(invoice)}>
+                                <Eye className="mr-2 h-4 w-4" />
+                                Voir
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleEditInvoice(invoice)}>
+                                <Pencil className="mr-2 h-4 w-4" />
+                                Modifier
+                              </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem onClick={() => handleDownload(invoice)}>
                                 <Download className="mr-2 h-4 w-4" />

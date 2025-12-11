@@ -2686,6 +2686,7 @@ export type Database = {
           client_signature: string | null
           company_id: string | null
           created_at: string
+          daily_limit: string | null
           damages: Json | null
           end_mileage: number | null
           expected_return_date: string | null
@@ -2724,6 +2725,7 @@ export type Database = {
           client_signature?: string | null
           company_id?: string | null
           created_at?: string
+          daily_limit?: string | null
           damages?: Json | null
           end_mileage?: number | null
           expected_return_date?: string | null
@@ -2762,6 +2764,7 @@ export type Database = {
           client_signature?: string | null
           company_id?: string | null
           created_at?: string
+          daily_limit?: string | null
           damages?: Json | null
           end_mileage?: number | null
           expected_return_date?: string | null
