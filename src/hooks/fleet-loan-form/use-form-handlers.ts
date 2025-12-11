@@ -170,6 +170,10 @@ export const useFleetLoanFormHandlers = (
     setFormData(prev => ({ ...prev, insurancePhone: value || '' }));
   };
 
+  const handleAssistanceSwitchChange = (checked: boolean) => {
+    setFormData(prev => ({ ...prev, hasAssistance: checked }));
+  };
+
   const handleSignatureChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -254,6 +258,7 @@ export const useFleetLoanFormHandlers = (
     handleLicenseAnalyzed,
     handleInsuranceSwitchChange,
     handleInsurancePhoneChange,
+    handleAssistanceSwitchChange,
     handleSignatureChange,
     handleSubmit
   };
