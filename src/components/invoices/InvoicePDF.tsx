@@ -18,6 +18,7 @@ interface InvoicePDFProps {
   template?: string;
   documentType?: 'invoice' | 'repair_order' | 'credit' | 'quote';
   showItemsDetails?: boolean;
+  isPaid?: boolean;
 }
 
 // Styles pour le template par défaut
@@ -364,7 +365,7 @@ const alternativeStyles = StyleSheet.create({
   },
 });
 
-const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleData, signatureData, template = 'default', documentType = 'invoice', showItemsDetails = true }: InvoicePDFProps) => {
+const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleData, signatureData, template = 'default', documentType = 'invoice', showItemsDetails = true, isPaid = false }: InvoicePDFProps) => {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '-';
     try {
@@ -394,6 +395,31 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
     return (
       <Document>
         <Page size="A4" style={alternativeStyles.page}>
+          {/* Tampon ACQUITTÉ pour les factures payées */}
+          {isPaid && documentType === 'invoice' && (
+            <View style={{
+              position: 'absolute',
+              top: 350,
+              left: 120,
+              transform: 'rotate(-30deg)',
+              zIndex: 10,
+            }}>
+              <Text style={{
+                fontSize: 48,
+                fontWeight: 'bold',
+                color: '#22c55e',
+                opacity: 0.4,
+                borderWidth: 4,
+                borderColor: '#22c55e',
+                borderStyle: 'solid',
+                padding: 15,
+                paddingHorizontal: 25,
+                borderRadius: 8,
+              }}>
+                ACQUITTÉ
+              </Text>
+            </View>
+          )}
           {/* Header avec entreprise et facture */}
           <View style={alternativeStyles.mainHeader}>
             <View style={alternativeStyles.companySection} wrap={false}>
@@ -753,6 +779,31 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
   return (
     <Document>
       <Page size="A4" style={defaultStyles.page}>
+        {/* Tampon ACQUITTÉ pour les factures payées */}
+        {isPaid && documentType === 'invoice' && (
+          <View style={{
+            position: 'absolute',
+            top: 350,
+            left: 120,
+            transform: 'rotate(-30deg)',
+            zIndex: 10,
+          }}>
+            <Text style={{
+              fontSize: 48,
+              fontWeight: 'bold',
+              color: '#22c55e',
+              opacity: 0.4,
+              borderWidth: 4,
+              borderColor: '#22c55e',
+              borderStyle: 'solid',
+              padding: 15,
+              paddingHorizontal: 25,
+              borderRadius: 8,
+            }}>
+              ACQUITTÉ
+            </Text>
+          </View>
+        )}
         {/* Header par défaut */}
         <View style={defaultStyles.header}>
           <View style={defaultStyles.headerColumn} wrap={false}>

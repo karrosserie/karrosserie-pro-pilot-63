@@ -44,9 +44,10 @@ interface DefaultInvoicePreviewProps {
   payments?: any[];
   totalPaidAmount?: number;
   remainingAmount?: number;
+  isPaid?: boolean;
 }
 
-const DefaultInvoicePreview = ({ companyData, invoiceData, clientData, items, totals, payments, totalPaidAmount, remainingAmount }: DefaultInvoicePreviewProps) => {
+const DefaultInvoicePreview = ({ companyData, invoiceData, clientData, items, totals, payments, totalPaidAmount, remainingAmount, isPaid = false }: DefaultInvoicePreviewProps) => {
   // Utiliser uniquement les données réelles, pas de valeurs par défaut
   const invoiceDataToUse = invoiceData || {};
   const clientDataToUse = clientData || {};
@@ -54,7 +55,15 @@ const DefaultInvoicePreview = ({ companyData, invoiceData, clientData, items, to
   const totalsToUse = totals || {};
 
   return (
-    <div className="bg-white p-2 sm:p-4 rounded shadow-sm w-full flex flex-col" style={{ minHeight: '100vh', height: 'auto', backgroundColor: 'white' }}>
+    <div className="bg-white p-2 sm:p-4 rounded shadow-sm w-full flex flex-col relative" style={{ minHeight: '100vh', height: 'auto', backgroundColor: 'white' }}>
+      {/* Tampon ACQUITTÉ pour les factures payées */}
+      {isPaid && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+          <div className="transform -rotate-[30deg] border-4 border-green-500 text-green-500 text-5xl font-bold px-8 py-4 rounded-lg opacity-40">
+            ACQUITTÉ
+          </div>
+        </div>
+      )}
       <DefaultInvoiceHeader
         companyData={companyData}
         invoiceData={invoiceDataToUse}

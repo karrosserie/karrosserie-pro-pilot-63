@@ -163,6 +163,9 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
     const totalPaidAmount = receiptsData.reduce((sum, receipt) => sum + receipt.amount, 0);
     const remainingAmount = invoice.amount - totalPaidAmount - globalDiscountTotal;
     
+    // Vérifier si la facture est entièrement payée
+    const isPaid = remainingAmount <= 0 && totalPaidAmount > 0;
+    
     const totalsData = {
       subtotal: `${totals.subtotalAfterDiscount.toFixed(2).replace('.', ',')} €`,
       vat: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`,
@@ -183,7 +186,8 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
       totals: totalsData,
       receipts: receiptsData,
       totalPaidAmount,
-      remainingAmount
+      remainingAmount,
+      isPaid
     };
   } catch (error) {
     console.error('Erreur lors de la préparation des données:', error);
@@ -217,7 +221,8 @@ export const generateInvoicePDFBlob = async (invoice: Invoice, companyData: any)
       receipts: data.receipts,
       clientData: pdfData,
       vehicleData: null,
-      template: data.template
+      template: data.template,
+      isPaid: data.isPaid
     });
     
     // Générer et retourner le blob PDF
@@ -255,7 +260,8 @@ export const generateInvoicePDFWithTemplate = async (invoice: Invoice, companyDa
       receipts: data.receipts,
       clientData: pdfData,
       vehicleData: null,
-      template: data.template
+      template: data.template,
+      isPaid: data.isPaid
     });
     
     // Générer le blob PDF
@@ -308,7 +314,8 @@ export const printInvoicePDFWithTemplate = async (invoice: Invoice, companyData:
       receipts: data.receipts,
       clientData: pdfData,
       vehicleData: null,
-      template: data.template
+      template: data.template,
+      isPaid: data.isPaid
     });
     
     // Générer le blob PDF
