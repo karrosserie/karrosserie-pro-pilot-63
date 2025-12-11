@@ -190,151 +190,119 @@ const VehicleQuotesTab: React.FC<VehicleQuotesTabProps> = ({ vehicleId }) => {
   return (
     <>
       <div className="w-full max-w-full overflow-hidden">
-        <div className="card-container p-0">
+        {/* Mobile: Cards empilées */}
+        <div className="md:hidden space-y-3 p-2">
+          {sortedData.map((quote) => (
+            <div key={quote.id} className="bg-white border rounded-lg p-3 shadow-sm">
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <p className="font-medium text-sm">{quote.reference}</p>
+                  <p className="text-xs text-gray-500">{new Date(quote.created_at).toLocaleDateString('fr-FR')}</p>
+                </div>
+                <StatusBadge status={quote.status === 'draft' ? 'En attente' : (quote.status || 'En attente')} />
+              </div>
+              <p className="text-sm font-semibold text-karrosserie-orange mb-3">{formatAmount(quote.amount)}</p>
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" size="sm" className="h-8 w-8 p-0" onClick={() => handleView(quote)}>
+                  <Eye className="h-4 w-4" />
+                </Button>
+                <Button size="sm" className="h-8 px-2 bg-karrosserie-orange hover:bg-karrosserie-orange/90" onClick={() => handleConvertToRepairOrder(quote)}>
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-background border shadow-lg z-50">
+                    <DropdownMenuItem onClick={() => handleEdit(quote)}><Pencil className="h-4 w-4 mr-2" />Modifier</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleDownload(quote)}><Download className="h-4 w-4 mr-2" />Télécharger</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handlePrint(quote)}><Printer className="h-4 w-4 mr-2" />Imprimer</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleSendEmail(quote)}><Mail className="h-4 w-4 mr-2" />E-mail</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => handleArchive(quote)} className="text-orange-600"><Archive className="h-4 w-4 mr-2" />Archiver</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+          ))}
+          {sortedData.length === 0 && (
+            <div className="text-center py-8">
+              <FileText className="mx-auto h-10 w-10 text-gray-400 mb-2" />
+              <h3 className="font-medium text-gray-900 text-sm">Aucun devis</h3>
+              <p className="text-gray-500 text-xs mt-1">Ce véhicule n'a pas encore de devis.</p>
+            </div>
+          )}
+        </div>
+
+        {/* Desktop: Table */}
+        <div className="hidden md:block card-container p-0">
           <div className="overflow-x-auto">
-            <Table className="min-w-[500px] w-full">
-            <TableHeader>
-              <TableRow>
-                <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
-                  Numéro
-                </SortableTableHeader>
-                <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>
-                  Date
-                </SortableTableHeader>
-                <SortableTableHeader sortKey="clients.first_name" sortConfig={sortConfig} onSort={handleSort} className="hidden md:table-cell">
-                  Client
-                </SortableTableHeader>
-                <TableHead className="hidden lg:table-cell">Véhicule</TableHead>
-                <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
-                  Montant
-                </SortableTableHeader>
-                <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
-                  Statut
-                </SortableTableHeader>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sortedData.length > 0 ? (
-                sortedData.map((quote) => (
-                  <React.Fragment key={quote.id}>
-                    <TableRow className="border-b-0">
-                      <TableCell className="font-medium text-xs sm:text-sm py-2 sm:py-4">{quote.reference}</TableCell>
-                      <TableCell className="text-xs sm:text-sm py-2 sm:py-4">{new Date(quote.created_at).toLocaleDateString('fr-FR')}</TableCell>
-                      <TableCell className="hidden md:table-cell text-xs sm:text-sm py-2 sm:py-4">{quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '-'}</TableCell>
-                      <TableCell className="hidden lg:table-cell text-xs sm:text-sm py-2 sm:py-4">
-                        {quote.vehicles 
-                          ? `${quote.vehicles.car_brands?.name || 'Marque inconnue'} ${quote.vehicles.car_models?.name || 'Modèle inconnu'} - ${quote.vehicles.license_plate}`
-                          : '-'
-                        }
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm py-2 sm:py-4">{formatAmount(quote.amount)}</TableCell>
-                      <TableCell className="py-2 sm:py-4">
-                        <StatusBadge status={quote.status === 'draft' ? 'En attente' : (quote.status || 'En attente')} />
-                      </TableCell>
-                    </TableRow>
-                    <TableRow className="border-t-0">
-                      <TableCell colSpan={6} className="py-2 sm:py-3 border-t-0">
-                        <div className="flex flex-wrap gap-1 sm:gap-2 justify-end px-2 sm:px-4">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3"
-                            onClick={() => handleView(quote)}
-                          >
-                            <Eye className="h-4 w-4" />
-                            <span className="hidden sm:inline sm:ml-1">Voir</span>
-                          </Button>
-                          <Button 
-                            size="sm"
-                            className="h-8 px-2 sm:h-9 sm:px-3 bg-karrosserie-orange hover:bg-karrosserie-orange/90"
-                            onClick={() => handleConvertToRepairOrder(quote)}
-                          >
-                            <ArrowRight className="h-4 w-4" />
-                            <span className="hidden sm:inline sm:ml-1">Convertir</span>
-                          </Button>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="outline" size="sm" className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3">
-                                <MoreVertical className="h-4 w-4" />
-                                <span className="hidden sm:inline sm:ml-1">Plus</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="bg-background border shadow-lg z-50">
-                              <DropdownMenuItem onClick={() => handleEdit(quote)}>
-                                <Pencil className="h-4 w-4 mr-2" />
-                                Modifier
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleDownload(quote)}>
-                                <Download className="h-4 w-4 mr-2" />
-                                Télécharger
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handlePrint(quote)}>
-                                <Printer className="h-4 w-4 mr-2" />
-                                Imprimer
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleSendEmail(quote)}>
-                                <Mail className="h-4 w-4 mr-2" />
-                                E-mail
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem onClick={() => handleArchive(quote)} className="text-orange-600">
-                                <Archive className="h-4 w-4 mr-2" />
-                                Archiver
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  </React.Fragment>
-                ))
-              ) : (
+            <Table className="w-full">
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-4">
-                    <div className="flex flex-col items-center justify-center py-8">
-                      <FileText className="h-10 w-10 text-gray-400 mb-2" />
+                  <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>Numéro</SortableTableHeader>
+                  <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>Date</SortableTableHeader>
+                  <SortableTableHeader sortKey="clients.first_name" sortConfig={sortConfig} onSort={handleSort}>Client</SortableTableHeader>
+                  <TableHead>Véhicule</TableHead>
+                  <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>Montant</SortableTableHeader>
+                  <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>Statut</SortableTableHeader>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sortedData.length > 0 ? sortedData.map((quote) => (
+                  <TableRow key={quote.id}>
+                    <TableCell className="font-medium">{quote.reference}</TableCell>
+                    <TableCell>{new Date(quote.created_at).toLocaleDateString('fr-FR')}</TableCell>
+                    <TableCell>{quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '-'}</TableCell>
+                    <TableCell>{quote.vehicles ? `${quote.vehicles.car_brands?.name || ''} ${quote.vehicles.car_models?.name || ''} - ${quote.vehicles.license_plate}` : '-'}</TableCell>
+                    <TableCell>{formatAmount(quote.amount)}</TableCell>
+                    <TableCell><StatusBadge status={quote.status === 'draft' ? 'En attente' : (quote.status || 'En attente')} /></TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={() => handleView(quote)}><Eye className="h-4 w-4 mr-1" />Voir</Button>
+                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90" onClick={() => handleConvertToRepairOrder(quote)}><ArrowRight className="h-4 w-4 mr-1" />Convertir</Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm"><MoreVertical className="h-4 w-4" /></Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="bg-background border shadow-lg z-50">
+                            <DropdownMenuItem onClick={() => handleEdit(quote)}><Pencil className="h-4 w-4 mr-2" />Modifier</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDownload(quote)}><Download className="h-4 w-4 mr-2" />Télécharger</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handlePrint(quote)}><Printer className="h-4 w-4 mr-2" />Imprimer</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleSendEmail(quote)}><Mail className="h-4 w-4 mr-2" />E-mail</DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => handleArchive(quote)} className="text-orange-600"><Archive className="h-4 w-4 mr-2" />Archiver</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )) : (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-8">
+                      <FileText className="mx-auto h-10 w-10 text-gray-400 mb-2" />
                       <h3 className="font-medium text-gray-900">Aucun devis</h3>
                       <p className="text-gray-500 mt-1">Ce véhicule n'a pas encore de devis.</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
             </Table>
           </div>
         </div>
       </div>
 
-      <QuoteDialog
-        quote={selectedQuote}
-        open={editDialogOpen}
-        onOpenChange={setEditDialogOpen}
-      />
-
-      <QuoteViewerModal
-        quote={selectedQuote}
-        open={viewerModalOpen}
-        onOpenChange={setViewerModalOpen}
-      />
-
-      <QuoteEmailDialog
-        quote={selectedQuoteForEmail}
-        open={emailDialogOpen}
-        onOpenChange={setEmailDialogOpen}
-      />
-
+      <QuoteDialog quote={selectedQuote} open={editDialogOpen} onOpenChange={setEditDialogOpen} />
+      <QuoteViewerModal quote={selectedQuote} open={viewerModalOpen} onOpenChange={setViewerModalOpen} />
+      <QuoteEmailDialog quote={selectedQuoteForEmail} open={emailDialogOpen} onOpenChange={setEmailDialogOpen} />
       <RepairOrderDialog
         order={prefilledRepairOrder as RepairOrder}
         open={repairOrderDialogOpen}
-        onOpenChange={(open) => {
-          setRepairOrderDialogOpen(open);
-          if (!open) {
-            setPrefilledRepairOrder(null);
-          }
-        }}
-        onSuccess={() => {
-          navigate('/documents/ordres');
-        }}
+        onOpenChange={(open) => { setRepairOrderDialogOpen(open); if (!open) setPrefilledRepairOrder(null); }}
+        onSuccess={() => navigate('/documents/ordres')}
       />
     </>
   );
