@@ -51,10 +51,19 @@ const VehicleFormTabs: React.FC<VehicleFormTabsProps> = ({
 }) => {
   return (
     <Tabs defaultValue="info" className="w-full">
-      <TabsList className="grid grid-cols-3 mb-6">
-        <TabsTrigger value="info">Informations de base</TabsTrigger>
-        <TabsTrigger value="details">Détails techniques</TabsTrigger>
-        <TabsTrigger value="documents">Documents & Photos</TabsTrigger>
+      <TabsList className="grid grid-cols-3 mb-4 sm:mb-6 h-auto">
+        <TabsTrigger value="info" className="text-xs sm:text-sm px-1 sm:px-3 py-2">
+          <span className="hidden sm:inline">Informations de base</span>
+          <span className="sm:hidden">Infos</span>
+        </TabsTrigger>
+        <TabsTrigger value="details" className="text-xs sm:text-sm px-1 sm:px-3 py-2">
+          <span className="hidden sm:inline">Détails techniques</span>
+          <span className="sm:hidden">Détails</span>
+        </TabsTrigger>
+        <TabsTrigger value="documents" className="text-xs sm:text-sm px-1 sm:px-3 py-2">
+          <span className="hidden sm:inline">Documents & Photos</span>
+          <span className="sm:hidden">Docs</span>
+        </TabsTrigger>
       </TabsList>
       
       <TabsContent value="info" className="space-y-4">

@@ -42,18 +42,18 @@ const VehicleDetailsForm: React.FC<VehicleDetailsFormProps> = ({
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6">
         {/* Left column: Road test fields - taking 3/5 of the space */}
-        <div className="lg:col-span-3 space-y-4">
+        <div className="lg:col-span-3 space-y-3 sm:space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="roadTest">Test routier</Label>
+            <Label htmlFor="roadTest" className="text-sm">Test routier</Label>
             <Select 
               disabled={isViewMode} 
               value={formData.roadTest} 
               onValueChange={(value) => onSelectChange('roadTest', value)}
             >
-              <SelectTrigger id="roadTest">
+              <SelectTrigger id="roadTest" className="text-sm">
                 <SelectValue placeholder="Sélectionner un type de test" />
               </SelectTrigger>
               <SelectContent>
@@ -67,7 +67,7 @@ const VehicleDetailsForm: React.FC<VehicleDetailsFormProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="roadTestNotes">Notes sur le test routier</Label>
+            <Label htmlFor="roadTestNotes" className="text-sm">Notes sur le test routier</Label>
             <Textarea
               id="roadTestNotes"
               name="roadTestNotes"
@@ -75,14 +75,15 @@ const VehicleDetailsForm: React.FC<VehicleDetailsFormProps> = ({
               onChange={onInputChange}
               disabled={isViewMode}
               rows={3}
+              className="text-sm"
             />
           </div>
         </div>
 
         {/* Right column: Fuel Gauge - taking 2/5 of the space */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-3 sm:space-y-4">
           <div className="text-center">
-            <Label>Niveau de carburant</Label>
+            <Label className="text-sm">Niveau de carburant</Label>
           </div>
           <div className="flex justify-center">
             <FuelGauge
@@ -94,43 +95,43 @@ const VehicleDetailsForm: React.FC<VehicleDetailsFormProps> = ({
         </div>
       </div>
 
-      <div className="space-y-4">
-        <Label htmlFor="preAccidentDefects">Pré-accident / Autres défauts</Label>
+      <div className="space-y-3 sm:space-y-4">
+        <Label htmlFor="preAccidentDefects" className="text-sm">Pré-accident / Autres défauts</Label>
         <Textarea
           id="preAccidentDefects"
           name="preAccidentDefects"
           value={formData.preAccidentDefects || ''}
           onChange={onInputChange}
           disabled={isViewMode}
-          className="min-h-[120px]"
+          className="min-h-[100px] sm:min-h-[120px] text-sm"
         />
       </div>
 
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Label>Travaux demandés / Instructions du propriétaire</Label>
+      <div className="space-y-3 sm:space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <Label className="text-sm">Travaux demandés / Instructions du propriétaire</Label>
           {!isViewMode && (
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={onAddWorkItem}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 w-full sm:w-auto text-xs sm:text-sm"
             >
               <Plus className="h-4 w-4" />
-              Ajouter un article
+              Ajouter
             </Button>
           )}
         </div>
         
-        <div className="space-y-3">
+        <div className="space-y-2 sm:space-y-3">
           {(formData.workItems || []).map((item: string, index: number) => (
             <div key={index} className="flex items-center gap-2">
               <Input
                 value={item}
                 onChange={(e) => onWorkItemChange(index, e.target.value)}
                 disabled={isViewMode}
-                className="flex-1"
+                className="flex-1 text-sm"
               />
               {!isViewMode && (
                 <Button
@@ -138,7 +139,7 @@ const VehicleDetailsForm: React.FC<VehicleDetailsFormProps> = ({
                   variant="outline"
                   size="sm"
                   onClick={() => onRemoveWorkItem(index)}
-                  className="text-red-500 hover:text-red-700"
+                  className="text-red-500 hover:text-red-700 px-2 sm:px-3"
                 >
                   <Trash className="h-4 w-4" />
                 </Button>
@@ -151,6 +152,7 @@ const VehicleDetailsForm: React.FC<VehicleDetailsFormProps> = ({
               value=""
               onChange={(e) => onWorkItemChange(0, e.target.value)}
               disabled={isViewMode}
+              className="text-sm"
             />
           )}
         </div>

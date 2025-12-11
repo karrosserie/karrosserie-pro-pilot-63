@@ -120,9 +120,9 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
       <div className="space-y-2">
-        <Label htmlFor="clientId">
+        <Label htmlFor="clientId" className="text-sm">
           Client <span className="text-red-500">*</span>
         </Label>
         <SearchableSelect
@@ -136,7 +136,7 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="brand">
+        <Label htmlFor="brand" className="text-sm">
           Marque <span className="text-red-500">*</span>
         </Label>
         <SearchableSelect
@@ -149,8 +149,8 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
         />
       </div>
       
-      <div className="space-y-2">
-        <Label htmlFor="model">
+      <div className="space-y-2 sm:col-span-2 md:col-span-1">
+        <Label htmlFor="model" className="text-sm">
           Modèle <span className="text-red-500">*</span>
         </Label>
         <SearchableSelect
@@ -168,7 +168,7 @@ const VehicleBasicDetails: React.FC<VehicleBasicDetailsProps> = ({
           disabled={isViewMode || !formData.brandId || modelsLoading}
         />
         {modelsLoading && formData.brandId && (
-          <p className="text-sm text-gray-500">Chargement des modèles...</p>
+          <p className="text-xs text-gray-500">Chargement des modèles...</p>
         )}
       </div>
     </div>
