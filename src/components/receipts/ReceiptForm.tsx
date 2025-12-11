@@ -72,38 +72,34 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting, presele
       }
     } else {
       // Si c'est un nouvel encaissement, générer la référence
+      // Appliquer immédiatement les données de la facture pré-sélectionnée
+      if (preselectedInvoice) {
+        setFormData(prev => ({
+          ...prev,
+          invoice: preselectedInvoice.id,
+          amount: preselectedInvoice.amount
+        }));
+      }
+      
       const generateReference = async () => {
         try {
           const reference = await receiptsService.generateReference();
-          setFormData(prev => {
-            const newData = { 
-              ...prev, 
-              reference,
-              // Si on a une facture pré-sélectionnée, pré-remplir l'invoice et le montant
-              ...(preselectedInvoice ? {
-                invoice: preselectedInvoice.id,
-                amount: preselectedInvoice.amount
-              } : {})
-            };
-            return newData;
-          });
+          setFormData(prev => ({ 
+            ...prev, 
+            reference
+          }));
         } catch (error) {
           console.error('Error generating reference:', error);
           setFormData(prev => ({ 
             ...prev, 
-            reference: '1',
-            // Si on a une facture pré-sélectionnée, pré-remplir l'invoice et le montant même en cas d'erreur
-            ...(preselectedInvoice ? {
-              invoice: preselectedInvoice.id,
-              amount: preselectedInvoice.amount
-            } : {})
+            reference: '1'
           }));
         }
       };
 
       generateReference();
     }
-  }, [receipt]);
+  }, [receipt, preselectedInvoice]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
