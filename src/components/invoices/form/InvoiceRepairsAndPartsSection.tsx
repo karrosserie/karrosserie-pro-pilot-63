@@ -49,6 +49,29 @@ export const InvoiceRepairsAndPartsSection = ({
 
   const updateRepair = (id: string, field: keyof InvoiceRepairItem, value: string | number) => {
     if (isReadOnly) return;
+    
+    // Si c'est un item temporaire, le convertir en item réel d'abord
+    if (id.startsWith('temp_')) {
+      const newRepair: InvoiceRepairItem = {
+        id: `repair_${Date.now()}`,
+        description: '',
+        quantity: 1,
+        unitCost: 0,
+        discount: 0,
+        vat: 20,
+        total: 0,
+        [field]: value
+      };
+      // Recalculer le total
+      const subtotal = newRepair.quantity * newRepair.unitCost;
+      const discountAmount = subtotal * (newRepair.discount / 100);
+      const afterDiscount = subtotal - discountAmount;
+      const vatAmount = afterDiscount * (newRepair.vat / 100);
+      newRepair.total = afterDiscount + vatAmount;
+      onRepairsChange([newRepair]);
+      return;
+    }
+    
     const updatedRepairs = repairs.map(repair => {
       if (repair.id === id) {
         const updated = { ...repair, [field]: value };
@@ -87,6 +110,29 @@ export const InvoiceRepairsAndPartsSection = ({
 
   const updatePart = (id: string, field: keyof InvoicePartItem, value: string | number) => {
     if (isReadOnly) return;
+    
+    // Si c'est un item temporaire, le convertir en item réel d'abord
+    if (id.startsWith('temp_')) {
+      const newPart: InvoicePartItem = {
+        id: `part_${Date.now()}`,
+        description: '',
+        quantity: 1,
+        unitCost: 0,
+        discount: 0,
+        vat: 20,
+        total: 0,
+        [field]: value
+      };
+      // Recalculer le total
+      const subtotal = newPart.quantity * newPart.unitCost;
+      const discountAmount = subtotal * (newPart.discount / 100);
+      const afterDiscount = subtotal - discountAmount;
+      const vatAmount = afterDiscount * (newPart.vat / 100);
+      newPart.total = afterDiscount + vatAmount;
+      onPartsChange([newPart]);
+      return;
+    }
+    
     const updatedParts = parts.map(part => {
       if (part.id === id) {
         const updated = { ...part, [field]: value };
