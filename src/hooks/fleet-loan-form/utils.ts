@@ -75,6 +75,10 @@ export const prepareReservationData = async (formData: LoanFormData, vehicleId: 
     insurance_address: formData.insuranceAddress || null,
     insurance_city: formData.insuranceCity || null,
     insurance_postal_code: formData.insurancePostalCode || null,
+    // Assistance fields
+    has_assistance: formData.hasAssistance || false,
+    assistance_case_number: formData.assistanceCaseNumber || null,
+    assistance_email: formData.assistanceEmail || null,
     attestation_accepted: formData.attestationAccepted || false,
     client_signature: formData.clientSignature || null,
     notes: formData.notes || null,

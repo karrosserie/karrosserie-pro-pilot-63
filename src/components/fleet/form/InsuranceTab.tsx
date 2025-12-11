@@ -11,6 +11,7 @@ interface InsuranceTabProps {
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSwitchChange: (checked: boolean) => void;
   onPhoneChange: (value: string | undefined) => void;
+  onAssistanceSwitchChange: (checked: boolean) => void;
   isViewMode?: boolean;
 }
 
@@ -19,6 +20,7 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
   onInputChange,
   onSwitchChange,
   onPhoneChange,
+  onAssistanceSwitchChange,
   isViewMode = false
 }) => {
   return (
@@ -137,6 +139,54 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
             />
           </div>
         </div>
+      </div>
+
+      {/* Assistance Section */}
+      <div className="space-y-6 border-t pt-6 mt-6">
+        <h4 className="text-sm font-medium text-foreground">Assistance</h4>
+        
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="hasAssistance"
+            checked={formData.hasAssistance || false}
+            onCheckedChange={onAssistanceSwitchChange}
+            disabled={isViewMode}
+          />
+          <Label htmlFor="hasAssistance">Dossier d'assistance</Label>
+        </div>
+
+        {formData.hasAssistance && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="assistanceCaseNumber">
+                Numéro de dossier d'assistance <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="assistanceCaseNumber"
+                name="assistanceCaseNumber"
+                value={formData.assistanceCaseNumber || ''}
+                onChange={onInputChange}
+                disabled={isViewMode}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="assistanceEmail">
+                Email de contact de l'assistance <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="assistanceEmail"
+                name="assistanceEmail"
+                type="email"
+                value={formData.assistanceEmail || ''}
+                onChange={onInputChange}
+                disabled={isViewMode}
+                required
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -2676,6 +2676,8 @@ export type Database = {
       fleet_reservations: {
         Row: {
           actual_return_date: string | null
+          assistance_case_number: string | null
+          assistance_email: string | null
           attestation_accepted: boolean | null
           claim_number: string | null
           client_email: string | null
@@ -2690,6 +2692,7 @@ export type Database = {
           fleet_vehicle_id: string
           fuel_level_end: number | null
           fuel_level_start: number
+          has_assistance: boolean | null
           holder_info: string | null
           id: string
           insurance_address: string | null
@@ -2711,6 +2714,8 @@ export type Database = {
         }
         Insert: {
           actual_return_date?: string | null
+          assistance_case_number?: string | null
+          assistance_email?: string | null
           attestation_accepted?: boolean | null
           claim_number?: string | null
           client_email?: string | null
@@ -2725,6 +2730,7 @@ export type Database = {
           fleet_vehicle_id: string
           fuel_level_end?: number | null
           fuel_level_start?: number
+          has_assistance?: boolean | null
           holder_info?: string | null
           id?: string
           insurance_address?: string | null
@@ -2746,6 +2752,8 @@ export type Database = {
         }
         Update: {
           actual_return_date?: string | null
+          assistance_case_number?: string | null
+          assistance_email?: string | null
           attestation_accepted?: boolean | null
           claim_number?: string | null
           client_email?: string | null
@@ -2760,6 +2768,7 @@ export type Database = {
           fleet_vehicle_id?: string
           fuel_level_end?: number | null
           fuel_level_start?: number
+          has_assistance?: boolean | null
           holder_info?: string | null
           id?: string
           insurance_address?: string | null
