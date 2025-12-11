@@ -216,6 +216,7 @@ const VehicleRepairOrdersTab: React.FC<VehicleRepairOrdersTabProps> = ({ vehicle
   return (
     <>
       <div className="w-full max-w-full overflow-hidden">
+        <h3 className="text-sm font-semibold text-muted-foreground mb-3 px-2 md:px-0">Ordres de réparation</h3>
         {/* Mobile: Cards empilées */}
         <div className="md:hidden space-y-3 p-2">
           {sortedData.map((order) => (
