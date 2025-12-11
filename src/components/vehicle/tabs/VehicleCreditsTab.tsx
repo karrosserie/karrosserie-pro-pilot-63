@@ -12,7 +12,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
-import { CreditCard, Eye, Pencil, Trash, Download, Printer, Mail } from 'lucide-react';
+import { CreditCard, Eye, Trash, Download, Printer, Mail, MoreVertical, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
@@ -21,6 +21,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
 import { EditCreditDialog } from '@/components/credits/EditCreditDialog';
@@ -50,7 +51,6 @@ const VehicleCreditsTab: React.FC<VehicleCreditsTabProps> = ({ vehicleId }) => {
     );
   }
 
-  // Filter credits: credit linked to an invoice belonging to the vehicle
   const vehicleCredits = credits?.filter(credit => {
     if (credit.invoice_id && invoices) {
       const relatedInvoice = invoices.find(invoice => invoice.id === credit.invoice_id);
@@ -61,7 +61,6 @@ const VehicleCreditsTab: React.FC<VehicleCreditsTabProps> = ({ vehicleId }) => {
   const { sortedData, sortConfig, handleSort } = useTableSorting(vehicleCredits, 'reference');
 
   const formatVehicleDisplay = (credit: any) => {
-    // First, try to get vehicle data from the credit itself
     if (credit.vehicles) {
       let brand = '';
       let model = '';
@@ -85,7 +84,6 @@ const VehicleCreditsTab: React.FC<VehicleCreditsTabProps> = ({ vehicleId }) => {
       }
     }
     
-    // If no vehicle data in credit, try to get it from the linked invoice
     if (credit.invoice_id && invoices) {
       const linkedInvoice = invoices.find(invoice => invoice.id === credit.invoice_id);
       
@@ -134,7 +132,6 @@ const VehicleCreditsTab: React.FC<VehicleCreditsTabProps> = ({ vehicleId }) => {
   };
 
   const handleView = (credit: any) => {
-    // Find the related invoice to display
     if (credit.invoice_id && invoices) {
       const relatedInvoice = invoices.find(invoice => invoice.id === credit.invoice_id);
       if (relatedInvoice) {
@@ -157,7 +154,6 @@ const VehicleCreditsTab: React.FC<VehicleCreditsTabProps> = ({ vehicleId }) => {
   };
 
   const handleEdit = (credit: any) => {
-    // Parse items_data if it exists
     let items = [];
     if (credit.items_data) {
       try {
@@ -279,97 +275,112 @@ const VehicleCreditsTab: React.FC<VehicleCreditsTabProps> = ({ vehicleId }) => {
   return (
     <>
       <div className="card-container p-0">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
-                Numéro
-              </SortableTableHeader>
-              <SortableTableHeader sortKey="created_date" sortConfig={sortConfig} onSort={handleSort}>
-                Date
-              </SortableTableHeader>
-              <TableHead>Véhicule</TableHead>
-              <TableHead>Facture d'origine</TableHead>
-              <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
-                Montant
-              </SortableTableHeader>
-              <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
-                Statut
-              </SortableTableHeader>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sortedData.length > 0 ? (
-              sortedData.map((credit) => (
-                <React.Fragment key={credit.id}>
-                  <TableRow className="hover:bg-gray-50 border-b-0">
-                    <TableCell className="font-medium">{credit.reference}</TableCell>
-                    <TableCell>{formatDate(credit.created_date || credit.created_at)}</TableCell>
-                    <TableCell>
-                      {formatVehicleDisplay(credit)}
-                    </TableCell>
-                    <TableCell>
-                      {getInvoiceDisplay(credit.invoice_id)}
-                    </TableCell>
-                    <TableCell>{formatAmount(credit.amount)}</TableCell>
-                    <TableCell>
-                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(credit.status || 'En attente')}`}>
-                        {credit.status || 'En attente'}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow className="border-t-0">
-                    <TableCell colSpan={6} className="py-3 border-t-0">
-                      <div className="flex flex-wrap gap-2 justify-end px-4">
-                        <Button variant="outline" size="sm" onClick={() => handleView(credit)}>
-                          <Eye className="h-4 w-4 mr-1" />
-                          Voir
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleEdit(credit)}>
-                          <Pencil className="h-4 w-4 mr-1" />
-                          Modifier
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleDownload(credit)}>
-                          <Download className="h-4 w-4 mr-1" />
-                          Télécharger
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => handlePrint(credit)}>
-                          <Printer className="h-4 w-4 mr-1" />
-                          Imprimer
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleSendEmail(credit)}>
-                          <Mail className="h-4 w-4 mr-1" />
-                          Envoyer
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
-                          onClick={() => handleDelete(credit)}
-                          disabled={deleteCredit.isPending}
-                          title="Supprimer"
-                        >
-                          <Trash className="h-4 w-4 mr-1" />
-                          Supprimer
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                </React.Fragment>
-              ))
-            ) : (
+        <div className="overflow-x-auto">
+          <Table className="min-w-[500px]">
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-4">
-                  <div className="flex flex-col items-center justify-center py-8">
-                    <CreditCard className="h-10 w-10 text-gray-400 mb-2" />
-                    <h3 className="font-medium text-gray-900">Aucun avoir</h3>
-                    <p className="text-gray-500 mt-1">Ce véhicule n'a pas encore d'avoir.</p>
-                  </div>
-                </TableCell>
+                <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
+                  Numéro
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="created_date" sortConfig={sortConfig} onSort={handleSort}>
+                  Date
+                </SortableTableHeader>
+                <TableHead className="hidden md:table-cell">Véhicule</TableHead>
+                <TableHead className="hidden lg:table-cell">Facture d'origine</TableHead>
+                <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
+                  Montant
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+                  Statut
+                </SortableTableHeader>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {sortedData.length > 0 ? (
+                sortedData.map((credit) => (
+                  <React.Fragment key={credit.id}>
+                    <TableRow className="hover:bg-gray-50 border-b-0">
+                      <TableCell className="font-medium text-xs sm:text-sm py-2 sm:py-4">{credit.reference}</TableCell>
+                      <TableCell className="text-xs sm:text-sm py-2 sm:py-4">{formatDate(credit.created_date || credit.created_at)}</TableCell>
+                      <TableCell className="hidden md:table-cell text-xs sm:text-sm py-2 sm:py-4">
+                        {formatVehicleDisplay(credit)}
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell text-xs sm:text-sm py-2 sm:py-4">
+                        {getInvoiceDisplay(credit.invoice_id)}
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm py-2 sm:py-4">{formatAmount(credit.amount)}</TableCell>
+                      <TableCell className="py-2 sm:py-4">
+                        <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(credit.status || 'En attente')}`}>
+                          {credit.status || 'En attente'}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow className="border-t-0">
+                      <TableCell colSpan={6} className="py-2 sm:py-3 border-t-0">
+                        <div className="flex flex-wrap gap-1 sm:gap-2 justify-end px-2 sm:px-4">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3"
+                            onClick={() => handleView(credit)}
+                          >
+                            <Eye className="h-4 w-4" />
+                            <span className="hidden sm:inline sm:ml-1">Voir</span>
+                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="outline" size="sm" className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3">
+                                <MoreVertical className="h-4 w-4" />
+                                <span className="hidden sm:inline sm:ml-1">Plus</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-background border shadow-lg z-50">
+                              <DropdownMenuItem onClick={() => handleEdit(credit)}>
+                                <Pencil className="h-4 w-4 mr-2" />
+                                Modifier
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleDownload(credit)}>
+                                <Download className="h-4 w-4 mr-2" />
+                                Télécharger
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handlePrint(credit)}>
+                                <Printer className="h-4 w-4 mr-2" />
+                                Imprimer
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleSendEmail(credit)}>
+                                <Mail className="h-4 w-4 mr-2" />
+                                Envoyer
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem 
+                                onClick={() => handleDelete(credit)} 
+                                disabled={deleteCredit.isPending}
+                                className="text-red-600"
+                              >
+                                <Trash className="h-4 w-4 mr-2" />
+                                Supprimer
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  </React.Fragment>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-4">
+                    <div className="flex flex-col items-center justify-center py-8">
+                      <CreditCard className="h-10 w-10 text-gray-400 mb-2" />
+                      <h3 className="font-medium text-gray-900">Aucun avoir</h3>
+                      <p className="text-gray-500 mt-1">Ce véhicule n'a pas encore d'avoir.</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       {selectedCredit && (

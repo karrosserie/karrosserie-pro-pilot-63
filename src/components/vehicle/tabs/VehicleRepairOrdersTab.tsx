@@ -10,10 +10,16 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
-import { Wrench, Eye, Pencil, Archive, Download, Printer, Mail, Signature, FileCheck, ArrowRight } from 'lucide-react';
+import { Wrench, Eye, Pencil, Archive, Download, Printer, Mail, Signature, ArrowRight, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
-import { RepairOrderActionsDropdown } from '@/components/repair-orders/RepairOrderActionsDropdown';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { calculateOrderAmount } from '@/components/repair-orders/utils/orderCalculations';
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
 import RepairOrderViewerModal from '@/components/repair-orders/RepairOrderViewerModal';
@@ -155,32 +161,7 @@ const VehicleRepairOrdersTab: React.FC<VehicleRepairOrdersTabProps> = ({ vehicle
     setSignatureDialogOpen(true);
   };
 
-  const handleRequestDocuments = async (order: RepairOrder) => {
-    try {
-      const { tokensService } = await import('@/services/supabase/tokens');
-      
-      await tokensService.createToken({
-        company_id: order.company_id!,
-        client_id: order.client_id,
-        vehicule_id: order.vehicle_id
-      });
-
-      toast({
-        title: "Demande de justificatifs",
-        description: `Demande de justificatifs envoyée pour l'ordre de réparation ${order.reference}. Token créé avec succès.`
-      });
-    } catch (error) {
-      console.error('Erreur lors de la création du token:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer le token pour la demande de justificatifs.",
-        variant: "destructive"
-      });
-    }
-  };
-
   const handleConvertToInvoice = (order: RepairOrder) => {
-    // Si l'OR n'est pas signé, afficher l'avertissement
     if (order.status !== 'Signé') {
       setOrderToConvert(order);
       setShowUnsignedWarning(true);
@@ -200,15 +181,12 @@ const VehicleRepairOrdersTab: React.FC<VehicleRepairOrdersTabProps> = ({ vehicle
       date: today,
       due_date: today,
       notes: order.notes || '',
-      // Informations du sinistre depuis l'ordre de réparation
       claim_number: order.claim_number || '',
       policy_number: order.policy_number || '',
       report_date: order.report_date || '',
       expert_name: order.expert_name || '',
       report_number: order.report_number || '',
       incident_date: order.incident_date || '',
-      // Inclure les données de réparations, pièces et remises de l'ordre de réparation
-      // Convertir Json en string si nécessaire
       repairs_data: order.repairs_data ? (typeof order.repairs_data === 'string' ? order.repairs_data : JSON.stringify(order.repairs_data)) : undefined,
       parts_data: order.parts_data ? (typeof order.parts_data === 'string' ? order.parts_data : JSON.stringify(order.parts_data)) : undefined,
       discounts_data: order.discounts_data ? (typeof order.discounts_data === 'string' ? order.discounts_data : JSON.stringify(order.discounts_data)) : undefined,
@@ -216,15 +194,6 @@ const VehicleRepairOrdersTab: React.FC<VehicleRepairOrdersTabProps> = ({ vehicle
 
     setPrefilledInvoice(prefilledData);
     setInvoiceDialogOpen(true);
-  };
-
-  const contextMenuProps = {
-    onDownload: handleDownload,
-    onPrint: handlePrint,
-    onSendEmail: handleSendEmail,
-    onSignOrder: handleSignOrder,
-    onRequestDocuments: handleRequestDocuments,
-    onConvertToInvoice: handleConvertToInvoice
   };
 
   const formatAmount = (amount: number | null | undefined): string => {
@@ -247,122 +216,130 @@ const VehicleRepairOrdersTab: React.FC<VehicleRepairOrdersTabProps> = ({ vehicle
   return (
     <>
       <div className="card-container p-0">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
-                Numéro
-              </SortableTableHeader>
-              <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>
-                Date
-              </SortableTableHeader>
-              <SortableTableHeader sortKey="clients.first_name" sortConfig={sortConfig} onSort={handleSort}>
-                Client
-              </SortableTableHeader>
-              <TableHead>Véhicule</TableHead>
-              <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
-                Montant
-              </SortableTableHeader>
-              <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
-                Statut
-              </SortableTableHeader>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sortedData.length > 0 ? (
-              sortedData.map((order) => (
-                <React.Fragment key={order.id}>
-                  <TableRow className="border-b-0">
-                    <TableCell className="font-medium">{order.reference}</TableCell>
-                    <TableCell>{formatDate(order.created_at)}</TableCell>
-                    <TableCell>
-                      {order.clients 
-                        ? `${order.clients.first_name} ${order.clients.last_name}`
-                        : '-'
-                      }
-                    </TableCell>
-                    <TableCell>
-                      {order.vehicles 
-                        ? `${order.vehicles.car_brands?.name || 'Marque inconnue'} ${order.vehicles.car_models?.name || 'Modèle inconnu'} - ${order.vehicles.license_plate}`
-                        : '-'
-                      }
-                    </TableCell>
-                    <TableCell>{formatAmount(calculateOrderAmount(order))}</TableCell>
-                    <TableCell>
-                      <StatusBadge status={order.status || 'En cours'} />
-                    </TableCell>
-                  </TableRow>
-                  <TableRow className="border-t-0">
-                    <TableCell colSpan={6} className="py-3 border-t-0">
-                      <div className="flex flex-wrap gap-2 justify-end px-4">
-                        <Button variant="outline" size="sm" onClick={() => handleViewOrder(order)}>
-                          <Eye className="h-4 w-4 mr-1" />
-                          Voir
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleEditOrder(order)}>
-                          <Pencil className="h-4 w-4 mr-1" />
-                          Modifier
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleDownload(order)}>
-                          <Download className="h-4 w-4 mr-1" />
-                          Télécharger
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => handlePrint(order)}>
-                          <Printer className="h-4 w-4 mr-1" />
-                          Imprimer
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleSendEmail(order)}>
-                          <Mail className="h-4 w-4 mr-1" />
-                          Envoyer
-                        </Button>
-                        {order.status !== 'Signé' && (
-                          <Button variant="outline" size="sm" onClick={() => handleSignOrder(order)}>
-                            <Signature className="h-4 w-4 mr-1" />
-                            Signature du client
-                          </Button>
-                        )}
-                        <Button variant="outline" size="sm" onClick={() => handleRequestDocuments(order)} className="hidden">
-                          <FileCheck className="h-4 w-4 mr-1" />
-                          Demander docs
-                        </Button>
-                        {!order.invoices || order.invoices.length === 0 ? (
-                          <Button 
-                            size="sm"
-                            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
-                            onClick={() => handleConvertToInvoice(order)}
-                          >
-                            <ArrowRight className="h-4 w-4 mr-1" />
-                            Convertir
-                          </Button>
-                        ) : null}
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-orange-600 hover:text-orange-700 border-orange-600 hover:border-orange-700"
-                          onClick={() => handleArchiveOrder(order)}
-                          title="Archiver"
-                        >
-                          <Archive className="h-4 w-4 mr-1" />
-                          Archiver
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                </React.Fragment>
-              ))
-            ) : (
+        <div className="overflow-x-auto">
+          <Table className="min-w-[600px]">
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-4">
-                  <div className="flex flex-col items-center justify-center py-8">
-                    <Wrench className="h-10 w-10 text-gray-400 mb-2" />
-                    <h3 className="font-medium text-gray-900">Aucun ordre de réparation</h3>
-                    <p className="text-gray-500 mt-1">Ce véhicule n'a pas encore d'ordre de réparation.</p>
-                  </div>
-                </TableCell>
+                <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
+                  Numéro
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>
+                  Date
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="clients.first_name" sortConfig={sortConfig} onSort={handleSort} className="hidden md:table-cell">
+                  Client
+                </SortableTableHeader>
+                <TableHead className="hidden lg:table-cell">Véhicule</TableHead>
+                <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
+                  Montant
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+                  Statut
+                </SortableTableHeader>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {sortedData.length > 0 ? (
+                sortedData.map((order) => (
+                  <React.Fragment key={order.id}>
+                    <TableRow className="border-b-0">
+                      <TableCell className="font-medium text-xs sm:text-sm py-2 sm:py-4">{order.reference}</TableCell>
+                      <TableCell className="text-xs sm:text-sm py-2 sm:py-4">{formatDate(order.created_at)}</TableCell>
+                      <TableCell className="hidden md:table-cell text-xs sm:text-sm py-2 sm:py-4">
+                        {order.clients 
+                          ? `${order.clients.first_name} ${order.clients.last_name}`
+                          : '-'
+                        }
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell text-xs sm:text-sm py-2 sm:py-4">
+                        {order.vehicles 
+                          ? `${order.vehicles.car_brands?.name || 'Marque inconnue'} ${order.vehicles.car_models?.name || 'Modèle inconnu'} - ${order.vehicles.license_plate}`
+                          : '-'
+                        }
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm py-2 sm:py-4">{formatAmount(calculateOrderAmount(order))}</TableCell>
+                      <TableCell className="py-2 sm:py-4">
+                        <StatusBadge status={order.status || 'En cours'} />
+                      </TableCell>
+                    </TableRow>
+                    <TableRow className="border-t-0">
+                      <TableCell colSpan={6} className="py-2 sm:py-3 border-t-0">
+                        <div className="flex flex-wrap gap-1 sm:gap-2 justify-end px-2 sm:px-4">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3"
+                            onClick={() => handleViewOrder(order)}
+                          >
+                            <Eye className="h-4 w-4" />
+                            <span className="hidden sm:inline sm:ml-1">Voir</span>
+                          </Button>
+                          {(!order.invoices || order.invoices.length === 0) && (
+                            <Button 
+                              size="sm"
+                              className="h-8 px-2 sm:h-9 sm:px-3 bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+                              onClick={() => handleConvertToInvoice(order)}
+                            >
+                              <ArrowRight className="h-4 w-4" />
+                              <span className="hidden sm:inline sm:ml-1">Convertir</span>
+                            </Button>
+                          )}
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="outline" size="sm" className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3">
+                                <MoreVertical className="h-4 w-4" />
+                                <span className="hidden sm:inline sm:ml-1">Plus</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-background border shadow-lg z-50">
+                              <DropdownMenuItem onClick={() => handleEditOrder(order)}>
+                                <Pencil className="h-4 w-4 mr-2" />
+                                Modifier
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleDownload(order)}>
+                                <Download className="h-4 w-4 mr-2" />
+                                Télécharger
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handlePrint(order)}>
+                                <Printer className="h-4 w-4 mr-2" />
+                                Imprimer
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleSendEmail(order)}>
+                                <Mail className="h-4 w-4 mr-2" />
+                                Envoyer
+                              </DropdownMenuItem>
+                              {order.status !== 'Signé' && (
+                                <DropdownMenuItem onClick={() => handleSignOrder(order)}>
+                                  <Signature className="h-4 w-4 mr-2" />
+                                  Signature du client
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={() => handleArchiveOrder(order)} className="text-orange-600">
+                                <Archive className="h-4 w-4 mr-2" />
+                                Archiver
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  </React.Fragment>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-4">
+                    <div className="flex flex-col items-center justify-center py-8">
+                      <Wrench className="h-10 w-10 text-gray-400 mb-2" />
+                      <h3 className="font-medium text-gray-900">Aucun ordre de réparation</h3>
+                      <p className="text-gray-500 mt-1">Ce véhicule n'a pas encore d'ordre de réparation.</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       <RepairOrderDialog
