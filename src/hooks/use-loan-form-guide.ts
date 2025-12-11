@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Step, CallBackProps, STATUS } from 'react-joyride';
+import { Step, CallBackProps, STATUS, ACTIONS, LIFECYCLE } from 'react-joyride';
 
 export const useLoanFormGuide = (
   isViewMode: boolean, 
@@ -31,16 +31,42 @@ export const useLoanFormGuide = (
     4: 'attestation'
   };
 
+  // Repositionner manuellement le spotlight sur l'élément cible
+  const repositionSpotlight = (targetSelector: string) => {
+    const targetElement = document.querySelector(targetSelector);
+    const spotlight = document.querySelector('.react-joyride__spotlight') as HTMLElement;
+    
+    if (targetElement && spotlight) {
+      const rect = targetElement.getBoundingClientRect();
+      spotlight.style.position = 'fixed';
+      spotlight.style.top = `${rect.top - 4}px`;
+      spotlight.style.left = `${rect.left - 4}px`;
+      spotlight.style.width = `${rect.width + 8}px`;
+      spotlight.style.height = `${rect.height + 8}px`;
+    }
+  };
+
   // Scroll vers l'élément cible et forcer recalcul Joyride
   const scrollToTarget = (targetSelector: string, callback?: () => void) => {
     setTimeout(() => {
       const element = document.querySelector(targetSelector);
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // Forcer Joyride à recalculer la position après le scroll
+        // Trouver le conteneur scrollable parent (TabsContent avec overflow-y-auto)
+        const scrollContainer = element.closest('[data-state="active"].overflow-y-auto') as HTMLElement;
+        
+        if (scrollContainer) {
+          // Scroller le conteneur vers le haut pour que l'élément soit visible
+          scrollContainer.scrollTop = 0;
+        }
+        
+        // Attendre que le scroll soit terminé, puis forcer recalcul
         setTimeout(() => {
           window.dispatchEvent(new Event('resize'));
-          callback?.();
+          // Repositionner manuellement le spotlight
+          setTimeout(() => {
+            repositionSpotlight(targetSelector);
+            callback?.();
+          }, 100);
         }, 200);
       } else {
         callback?.();
@@ -126,13 +152,23 @@ export const useLoanFormGuide = (
   }, [driverLicenseFrontUrl, driverLicenseBackUrl, currentStep, isOpen, isViewMode, setActiveTab]);
 
   const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status, action, index, type } = data;
+    const { status, action, index, type, lifecycle } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
     if (finishedStatuses.includes(status)) {
       setRunTour(false);
       setCurrentStep(0);
       return;
+    }
+
+    // Repositionner le spotlight quand le tooltip apparaît
+    if (action === ACTIONS.UPDATE && lifecycle === LIFECYCLE.TOOLTIP) {
+      const steps = getSteps();
+      if (steps[index]) {
+        setTimeout(() => {
+          repositionSpotlight(steps[index].target as string);
+        }, 50);
+      }
     }
 
     if (type === 'step:after') {
