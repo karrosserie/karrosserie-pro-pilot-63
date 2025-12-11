@@ -47,16 +47,16 @@ const MultipleVehicleImages: React.FC<MultipleVehicleImagesProps> = ({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <Label>Photos du véhicule</Label>
+    <div className="space-y-3 sm:space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <Label className="text-sm">Photos du véhicule</Label>
         {!isViewMode && (
           <Button 
             type="button" 
             variant="outline" 
             size="sm"
             onClick={addNewImageSlot}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 w-full sm:w-auto text-xs sm:text-sm"
           >
             <Plus className="h-4 w-4" />
             Ajouter une photo
@@ -64,7 +64,7 @@ const MultipleVehicleImages: React.FC<MultipleVehicleImagesProps> = ({
         )}
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {vehicleImages.length === 0 && !isViewMode && (
           <DocumentUploader
             documentType="vehicle-image"
@@ -93,7 +93,7 @@ const MultipleVehicleImages: React.FC<MultipleVehicleImagesProps> = ({
                           onValueChange={(value) => onImageTimingUpdate(index, value as 'Avant' | 'Pendant' | 'Après')}
                           disabled={isViewMode}
                         >
-                          <SelectTrigger className="w-28">
+                          <SelectTrigger className="w-24 sm:w-28 text-xs sm:text-sm">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -112,7 +112,7 @@ const MultipleVehicleImages: React.FC<MultipleVehicleImagesProps> = ({
                     variant="outline"
                     size="sm"
                     onClick={() => onImageRemove(index)}
-                    className="text-red-500 hover:text-red-600"
+                    className="text-red-500 hover:text-red-600 px-2 sm:px-3"
                   >
                     <X className="h-4 w-4" />
                   </Button>

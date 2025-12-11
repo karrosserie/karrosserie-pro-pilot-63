@@ -55,9 +55,9 @@ const VehicleSpecifications: React.FC<VehicleSpecificationsProps> = ({
   const isLicensePlateValid = formData.licensePlate ? validateLicensePlate(formData.licensePlate) : true;
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div className="space-y-2">
-        <Label htmlFor="licensePlate">
+    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+      <div className="space-y-2 col-span-2 sm:col-span-1">
+        <Label htmlFor="licensePlate" className="text-sm">
           Plaque d'immatriculation <span className="text-red-500">*</span>
         </Label>
         <Input
@@ -68,17 +68,17 @@ const VehicleSpecifications: React.FC<VehicleSpecificationsProps> = ({
           disabled={isViewMode}
           required
           placeholder="AB-456-CD ou 2567 AB 33"
-          className={!isLicensePlateValid ? 'border-red-500' : ''}
+          className={`text-sm ${!isLicensePlateValid ? 'border-red-500' : ''}`}
         />
         {formData.licensePlate && !isLicensePlateValid && (
-          <p className="text-red-500 text-sm">
+          <p className="text-red-500 text-xs">
             Format invalide. Utilisez : AB-456-CD ou 2567 AB 33
           </p>
         )}
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="year">Année</Label>
+        <Label htmlFor="year" className="text-sm">Année</Label>
         <Input
           id="year"
           name="year"
@@ -88,22 +88,24 @@ const VehicleSpecifications: React.FC<VehicleSpecificationsProps> = ({
           value={formData.year || ''}
           onChange={onInputChange}
           disabled={isViewMode}
+          className="text-sm"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="color">Couleur</Label>
+        <Label htmlFor="color" className="text-sm">Couleur</Label>
         <Input
           id="color"
           name="color"
           value={formData.color || ''}
           onChange={onInputChange}
           disabled={isViewMode}
+          className="text-sm"
         />
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="mileage">Kilométrage</Label>
+        <Label htmlFor="mileage" className="text-sm">Kilométrage</Label>
         <Input
           id="mileage"
           name="mileage"
@@ -111,6 +113,7 @@ const VehicleSpecifications: React.FC<VehicleSpecificationsProps> = ({
           value={formData.mileage || ''}
           onChange={onInputChange}
           disabled={isViewMode}
+          className="text-sm"
         />
       </div>
     </div>

@@ -103,9 +103,9 @@ const VehicleIdentificationFields: React.FC<VehicleIdentificationFieldsProps> = 
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div className="space-y-2">
-          <Label htmlFor="vin">
+          <Label htmlFor="vin" className="text-sm">
             Numéro de série (VIN) <span className="text-red-500">*</span>
           </Label>
           <Input
@@ -117,30 +117,32 @@ const VehicleIdentificationFields: React.FC<VehicleIdentificationFieldsProps> = 
             required
             placeholder="17 caractères"
             maxLength={17}
+            className="text-sm"
             style={{
               textTransform: 'uppercase'
             }}
           />
           {formData.vin && !isValidVin(formData.vin) && (
-            <p className="text-sm text-red-500">
+            <p className="text-xs sm:text-sm text-red-500">
               Le VIN doit contenir exactement 17 caractères alphanumériques (sans I, O, Q)
             </p>
           )}
           {formData.vin && isValidVin(formData.vin) && (
-            <p className="text-sm text-green-600">
+            <p className="text-xs sm:text-sm text-green-600">
               ✓ VIN valide - Décodage automatique en cours...
             </p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="engineNumber">Numéro de moteur</Label>
+          <Label htmlFor="engineNumber" className="text-sm">Numéro de moteur</Label>
           <Input
             id="engineNumber"
             name="engineNumber"
             value={formData.engineNumber || ''}
             onChange={onInputChange}
             disabled={isViewMode}
+            className="text-sm"
           />
         </div>
       </div>

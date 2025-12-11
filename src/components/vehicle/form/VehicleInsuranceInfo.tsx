@@ -27,9 +27,9 @@ const VehicleInsuranceInfo: React.FC<VehicleInsuranceInfoProps> = ({
   }));
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-      <div className="md:col-span-4 space-y-2">
-        <Label htmlFor="insuranceCompanyId">Compagnie d'assurance</Label>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">
+      <div className="sm:col-span-2 md:col-span-4 space-y-2">
+        <Label htmlFor="insuranceCompanyId" className="text-sm">Compagnie d'assurance</Label>
         <SearchableSelect
           options={insuranceOptions}
           value={formData.insuranceCompanyId || ''}
@@ -41,7 +41,7 @@ const VehicleInsuranceInfo: React.FC<VehicleInsuranceInfoProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="insuranceExpiryDate">Date d'expiration</Label>
+        <Label htmlFor="insuranceExpiryDate" className="text-sm">Date d'expiration</Label>
         <Input
           id="insuranceExpiryDate"
           name="insuranceExpiryDate"
@@ -49,6 +49,7 @@ const VehicleInsuranceInfo: React.FC<VehicleInsuranceInfoProps> = ({
           value={formData.insuranceExpiryDate || ''}
           onChange={onInputChange}
           disabled={isViewMode}
+          className="text-sm"
         />
       </div>
     </div>

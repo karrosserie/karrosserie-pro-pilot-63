@@ -65,27 +65,29 @@ const VehicleDocumentsForm: React.FC<VehicleDocumentsFormProps> = ({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <Label>Certificat d'immatriculation (Recto)</Label>
-        <DocumentUploader
-          documentType="registration"
-          documentId={`${vehicleId}-front`}
-          currentDocumentUrl={formData.registrationDocumentFrontUrl}
-          onUploadComplete={onRegistrationFrontUpload}
-          isViewMode={isViewMode}
-        />
-      </div>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+        <div className="space-y-2">
+          <Label className="text-sm">Certificat d'immatriculation (Recto)</Label>
+          <DocumentUploader
+            documentType="registration"
+            documentId={`${vehicleId}-front`}
+            currentDocumentUrl={formData.registrationDocumentFrontUrl}
+            onUploadComplete={onRegistrationFrontUpload}
+            isViewMode={isViewMode}
+          />
+        </div>
 
-      <div className="space-y-2">
-        <Label>Certificat d'immatriculation (Verso)</Label>
-        <DocumentUploader
-          documentType="registration"
-          documentId={`${vehicleId}-back`}
-          currentDocumentUrl={formData.registrationDocumentBackUrl}
-          onUploadComplete={onRegistrationBackUpload}
-          isViewMode={isViewMode}
-        />
+        <div className="space-y-2">
+          <Label className="text-sm">Certificat d'immatriculation (Verso)</Label>
+          <DocumentUploader
+            documentType="registration"
+            documentId={`${vehicleId}-back`}
+            currentDocumentUrl={formData.registrationDocumentBackUrl}
+            onUploadComplete={onRegistrationBackUpload}
+            isViewMode={isViewMode}
+          />
+        </div>
       </div>
 
       <MultipleVehicleImages
