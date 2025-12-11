@@ -57,10 +57,8 @@ export const InvoiceBasicInfoSection = ({
             <Input
               id="reference"
               value={formData.reference || ''}
-              readOnly={!isNewInvoice}
-              onChange={(e) => isNewInvoice && onFieldChange('reference', e.target.value)}
+              onChange={(e) => onFieldChange('reference', e.target.value)}
               className={cn(
-                !isNewInvoice && "bg-gray-50 cursor-not-allowed",
                 errors.reference && "border-red-500 focus-visible:ring-red-500"
               )}
               placeholder={!formData.reference ? "Généré automatiquement" : undefined}
