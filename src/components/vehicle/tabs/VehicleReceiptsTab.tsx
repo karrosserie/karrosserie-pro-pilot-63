@@ -38,7 +38,6 @@ const VehicleReceiptsTab: React.FC<VehicleReceiptsTabProps> = ({ vehicleId }) =>
     );
   }
 
-  // Filter receipts by vehicle via invoices
   const vehicleReceipts = receipts?.filter(receipt => {
     if (receipt.invoice_id && invoices) {
       const relatedInvoice = invoices.find(invoice => invoice.id === receipt.invoice_id);
@@ -67,11 +66,6 @@ const VehicleReceiptsTab: React.FC<VehicleReceiptsTabProps> = ({ vehicleId }) =>
       : '0,00';
     
     return `Facture n°${invoice.reference} - ${clientName} - ${amount} €`;
-  };
-
-  const handleView = (receipt: any) => {
-    setSelectedReceipt(receipt);
-    setEditDialogOpen(true);
   };
 
   const handleEdit = (receipt: any) => {
@@ -127,87 +121,88 @@ const VehicleReceiptsTab: React.FC<VehicleReceiptsTabProps> = ({ vehicleId }) =>
   return (
     <>
       <div className="card-container p-0">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
-                Numéro
-              </SortableTableHeader>
-              <SortableTableHeader sortKey="date" sortConfig={sortConfig} onSort={handleSort}>
-                Date
-              </SortableTableHeader>
-              <TableHead>Facture</TableHead>
-              <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
-                Montant
-              </SortableTableHeader>
-              <SortableTableHeader sortKey="payment_method" sortConfig={sortConfig} onSort={handleSort}>
-                Méthode de paiement
-              </SortableTableHeader>
-              <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
-                Statut
-              </SortableTableHeader>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sortedData.length > 0 ? (
-              sortedData.map((receipt) => (
-                <React.Fragment key={receipt.id}>
-                  <TableRow className="hover:bg-gray-50 border-b-0">
-                    <TableCell>{receipt.reference || 'N/A'}</TableCell>
-                    <TableCell>{formatDate(receipt.date)}</TableCell>
-                    <TableCell>
-                      {getInvoiceDisplay(receipt.invoice_id)}
-                    </TableCell>
-                    <TableCell>
-                      {formatAmount(receipt.amount)}
-                    </TableCell>
-                    <TableCell>{receipt.payment_method}</TableCell>
-                    <TableCell>
-                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(receipt.status)}`}>
-                        {receipt.status}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow className="border-t-0">
-                    <TableCell colSpan={6} className="py-3 border-t-0">
-                      <div className="flex flex-wrap gap-2 justify-end px-4">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleEdit(receipt)}
-                          title="Modifier"
-                        >
-                          <Pencil className="h-4 w-4 mr-1" />
-                          Modifier
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
-                          onClick={() => handleDelete(receipt)}
-                          title="Supprimer"
-                        >
-                          <Trash className="h-4 w-4 mr-1" />
-                          Supprimer
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                </React.Fragment>
-              ))
-            ) : (
+        <div className="overflow-x-auto">
+          <Table className="min-w-[500px]">
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-4">
-                  <div className="flex flex-col items-center justify-center py-8">
-                    <Banknote className="h-10 w-10 text-gray-400 mb-2" />
-                    <h3 className="font-medium text-gray-900">Aucun encaissement</h3>
-                    <p className="text-gray-500 mt-1">Ce véhicule n'a pas encore d'encaissement.</p>
-                  </div>
-                </TableCell>
+                <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
+                  Numéro
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="date" sortConfig={sortConfig} onSort={handleSort}>
+                  Date
+                </SortableTableHeader>
+                <TableHead className="hidden md:table-cell">Facture</TableHead>
+                <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
+                  Montant
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="payment_method" sortConfig={sortConfig} onSort={handleSort} className="hidden sm:table-cell">
+                  Méthode
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+                  Statut
+                </SortableTableHeader>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {sortedData.length > 0 ? (
+                sortedData.map((receipt) => (
+                  <React.Fragment key={receipt.id}>
+                    <TableRow className="hover:bg-gray-50 border-b-0">
+                      <TableCell className="text-xs sm:text-sm py-2 sm:py-4">{receipt.reference || 'N/A'}</TableCell>
+                      <TableCell className="text-xs sm:text-sm py-2 sm:py-4">{formatDate(receipt.date)}</TableCell>
+                      <TableCell className="hidden md:table-cell text-xs sm:text-sm py-2 sm:py-4">
+                        {getInvoiceDisplay(receipt.invoice_id)}
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm py-2 sm:py-4">
+                        {formatAmount(receipt.amount)}
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell text-xs sm:text-sm py-2 sm:py-4">{receipt.payment_method}</TableCell>
+                      <TableCell className="py-2 sm:py-4">
+                        <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(receipt.status)}`}>
+                          {receipt.status}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow className="border-t-0">
+                      <TableCell colSpan={6} className="py-2 sm:py-3 border-t-0">
+                        <div className="flex flex-wrap gap-1 sm:gap-2 justify-end px-2 sm:px-4">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3"
+                            onClick={() => handleEdit(receipt)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                            <span className="hidden sm:inline sm:ml-1">Modifier</span>
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3 text-red-500 hover:text-red-700 border-red-500 hover:border-red-700"
+                            onClick={() => handleDelete(receipt)}
+                          >
+                            <Trash className="h-4 w-4" />
+                            <span className="hidden sm:inline sm:ml-1">Supprimer</span>
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  </React.Fragment>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-4">
+                    <div className="flex flex-col items-center justify-center py-8">
+                      <Banknote className="h-10 w-10 text-gray-400 mb-2" />
+                      <h3 className="font-medium text-gray-900">Aucun encaissement</h3>
+                      <p className="text-gray-500 mt-1">Ce véhicule n'a pas encore d'encaissement.</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       {selectedReceipt && (

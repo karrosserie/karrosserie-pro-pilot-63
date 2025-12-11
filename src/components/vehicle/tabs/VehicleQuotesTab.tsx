@@ -21,7 +21,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Download, Printer, Mail, FileCheck, ArrowRight } from 'lucide-react';
+import { Download, Printer, Mail, ArrowRight } from 'lucide-react';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
 import QuoteViewerModal from '@/components/quotes/QuoteViewerModal';
 import QuoteEmailDialog from '@/components/quotes/QuoteEmailDialog';
@@ -135,32 +135,7 @@ const VehicleQuotesTab: React.FC<VehicleQuotesTabProps> = ({ vehicleId }) => {
     setEmailDialogOpen(true);
   };
 
-  const handleRequestDocuments = async (quote: Quote) => {
-    try {
-      const { tokensService } = await import('@/services/supabase/tokens');
-      
-      await tokensService.createToken({
-        company_id: quote.company_id!,
-        client_id: quote.client_id,
-        vehicule_id: quote.vehicle_id
-      });
-
-      toast({
-        title: "Demande de justificatifs",
-        description: `Demande de justificatifs envoyée pour le devis ${quote.reference}. Token créé avec succès.`
-      });
-    } catch (error) {
-      console.error('Erreur lors de la création du token:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer le token pour la demande de justificatifs.",
-        variant: "destructive"
-      });
-    }
-  };
-
   const handleConvertToRepairOrder = (quote: Quote) => {
-    // Parser les données JSON du devis
     let repairs = [];
     let parts = [];
     let discounts = [];
@@ -195,7 +170,6 @@ const VehicleQuotesTab: React.FC<VehicleQuotesTabProps> = ({ vehicleId }) => {
       report_date: quote.report_date || '',
       expert_name: quote.expert_name || '',
       incident_date: quote.incident_date || '',
-      // Convertir les données JSON en string pour l'ordre de réparation
       repairs_data: JSON.stringify(repairs),
       parts_data: JSON.stringify(parts),
       discounts_data: JSON.stringify(discounts),
@@ -216,126 +190,117 @@ const VehicleQuotesTab: React.FC<VehicleQuotesTabProps> = ({ vehicleId }) => {
   return (
     <>
       <div className="card-container p-0">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
-                Numéro
-              </SortableTableHeader>
-              <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>
-                Date
-              </SortableTableHeader>
-              <SortableTableHeader sortKey="clients.first_name" sortConfig={sortConfig} onSort={handleSort}>
-                Client
-              </SortableTableHeader>
-              <TableHead>Véhicule</TableHead>
-              <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
-                Montant
-              </SortableTableHeader>
-              <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
-                Statut
-              </SortableTableHeader>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sortedData.length > 0 ? (
-              sortedData.map((quote) => (
-                <React.Fragment key={quote.id}>
-                  <TableRow className="border-b-0">
-                    <TableCell className="font-medium">{quote.reference}</TableCell>
-                    <TableCell>{new Date(quote.created_at).toLocaleDateString('fr-FR')}</TableCell>
-                    <TableCell>{quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '-'}</TableCell>
-                    <TableCell>
-                      {quote.vehicles 
-                        ? `${quote.vehicles.car_brands?.name || 'Marque inconnue'} ${quote.vehicles.car_models?.name || 'Modèle inconnu'} - ${quote.vehicles.license_plate}`
-                        : '-'
-                      }
-                    </TableCell>
-                    <TableCell>{formatAmount(quote.amount)}</TableCell>
-                    <TableCell>
-                      <StatusBadge status={quote.status === 'draft' ? 'En attente' : (quote.status || 'En attente')} />
-                    </TableCell>
-                  </TableRow>
-                  <TableRow className="border-t-0">
-                    <TableCell colSpan={6} className="py-3 border-t-0">
-                      <div className="flex flex-wrap gap-2 justify-end px-4">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleView(quote)}
-                          title="Voir"
-                        >
-                          <Eye className="h-4 w-4 mr-1" />
-                          Voir
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleEdit(quote)}
-                          title="Modifier"
-                        >
-                          <Pencil className="h-4 w-4 mr-1" />
-                          Modifier
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleDownload(quote)}
-                          title="Télécharger"
-                        >
-                          <Download className="h-4 w-4 mr-1" />
-                          Télécharger
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handlePrint(quote)}
-                          title="Imprimer"
-                        >
-                          <Printer className="h-4 w-4 mr-1" />
-                          Imprimer
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleSendEmail(quote)}
-                          title="E-mail"
-                        >
-                          <Mail className="h-4 w-4 mr-1" />
-                          E-mail
-                        </Button>
-                        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90" onClick={() => handleConvertToRepairOrder(quote)}>
-                          <ArrowRight className="h-4 w-4 mr-1" />
-                            Convertir
-                          </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-orange-600 hover:text-orange-700 border-orange-600 hover:border-orange-700"
-                          onClick={() => handleArchive(quote)}
-                          title="Archiver"
-                        >
-                          <Archive className="h-4 w-4 mr-1" />
-                          Archiver
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                </React.Fragment>
-              ))
-            ) : (
+        <div className="overflow-x-auto">
+          <Table className="min-w-[600px]">
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-4">
-                  <div className="flex flex-col items-center justify-center py-8">
-                    <FileText className="h-10 w-10 text-gray-400 mb-2" />
-                    <h3 className="font-medium text-gray-900">Aucun devis</h3>
-                    <p className="text-gray-500 mt-1">Ce véhicule n'a pas encore de devis.</p>
-                  </div>
-                </TableCell>
+                <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
+                  Numéro
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>
+                  Date
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="clients.first_name" sortConfig={sortConfig} onSort={handleSort} className="hidden md:table-cell">
+                  Client
+                </SortableTableHeader>
+                <TableHead className="hidden lg:table-cell">Véhicule</TableHead>
+                <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
+                  Montant
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
+                  Statut
+                </SortableTableHeader>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {sortedData.length > 0 ? (
+                sortedData.map((quote) => (
+                  <React.Fragment key={quote.id}>
+                    <TableRow className="border-b-0">
+                      <TableCell className="font-medium text-xs sm:text-sm py-2 sm:py-4">{quote.reference}</TableCell>
+                      <TableCell className="text-xs sm:text-sm py-2 sm:py-4">{new Date(quote.created_at).toLocaleDateString('fr-FR')}</TableCell>
+                      <TableCell className="hidden md:table-cell text-xs sm:text-sm py-2 sm:py-4">{quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '-'}</TableCell>
+                      <TableCell className="hidden lg:table-cell text-xs sm:text-sm py-2 sm:py-4">
+                        {quote.vehicles 
+                          ? `${quote.vehicles.car_brands?.name || 'Marque inconnue'} ${quote.vehicles.car_models?.name || 'Modèle inconnu'} - ${quote.vehicles.license_plate}`
+                          : '-'
+                        }
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm py-2 sm:py-4">{formatAmount(quote.amount)}</TableCell>
+                      <TableCell className="py-2 sm:py-4">
+                        <StatusBadge status={quote.status === 'draft' ? 'En attente' : (quote.status || 'En attente')} />
+                      </TableCell>
+                    </TableRow>
+                    <TableRow className="border-t-0">
+                      <TableCell colSpan={6} className="py-2 sm:py-3 border-t-0">
+                        <div className="flex flex-wrap gap-1 sm:gap-2 justify-end px-2 sm:px-4">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3"
+                            onClick={() => handleView(quote)}
+                          >
+                            <Eye className="h-4 w-4" />
+                            <span className="hidden sm:inline sm:ml-1">Voir</span>
+                          </Button>
+                          <Button 
+                            size="sm"
+                            className="h-8 px-2 sm:h-9 sm:px-3 bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+                            onClick={() => handleConvertToRepairOrder(quote)}
+                          >
+                            <ArrowRight className="h-4 w-4" />
+                            <span className="hidden sm:inline sm:ml-1">Convertir</span>
+                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="outline" size="sm" className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3">
+                                <MoreVertical className="h-4 w-4" />
+                                <span className="hidden sm:inline sm:ml-1">Plus</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-background border shadow-lg z-50">
+                              <DropdownMenuItem onClick={() => handleEdit(quote)}>
+                                <Pencil className="h-4 w-4 mr-2" />
+                                Modifier
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleDownload(quote)}>
+                                <Download className="h-4 w-4 mr-2" />
+                                Télécharger
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handlePrint(quote)}>
+                                <Printer className="h-4 w-4 mr-2" />
+                                Imprimer
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleSendEmail(quote)}>
+                                <Mail className="h-4 w-4 mr-2" />
+                                E-mail
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={() => handleArchive(quote)} className="text-orange-600">
+                                <Archive className="h-4 w-4 mr-2" />
+                                Archiver
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  </React.Fragment>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-4">
+                    <div className="flex flex-col items-center justify-center py-8">
+                      <FileText className="h-10 w-10 text-gray-400 mb-2" />
+                      <h3 className="font-medium text-gray-900">Aucun devis</h3>
+                      <p className="text-gray-500 mt-1">Ce véhicule n'a pas encore de devis.</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       <QuoteDialog
