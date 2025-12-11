@@ -83,6 +83,8 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
 }) => {
   // État pour le dialog de création de client
   const [isClientDialogOpen, setIsClientDialogOpen] = useState(false);
+  // État pour tracker les onglets validés explicitement via "Suivant"
+  const [validatedTabs, setValidatedTabs] = useState<Set<string>>(new Set());
   
   // Hook pour gérer les clients
   const { createClient } = useClients();
@@ -143,6 +145,9 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
       if (!validateTabByValue(currentTab.value, formData)) {
         return; // Arrêter si la validation échoue
       }
+      
+      // Marquer l'onglet comme validé
+      setValidatedTabs(prev => new Set([...prev, currentTab.value]));
       
       const nextTab = tabs[currentTabIndex + 1];
       setActiveTab(nextTab.value);
@@ -228,6 +233,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
             onTabChange={setActiveTab}
             formData={formData}
             isViewMode={isViewMode}
+            validatedTabs={validatedTabs}
           />
         </div>
 
