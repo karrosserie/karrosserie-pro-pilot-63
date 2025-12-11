@@ -101,16 +101,16 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
         {paginatedVehicles.map((vehicle) => {
           const firstImage = getFirstImage(vehicle);
           const hasRegistration = hasCompleteRegistration(vehicle);
           const workTimeData = workTimeMap.get(vehicle.id);
           
           return (
-            <div key={vehicle.id} className="card-container flex flex-col h-full animate-fade-in">
-              <div className="relative h-40 bg-gray-100 rounded-lg mb-4 overflow-hidden">
+            <div key={vehicle.id} className="card-container flex flex-col h-full animate-fade-in p-3 sm:p-4">
+              <div className="relative h-32 sm:h-40 bg-gray-100 rounded-lg mb-3 sm:mb-4 overflow-hidden">
                 {firstImage ? (
                   <img 
                     src={firstImage} 
@@ -178,24 +178,24 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
                 )}
               </div>
               
-              <div className="border-t border-gray-100 mt-4 pt-3">
-                <div className="flex flex-wrap gap-2 justify-center">
-                  <Button variant="outline" size="sm" onClick={() => onViewVehicle(vehicle)}>
-                    <Eye className="h-4 w-4 mr-1" />
-                    Voir
+              <div className="border-t border-gray-100 mt-3 sm:mt-4 pt-3">
+                <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center">
+                  <Button variant="outline" size="sm" onClick={() => onViewVehicle(vehicle)} className="h-8 px-2 sm:px-3">
+                    <Eye className="h-4 w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Voir</span>
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => onEditVehicle(vehicle)}>
-                    <Pencil className="h-4 w-4 mr-1" />
-                    Modifier
+                  <Button variant="outline" size="sm" onClick={() => onEditVehicle(vehicle)} className="h-8 px-2 sm:px-3">
+                    <Pencil className="h-4 w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Modifier</span>
                   </Button>
                   <Button
                     variant="outline" 
                     size="sm"
-                    className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700" 
+                    className="h-8 px-2 sm:px-3 text-red-500 hover:text-red-700 border-red-500 hover:border-red-700" 
                     onClick={() => onDeleteVehicle(vehicle.id)}
                   >
-                    <Trash className="h-4 w-4 mr-1" />
-                    Supprimer
+                    <Trash className="h-4 w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Supprimer</span>
                   </Button>
                 </div>
               </div>
@@ -205,8 +205,8 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 py-3 border border-border rounded-lg bg-muted/30">
-          <div className="text-sm text-muted-foreground">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-3 sm:px-4 py-3 border border-border rounded-lg bg-muted/30">
+          <div className="text-xs sm:text-sm text-muted-foreground">
             {vehicles.length} véhicule{vehicles.length > 1 ? 's' : ''} au total
           </div>
           <div className="flex items-center gap-2">
@@ -215,20 +215,22 @@ const VehiclesGrid: React.FC<VehiclesGridProps> = ({
               size="sm"
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
+              className="h-8 px-2 sm:px-3"
             >
               <ChevronLeft className="h-4 w-4" />
-              Précédent
+              <span className="hidden sm:inline ml-1">Précédent</span>
             </Button>
-            <span className="text-sm text-muted-foreground px-2">
-              Page {currentPage} sur {totalPages}
+            <span className="text-xs sm:text-sm text-muted-foreground px-1 sm:px-2">
+              {currentPage}/{totalPages}
             </span>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
+              className="h-8 px-2 sm:px-3"
             >
-              Suivant
+              <span className="hidden sm:inline mr-1">Suivant</span>
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
