@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Bot, Car, Users, FileText, ArrowRight, Zap, Camera, Receipt, Shield, AlertTriangle } from 'lucide-react';
@@ -17,15 +16,24 @@ import VehiclePhotoDialog from './VehiclePhotoDialog';
 import ExpenseDialog from '@/components/expenses/ExpenseDialog';
 import { VehiculeUrgenceModal } from '@/components/planning/VehiculeUrgenceModal';
 import { useToast } from '@/hooks/use-toast';
-
 const MobileHomePage = () => {
   console.log('MobileHomePage: Component rendering');
-  
-  const { dashboardStats } = useDashboardData();
-  const { vehicles } = useVehicles();
-  const { userRole, isOwner } = useUserRole();
-  const { companyId } = useCompanyId();
-  const { toast } = useToast();
+  const {
+    dashboardStats
+  } = useDashboardData();
+  const {
+    vehicles
+  } = useVehicles();
+  const {
+    userRole,
+    isOwner
+  } = useUserRole();
+  const {
+    companyId
+  } = useCompanyId();
+  const {
+    toast
+  } = useToast();
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showPhotoDialog, setShowPhotoDialog] = useState(false);
   const [showVehiclePhotoDialog, setShowVehiclePhotoDialog] = useState(false);
@@ -33,46 +41,46 @@ const MobileHomePage = () => {
   const [showVehiculeUrgenceModal, setShowVehiculeUrgenceModal] = useState(false);
 
   // Récupérer les employés pour le modal d'urgence
-  const { employees: employesFromData, refetch: refetchEmployees } = useEmployeeData(companyId);
-  const { refetch: refetchVehicles } = useVehicleData(companyId);
-  const { ajouterVehiculeUrgence } = usePlanningManager();
-
-  const quickActions = [
-    {
-      icon: <Camera className="h-8 w-8" />,
-      title: "Prendre une photo",
-      color: "bg-blue-500",
-      path: "/camera"
-    },
-    // {
-    //   icon: <Bot className="h-6 w-6" />,
-    //   title: "Assistant IA",
-    //   description: "Gestion automatique",
-    //   color: "bg-gradient-to-br from-blue-500 to-purple-600",
-    //   path: "/ai-assistant"
-    // },
-    {
-      icon: <Car className="h-8 w-8" />,
-      title: "Véhicules",
-      color: "bg-karrosserie-orange",
-      path: "/vehicles"
-    },
-    {
-      icon: <Users className="h-8 w-8" />,
-      title: "Clients",
-      color: "bg-green-600",
-      path: "/clients"
-    },
-    {
-      icon: <FileText className="h-8 w-8" />,
-      title: "Documents",
-      color: "bg-purple-600",
-      path: "/documents"
-    }
-  ];
-
-  return (
-    <div className="min-h-screen bg-background flex flex-col">
+  const {
+    employees: employesFromData,
+    refetch: refetchEmployees
+  } = useEmployeeData(companyId);
+  const {
+    refetch: refetchVehicles
+  } = useVehicleData(companyId);
+  const {
+    ajouterVehiculeUrgence
+  } = usePlanningManager();
+  const quickActions = [{
+    icon: <Camera className="h-8 w-8" />,
+    title: "Prendre une photo",
+    color: "bg-blue-500",
+    path: "/camera"
+  },
+  // {
+  //   icon: <Bot className="h-6 w-6" />,
+  //   title: "Assistant IA",
+  //   description: "Gestion automatique",
+  //   color: "bg-gradient-to-br from-blue-500 to-purple-600",
+  //   path: "/ai-assistant"
+  // },
+  {
+    icon: <Car className="h-8 w-8" />,
+    title: "Véhicules",
+    color: "bg-karrosserie-orange",
+    path: "/vehicles"
+  }, {
+    icon: <Users className="h-8 w-8" />,
+    title: "Clients",
+    color: "bg-green-600",
+    path: "/clients"
+  }, {
+    icon: <FileText className="h-8 w-8" />,
+    title: "Documents",
+    color: "bg-purple-600",
+    path: "/documents"
+  }];
+  return <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <div className="pt-12 pb-8 px-6">
         <div className="text-center">
@@ -132,35 +140,25 @@ const MobileHomePage = () => {
         
         {/* Bouton principal remonté */}
         <div className="mb-8">
-          <Button 
-            onClick={() => setShowImportDialog(true)}
-            className="w-full h-12 bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90 font-medium transition-all duration-300"
-          >
+          <Button onClick={() => setShowImportDialog(true)} className="w-full h-12 bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90 font-medium transition-all duration-300">
             <FileText className="h-4 w-4 mr-2" />
             Importer un rapport d&apos;expertise
           </Button>
         </div>
         
         {/* Bouton Tour de contrôle - uniquement pour les propriétaires */}
-        {isOwner && (
-          <div className="mb-4">
+        {isOwner && <div className="mb-4">
             <Link to="/ai-assistant">
-              <Button 
-                className="w-full h-12 bg-red-600 text-white hover:bg-red-700 font-medium transition-all duration-300"
-              >
+              <Button className="w-full h-12 bg-red-600 text-white hover:bg-red-700 font-medium transition-all duration-300">
                 <Shield className="h-4 w-4 mr-2" />
                 Tour de contrôle
               </Button>
             </Link>
-          </div>
-        )}
+          </div>}
 
         {/* Bouton Véhicule d'urgence */}
         <div className="mb-8">
-          <Button 
-            onClick={() => setShowVehiculeUrgenceModal(true)}
-            className="w-full h-12 bg-amber-500 text-white hover:bg-amber-600 font-medium transition-all duration-300"
-          >
+          <Button onClick={() => setShowVehiculeUrgenceModal(true)} className="w-full h-12 bg-amber-500 text-white hover:bg-amber-600 font-medium transition-all duration-300">
             <AlertTriangle className="h-4 w-4 mr-2" />
             Véhicule d&apos;urgence
           </Button>
@@ -168,15 +166,9 @@ const MobileHomePage = () => {
         
         <div className="grid grid-cols-2 gap-4 mb-8">
           {quickActions.map((action, index) => {
-            const isPhotoAction = action.title === "Prendre une photo";
-            
-            if (isPhotoAction) {
-              return (
-                <div 
-                  key={index}
-                  className="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer h-28 flex flex-col justify-center"
-                  onClick={() => setShowPhotoDialog(true)}
-                >
+          const isPhotoAction = action.title === "Prendre une photo";
+          if (isPhotoAction) {
+            return <div key={index} className="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer h-28 flex flex-col justify-center" onClick={() => setShowPhotoDialog(true)}>
                   <div className="flex flex-col items-center space-y-3">
                     <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                       <Camera className="h-6 w-6 text-blue-600" />
@@ -185,53 +177,35 @@ const MobileHomePage = () => {
                       <div className="font-medium text-foreground text-xs whitespace-nowrap overflow-hidden text-ellipsis">{action.title}</div>
                     </div>
                   </div>
-                </div>
-              );
-            }
-            
-            return (
-              <Link key={index} to={action.path}>
+                </div>;
+          }
+          return <Link key={index} to={action.path}>
                 <div className="bg-white border rounded-lg p-6 hover:shadow-md transition-shadow h-28 flex flex-col justify-center">
                   <div className="flex flex-col items-center space-y-3">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                      action.title === "Véhicules" ? "bg-orange-100" :
-                      action.title === "Clients" ? "bg-green-100" :
-                      action.title === "Documents" ? "bg-purple-100" : "bg-gray-100"
-                    }`}>
-                      {React.cloneElement(action.icon, { 
-                        className: `h-6 w-6 ${
-                          action.title === "Véhicules" ? "text-karrosserie-orange" :
-                          action.title === "Clients" ? "text-green-600" :
-                          action.title === "Documents" ? "text-purple-600" : "text-gray-600"
-                        }`
-                      })}
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${action.title === "Véhicules" ? "bg-orange-100" : action.title === "Clients" ? "bg-green-100" : action.title === "Documents" ? "bg-purple-100" : "bg-gray-100"}`}>
+                      {React.cloneElement(action.icon, {
+                    className: `h-6 w-6 ${action.title === "Véhicules" ? "text-karrosserie-orange" : action.title === "Clients" ? "text-green-600" : action.title === "Documents" ? "text-purple-600" : "text-gray-600"}`
+                  })}
                     </div>
                     <div className="text-center">
                       <div className="font-medium text-foreground text-xs whitespace-nowrap overflow-hidden text-ellipsis">{action.title}</div>
                     </div>
                   </div>
                 </div>
-              </Link>
-            );
-          })}
+              </Link>;
+        })}
         </div>
 
         {/* Bouton accès complet */}
         <div className="space-y-4">
           <Link to="/vehicles">
-            <Button variant="outline" className="w-full h-12 border-2 border-border hover:border-karrosserie-orange hover:bg-orange-50 font-medium text-muted-foreground hover:text-karrosserie-orange transition-all duration-300">
-              Accéder à l&apos;application complète
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
+            
           </Link>
         </div>
       </div>
 
       {/* Dialog d'import de rapport d'expertise */}
-      <ImportDialog 
-        open={showImportDialog} 
-        onOpenChange={setShowImportDialog} 
-      />
+      <ImportDialog open={showImportDialog} onOpenChange={setShowImportDialog} />
 
       {/* Dialog pour les options de photo */}
       <Dialog open={showPhotoDialog} onOpenChange={setShowPhotoDialog}>
@@ -240,25 +214,17 @@ const MobileHomePage = () => {
             <DialogTitle>Choisir une action</DialogTitle>
           </DialogHeader>
           <div className="space-y-3 mt-4">
-            <Button
-              variant="outline"
-              className="w-full h-16 flex items-center justify-center space-x-3"
-              onClick={() => {
-                setShowPhotoDialog(false);
-                setShowVehiclePhotoDialog(true);
-              }}
-            >
+            <Button variant="outline" className="w-full h-16 flex items-center justify-center space-x-3" onClick={() => {
+            setShowPhotoDialog(false);
+            setShowVehiclePhotoDialog(true);
+          }}>
               <Car className="h-6 w-6" />
               <span>Véhicule</span>
             </Button>
-            <Button
-              variant="outline"
-              className="w-full h-16 flex items-center justify-center space-x-3"
-              onClick={() => {
-                setShowPhotoDialog(false);
-                setShowExpenseDialog(true);
-              }}
-            >
+            <Button variant="outline" className="w-full h-16 flex items-center justify-center space-x-3" onClick={() => {
+            setShowPhotoDialog(false);
+            setShowExpenseDialog(true);
+          }}>
               <Receipt className="h-6 w-6" />
               <span>Dépense</span>
             </Button>
@@ -267,47 +233,34 @@ const MobileHomePage = () => {
       </Dialog>
 
       {/* Dialog pour les photos de véhicule */}
-      <VehiclePhotoDialog 
-        open={showVehiclePhotoDialog} 
-        onOpenChange={setShowVehiclePhotoDialog} 
-      />
+      <VehiclePhotoDialog open={showVehiclePhotoDialog} onOpenChange={setShowVehiclePhotoDialog} />
 
       {/* Dialog pour ajouter une dépense */}
-      <ExpenseDialog
-        open={showExpenseDialog}
-        onOpenChange={setShowExpenseDialog}
-      />
+      <ExpenseDialog open={showExpenseDialog} onOpenChange={setShowExpenseDialog} />
 
       {/* Modal pour véhicule d'urgence */}
-      <VehiculeUrgenceModal
-        isOpen={showVehiculeUrgenceModal}
-        onClose={() => setShowVehiculeUrgenceModal(false)}
-        employes={employesFromData || []}
-        onAjouterVehicule={async (vehiculeUrgence) => {
-          console.log('Véhicule urgence ajouté:', vehiculeUrgence);
-          if (companyId) {
-            try {
-              await ajouterVehiculeUrgence(vehiculeUrgence, companyId, {
-                refetchEmployees,
-                refetchVehicles
-              });
-              toast({
-                title: "Véhicule d'urgence ajouté",
-                description: `${vehiculeUrgence.plaque} a été ajouté avec succès`,
-              });
-            } catch (error) {
-              console.error('Erreur lors de l\'ajout du véhicule d\'urgence:', error);
-              toast({
-                title: "Erreur",
-                description: "Une erreur est survenue lors de l'ajout du véhicule",
-                variant: "destructive"
-              });
-            }
-          }
-        }}
-      />
-    </div>
-  );
+      <VehiculeUrgenceModal isOpen={showVehiculeUrgenceModal} onClose={() => setShowVehiculeUrgenceModal(false)} employes={employesFromData || []} onAjouterVehicule={async vehiculeUrgence => {
+      console.log('Véhicule urgence ajouté:', vehiculeUrgence);
+      if (companyId) {
+        try {
+          await ajouterVehiculeUrgence(vehiculeUrgence, companyId, {
+            refetchEmployees,
+            refetchVehicles
+          });
+          toast({
+            title: "Véhicule d'urgence ajouté",
+            description: `${vehiculeUrgence.plaque} a été ajouté avec succès`
+          });
+        } catch (error) {
+          console.error('Erreur lors de l\'ajout du véhicule d\'urgence:', error);
+          toast({
+            title: "Erreur",
+            description: "Une erreur est survenue lors de l'ajout du véhicule",
+            variant: "destructive"
+          });
+        }
+      }
+    }} />
+    </div>;
 };
-
 export default MobileHomePage;
