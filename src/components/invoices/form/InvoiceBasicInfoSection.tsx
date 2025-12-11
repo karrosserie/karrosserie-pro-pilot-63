@@ -22,6 +22,7 @@ interface InvoiceBasicInfoSectionProps {
   onFieldChange: (field: string, value: any) => void;
   claimNumber?: string;
   onClaimNumberChange?: (value: string) => void;
+  isNewInvoice?: boolean;
 }
 
 export const InvoiceBasicInfoSection = ({ 
@@ -29,7 +30,8 @@ export const InvoiceBasicInfoSection = ({
   errors, 
   onFieldChange,
   claimNumber = '',
-  onClaimNumberChange
+  onClaimNumberChange,
+  isNewInvoice = false
 }: InvoiceBasicInfoSectionProps) => {
   const statusOptions = [
     { value: 'En attente de paiement', label: 'En attente de paiement' },
@@ -55,9 +57,10 @@ export const InvoiceBasicInfoSection = ({
             <Input
               id="reference"
               value={formData.reference || ''}
-              readOnly
+              readOnly={!isNewInvoice}
+              onChange={(e) => isNewInvoice && onFieldChange('reference', e.target.value)}
               className={cn(
-                "bg-gray-50 cursor-not-allowed",
+                !isNewInvoice && "bg-gray-50 cursor-not-allowed",
                 errors.reference && "border-red-500 focus-visible:ring-red-500"
               )}
               placeholder={!formData.reference ? "Généré automatiquement" : undefined}
