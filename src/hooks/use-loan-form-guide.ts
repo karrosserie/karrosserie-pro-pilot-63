@@ -31,12 +31,19 @@ export const useLoanFormGuide = (
     4: 'attestation'
   };
 
-  // Scroll vers l'élément cible
-  const scrollToTarget = (targetSelector: string) => {
+  // Scroll vers l'élément cible et forcer recalcul Joyride
+  const scrollToTarget = (targetSelector: string, callback?: () => void) => {
     setTimeout(() => {
       const element = document.querySelector(targetSelector);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Forcer Joyride à recalculer la position après le scroll
+        setTimeout(() => {
+          window.dispatchEvent(new Event('resize'));
+          callback?.();
+        }, 200);
+      } else {
+        callback?.();
       }
     }, 100);
   };
@@ -46,8 +53,12 @@ export const useLoanFormGuide = (
     if (!isViewMode && isOpen) {
       setTimeout(() => {
         setCurrentStep(0);
-        setRunTour(true);
-        scrollToTarget('[data-tour="client-select"]');
+        // D'abord scroller vers l'élément, PUIS activer le tour
+        scrollToTarget('[data-tour="client-select"]', () => {
+          setTimeout(() => {
+            setRunTour(true);
+          }, 100);
+        });
       }, 1000);
     } else {
       setRunTour(false);
@@ -130,14 +141,15 @@ export const useLoanFormGuide = (
         const nextTab = stepToTab[nextStep];
         
         if (nextTab && setActiveTab) {
-          // Changer d'onglet puis mettre à jour le step
+          setRunTour(false);
           setActiveTab(nextTab);
           setTimeout(() => {
-            setCurrentStep(nextStep);
-            setRunTour(true);
             const steps = getSteps();
             if (steps[nextStep]) {
-              scrollToTarget(steps[nextStep].target as string);
+              scrollToTarget(steps[nextStep].target as string, () => {
+                setCurrentStep(nextStep);
+                setRunTour(true);
+              });
             }
           }, 300);
         }
@@ -146,10 +158,16 @@ export const useLoanFormGuide = (
         const prevTab = stepToTab[prevStep];
         
         if (prevTab && setActiveTab) {
+          setRunTour(false);
           setActiveTab(prevTab);
           setTimeout(() => {
-            setCurrentStep(prevStep);
-            setRunTour(true);
+            const steps = getSteps();
+            if (steps[prevStep]) {
+              scrollToTarget(steps[prevStep].target as string, () => {
+                setCurrentStep(prevStep);
+                setRunTour(true);
+              });
+            }
           }, 300);
         }
       }

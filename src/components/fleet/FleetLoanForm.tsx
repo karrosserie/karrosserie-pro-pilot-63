@@ -204,9 +204,10 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
         showProgress
         showSkipButton
         spotlightClicks
-        scrollToFirstStep
-        scrollOffset={100}
-        disableScrollParentFix={false}
+        scrollToFirstStep={false}
+        scrollOffset={150}
+        disableScrollParentFix
+        disableScrolling
         callback={handleJoyrideCallback}
         floaterProps={{
           disableAnimation: false,
