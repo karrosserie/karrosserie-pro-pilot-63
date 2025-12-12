@@ -40,6 +40,8 @@ export const InvoiceForm = ({
     errors,
     isReadOnly,
     claimNumber,
+    skipVehicle,
+    setSkipVehicle,
     setRepairs,
     setParts,
     setDiscounts,
@@ -98,6 +100,8 @@ export const InvoiceForm = ({
         onFieldChange={handleChange}
         clientOptions={clientOptions}
         isLoadingClients={isLoadingClients}
+        skipVehicle={skipVehicle}
+        onSkipVehicleChange={setSkipVehicle}
       />
 
       <InvoiceRepairsAndPartsSection

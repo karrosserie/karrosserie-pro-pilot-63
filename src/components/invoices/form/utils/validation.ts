@@ -1,11 +1,12 @@
 
 export const validateInvoiceForm = (
   formData: any,
-  claimNumber: string
+  claimNumber: string,
+  skipVehicle: boolean = false
 ) => {
   const newErrors: Record<string, string> = {};
   
-  console.log('Starting invoice validation with:', { formData, claimNumber });
+  console.log('Starting invoice validation with:', { formData, claimNumber, skipVehicle });
   
   if (!formData.reference?.trim()) {
     newErrors.reference = 'Le numéro de la facture est obligatoire';
@@ -17,7 +18,7 @@ export const validateInvoiceForm = (
     console.log('Client error detected');
   }
 
-  if (!formData.vehicle_id) {
+  if (!skipVehicle && !formData.vehicle_id) {
     newErrors.vehicle_id = 'Le véhicule est obligatoire';
     console.log('Vehicle error detected');
   }
