@@ -3,6 +3,7 @@ import React from 'react';
 import { Label } from '@/components/ui/label';
 import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import { Users, AlertCircle } from 'lucide-react';
 import { Invoice } from '@/services/supabase/invoices';
 import { Client } from '@/services/supabase/clients';
@@ -15,6 +16,8 @@ interface InvoiceAssignmentSectionProps {
   onFieldChange: (field: string, value: any) => void;
   clientOptions: Client[];
   isLoadingClients: boolean;
+  skipVehicle?: boolean;
+  onSkipVehicleChange?: (value: boolean) => void;
 }
 
 export const InvoiceAssignmentSection = ({
@@ -22,9 +25,18 @@ export const InvoiceAssignmentSection = ({
   errors = {},
   onFieldChange,
   clientOptions,
-  isLoadingClients
+  isLoadingClients,
+  skipVehicle = false,
+  onSkipVehicleChange
 }: InvoiceAssignmentSectionProps) => {
   const { vehicles, isLoading: isLoadingVehicles } = useVehicles();
+
+  const handleSkipVehicleToggle = (checked: boolean) => {
+    onSkipVehicleChange?.(checked);
+    if (checked) {
+      onFieldChange('vehicle_id', null);
+    }
+  };
   
   console.log('InvoiceAssignmentSection - clientOptions:', clientOptions);
   console.log('InvoiceAssignmentSection - formData.client_id:', formData.client_id);
@@ -72,7 +84,18 @@ export const InvoiceAssignmentSection = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="flex items-center space-x-2 pb-2 border-b border-border">
+          <Switch
+            id="skip-vehicle"
+            checked={skipVehicle}
+            onCheckedChange={handleSkipVehicleToggle}
+          />
+          <Label htmlFor="skip-vehicle" className="cursor-pointer text-sm font-normal">
+            Facture sans véhicule
+          </Label>
+        </div>
+        
+        <div className={cn("grid gap-4", skipVehicle ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2")}>
           <div>
             <Label htmlFor="client_id" required>Client</Label>
             <SearchableSelect
@@ -94,34 +117,36 @@ export const InvoiceAssignmentSection = ({
             )}
           </div>
 
-          <div>
-            <Label htmlFor="vehicle_id" required>Véhicule</Label>
-            <SearchableSelect
-              options={vehicleSelectOptions}
-              value={formData.vehicle_id || ''}
-              onValueChange={handleVehicleChange}
-              placeholder={
-                !formData.client_id 
-                  ? "Sélectionnez d'abord un client"
-                  : isLoadingVehicles 
-                  ? "Chargement..."
-                  : clientVehicles.length === 0
-                  ? "Aucun véhicule trouvé pour ce client"
-                  : "Sélectionner un véhicule"
-              }
-              searchPlaceholder="Rechercher un véhicule..."
-              disabled={!formData.client_id || isLoadingVehicles}
-              className={cn(
-                errors.vehicle_id && "border-red-500 focus-visible:ring-red-500"
+          {!skipVehicle && (
+            <div>
+              <Label htmlFor="vehicle_id" required>Véhicule</Label>
+              <SearchableSelect
+                options={vehicleSelectOptions}
+                value={formData.vehicle_id || ''}
+                onValueChange={handleVehicleChange}
+                placeholder={
+                  !formData.client_id 
+                    ? "Sélectionnez d'abord un client"
+                    : isLoadingVehicles 
+                    ? "Chargement..."
+                    : clientVehicles.length === 0
+                    ? "Aucun véhicule trouvé pour ce client"
+                    : "Sélectionner un véhicule"
+                }
+                searchPlaceholder="Rechercher un véhicule..."
+                disabled={!formData.client_id || isLoadingVehicles}
+                className={cn(
+                  errors.vehicle_id && "border-red-500 focus-visible:ring-red-500"
+                )}
+              />
+              {errors.vehicle_id && (
+                <p className="text-sm text-red-500 mt-1 flex items-center">
+                  <AlertCircle className="h-4 w-4 mr-1" />
+                  {errors.vehicle_id}
+                </p>
               )}
-            />
-            {errors.vehicle_id && (
-              <p className="text-sm text-red-500 mt-1 flex items-center">
-                <AlertCircle className="h-4 w-4 mr-1" />
-                {errors.vehicle_id}
-              </p>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

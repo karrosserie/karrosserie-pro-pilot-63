@@ -7,6 +7,7 @@ interface UseInvoiceFormHandlersProps {
   claimNumber: string;
   isReadOnly: boolean;
   errors: Record<string, string>;
+  skipVehicle: boolean;
   setFormData: (updater: (prev: Partial<Invoice>) => Partial<Invoice>) => void;
   setClaimNumber: (value: string) => void;
   setErrors: (updater: (prev: Record<string, string>) => Record<string, string>) => void;
@@ -17,12 +18,13 @@ export const useInvoiceFormHandlers = ({
   claimNumber,
   isReadOnly,
   errors,
+  skipVehicle,
   setFormData,
   setClaimNumber,
   setErrors
 }: UseInvoiceFormHandlersProps) => {
   const validateForm = () => {
-    const validationResult = validateInvoiceForm(formData, claimNumber);
+    const validationResult = validateInvoiceForm(formData, claimNumber, skipVehicle);
     setErrors(() => validationResult.errors);
     return validationResult.isValid;
   };

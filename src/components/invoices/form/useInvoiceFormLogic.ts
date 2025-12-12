@@ -26,7 +26,9 @@ export const useInvoiceFormLogic = ({ invoice, prefillData }: UseInvoiceFormLogi
     setDiscounts,
     errors,
     setErrors,
-    isReadOnly
+    isReadOnly,
+    skipVehicle,
+    setSkipVehicle
   } = useInvoiceFormData();
 
   const {
@@ -38,6 +40,7 @@ export const useInvoiceFormLogic = ({ invoice, prefillData }: UseInvoiceFormLogi
     claimNumber,
     isReadOnly,
     errors,
+    skipVehicle,
     setFormData,
     setClaimNumber,
     setErrors
@@ -74,6 +77,8 @@ export const useInvoiceFormLogic = ({ invoice, prefillData }: UseInvoiceFormLogi
     discounts,
     errors,
     isReadOnly,
+    skipVehicle,
+    setSkipVehicle,
     setRepairs,
     setParts,
     setDiscounts,

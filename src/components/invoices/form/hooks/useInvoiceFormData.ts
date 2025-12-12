@@ -20,6 +20,7 @@ export const useInvoiceFormData = () => {
   const [parts, setParts] = useState<InvoicePartItem[]>([]);
   const [discounts, setDiscounts] = useState<InvoiceDiscountItem[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [skipVehicle, setSkipVehicle] = useState(false);
 
   // Permettre la modification de toutes les factures
   const isReadOnly = false;
@@ -37,6 +38,8 @@ export const useInvoiceFormData = () => {
     setDiscounts,
     errors,
     setErrors,
-    isReadOnly
+    isReadOnly,
+    skipVehicle,
+    setSkipVehicle
   };
 };
