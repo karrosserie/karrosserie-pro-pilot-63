@@ -54,8 +54,8 @@ export const useInvoiceDataPreparation = ({
       discounts_data: discounts || [],
       // S'assurer que les champs essentiels sont présents
       reference: formData.reference || '',
-      client_id: formData.client_id || '',
-      vehicle_id: formData.vehicle_id || '',
+      client_id: formData.client_id || null,
+      vehicle_id: formData.vehicle_id || null,
       status: formData.status || 'En attente de paiement',
       date: formData.date || '',
       due_date: formData.due_date || '',
