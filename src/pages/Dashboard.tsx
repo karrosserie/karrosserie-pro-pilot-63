@@ -33,7 +33,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6">
       <DashboardHeader
         period1={period1}
         period2={period2}
