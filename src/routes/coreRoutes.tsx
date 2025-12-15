@@ -19,10 +19,18 @@ import DepotDossier from "@/pages/DepotDossier";
 import Welcome from "@/pages/Welcome";
 import TermsAndConditions from "@/pages/TermsAndConditions";
 import Dashboard from "@/pages/Dashboard";
-
 import GestionTemplates from "@/pages/GestionTemplates";
+import GestionAtelier from "@/pages/GestionAtelier";
 
 export const coreRoutes = [
+  {
+    path: "/gestion-atelier",
+    element: (
+      <ProtectedRoute>
+        <GestionAtelier />
+      </ProtectedRoute>
+    )
+  },
   {
     path: "/dashboard",
     element: (
