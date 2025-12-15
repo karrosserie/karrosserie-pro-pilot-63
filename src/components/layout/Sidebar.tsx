@@ -105,11 +105,6 @@ const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems
       >
         <span className="mr-3 flex-shrink-0">{icon}</span>
         <span className="flex-1 truncate">{label}</span>
-        {disabled && (
-          <span className="ml-2 text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">
-            Bientôt
-          </span>
-        )}
         {badgeCount !== undefined && badgeCount > 0 && !disabled && (
           <Badge className="ml-2 bg-karrosserie-orange hover:bg-karrosserie-orange text-white">
             {badgeCount}
