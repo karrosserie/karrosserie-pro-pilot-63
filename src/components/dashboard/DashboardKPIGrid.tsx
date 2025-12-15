@@ -1,126 +1,98 @@
-
 import { DashboardProductivityData } from '@/hooks/dashboard/use-dashboard-productivity';
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+
+interface KPICardProps {
+  title: string;
+  value: string;
+  subtitle: string;
+  evolution: number;
+  currentValue: string;
+  previousValue: string;
+}
+
+const KPICard = ({ title, value, subtitle, evolution, currentValue, previousValue }: KPICardProps) => {
+  const isPositive = evolution > 0;
+  const isNeutral = evolution === 0;
+  
+  return (
+    <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
+      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{title}</p>
+      <p className="text-2xl font-bold text-foreground mt-1">{value}</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
+      
+      <div className="flex items-center gap-1.5 mt-2">
+        {isNeutral ? (
+          <Minus className="w-3 h-3 text-muted-foreground" />
+        ) : isPositive ? (
+          <TrendingUp className="w-3 h-3 text-green-600" />
+        ) : (
+          <TrendingDown className="w-3 h-3 text-red-600" />
+        )}
+        <span className={`text-xs font-medium ${isNeutral ? 'text-muted-foreground' : isPositive ? 'text-green-600' : 'text-red-600'}`}>
+          {isPositive ? '+' : ''}{evolution.toFixed(1)}%
+        </span>
+      </div>
+      
+      <div className="flex gap-4 mt-3 pt-3 border-t border-border text-xs">
+        <div>
+          <p className="text-muted-foreground">Période 2</p>
+          <p className="font-medium text-foreground">{currentValue}</p>
+        </div>
+        <div>
+          <p className="text-muted-foreground">Période 1</p>
+          <p className="font-medium text-foreground">{previousValue}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 interface DashboardKPIGridProps {
   data: DashboardProductivityData;
 }
 
-const KPICard = ({ 
-  title, 
-  value, 
-  subtitle, 
-  evolution, 
-  isPositive,
-  currentValue,
-  previousValue,
-  currentLabel,
-  previousLabel,
-  analysis,
-  colorClass
-}: {
-  title: string;
-  value: string;
-  subtitle: string;
-  evolution: string;
-  isPositive: boolean;
-  currentValue: string;
-  previousValue: string;
-  currentLabel: string;
-  previousLabel: string;
-  analysis: string;
-  colorClass: string;
-}) => (
-  <div className="bg-card rounded-3xl p-7 shadow-sm hover:shadow-lg transition-all hover:-translate-y-1">
-    <div className="text-xs uppercase text-muted-foreground font-semibold tracking-wide mb-4">
-      {title}
-    </div>
-    <div className={`text-5xl font-bold mb-3 ${colorClass}`}>
-      {value}
-    </div>
-    <div className="text-muted-foreground mb-4">{subtitle}</div>
-    <span className={`inline-block px-4 py-2 rounded-xl text-sm font-bold ${
-      isPositive 
-        ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' 
-        : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
-    }`}>
-      {evolution}
-    </span>
-    
-    <div className="flex gap-5 pt-4 mt-4 border-t border-border">
-      <div className="flex-1">
-        <div className="text-xs text-muted-foreground mb-1">{currentLabel}</div>
-        <div className="text-lg font-semibold">{currentValue}</div>
-      </div>
-      <div className="flex-1">
-        <div className="text-xs text-muted-foreground mb-1">{previousLabel}</div>
-        <div className="text-lg font-semibold">{previousValue}</div>
-      </div>
-    </div>
-    
-    <div className="mt-4 pt-4 border-t border-border text-sm text-muted-foreground leading-relaxed">
-      <strong className="text-foreground">💡 Analyse :</strong><br/>
-      {analysis}
-    </div>
-  </div>
-);
-
 export const DashboardKPIGrid = ({ data }: DashboardKPIGridProps) => {
+  const previousProductivity = Math.round(data.globalProductivity / (1 + data.globalProductivityEvolution / 100));
+  const previousRevenue = Math.round(data.totalRevenue / (1 + data.revenueEvolution / 100));
+  const previousVehicles = Math.round(data.vehiclesCount / (1 + data.vehiclesEvolution / 100));
+  const previousMargin = (data.grossMargin - data.grossMarginEvolution).toFixed(1);
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
       <KPICard
         title="Productivité Globale"
         value={`${data.globalProductivity}%`}
         subtitle="Objectif : 120%"
-        evolution={`${data.globalProductivityEvolution >= 0 ? '+' : ''}${data.globalProductivityEvolution}%`}
-        isPositive={data.globalProductivityEvolution >= 0}
+        evolution={data.globalProductivityEvolution}
         currentValue={`${data.globalProductivity}%`}
-        previousValue={`${(data.globalProductivity - data.globalProductivityEvolution).toFixed(1)}%`}
-        currentLabel="Période 2 (actuelle)"
-        previousLabel="Période 1 (précédente)"
-        analysis="La productivité mesure le ratio entre les heures vendues aux clients et les heures payées aux employés. Un taux de 120% signifie que vous vendez 1,2 heure pour chaque heure achetée."
-        colorClass="text-blue-500"
+        previousValue={`${previousProductivity}%`}
       />
       
       <KPICard
         title="CA Main d'Œuvre"
         value={`${(data.totalRevenue / 1000).toFixed(1)}k€`}
         subtitle="Chiffre d'affaires total"
-        evolution={`${data.revenueEvolution >= 0 ? '+' : ''}${data.revenueEvolution}%`}
-        isPositive={data.revenueEvolution >= 0}
+        evolution={data.revenueEvolution}
         currentValue={`${data.totalRevenue.toLocaleString('fr-FR')}€`}
-        previousValue={`${Math.round(data.totalRevenue / (1 + data.revenueEvolution / 100)).toLocaleString('fr-FR')}€`}
-        currentLabel="Mois N"
-        previousLabel="Mois N-1"
-        analysis="Le CA Main d'Œuvre représente uniquement la facturation du temps de travail (hors pièces et fournitures). C'est le résultat direct des heures vendues combinées aux taux horaires."
-        colorClass="text-green-500"
+        previousValue={`${previousRevenue.toLocaleString('fr-FR')}€`}
       />
       
       <KPICard
         title="Véhicules Traités"
-        value={String(data.vehiclesCount)}
+        value={data.vehiclesCount.toString()}
         subtitle="Nombre total"
-        evolution={`${data.vehiclesEvolution >= 0 ? '+' : ''}${data.vehiclesEvolution}%`}
-        isPositive={data.vehiclesEvolution >= 0}
-        currentValue={String(data.vehiclesCount)}
-        previousValue={String(Math.round(data.vehiclesCount / (1 + data.vehiclesEvolution / 100)))}
-        currentLabel="Mois N"
-        previousLabel="Mois N-1"
-        analysis={`Le nombre de véhicules traités mesure le volume d'activité global. Avec ${data.totalEmployees} employés, cela représente environ ${(data.vehiclesCount / data.totalEmployees).toFixed(1)} véhicules par employé.`}
-        colorClass="text-purple-500"
+        evolution={data.vehiclesEvolution}
+        currentValue={data.vehiclesCount.toString()}
+        previousValue={previousVehicles.toString()}
       />
       
       <KPICard
         title="Marge Brute MO"
         value={`${data.grossMargin}%`}
         subtitle="Objectif : 65-75%"
-        evolution={`${data.grossMarginEvolution >= 0 ? '+' : ''}${data.grossMarginEvolution} pts`}
-        isPositive={data.grossMarginEvolution >= 0}
+        evolution={data.grossMarginEvolution}
         currentValue={`${data.grossMargin}%`}
-        previousValue={`${(data.grossMargin - data.grossMarginEvolution).toFixed(1)}%`}
-        currentLabel="Mois N"
-        previousLabel="Mois N-1"
-        analysis={`La marge brute MO est le rapport entre le CA généré et les coûts salariaux directs. Un taux de ${data.grossMargin}% signifie que sur 100€ facturés, ${data.grossMargin}€ restent après paiement des salaires.`}
-        colorClass="text-pink-500"
+        previousValue={`${previousMargin}%`}
       />
     </div>
   );
