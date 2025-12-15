@@ -60,22 +60,15 @@ export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps
 
   const handleChange = (field: string, value: any) => {
     if (isReadOnly && field !== 'status') {
-      return; // Empêcher les modifications si en lecture seule
+      return;
     }
-    
-    console.log(`QuoteFormLogic - handleChange called with field: ${field}, value:`, value);
     
     if (field === 'notes') {
       setNotes(value);
     } else {
-      setFormData(prev => {
-        const newFormData = { ...prev, [field]: value };
-        console.log('QuoteFormLogic - Updated formData:', newFormData);
-        return newFormData;
-      });
+      setFormData(prev => ({ ...prev, [field]: value }));
     }
     
-    // Effacer l'erreur quand l'utilisateur commence à taper
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
@@ -84,8 +77,6 @@ export const useQuoteFormLogic = ({ quote, prefillData }: UseQuoteFormLogicProps
   const handleClaimNumberChange = (value: string) => {
     if (!isReadOnly) {
       setClaimNumber(value);
-      console.log('Claim number changed to:', value);
-      // Effacer l'erreur quand l'utilisateur modifie le champ
       if (errors.claim_number) {
         setErrors(prev => ({ ...prev, claim_number: '' }));
       }

@@ -57,12 +57,7 @@ export const CreditForm = ({ onClose, preselectedInvoice }: CreditFormProps) => 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('Form submission started');
-    console.log('Form data:', formData);
-    console.log('Items:', items);
-    
     if (!validateForm()) {
-      console.log('Form validation failed');
       return;
     }
 
@@ -75,14 +70,11 @@ export const CreditForm = ({ onClose, preselectedInvoice }: CreditFormProps) => 
       notes: formData.notes || ''
     };
 
-    console.log('Submitting credit data:', submitData);
-
     try {
       await createCredit.mutateAsync(submitData);
-      console.log('Credit creation successful');
       onClose();
     } catch (error) {
-      console.error('Error in handleSubmit:', error);
+      // Error handled by mutation
     }
   };
 
