@@ -22,7 +22,8 @@ import {
   Calendar,
   Shield,
   MessageSquare,
-  Scale
+  Scale,
+  LayoutDashboard
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useAdmin } from '@/hooks/use-admin';
@@ -165,6 +166,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
 
   // Définir tous les éléments de navigation
   const allNavItems = [
+    { icon: <LayoutDashboard className="app-icon" />, label: 'Dashboard', path: '#' },
     { icon: <Bot className="app-icon" />, label: 'Tour de contrôle', path: '/ai-assistant' },
     { icon: <Home className="app-icon" />, label: 'Vue synthétique', path: '/' },
     { icon: <MessageSquare className="app-icon" />, label: 'Messageries', path: '/messageries' },
