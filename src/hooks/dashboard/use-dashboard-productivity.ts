@@ -227,26 +227,59 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
       const employeesByTrade = { carrosserie: 0, peinture: 0, mecanique: 0 };
       const employeeList: EmployeeProductivity[] = [];
 
+      // Rôles non-productifs à exclure du tableau de productivité
+      const nonProductiveRoles = ['propriétaire', 'gestionnaire de réservation', 'gestionnaire d\'inventaire', 'administrateur'];
+
       employees?.forEach(emp => {
         const profile = emp.profiles as any;
         const name = `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Employé';
-        
-        // Déterminer le métier basé sur les qualifications ou le rôle
-        let trade: 'carrosserie' | 'peinture' | 'mecanique' = 'carrosserie';
-        const quals = (emp.qualifications as string[] || []).map(q => q.toLowerCase()).join(' ');
         const role = (emp.role || '').toLowerCase();
         
-        if (quals.includes('peinture') || quals.includes('peintre') || quals.includes('mise en peinture') ||
-            role.includes('peintre')) {
+        // Exclure les rôles non-productifs
+        if (nonProductiveRoles.some(npr => role.includes(npr))) {
+          return;
+        }
+        
+        // Déterminer le métier basé sur les qualifications réelles
+        let trade: 'carrosserie' | 'peinture' | 'mecanique' = 'carrosserie';
+        const qualifications = emp.qualifications as string[] || [];
+        
+        // Mapper les qualifications réelles vers les métiers
+        const hasPeintureQual = qualifications.some(q => 
+          q.toLowerCase().includes('peinture') || 
+          q.toLowerCase().includes('mise en peinture') ||
+          q.toLowerCase().includes('préparation peinture')
+        );
+        
+        const hasCarrosserieQual = qualifications.some(q =>
+          q.toLowerCase().includes('remplacement') ||
+          q.toLowerCase().includes('débosselage') ||
+          q.toLowerCase().includes('tôlerie') ||
+          q.toLowerCase().includes('tolerie') ||
+          q.toLowerCase().includes('finitions') ||
+          q.toLowerCase().includes('remontage') ||
+          q.toLowerCase().includes('accueil') ||
+          q.toLowerCase().includes('préparation du dossier') ||
+          q.toLowerCase().includes('clôture') ||
+          q.toLowerCase().includes('livraison') ||
+          q.toLowerCase().includes('contrôle technique')
+        );
+        
+        const hasMecaniqueQual = qualifications.some(q =>
+          q.toLowerCase().includes('mécanique') ||
+          q.toLowerCase().includes('mecanique') ||
+          q.toLowerCase().includes('mécanicien')
+        );
+        
+        // Priorité : peinture > mécanique > carrosserie (défaut)
+        if (hasPeintureQual) {
           trade = 'peinture';
-        } else if (quals.includes('mécanicien') || quals.includes('mecanique') || quals.includes('mécanique') ||
-                   role.includes('mécanicien')) {
+        } else if (hasMecaniqueQual) {
           trade = 'mecanique';
-        } else if (quals.includes('carrosserie') || quals.includes('carrossier') || quals.includes('tôlerie') ||
-                   quals.includes('débosselage') || quals.includes('remplacement') ||
-                   role.includes('carrossier')) {
+        } else if (hasCarrosserieQual || role.includes('carrossier')) {
           trade = 'carrosserie';
         }
+        // Si aucune qualification reconnue, on garde carrosserie par défaut
         
         employeesByTrade[trade]++;
         
