@@ -4,8 +4,6 @@ import { Receipt } from './types';
 
 export const receiptQueries = {
   getAll: async (): Promise<Receipt[]> => {
-    console.log('Fetching receipts...');
-    
     // Gérer l'impersonation côté client
     const impersonationData = localStorage.getItem('admin_impersonation');
     let baseQuery = supabase.from('receipts');
@@ -23,8 +21,6 @@ export const receiptQueries = {
     if (impersonationData) {
       try {
         const data = JSON.parse(impersonationData);
-        console.log('Using impersonation company_id for receipts:', data.company_id);
-        // Filtrer par la company_id d'impersonation
         query = query.eq('company_id', data.company_id);
       } catch (error) {
         console.error('Error parsing impersonation data for receipts:', error);
@@ -34,8 +30,6 @@ export const receiptQueries = {
     const { data: receiptsWithJoins, error: joinError } = await query.order('created_at', { ascending: false });
 
     if (joinError) {
-      console.log('Joins failed for receipts, falling back to basic query:', joinError);
-      
       let basicQuery = baseQuery.select('*');
       
       if (impersonationData) {

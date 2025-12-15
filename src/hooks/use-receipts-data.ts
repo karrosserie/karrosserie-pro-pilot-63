@@ -4,7 +4,7 @@ import { receiptsService, ReceiptWithClient } from '@/services/supabase/receipts
 import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
 import { useImpersonation } from '@/hooks/use-impersonation';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 export function useReceiptsData() {
   const queryClient = useQueryClient();
@@ -28,22 +28,23 @@ export function useReceiptsData() {
     staleTime: 5000 // 5 secondes avant de considérer les données comme obsolètes
   });
 
-  // Transform receipts data to include client names and invoice references
-  const receipts: ReceiptWithClient[] = receiptsData?.map(receipt => {
-    let clientName = 'Client non assigné';
-    let invoiceRef = receipt.invoice_id || '';
+  // Transform receipts data to include client names and invoice references - memoized
+  const receipts: ReceiptWithClient[] = useMemo(() => {
+    return receiptsData?.map(receipt => {
+      let clientName = 'Client non assigné';
+      let invoiceRef = receipt.invoice_id || '';
 
-    if (receipt.invoices) {
-      invoiceRef = receipt.invoices.reference;
-      // We'll need to get client data separately for now
-    }
+      if (receipt.invoices) {
+        invoiceRef = receipt.invoices.reference;
+      }
 
-    return {
-      ...receipt,
-      client: clientName,
-      invoice: invoiceRef
-    };
-  }) || [];
+      return {
+        ...receipt,
+        client: clientName,
+        invoice: invoiceRef
+      };
+    }) || [];
+  }, [receiptsData]);
   
   const createReceipt = useMutation({
     mutationFn: (newReceipt: Omit<Parameters<typeof receiptsService.create>[0], 'company_id'>) => 
