@@ -43,8 +43,6 @@ export function useQuotes() {
 
   const createQuote = useMutation({
     mutationFn: async (quoteData: any) => {
-      console.log('🚀 useQuotes - createQuote called with:', JSON.stringify(quoteData, null, 2));
-      
       // Get current user
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       
@@ -54,19 +52,12 @@ export function useQuotes() {
       }
 
       const companyId = await getCurrentUserCompanyId();
-      console.log('🏢 useQuotes - Company ID:', companyId);
 
       // Add company_id automatically
       const quoteWithCompanyId = {
         ...quoteData,
         company_id: companyId
       };
-
-      console.log('📝 useQuotes - About to insert quote:', JSON.stringify(quoteWithCompanyId, null, 2));
-      console.log('📋 useQuotes - Checking required fields:');
-      console.log('  - client_id:', quoteWithCompanyId.client_id, typeof quoteWithCompanyId.client_id);
-      console.log('  - vehicle_id:', quoteWithCompanyId.vehicle_id, typeof quoteWithCompanyId.vehicle_id);
-      console.log('  - company_id:', quoteWithCompanyId.company_id, typeof quoteWithCompanyId.company_id);
 
       const { data, error } = await supabase
         .from('quotes')
@@ -84,14 +75,10 @@ export function useQuotes() {
         .single();
 
       if (error) {
-        console.error('❌ useQuotes - Database error creating quote:', error);
-        console.error('❌ useQuotes - Error details:', error.details);
-        console.error('❌ useQuotes - Error hint:', error.hint);
-        console.error('❌ useQuotes - Error message:', error.message);
+        console.error('Error creating quote:', error);
         throw new Error(error.message);
       }
 
-      console.log('✅ useQuotes - Quote created successfully:', data);
       return data;
     },
     onSuccess: (data) => {

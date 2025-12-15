@@ -50,8 +50,6 @@ export const RepairOrderTableRow = ({ order, onEditOrder, onDeleteOrder, onResto
   };
 
   const formatVehicleDisplay = (order: RepairOrder) => {
-    console.log('Formatting vehicle display for order:', order.id, 'vehicle data:', order.vehicles);
-    
     if (order.vehicles) {
       const brand = order.vehicles.car_brands?.name || '';
       const model = order.vehicles.car_models?.name || '';

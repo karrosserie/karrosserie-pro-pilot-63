@@ -105,8 +105,6 @@ export const ContactExpertDialog = ({
         timestamp: new Date().toISOString()
       };
 
-      console.log('📧 Envoi au webhook modificatif:', webhookPayload);
-      
       const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
