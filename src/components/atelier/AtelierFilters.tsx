@@ -1,7 +1,7 @@
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Search, ClipboardList, AlertCircle, Eye, Key, FolderArchive } from 'lucide-react';
 import { STATUS_CONFIG } from '@/types/atelier';
 
 interface AtelierFiltersProps {
@@ -24,27 +24,28 @@ export const AtelierFilters = ({
   alertsCount
 }: AtelierFiltersProps) => {
   const tabs = [
-    { id: 'all', label: 'Tous', icon: '📋' },
-    { id: 'alertes', label: 'Alertes', icon: '⚠️', count: alertsCount },
-    { id: 'expertise', label: 'Expertises', icon: '🔍' },
-    { id: 'restitution', label: 'Restitutions', icon: '🔑' },
-    { id: 'clotures', label: 'Clôturés', icon: '📁' }
+    { id: 'all', label: 'Tous', Icon: ClipboardList },
+    { id: 'alertes', label: 'Alertes', Icon: AlertCircle, count: alertsCount },
+    { id: 'expertise', label: 'Expertises', Icon: Eye },
+    { id: 'restitution', label: 'Restitutions', Icon: Key },
+    { id: 'clotures', label: 'Clôturés', Icon: FolderArchive }
   ];
 
   return (
-    <Card className="p-4">
+    <div className="mb-6">
       <div className="flex flex-wrap gap-2 mb-4 border-b pb-3">
         {tabs.map(t => (
           <Button
             key={t.id}
-            variant={activeTab === t.id ? 'default' : 'secondary'}
+            variant={activeTab === t.id ? 'default' : 'outline'}
+            size="sm"
             onClick={() => setActiveTab(t.id)}
             className="flex items-center gap-2"
           >
-            <span>{t.icon}</span>
+            <t.Icon className="h-4 w-4" />
             {t.label}
             {t.count !== undefined && t.count > 0 && (
-              <span className="bg-red-500 text-white text-xs px-1.5 rounded-full">
+              <span className="bg-destructive text-destructive-foreground text-xs px-1.5 rounded-full">
                 {t.count}
               </span>
             )}
@@ -53,12 +54,16 @@ export const AtelierFilters = ({
       </div>
 
       <div className="grid md:grid-cols-2 gap-3">
-        <Input
-          type="text"
-          placeholder="🔍 Rechercher..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Rechercher..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
         <Select value={filterStatus} onValueChange={setFilterStatus}>
           <SelectTrigger>
             <SelectValue placeholder="Tous les statuts" />
@@ -67,12 +72,15 @@ export const AtelierFilters = ({
             <SelectItem value="all">Tous</SelectItem>
             {Object.entries(STATUS_CONFIG).map(([k, v]) => (
               <SelectItem key={k} value={k}>
-                {v.icon} {v.label}
+                <div className="flex items-center gap-2">
+                  <v.Icon className="h-4 w-4" />
+                  {v.label}
+                </div>
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
-    </Card>
+    </div>
   );
 };

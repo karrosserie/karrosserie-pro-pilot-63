@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Key } from 'lucide-react';
 import { Dossier } from '@/types/atelier';
 
 interface RestitutionModalProps {
@@ -27,7 +28,8 @@ export const RestitutionModal = ({ open, onOpenChange, dossier, onSubmit }: Rest
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            🔑 Planifier RDV restitution
+            <Key className="h-5 w-5" />
+            Planifier RDV restitution
           </DialogTitle>
         </DialogHeader>
 
@@ -61,7 +63,7 @@ export const RestitutionModal = ({ open, onOpenChange, dossier, onSubmit }: Rest
           <Button
             onClick={handleSubmit}
             disabled={!form.dateRestitution || !form.heureRestitution}
-            className="flex-1 bg-gradient-to-r from-karrosserie-orange to-orange-500"
+            className="flex-1 bg-karrosserie-orange hover:bg-karrosserie-orange/90"
           >
             Confirmer
           </Button>
