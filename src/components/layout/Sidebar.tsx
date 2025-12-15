@@ -160,6 +160,9 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
     return location.pathname.startsWith(path);
   };
 
+  // Routes temporairement désactivées (facile à réactiver)
+  const DISABLED_ROUTES = ['/planning'];
+
   // Définir tous les éléments de navigation
   const allNavItems = [
     { icon: <Bot className="app-icon" />, label: 'Tour de contrôle', path: '/ai-assistant' },
@@ -210,8 +213,11 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
     { icon: <Settings className="app-icon" />, label: 'Paramètres', path: '/settings' },
   ];
 
+  // Filtrer les routes désactivées
+  const enabledNavItems = allNavItems.filter(item => !DISABLED_ROUTES.includes(item.path));
+
   // Filtrer les éléments selon le rôle de l'utilisateur
-  let navItems = allNavItems;
+  let navItems = enabledNavItems;
 
   if (isCarrossier) {
     // Carrossier : seulement planning
