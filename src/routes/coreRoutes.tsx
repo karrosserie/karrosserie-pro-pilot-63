@@ -27,7 +27,9 @@ export const coreRoutes = [
     path: "/gestion-atelier",
     element: (
       <ProtectedRoute>
-        <GestionAtelier />
+        <AppLayout>
+          <GestionAtelier />
+        </AppLayout>
       </ProtectedRoute>
     )
   },
