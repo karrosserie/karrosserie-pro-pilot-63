@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,8 +12,8 @@ interface RepairOrderDiscountsSectionProps {
   isReadOnly?: boolean;
 }
 
-export const RepairOrderDiscountsSection = ({ discounts, onDiscountsChange, isReadOnly = false }: RepairOrderDiscountsSectionProps) => {
-  const addDiscount = () => {
+export const RepairOrderDiscountsSection = React.memo(({ discounts, onDiscountsChange, isReadOnly = false }: RepairOrderDiscountsSectionProps) => {
+  const addDiscount = useCallback(() => {
     if (isReadOnly) return;
     const newDiscount: RepairOrderDiscountItem = {
       id: `discount_${Date.now()}`,
@@ -22,14 +21,14 @@ export const RepairOrderDiscountsSection = ({ discounts, onDiscountsChange, isRe
       amount: 0
     };
     onDiscountsChange([...discounts, newDiscount]);
-  };
+  }, [isReadOnly, discounts, onDiscountsChange]);
 
-  const removeDiscount = (id: string) => {
+  const removeDiscount = useCallback((id: string) => {
     if (isReadOnly) return;
     onDiscountsChange(discounts.filter(discount => discount.id !== id));
-  };
+  }, [isReadOnly, discounts, onDiscountsChange]);
 
-  const updateDiscount = (id: string, field: keyof RepairOrderDiscountItem, value: string | number) => {
+  const updateDiscount = useCallback((id: string, field: keyof RepairOrderDiscountItem, value: string | number) => {
     if (isReadOnly) return;
     const updatedDiscounts = discounts.map(discount => {
       if (discount.id === id) {
@@ -38,9 +37,17 @@ export const RepairOrderDiscountsSection = ({ discounts, onDiscountsChange, isRe
       return discount;
     });
     onDiscountsChange(updatedDiscounts);
-  };
+  }, [isReadOnly, discounts, onDiscountsChange]);
 
-  const totalDiscounts = discounts.reduce((sum, discount) => sum + discount.amount, 0);
+  const totalDiscounts = useMemo(() => 
+    discounts.reduce((sum, discount) => sum + discount.amount, 0),
+    [discounts]
+  );
+
+  const discountsToShow = useMemo(() => 
+    discounts.length > 0 ? discounts : [{ id: 'temp', description: '', amount: 0 }],
+    [discounts]
+  );
 
   return (
     <Card>
@@ -63,7 +70,7 @@ export const RepairOrderDiscountsSection = ({ discounts, onDiscountsChange, isRe
           </div>
 
           {/* Discount items - Always show at least one */}
-          {(discounts.length > 0 ? discounts : [{ id: 'temp', description: '', amount: 0 }]).map((discount) => (
+          {discountsToShow.map((discount) => (
             <div key={discount.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 2fr auto' }}>
               <Input
                 value={discount.description}
@@ -117,4 +124,4 @@ export const RepairOrderDiscountsSection = ({ discounts, onDiscountsChange, isRe
       </CardContent>
     </Card>
   );
-};
+});

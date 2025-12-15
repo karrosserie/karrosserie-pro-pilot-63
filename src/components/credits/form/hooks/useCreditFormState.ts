@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { CreditFormData, CreditItem } from '../types';
 import { creditsService } from '@/services/supabase/credits';
 
@@ -21,7 +20,6 @@ export const useCreditFormState = () => {
         const reference = await creditsService.generateReference();
         setFormData(prev => ({ ...prev, reference }));
       } catch (error) {
-        console.error('Error generating reference:', error);
         const currentYear = new Date().getFullYear();
         setFormData(prev => ({ ...prev, reference: `AV${currentYear}-001` }));
       }
@@ -30,14 +28,17 @@ export const useCreditFormState = () => {
     generateReference();
   }, []);
 
-  const handleChange = (field: keyof CreditFormData, value: any) => {
+  const handleChange = useCallback((field: keyof CreditFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
-    }
-  };
+    setErrors(prev => {
+      if (prev[field]) {
+        return { ...prev, [field]: '' };
+      }
+      return prev;
+    });
+  }, []);
 
-  const addItem = () => {
+  const addItem = useCallback(() => {
     const newItem: CreditItem = {
       id: Date.now().toString(),
       description: '',
@@ -48,9 +49,9 @@ export const useCreditFormState = () => {
       total: 0
     };
     setItems(prev => [...prev, newItem]);
-  };
+  }, []);
 
-  const updateItem = (id: string, field: keyof CreditItem, value: any) => {
+  const updateItem = useCallback((id: string, field: keyof CreditItem, value: any) => {
     setItems(prev => prev.map(item => {
       if (item.id === id) {
         const updatedItem = { ...item, [field]: value };
@@ -64,15 +65,16 @@ export const useCreditFormState = () => {
       }
       return item;
     }));
-  };
+  }, []);
 
-  const removeItem = (id: string) => {
+  const removeItem = useCallback((id: string) => {
     setItems(prev => prev.filter(item => item.id !== id));
-  };
+  }, []);
 
-  const calculateTotal = () => {
-    return items.reduce((sum, item) => sum + item.total, 0);
-  };
+  const calculateTotal = useMemo(() => 
+    items.reduce((sum, item) => sum + item.total, 0),
+    [items]
+  );
 
   return {
     formData,
@@ -82,7 +84,7 @@ export const useCreditFormState = () => {
     addItem,
     updateItem,
     removeItem,
-    calculateTotal,
+    calculateTotal: () => calculateTotal,
     setErrors,
     setFormData
   };

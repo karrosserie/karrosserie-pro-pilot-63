@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Label } from '@/components/ui/label';
 import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,7 +18,7 @@ interface QuoteAssignmentSectionProps {
   onNewVehicleClick?: () => void;
 }
 
-export const QuoteAssignmentSection = ({ 
+export const QuoteAssignmentSection = React.memo(({ 
   formData, 
   onChange, 
   clientOptions, 
@@ -30,39 +29,38 @@ export const QuoteAssignmentSection = ({
 }: QuoteAssignmentSectionProps) => {
   const { vehicles, isLoading: isLoadingVehicles } = useVehicles();
   
-  console.log('QuoteAssignmentSection - clientOptions:', clientOptions);
-  console.log('QuoteAssignmentSection - formData.client_id:', formData.client_id);
-  
   // Filtrer les véhicules pour le client sélectionné
-  const clientVehicles = vehicles?.filter(vehicle => 
-    vehicle.client_id === formData.client_id
-  ) || [];
+  const clientVehicles = useMemo(() => 
+    vehicles?.filter(vehicle => vehicle.client_id === formData.client_id) || [],
+    [vehicles, formData.client_id]
+  );
 
-  console.log('QuoteAssignmentSection - clientVehicles:', clientVehicles);
-
-  const handleClientChange = (clientId: string) => {
-    console.log('QuoteAssignmentSection - Client changed to:', clientId);
-    console.log('QuoteAssignmentSection - Calling onChange with client_id:', clientId);
+  const handleClientChange = useCallback((clientId: string) => {
     onChange('client_id', clientId);
     // Réinitialiser le véhicule quand on change de client
     onChange('vehicle_id', '');
-  };
+  }, [onChange]);
 
-  const handleVehicleChange = (vehicleId: string) => {
-    console.log('QuoteAssignmentSection - Vehicle changed to:', vehicleId);
+  const handleVehicleChange = useCallback((vehicleId: string) => {
     onChange('vehicle_id', vehicleId);
-  };
+  }, [onChange]);
 
   // Préparer les options pour SearchableSelect
-  const clientSelectOptions = (clientOptions || []).map(client => ({
-    value: client.id,
-    label: `${client.first_name} ${client.last_name}`
-  }));
+  const clientSelectOptions = useMemo(() => 
+    (clientOptions || []).map(client => ({
+      value: client.id,
+      label: `${client.first_name} ${client.last_name}`
+    })),
+    [clientOptions]
+  );
 
-  const vehicleSelectOptions = clientVehicles.map(vehicle => ({
-    value: vehicle.id,
-    label: `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate}`
-  }));
+  const vehicleSelectOptions = useMemo(() => 
+    clientVehicles.map(vehicle => ({
+      value: vehicle.id,
+      label: `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate}`
+    })),
+    [clientVehicles]
+  );
 
   return (
     <Card>
@@ -134,4 +132,4 @@ export const QuoteAssignmentSection = ({
       </CardContent>
     </Card>
   );
-};
+});

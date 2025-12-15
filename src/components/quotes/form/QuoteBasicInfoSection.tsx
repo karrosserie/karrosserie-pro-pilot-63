@@ -32,10 +32,6 @@ export const QuoteBasicInfoSection = ({
   claimNumber = '',
   onClaimNumberChange
 }: QuoteBasicInfoSectionProps) => {
-  console.log('QuoteBasicInfoSection - Errors received:', errors);
-  console.log('QuoteBasicInfoSection - client_id error:', errors.client_id);
-  console.log('QuoteBasicInfoSection - formData.client_id:', formData.client_id);
-
   const statusOptions = [
     { value: 'En attente', label: 'En attente' },
     { value: 'Facturé', label: 'Facturé' },

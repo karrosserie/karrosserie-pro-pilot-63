@@ -7,7 +7,6 @@ export const useFormValidation = (
   setErrors: (errors: Record<string, string>) => void
 ) => {
   const validateForm = () => {
-    console.log('Validating form with data:', formData);
     const validationResult = validateRepairOrderForm(formData, claimNumber);
     setErrors(validationResult.errors);
     return validationResult.isValid;
