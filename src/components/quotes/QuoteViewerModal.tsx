@@ -66,7 +66,6 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
         if (cachedQuotes) {
           const updatedQuote = cachedQuotes.find(q => q.id === currentQuote.id);
           if (updatedQuote) {
-            console.log('Quote updated from cache:', updatedQuote);
             setCurrentQuote(updatedQuote);
           }
         }

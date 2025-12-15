@@ -55,7 +55,6 @@ const RepairOrderDialog = ({
       // Si c'est une conversion depuis un devis et qu'un ordre a été créé,
       // rediriger vers la page des ordres de réparation avec l'ordre ouvert
       if (isConversionFromQuote && createdOrder?.id) {
-        console.log('Redirection vers ordre créé:', createdOrder.id);
         
         // Onboarding : Devis converti en ordre de réparation
         const { onboardingService } = await import('@/services/onboarding/OnboardingService');

@@ -163,8 +163,6 @@ export const quotesService = {
   },
   
   create: async (quote: NewQuote) => {
-    console.log('Creating quote with data:', quote);
-
     // Récupérer l'utilisateur actuel
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     
@@ -201,13 +199,10 @@ export const quotesService = {
       throw new Error(error.message);
     }
     
-    console.log('Quote created successfully:', data);
     return data;
   },
   
   update: async (id: string, quote: UpdateQuote) => {
-    console.log('Updating quote with id:', id, 'and data:', quote);
-
     const { data, error } = await supabase
       .from('quotes')
       .update(quote)
@@ -220,7 +215,6 @@ export const quotesService = {
       throw new Error(error.message);
     }
     
-    console.log('Quote updated successfully:', data);
     return data;
   },
   
@@ -377,14 +371,6 @@ export const quotesService = {
       valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
     };
     
-    console.log('📄 Quote data being created from report:', {
-      report_id: expertiseReport.id,
-      discounts_data: quoteData.discounts_data,
-      global_discount_from_report: expertiseReport.global_discount_data,
-      discounts_array: discounts,
-      amount: quoteData.amount
-    });
-
     const { data, error } = await supabase
       .from('quotes')
       .insert([quoteData])
@@ -396,7 +382,6 @@ export const quotesService = {
       throw new Error(error.message);
     }
 
-    console.log('Quote created from report successfully:', data);
     return data;
   },
 

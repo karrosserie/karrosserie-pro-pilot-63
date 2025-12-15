@@ -1,14 +1,11 @@
 
 export const calculateOrderAmount = (order: any) => {
-  console.log('=== CALCULATING ORDER AMOUNT ===');
-  console.log('Order ID:', order.id);
   let totalAmount = 0;
   
   // Calculer le total des réparations depuis repairs_data
   if (order.repairs_data) {
     try {
       const repairsData = typeof order.repairs_data === 'string' ? JSON.parse(order.repairs_data) : order.repairs_data;
-      console.log('Repairs data:', repairsData);
       
       if (Array.isArray(repairsData)) {
         repairsData.forEach((repair: any) => {
@@ -33,7 +30,6 @@ export const calculateOrderAmount = (order: any) => {
   if (order.parts_data) {
     try {
       const partsData = typeof order.parts_data === 'string' ? JSON.parse(order.parts_data) : order.parts_data;
-      console.log('Parts data:', partsData);
       
       if (Array.isArray(partsData)) {
         partsData.forEach((part: any) => {
@@ -58,7 +54,6 @@ export const calculateOrderAmount = (order: any) => {
   if (order.discounts_data) {
     try {
       const discountsData = typeof order.discounts_data === 'string' ? JSON.parse(order.discounts_data) : order.discounts_data;
-      console.log('Discounts data:', discountsData);
       
       if (Array.isArray(discountsData)) {
         discountsData.forEach((discount: any) => {
@@ -75,7 +70,6 @@ export const calculateOrderAmount = (order: any) => {
     }
   }
 
-  console.log('Final calculated amount:', totalAmount);
   return totalAmount > 0 ? totalAmount : 0;
 };
 

@@ -31,19 +31,6 @@ export const RepairOrderActionsDropdown = ({ order, contextMenuProps }: RepairOr
   const isSignatureInProgress = order.oodrive_contract_id && !order.signed_document_url;
   const isAlreadySignedOodrive = order.signed_document_url;
 
-  // Debug logs
-  console.log('RepairOrder Debug:', {
-    orderId: order.id,
-    clientPhone: order.clients?.phone,
-    hasValidClientPhone,
-    isAlreadySignedOodrive,
-    isSignatureInProgress,
-    oodrive_contract_id: order.oodrive_contract_id,
-    signed_document_url: order.signed_document_url,
-    hasOodriveSignatureAction: !!contextMenuProps?.onSendForOodriveSignature,
-    shouldShowButton: hasValidClientPhone && !isAlreadySignedOodrive && !isSignatureInProgress && !!contextMenuProps?.onSendForOodriveSignature
-  });
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

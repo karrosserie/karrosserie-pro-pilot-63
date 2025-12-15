@@ -62,7 +62,6 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
         if (cachedOrders) {
           const updatedOrder = cachedOrders.find(o => o.id === currentRepairOrder.id);
           if (updatedOrder) {
-            console.log('Repair order updated from cache:', updatedOrder);
             setCurrentRepairOrder(updatedOrder);
           }
         }
@@ -383,9 +382,6 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
       parts_data: currentRepairOrder.parts_data ? (typeof currentRepairOrder.parts_data === 'string' ? currentRepairOrder.parts_data : JSON.stringify(currentRepairOrder.parts_data)) : undefined,
       discounts_data: currentRepairOrder.discounts_data ? (typeof currentRepairOrder.discounts_data === 'string' ? currentRepairOrder.discounts_data : JSON.stringify(currentRepairOrder.discounts_data)) : undefined,
     };
-
-    console.log('Converting repair order to invoice with data:', prefilledData);
-    console.log('Original repair order data:', currentRepairOrder);
 
     // Passer les données de pré-remplissage pour la création d'une nouvelle facture
     setPrefilledInvoice(prefilledData);
