@@ -43,10 +43,20 @@ const Dashboard = () => {
         isLoading={isLoading}
       />
       
-      <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg text-sm text-muted-foreground">
-        <Info className="w-4 h-4" />
-        <span>Base de calcul : 152 heures par mois et par ouvrier</span>
-      </div>
+      {/* Avertissements de données manquantes */}
+      {data.dataWarnings && data.dataWarnings.length > 0 && (
+        <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg space-y-2">
+          <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 font-medium">
+            <Info className="w-5 h-5" />
+            <span>Données partielles</span>
+          </div>
+          <ul className="text-sm text-amber-600 dark:text-amber-500 space-y-1 ml-7">
+            {data.dataWarnings.map((warning, index) => (
+              <li key={index}>• {warning}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <DashboardKPIGrid data={data} />
 
@@ -57,6 +67,7 @@ const Dashboard = () => {
         globalProductivity={data.globalProductivity}
         totalEmployees={data.totalEmployees}
         globalProductivityEvolution={data.globalProductivityEvolution}
+        hasTimesheetData={data.hasTimesheetData}
       />
 
       <EmployeePerformanceTable employees={data.employees} />

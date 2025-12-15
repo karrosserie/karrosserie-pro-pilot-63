@@ -5,14 +5,6 @@ import { useCompany } from '@/hooks/use-company';
 import { startOfMonth, endOfMonth, format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
-// Constantes
-const HOURS_PER_MONTH = 152;
-const HOURLY_RATES = {
-  carrosserie: 55,
-  peinture: 50,
-  mecanique: 45
-};
-
 export interface EmployeeProductivity {
   id: string;
   name: string;
@@ -22,6 +14,7 @@ export interface EmployeeProductivity {
   productivity: number;
   vehiclesCount: number;
   performance: 'excellent' | 'bon' | 'correct' | 'a_ameliorer';
+  hasTimesheetData: boolean;
 }
 
 export interface TradeMetrics {
@@ -35,6 +28,7 @@ export interface TradeMetrics {
   revenueEvolution: number;
   revenueShare: number;
   hourlyRate: number;
+  hasTimesheetData: boolean;
 }
 
 export interface DashboardProductivityData {
@@ -62,6 +56,11 @@ export interface DashboardProductivityData {
   // Périodes
   period1Label: string;
   period2Label: string;
+  
+  // Indicateurs de données manquantes
+  hasTimesheetData: boolean;
+  hasRepairsData: boolean;
+  dataWarnings: string[];
 }
 
 // Fonction pour catégoriser les réparations par métier
@@ -101,6 +100,8 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
     queryFn: async (): Promise<DashboardProductivityData> => {
       if (!companyData?.id) throw new Error('No company');
 
+      const dataWarnings: string[] = [];
+
       // Parse les périodes
       const period1Date = parseISO(`${period1}-01`);
       const period2Date = parseISO(`${period2}-01`);
@@ -130,17 +131,17 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
         .gte('date', format(period2Start, 'yyyy-MM-dd'))
         .lte('date', format(period2End, 'yyyy-MM-dd'));
 
-      // 3. Récupérer les factures pour calculer les heures vendues
+      // 3. Récupérer les factures pour calculer le CA RÉEL
       const { data: invoicesP2 } = await supabase
         .from('invoices')
-        .select('*')
+        .select('id, amount, repairs_data')
         .eq('company_id', companyData.id)
         .gte('date', format(period2Start, 'yyyy-MM-dd'))
         .lte('date', format(period2End, 'yyyy-MM-dd'));
 
       const { data: invoicesP1 } = await supabase
         .from('invoices')
-        .select('*')
+        .select('id, amount, repairs_data')
         .eq('company_id', companyData.id)
         .gte('date', format(period1Start, 'yyyy-MM-dd'))
         .lte('date', format(period1End, 'yyyy-MM-dd'));
@@ -162,48 +163,67 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
         .gte('created_at', format(period1Start, 'yyyy-MM-dd'))
         .lte('created_at', format(period1End, 'yyyy-MM-dd'));
 
-      // Calculer les heures vendues par métier à partir des factures
+      // === CALCUL DU CA RÉEL (somme des factures) ===
+      const totalRevenueP2 = invoicesP2?.reduce((sum, inv) => sum + (inv.amount || 0), 0) || 0;
+      const totalRevenueP1 = invoicesP1?.reduce((sum, inv) => sum + (inv.amount || 0), 0) || 0;
+
+      // === VÉRIFICATION DES DONNÉES DE POINTAGE ===
+      const hasTimesheetData = (timesheets?.length || 0) > 0;
+      if (!hasTimesheetData) {
+        dataWarnings.push("Aucune donnée de pointage pour cette période - les heures achetées ne peuvent pas être calculées");
+      }
+
+      // === CALCUL DES HEURES DEPUIS repairs_data ===
       const soldHoursByTrade = { carrosserie: 0, peinture: 0, mecanique: 0 };
       const soldHoursByTradeP1 = { carrosserie: 0, peinture: 0, mecanique: 0 };
-      
-      // Taux horaire moyen pour estimation
-      const avgHourlyRate = (HOURLY_RATES.carrosserie + HOURLY_RATES.peinture + HOURLY_RATES.mecanique) / 3;
+      let invoicesWithRepairsData = 0;
+      let invoicesWithRepairsDataP1 = 0;
 
-      // Parse repairs_data des factures pour extraire les heures vendues
-      // Fallback sur le montant si repairs_data est vide
       invoicesP2?.forEach(invoice => {
         if (invoice.repairs_data && Array.isArray(invoice.repairs_data) && invoice.repairs_data.length > 0) {
+          invoicesWithRepairsData++;
           (invoice.repairs_data as any[]).forEach(repair => {
             const trade = categorizeTrade(repair.designation || repair.description || '');
             const hours = parseFloat(repair.quantity) || 0;
             soldHoursByTrade[trade] += hours;
           });
-        } else if (invoice.amount && invoice.amount > 0) {
-          // Fallback: estimer les heures à partir du montant (répartition égale par défaut)
-          const estimatedHours = invoice.amount / avgHourlyRate;
-          soldHoursByTrade.carrosserie += estimatedHours * 0.5; // 50% carrosserie
-          soldHoursByTrade.peinture += estimatedHours * 0.35;   // 35% peinture
-          soldHoursByTrade.mecanique += estimatedHours * 0.15;  // 15% mécanique
         }
       });
 
       invoicesP1?.forEach(invoice => {
         if (invoice.repairs_data && Array.isArray(invoice.repairs_data) && invoice.repairs_data.length > 0) {
+          invoicesWithRepairsDataP1++;
           (invoice.repairs_data as any[]).forEach(repair => {
             const trade = categorizeTrade(repair.designation || repair.description || '');
             const hours = parseFloat(repair.quantity) || 0;
             soldHoursByTradeP1[trade] += hours;
           });
-        } else if (invoice.amount && invoice.amount > 0) {
-          // Fallback: estimer les heures à partir du montant
-          const estimatedHours = invoice.amount / avgHourlyRate;
-          soldHoursByTradeP1.carrosserie += estimatedHours * 0.5;
-          soldHoursByTradeP1.peinture += estimatedHours * 0.35;
-          soldHoursByTradeP1.mecanique += estimatedHours * 0.15;
         }
       });
 
-      // Compter les employés par métier (basé sur qualifications ou défaut)
+      const hasRepairsData = invoicesWithRepairsData > 0;
+      const totalInvoicesP2 = invoicesP2?.length || 0;
+      
+      if (totalInvoicesP2 > 0 && invoicesWithRepairsData < totalInvoicesP2) {
+        const missingPercentage = Math.round(((totalInvoicesP2 - invoicesWithRepairsData) / totalInvoicesP2) * 100);
+        dataWarnings.push(`${missingPercentage}% des factures n'ont pas de détail des heures (${totalInvoicesP2 - invoicesWithRepairsData}/${totalInvoicesP2})`);
+      }
+
+      // === CALCUL DES HEURES ACHETÉES RÉELLES (depuis timesheets) ===
+      const boughtHoursByEmployee: Record<string, number> = {};
+      let totalRealBoughtHours = 0;
+
+      timesheets?.forEach(ts => {
+        if (ts.clock_in_time && ts.clock_out_time) {
+          const clockIn = new Date(ts.clock_in_time);
+          const clockOut = new Date(ts.clock_out_time);
+          const hours = (clockOut.getTime() - clockIn.getTime()) / (1000 * 60 * 60);
+          boughtHoursByEmployee[ts.user_id] = (boughtHoursByEmployee[ts.user_id] || 0) + hours;
+          totalRealBoughtHours += hours;
+        }
+      });
+
+      // === LISTE DES EMPLOYÉS ===
       const employeesByTrade = { carrosserie: 0, peinture: 0, mecanique: 0 };
       const employeeList: EmployeeProductivity[] = [];
 
@@ -230,25 +250,16 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
         
         employeesByTrade[trade]++;
         
-        // Calculer les heures de cet employé
-        const empTimesheets = timesheets?.filter(t => t.user_id === emp.user_id) || [];
-        let workedHours = 0;
-        empTimesheets.forEach(ts => {
-          if (ts.clock_in_time && ts.clock_out_time) {
-            const clockIn = new Date(ts.clock_in_time);
-            const clockOut = new Date(ts.clock_out_time);
-            workedHours += (clockOut.getTime() - clockIn.getTime()) / (1000 * 60 * 60);
-          }
-        });
-        
-        // Si pas de timesheet, utiliser la base 152h
-        const boughtHours = workedHours > 0 ? workedHours : HOURS_PER_MONTH;
+        // Heures achetées RÉELLES de cet employé
+        const boughtHours = boughtHoursByEmployee[emp.user_id] || 0;
+        const hasEmpTimesheetData = boughtHours > 0;
         
         // Répartir les heures vendues proportionnellement aux employés du métier
         const tradeEmployeeCount = employeesByTrade[trade] || 1;
         const soldHours = soldHoursByTrade[trade] / tradeEmployeeCount;
         
-        const productivity = boughtHours > 0 ? (soldHours / boughtHours) * 100 : 0;
+        // Productivité seulement si on a les heures achetées
+        const productivity = (hasEmpTimesheetData && boughtHours > 0) ? (soldHours / boughtHours) * 100 : 0;
         
         employeeList.push({
           id: emp.user_id,
@@ -258,89 +269,103 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
           soldHours: Math.round(soldHours),
           productivity: Math.round(productivity),
           vehiclesCount: Math.round((repairOrdersP2?.length || 0) / (employees?.length || 1)),
-          performance: getPerformanceLevel(productivity)
+          performance: hasEmpTimesheetData ? getPerformanceLevel(productivity) : 'a_ameliorer',
+          hasTimesheetData: hasEmpTimesheetData
         });
       });
 
-      // Si pas d'employés, ne pas créer de données fictives
-
-      // Calculer les métriques par métier
+      // === MÉTRIQUES PAR MÉTIER (avec données réelles) ===
       const trades: ('carrosserie' | 'peinture' | 'mecanique')[] = ['carrosserie', 'peinture', 'mecanique'];
       const tradeMetrics: TradeMetrics[] = trades.map(trade => {
         const tradeEmployees = employeeList.filter(e => e.trade === trade);
-        const employeeCount = tradeEmployees.length || employeesByTrade[trade] || 1;
-        const boughtHours = employeeCount * HOURS_PER_MONTH;
-        const soldHours = tradeEmployees.reduce((sum, e) => sum + e.soldHours, 0) || soldHoursByTrade[trade];
-        const soldHoursP1 = soldHoursByTradeP1[trade] || soldHours * 0.95;
+        const employeeCount = tradeEmployees.length;
         
-        const productivity = boughtHours > 0 ? (soldHours / boughtHours) * 100 : 0;
-        const productivityP1 = boughtHours > 0 ? (soldHoursP1 / boughtHours) * 100 : 0;
+        // Heures achetées RÉELLES pour ce métier
+        const boughtHours = tradeEmployees.reduce((sum, e) => sum + e.boughtHours, 0);
+        const hasTradeTimesheetData = boughtHours > 0;
         
-        const revenue = soldHours * HOURLY_RATES[trade];
-        const revenueP1 = soldHoursP1 * HOURLY_RATES[trade];
+        // Heures vendues depuis repairs_data
+        const soldHours = soldHoursByTrade[trade];
+        const soldHoursP1 = soldHoursByTradeP1[trade];
+        
+        // Productivité seulement si on a les heures achetées
+        const productivity = (hasTradeTimesheetData && boughtHours > 0) ? (soldHours / boughtHours) * 100 : 0;
+        const productivityP1 = (hasTradeTimesheetData && boughtHours > 0) ? (soldHoursP1 / boughtHours) * 100 : 0;
+        
+        // CA réel = part proportionnelle du CA total basée sur les heures vendues
+        const totalSoldHours = soldHoursByTrade.carrosserie + soldHoursByTrade.peinture + soldHoursByTrade.mecanique;
+        const tradeShare = totalSoldHours > 0 ? soldHours / totalSoldHours : 0;
+        const revenue = Math.round(totalRevenueP2 * tradeShare);
+        
+        const tradeShareP1 = (soldHoursByTradeP1.carrosserie + soldHoursByTradeP1.peinture + soldHoursByTradeP1.mecanique) > 0 
+          ? soldHoursP1 / (soldHoursByTradeP1.carrosserie + soldHoursByTradeP1.peinture + soldHoursByTradeP1.mecanique) 
+          : 0;
+        const revenueP1 = Math.round(totalRevenueP1 * tradeShareP1);
+        
+        // Taux horaire calculé = CA / heures vendues
+        const hourlyRate = soldHours > 0 ? Math.round(revenue / soldHours) : 0;
         
         return {
           trade,
           employeeCount,
-          boughtHours,
+          boughtHours: Math.round(boughtHours),
           soldHours: Math.round(soldHours),
           productivity: Math.round(productivity),
           evolution: Math.round(productivity - productivityP1),
-          revenue: Math.round(revenue),
+          revenue,
           revenueEvolution: revenueP1 > 0 ? Math.round(((revenue - revenueP1) / revenueP1) * 100) : 0,
-          revenueShare: 0, // Calculé après
-          hourlyRate: HOURLY_RATES[trade]
+          revenueShare: totalRevenueP2 > 0 ? Math.round((revenue / totalRevenueP2) * 100) : 0,
+          hourlyRate,
+          hasTimesheetData: hasTradeTimesheetData
         };
       });
 
-      // Calculer les parts de CA
-      const totalRevenue = tradeMetrics.reduce((sum, t) => sum + t.revenue, 0);
-      tradeMetrics.forEach(t => {
-        t.revenueShare = totalRevenue > 0 ? Math.round((t.revenue / totalRevenue) * 100) : 0;
-      });
-
-      // Totaux
-      const totalBoughtHours = tradeMetrics.reduce((sum, t) => sum + t.boughtHours, 0);
-      const totalSoldHours = tradeMetrics.reduce((sum, t) => sum + t.soldHours, 0);
+      // === TOTAUX ===
+      const totalBoughtHours = Math.round(totalRealBoughtHours);
+      const totalSoldHours = Math.round(soldHoursByTrade.carrosserie + soldHoursByTrade.peinture + soldHoursByTrade.mecanique);
       const totalEmployees = employeeList.length;
       
-      const globalProductivity = totalBoughtHours > 0 ? (totalSoldHours / totalBoughtHours) * 100 : 0;
+      // Productivité globale seulement si on a les heures achetées
+      const globalProductivity = (hasTimesheetData && totalBoughtHours > 0) ? (totalSoldHours / totalBoughtHours) * 100 : 0;
       
-      // Calcul des évolutions réelles
       const totalSoldHoursP1 = soldHoursByTradeP1.carrosserie + soldHoursByTradeP1.peinture + soldHoursByTradeP1.mecanique;
-      const globalProductivityP1 = totalBoughtHours > 0 ? (totalSoldHoursP1 / totalBoughtHours) * 100 : 0;
+      const globalProductivityP1 = (hasTimesheetData && totalBoughtHours > 0) ? (totalSoldHoursP1 / totalBoughtHours) * 100 : 0;
       const globalProductivityEvolution = Math.round((globalProductivity - globalProductivityP1) * 10) / 10;
       
-      const totalRevenueP1 = (soldHoursByTradeP1.carrosserie * HOURLY_RATES.carrosserie) + 
-                             (soldHoursByTradeP1.peinture * HOURLY_RATES.peinture) + 
-                             (soldHoursByTradeP1.mecanique * HOURLY_RATES.mecanique);
-      const revenueEvolution = totalRevenueP1 > 0 ? Math.round(((totalRevenue - totalRevenueP1) / totalRevenueP1) * 100) : 0;
+      // Évolution du CA réel
+      const revenueEvolution = totalRevenueP1 > 0 ? Math.round(((totalRevenueP2 - totalRevenueP1) / totalRevenueP1) * 100) : 0;
       
+      // Véhicules traités
       const vehiclesCount = repairOrdersP2?.length || 0;
       const vehiclesCountP1 = repairOrdersP1?.length || 0;
       const vehiclesEvolution = vehiclesCountP1 > 0 ? 
         Math.round(((vehiclesCount - vehiclesCountP1) / vehiclesCountP1) * 100) : 0;
       
-      // Marge brute (CA - coûts salariaux estimés)
-      const estimatedLaborCost = totalBoughtHours * 25; // Coût horaire moyen estimé
-      const grossMargin = totalRevenue > 0 ? ((totalRevenue - estimatedLaborCost) / totalRevenue) * 100 : 0;
+      // Marge brute : pas de données de coût salarial => on ne peut pas calculer
+      // On affiche 0 avec un warning
+      if (!hasTimesheetData) {
+        dataWarnings.push("La marge brute ne peut pas être calculée sans données de pointage");
+      }
 
       return {
         globalProductivity: Math.round(globalProductivity * 10) / 10,
         globalProductivityEvolution,
-        totalRevenue,
+        totalRevenue: totalRevenueP2,
         revenueEvolution,
         vehiclesCount,
         vehiclesEvolution,
-        grossMargin: Math.round(grossMargin * 10) / 10,
-        grossMarginEvolution: totalRevenueP1 > 0 ? Math.round((grossMargin - ((totalRevenueP1 - estimatedLaborCost) / totalRevenueP1) * 100) * 10) / 10 : 0,
+        grossMargin: 0, // Pas calculable sans coûts salariaux réels
+        grossMarginEvolution: 0,
         tradeMetrics,
         employees: employeeList,
         totalBoughtHours,
         totalSoldHours,
         totalEmployees,
         period1Label: format(period1Date, 'MMMM yyyy', { locale: fr }),
-        period2Label: format(period2Date, 'MMMM yyyy', { locale: fr })
+        period2Label: format(period2Date, 'MMMM yyyy', { locale: fr }),
+        hasTimesheetData,
+        hasRepairsData,
+        dataWarnings
       };
     },
     enabled: !!companyData?.id && !!period1 && !!period2

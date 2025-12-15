@@ -8,6 +8,7 @@ interface ProductivityTableProps {
   globalProductivity: number;
   totalEmployees: number;
   globalProductivityEvolution: number;
+  hasTimesheetData?: boolean;
 }
 
 const TradeBadge = ({ trade }: { trade: string }) => {
@@ -36,7 +37,8 @@ export const ProductivityTable = ({
   totalSoldHours, 
   globalProductivity, 
   totalEmployees,
-  globalProductivityEvolution 
+  globalProductivityEvolution,
+  hasTimesheetData = true
 }: ProductivityTableProps) => {
   return (
     <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
@@ -62,34 +64,64 @@ export const ProductivityTable = ({
               <tr key={metric.trade} className="border-b border-border hover:bg-muted/30">
                 <td className="px-3 py-2"><TradeBadge trade={metric.trade} /></td>
                 <td className="px-3 py-2">{metric.employeeCount}</td>
-                <td className="px-3 py-2 font-medium">{metric.boughtHours}h</td>
+                <td className="px-3 py-2 font-medium">
+                  {metric.hasTimesheetData ? `${metric.boughtHours}h` : (
+                    <span className="text-muted-foreground italic">N/A</span>
+                  )}
+                </td>
                 <td className="px-3 py-2 font-medium">{metric.soldHours}h</td>
                 <td className="px-3 py-2">
-                  <span className={`font-medium ${metric.productivity >= 100 ? 'text-green-600' : 'text-red-600'}`}>
-                    {metric.productivity}%
-                  </span>
+                  {metric.hasTimesheetData ? (
+                    <span className={`font-medium ${metric.productivity >= 100 ? 'text-green-600' : 'text-red-600'}`}>
+                      {metric.productivity}%
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground italic">N/A</span>
+                  )}
                 </td>
                 <td className="px-3 py-2">
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${
-                    metric.evolution >= 0 
-                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
-                      : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                  }`}>
-                    {metric.evolution >= 0 ? '+' : ''}{metric.evolution}%
-                  </span>
+                  {metric.hasTimesheetData ? (
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${
+                      metric.evolution >= 0 
+                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
+                        : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                    }`}>
+                      {metric.evolution >= 0 ? '+' : ''}{metric.evolution}%
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground italic">N/A</span>
+                  )}
                 </td>
               </tr>
             ))}
             <tr className="bg-muted/30 font-medium">
               <td className="px-3 py-2">TOTAL</td>
               <td className="px-3 py-2">{totalEmployees}</td>
-              <td className="px-3 py-2">{totalBoughtHours}h</td>
-              <td className="px-3 py-2">{totalSoldHours}h</td>
-              <td className="px-3 py-2 text-green-600">{globalProductivity}%</td>
               <td className="px-3 py-2">
-                <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                  +{globalProductivityEvolution}%
-                </span>
+                {hasTimesheetData ? `${totalBoughtHours}h` : (
+                  <span className="text-muted-foreground italic">N/A</span>
+                )}
+              </td>
+              <td className="px-3 py-2">{totalSoldHours}h</td>
+              <td className="px-3 py-2">
+                {hasTimesheetData ? (
+                  <span className="text-green-600">{globalProductivity}%</span>
+                ) : (
+                  <span className="text-muted-foreground italic">N/A</span>
+                )}
+              </td>
+              <td className="px-3 py-2">
+                {hasTimesheetData ? (
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${
+                    globalProductivityEvolution >= 0
+                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                      : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                  }`}>
+                    {globalProductivityEvolution >= 0 ? '+' : ''}{globalProductivityEvolution}%
+                  </span>
+                ) : (
+                  <span className="text-muted-foreground italic">N/A</span>
+                )}
               </td>
             </tr>
           </tbody>
