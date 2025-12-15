@@ -333,7 +333,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
                 openMenuPath={openMenuPath}
                 onMenuToggle={setOpenMenuPath}
                 badgeCount={item.path === '/ai-assistant' ? unhandledAlertsCount : undefined}
-                disabled={item.disabled}
+                
               />
             ))}
           </nav>
