@@ -98,11 +98,9 @@ const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems
         to={disabled ? '#' : (hasSubMenu ? '#' : path)}
         onClick={handleClick}
         className={`flex items-center py-3 px-4 rounded-lg text-sm font-medium transition-colors ${
-          disabled
-            ? 'opacity-50 cursor-not-allowed text-gray-400'
-            : isActive 
-              ? 'bg-karrosserie-orange/10 text-karrosserie-orange border border-karrosserie-orange/20' 
-              : 'text-gray-600 hover:bg-gray-100 active:bg-gray-200'
+          isActive 
+            ? 'bg-karrosserie-orange/10 text-karrosserie-orange border border-karrosserie-orange/20' 
+            : 'text-gray-600 hover:bg-gray-100 active:bg-gray-200'
         }`}
       >
         <span className="mr-3 flex-shrink-0">{icon}</span>
