@@ -1,97 +1,61 @@
 
+import { CheckCircle, ThumbsUp, AlertTriangle, Target } from 'lucide-react';
 
 export const PerformanceExplanation = () => {
   return (
-    <div className="mt-8">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {/* Encadré VERT : Excellent */}
-        <div className="bg-gradient-to-br from-green-50 to-cyan-50 dark:from-green-900/20 dark:to-cyan-900/20 border-l-[6px] border-green-600 rounded-2xl p-5">
-          <div className="text-xl font-bold mb-3 text-green-700 dark:text-green-400">
-            ✅ EXCELLENT (&gt;125%)
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Excellent */}
+        <div className="bg-card rounded-lg border-l-4 border-l-green-500 border border-border p-4">
+          <div className="flex items-center gap-2 text-green-600 font-semibold mb-2">
+            <CheckCircle className="w-4 h-4" />
+            Excellent (&gt;125%)
           </div>
-          <div className="text-base leading-relaxed text-foreground mb-4">
-            <strong>C'EST QUOI ?</strong><br/>
-            L'employé vend BEAUCOUP plus d'heures qu'il n'en coûte. Il génère du PROFIT.
-          </div>
-          <div className="bg-white dark:bg-background/50 rounded-xl p-4 mb-4">
-            <div className="text-sm text-muted-foreground mb-2">👤 Exemples :</div>
-            <strong className="text-green-700 dark:text-green-400">• Jean Martin (128%)</strong><br/>
-            <strong className="text-green-700 dark:text-green-400">• Sophie Bernard (130%)</strong>
-          </div>
-          <div className="text-base text-foreground leading-relaxed">
-            <strong className="text-green-700 dark:text-green-400">✨ CE QU'IL FAUT FAIRE :</strong><br/>
-            → Continue comme ça !<br/>
-            → Utilise-le en exemple<br/>
-            → Récompense sa performance
-          </div>
+          <p className="text-sm text-muted-foreground mb-2">
+            L'employé vend beaucoup plus d'heures qu'il n'en coûte. Il génère du profit.
+          </p>
+          <p className="text-xs text-green-600">
+            Continue ainsi, utilise-le en exemple pour les autres.
+          </p>
         </div>
 
-        {/* Encadré BLEU : Bon */}
-        <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-l-[6px] border-blue-500 rounded-2xl p-5">
-          <div className="text-xl font-bold mb-3 text-blue-600 dark:text-blue-400">
-            👍 BON (110-125%)
+        {/* Bon */}
+        <div className="bg-card rounded-lg border-l-4 border-l-blue-500 border border-border p-4">
+          <div className="flex items-center gap-2 text-blue-600 font-semibold mb-2">
+            <ThumbsUp className="w-4 h-4" />
+            Bon (110-125%)
           </div>
-          <div className="text-base leading-relaxed text-foreground mb-4">
-            <strong>C'EST QUOI ?</strong><br/>
-            L'employé est rentable, il vend plus qu'il ne coûte. C'est BIEN mais peut mieux faire.
-          </div>
-          <div className="bg-white dark:bg-background/50 rounded-xl p-4 mb-4">
-            <div className="text-sm text-muted-foreground mb-2">👤 Exemples :</div>
-            <strong className="text-blue-600 dark:text-blue-400">• Pierre Dupont (124%)</strong><br/>
-            <strong className="text-blue-600 dark:text-blue-400">• Julie Moreau (120%)</strong>
-          </div>
-          <div className="text-base text-foreground leading-relaxed">
-            <strong className="text-blue-600 dark:text-blue-400">🎯 CE QU'IL FAUT FAIRE :</strong><br/>
-            → Encourage-le à viser 130%<br/>
-            → Vérifie s'il perd du temps<br/>
-            → Formation pour améliorer
-          </div>
+          <p className="text-sm text-muted-foreground mb-2">
+            L'employé est rentable, il vend plus qu'il ne coûte. Peut mieux faire.
+          </p>
+          <p className="text-xs text-blue-600">
+            Encourage-le à viser 130%, vérifie s'il perd du temps quelque part.
+          </p>
         </div>
 
-        {/* Encadré ORANGE : À améliorer */}
-        <div className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-l-[6px] border-orange-500 rounded-2xl p-5">
-          <div className="text-xl font-bold mb-3 text-orange-600 dark:text-orange-400">
-            ⚠️ À AMÉLIORER (&lt;110%)
+        {/* À améliorer */}
+        <div className="bg-card rounded-lg border-l-4 border-l-orange-500 border border-border p-4">
+          <div className="flex items-center gap-2 text-orange-600 font-semibold mb-2">
+            <AlertTriangle className="w-4 h-4" />
+            À améliorer (&lt;110%)
           </div>
-          <div className="text-base leading-relaxed text-foreground mb-4">
-            <strong>C'EST QUOI ?</strong><br/>
-            L'employé ne vend pas assez d'heures. <strong className="text-red-600">ATTENTION !</strong>
-          </div>
-          <div className="bg-white dark:bg-background/50 rounded-xl p-4 mb-4">
-            <div className="text-sm text-muted-foreground mb-2">👤 Exemples :</div>
-            <strong className="text-orange-600 dark:text-orange-400">• Marc Leblanc (108%)</strong><br/>
-            <strong className="text-red-600 dark:text-red-400">• Luc Garnier (107%) ⚠️ CRITIQUE</strong>
-          </div>
-          <div className="text-base text-foreground leading-relaxed">
-            <strong className="text-red-600 dark:text-red-400">🚨 CE QU'IL FAUT FAIRE :</strong><br/>
-            → Parle avec lui<br/>
-            → Formation urgente<br/>
-            → Impact sur la rentabilité !
-          </div>
+          <p className="text-sm text-muted-foreground mb-2">
+            L'employé ne vend pas assez d'heures. Attention à la rentabilité.
+          </p>
+          <p className="text-xs text-orange-600">
+            Parle avec lui pour comprendre le problème, formation urgente si nécessaire.
+          </p>
         </div>
       </div>
 
       {/* Résumé */}
-      <div className="mt-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-3xl p-6 text-white">
-        <div className="text-2xl font-bold mb-5 text-center">
-          💡 COMMENT LIRE CE TABLEAU EN 10 SECONDES
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-lg leading-relaxed mb-5">
-          <div>
-            <strong className="text-xl">1️⃣</strong> Regarde <strong>"Productivité"</strong>
-          </div>
-          <div>
-            <strong className="text-xl">2️⃣</strong> Si <strong>&gt;125% = 🟢 Super !</strong>
-          </div>
-          <div>
-            <strong className="text-xl">3️⃣</strong> Si <strong>110-125% = 🔵 Bien</strong>
-          </div>
-          <div>
-            <strong className="text-xl">4️⃣</strong> Si <strong>&lt;110% = 🟠 ATTENTION !</strong>
-          </div>
-        </div>
-        <div className="p-4 bg-white/20 rounded-xl text-center text-lg">
-          <strong>🎯 OBJECTIF :</strong> Tous tes employés doivent être au MINIMUM à 120% pour que ton atelier soit vraiment rentable !
+      <div className="bg-muted/50 rounded-lg p-4 flex items-start gap-3">
+        <Target className="w-5 h-5 text-primary mt-0.5" />
+        <div>
+          <p className="text-sm font-medium text-foreground">Objectif de rentabilité</p>
+          <p className="text-xs text-muted-foreground">
+            Tous les employés doivent être au minimum à 120% pour que l'atelier soit vraiment rentable.
+          </p>
         </div>
       </div>
     </div>
