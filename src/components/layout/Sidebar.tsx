@@ -173,13 +173,13 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
 
   // Définir tous les éléments de navigation
   const allNavItems = [
-    { icon: <LayoutDashboard className="app-icon" />, label: 'Dashboard', path: '/dashboard' },
-    { icon: <Wrench className="app-icon" />, label: 'Gestion atelier', path: '/gestion-atelier' },
     { icon: <Bot className="app-icon" />, label: 'Tour de contrôle', path: '/ai-assistant' },
     { icon: <Home className="app-icon" />, label: 'Vue synthétique', path: '/' },
+    { icon: <LayoutDashboard className="app-icon" />, label: 'Dashboard', path: '/dashboard' },
     { icon: <MessageSquare className="app-icon" />, label: 'Messageries', path: '/messageries' },
     { icon: <Users className="app-icon" />, label: 'Clients', path: '/clients' },
     { icon: <Car className="app-icon" />, label: 'Véhicules', path: '/vehicles' },
+    { icon: <Wrench className="app-icon" />, label: 'Gestion atelier', path: '/gestion-atelier' },
     { icon: <Calendar className="app-icon" />, label: 'Planning', path: '/planning' },
     { 
       icon: <FileText className="app-icon" />, 
