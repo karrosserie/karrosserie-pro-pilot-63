@@ -52,26 +52,50 @@ interface DashboardKPIGridProps {
 }
 
 export const DashboardKPIGrid = ({ data }: DashboardKPIGridProps) => {
-  const previousProductivity = Math.round(data.globalProductivity / (1 + data.globalProductivityEvolution / 100));
-  const previousRevenue = Math.round(data.totalRevenue / (1 + data.revenueEvolution / 100));
-  const previousVehicles = Math.round(data.vehiclesCount / (1 + data.vehiclesEvolution / 100));
-  const previousMargin = (data.grossMargin - data.grossMarginEvolution).toFixed(1);
+  const previousRevenue = data.revenueEvolution !== 0 
+    ? Math.round(data.totalRevenue / (1 + data.revenueEvolution / 100)) 
+    : data.totalRevenue;
+  const previousVehicles = data.vehiclesEvolution !== 0 
+    ? Math.round(data.vehiclesCount / (1 + data.vehiclesEvolution / 100)) 
+    : data.vehiclesCount;
+
+  const hasProductivityData = data.hasTimesheetData && data.globalProductivity > 0;
+  const previousProductivity = hasProductivityData && data.globalProductivityEvolution !== 0
+    ? Math.round(data.globalProductivity / (1 + data.globalProductivityEvolution / 100))
+    : 0;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-      <KPICard
-        title="Productivité Globale"
-        value={`${data.globalProductivity}%`}
-        subtitle="Objectif : 120%"
-        evolution={data.globalProductivityEvolution}
-        currentValue={`${data.globalProductivity}%`}
-        previousValue={`${previousProductivity}%`}
-      />
+      {/* Productivité - seulement si données de pointage disponibles */}
+      <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Productivité Globale</p>
+        {hasProductivityData ? (
+          <>
+            <p className="text-2xl font-bold text-foreground mt-1">{data.globalProductivity}%</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Objectif : 120%</p>
+            <div className="flex items-center gap-1.5 mt-2">
+              {data.globalProductivityEvolution >= 0 ? (
+                <TrendingUp className="w-3 h-3 text-green-600" />
+              ) : (
+                <TrendingDown className="w-3 h-3 text-red-600" />
+              )}
+              <span className={`text-xs font-medium ${data.globalProductivityEvolution >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {data.globalProductivityEvolution >= 0 ? '+' : ''}{data.globalProductivityEvolution.toFixed(1)}%
+              </span>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="text-lg font-medium text-muted-foreground mt-1 italic">Données indisponibles</p>
+            <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">Pointages requis</p>
+          </>
+        )}
+      </div>
       
       <KPICard
         title="CA Main d'Œuvre"
-        value={`${(data.totalRevenue / 1000).toFixed(1)}k€`}
-        subtitle="Chiffre d'affaires total"
+        value={data.totalRevenue > 0 ? `${(data.totalRevenue / 1000).toFixed(1)}k€` : '0€'}
+        subtitle="Somme des factures"
         evolution={data.revenueEvolution}
         currentValue={`${data.totalRevenue.toLocaleString('fr-FR')}€`}
         previousValue={`${previousRevenue.toLocaleString('fr-FR')}€`}
@@ -80,20 +104,27 @@ export const DashboardKPIGrid = ({ data }: DashboardKPIGridProps) => {
       <KPICard
         title="Véhicules Traités"
         value={data.vehiclesCount.toString()}
-        subtitle="Nombre total"
+        subtitle="OR signés/en cours"
         evolution={data.vehiclesEvolution}
         currentValue={data.vehiclesCount.toString()}
         previousValue={previousVehicles.toString()}
       />
       
-      <KPICard
-        title="Marge Brute MO"
-        value={`${data.grossMargin}%`}
-        subtitle="Objectif : 65-75%"
-        evolution={data.grossMarginEvolution}
-        currentValue={`${data.grossMargin}%`}
-        previousValue={`${previousMargin}%`}
-      />
+      {/* Marge Brute - seulement si données de pointage disponibles */}
+      <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Marge Brute MO</p>
+        {data.hasTimesheetData ? (
+          <>
+            <p className="text-2xl font-bold text-foreground mt-1">{data.grossMargin}%</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Objectif : 65-75%</p>
+          </>
+        ) : (
+          <>
+            <p className="text-lg font-medium text-muted-foreground mt-1 italic">Données indisponibles</p>
+            <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">Coûts salariaux requis</p>
+          </>
+        )}
+      </div>
     </div>
   );
 };
