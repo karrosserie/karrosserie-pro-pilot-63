@@ -2,6 +2,14 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { formatCurrency } from '@/utils/date-formatter';
 
+// Helper to get the first day of the next month correctly
+const getNextMonthStart = (year: number, month: number) => {
+  if (month === 12) {
+    return `${year + 1}-01-01`;
+  }
+  return `${year}-${(month + 1).toString().padStart(2, '0')}-01`;
+};
+
 export const usePaymentStatistics = () => {
   return useQuery({
     queryKey: ['payment-statistics'],
@@ -12,12 +20,16 @@ export const usePaymentStatistics = () => {
       const lastMonth = currentMonth === 1 ? 12 : currentMonth - 1;
       const lastMonthYear = currentMonth === 1 ? currentYear - 1 : currentYear;
 
+      const currentMonthStart = `${currentYear}-${currentMonth.toString().padStart(2, '0')}-01`;
+      const nextMonthStart = getNextMonthStart(currentYear, currentMonth);
+      const lastMonthStart = `${lastMonthYear}-${lastMonth.toString().padStart(2, '0')}-01`;
+
       // Get current month receipts
       const { data: currentMonthReceipts, error: receiptsError } = await supabase
         .from('receipts')
         .select('amount')
-        .gte('date', `${currentYear}-${currentMonth.toString().padStart(2, '0')}-01`)
-        .lt('date', `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}-01`);
+        .gte('date', currentMonthStart)
+        .lt('date', nextMonthStart);
 
       if (receiptsError) throw receiptsError;
 
@@ -25,8 +37,8 @@ export const usePaymentStatistics = () => {
       const { data: lastMonthReceipts, error: lastReceiptsError } = await supabase
         .from('receipts')
         .select('amount')
-        .gte('date', `${lastMonthYear}-${lastMonth.toString().padStart(2, '0')}-01`)
-        .lt('date', `${lastMonthYear}-${currentMonth.toString().padStart(2, '0')}-01`);
+        .gte('date', lastMonthStart)
+        .lt('date', currentMonthStart);
 
       if (lastReceiptsError) throw lastReceiptsError;
 
@@ -34,8 +46,8 @@ export const usePaymentStatistics = () => {
       const { data: currentMonthExpenses, error: expensesError } = await supabase
         .from('expenses')
         .select('total_amount')
-        .gte('date', `${currentYear}-${currentMonth.toString().padStart(2, '0')}-01`)
-        .lt('date', `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}-01`);
+        .gte('date', currentMonthStart)
+        .lt('date', nextMonthStart);
 
       if (expensesError) throw expensesError;
 
@@ -43,8 +55,8 @@ export const usePaymentStatistics = () => {
       const { data: lastMonthExpenses, error: lastExpensesError } = await supabase
         .from('expenses')
         .select('total_amount')
-        .gte('date', `${lastMonthYear}-${lastMonth.toString().padStart(2, '0')}-01`)
-        .lt('date', `${lastMonthYear}-${currentMonth.toString().padStart(2, '0')}-01`);
+        .gte('date', lastMonthStart)
+        .lt('date', currentMonthStart);
 
       if (lastExpensesError) throw lastExpensesError;
 
