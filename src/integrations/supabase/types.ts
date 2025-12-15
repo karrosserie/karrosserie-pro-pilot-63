@@ -2704,6 +2704,7 @@ export type Database = {
           insurance_postal_code: string | null
           insurance_status: string | null
           last_reminder_at: string | null
+          loan_duration: string | null
           notes: string | null
           quote_id: string | null
           start_date: string
@@ -2742,6 +2743,7 @@ export type Database = {
           insurance_postal_code?: string | null
           insurance_status?: string | null
           last_reminder_at?: string | null
+          loan_duration?: string | null
           notes?: string | null
           quote_id?: string | null
           start_date: string
@@ -2780,6 +2782,7 @@ export type Database = {
           insurance_postal_code?: string | null
           insurance_status?: string | null
           last_reminder_at?: string | null
+          loan_duration?: string | null
           notes?: string | null
           quote_id?: string | null
           start_date?: string
