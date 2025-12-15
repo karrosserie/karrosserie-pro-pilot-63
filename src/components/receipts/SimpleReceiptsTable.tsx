@@ -1,10 +1,8 @@
-
 import React from 'react';
 import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
@@ -19,7 +17,6 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from 'react';
 import { ReceiptWithClient } from '@/services/supabase/receipts/types';
-import { useInvoices } from '@/hooks/use-invoices';
 import { useTableSorting } from '@/hooks/use-table-sorting';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 
@@ -34,7 +31,6 @@ export const SimpleReceiptsTable = ({
   onEdit,
   onDelete
 }: SimpleReceiptsTableProps) => {
-  const { invoices } = useInvoices();
   const { sortedData, sortConfig, handleSort } = useTableSorting(receipts, 'date');
   const [checkViewUrl, setCheckViewUrl] = useState<string | null>(null);
 
@@ -62,25 +58,18 @@ export const SimpleReceiptsTable = ({
     return new Date(dateString).toLocaleDateString('fr-FR');
   };
 
-  const getInvoiceDisplay = (invoiceId: string | null) => {
-    if (!invoiceId || !invoices) {
+  // Use invoice data from receipt join instead of loading all invoices
+  const getInvoiceDisplay = (receipt: ReceiptWithClient) => {
+    const invoice = receipt.invoices;
+    if (!invoice) {
       return 'Sans facture';
     }
-    
-    const invoice = invoices.find(inv => inv.id === invoiceId);
-    if (!invoice) {
-      return 'Facture introuvable';
-    }
-    
-    const clientName = invoice.clients 
-      ? `${invoice.clients.first_name} ${invoice.clients.last_name}` 
-      : 'Client non assigné';
     
     const amount = typeof invoice.amount === 'number' 
       ? invoice.amount.toFixed(2).replace('.', ',')
       : '0,00';
     
-    return `Facture n°${invoice.reference} - ${clientName} - ${amount} €`;
+    return `Facture n°${invoice.reference} - ${amount} €`;
   };
 
   const hasCheckScan = (receipt: ReceiptWithClient) => {
@@ -131,7 +120,7 @@ export const SimpleReceiptsTable = ({
                 <TableCell>{receipt.reference || 'N/A'}</TableCell>
                 <TableCell>{formatDate(receipt.date)}</TableCell>
                 <TableCell>
-                  {getInvoiceDisplay(receipt.invoice_id)}
+                  {getInvoiceDisplay(receipt)}
                 </TableCell>
                 <TableCell>
                   {formatAmount(receipt.amount)}
