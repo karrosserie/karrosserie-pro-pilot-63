@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { User, Car, Calendar, FileText, History, MessageCircle, Key, Pen, Package, Check } from 'lucide-react';
 import { Dossier, STATUS_CONFIG } from '@/types/atelier';
 
 interface DossierDetailModalProps {
@@ -23,7 +24,8 @@ export const DossierDetailModal = ({ open, onOpenChange, dossier, onAction }: Do
           <DialogTitle className="flex items-center gap-3">
             <span className="text-2xl font-bold">{dossier.immatriculation}</span>
             <Badge className={status.color}>
-              {status.icon} {status.label}
+              <status.Icon className="h-3 w-3 mr-1" />
+              {status.label}
             </Badge>
           </DialogTitle>
         </DialogHeader>
@@ -31,7 +33,10 @@ export const DossierDetailModal = ({ open, onOpenChange, dossier, onAction }: Do
         <div className="space-y-4">
           {/* Client Info */}
           <Card className="p-4">
-            <h3 className="font-semibold mb-3">👤 Client</h3>
+            <h3 className="font-semibold mb-3 flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Client
+            </h3>
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
                 <span className="text-muted-foreground">Nom:</span>{' '}
@@ -52,7 +57,10 @@ export const DossierDetailModal = ({ open, onOpenChange, dossier, onAction }: Do
 
           {/* Vehicle Info */}
           <Card className="p-4">
-            <h3 className="font-semibold mb-3">🚗 Véhicule</h3>
+            <h3 className="font-semibold mb-3 flex items-center gap-2">
+              <Car className="h-4 w-4" />
+              Véhicule
+            </h3>
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
                 <span className="text-muted-foreground">Immatriculation:</span>{' '}
@@ -81,7 +89,10 @@ export const DossierDetailModal = ({ open, onOpenChange, dossier, onAction }: Do
 
           {/* Dates */}
           <Card className="p-4">
-            <h3 className="font-semibold mb-3">📅 Dates</h3>
+            <h3 className="font-semibold mb-3 flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Dates
+            </h3>
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
                 <span className="text-muted-foreground">Entrée:</span>{' '}
@@ -105,7 +116,10 @@ export const DossierDetailModal = ({ open, onOpenChange, dossier, onAction }: Do
           {/* Notes */}
           {dossier.notes && (
             <Card className="p-4">
-              <h3 className="font-semibold mb-2">📝 Notes</h3>
+              <h3 className="font-semibold mb-2 flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Notes
+              </h3>
               <p className="text-sm">{dossier.notes}</p>
             </Card>
           )}
@@ -113,7 +127,10 @@ export const DossierDetailModal = ({ open, onOpenChange, dossier, onAction }: Do
           {/* History */}
           {dossier.historique && dossier.historique.length > 0 && (
             <Card className="p-4">
-              <h3 className="font-semibold mb-3">📜 Historique</h3>
+              <h3 className="font-semibold mb-3 flex items-center gap-2">
+                <History className="h-4 w-4" />
+                Historique
+              </h3>
               <div className="space-y-2">
                 {dossier.historique.map((h, i) => (
                   <div key={i} className="flex items-center gap-3 text-sm border-l-2 border-muted pl-3">
@@ -132,28 +149,33 @@ export const DossierDetailModal = ({ open, onOpenChange, dossier, onAction }: Do
             {dossier.status === 'termine' && (
               <>
                 <Button variant="outline" onClick={() => onAction('whatsapp_rdv', dossier)}>
-                  💬 WhatsApp
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  WhatsApp
                 </Button>
                 <Button variant="outline" onClick={() => onAction('planifier_rdv', dossier)}>
-                  🔑 Planifier RDV
+                  <Key className="h-4 w-4 mr-2" />
+                  Planifier RDV
                 </Button>
               </>
             )}
             {dossier.status === 'rdv_restitution' && (
               <Button 
-                className="bg-gradient-to-r from-karrosserie-blue to-purple-600"
+                className="bg-karrosserie-blue hover:bg-karrosserie-blue/90"
                 onClick={() => onAction('signer_pv', dossier)}
               >
-                ✍️ Signer PV réception
+                <Pen className="h-4 w-4 mr-2" />
+                Signer PV réception
               </Button>
             )}
             {dossier.status === 'en_reparation' && (
               <>
                 <Button variant="outline" onClick={() => onAction('attente_pieces', dossier)}>
-                  📦 Attente pièces
+                  <Package className="h-4 w-4 mr-2" />
+                  Attente pièces
                 </Button>
                 <Button variant="outline" onClick={() => onAction('terminer', dossier)}>
-                  ✅ Terminer
+                  <Check className="h-4 w-4 mr-2" />
+                  Terminer
                 </Button>
               </>
             )}

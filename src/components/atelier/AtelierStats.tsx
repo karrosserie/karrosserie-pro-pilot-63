@@ -12,7 +12,7 @@ export const AtelierStats = ({ dossiers, allAlerts }: AtelierStatsProps) => {
     .slice(0, 5);
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
       {visibleStatuses.map(([k, v]) => {
         const count = dossiers.filter(d => d.status === k).length;
         const hasUrgentAlert = allAlerts.some(
@@ -22,14 +22,14 @@ export const AtelierStats = ({ dossiers, allAlerts }: AtelierStatsProps) => {
         return (
           <Card 
             key={k} 
-            className={`p-3 ${hasUrgentAlert ? 'ring-2 ring-red-400' : ''}`}
+            className={`p-3 ${hasUrgentAlert ? 'ring-2 ring-destructive' : ''}`}
           >
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs text-muted-foreground truncate">{v.label}</p>
                 <p className="text-2xl font-bold">{count}</p>
               </div>
-              <span className="text-2xl">{v.icon}</span>
+              <v.Icon className="h-6 w-6 text-muted-foreground" />
             </div>
           </Card>
         );

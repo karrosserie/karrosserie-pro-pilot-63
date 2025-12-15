@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Car } from 'lucide-react';
 
 interface NewDossierModalProps {
   open: boolean;
@@ -49,7 +50,8 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit }: NewDossierModa
       <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            🚗 Nouveau dossier
+            <Car className="h-5 w-5" />
+            Nouveau dossier
           </DialogTitle>
         </DialogHeader>
 
@@ -150,7 +152,7 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit }: NewDossierModa
           <Button
             onClick={handleSubmit}
             disabled={!formData.nom || !formData.immatriculation}
-            className="flex-1 bg-gradient-to-r from-karrosserie-orange to-orange-500"
+            className="flex-1 bg-karrosserie-orange hover:bg-karrosserie-orange/90"
           >
             Créer
           </Button>
