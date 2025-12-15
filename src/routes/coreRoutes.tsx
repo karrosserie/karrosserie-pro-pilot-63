@@ -18,10 +18,21 @@ import CreationDossierJudiciaire from "@/pages/CreationDossierJudiciaire";
 import DepotDossier from "@/pages/DepotDossier";
 import Welcome from "@/pages/Welcome";
 import TermsAndConditions from "@/pages/TermsAndConditions";
+import Dashboard from "@/pages/Dashboard";
 
 import GestionTemplates from "@/pages/GestionTemplates";
 
 export const coreRoutes = [
+  {
+    path: "/dashboard",
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <Dashboard />
+        </AppLayout>
+      </ProtectedRoute>
+    )
+  },
   {
     path: "/",
     element: (
