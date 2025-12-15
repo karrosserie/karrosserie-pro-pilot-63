@@ -1,4 +1,5 @@
 
+import { useCallback } from 'react';
 import { Invoice } from '@/services/supabase/invoices';
 import { InvoiceRepairItem, InvoicePartItem, InvoiceDiscountItem } from '../types';
 import { safeNumber } from '@/lib/utils';
@@ -18,15 +19,7 @@ export const useInvoiceDataPreparation = ({
   parts,
   discounts
 }: UseInvoiceDataPreparationProps) => {
-  const prepareSubmitData = () => {
-    console.log('Preparing submit data with:', {
-      formData,
-      claimNumber,
-      repairs,
-      parts,
-      discounts
-    });
-
+  const prepareSubmitData = useCallback(() => {
     // Normaliser les réparations avant sauvegarde
     const normalizedRepairs = (repairs || []).map(repair => ({
       ...repair,
@@ -68,9 +61,8 @@ export const useInvoiceDataPreparation = ({
       incident_date: (formData as any).incident_date || null
     };
 
-    console.log('Final submit data:', submitData);
     return submitData;
-  };
+  }, [formData, claimNumber, repairs, parts, discounts]);
 
   return {
     prepareSubmitData

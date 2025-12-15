@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Invoice } from '@/services/supabase/invoices';
 import { InvoiceRepairItem, InvoicePartItem, InvoiceDiscountItem } from '../types';
 import { parseInvoiceNotes, generateNextInvoiceNumber } from '../utils/invoiceFormUtils';
@@ -23,16 +23,21 @@ export const useInvoiceFormInitialization = ({
   setParts,
   setDiscounts
 }: UseInvoiceFormInitializationProps) => {
+  const initializedRef = useRef(false);
+  const invoiceIdRef = useRef<string | null>(null);
+
   useEffect(() => {
+    // Éviter la ré-initialisation si déjà fait pour la même facture
+    const currentInvoiceId = invoice?.id || 'new';
+    if (initializedRef.current && invoiceIdRef.current === currentInvoiceId) {
+      return;
+    }
+
     const initializeForm = async () => {
-      console.log('Invoice form initializing with invoice:', invoice);
-      console.log('PrefillData:', prefillData);
-      
       // Vérifier si c'est une facture existante (avec un ID) ou une nouvelle facture
       const isExistingInvoice = invoice && invoice.id;
       
       if (isExistingInvoice) {
-        console.log('Existing invoice, setting form data with reference:', invoice.reference);
         setFormData(prev => ({
           reference: invoice.reference,
           client_id: invoice.client_id,
@@ -48,14 +53,6 @@ export const useInvoiceFormInitialization = ({
           expert_name: (invoice as any).expert_name || '',
           incident_date: (invoice as any).incident_date || ''
         }));
-        
-        // Pour une facture existante, récupérer les données directement depuis les champs de la facture
-        console.log('Loading existing invoice data:', {
-          claim_number: invoice.claim_number,
-          repairs_data: invoice.repairs_data,
-          parts_data: invoice.parts_data,
-          discounts_data: invoice.discounts_data
-        });
 
         setClaimNumber(invoice.claim_number || '');
         
@@ -92,7 +89,6 @@ export const useInvoiceFormInitialization = ({
             }
           }
         } catch (error) {
-          console.error('Error parsing invoice data:', error);
           // En cas d'erreur, essayer de parser depuis les notes comme fallback
           if (invoice.notes) {
             const parsedData = parseInvoiceNotes(invoice.notes);
@@ -102,17 +98,10 @@ export const useInvoiceFormInitialization = ({
           }
         }
 
-        console.log('Setting parsed data:', {
-          repairs: repairsData,
-          parts: partsData,
-          discounts: discountsData
-        });
-
         setRepairs(repairsData);
         setParts(partsData);
         setDiscounts(discountsData);
       } else {
-        console.log('New invoice or prefilled data, generating number...');
         // Pour une nouvelle facture, générer automatiquement le numéro
         const today = new Date().toISOString().split('T')[0];
         const dueDate = new Date();
@@ -121,7 +110,6 @@ export const useInvoiceFormInitialization = ({
         
         try {
           const nextNumber = await generateNextInvoiceNumber();
-          console.log('Generated invoice number:', nextNumber);
           
            setFormData(prev => ({
              reference: nextNumber,
@@ -160,7 +148,7 @@ export const useInvoiceFormInitialization = ({
                  repairsData = dataSource.repairs_data;
                }
              } catch (error) {
-               console.error('Erreur lors du parsing des repairs_data:', error);
+               // Silent fail
              }
            }
 
@@ -173,7 +161,7 @@ export const useInvoiceFormInitialization = ({
                  partsData = dataSource.parts_data;
                }
              } catch (error) {
-               console.error('Erreur lors du parsing des parts_data:', error);
+               // Silent fail
              }
            }
 
@@ -186,26 +174,14 @@ export const useInvoiceFormInitialization = ({
                  discountsData = dataSource.discounts_data;
                }
              } catch (error) {
-               console.error('Erreur lors du parsing des discounts_data:', error);
+               // Silent fail
              }
            }
 
            setRepairs(repairsData);
            setParts(partsData);
            setDiscounts(discountsData);
-           
-           console.log('Initialized form with data from repair order:', {
-             client_id: prefillData?.client_id,
-             vehicle_id: prefillData?.vehicle_id,
-             claim_number: (invoice as any)?.claim_number || prefillData?.claim_number,
-             repairs: repairsData,
-             parts: partsData,
-             discounts: discountsData
-           });
-          
-          console.log('Form data set with generated number:', nextNumber);
         } catch (error) {
-          console.error('Erreur lors de la génération du numéro de facture:', error);
            setFormData(prev => ({
              reference: '1',
              client_id: invoice?.client_id || prefillData?.client_id || '',
@@ -238,31 +214,33 @@ export const useInvoiceFormInitialization = ({
              try {
                repairsData = typeof dataSource.repairs_data === 'string' ? JSON.parse(dataSource.repairs_data) : dataSource.repairs_data;
              } catch (err) {
-               console.error('Erreur parsing repairs_data fallback:', err);
+               // Silent fail
              }
            }
            if (dataSource?.parts_data) {
              try {
                partsData = typeof dataSource.parts_data === 'string' ? JSON.parse(dataSource.parts_data) : dataSource.parts_data;
              } catch (err) {
-               console.error('Erreur parsing parts_data fallback:', err);
+               // Silent fail
              }
            }
            if (dataSource?.discounts_data) {
              try {
                discountsData = typeof dataSource.discounts_data === 'string' ? JSON.parse(dataSource.discounts_data) : dataSource.discounts_data;
              } catch (err) {
-               console.error('Erreur parsing discounts_data fallback:', err);
+               // Silent fail
              }
            }
 
            setRepairs(repairsData);
            setParts(partsData);
            setDiscounts(discountsData);
-           
-           console.log('Set fallback form data with prefillData support');
         }
       }
+
+      // Marquer comme initialisé
+      initializedRef.current = true;
+      invoiceIdRef.current = currentInvoiceId;
     };
 
     initializeForm();

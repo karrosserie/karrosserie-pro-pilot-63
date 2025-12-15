@@ -60,12 +60,11 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
         if (cachedInvoices) {
           const updatedInvoice = cachedInvoices.find(i => i.id === currentInvoice.id);
           if (updatedInvoice) {
-            console.log('Invoice updated from cache:', updatedInvoice);
             setCurrentInvoice(updatedInvoice);
           }
         }
       } catch (error) {
-        console.error('Error refreshing invoice data:', error);
+        // Silent fail
       }
     };
 
@@ -128,7 +127,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
           setReceiptsData(receipts);
         }
       } catch (error) {
-        console.error('Erreur lors de la récupération des données:', error);
+        // Silent fail
       }
     };
 
@@ -252,7 +251,6 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
           description: `La facture ${currentInvoice.reference} a été supprimée avec succès.`,
         });
       } catch (error: any) {
-        console.error('Error deleting invoice:', error);
         toast({
           title: "Erreur",
           description: "Impossible de supprimer la facture.",

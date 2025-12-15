@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Label } from '@/components/ui/label';
 import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,38 +31,45 @@ export const InvoiceAssignmentSection = ({
 }: InvoiceAssignmentSectionProps) => {
   const { vehicles, isLoading: isLoadingVehicles } = useVehicles();
 
-  const handleSkipVehicleToggle = (checked: boolean) => {
+  const handleSkipVehicleToggle = useCallback((checked: boolean) => {
     onSkipVehicleChange?.(checked);
     if (checked) {
       onFieldChange('vehicle_id', null);
     }
-  };
+  }, [onSkipVehicleChange, onFieldChange]);
   
   // Filtrer les véhicules pour le client sélectionné
-  const clientVehicles = vehicles?.filter(vehicle => 
-    vehicle.client_id === formData.client_id
-  ) || [];
+  const clientVehicles = useMemo(() => 
+    vehicles?.filter(vehicle => vehicle.client_id === formData.client_id) || [],
+    [vehicles, formData.client_id]
+  );
 
-  const handleClientChange = (clientId: string) => {
+  const handleClientChange = useCallback((clientId: string) => {
     onFieldChange('client_id', clientId);
     // Réinitialiser le véhicule quand on change de client
     onFieldChange('vehicle_id', null);
-  };
+  }, [onFieldChange]);
 
-  const handleVehicleChange = (vehicleId: string) => {
+  const handleVehicleChange = useCallback((vehicleId: string) => {
     onFieldChange('vehicle_id', vehicleId);
-  };
+  }, [onFieldChange]);
 
   // Préparer les options pour SearchableSelect
-  const clientSelectOptions = (clientOptions || []).map(client => ({
-    value: client.id,
-    label: `${client.first_name} ${client.last_name}`
-  }));
+  const clientSelectOptions = useMemo(() => 
+    (clientOptions || []).map(client => ({
+      value: client.id,
+      label: `${client.first_name} ${client.last_name}`
+    })),
+    [clientOptions]
+  );
 
-  const vehicleSelectOptions = clientVehicles.map(vehicle => ({
-    value: vehicle.id,
-    label: `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate}`
-  }));
+  const vehicleSelectOptions = useMemo(() => 
+    clientVehicles.map(vehicle => ({
+      value: vehicle.id,
+      label: `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate}`
+    })),
+    [clientVehicles]
+  );
 
   return (
     <Card>
