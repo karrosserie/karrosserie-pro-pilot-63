@@ -37,28 +37,44 @@ export function Combobox({
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
   const [inputValue, setInputValue] = React.useState(value)
+  const [debouncedInputValue, setDebouncedInputValue] = React.useState(value)
+  const onChangeRef = React.useRef(onChange)
+  onChangeRef.current = onChange
 
   React.useEffect(() => {
     setInputValue(value)
+    setDebouncedInputValue(value)
   }, [value])
 
-  const handleSelect = (selectedValue: string) => {
-    onChange(selectedValue)
-    setInputValue(selectedValue)
-    setOpen(false)
-  }
+  // Debounce filtering for performance
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedInputValue(inputValue)
+    }, 150)
+    return () => clearTimeout(timer)
+  }, [inputValue])
 
-  const handleInputChange = (newValue: string) => {
+  const handleSelect = React.useCallback((selectedValue: string) => {
+    onChangeRef.current(selectedValue)
+    setInputValue(selectedValue)
+    setDebouncedInputValue(selectedValue)
+    setOpen(false)
+  }, [])
+
+  const handleInputChange = React.useCallback((newValue: string) => {
     setInputValue(newValue)
-    onChange(newValue)
+    onChangeRef.current(newValue)
     // Ouvrir automatiquement le popover quand l'utilisateur tape
-    if (newValue.length > 0 && !open) {
+    if (newValue.length > 0) {
       setOpen(true)
     }
-  }
+  }, [])
 
-  const filteredOptions = options.filter((option) =>
-    option.toLowerCase().includes(inputValue.toLowerCase())
+  const filteredOptions = React.useMemo(() => 
+    options.filter((option) =>
+      option.toLowerCase().includes(debouncedInputValue.toLowerCase())
+    ),
+    [options, debouncedInputValue]
   )
 
   const showOptions = filteredOptions.length > 0

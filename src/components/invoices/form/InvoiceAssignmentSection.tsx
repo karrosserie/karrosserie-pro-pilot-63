@@ -38,26 +38,18 @@ export const InvoiceAssignmentSection = ({
     }
   };
   
-  console.log('InvoiceAssignmentSection - clientOptions:', clientOptions);
-  console.log('InvoiceAssignmentSection - formData.client_id:', formData.client_id);
-  
   // Filtrer les véhicules pour le client sélectionné
   const clientVehicles = vehicles?.filter(vehicle => 
     vehicle.client_id === formData.client_id
   ) || [];
 
-  console.log('InvoiceAssignmentSection - clientVehicles:', clientVehicles);
-
   const handleClientChange = (clientId: string) => {
-    console.log('Client changed to:', clientId);
-    console.log('Calling onFieldChange with client_id:', clientId);
     onFieldChange('client_id', clientId);
     // Réinitialiser le véhicule quand on change de client
     onFieldChange('vehicle_id', null);
   };
 
   const handleVehicleChange = (vehicleId: string) => {
-    console.log('Vehicle changed to:', vehicleId);
     onFieldChange('vehicle_id', vehicleId);
   };
 

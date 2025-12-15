@@ -41,7 +41,8 @@ export function useClients() {
     queryFn: async () => {
       const data = await clientsService.getAll();
       return data?.map(transformClientFromDB) || [];
-    }
+    },
+    staleTime: 10000, // 10 secondes avant refetch
   });
   
   const createClient = useMutation({

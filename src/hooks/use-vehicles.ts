@@ -49,7 +49,8 @@ export function useVehicles() {
     queryFn: async () => {
       const data = await vehiclesService.getAll();
       return data as Vehicle[];
-    }
+    },
+    staleTime: 10000, // 10 secondes avant refetch
   });
 
   const createVehicle = useMutation({

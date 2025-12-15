@@ -67,11 +67,6 @@ const Invoices = () => {
   const isMobile = useIsMobile();
   const { sendRelance } = useSendRelance();
   
-  console.log('=== DONNÉES FACTURES DANS LE COMPOSANT ===');
-  console.log('invoices:', invoices);
-  console.log('Premier invoice (si existant):', invoices?.[0]);
-  console.log('Premier invoice.clients:', invoices?.[0]?.clients);
-  
   const filteredInvoices = sortedInvoices?.filter(invoice => {
     const matchesSearch = invoice.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (invoice.clients && `${invoice.clients.first_name} ${invoice.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 
 interface UseAmountInputProps {
   value: number | string;
@@ -9,6 +9,10 @@ interface UseAmountInputProps {
 export const useAmountInput = ({ value, onChange, defaultValue = 0 }: UseAmountInputProps) => {
   const [displayValue, setDisplayValue] = useState<string>(String(value || defaultValue));
   const [isFocused, setIsFocused] = useState(false);
+  
+  // Use ref to avoid re-renders when onChange changes
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
 
   const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
     setIsFocused(true);
@@ -26,12 +30,12 @@ export const useAmountInput = ({ value, onChange, defaultValue = 0 }: UseAmountI
     if (currentValue === '' || currentValue === null || currentValue === undefined) {
       const finalValue = defaultValue;
       setDisplayValue(String(finalValue));
-      onChange(finalValue);
+      onChangeRef.current(finalValue);
     } else {
       const numValue = parseFloat(currentValue) || 0;
-      onChange(numValue);
+      onChangeRef.current(numValue);
     }
-  }, [defaultValue, onChange]);
+  }, [defaultValue]);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
@@ -41,10 +45,10 @@ export const useAmountInput = ({ value, onChange, defaultValue = 0 }: UseAmountI
     if (newValue !== '' && newValue !== null && newValue !== undefined) {
       const numValue = parseFloat(newValue);
       if (!isNaN(numValue)) {
-        onChange(numValue);
+        onChangeRef.current(numValue);
       }
     }
-  }, [onChange]);
+  }, []);
 
   // Mettre à jour l'affichage quand la valeur externe change (mais pas pendant le focus)
   const updateDisplayValue = useCallback((newValue: number | string) => {
