@@ -55,38 +55,46 @@ export const EmployeePerformanceTable = ({ employees }: EmployeePerformanceTable
         Détail par Employé
       </h2>
       
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="bg-muted/50">
-            <tr>
-              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Employé</th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Métier</th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">H. Achetées</th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">H. Vendues</th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Productivité</th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Véhicules</th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Performance</th>
-            </tr>
-          </thead>
-          <tbody>
-            {employees.map((employee) => (
-              <tr key={employee.id} className="border-b border-border hover:bg-muted/30">
-                <td className="px-3 py-2 font-medium">{employee.name}</td>
-                <td className="px-3 py-2"><TradeBadge trade={employee.trade} /></td>
-                <td className="px-3 py-2">{employee.boughtHours}h</td>
-                <td className="px-3 py-2">{employee.soldHours}h</td>
-                <td className="px-3 py-2">
-                  <span className={`font-medium ${employee.productivity >= 100 ? 'text-green-600' : 'text-red-600'}`}>
-                    {employee.productivity}%
-                  </span>
-                </td>
-                <td className="px-3 py-2">{employee.vehiclesCount}</td>
-                <td className="px-3 py-2"><PerformanceBadge level={performanceLabels[employee.performance] || 'Correct'} /></td>
+      {employees.length === 0 ? (
+        <div className="text-center py-8 text-muted-foreground">
+          <Users className="w-10 h-10 mx-auto mb-3 opacity-40" />
+          <p className="text-sm">Aucun employé productif trouvé pour cette entreprise</p>
+          <p className="text-xs mt-1">Les rôles administratifs (Propriétaire, Gestionnaire) ne sont pas affichés ici</p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50">
+              <tr>
+                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Employé</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Métier</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">H. Achetées</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">H. Vendues</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Productivité</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Véhicules</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase">Performance</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {employees.map((employee) => (
+                <tr key={employee.id} className="border-b border-border hover:bg-muted/30">
+                  <td className="px-3 py-2 font-medium">{employee.name}</td>
+                  <td className="px-3 py-2"><TradeBadge trade={employee.trade} /></td>
+                  <td className="px-3 py-2">{employee.boughtHours}h</td>
+                  <td className="px-3 py-2">{employee.soldHours}h</td>
+                  <td className="px-3 py-2">
+                    <span className={`font-medium ${employee.productivity >= 100 ? 'text-green-600' : 'text-red-600'}`}>
+                      {employee.productivity}%
+                    </span>
+                  </td>
+                  <td className="px-3 py-2">{employee.vehiclesCount}</td>
+                  <td className="px-3 py-2"><PerformanceBadge level={performanceLabels[employee.performance] || 'Correct'} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
