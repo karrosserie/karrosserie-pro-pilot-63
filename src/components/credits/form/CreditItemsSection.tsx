@@ -1,11 +1,12 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AmountInput } from '@/components/ui/amount-input';
+import { Label } from '@/components/ui/label';
 import { Package, Plus, Trash } from 'lucide-react';
 import { CreditItem } from './types';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface CreditItemsSectionProps {
   items: CreditItem[];
@@ -22,6 +23,86 @@ export const CreditItemsSection = ({
   onRemoveItem,
   readOnly = false
 }: CreditItemsSectionProps) => {
+  const isMobile = useIsMobile();
+
+  // Mobile card component for credit items
+  const CreditItemMobileCard = ({ item }: { item: CreditItem }) => (
+    <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
+      <div>
+        <Label className="text-xs text-muted-foreground">Désignation</Label>
+        <Input
+          value={item.description}
+          onChange={(e) => !readOnly && onUpdateItem(item.id, 'description', e.target.value)}
+          placeholder="Désignation de l'article"
+          readOnly={readOnly}
+          className={readOnly ? "bg-muted cursor-not-allowed" : ""}
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <Label className="text-xs text-muted-foreground">Qté</Label>
+          <Input
+            type="number"
+            value={item.quantity}
+            onChange={(e) => !readOnly && onUpdateItem(item.id, 'quantity', parseFloat(e.target.value) || 0)}
+            min="0"
+            step="0.01"
+            readOnly={readOnly}
+            className={readOnly ? "bg-muted cursor-not-allowed" : ""}
+          />
+        </div>
+        <div>
+          <Label className="text-xs text-muted-foreground">Prix Unitaire (€)</Label>
+          <AmountInput
+            value={item.unit_price}
+            onChange={(value) => !readOnly && onUpdateItem(item.id, 'unit_price', value)}
+            readOnly={readOnly}
+            className={readOnly ? "bg-muted cursor-not-allowed" : ""}
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <Label className="text-xs text-muted-foreground">Remise (%)</Label>
+          <AmountInput
+            value={item.discount}
+            onChange={(value) => !readOnly && onUpdateItem(item.id, 'discount', value)}
+            readOnly={readOnly}
+            className={readOnly ? "bg-muted cursor-not-allowed" : ""}
+          />
+        </div>
+        <div>
+          <Label className="text-xs text-muted-foreground">TVA (%)</Label>
+          <Input
+            type="number"
+            value={item.vat}
+            onChange={(e) => !readOnly && onUpdateItem(item.id, 'vat', parseFloat(e.target.value) || 0)}
+            min="0"
+            step="0.1"
+            readOnly={readOnly}
+            className={readOnly ? "bg-muted cursor-not-allowed" : ""}
+          />
+        </div>
+      </div>
+      <div className="flex items-center justify-between pt-2 border-t">
+        <div className="font-medium text-lg">
+          Total : {item.total.toFixed(2)} €
+        </div>
+        {!readOnly && (
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => onRemoveItem(item.id)}
+            className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+          >
+            <Trash className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -35,13 +116,21 @@ export const CreditItemsSection = ({
       </CardHeader>
       <CardContent className="space-y-4">
         {items.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-muted-foreground">
             Aucun article ajouté
           </div>
+        ) : isMobile ? (
+          // Mobile: Card layout
+          <div className="space-y-4">
+            {items.map((item) => (
+              <CreditItemMobileCard key={item.id} item={item} />
+            ))}
+          </div>
         ) : (
+          // Desktop: Grid layout
           <div className="space-y-2">
             {/* Header */}
-            <div className="grid gap-2 text-sm font-medium text-gray-700 pb-2 border-b" style={{ gridTemplateColumns: readOnly ? '4fr 1fr 1.5fr 1fr 1fr 1.5fr' : '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
+            <div className="grid gap-2 text-sm font-medium text-muted-foreground pb-2 border-b" style={{ gridTemplateColumns: readOnly ? '4fr 1fr 1.5fr 1fr 1fr 1.5fr' : '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
               <div>Désignation</div>
               <div>Qté</div>
               <div>Prix Unitaire (€)</div>
@@ -59,7 +148,7 @@ export const CreditItemsSection = ({
                   onChange={(e) => !readOnly && onUpdateItem(item.id, 'description', e.target.value)}
                   placeholder="Désignation de l'article"
                   readOnly={readOnly}
-                  className={readOnly ? "bg-gray-50 cursor-not-allowed" : ""}
+                  className={readOnly ? "bg-muted cursor-not-allowed" : ""}
                 />
                 <Input
                   type="number"
@@ -68,19 +157,19 @@ export const CreditItemsSection = ({
                   min="0"
                   step="0.01"
                   readOnly={readOnly}
-                  className={readOnly ? "bg-gray-50 cursor-not-allowed" : ""}
+                  className={readOnly ? "bg-muted cursor-not-allowed" : ""}
                 />
                 <AmountInput
                   value={item.unit_price}
                   onChange={(value) => !readOnly && onUpdateItem(item.id, 'unit_price', value)}
                   readOnly={readOnly}
-                  className={readOnly ? "bg-gray-50 cursor-not-allowed" : ""}
+                  className={readOnly ? "bg-muted cursor-not-allowed" : ""}
                 />
                 <AmountInput
                   value={item.discount}
                   onChange={(value) => !readOnly && onUpdateItem(item.id, 'discount', value)}
                   readOnly={readOnly}
-                  className={readOnly ? "bg-gray-50 cursor-not-allowed" : ""}
+                  className={readOnly ? "bg-muted cursor-not-allowed" : ""}
                 />
                 <Input
                   type="number"
@@ -89,7 +178,7 @@ export const CreditItemsSection = ({
                   min="0"
                   step="0.1"
                   readOnly={readOnly}
-                  className={readOnly ? "bg-gray-50 cursor-not-allowed" : ""}
+                  className={readOnly ? "bg-muted cursor-not-allowed" : ""}
                 />
                 <div className="text-right font-medium">
                   {item.total.toFixed(2)} €
@@ -119,7 +208,7 @@ export const CreditItemsSection = ({
               className="w-auto"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Ajouter un article
+              {isMobile ? 'Ajouter' : 'Ajouter un article'}
             </Button>
           </div>
         )}
