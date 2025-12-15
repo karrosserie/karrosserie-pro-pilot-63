@@ -1,7 +1,10 @@
 import { LucideIcon, Car, ClipboardList, Calendar, CheckCircle, Wrench, Package, CircleCheck, Key, FolderArchive, AlertTriangle, Siren, AlertCircle, Clock, Phone } from 'lucide-react';
 
 export interface Dossier {
-  id: number;
+  id: string;
+  repairOrderId?: string;
+  clientId?: string;
+  vehicleId?: string;
   nom: string;
   prenom: string;
   immatriculation: string;
