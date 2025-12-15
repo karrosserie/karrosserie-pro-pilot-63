@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+
 import { Invoice } from '@/services/supabase/invoices';
 import { calculateGlobalTotals } from './hooks/useInvoiceCalculations';
 import { useInvoiceFormData } from './hooks/useInvoiceFormData';
@@ -64,10 +64,6 @@ export const useInvoiceFormLogic = ({ invoice, prefillData }: UseInvoiceFormLogi
     setDiscounts
   });
 
-  // Log formData changes
-  useEffect(() => {
-    console.log('FormData updated:', formData);
-  }, [formData]);
 
   return {
     formData,

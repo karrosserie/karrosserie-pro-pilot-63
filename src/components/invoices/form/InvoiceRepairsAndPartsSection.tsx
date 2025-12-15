@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -27,8 +27,8 @@ export const InvoiceRepairsAndPartsSection = ({
 }: InvoiceRepairsAndPartsSectionProps) => {
   const { data: partDesignations = [] } = useAutomotivePartNames();
 
-  // Repair functions
-  const addRepair = () => {
+  // Repair functions - memoized
+  const addRepair = useCallback(() => {
     if (isReadOnly) return;
     const newRepair: InvoiceRepairItem = {
       id: `repair_${Date.now()}`,
@@ -40,14 +40,14 @@ export const InvoiceRepairsAndPartsSection = ({
       total: 0
     };
     onRepairsChange([...repairs, newRepair]);
-  };
+  }, [isReadOnly, repairs, onRepairsChange]);
 
-  const removeRepair = (id: string) => {
+  const removeRepair = useCallback((id: string) => {
     if (isReadOnly) return;
     onRepairsChange(repairs.filter(repair => repair.id !== id));
-  };
+  }, [isReadOnly, repairs, onRepairsChange]);
 
-  const updateRepair = (id: string, field: keyof InvoiceRepairItem, value: string | number) => {
+  const updateRepair = useCallback((id: string, field: keyof InvoiceRepairItem, value: string | number) => {
     if (isReadOnly) return;
     
     // Si c'est un item temporaire, le convertir en item réel d'abord
@@ -86,10 +86,10 @@ export const InvoiceRepairsAndPartsSection = ({
       return repair;
     });
     onRepairsChange(updatedRepairs);
-  };
+  }, [isReadOnly, repairs, onRepairsChange]);
 
-  // Part functions
-  const addPart = () => {
+  // Part functions - memoized
+  const addPart = useCallback(() => {
     if (isReadOnly) return;
     const newPart: InvoicePartItem = {
       id: `part_${Date.now()}`,
@@ -101,14 +101,14 @@ export const InvoiceRepairsAndPartsSection = ({
       total: 0
     };
     onPartsChange([...parts, newPart]);
-  };
+  }, [isReadOnly, parts, onPartsChange]);
 
-  const removePart = (id: string) => {
+  const removePart = useCallback((id: string) => {
     if (isReadOnly) return;
     onPartsChange(parts.filter(part => part.id !== id));
-  };
+  }, [isReadOnly, parts, onPartsChange]);
 
-  const updatePart = (id: string, field: keyof InvoicePartItem, value: string | number) => {
+  const updatePart = useCallback((id: string, field: keyof InvoicePartItem, value: string | number) => {
     if (isReadOnly) return;
     
     // Si c'est un item temporaire, le convertir en item réel d'abord
@@ -147,10 +147,10 @@ export const InvoiceRepairsAndPartsSection = ({
       return part;
     });
     onPartsChange(updatedParts);
-  };
+  }, [isReadOnly, parts, onPartsChange]);
 
-  // Calculate totals
-  const calculateRepairTotals = () => {
+  // Calculate totals - memoized
+  const repairTotals = useMemo(() => {
     const subTotal = repairs.reduce((sum, repair) => sum + (repair.quantity * repair.unitCost), 0);
     const totalVat = repairs.reduce((sum, repair) => {
       const subtotal = repair.quantity * repair.unitCost;
@@ -164,9 +164,9 @@ export const InvoiceRepairsAndPartsSection = ({
     }, 0);
     const total = repairs.reduce((sum, repair) => sum + repair.total, 0);
     return { subTotal, totalVat, totalDiscount, total };
-  };
+  }, [repairs]);
 
-  const calculatePartTotals = () => {
+  const partTotals = useMemo(() => {
     const subTotal = parts.reduce((sum, part) => sum + (part.quantity * part.unitCost), 0);
     const totalVat = parts.reduce((sum, part) => {
       const subtotal = part.quantity * part.unitCost;
@@ -178,20 +178,24 @@ export const InvoiceRepairsAndPartsSection = ({
     }, 0);
     const total = parts.reduce((sum, part) => sum + part.total, 0);
     return { subTotal, totalVat, totalDiscount, total };
-  };
+  }, [parts]);
 
   // Always show at least one empty item for each tab
-  const repairsToShow = repairs.length > 0 ? repairs : [{ id: 'temp_repair', description: '', quantity: 1, unitCost: 0, discount: 0, vat: 20, total: 0 }];
-  const partsToShow = parts.length > 0 ? parts : [{ id: 'temp_part', description: '', quantity: 1, unitCost: 0, discount: 0, vat: 20, total: 0 }];
+  const repairsToShow = useMemo(() => 
+    repairs.length > 0 ? repairs : [{ id: 'temp_repair', description: '', quantity: 1, unitCost: 0, discount: 0, vat: 20, total: 0 }],
+    [repairs]
+  );
+  const partsToShow = useMemo(() => 
+    parts.length > 0 ? parts : [{ id: 'temp_part', description: '', quantity: 1, unitCost: 0, discount: 0, vat: 20, total: 0 }],
+    [parts]
+  );
 
-  const repairTotals = calculateRepairTotals();
-  const partTotals = calculatePartTotals();
-  const combinedTotals = {
+  const combinedTotals = useMemo(() => ({
     subTotal: repairTotals.subTotal + partTotals.subTotal,
     totalVat: repairTotals.totalVat + partTotals.totalVat,
     totalDiscount: repairTotals.totalDiscount + partTotals.totalDiscount,
     total: repairTotals.total + partTotals.total
-  };
+  }), [repairTotals, partTotals]);
 
   return (
     <Card>
