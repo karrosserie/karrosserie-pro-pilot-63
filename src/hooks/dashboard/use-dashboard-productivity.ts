@@ -145,12 +145,12 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
         .gte('date', format(period1Start, 'yyyy-MM-dd'))
         .lte('date', format(period1End, 'yyyy-MM-dd'));
 
-      // 4. Récupérer les OR terminés pour compter les véhicules
+      // 4. Récupérer les OR terminés/signés pour compter les véhicules
       const { data: repairOrdersP2 } = await supabase
         .from('repair_orders')
         .select('vehicle_id')
         .eq('company_id', companyData.id)
-        .eq('status', 'Terminé')
+        .in('status', ['Signé', 'En cours'])
         .gte('created_at', format(period2Start, 'yyyy-MM-dd'))
         .lte('created_at', format(period2End, 'yyyy-MM-dd'));
 
@@ -158,32 +158,48 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
         .from('repair_orders')
         .select('vehicle_id')
         .eq('company_id', companyData.id)
-        .eq('status', 'Terminé')
+        .in('status', ['Signé', 'En cours'])
         .gte('created_at', format(period1Start, 'yyyy-MM-dd'))
         .lte('created_at', format(period1End, 'yyyy-MM-dd'));
 
       // Calculer les heures vendues par métier à partir des factures
       const soldHoursByTrade = { carrosserie: 0, peinture: 0, mecanique: 0 };
       const soldHoursByTradeP1 = { carrosserie: 0, peinture: 0, mecanique: 0 };
+      
+      // Taux horaire moyen pour estimation
+      const avgHourlyRate = (HOURLY_RATES.carrosserie + HOURLY_RATES.peinture + HOURLY_RATES.mecanique) / 3;
 
       // Parse repairs_data des factures pour extraire les heures vendues
+      // Fallback sur le montant si repairs_data est vide
       invoicesP2?.forEach(invoice => {
-        if (invoice.repairs_data && Array.isArray(invoice.repairs_data)) {
+        if (invoice.repairs_data && Array.isArray(invoice.repairs_data) && invoice.repairs_data.length > 0) {
           (invoice.repairs_data as any[]).forEach(repair => {
             const trade = categorizeTrade(repair.designation || repair.description || '');
             const hours = parseFloat(repair.quantity) || 0;
             soldHoursByTrade[trade] += hours;
           });
+        } else if (invoice.amount && invoice.amount > 0) {
+          // Fallback: estimer les heures à partir du montant (répartition égale par défaut)
+          const estimatedHours = invoice.amount / avgHourlyRate;
+          soldHoursByTrade.carrosserie += estimatedHours * 0.5; // 50% carrosserie
+          soldHoursByTrade.peinture += estimatedHours * 0.35;   // 35% peinture
+          soldHoursByTrade.mecanique += estimatedHours * 0.15;  // 15% mécanique
         }
       });
 
       invoicesP1?.forEach(invoice => {
-        if (invoice.repairs_data && Array.isArray(invoice.repairs_data)) {
+        if (invoice.repairs_data && Array.isArray(invoice.repairs_data) && invoice.repairs_data.length > 0) {
           (invoice.repairs_data as any[]).forEach(repair => {
             const trade = categorizeTrade(repair.designation || repair.description || '');
             const hours = parseFloat(repair.quantity) || 0;
             soldHoursByTradeP1[trade] += hours;
           });
+        } else if (invoice.amount && invoice.amount > 0) {
+          // Fallback: estimer les heures à partir du montant
+          const estimatedHours = invoice.amount / avgHourlyRate;
+          soldHoursByTradeP1.carrosserie += estimatedHours * 0.5;
+          soldHoursByTradeP1.peinture += estimatedHours * 0.35;
+          soldHoursByTradeP1.mecanique += estimatedHours * 0.15;
         }
       });
 
@@ -198,11 +214,18 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
         // Déterminer le métier basé sur les qualifications ou le rôle
         let trade: 'carrosserie' | 'peinture' | 'mecanique' = 'carrosserie';
         const quals = (emp.qualifications as string[] || []).map(q => q.toLowerCase()).join(' ');
+        const role = (emp.role || '').toLowerCase();
         
-        if (quals.includes('peinture') || quals.includes('peintre')) {
+        if (quals.includes('peinture') || quals.includes('peintre') || quals.includes('mise en peinture') ||
+            role.includes('peintre')) {
           trade = 'peinture';
-        } else if (quals.includes('mécanicien') || quals.includes('mecanique')) {
+        } else if (quals.includes('mécanicien') || quals.includes('mecanique') || quals.includes('mécanique') ||
+                   role.includes('mécanicien')) {
           trade = 'mecanique';
+        } else if (quals.includes('carrosserie') || quals.includes('carrossier') || quals.includes('tôlerie') ||
+                   quals.includes('débosselage') || quals.includes('remplacement') ||
+                   role.includes('carrossier')) {
+          trade = 'carrosserie';
         }
         
         employeesByTrade[trade]++;
@@ -239,40 +262,7 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
         });
       });
 
-      // Si pas d'employés, créer des données de démonstration
-      if (employeeList.length === 0) {
-        employeesByTrade.carrosserie = 3;
-        employeesByTrade.peinture = 2;
-        employeesByTrade.mecanique = 2;
-        
-        // Données de démo pour chaque métier
-        const demoEmployees = [
-          { name: 'Employé Carrosserie 1', trade: 'carrosserie' as const },
-          { name: 'Employé Carrosserie 2', trade: 'carrosserie' as const },
-          { name: 'Employé Carrosserie 3', trade: 'carrosserie' as const },
-          { name: 'Employé Peinture 1', trade: 'peinture' as const },
-          { name: 'Employé Peinture 2', trade: 'peinture' as const },
-          { name: 'Employé Mécanique 1', trade: 'mecanique' as const },
-          { name: 'Employé Mécanique 2', trade: 'mecanique' as const },
-        ];
-        
-        demoEmployees.forEach((emp, idx) => {
-          const boughtHours = HOURS_PER_MONTH;
-          const soldHours = Math.round(HOURS_PER_MONTH * (1.1 + Math.random() * 0.3));
-          const productivity = (soldHours / boughtHours) * 100;
-          
-          employeeList.push({
-            id: `demo-${idx}`,
-            name: emp.name,
-            trade: emp.trade,
-            boughtHours,
-            soldHours,
-            productivity: Math.round(productivity),
-            vehiclesCount: Math.round(10 + Math.random() * 5),
-            performance: getPerformanceLevel(productivity)
-          });
-        });
-      }
+      // Si pas d'employés, ne pas créer de données fictives
 
       // Calculer les métriques par métier
       const trades: ('carrosserie' | 'peinture' | 'mecanique')[] = ['carrosserie', 'peinture', 'mecanique'];
@@ -316,11 +306,18 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
       
       const globalProductivity = totalBoughtHours > 0 ? (totalSoldHours / totalBoughtHours) * 100 : 0;
       
-      // Évolutions (simplifiées pour la démo)
-      const globalProductivityEvolution = 5.2;
-      const revenueEvolution = 5.9;
-      const vehiclesCount = repairOrdersP2?.length || 89;
-      const vehiclesCountP1 = repairOrdersP1?.length || 77;
+      // Calcul des évolutions réelles
+      const totalSoldHoursP1 = soldHoursByTradeP1.carrosserie + soldHoursByTradeP1.peinture + soldHoursByTradeP1.mecanique;
+      const globalProductivityP1 = totalBoughtHours > 0 ? (totalSoldHoursP1 / totalBoughtHours) * 100 : 0;
+      const globalProductivityEvolution = Math.round((globalProductivity - globalProductivityP1) * 10) / 10;
+      
+      const totalRevenueP1 = (soldHoursByTradeP1.carrosserie * HOURLY_RATES.carrosserie) + 
+                             (soldHoursByTradeP1.peinture * HOURLY_RATES.peinture) + 
+                             (soldHoursByTradeP1.mecanique * HOURLY_RATES.mecanique);
+      const revenueEvolution = totalRevenueP1 > 0 ? Math.round(((totalRevenue - totalRevenueP1) / totalRevenueP1) * 100) : 0;
+      
+      const vehiclesCount = repairOrdersP2?.length || 0;
+      const vehiclesCountP1 = repairOrdersP1?.length || 0;
       const vehiclesEvolution = vehiclesCountP1 > 0 ? 
         Math.round(((vehiclesCount - vehiclesCountP1) / vehiclesCountP1) * 100) : 0;
       
@@ -336,7 +333,7 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
         vehiclesCount,
         vehiclesEvolution,
         grossMargin: Math.round(grossMargin * 10) / 10,
-        grossMarginEvolution: 2.1,
+        grossMarginEvolution: totalRevenueP1 > 0 ? Math.round((grossMargin - ((totalRevenueP1 - estimatedLaborCost) / totalRevenueP1) * 100) * 10) / 10 : 0,
         tradeMetrics,
         employees: employeeList,
         totalBoughtHours,
