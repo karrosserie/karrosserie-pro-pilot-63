@@ -7,11 +7,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Car } from 'lucide-react';
 import { isValidFrenchMobilePhone } from '@/utils/phoneValidation';
+import { AtelierPhotoCapture } from '../AtelierPhotoCapture';
+
+interface CapturedPhoto {
+  blob: Blob;
+  preview: string;
+}
 
 interface NewDossierModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: any, entryPhotos: CapturedPhoto[]) => void;
 }
 
 export const NewDossierModal = ({ open, onOpenChange, onSubmit }: NewDossierModalProps) => {
@@ -28,6 +34,7 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit }: NewDossierModa
     notes: ''
   });
   const [phoneError, setPhoneError] = useState('');
+  const [entryPhotos, setEntryPhotos] = useState<CapturedPhoto[]>([]);
 
   const validatePhone = (phone: string) => {
     if (!phone.trim()) {
@@ -45,7 +52,8 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit }: NewDossierModa
   const handleSubmit = () => {
     if (!formData.nom || !formData.immatriculation) return;
     if (!validatePhone(formData.mobile)) return;
-    onSubmit(formData);
+    if (entryPhotos.length < 2) return;
+    onSubmit(formData, entryPhotos);
     setFormData({
       nom: '',
       prenom: '',
@@ -59,6 +67,7 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit }: NewDossierModa
       notes: ''
     });
     setPhoneError('');
+    setEntryPhotos([]);
     onOpenChange(false);
   };
 
@@ -171,12 +180,20 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit }: NewDossierModa
               rows={2}
             />
           </div>
+
+          {/* Photos d'entrée */}
+          <AtelierPhotoCapture
+            photos={entryPhotos}
+            onPhotosChange={setEntryPhotos}
+            minPhotos={2}
+            title="Photos du véhicule à l'entrée"
+          />
         </div>
 
         <div className="flex gap-3 mt-4">
           <Button
             onClick={handleSubmit}
-            disabled={!formData.nom || !formData.immatriculation || !formData.mobile.trim() || (phoneError !== '')}
+            disabled={!formData.nom || !formData.immatriculation || !formData.mobile.trim() || phoneError !== '' || entryPhotos.length < 2}
             className="flex-1 bg-karrosserie-orange hover:bg-karrosserie-orange/90"
           >
             Créer

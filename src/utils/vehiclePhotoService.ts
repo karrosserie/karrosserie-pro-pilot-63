@@ -24,7 +24,8 @@ export const uploadVehiclePhoto = async (
   employeeId: string,
   companyId: string,
   photoBlob: Blob,
-  description?: string
+  description?: string,
+  photoType: 'workshop' | 'entry' | 'restitution' = 'workshop'
 ): Promise<PhotoResult> => {
   try {
     // Générer un nom de fichier unique
@@ -62,7 +63,7 @@ export const uploadVehiclePhoto = async (
         vehicle_id: vehicleId,
         employee_id: employeeId,
         company_id: companyId,
-        photo_type: 'workshop',
+        photo_type: photoType,
         file_url: publicUrl,
         file_name: fileName,
         description: description
