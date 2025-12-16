@@ -257,9 +257,30 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
           facingMode: 'environment',
           width: { ideal: VIDEO_WIDTH },
           height: { ideal: VIDEO_HEIGHT },
+          // @ts-ignore - focusMode is valid but not in TypeScript types
+          focusMode: { ideal: 'continuous' },
         },
         audio: false,
       });
+      
+      // Apply continuous autofocus after stream starts (better compatibility)
+      try {
+        const track = stream.getVideoTracks()[0];
+        if (track) {
+          const capabilities = track.getCapabilities?.();
+          // @ts-ignore - focusMode exists on capabilities but not in TS types
+          if (capabilities?.focusMode?.includes('continuous')) {
+            await track.applyConstraints({
+              // @ts-ignore
+              advanced: [{ focusMode: 'continuous' }]
+            });
+            console.log('[Scanner] Autofocus continu activé');
+          }
+        }
+      } catch (afError) {
+        // Autofocus not supported, continue without it
+        console.log('[Scanner] Autofocus non supporté sur cet appareil');
+      }
 
       streamRef.current = stream;
 
