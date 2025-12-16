@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { User, Car, Calendar, FileText, History, MessageCircle, Key, Pen, Package, Check, CalendarPlus, HardHat, AlertCircle } from 'lucide-react';
+import { User, Car, Calendar, FileText, History, MessageCircle, Key, Pen, Package, Check, CalendarPlus, HardHat, AlertCircle, UserPlus } from 'lucide-react';
 import { Dossier, STATUS_CONFIG } from '@/types/atelier';
 
 interface DossierDetailModalProps {
@@ -10,9 +10,10 @@ interface DossierDetailModalProps {
   onOpenChange: (open: boolean) => void;
   dossier: Dossier | null;
   onAction: (action: string, dossier: Dossier) => void;
+  onAssigner: (dossier: Dossier) => void;
 }
 
-export const DossierDetailModal = ({ open, onOpenChange, dossier, onAction }: DossierDetailModalProps) => {
+export const DossierDetailModal = ({ open, onOpenChange, dossier, onAction, onAssigner }: DossierDetailModalProps) => {
   if (!dossier) return null;
 
   const status = STATUS_CONFIG[dossier.status];
@@ -71,23 +72,32 @@ export const DossierDetailModal = ({ open, onOpenChange, dossier, onAction }: Do
                     </p>
                   )}
                 </div>
-                {dossier.employeAssigne.statusTache && (
-                  <Badge 
-                    className={`${
-                      dossier.employeAssigne.statusTache === 'En cours' 
-                        ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' 
-                        : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300'
-                    }`}
-                  >
-                    {dossier.employeAssigne.statusTache}
-                  </Badge>
-                )}
+                <div className="flex items-center gap-2">
+                  {dossier.employeAssigne.statusTache && (
+                    <Badge 
+                      className={`${
+                        dossier.employeAssigne.statusTache === 'En cours' 
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' 
+                          : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300'
+                      }`}
+                    >
+                      {dossier.employeAssigne.statusTache}
+                    </Badge>
+                  )}
+                  <Button size="sm" variant="outline" onClick={() => onAssigner(dossier)}>
+                    <UserPlus className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             ) : (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <AlertCircle className="h-4 w-4 text-orange-500" />
-                <span>Aucun employé assigné</span>
-              </div>
+              <Button 
+                variant="outline" 
+                className="w-full text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+                onClick={() => onAssigner(dossier)}
+              >
+                <UserPlus className="h-4 w-4 mr-2" />
+                Assigner un employé
+              </Button>
             )}
           </Card>
 
