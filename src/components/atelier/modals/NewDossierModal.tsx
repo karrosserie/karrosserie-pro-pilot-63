@@ -180,7 +180,7 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit, isSubmitting = f
             {/* Marque */}
             <div>
               <Label>Marque</Label>
-              <Popover open={brandOpen} onOpenChange={setBrandOpen} modal={false}>
+              <Popover open={brandOpen} onOpenChange={setBrandOpen} modal={true}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
@@ -198,34 +198,46 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit, isSubmitting = f
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="w-[200px] p-0"
+                  className="w-[200px] p-0 z-[200]"
                   align="start"
                   onOpenAutoFocus={(e) => e.preventDefault()}
                   onInteractOutside={(e) => e.preventDefault()}
                   onPointerDownOutside={(e) => e.preventDefault()}
+                  style={{ touchAction: 'auto' }}
                 >
-                  <Command>
-                    <CommandInput placeholder="Rechercher..." className="hidden sm:flex" />
-                    <CommandList className="max-h-[200px]" onWheel={(e) => e.stopPropagation()}>
-                      <CommandEmpty>Aucune marque</CommandEmpty>
-                      <CommandGroup>
-                        {carBrands?.map(brand => (
-                          <CommandItem
-                            key={brand.id}
-                            value={brand.name}
-                            onPointerDown={(e) => e.stopPropagation()}
-                            onSelect={() => {
-                              handleBrandChange(brand.id);
-                              setBrandOpen(false);
-                            }}
-                          >
-                            <Check className={cn("mr-2 h-4 w-4", formData.brand_id === brand.id ? "opacity-100" : "opacity-0")} />
-                            {brand.name}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
+                  <div 
+                    onTouchStart={(e) => e.stopPropagation()} 
+                    onTouchMove={(e) => e.stopPropagation()}
+                  >
+                    <Command>
+                      <CommandInput placeholder="Rechercher..." className="hidden sm:flex" />
+                      <CommandList 
+                        className="max-h-[200px]" 
+                        onWheel={(e) => e.stopPropagation()}
+                        style={{ touchAction: 'auto', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}
+                        onTouchStart={(e) => e.stopPropagation()}
+                        onTouchMove={(e) => e.stopPropagation()}
+                      >
+                        <CommandEmpty>Aucune marque</CommandEmpty>
+                        <CommandGroup>
+                          {carBrands?.map(brand => (
+                            <CommandItem
+                              key={brand.id}
+                              value={brand.name}
+                              onPointerDown={(e) => e.stopPropagation()}
+                              onSelect={() => {
+                                handleBrandChange(brand.id);
+                                setBrandOpen(false);
+                              }}
+                            >
+                              <Check className={cn("mr-2 h-4 w-4", formData.brand_id === brand.id ? "opacity-100" : "opacity-0")} />
+                              {brand.name}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </div>
                 </PopoverContent>
               </Popover>
             </div>
@@ -233,7 +245,7 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit, isSubmitting = f
             {/* Modèle */}
             <div>
               <Label>Modèle</Label>
-              <Popover open={modelOpen} onOpenChange={setModelOpen} modal={false}>
+              <Popover open={modelOpen} onOpenChange={setModelOpen} modal={true}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
@@ -251,34 +263,46 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit, isSubmitting = f
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="w-[200px] p-0"
+                  className="w-[200px] p-0 z-[200]"
                   align="start"
                   onOpenAutoFocus={(e) => e.preventDefault()}
                   onInteractOutside={(e) => e.preventDefault()}
                   onPointerDownOutside={(e) => e.preventDefault()}
+                  style={{ touchAction: 'auto' }}
                 >
-                  <Command>
-                    <CommandInput placeholder="Rechercher..." className="hidden sm:flex" />
-                    <CommandList className="max-h-[200px]" onWheel={(e) => e.stopPropagation()}>
-                      <CommandEmpty>Aucun modèle</CommandEmpty>
-                      <CommandGroup>
-                        {carModels?.map(model => (
-                          <CommandItem
-                            key={model.id}
-                            value={model.name}
-                            onPointerDown={(e) => e.stopPropagation()}
-                            onSelect={() => {
-                              setFormData({ ...formData, model_id: model.id });
-                              setModelOpen(false);
-                            }}
-                          >
-                            <Check className={cn("mr-2 h-4 w-4", formData.model_id === model.id ? "opacity-100" : "opacity-0")} />
-                            {model.name}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
+                  <div 
+                    onTouchStart={(e) => e.stopPropagation()} 
+                    onTouchMove={(e) => e.stopPropagation()}
+                  >
+                    <Command>
+                      <CommandInput placeholder="Rechercher..." className="hidden sm:flex" />
+                      <CommandList 
+                        className="max-h-[200px]" 
+                        onWheel={(e) => e.stopPropagation()}
+                        style={{ touchAction: 'auto', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}
+                        onTouchStart={(e) => e.stopPropagation()}
+                        onTouchMove={(e) => e.stopPropagation()}
+                      >
+                        <CommandEmpty>Aucun modèle</CommandEmpty>
+                        <CommandGroup>
+                          {carModels?.map(model => (
+                            <CommandItem
+                              key={model.id}
+                              value={model.name}
+                              onPointerDown={(e) => e.stopPropagation()}
+                              onSelect={() => {
+                                setFormData({ ...formData, model_id: model.id });
+                                setModelOpen(false);
+                              }}
+                            >
+                              <Check className={cn("mr-2 h-4 w-4", formData.model_id === model.id ? "opacity-100" : "opacity-0")} />
+                              {model.name}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </div>
                 </PopoverContent>
               </Popover>
             </div>
