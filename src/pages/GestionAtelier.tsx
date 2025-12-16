@@ -12,6 +12,7 @@ import { RestitutionModal } from '@/components/atelier/modals/RestitutionModal';
 import { DossierDetailModal } from '@/components/atelier/modals/DossierDetailModal';
 import { ExpertiseRdvModal } from '@/components/atelier/modals/ExpertiseRdvModal';
 import { PlanVehicleModal } from '@/components/planning/PlanVehicleModal';
+import { OwnerPlanningTab } from '@/components/planning/OwnerPlanningTab';
 import { Card } from '@/components/ui/card';
 import { Loader2, Search } from 'lucide-react';
 import { toast } from 'sonner';
@@ -373,28 +374,32 @@ const GestionAtelier = () => {
         alertsCount={allAlerts.length}
       />
 
-      <div className="space-y-3">
-        {filteredDossiers.map(d => (
-          <DossierCard
-            key={d.id}
-            dossier={d}
-            alerts={calculateAlerts(d)}
-            onSelect={setSelectedDossier}
-            onAction={handleAction}
-            onAssigner={(dossier) => setShowAssignerModal(dossier)}
-            formatCountdown={formatCountdown}
-          />
-        ))}
-        
-        {filteredDossiers.length === 0 && (
-          <Card className="p-8 text-center">
-            <Search className="h-12 w-12 mx-auto text-muted-foreground" />
-            <p className="text-muted-foreground mt-2">
-              {dossiers.length === 0 ? 'Aucun véhicule en atelier' : 'Aucun véhicule trouvé'}
-            </p>
-          </Card>
-        )}
-      </div>
+      {activeTab === 'planning' ? (
+        <OwnerPlanningTab />
+      ) : (
+        <div className="space-y-3">
+          {filteredDossiers.map(d => (
+            <DossierCard
+              key={d.id}
+              dossier={d}
+              alerts={calculateAlerts(d)}
+              onSelect={setSelectedDossier}
+              onAction={handleAction}
+              onAssigner={(dossier) => setShowAssignerModal(dossier)}
+              formatCountdown={formatCountdown}
+            />
+          ))}
+          
+          {filteredDossiers.length === 0 && (
+            <Card className="p-8 text-center">
+              <Search className="h-12 w-12 mx-auto text-muted-foreground" />
+              <p className="text-muted-foreground mt-2">
+                {dossiers.length === 0 ? 'Aucun véhicule en atelier' : 'Aucun véhicule trouvé'}
+              </p>
+            </Card>
+          )}
+        </div>
+      )}
 
       {/* Modals */}
       <NewDossierModal
