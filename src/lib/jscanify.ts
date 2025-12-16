@@ -386,6 +386,64 @@ export class Jscanify {
   }
 
   /**
+   * Detect paper and return stabilized corner points WITHOUT drawing
+   * Used for overlay canvas architecture
+   */
+  detectPaper(image: HTMLCanvasElement | HTMLImageElement, isSmallFormat: boolean = false): CornerPoints | null {
+    let cv: any;
+    try {
+      cv = this.getCV();
+    } catch (err) {
+      return null;
+    }
+
+    let canvas: HTMLCanvasElement;
+    if (image instanceof HTMLCanvasElement) {
+      canvas = image;
+    } else {
+      canvas = document.createElement('canvas');
+      canvas.width = image.width || image.naturalWidth;
+      canvas.height = image.height || image.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(image, 0, 0);
+      }
+    }
+
+    let img: any = null;
+    let contour: any = null;
+
+    try {
+      img = cv.imread(canvas);
+
+      if (!img || img.empty || img.empty()) {
+        return null;
+      }
+
+      contour = this.findPaperContour(img, isSmallFormat);
+
+      const rawPoints = contour ? this.getCornerPoints(contour) : null;
+
+      this.stabilizer.addDetection(rawPoints);
+      return this.stabilizer.getStabilizedPoints();
+
+    } catch (error) {
+      return null;
+    } finally {
+      try {
+        if (img && typeof img.delete === 'function' && !img.isDeleted?.()) {
+          img.delete();
+        }
+      } catch (e) {}
+      try {
+        if (contour && typeof contour.delete === 'function' && !contour.isDeleted?.()) {
+          contour.delete();
+        }
+      } catch (e) {}
+    }
+  }
+
+  /**
    * Highlights the paper on the image/canvas with temporal stabilization
    * OPTIMIZED: Lighter processing on mobile
    */
