@@ -122,14 +122,14 @@ Deno.serve(async (req) => {
 
     console.log('Updating profile for user:', targetUserId, 'with data:', profileData);
 
-    // Update the user's profile
+    // Update or create the user's profile using upsert
     const { data, error } = await supabaseClient
       .from('profiles')
-      .update({
+      .upsert({
+        id: targetUserId,
         ...profileData,
         updated_at: new Date().toISOString(),
-      })
-      .eq('id', targetUserId)
+      }, { onConflict: 'id' })
       .select()
       .single();
 
