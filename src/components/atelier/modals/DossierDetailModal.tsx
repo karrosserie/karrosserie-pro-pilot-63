@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { User, Car, Calendar, FileText, History, MessageCircle, Key, Pen, Package, Check } from 'lucide-react';
+import { User, Car, Calendar, FileText, History, MessageCircle, Key, Pen, Package, Check, CalendarPlus } from 'lucide-react';
 import { Dossier, STATUS_CONFIG } from '@/types/atelier';
 
 interface DossierDetailModalProps {
@@ -146,6 +146,13 @@ export const DossierDetailModal = ({ open, onOpenChange, dossier, onAction }: Do
 
           {/* Actions */}
           <div className="flex flex-wrap gap-2 pt-4 border-t">
+            {/* Planifier Expertise - pour les dossiers sans expertise planifiée */}
+            {(dossier.status === 'entree_atelier' || dossier.status === 'attente_expertise') && !dossier.dateExpertise && (
+              <Button variant="outline" onClick={() => onAction('planifier_expertise', dossier)}>
+                <CalendarPlus className="h-4 w-4 mr-2" />
+                Planifier expertise
+              </Button>
+            )}
             {dossier.status === 'termine' && (
               <>
                 <Button variant="outline" onClick={() => onAction('whatsapp_rdv', dossier)}>

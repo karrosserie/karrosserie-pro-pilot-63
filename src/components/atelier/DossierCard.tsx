@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { User, Phone, Key, MessageCircle, Check, Pen, Package, CheckCircle } from 'lucide-react';
+import { User, Phone, Key, MessageCircle, Check, Pen, Package, CheckCircle, Calendar } from 'lucide-react';
 import { Dossier, Alert, STATUS_CONFIG, ALERT_CONFIG } from '@/types/atelier';
 
 interface DossierCardProps {
@@ -88,6 +88,13 @@ export const DossierCard = ({
 
       {/* Quick Actions */}
       <div className="flex flex-wrap gap-2 mt-3">
+        {/* Planifier Expertise - pour les dossiers sans expertise planifiée */}
+        {(d.status === 'entree_atelier' || d.status === 'attente_expertise') && !d.dateExpertise && (
+          <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); onAction('planifier_expertise', d); }}>
+            <Calendar className="h-4 w-4 mr-1" />
+            Expertise
+          </Button>
+        )}
         {d.status === 'termine' && (
           <>
             <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); onAction('whatsapp_rdv', d); }}>

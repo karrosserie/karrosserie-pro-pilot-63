@@ -4947,6 +4947,8 @@ export type Database = {
           end_date: string | null
           estimated_hours: number | null
           expert_name: string | null
+          expertise_date: string | null
+          expertise_time: string | null
           general_condition: string | null
           id: string
           incident_date: string | null
@@ -4992,6 +4994,8 @@ export type Database = {
           end_date?: string | null
           estimated_hours?: number | null
           expert_name?: string | null
+          expertise_date?: string | null
+          expertise_time?: string | null
           general_condition?: string | null
           id?: string
           incident_date?: string | null
@@ -5037,6 +5041,8 @@ export type Database = {
           end_date?: string | null
           estimated_hours?: number | null
           expert_name?: string | null
+          expertise_date?: string | null
+          expertise_time?: string | null
           general_condition?: string | null
           id?: string
           incident_date?: string | null
