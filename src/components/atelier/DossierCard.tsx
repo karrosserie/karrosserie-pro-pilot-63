@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { User, Phone, Key, MessageCircle, Check, Pen, Package, CheckCircle, Calendar, HardHat, AlertCircle } from 'lucide-react';
+import { User, Phone, Key, MessageCircle, Check, Pen, Package, CheckCircle, Calendar, HardHat, AlertCircle, UserPlus } from 'lucide-react';
 import { Dossier, Alert, STATUS_CONFIG, ALERT_CONFIG } from '@/types/atelier';
 
 interface DossierCardProps {
@@ -9,6 +9,7 @@ interface DossierCardProps {
   alerts: Alert[];
   onSelect: (dossier: Dossier) => void;
   onAction: (action: string, dossier: Dossier) => void;
+  onAssigner: (dossier: Dossier) => void;
   formatCountdown: (ms: number) => string;
 }
 
@@ -17,6 +18,7 @@ export const DossierCard = ({
   alerts, 
   onSelect, 
   onAction,
+  onAssigner,
   formatCountdown 
 }: DossierCardProps) => {
   const urgent = alerts.some(a => ALERT_CONFIG[a.type].priority <= 1);
@@ -120,6 +122,17 @@ export const DossierCard = ({
 
       {/* Quick Actions */}
       <div className="flex flex-wrap gap-2 mt-3">
+        {/* Bouton Assigner */}
+        <Button 
+          size="sm" 
+          variant="outline" 
+          onClick={(e) => { e.stopPropagation(); onAssigner(d); }}
+          className="text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+        >
+          <UserPlus className="h-4 w-4 mr-1" />
+          Assigner
+        </Button>
+        
         {/* Planifier Expertise - pour les dossiers sans expertise planifiée */}
         {(d.status === 'entree_atelier' || d.status === 'attente_expertise') && !d.dateExpertise && (
           <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); onAction('planifier_expertise', d); }}>

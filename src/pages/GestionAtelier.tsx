@@ -11,10 +11,12 @@ import { AlertsModal } from '@/components/atelier/modals/AlertsModal';
 import { RestitutionModal } from '@/components/atelier/modals/RestitutionModal';
 import { DossierDetailModal } from '@/components/atelier/modals/DossierDetailModal';
 import { ExpertiseRdvModal } from '@/components/atelier/modals/ExpertiseRdvModal';
+import { PlanVehicleModal } from '@/components/planning/PlanVehicleModal';
 import { Card } from '@/components/ui/card';
 import { Loader2, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAtelierDossiers } from '@/hooks/use-atelier-dossiers';
+import { useEmployeeData } from '@/hooks/useEmployeeData';
 import { uploadVehiclePhoto } from '@/utils/vehiclePhotoService';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompanyId } from '@/hooks/use-company-id';
@@ -35,12 +37,14 @@ const GestionAtelier = () => {
   const { profile } = useAuth();
   const { companyId } = useCompanyId();
   const { dossiers, isLoading, updateStatus: updateStatusMutation, refetch, planifierExpertise } = useAtelierDossiers();
+  const { employees } = useEmployeeData(companyId || null);
   
   const [selectedDossier, setSelectedDossier] = useState<Dossier | null>(null);
   const [showNewDossier, setShowNewDossier] = useState(false);
   const [showAlerts, setShowAlerts] = useState(false);
   const [showRestitutionModal, setShowRestitutionModal] = useState<Dossier | null>(null);
   const [showExpertiseModal, setShowExpertiseModal] = useState<Dossier | null>(null);
+  const [showAssignerModal, setShowAssignerModal] = useState<Dossier | null>(null);
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('all');
@@ -377,6 +381,7 @@ const GestionAtelier = () => {
             alerts={calculateAlerts(d)}
             onSelect={setSelectedDossier}
             onAction={handleAction}
+            onAssigner={(dossier) => setShowAssignerModal(dossier)}
             formatCountdown={formatCountdown}
           />
         ))}
@@ -419,6 +424,30 @@ const GestionAtelier = () => {
         onOpenChange={(open) => !open && setSelectedDossier(null)}
         dossier={selectedDossier}
         onAction={handleAction}
+        onAssigner={(dossier) => {
+          setSelectedDossier(null);
+          setShowAssignerModal(dossier);
+        }}
+      />
+
+      <PlanVehicleModal
+        isOpen={!!showAssignerModal}
+        onClose={() => setShowAssignerModal(null)}
+        vehicle={showAssignerModal ? {
+          id: showAssignerModal.vehicleId || '',
+          brand: showAssignerModal.marqueModele?.split(' ')[0] || '',
+          model: showAssignerModal.marqueModele?.split(' ').slice(1).join(' ') || '',
+          licensePlate: showAssignerModal.immatriculation,
+          client: `${showAssignerModal.prenom || ''} ${showAssignerModal.nom}`.trim()
+        } : null}
+        employees={employees.map(e => ({
+          id: e.id,
+          user_id: e.user_id,
+          nom: e.nom,
+          role: e.role || ''
+        }))}
+        companyId={companyId || null}
+        onSuccess={() => refetch()}
       />
 
       <ExpertiseRdvModal
