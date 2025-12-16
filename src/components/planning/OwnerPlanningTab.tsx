@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ChevronLeft, ChevronRight, Crown, Plus, Move } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Crown, Plus, Move, Search } from 'lucide-react';
 import { format, startOfWeek, addWeeks, subWeeks, addDays, isSameDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,12 +29,23 @@ interface PlanningPatronTask {
   created_at: string;
 }
 
+interface ExpertiseRdv {
+  id: string;
+  date: string;
+  time: string;
+  clientName: string;
+  immatriculation: string;
+  vehicleInfo: string;
+  isExpertise: true;
+}
+
 export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = [] }: OwnerPlanningTabProps) => {
   const [currentWeek, setCurrentWeek] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
   const [selectedTaskToMove, setSelectedTaskToMove] = useState<PlanningPatronTask | null>(null);
   const [patronTasks, setPatronTasks] = useState<PlanningPatronTask[]>([]);
+  const [expertiseRdvs, setExpertiseRdvs] = useState<ExpertiseRdv[]>([]);
   const [newTask, setNewTask] = useState({
     name: '',
     date: format(new Date(), 'yyyy-MM-dd'),
@@ -90,8 +101,58 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
     setPatronTasks(sortedTasks);
   };
 
+  // Récupérer les RDV expertise depuis repair_orders
+  const fetchExpertiseRdv = async () => {
+    if (!companyId) return;
+
+    const { data, error } = await supabase
+      .from('repair_orders')
+      .select(`
+        id,
+        expertise_date,
+        expertise_time,
+        clients (first_name, last_name),
+        vehicles (
+          license_plate,
+          car_brands (name),
+          car_models (name)
+        )
+      `)
+      .eq('company_id', companyId)
+      .not('expertise_date', 'is', null)
+      .gte('expertise_date', format(subWeeks(new Date(), 2), 'yyyy-MM-dd'));
+
+    if (error) {
+      console.error('Erreur lors de la récupération des RDV expertise:', error);
+      return;
+    }
+
+    const rdvs: ExpertiseRdv[] = (data || []).map((ro: any) => {
+      const clientName = ro.clients 
+        ? `${ro.clients.first_name || ''} ${ro.clients.last_name || ''}`.trim() 
+        : 'Client inconnu';
+      const immatriculation = ro.vehicles?.license_plate || 'N/A';
+      const brandName = ro.vehicles?.car_brands?.name || '';
+      const modelName = ro.vehicles?.car_models?.name || '';
+      const vehicleInfo = [brandName, modelName].filter(Boolean).join(' ');
+
+      return {
+        id: ro.id,
+        date: ro.expertise_date,
+        time: ro.expertise_time || '09:00',
+        clientName,
+        immatriculation,
+        vehicleInfo,
+        isExpertise: true as const
+      };
+    });
+
+    setExpertiseRdvs(rdvs);
+  };
+
   useEffect(() => {
     fetchPatronTasks();
+    fetchExpertiseRdv();
   }, [companyId]);
 
   const goToPreviousWeek = () => {
@@ -129,6 +190,12 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
   const weekPatronTasks = patronTasks.filter(task => {
     const taskDate = new Date(task.date);
     return weekDays.some(day => isSameDay(taskDate, day));
+  });
+
+  // Filtrer les RDV expertise pour la semaine actuelle
+  const weekExpertiseRdvs = expertiseRdvs.filter(rdv => {
+    const rdvDate = new Date(rdv.date);
+    return weekDays.some(day => isSameDay(rdvDate, day));
   });
 
   const handleTaskSubmit = async () => {
@@ -667,12 +734,38 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
                         </Card>
                       ))}
 
+                    {/* RDV Expertise */}
+                    {weekExpertiseRdvs
+                      .filter(rdv => isSameDay(new Date(rdv.date), day))
+                      .sort((a, b) => a.time.localeCompare(b.time))
+                      .map((rdv, idx) => (
+                        <Card key={`expertise-${idx}`} className="p-2 border-l-4 border-l-blue-500 bg-blue-50">
+                          <div className="space-y-1">
+                            <div className="font-medium text-sm flex items-center gap-1">
+                              <Search className="w-3 h-3 text-blue-600" />
+                              <span className="text-blue-700">Expertise</span>
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              ⏰ {rdv.time}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              👤 {rdv.clientName}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              🚗 {rdv.immatriculation} {rdv.vehicleInfo && `- ${rdv.vehicleInfo}`}
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+
                      {/* Aucune tâche */}
-                     {dayOwnerSchedules.length === 0 && weekPatronTasks.filter(task => isSameDay(new Date(task.date), day)).length === 0 && (
-                       <div className="p-2 text-center text-sm text-muted-foreground border border-dashed rounded">
-                         Aucune tâche
-                       </div>
-                     )}
+                     {dayOwnerSchedules.length === 0 && 
+                      weekPatronTasks.filter(task => isSameDay(new Date(task.date), day)).length === 0 &&
+                      weekExpertiseRdvs.filter(rdv => isSameDay(new Date(rdv.date), day)).length === 0 && (
+                        <div className="p-2 text-center text-sm text-muted-foreground border border-dashed rounded">
+                          Aucune tâche
+                        </div>
+                      )}
                   </div>
                 </div>
               );
@@ -688,29 +781,29 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
         </CardHeader>
         <CardContent>
            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-             <div className="text-center p-4 bg-muted rounded-lg">
-               <div className="text-2xl font-bold text-primary">{ownerSchedules.length + weekPatronTasks.length}</div>
-               <div className="text-sm text-muted-foreground">Tâches total</div>
-             </div>
-             <div className="text-center p-4 bg-muted rounded-lg">
-               <div className="text-2xl font-bold text-green-600">
-                 {ownerSchedules.filter(s => s.status === 'Terminé').length}
-               </div>
+              <div className="text-center p-4 bg-muted rounded-lg">
+                <div className="text-2xl font-bold text-primary">{ownerSchedules.length + weekPatronTasks.length + weekExpertiseRdvs.length}</div>
+                <div className="text-sm text-muted-foreground">Tâches total</div>
+              </div>
+              <div className="text-center p-4 bg-muted rounded-lg">
+                <div className="text-2xl font-bold text-blue-600">
+                  {weekExpertiseRdvs.length}
+                </div>
+                <div className="text-sm text-muted-foreground">RDV Expertise</div>
+              </div>
+              <div className="text-center p-4 bg-muted rounded-lg">
+                <div className="text-2xl font-bold text-orange-600">
+                  {weekPatronTasks.length}
+                </div>
+                <div className="text-sm text-muted-foreground">Tâches patron</div>
+              </div>
+              <div className="text-center p-4 bg-muted rounded-lg">
+                <div className="text-2xl font-bold text-green-600">
+                  {ownerSchedules.filter(s => s.status === 'Terminé').length}
+                </div>
                <div className="text-sm text-muted-foreground">Terminées</div>
              </div>
-             <div className="text-center p-4 bg-muted rounded-lg">
-               <div className="text-2xl font-bold text-orange-600">
-                 {ownerSchedules.filter(s => s.status === 'En cours').length + weekPatronTasks.length}
-               </div>
-               <div className="text-sm text-muted-foreground">En cours/Patron</div>
-             </div>
-             <div className="text-center p-4 bg-muted rounded-lg">
-               <div className="text-2xl font-bold text-blue-600">
-                 {ownerSchedules.filter(s => s.status === 'En attente').length}
-               </div>
-              <div className="text-sm text-muted-foreground">En attente</div>
-            </div>
-          </div>
+           </div>
         </CardContent>
       </Card>
     </div>
