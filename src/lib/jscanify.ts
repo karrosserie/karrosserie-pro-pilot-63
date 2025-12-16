@@ -4,6 +4,7 @@
  * Converted to ES module with explicit window.cv access
  * Enhanced with adaptive detection for small documents (licenses, cards)
  * Added temporal stabilization for smooth contour display
+ * OPTIMIZED: Mobile performance improvements, adaptive Canny, better cropping
  */
 
 function distance(p1: { x: number; y: number }, p2: { x: number; y: number }): number {
@@ -23,33 +24,28 @@ export interface CornerPoints {
   bottomRight: { x: number; y: number };
 }
 
-// Detect mobile for adaptive stabilizer settings
+// Detect mobile for adaptive settings
 const isMobileDevice = typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
 /**
  * ContourStabilizer - Temporal smoothing for stable contour display
- * Uses weighted averaging over multiple frames with hysteresis
- * Reduced history on mobile to save memory
+ * OPTIMIZED: Minimal history on mobile to prevent memory issues
  */
 class ContourStabilizer {
   private history: CornerPoints[] = [];
   private lastDrawnPoints: CornerPoints | null = null;
   private framesWithoutDetection = 0;
   
-  // Configuration - DRASTICALLY reduced history on mobile to prevent OOM crashes
-  private readonly HISTORY_SIZE = isMobileDevice ? 2 : 5; // Minimal history on mobile
-  private readonly MIN_MOVEMENT_THRESHOLD = isMobileDevice ? 12 : 8; // Less sensitive on mobile
-  private readonly DISAPPEAR_THRESHOLD = isMobileDevice ? 1 : 3; // Immediate disappear on mobile
+  // Configuration - DRASTICALLY reduced for mobile performance
+  private readonly HISTORY_SIZE = isMobileDevice ? 1 : 3; // Single frame on mobile
+  private readonly MIN_MOVEMENT_THRESHOLD = isMobileDevice ? 15 : 8; // Less sensitive on mobile
+  private readonly DISAPPEAR_THRESHOLD = isMobileDevice ? 1 : 2; // Immediate disappear on mobile
   
-  /**
-   * Add a new detection to the history
-   */
   addDetection(points: CornerPoints | null): void {
     if (points) {
       this.framesWithoutDetection = 0;
       this.history.push(points);
       
-      // Keep only the last HISTORY_SIZE frames
       if (this.history.length > this.HISTORY_SIZE) {
         this.history.shift();
       }
@@ -58,25 +54,25 @@ class ContourStabilizer {
     }
   }
   
-  /**
-   * Get stabilized corner points with weighted average
-   * Returns null if no stable detection or if detection disappeared
-   */
   getStabilizedPoints(): CornerPoints | null {
-    // If too many frames without detection, clear and return null
     if (this.framesWithoutDetection >= this.DISAPPEAR_THRESHOLD) {
       this.lastDrawnPoints = null;
       this.history = [];
       return null;
     }
     
-    // If no history but within hysteresis window, return last drawn points
     if (this.history.length === 0) {
       return this.lastDrawnPoints;
     }
     
-    // Calculate weighted average (recent frames have more weight)
-    const weights = this.history.map((_, i) => i + 1); // 1, 2, 3, 4, 5
+    // On mobile, return latest detection directly (no averaging)
+    if (isMobileDevice && this.history.length > 0) {
+      this.lastDrawnPoints = this.history[this.history.length - 1];
+      return this.lastDrawnPoints;
+    }
+    
+    // Desktop: weighted average
+    const weights = this.history.map((_, i) => i + 1);
     const totalWeight = weights.reduce((sum, w) => sum + w, 0);
     
     const averaged: CornerPoints = {
@@ -103,7 +99,6 @@ class ContourStabilizer {
       };
     }
     
-    // Check if movement exceeds threshold (only redraw if significant change)
     if (this.lastDrawnPoints && !this.hasSignificantMovement(this.lastDrawnPoints, averaged)) {
       return this.lastDrawnPoints;
     }
@@ -112,9 +107,6 @@ class ContourStabilizer {
     return averaged;
   }
   
-  /**
-   * Check if the movement between two sets of corners exceeds the threshold
-   */
   private hasSignificantMovement(prev: CornerPoints, curr: CornerPoints): boolean {
     const corners: (keyof CornerPoints)[] = ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'];
     
@@ -128,26 +120,24 @@ class ContourStabilizer {
     return false;
   }
   
-  /**
-   * Get confidence level based on detection stability (0-1)
-   */
   getConfidence(): number {
     if (this.history.length === 0) {
       return this.lastDrawnPoints ? 0.3 : 0;
     }
     
-    // Higher confidence with more consecutive detections
     const detectionConfidence = Math.min(this.history.length / this.HISTORY_SIZE, 1);
-    
-    // Lower confidence if we're in hysteresis (no recent detection)
     const hysteresisConfidence = this.framesWithoutDetection === 0 ? 1 : 0.5;
     
     return detectionConfidence * hysteresisConfidence;
   }
   
   /**
-   * Reset the stabilizer state
+   * Get raw (non-stabilized) points for final capture
    */
+  getRawLastPoints(): CornerPoints | null {
+    return this.history.length > 0 ? this.history[this.history.length - 1] : null;
+  }
+  
   reset(): void {
     this.history = [];
     this.lastDrawnPoints = null;
@@ -167,18 +157,46 @@ export class Jscanify {
   }
 
   /**
+   * Calculate adaptive Canny thresholds based on image brightness
+   */
+  private getAdaptiveCannyThresholds(imgGray: any, cv: any, isSmallFormat: boolean): { low: number; high: number } {
+    // Calculate mean brightness
+    const mean = cv.mean(imgGray);
+    const brightness = mean[0]; // 0-255
+    
+    // Base thresholds adjusted for brightness
+    // Darker images need lower thresholds, brighter need higher
+    let baseLow: number;
+    let baseHigh: number;
+    
+    if (brightness < 80) {
+      // Dark image - use very low thresholds
+      baseLow = isSmallFormat ? 15 : 40;
+      baseHigh = isSmallFormat ? 60 : 120;
+    } else if (brightness < 150) {
+      // Medium brightness - standard thresholds
+      baseLow = isSmallFormat ? 25 : 60;
+      baseHigh = isSmallFormat ? 80 : 160;
+    } else {
+      // Bright image - higher thresholds
+      baseLow = isSmallFormat ? 35 : 75;
+      baseHigh = isSmallFormat ? 100 : 200;
+    }
+    
+    return { low: baseLow, high: baseHigh };
+  }
+
+  /**
    * Finds the contour of the paper in the image
-   * @param img OpenCV Mat image
-   * @param isSmallFormat Use relaxed detection for small documents (licenses, cards)
+   * OPTIMIZED: Skip dilation on mobile, adaptive thresholds, lower min area
    */
   findPaperContour(img: any, isSmallFormat: boolean = false): any {
     const cv = this.getCV();
     
-    // Matrices to clean up
     let imgGray: any = null;
     let imgBlur: any = null;
     let kernel: any = null;
-    let imgDilated: any = null;
+    let imgProcessed: any = null;
     let imgThresh: any = null;
     let contours: any = null;
     let hierarchy: any = null;
@@ -190,24 +208,28 @@ export class Jscanify {
       imgBlur = new cv.Mat();
       cv.GaussianBlur(imgGray, imgBlur, new cv.Size(5, 5), 0);
       
-      // Morphological dilation to reinforce contours (especially for small documents)
-      kernel = cv.Mat.ones(3, 3, cv.CV_8U);
-      imgDilated = new cv.Mat();
-      cv.dilate(imgBlur, imgDilated, kernel);
+      // OPTIMIZATION: Skip morphological dilation on mobile (CPU expensive)
+      if (isMobileDevice) {
+        imgProcessed = imgBlur;
+      } else {
+        kernel = cv.Mat.ones(3, 3, cv.CV_8U);
+        imgProcessed = new cv.Mat();
+        cv.dilate(imgBlur, imgProcessed, kernel);
+      }
       
       imgThresh = new cv.Mat();
-      // Adaptive Canny thresholds - lower for small documents with less contrast
-      const lowThreshold = isSmallFormat ? 30 : 75;
-      const highThreshold = isSmallFormat ? 100 : 200;
-      cv.Canny(imgDilated, imgThresh, lowThreshold, highThreshold);
+      
+      // OPTIMIZATION: Use adaptive Canny thresholds based on image brightness
+      const { low, high } = this.getAdaptiveCannyThresholds(imgGray, cv, isSmallFormat);
+      cv.Canny(imgProcessed, imgThresh, low, high);
       
       contours = new cv.MatVector();
       hierarchy = new cv.Mat();
       cv.findContours(imgThresh, contours, hierarchy, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE);
       
-      // Minimum area filtering
       const imgArea = img.rows * img.cols;
-      const minAreaRatio = isSmallFormat ? 0.03 : 0.08; // Lower threshold for small docs
+      // OPTIMIZATION: Lower minimum area ratio for better small document detection
+      const minAreaRatio = isSmallFormat ? 0.02 : 0.05;
       
       let maxArea = 0;
       let maxContourIndex = -1;
@@ -216,7 +238,6 @@ export class Jscanify {
         const contour = contours.get(i);
         const area = cv.contourArea(contour);
         
-        // Skip contours that are too small
         if (area < imgArea * minAreaRatio) continue;
         
         if (area > maxArea) {
@@ -231,18 +252,15 @@ export class Jscanify {
         const peri = cv.arcLength(contour, true);
         const approx = new cv.Mat();
         
-        // Relaxed approximation for small formats (more tolerant of rounded corners)
-        const approxFactor = isSmallFormat ? 0.04 : 0.02;
+        // OPTIMIZATION: More relaxed approximation for better corner detection
+        const approxFactor = isSmallFormat ? 0.05 : 0.03;
         cv.approxPolyDP(contour, approx, approxFactor * peri, true);
         
-        // Accept 4 points exactly, or 4-6 points for small formats (rounded corners)
-        const acceptablePointCount = isSmallFormat 
-          ? (approx.rows >= 4 && approx.rows <= 6)
-          : (approx.rows === 4);
+        // Accept 3-6 points for more flexible detection
+        const acceptablePointCount = approx.rows >= 3 && approx.rows <= 6;
         
         if (acceptablePointCount) {
-          // For small formats with more than 4 points, reduce to 4 corners
-          if (approx.rows > 4) {
+          if (approx.rows !== 4) {
             const reducedContour = this.reduceToFourCorners(approx, cv);
             if (reducedContour) {
               approx.delete();
@@ -260,11 +278,10 @@ export class Jscanify {
       
       return paperContour;
     } finally {
-      // Cleanup
       if (imgGray) imgGray.delete();
-      if (imgBlur) imgBlur.delete();
+      if (imgBlur && imgBlur !== imgProcessed) imgBlur.delete();
       if (kernel) kernel.delete();
-      if (imgDilated) imgDilated.delete();
+      if (imgProcessed && imgProcessed !== imgBlur) imgProcessed.delete();
       if (imgThresh) imgThresh.delete();
       if (hierarchy) hierarchy.delete();
       if (contours) contours.delete();
@@ -272,55 +289,69 @@ export class Jscanify {
   }
 
   /**
-   * Reduce a polygon with more than 4 points to 4 corners
+   * Reduce a polygon to 4 corners using convex hull approach
+   * IMPROVED: Better corner selection using bounding box extremes
    */
   private reduceToFourCorners(approx: any, cv: any): any {
     try {
-      const points: Array<{ x: number; y: number; index: number }> = [];
+      const points: Array<{ x: number; y: number }> = [];
       for (let i = 0; i < approx.rows; i++) {
         points.push({
           x: approx.data32S[i * 2],
-          y: approx.data32S[i * 2 + 1],
-          index: i
+          y: approx.data32S[i * 2 + 1]
         });
       }
       
-      // Find bounding box corners
+      if (points.length < 3) return null;
+      
+      // Find centroid
+      const centroidX = points.reduce((sum, p) => sum + p.x, 0) / points.length;
+      const centroidY = points.reduce((sum, p) => sum + p.y, 0) / points.length;
+      
+      // Classify points into quadrants relative to centroid
+      const topLeft: Array<{ x: number; y: number; score: number }> = [];
+      const topRight: Array<{ x: number; y: number; score: number }> = [];
+      const bottomLeft: Array<{ x: number; y: number; score: number }> = [];
+      const bottomRight: Array<{ x: number; y: number; score: number }> = [];
+      
+      for (const p of points) {
+        const isLeft = p.x < centroidX;
+        const isTop = p.y < centroidY;
+        // Score = distance from centroid (further is better for corners)
+        const score = Math.hypot(p.x - centroidX, p.y - centroidY);
+        
+        if (isTop && isLeft) topLeft.push({ ...p, score });
+        else if (isTop && !isLeft) topRight.push({ ...p, score });
+        else if (!isTop && isLeft) bottomLeft.push({ ...p, score });
+        else bottomRight.push({ ...p, score });
+      }
+      
+      // Select best point from each quadrant (furthest from centroid)
+      const selectBest = (arr: Array<{ x: number; y: number; score: number }>, fallbackX: number, fallbackY: number) => {
+        if (arr.length === 0) return { x: fallbackX, y: fallbackY };
+        arr.sort((a, b) => b.score - a.score);
+        return { x: arr[0].x, y: arr[0].y };
+      };
+      
       const minX = Math.min(...points.map(p => p.x));
       const maxX = Math.max(...points.map(p => p.x));
       const minY = Math.min(...points.map(p => p.y));
       const maxY = Math.max(...points.map(p => p.y));
       
-      // Find closest point to each corner
-      const findClosest = (targetX: number, targetY: number) => {
-        let closest = points[0];
-        let minDist = Infinity;
-        for (const p of points) {
-          const dist = Math.hypot(p.x - targetX, p.y - targetY);
-          if (dist < minDist) {
-            minDist = dist;
-            closest = p;
-          }
-        }
-        return closest;
-      };
+      const tl = selectBest(topLeft, minX, minY);
+      const tr = selectBest(topRight, maxX, minY);
+      const bl = selectBest(bottomLeft, minX, maxY);
+      const br = selectBest(bottomRight, maxX, maxY);
       
-      const topLeft = findClosest(minX, minY);
-      const topRight = findClosest(maxX, minY);
-      const bottomRight = findClosest(maxX, maxY);
-      const bottomLeft = findClosest(minX, maxY);
-      
-      // Create new 4-point contour
       const newContour = cv.matFromArray(4, 1, cv.CV_32SC2, [
-        topLeft.x, topLeft.y,
-        topRight.x, topRight.y,
-        bottomRight.x, bottomRight.y,
-        bottomLeft.x, bottomLeft.y
+        tl.x, tl.y,
+        tr.x, tr.y,
+        br.x, br.y,
+        bl.x, bl.y
       ]);
       
       return newContour;
     } catch (err) {
-      console.error('[Jscanify] reduceToFourCorners error:', err);
       return null;
     }
   }
@@ -341,12 +372,9 @@ export class Jscanify {
       });
     }
     
-    // Sort points by y coordinate
     points.sort((a, b) => a.y - b.y);
     
-    // Top two points
     const topPoints = points.slice(0, 2).sort((a, b) => a.x - b.x);
-    // Bottom two points
     const bottomPoints = points.slice(2, 4).sort((a, b) => a.x - b.x);
     
     return {
@@ -359,14 +387,13 @@ export class Jscanify {
 
   /**
    * Highlights the paper on the image/canvas with temporal stabilization
-   * Optimized with improved memory cleanup
+   * OPTIMIZED: Lighter processing on mobile
    */
   highlightPaper(image: HTMLCanvasElement | HTMLImageElement, options?: ScanOptions): HTMLCanvasElement | null {
     let cv: any;
     try {
       cv = this.getCV();
     } catch (err) {
-      console.warn('[Jscanify] OpenCV not ready');
       return null;
     }
     
@@ -391,18 +418,14 @@ export class Jscanify {
     try {
       img = cv.imread(canvas);
       
-      // Validate imread result
       if (!img || img.empty || img.empty()) {
-        console.warn('[Jscanify] Failed to read canvas - empty image');
         return null;
       }
       
       contour = this.findPaperContour(img, isSmallFormat);
       
-      // Get raw corner points from current frame
       const rawPoints = contour ? this.getCornerPoints(contour) : null;
       
-      // Add to stabilizer and get smoothed points
       this.stabilizer.addDetection(rawPoints);
       const stabilizedPoints = this.stabilizer.getStabilizedPoints();
       const confidence = this.stabilizer.getConfidence();
@@ -410,11 +433,9 @@ export class Jscanify {
       if (stabilizedPoints) {
         const ctx = canvas.getContext('2d');
         if (ctx) {
-          // Adjust visual style based on confidence
           ctx.strokeStyle = color;
           ctx.lineWidth = thickness;
-          // Higher confidence = more opaque
-          ctx.globalAlpha = 0.5 + (confidence * 0.5); // Range: 0.5 to 1.0
+          ctx.globalAlpha = 0.6 + (confidence * 0.4);
           
           ctx.beginPath();
           ctx.moveTo(stabilizedPoints.topLeft.x, stabilizedPoints.topLeft.y);
@@ -424,43 +445,34 @@ export class Jscanify {
           ctx.closePath();
           ctx.stroke();
           
-          // Reset alpha
           ctx.globalAlpha = 1.0;
         }
       }
       
       return canvas;
     } catch (error) {
-      console.error('[Jscanify] highlightPaper error:', error);
       return null;
     } finally {
-      // Guaranteed cleanup with null checks and isDeleted verification
       try {
         if (img && typeof img.delete === 'function' && !img.isDeleted?.()) {
           img.delete();
         }
-      } catch (e) {
-        console.warn('[Jscanify] Error cleaning img:', e);
-      }
+      } catch (e) {}
       try {
         if (contour && typeof contour.delete === 'function' && !contour.isDeleted?.()) {
           contour.delete();
         }
-      } catch (e) {
-        console.warn('[Jscanify] Error cleaning contour:', e);
-      }
+      } catch (e) {}
     }
   }
 
-  /**
-   * Reset the contour stabilizer (call when starting a new scan session)
-   */
   resetStabilizer(): void {
     this.stabilizer.reset();
   }
 
   /**
    * Extracts and transforms the paper from the image
+   * IMPROVED: Safety margin to prevent edge clipping
    */
   extractPaper(
     image: HTMLCanvasElement | HTMLImageElement, 
@@ -484,7 +496,6 @@ export class Jscanify {
       }
     }
     
-    // Declare all OpenCV matrices outside try block for guaranteed cleanup
     let img: any = null;
     let contour: any = null;
     let srcTri: any = null;
@@ -504,25 +515,40 @@ export class Jscanify {
       }
       
       if (!contour) {
-        console.warn('[Jscanify] No paper contour found, returning null');
         return null;
       }
       
       const points = this.getCornerPoints(contour);
       if (!points) {
-        console.warn('[Jscanify] Could not get corner points');
         return null;
       }
       
-      // Source points
+      // IMPROVEMENT: Add safety margin (2%) to prevent edge clipping
+      const margin = 0.02;
+      const expandPoint = (p: { x: number; y: number }, centerX: number, centerY: number) => {
+        const dx = p.x - centerX;
+        const dy = p.y - centerY;
+        return {
+          x: p.x + dx * margin,
+          y: p.y + dy * margin
+        };
+      };
+      
+      const centerX = (points.topLeft.x + points.topRight.x + points.bottomLeft.x + points.bottomRight.x) / 4;
+      const centerY = (points.topLeft.y + points.topRight.y + points.bottomLeft.y + points.bottomRight.y) / 4;
+      
+      const tl = expandPoint(points.topLeft, centerX, centerY);
+      const tr = expandPoint(points.topRight, centerX, centerY);
+      const br = expandPoint(points.bottomRight, centerX, centerY);
+      const bl = expandPoint(points.bottomLeft, centerX, centerY);
+      
       srcTri = cv.matFromArray(4, 1, cv.CV_32FC2, [
-        points.topLeft.x, points.topLeft.y,
-        points.topRight.x, points.topRight.y,
-        points.bottomRight.x, points.bottomRight.y,
-        points.bottomLeft.x, points.bottomLeft.y
+        tl.x, tl.y,
+        tr.x, tr.y,
+        br.x, br.y,
+        bl.x, bl.y
       ]);
       
-      // Destination points
       dstTri = cv.matFromArray(4, 1, cv.CV_32FC2, [
         0, 0,
         resultWidth, 0,
@@ -530,15 +556,12 @@ export class Jscanify {
         0, resultHeight
       ]);
       
-      // Get perspective transform
       M = cv.getPerspectiveTransform(srcTri, dstTri);
       
-      // Apply transform
       result = new cv.Mat();
       const dsize = new cv.Size(resultWidth, resultHeight);
       cv.warpPerspective(img, result, M, dsize);
       
-      // Create output canvas
       const outputCanvas = document.createElement('canvas');
       outputCanvas.width = resultWidth;
       outputCanvas.height = resultHeight;
@@ -546,10 +569,8 @@ export class Jscanify {
       
       return outputCanvas;
     } catch (error) {
-      console.error('[Jscanify] extractPaper error:', error);
       return null;
     } finally {
-      // GUARANTEED CLEANUP - prevents WebAssembly memory leaks
       if (img) img.delete();
       if (srcTri) srcTri.delete();
       if (dstTri) dstTri.delete();
