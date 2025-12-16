@@ -180,7 +180,7 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit, isSubmitting = f
             {/* Marque */}
             <div>
               <Label>Marque</Label>
-              <Popover open={brandOpen} onOpenChange={setBrandOpen}>
+              <Popover open={brandOpen} onOpenChange={setBrandOpen} modal={false}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
@@ -199,7 +199,7 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit, isSubmitting = f
                 </PopoverTrigger>
                 <PopoverContent className="w-[200px] p-0" align="start">
                   <Command>
-                    <CommandInput placeholder="Rechercher..." />
+                    <CommandInput placeholder="Rechercher..." className="hidden sm:flex" />
                     <CommandList className="max-h-[200px]" onWheel={(e) => e.stopPropagation()}>
                       <CommandEmpty>Aucune marque</CommandEmpty>
                       <CommandGroup>
@@ -207,6 +207,7 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit, isSubmitting = f
                           <CommandItem
                             key={brand.id}
                             value={brand.name}
+                            onPointerDown={(e) => e.stopPropagation()}
                             onSelect={() => {
                               handleBrandChange(brand.id);
                               setBrandOpen(false);
@@ -226,7 +227,7 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit, isSubmitting = f
             {/* Modèle */}
             <div>
               <Label>Modèle</Label>
-              <Popover open={modelOpen} onOpenChange={setModelOpen}>
+              <Popover open={modelOpen} onOpenChange={setModelOpen} modal={false}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
@@ -245,7 +246,7 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit, isSubmitting = f
                 </PopoverTrigger>
                 <PopoverContent className="w-[200px] p-0" align="start">
                   <Command>
-                    <CommandInput placeholder="Rechercher..." />
+                    <CommandInput placeholder="Rechercher..." className="hidden sm:flex" />
                     <CommandList className="max-h-[200px]" onWheel={(e) => e.stopPropagation()}>
                       <CommandEmpty>Aucun modèle</CommandEmpty>
                       <CommandGroup>
@@ -253,6 +254,7 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit, isSubmitting = f
                           <CommandItem
                             key={model.id}
                             value={model.name}
+                            onPointerDown={(e) => e.stopPropagation()}
                             onSelect={() => {
                               setFormData({ ...formData, model_id: model.id });
                               setModelOpen(false);
