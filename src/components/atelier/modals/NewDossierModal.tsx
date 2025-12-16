@@ -200,7 +200,7 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit, isSubmitting = f
                 <PopoverContent className="w-[200px] p-0" align="start">
                   <Command>
                     <CommandInput placeholder="Rechercher..." />
-                    <CommandList className="max-h-[200px]">
+                    <CommandList className="max-h-[200px]" onWheel={(e) => e.stopPropagation()}>
                       <CommandEmpty>Aucune marque</CommandEmpty>
                       <CommandGroup>
                         {carBrands?.map(brand => (
@@ -246,7 +246,7 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit, isSubmitting = f
                 <PopoverContent className="w-[200px] p-0" align="start">
                   <Command>
                     <CommandInput placeholder="Rechercher..." />
-                    <CommandList className="max-h-[200px]">
+                    <CommandList className="max-h-[200px]" onWheel={(e) => e.stopPropagation()}>
                       <CommandEmpty>Aucun modèle</CommandEmpty>
                       <CommandGroup>
                         {carModels?.map(model => (
