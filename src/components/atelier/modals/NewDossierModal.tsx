@@ -184,7 +184,7 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit, isSubmitting = f
                 <SelectTrigger>
                   <SelectValue placeholder={brandsLoading ? "Chargement..." : "Sélectionner"} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-[200px] overflow-y-auto">
                   {carBrands?.map(brand => (
                     <SelectItem key={brand.id} value={brand.id}>
                       {brand.name}
@@ -205,7 +205,7 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit, isSubmitting = f
                 <SelectTrigger>
                   <SelectValue placeholder={modelsLoading ? "Chargement..." : "Sélectionner"} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-[200px] overflow-y-auto">
                   {carModels?.map(model => (
                     <SelectItem key={model.id} value={model.id}>
                       {model.name}
