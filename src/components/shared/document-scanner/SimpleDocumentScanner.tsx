@@ -258,8 +258,6 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
           facingMode: 'environment',
           width: { ideal: VIDEO_WIDTH },
           height: { ideal: VIDEO_HEIGHT },
-          // @ts-ignore - focusMode is valid but not in TypeScript types
-          focusMode: { ideal: 'continuous' },
         },
         audio: false,
       });
