@@ -1,5 +1,6 @@
 
 import React, { useRef, useState, useEffect, useCallback } from 'react';
+import type { CornerPoints } from '@/lib/jscanify';
 import { Button } from '@/components/ui/button';
 import { X, Camera, Check, RotateCcw, Loader2, CameraOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -130,6 +131,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   const consecutiveErrorsRef = useRef<number>(0);
   const lastSuccessfulDetectionRef = useRef<number>(0);
   const pulsePhaseRef = useRef<number>(0);
+  const lastDetectedPointsRef = useRef<CornerPoints | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isOpenCVReady, setIsOpenCVReady] = useState(false);
@@ -410,6 +412,8 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
               const detectedPoints = scanner.detectPaper(processingCanvas, isSmallFormat);
               
               if (detectedPoints) {
+                // Store points for pulsing animation (avoids re-running OpenCV)
+                lastDetectedPointsRef.current = detectedPoints;
                 // Draw contours on overlay canvas with coordinate transform
                 drawContours(overlayCtx, detectedPoints, overlayCanvas.width, overlayCanvas.height, transform);
                 
@@ -439,13 +443,10 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
             }
           }
         }
-      } else if (hasDetectedDocument && container) {
-        // Continue pulsing animation between detection frames
-        const detectedPoints = scanner.detectPaper(processingCanvas, isSmallFormat);
-        if (detectedPoints && overlayCtx) {
-          const transform = getVideoCoverTransform(video, container.clientWidth, container.clientHeight);
-          drawContours(overlayCtx, detectedPoints, overlayCanvas.width, overlayCanvas.height, transform);
-        }
+      } else if (hasDetectedDocument && lastDetectedPointsRef.current && container && overlayCtx) {
+        // Continue pulsing animation using STORED points - NO OpenCV call (critical for FPS)
+        const transform = getVideoCoverTransform(video, container.clientWidth, container.clientHeight);
+        drawContours(overlayCtx, lastDetectedPointsRef.current, overlayCanvas.width, overlayCanvas.height, transform);
       }
 
       animationRef.current = requestAnimationFrame(detectLoop);
@@ -680,7 +681,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         {/* Transparent overlay canvas for green contours - NO object-cover, sized to container */}
         <canvas
           ref={overlayCanvasRef}
-          className="absolute inset-0 w-full h-full pointer-events-none z-10"
+          className="absolute inset-0 pointer-events-none z-10"
         />
 
         {/* Legacy canvas for fallback capture */}
