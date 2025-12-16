@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { User, Car, Calendar, FileText, History, MessageCircle, Key, Pen, Package, Check, CalendarPlus } from 'lucide-react';
+import { User, Car, Calendar, FileText, History, MessageCircle, Key, Pen, Package, Check, CalendarPlus, HardHat, AlertCircle } from 'lucide-react';
 import { Dossier, STATUS_CONFIG } from '@/types/atelier';
 
 interface DossierDetailModalProps {
@@ -53,6 +53,42 @@ export const DossierDetailModal = ({ open, onOpenChange, dossier, onAction }: Do
                 </div>
               )}
             </div>
+          </Card>
+
+          {/* Employé assigné */}
+          <Card className="p-4">
+            <h3 className="font-semibold mb-3 flex items-center gap-2">
+              <HardHat className="h-4 w-4" />
+              Employé assigné
+            </h3>
+            {dossier.employeAssigne ? (
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="font-medium text-indigo-600">{dossier.employeAssigne.nom}</span>
+                  {dossier.employeAssigne.tacheEnCours && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {dossier.employeAssigne.tacheEnCours}
+                    </p>
+                  )}
+                </div>
+                {dossier.employeAssigne.statusTache && (
+                  <Badge 
+                    className={`${
+                      dossier.employeAssigne.statusTache === 'En cours' 
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' 
+                        : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300'
+                    }`}
+                  >
+                    {dossier.employeAssigne.statusTache}
+                  </Badge>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <AlertCircle className="h-4 w-4 text-orange-500" />
+                <span>Aucun employé assigné</span>
+              </div>
+            )}
           </Card>
 
           {/* Vehicle Info */}
