@@ -1,10 +1,9 @@
 
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Camera, Check, RotateCcw, Loader2 } from 'lucide-react';
+import { X, Camera, Check, RotateCcw, Loader2, CameraOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Jscanify } from '@/lib/jscanify';
-import SimpleCaptureMode from './SimpleCaptureMode';
 
 interface SimpleDocumentScannerProps {
   onCapture: (blob: Blob) => void;
@@ -40,30 +39,24 @@ declare global {
   }
 }
 
-// Load OpenCV via CDN (more reliable than npm)
+// Load OpenCV via CDN
 const loadOpenCV = (): Promise<void> => {
   return new Promise((resolve, reject) => {
     if (window.cv && window.cv.Mat) {
-      console.log('[OpenCV] Already loaded');
       resolve();
       return;
     }
 
-    console.log('[OpenCV] Loading from CDN...');
     const script = document.createElement('script');
     script.src = 'https://docs.opencv.org/4.7.0/opencv.js';
     script.async = true;
 
     script.onload = () => {
-      console.log('[OpenCV] Script loaded, waiting for runtime...');
-      
       const checkReady = () => {
         if (window.cv && window.cv.Mat) {
-          console.log('[OpenCV] Runtime ready');
           resolve();
         } else if (window.cv) {
           window.cv.onRuntimeInitialized = () => {
-            console.log('[OpenCV] Runtime initialized');
             resolve();
           };
         } else {
@@ -74,7 +67,6 @@ const loadOpenCV = (): Promise<void> => {
     };
 
     script.onerror = () => {
-      console.error('[OpenCV] Failed to load from CDN');
       reject(new Error('Échec du chargement OpenCV'));
     };
 
@@ -85,14 +77,16 @@ const loadOpenCV = (): Promise<void> => {
 // Detect mobile device
 const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-// Adaptive constants for mobile vs desktop
-const DETECTION_INTERVAL = isMobileDevice ? 120 : 66; // 8 FPS mobile, 15 FPS desktop
-const SCANNER_TIMEOUT = isMobileDevice ? 30000 : 60000; // 30s mobile, 60s desktop
-const GC_PAUSE_INTERVAL = isMobileDevice ? 3000 : 5000; // 3s mobile, 5s desktop
-const GC_PAUSE_DURATION = isMobileDevice ? 300 : 500; // 300ms mobile, 500ms desktop
-const MAX_CONSECUTIVE_ERRORS = 5;
-const VIDEO_WIDTH = isMobileDevice ? 1280 : 1920;
-const VIDEO_HEIGHT = isMobileDevice ? 720 : 1080;
+// OPTIMIZED: Adaptive constants for mobile vs desktop
+const DETECTION_INTERVAL = isMobileDevice ? 200 : 80; // 5 FPS mobile, 12 FPS desktop
+const SCANNER_TIMEOUT = isMobileDevice ? 25000 : 60000; // 25s mobile, 60s desktop
+const GC_PAUSE_INTERVAL = isMobileDevice ? 2500 : 5000; // 2.5s mobile
+const GC_PAUSE_DURATION = isMobileDevice ? 400 : 500; // 400ms mobile
+const MAX_CONSECUTIVE_ERRORS = 3;
+const NO_DETECTION_TIMEOUT = 5000; // Show manual capture after 5s without detection
+// OPTIMIZED: Lower resolution for mobile
+const VIDEO_WIDTH = isMobileDevice ? 960 : 1920;
+const VIDEO_HEIGHT = isMobileDevice ? 540 : 1080;
 
 export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   onCapture,
@@ -109,6 +103,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   const scannerStartTimeRef = useRef<number>(0);
   const lastGCPauseRef = useRef<number>(0);
   const consecutiveErrorsRef = useRef<number>(0);
+  const lastSuccessfulDetectionRef = useRef<number>(0);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isOpenCVReady, setIsOpenCVReady] = useState(false);
@@ -119,8 +114,10 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   const [previewDataUrl, setPreviewDataUrl] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [statusMessage, setStatusMessage] = useState('Chargement...');
+  const [showManualCapture, setShowManualCapture] = useState(false);
+  const [hasDetectedDocument, setHasDetectedDocument] = useState(false);
 
-  // Release canvas memory explicitly (critical for iOS Safari)
+  // Release canvas memory explicitly
   const releaseCanvas = useCallback((canvas: HTMLCanvasElement | null) => {
     if (!canvas) return;
     try {
@@ -128,18 +125,13 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       if (ctx) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
-      // Setting dimensions to 0 forces memory release on iOS
       canvas.width = 0;
       canvas.height = 0;
-      console.log('[Memory] Canvas released');
-    } catch (e) {
-      console.warn('[Memory] Canvas release error:', e);
-    }
+    } catch (e) {}
   }, []);
 
-  // Stop camera with explicit memory cleanup
+  // Stop camera with cleanup
   const stopCamera = useCallback(() => {
-    console.log('[Camera] Stopping with memory cleanup...');
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
@@ -151,20 +143,21 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
-    // Release canvas memory
     releaseCanvas(canvasRef.current);
   }, [releaseCanvas]);
 
-  // Start camera with adaptive resolution for mobile
+  // Start camera with optimized resolution for mobile
   const startCamera = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
       setUseFallbackMode(false);
+      setShowManualCapture(false);
+      setHasDetectedDocument(false);
       consecutiveErrorsRef.current = 0;
+      lastSuccessfulDetectionRef.current = 0;
       setStatusMessage('Accès caméra...');
 
-      console.log('[Camera] Requesting getUserMedia, isMobile:', isMobileDevice);
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'environment',
@@ -178,17 +171,14 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        console.log('[Camera] Stream attached to video');
         
         try {
           await videoRef.current.play();
-          console.log('[Camera] Video playing');
         } catch (playErr) {
-          console.warn('[Camera] Autoplay failed:', playErr);
+          // Autoplay may fail, user interaction required
         }
       }
     } catch (err) {
-      console.error('[Camera] Error:', err);
       setError("Impossible d'accéder à la caméra. Vérifiez les permissions.");
       setIsLoading(false);
     }
@@ -196,10 +186,9 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
 
   // Handle video play event
   const handleVideoPlay = useCallback(() => {
-    console.log('[Video] Playing');
     setIsVideoPlaying(true);
     setIsLoading(false);
-    setStatusMessage('Détection active');
+    setStatusMessage('Recherche du document...');
   }, []);
 
   // Initialize OpenCV and camera on mount
@@ -208,19 +197,14 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
 
     const initialize = async () => {
       try {
-        // Load OpenCV first
-        setStatusMessage('Chargement OpenCV...');
+        setStatusMessage('Chargement...');
         await loadOpenCV();
         
         if (!mounted) return;
         
         setIsOpenCVReady(true);
-        console.log('[Init] OpenCV ready');
-
-        // Then start camera
         await startCamera();
       } catch (err) {
-        console.error('[Init] Error:', err);
         if (mounted) {
           setError('Erreur initialisation. Réessayez.');
           setIsLoading(false);
@@ -236,10 +220,10 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     };
   }, [startCamera, stopCamera]);
 
-  // Determine if this is a small format document (license, card, etc.)
-  const isSmallFormat = ['driver-license', 'insurance', 'violation', 'check'].includes(documentType || '');
+  // Determine if this is a small format document
+  const isSmallFormat = ['driver-license', 'insurance', 'violation', 'check', 'cheque'].includes(documentType || '');
 
-  // Detection loop with throttling and timeout
+  // Detection loop with optimized throttling
   useEffect(() => {
     if (!isVideoPlaying || !isOpenCVReady) return;
 
@@ -250,34 +234,39 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Initialize scanner and reset stabilizer for fresh detection
     const scanner = new Jscanify();
     scanner.resetStabilizer();
     scannerRef.current = scanner;
     scannerStartTimeRef.current = performance.now();
-    console.log('[Detection] Starting loop, isSmallFormat:', isSmallFormat);
+    lastSuccessfulDetectionRef.current = performance.now();
 
     const detectLoop = (timestamp: number) => {
       const elapsedTime = timestamp - scannerStartTimeRef.current;
       
-      // Security timeout - stop detection to prevent memory leaks
+      // Security timeout
       if (elapsedTime > SCANNER_TIMEOUT) {
-        console.warn('[Detection] Timeout reached, stopping detection loop');
         if (animationRef.current) {
           cancelAnimationFrame(animationRef.current);
           animationRef.current = null;
         }
+        setUseFallbackMode(true);
         toast({
           title: "Scanner arrêté",
-          description: `Le scanner s'est arrêté après ${SCANNER_TIMEOUT / 1000}s. Appuyez sur SCANNER pour capturer.`,
+          description: "Utilisez le bouton CAPTURER pour prendre la photo.",
         });
         return;
       }
 
-      // Periodic GC pause - skip detection every 5 seconds for 500ms to let garbage collector work
+      // Check if we should show manual capture button
+      const timeSinceLastDetection = timestamp - lastSuccessfulDetectionRef.current;
+      if (timeSinceLastDetection > NO_DETECTION_TIMEOUT && !showManualCapture && !hasDetectedDocument) {
+        setShowManualCapture(true);
+        setStatusMessage('Document non détecté');
+      }
+
+      // GC pause for mobile memory
       const timeSinceLastGCPause = timestamp - lastGCPauseRef.current;
       if (timeSinceLastGCPause >= GC_PAUSE_INTERVAL && timeSinceLastGCPause < GC_PAUSE_INTERVAL + GC_PAUSE_DURATION) {
-        // In GC pause window - skip detection
         animationRef.current = requestAnimationFrame(detectLoop);
         return;
       }
@@ -285,41 +274,45 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         lastGCPauseRef.current = timestamp;
       }
 
-      // Throttle detection - 8 FPS on mobile, 15 FPS on desktop
+      // Throttled detection
       if (timestamp - lastDetectionTimeRef.current >= DETECTION_INTERVAL) {
         lastDetectionTimeRef.current = timestamp;
         
         if (video.readyState >= 2 && video.videoWidth > 0) {
-          // Match canvas size to video
           if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
           }
 
-          // Draw video frame
           ctx.drawImage(video, 0, 0);
 
-          // Highlight detected document (green contours) with adaptive detection
-          // Skip OpenCV detection in fallback mode
           if (!useFallbackMode) {
             try {
-              scanner.highlightPaper(canvas, { 
+              const result = scanner.highlightPaper(canvas, { 
                 color: 'lime', 
-                thickness: 6,
+                thickness: isMobileDevice ? 4 : 6,
                 isSmallFormat 
               });
-              consecutiveErrorsRef.current = 0; // Reset on success
+              
+              // Check if document was detected (result !== null means contours were drawn)
+              if (result) {
+                lastSuccessfulDetectionRef.current = timestamp;
+                if (!hasDetectedDocument) {
+                  setHasDetectedDocument(true);
+                  setShowManualCapture(false);
+                  setStatusMessage('Document détecté ✓');
+                }
+              }
+              
+              consecutiveErrorsRef.current = 0;
             } catch (err) {
               consecutiveErrorsRef.current++;
-              console.warn('[Detection] Error count:', consecutiveErrorsRef.current);
               
-              // Switch to fallback mode after too many errors
               if (consecutiveErrorsRef.current >= MAX_CONSECUTIVE_ERRORS) {
-                console.warn('[Detection] Switching to fallback mode (no OpenCV)');
                 setUseFallbackMode(true);
                 toast({
-                  title: "Mode simplifié activé",
-                  description: "Détection désactivée. Cadrez manuellement le document.",
+                  title: "Mode simplifié",
+                  description: "Cadrez manuellement le document.",
                 });
               }
             }
@@ -338,20 +331,16 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         animationRef.current = null;
       }
     };
-  }, [isVideoPlaying, isOpenCVReady, isSmallFormat, useFallbackMode, toast]);
+  }, [isVideoPlaying, isOpenCVReady, isSmallFormat, useFallbackMode, toast, showManualCapture, hasDetectedDocument]);
 
-  // Capture document with double-click protection
+  // Capture with OpenCV extraction
   const handleCapture = useCallback(() => {
-    // Double-click protection
-    if (isCapturing) {
-      console.log('[Capture] Already capturing, ignoring');
-      return;
-    }
+    if (isCapturing) return;
     
     const canvas = canvasRef.current;
     const scanner = scannerRef.current;
 
-    if (!canvas || !scanner) {
+    if (!canvas) {
       toast({
         title: "Erreur",
         description: "Scanner non prêt",
@@ -362,56 +351,71 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
 
     setIsCapturing(true);
 
-    // Get dimensions based on document type
     const { width, height } = getExtractionDimensions(documentType);
-    console.log('[Capture] Extracting paper with dimensions:', width, 'x', height, 'for type:', documentType, 'isSmallFormat:', isSmallFormat);
 
     try {
-      // Pass isSmallFormat for adaptive extraction
-      const extracted = scanner.extractPaper(canvas, width, height, undefined, isSmallFormat);
+      let extracted: HTMLCanvasElement | null = null;
+      
+      // Try OpenCV extraction if scanner is available
+      if (scanner && !useFallbackMode) {
+        extracted = scanner.extractPaper(canvas, width, height, undefined, isSmallFormat);
+      }
 
       if (extracted && extracted.width > 0) {
-        console.log('[Capture] Extraction successful:', extracted.width, 'x', extracted.height);
         const dataUrl = extracted.toDataURL('image/jpeg', 0.92);
         setPreviewDataUrl(dataUrl);
         setShowPreview(true);
       } else {
-        console.warn('[Capture] No document detected, using raw capture');
-        // Fallback: capture raw canvas
+        // Fallback: raw capture
         const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
         setPreviewDataUrl(dataUrl);
         setShowPreview(true);
-        toast({
-          title: "Aucun document détecté",
-          description: "Image brute capturée. Assurez-vous que le document est visible avec un fond contrasté.",
-        });
+        
+        if (!useFallbackMode) {
+          toast({
+            title: "Capture brute",
+            description: "Document non détecté, image brute capturée.",
+          });
+        }
       }
     } catch (err) {
-      console.error('[Capture] Error:', err);
-      // Fallback: capture raw canvas
       const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
       setPreviewDataUrl(dataUrl);
       setShowPreview(true);
     } finally {
       setIsCapturing(false);
     }
-  }, [toast, documentType, isSmallFormat, isCapturing]);
+  }, [toast, documentType, isSmallFormat, isCapturing, useFallbackMode]);
+
+  // Manual capture without OpenCV
+  const handleManualCapture = useCallback(() => {
+    if (isCapturing) return;
+    
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    setIsCapturing(true);
+
+    try {
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+      setPreviewDataUrl(dataUrl);
+      setShowPreview(true);
+    } finally {
+      setIsCapturing(false);
+    }
+  }, [isCapturing]);
 
   // Validate captured document
   const handleValidate = useCallback(() => {
     if (!previewDataUrl) return;
-
-    console.log('[Validate] Converting to blob...');
     
     fetch(previewDataUrl)
       .then(res => res.blob())
       .then(blob => {
-        console.log('[Validate] Blob created:', blob.size, 'bytes');
         stopCamera();
         onCapture(blob);
       })
       .catch(err => {
-        console.error('[Validate] Error:', err);
         toast({
           title: "Erreur",
           description: "Impossible de sauvegarder l'image",
@@ -425,13 +429,13 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     setShowPreview(false);
     setPreviewDataUrl(null);
     setIsVideoPlaying(false);
+    setShowManualCapture(false);
+    setHasDetectedDocument(false);
     
-    // Reset stabilizer for fresh detection on retake
     if (scannerRef.current) {
       scannerRef.current.resetStabilizer();
     }
     
-    // Restart camera to reconnect stream
     await startCamera();
   }, [startCamera]);
 
@@ -445,7 +449,6 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   if (showPreview && previewDataUrl) {
     return (
       <div className="fixed inset-0 z-50 bg-black flex flex-col">
-        {/* Header */}
         <div className="flex items-center justify-between p-4 bg-black/80">
           <h2 className="text-white font-medium">Aperçu du document</h2>
           <Button type="button" variant="ghost" size="icon" onClick={handleClose} className="text-white">
@@ -453,7 +456,6 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
           </Button>
         </div>
 
-        {/* Preview image */}
         <div className="flex-1 flex items-center justify-center p-4 overflow-auto">
           <img
             src={previewDataUrl}
@@ -462,7 +464,6 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
           />
         </div>
 
-        {/* Action buttons */}
         <div className="p-4 bg-black/80 flex gap-4">
           <Button
             type="button"
@@ -499,7 +500,6 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
 
       {/* Camera view */}
       <div className="flex-1 relative overflow-hidden">
-        {/* Video element - visible */}
         <video
           ref={videoRef}
           autoPlay
@@ -509,7 +509,6 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
           onPlay={handleVideoPlay}
         />
 
-        {/* Canvas overlay for detection contours */}
         <canvas
           ref={canvasRef}
           className="absolute inset-0 w-full h-full object-cover"
@@ -536,8 +535,22 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         {/* Status indicator */}
         {isVideoPlaying && !isLoading && (
           <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-black/50 rounded-full px-3 py-1.5">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            <div className={`w-2 h-2 rounded-full ${hasDetectedDocument ? 'bg-green-500' : 'bg-yellow-500'} animate-pulse`} />
             <span className="text-white text-sm">{statusMessage}</span>
+          </div>
+        )}
+
+        {/* Static guide when no detection */}
+        {showManualCapture && !hasDetectedDocument && isVideoPlaying && !isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+            <div className="border-2 border-dashed border-white/50 rounded-lg" 
+                 style={{ 
+                   width: isSmallFormat ? '70%' : '80%', 
+                   height: isSmallFormat ? '45%' : '60%',
+                   maxWidth: '400px',
+                   maxHeight: isSmallFormat ? '250px' : '500px'
+                 }} 
+            />
           </div>
         )}
       </div>
@@ -546,18 +559,38 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       {isVideoPlaying && !isLoading && (
         <div className="bg-black/80 px-4 py-2 text-center">
           <p className="text-white/80 text-sm">
-            Cadrez le document • Les contours verts s'affichent quand détecté
+            {hasDetectedDocument 
+              ? 'Document détecté • Appuyez sur SCANNER' 
+              : showManualCapture 
+                ? 'Cadrez manuellement le document' 
+                : 'Cadrez le document • Contours verts = détecté'
+            }
           </p>
         </div>
       )}
 
-      {/* Capture button */}
-      <div className="p-4 bg-black/80">
+      {/* Action buttons */}
+      <div className="p-4 bg-black/80 flex gap-3">
+        {/* Manual capture button (shown when no detection) */}
+        {showManualCapture && !hasDetectedDocument && (
+          <Button
+            type="button"
+            onClick={handleManualCapture}
+            disabled={!isVideoPlaying || isLoading}
+            variant="outline"
+            className="flex-1 h-14 text-base border-white/30 text-white hover:bg-white/10"
+          >
+            <CameraOff className="mr-2 h-5 w-5" />
+            CAPTURER
+          </Button>
+        )}
+        
+        {/* Main scanner button */}
         <Button
           type="button"
           onClick={handleCapture}
           disabled={!isVideoPlaying || isLoading}
-          className="w-full h-16 text-xl bg-white text-black hover:bg-white/90 disabled:opacity-50"
+          className={`${showManualCapture && !hasDetectedDocument ? 'flex-1' : 'w-full'} h-14 text-xl bg-white text-black hover:bg-white/90 disabled:opacity-50`}
         >
           <Camera className="mr-3 h-6 w-6" />
           SCANNER
