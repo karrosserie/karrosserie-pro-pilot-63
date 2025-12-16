@@ -1,13 +1,14 @@
 
 import React from 'react';
-import { Search, Upload } from 'lucide-react';
+import { Search, Upload, Wrench } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface SearchBarProps {
   onImportClick: () => void;
+  onAtelierClick: () => void;
 }
 
-const SearchBar = ({ onImportClick }: SearchBarProps) => {
+const SearchBar = ({ onImportClick, onAtelierClick }: SearchBarProps) => {
   return (
     <div className="hidden md:flex items-center space-x-2 relative max-w-xl w-full mx-4">
       <div className="relative flex-1 hidden">
@@ -18,6 +19,15 @@ const SearchBar = ({ onImportClick }: SearchBarProps) => {
           className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-karrosserie-orange h-10"
         />
       </div>
+      <Button 
+        variant="secondary"
+        className="bg-gray-200 text-gray-700 hover:bg-gray-300 h-10"
+        size="sm"
+        onClick={onAtelierClick}
+      >
+        <Wrench className="h-4 w-4 mr-2" />
+        Gestion Atelier
+      </Button>
       <Button 
         className="bg-karrosserie-orange text-white hover:bg-karrosserie-orange/90 h-10"
         size="sm"

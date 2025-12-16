@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Dossier, Alert, STATUS_CONFIG, ALERT_CONFIG } from '@/types/atelier';
 import { AtelierHeader } from '@/components/atelier/AtelierHeader';
@@ -24,6 +25,8 @@ interface CapturedPhoto {
 
 const GestionAtelier = () => {
   const isMobile = useIsMobile();
+  const location = useLocation();
+  const navigate = useNavigate();
   const { profile } = useAuth();
   const { companyId } = useCompanyId();
   const { dossiers, isLoading, updateStatus: updateStatusMutation, refetch } = useAtelierDossiers();
@@ -36,6 +39,17 @@ const GestionAtelier = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('all');
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Handle incoming data from Navbar shortcut
+  useEffect(() => {
+    const state = location.state as { newDossier?: any; entryPhotos?: CapturedPhoto[] } | null;
+    if (state?.newDossier) {
+      // Process the new dossier data
+      handleCreateDossier(state.newDossier, state.entryPhotos || []);
+      // Clear the state to prevent re-processing on refresh
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state]);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
