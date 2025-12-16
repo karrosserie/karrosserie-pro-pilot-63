@@ -164,9 +164,11 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     canvasHeight: number,
     transform: { scale: number, offsetX: number, offsetY: number }
   ) => {
+    if (canvasWidth <= 0 || canvasHeight <= 0) return;
+
     // Clear overlay
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-    
+
     // Transform point from video coordinates to display coordinates
     const transformPoint = (p: {x: number, y: number}) => ({
       x: p.x * transform.scale + transform.offsetX,
@@ -279,6 +281,14 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     setIsVideoPlaying(true);
     setIsLoading(false);
     setStatusMessage('Recherche du document...');
+
+    // Ensure overlay canvas is sized immediately (before the first detection frame)
+    const container = containerRef.current;
+    const overlayCanvas = overlayCanvasRef.current;
+    if (container && overlayCanvas) {
+      overlayCanvas.width = container.clientWidth;
+      overlayCanvas.height = container.clientHeight;
+    }
   }, []);
 
   // Initialize OpenCV and camera on mount
@@ -670,8 +680,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         {/* Transparent overlay canvas for green contours - NO object-cover, sized to container */}
         <canvas
           ref={overlayCanvasRef}
-          className="absolute inset-0 pointer-events-none"
-          style={{ width: '100%', height: '100%' }}
+          className="absolute inset-0 w-full h-full pointer-events-none z-10"
         />
 
         {/* Legacy canvas for fallback capture */}
