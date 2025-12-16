@@ -144,6 +144,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   const [statusMessage, setStatusMessage] = useState('Chargement...');
   const [showManualCapture, setShowManualCapture] = useState(false);
   const [hasDetectedDocument, setHasDetectedDocument] = useState(false);
+  const [focusPoint, setFocusPoint] = useState<{x: number, y: number} | null>(null);
 
   // Release canvas memory explicitly
   const releaseCanvas = useCallback((canvas: HTMLCanvasElement | null) => {
@@ -298,6 +299,64 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       setIsLoading(false);
     }
   }, []);
+
+  // Trigger refocus (tap-to-focus)
+  const triggerRefocus = useCallback(async () => {
+    const track = streamRef.current?.getVideoTracks()[0];
+    if (!track) return;
+    
+    try {
+      const capabilities = track.getCapabilities?.();
+      // @ts-ignore - focusMode exists on capabilities
+      const supportedModes = capabilities?.focusMode || [];
+      
+      // Use single-shot for instant refocus, then back to continuous
+      if (supportedModes.includes('single-shot')) {
+        await track.applyConstraints({
+          // @ts-ignore
+          advanced: [{ focusMode: 'single-shot' }]
+        });
+        
+        // Return to continuous after focus completes
+        setTimeout(async () => {
+          try {
+            if (supportedModes.includes('continuous')) {
+              await track.applyConstraints({
+                // @ts-ignore
+                advanced: [{ focusMode: 'continuous' }]
+              });
+            }
+          } catch {}
+        }, 500);
+      } else if (supportedModes.includes('continuous')) {
+        // Fallback: toggle continuous mode to trigger refocus
+        await track.applyConstraints({
+          // @ts-ignore
+          advanced: [{ focusMode: 'continuous' }]
+        });
+      }
+    } catch (err) {
+      // Refocus not supported, silently ignore
+    }
+  }, []);
+
+  // Handle tap on video to refocus
+  const handleVideoTap = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    // Get tap coordinates for visual feedback
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+    
+    // Show focus animation
+    setFocusPoint({ x, y });
+    setTimeout(() => setFocusPoint(null), 800);
+    
+    // Trigger refocus
+    triggerRefocus();
+  }, [triggerRefocus]);
 
   // Handle video play event
   const handleVideoPlay = useCallback(() => {
@@ -682,7 +741,12 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       </div>
 
       {/* Camera view */}
-      <div ref={containerRef} className="flex-1 relative overflow-hidden">
+      <div 
+        ref={containerRef} 
+        className="flex-1 relative overflow-hidden"
+        onClick={handleVideoTap}
+        onTouchStart={handleVideoTap}
+      >
         {/* Native video stream - always visible */}
         <video
           ref={videoRef}
@@ -692,6 +756,22 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
           className="absolute inset-0 w-full h-full object-cover"
           onPlay={handleVideoPlay}
         />
+
+        {/* Tap-to-focus indicator */}
+        {focusPoint && (
+          <div
+            className="absolute pointer-events-none z-30"
+            style={{
+              left: focusPoint.x - 30,
+              top: focusPoint.y - 30,
+              width: 60,
+              height: 60,
+            }}
+          >
+            <div className="w-full h-full border-2 border-yellow-400 rounded-full animate-ping" />
+            <div className="absolute inset-2 border-2 border-yellow-400 rounded-full" />
+          </div>
+        )}
 
         {/* Hidden processing canvas for OpenCV */}
         <canvas
