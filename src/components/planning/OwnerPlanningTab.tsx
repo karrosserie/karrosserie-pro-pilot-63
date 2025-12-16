@@ -111,6 +111,7 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
         id,
         expertise_date,
         expertise_time,
+        atelier_status,
         clients (first_name, last_name),
         vehicles (
           license_plate,
@@ -119,6 +120,7 @@ export const OwnerPlanningTab = ({ schedules = [], employees = [], vehicles = []
         )
       `)
       .eq('company_id', companyId)
+      .eq('atelier_status', 'expertise_planifiee')
       .not('expertise_date', 'is', null)
       .gte('expertise_date', format(subWeeks(new Date(), 2), 'yyyy-MM-dd'));
 
