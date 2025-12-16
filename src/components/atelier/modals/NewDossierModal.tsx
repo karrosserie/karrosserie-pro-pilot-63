@@ -197,7 +197,13 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit, isSubmitting = f
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0" align="start">
+                <PopoverContent
+                  className="w-[200px] p-0"
+                  align="start"
+                  onOpenAutoFocus={(e) => e.preventDefault()}
+                  onInteractOutside={(e) => e.preventDefault()}
+                  onPointerDownOutside={(e) => e.preventDefault()}
+                >
                   <Command>
                     <CommandInput placeholder="Rechercher..." className="hidden sm:flex" />
                     <CommandList className="max-h-[200px]" onWheel={(e) => e.stopPropagation()}>
@@ -244,7 +250,13 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit, isSubmitting = f
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0" align="start">
+                <PopoverContent
+                  className="w-[200px] p-0"
+                  align="start"
+                  onOpenAutoFocus={(e) => e.preventDefault()}
+                  onInteractOutside={(e) => e.preventDefault()}
+                  onPointerDownOutside={(e) => e.preventDefault()}
+                >
                   <Command>
                     <CommandInput placeholder="Rechercher..." className="hidden sm:flex" />
                     <CommandList className="max-h-[200px]" onWheel={(e) => e.stopPropagation()}>
