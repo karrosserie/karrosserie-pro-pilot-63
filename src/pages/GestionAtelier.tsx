@@ -10,6 +10,7 @@ import { NewDossierModal, NewDossierFormData } from '@/components/atelier/modals
 import { AlertsModal } from '@/components/atelier/modals/AlertsModal';
 import { RestitutionModal } from '@/components/atelier/modals/RestitutionModal';
 import { DossierDetailModal } from '@/components/atelier/modals/DossierDetailModal';
+import { ExpertiseRdvModal } from '@/components/atelier/modals/ExpertiseRdvModal';
 import { Card } from '@/components/ui/card';
 import { Loader2, Search } from 'lucide-react';
 import { toast } from 'sonner';
@@ -33,12 +34,13 @@ const GestionAtelier = () => {
   const navigate = useNavigate();
   const { profile } = useAuth();
   const { companyId } = useCompanyId();
-  const { dossiers, isLoading, updateStatus: updateStatusMutation, refetch } = useAtelierDossiers();
+  const { dossiers, isLoading, updateStatus: updateStatusMutation, refetch, planifierExpertise } = useAtelierDossiers();
   
   const [selectedDossier, setSelectedDossier] = useState<Dossier | null>(null);
   const [showNewDossier, setShowNewDossier] = useState(false);
   const [showAlerts, setShowAlerts] = useState(false);
   const [showRestitutionModal, setShowRestitutionModal] = useState<Dossier | null>(null);
+  const [showExpertiseModal, setShowExpertiseModal] = useState<Dossier | null>(null);
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('all');
@@ -302,6 +304,11 @@ const GestionAtelier = () => {
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
+  const handlePlanifierExpertise = (dossier: Dossier, date: string, heure: string) => {
+    planifierExpertise({ id: dossier.id, date, time: heure });
+    setShowExpertiseModal(null);
+  };
+
   const handleAction = (action: string, dossier: Dossier) => {
     switch (action) {
       case 'whatsapp_rdv':
@@ -312,6 +319,10 @@ const GestionAtelier = () => {
         break;
       case 'planifier_rdv':
         setShowRestitutionModal(dossier);
+        setSelectedDossier(null);
+        break;
+      case 'planifier_expertise':
+        setShowExpertiseModal(dossier);
         setSelectedDossier(null);
         break;
       case 'signer_pv':
@@ -408,6 +419,13 @@ const GestionAtelier = () => {
         onOpenChange={(open) => !open && setSelectedDossier(null)}
         dossier={selectedDossier}
         onAction={handleAction}
+      />
+
+      <ExpertiseRdvModal
+        open={!!showExpertiseModal}
+        onOpenChange={(open) => !open && setShowExpertiseModal(null)}
+        dossier={showExpertiseModal}
+        onSubmit={handlePlanifierExpertise}
       />
     </div>
   );

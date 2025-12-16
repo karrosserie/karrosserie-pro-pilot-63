@@ -44,6 +44,8 @@ export const useAtelierDossiers = () => {
           arrival_date,
           start_date,
           end_date,
+          expertise_date,
+          expertise_time,
           notes,
           clients (
             id,
@@ -97,7 +99,10 @@ export const useAtelierDossiers = () => {
         const client = ro.clients as any;
         
         const arrivalDate = ro.arrival_date ? new Date(ro.arrival_date) : new Date(ro.created_at);
-        const expertiseDate = expertise?.report_date;
+        
+        // Prioritize expertise_date from repair_order, fallback to expertise report
+        const expertiseDate = (ro as any).expertise_date || expertise?.report_date;
+        const expertiseTime = (ro as any).expertise_time;
         
         const brandName = vehicle?.car_brands?.name || '';
         const modelName = vehicle?.car_models?.name || '';
@@ -114,11 +119,11 @@ export const useAtelierDossiers = () => {
           email: client?.email || undefined,
           dateEntree: arrivalDate.toISOString().split('T')[0],
           heureEntree: arrivalDate.toTimeString().slice(0, 5),
-          status: (ro as any).atelier_status || mapRepairOrderStatus(ro.status || 'En attente', !!expertise, expertiseDate),
-          expertisePrevue: !!expertise,
+          status: (ro as any).atelier_status || mapRepairOrderStatus(ro.status || 'En attente', !!expertiseDate, expertiseDate),
+          expertisePrevue: !!expertiseDate,
           expertiseEffectuee: expertise?.status === 'Terminé',
-          dateExpertise: expertiseDate ? new Date(expertiseDate).toISOString().split('T')[0] : undefined,
-          heureExpertise: expertiseDate ? new Date(expertiseDate).toTimeString().slice(0, 5) : undefined,
+          dateExpertise: expertiseDate || undefined,
+          heureExpertise: expertiseTime || (expertise?.report_date ? new Date(expertise.report_date).toTimeString().slice(0, 5) : undefined),
           dateFin: ro.end_date || (ro.status === 'Terminé' || ro.status === 'Signé' ? ro.created_at : undefined),
           dateRestitution: ro.end_date ? new Date(ro.end_date).toISOString().split('T')[0] : undefined,
           heureRestitution: ro.end_date ? new Date(ro.end_date).toTimeString().slice(0, 5) : undefined,
@@ -184,12 +189,37 @@ export const useAtelierDossiers = () => {
     }
   });
 
+  const planifierExpertiseMutation = useMutation({
+    mutationFn: async ({ id, date, time }: { id: string; date: string; time: string }) => {
+      const { error } = await supabase
+        .from('repair_orders')
+        .update({ 
+          expertise_date: date,
+          expertise_time: time,
+          atelier_status: 'expertise_planifiee'
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['atelier-dossiers'] });
+      toast.success('RDV expert planifié');
+    },
+    onError: (error) => {
+      toast.error('Erreur lors de la planification');
+      console.error(error);
+    }
+  });
+
   return {
     dossiers,
     isLoading,
     error,
     refetch,
     updateStatus: updateStatusMutation.mutate,
-    isUpdating: updateStatusMutation.isPending
+    isUpdating: updateStatusMutation.isPending,
+    planifierExpertise: planifierExpertiseMutation.mutate,
+    isPlanningExpertise: planifierExpertiseMutation.isPending
   };
 };
