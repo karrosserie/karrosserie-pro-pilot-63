@@ -681,7 +681,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         {/* Transparent overlay canvas for green contours - NO object-cover, sized to container */}
         <canvas
           ref={overlayCanvasRef}
-          className="absolute inset-0 pointer-events-none z-10"
+          className="absolute inset-0 w-full h-full pointer-events-none z-10"
         />
 
         {/* Legacy canvas for fallback capture */}
