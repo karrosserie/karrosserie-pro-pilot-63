@@ -13,9 +13,19 @@ import { Card } from '@/components/ui/card';
 import { Loader2, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAtelierDossiers } from '@/hooks/use-atelier-dossiers';
+import { uploadVehiclePhoto } from '@/utils/vehiclePhotoService';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCompanyId } from '@/hooks/use-company-id';
+
+interface CapturedPhoto {
+  blob: Blob;
+  preview: string;
+}
 
 const GestionAtelier = () => {
   const isMobile = useIsMobile();
+  const { profile } = useAuth();
+  const { companyId } = useCompanyId();
   const { dossiers, isLoading, updateStatus: updateStatusMutation, refetch } = useAtelierDossiers();
   
   const [selectedDossier, setSelectedDossier] = useState<Dossier | null>(null);
@@ -111,14 +121,38 @@ const GestionAtelier = () => {
     toast.success(`Statut mis à jour: ${STATUS_CONFIG[status]?.label || status}`);
   };
 
-  const handleCreateDossier = (data: any) => {
+  const handleCreateDossier = async (data: any, entryPhotos: CapturedPhoto[]) => {
     // TODO: Créer un repair_order via le service existant
+    // Pour l'instant, on affiche un message
     toast.info('Création de dossier - Utilisez la page Ordres de réparation');
+    
+    // Les photos seront uploadées après création du véhicule
+    console.log(`📸 ${entryPhotos.length} photos d'entrée à uploader après création du véhicule`);
     setShowNewDossier(false);
   };
 
-  const handlePlanifierRestitution = (dossier: Dossier, dateRestitution: string, heureRestitution: string) => {
+  const handlePlanifierRestitution = async (dossier: Dossier, dateRestitution: string, heureRestitution: string, restitutionPhotos: CapturedPhoto[]) => {
     handleUpdateStatus(dossier.id, 'rdv_restitution', { dateRestitution, heureRestitution });
+    
+    // Upload des photos de restitution
+    if (restitutionPhotos.length > 0 && dossier.vehicleId && profile?.id && companyId) {
+      toast.loading('Upload des photos de restitution...');
+      for (let i = 0; i < restitutionPhotos.length; i++) {
+        const result = await uploadVehiclePhoto(
+          dossier.vehicleId,
+          profile.id,
+          companyId,
+          restitutionPhotos[i].blob,
+          `Photo restitution ${i + 1}`,
+          'restitution'
+        );
+        if (!result.success) {
+          toast.error(`Erreur upload photo ${i + 1}`);
+        }
+      }
+      toast.success(`${restitutionPhotos.length} photos de restitution enregistrées`);
+    }
+    
     setShowRestitutionModal(null);
   };
 
