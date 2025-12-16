@@ -1,5 +1,12 @@
 import { LucideIcon, Car, ClipboardList, Calendar, CheckCircle, Wrench, Package, CircleCheck, Key, FolderArchive, AlertTriangle, Siren, AlertCircle, Clock, Phone } from 'lucide-react';
 
+export interface EmployeAssigne {
+  id: string;
+  nom: string;
+  tacheEnCours?: string;
+  statusTache?: 'En attente' | 'En cours' | 'Terminé';
+}
+
 export interface Dossier {
   id: string;
   repairOrderId?: string;
@@ -31,6 +38,7 @@ export interface Dossier {
   piecesAttente?: string;
   pvReception?: any;
   dateCloture?: string;
+  employeAssigne?: EmployeAssigne;
   relances: Array<{ date: string; type: string; msg: string }>;
   historique: Array<{ date: string; action: string; status: string }>;
 }

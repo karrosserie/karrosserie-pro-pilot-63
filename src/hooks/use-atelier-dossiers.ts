@@ -92,6 +92,42 @@ export const useAtelierDossiers = () => {
         }
       }
 
+      // Fetch employee assignments for these vehicles
+      let employeeByVehicle = new Map<string, { id: string; nom: string; tacheEnCours?: string; statusTache?: 'En attente' | 'En cours' | 'Terminé' }>();
+      
+      if (vehicleIds.length > 0) {
+        const { data: employeeSchedules } = await supabase
+          .from('employee_schedule')
+          .select(`
+            vehicle_id,
+            user_id,
+            task_type,
+            status,
+            profiles!user_id (
+              first_name,
+              last_name
+            )
+          `)
+          .in('vehicle_id', vehicleIds)
+          .in('status', ['En attente', 'En cours'])
+          .order('start_datetime', { ascending: true });
+
+        if (employeeSchedules) {
+          employeeSchedules.forEach((es: any) => {
+            // Only keep first assignment per vehicle
+            if (!employeeByVehicle.has(es.vehicle_id)) {
+              const profile = es.profiles;
+              employeeByVehicle.set(es.vehicle_id, {
+                id: es.user_id,
+                nom: `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Employé',
+                tacheEnCours: es.task_type,
+                statusTache: es.status as 'En attente' | 'En cours' | 'Terminé'
+              });
+            }
+          });
+        }
+      }
+
       // Transform to Dossier format
       const transformedDossiers: Dossier[] = repairOrders.map(ro => {
         const vehicle = ro.vehicles as any;
@@ -106,6 +142,9 @@ export const useAtelierDossiers = () => {
         
         const brandName = vehicle?.car_brands?.name || '';
         const modelName = vehicle?.car_models?.name || '';
+        
+        // Get employee assignment for this vehicle
+        const employeAssigne = vehicle?.id ? employeeByVehicle.get(vehicle.id) : undefined;
         
         return {
           id: ro.id,
@@ -131,6 +170,7 @@ export const useAtelierDossiers = () => {
           marqueModele: `${brandName} ${modelName}`.trim() || undefined,
           vin: vehicle?.vin || undefined,
           kmEntree: vehicle?.mileage?.toString() || undefined,
+          employeAssigne,
           relances: [],
           historique: [{ 
             date: ro.created_at, 

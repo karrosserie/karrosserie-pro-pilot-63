@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { User, Phone, Key, MessageCircle, Check, Pen, Package, CheckCircle, Calendar } from 'lucide-react';
+import { User, Phone, Key, MessageCircle, Check, Pen, Package, CheckCircle, Calendar, HardHat, AlertCircle } from 'lucide-react';
 import { Dossier, Alert, STATUS_CONFIG, ALERT_CONFIG } from '@/types/atelier';
 
 interface DossierCardProps {
@@ -61,6 +61,38 @@ export const DossierCard = ({
           <span className="flex items-center gap-1 text-cyan-600 font-medium">
             <Key className="h-4 w-4" />
             {d.dateRestitution} {d.heureRestitution}
+          </span>
+        )}
+      </div>
+
+      {/* Employé assigné */}
+      <div className="mt-2">
+        {d.employeAssigne ? (
+          <span className="flex items-center gap-2 text-sm">
+            <HardHat className="h-4 w-4 text-indigo-600" />
+            <span className="font-medium text-indigo-600">{d.employeAssigne.nom}</span>
+            {d.employeAssigne.tacheEnCours && (
+              <Badge variant="outline" className="text-xs">
+                {d.employeAssigne.tacheEnCours}
+              </Badge>
+            )}
+            {d.employeAssigne.statusTache && (
+              <Badge 
+                variant="secondary" 
+                className={`text-xs ${
+                  d.employeAssigne.statusTache === 'En cours' 
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' 
+                    : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300'
+                }`}
+              >
+                {d.employeAssigne.statusTache}
+              </Badge>
+            )}
+          </span>
+        ) : d.status === 'en_reparation' && (
+          <span className="flex items-center gap-1 text-sm text-orange-600">
+            <AlertCircle className="h-4 w-4" />
+            Non assigné
           </span>
         )}
       </div>
