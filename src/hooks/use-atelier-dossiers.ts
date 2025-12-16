@@ -39,6 +39,7 @@ export const useAtelierDossiers = () => {
           id,
           reference,
           status,
+          atelier_status,
           created_at,
           arrival_date,
           start_date,
@@ -113,7 +114,7 @@ export const useAtelierDossiers = () => {
           email: client?.email || undefined,
           dateEntree: arrivalDate.toISOString().split('T')[0],
           heureEntree: arrivalDate.toTimeString().slice(0, 5),
-          status: mapRepairOrderStatus(ro.status || 'En attente', !!expertise, expertiseDate),
+          status: (ro as any).atelier_status || mapRepairOrderStatus(ro.status || 'En attente', !!expertise, expertiseDate),
           expertisePrevue: !!expertise,
           expertiseEffectuee: expertise?.status === 'Terminé',
           dateExpertise: expertiseDate ? new Date(expertiseDate).toISOString().split('T')[0] : undefined,
@@ -159,7 +160,10 @@ export const useAtelierDossiers = () => {
           roStatus = 'En attente';
       }
 
-      const updateData: Record<string, unknown> = { status: roStatus };
+      const updateData: Record<string, unknown> = { 
+        status: roStatus,
+        atelier_status: status  // Store the detailed workshop status
+      };
       if (endDate) {
         updateData.end_date = endDate;
       }

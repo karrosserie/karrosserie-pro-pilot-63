@@ -4934,6 +4934,7 @@ export type Database = {
         Row: {
           archived: boolean
           arrival_date: string | null
+          atelier_status: string | null
           claim_number: string | null
           cleanliness_condition: string | null
           client_id: string | null
@@ -4978,6 +4979,7 @@ export type Database = {
         Insert: {
           archived?: boolean
           arrival_date?: string | null
+          atelier_status?: string | null
           claim_number?: string | null
           cleanliness_condition?: string | null
           client_id?: string | null
@@ -5022,6 +5024,7 @@ export type Database = {
         Update: {
           archived?: boolean
           arrival_date?: string | null
+          atelier_status?: string | null
           claim_number?: string | null
           cleanliness_condition?: string | null
           client_id?: string | null
