@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -60,6 +60,14 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit, isSubmitting = f
   const [entryPhotos, setEntryPhotos] = useState<CapturedPhoto[]>([]);
   const [brandOpen, setBrandOpen] = useState(false);
   const [modelOpen, setModelOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const { carBrands, isLoading: brandsLoading } = useCarBrands();
   const { carModels, isLoading: modelsLoading } = useCarModels(formData.brand_id);
@@ -210,7 +218,7 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit, isSubmitting = f
                     onTouchMove={(e) => e.stopPropagation()}
                   >
                     <Command>
-                      <CommandInput placeholder="Rechercher..." className="hidden sm:flex" />
+{!isMobile && <CommandInput placeholder="Rechercher..." />}
                       <CommandList 
                         className="max-h-[200px]" 
                         onWheel={(e) => e.stopPropagation()}
@@ -275,7 +283,7 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit, isSubmitting = f
                     onTouchMove={(e) => e.stopPropagation()}
                   >
                     <Command>
-                      <CommandInput placeholder="Rechercher..." className="hidden sm:flex" />
+                      {!isMobile && <CommandInput placeholder="Rechercher..." />}
                       <CommandList 
                         className="max-h-[200px]" 
                         onWheel={(e) => e.stopPropagation()}
