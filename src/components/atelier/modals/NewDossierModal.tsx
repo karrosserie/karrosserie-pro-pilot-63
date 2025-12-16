@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Car } from 'lucide-react';
+import { isValidFrenchMobilePhone } from '@/utils/phoneValidation';
 
 interface NewDossierModalProps {
   open: boolean;
@@ -26,9 +27,24 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit }: NewDossierModa
     heureExpertise: '',
     notes: ''
   });
+  const [phoneError, setPhoneError] = useState('');
+
+  const validatePhone = (phone: string) => {
+    if (!phone.trim()) {
+      setPhoneError('Le numéro de téléphone est obligatoire');
+      return false;
+    }
+    if (!isValidFrenchMobilePhone(phone)) {
+      setPhoneError('Seuls les numéros mobiles (06 ou 07) sont acceptés');
+      return false;
+    }
+    setPhoneError('');
+    return true;
+  };
 
   const handleSubmit = () => {
     if (!formData.nom || !formData.immatriculation) return;
+    if (!validatePhone(formData.mobile)) return;
     onSubmit(formData);
     setFormData({
       nom: '',
@@ -42,6 +58,7 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit }: NewDossierModa
       heureExpertise: '',
       notes: ''
     });
+    setPhoneError('');
     onOpenChange(false);
   };
 
@@ -82,12 +99,20 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit }: NewDossierModa
               />
             </div>
             <div>
-              <Label>Mobile</Label>
+              <Label>Mobile *</Label>
               <Input
                 placeholder="06 12 34 56 78"
                 value={formData.mobile}
-                onChange={e => setFormData({ ...formData, mobile: e.target.value })}
+                onChange={e => {
+                  setFormData({ ...formData, mobile: e.target.value });
+                  if (phoneError) validatePhone(e.target.value);
+                }}
+                onBlur={() => validatePhone(formData.mobile)}
+                className={phoneError ? 'border-destructive' : ''}
               />
+              {phoneError && (
+                <p className="text-sm text-destructive mt-1">{phoneError}</p>
+              )}
             </div>
             <div>
               <Label>Marque/Modèle</Label>
@@ -151,7 +176,7 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit }: NewDossierModa
         <div className="flex gap-3 mt-4">
           <Button
             onClick={handleSubmit}
-            disabled={!formData.nom || !formData.immatriculation}
+            disabled={!formData.nom || !formData.immatriculation || !formData.mobile.trim() || (phoneError !== '')}
             className="flex-1 bg-karrosserie-orange hover:bg-karrosserie-orange/90"
           >
             Créer
