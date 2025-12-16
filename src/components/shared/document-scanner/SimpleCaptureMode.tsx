@@ -35,11 +35,66 @@ const SimpleCaptureMode: React.FC<SimpleCaptureModeProps> = ({
   const [capturedBlob, setCapturedBlob] = useState<Blob | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isStarting, setIsStarting] = useState(true);
+  const [focusPoint, setFocusPoint] = useState<{ x: number; y: number } | null>(null);
+  const [isCapturing, setIsCapturing] = useState(false);
   const streamRef = useRef<MediaStream | null>(null);
 
   const guide = getGuideRatio(documentType);
 
-  // Start camera - ultra simple, no OpenCV
+  // Trigger refocus - switch to single-shot then back to continuous
+  const triggerRefocus = useCallback(async () => {
+    if (!streamRef.current) return;
+    
+    const track = streamRef.current.getVideoTracks()[0];
+    if (!track) return;
+
+    try {
+      const capabilities = track.getCapabilities?.() as MediaTrackCapabilities & { focusMode?: string[] };
+      if (!capabilities?.focusMode?.includes('single-shot')) {
+        console.log('[SimpleCaptureMode] single-shot focus not supported');
+        return;
+      }
+
+      // Single-shot for instant refocus
+      await track.applyConstraints({
+        advanced: [{ focusMode: 'single-shot' } as any]
+      });
+      console.log('[SimpleCaptureMode] Refocus triggered');
+
+      // Return to continuous after 500ms
+      setTimeout(async () => {
+        try {
+          if (capabilities.focusMode?.includes('continuous')) {
+            await track.applyConstraints({
+              advanced: [{ focusMode: 'continuous' } as any]
+            });
+          }
+        } catch (e) {
+          // Ignore errors when returning to continuous
+        }
+      }, 500);
+    } catch (err) {
+      console.warn('[SimpleCaptureMode] Refocus failed:', err);
+    }
+  }, []);
+
+  // Handle tap-to-refocus
+  const handleTapToFocus = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isVideoReady || isCapturing) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Show visual feedback
+    setFocusPoint({ x, y });
+    setTimeout(() => setFocusPoint(null), 800);
+
+    // Trigger refocus
+    triggerRefocus();
+  }, [isVideoReady, isCapturing, triggerRefocus]);
+
+  // Start camera with autofocus
   const startCamera = useCallback(async () => {
     console.log('[SimpleCaptureMode] Starting camera...');
     setIsStarting(true);
@@ -49,7 +104,6 @@ const SimpleCaptureMode: React.FC<SimpleCaptureModeProps> = ({
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'environment',
-          // Low resolution to prevent memory issues
           width: { ideal: 1280 },
           height: { ideal: 720 },
         },
@@ -57,6 +111,22 @@ const SimpleCaptureMode: React.FC<SimpleCaptureModeProps> = ({
       });
 
       streamRef.current = stream;
+
+      // Enable continuous autofocus if supported
+      const track = stream.getVideoTracks()[0];
+      if (track) {
+        try {
+          const capabilities = track.getCapabilities?.() as MediaTrackCapabilities & { focusMode?: string[] };
+          if (capabilities?.focusMode?.includes('continuous')) {
+            await track.applyConstraints({
+              advanced: [{ focusMode: 'continuous' } as any]
+            });
+            console.log('[SimpleCaptureMode] Continuous autofocus enabled');
+          }
+        } catch (focusErr) {
+          console.warn('[SimpleCaptureMode] Could not enable autofocus:', focusErr);
+        }
+      }
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -93,6 +163,7 @@ const SimpleCaptureMode: React.FC<SimpleCaptureModeProps> = ({
     const video = videoRef.current;
     if (!video || !isVideoReady) return;
 
+    setIsCapturing(true);
     console.log('[SimpleCaptureMode] Capturing...');
 
     // Create temporary canvas for capture
@@ -227,8 +298,11 @@ const SimpleCaptureMode: React.FC<SimpleCaptureModeProps> = ({
         </Button>
       </div>
 
-      {/* Video container */}
-      <div className="flex-1 relative flex items-center justify-center overflow-hidden">
+      {/* Video container - tap to refocus */}
+      <div 
+        className="flex-1 relative flex items-center justify-center overflow-hidden cursor-pointer"
+        onClick={handleTapToFocus}
+      >
         {/* Video element */}
         <video
           ref={videoRef}
@@ -238,6 +312,20 @@ const SimpleCaptureMode: React.FC<SimpleCaptureModeProps> = ({
           onCanPlay={() => setIsVideoReady(true)}
           className="absolute inset-0 w-full h-full object-cover"
         />
+
+        {/* Focus point animation */}
+        {focusPoint && (
+          <div
+            className="absolute pointer-events-none z-20"
+            style={{
+              left: focusPoint.x - 30,
+              top: focusPoint.y - 30,
+            }}
+          >
+            <div className="w-[60px] h-[60px] border-2 border-yellow-400 rounded-full animate-ping" />
+            <div className="absolute inset-0 w-[60px] h-[60px] border-2 border-yellow-400 rounded-full" />
+          </div>
+        )}
 
         {/* Visual guide overlay */}
         {isVideoReady && (
