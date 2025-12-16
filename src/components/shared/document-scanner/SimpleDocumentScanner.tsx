@@ -95,7 +95,9 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
 }) => {
   const { toast } = useToast();
   const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const processingCanvasRef = useRef<HTMLCanvasElement>(null); // Hidden canvas for OpenCV
+  const overlayCanvasRef = useRef<HTMLCanvasElement>(null); // Visible overlay for contours
+  const canvasRef = useRef<HTMLCanvasElement>(null); // For capture fallback
   const animationRef = useRef<number | null>(null);
   const scannerRef = useRef<Jscanify | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -104,6 +106,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   const lastGCPauseRef = useRef<number>(0);
   const consecutiveErrorsRef = useRef<number>(0);
   const lastSuccessfulDetectionRef = useRef<number>(0);
+  const pulsePhaseRef = useRef<number>(0);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isOpenCVReady, setIsOpenCVReady] = useState(false);
@@ -130,6 +133,54 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     } catch (e) {}
   }, []);
 
+  // Draw contours on overlay canvas with pulsing effect
+  const drawContours = useCallback((
+    ctx: CanvasRenderingContext2D, 
+    points: { topLeft: {x: number, y: number}, topRight: {x: number, y: number}, bottomLeft: {x: number, y: number}, bottomRight: {x: number, y: number} },
+    width: number,
+    height: number
+  ) => {
+    // Clear overlay
+    ctx.clearRect(0, 0, width, height);
+    
+    // Pulsing effect
+    pulsePhaseRef.current = (pulsePhaseRef.current + 0.15) % (Math.PI * 2);
+    const pulseAlpha = 0.7 + Math.sin(pulsePhaseRef.current) * 0.3;
+    const pulseGlow = 10 + Math.sin(pulsePhaseRef.current) * 8;
+    
+    ctx.save();
+    
+    // Glow effect
+    ctx.shadowColor = 'lime';
+    ctx.shadowBlur = pulseGlow;
+    
+    // Draw contour
+    ctx.strokeStyle = `rgba(50, 255, 50, ${pulseAlpha})`;
+    ctx.lineWidth = isMobileDevice ? 4 : 6;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    
+    ctx.beginPath();
+    ctx.moveTo(points.topLeft.x, points.topLeft.y);
+    ctx.lineTo(points.topRight.x, points.topRight.y);
+    ctx.lineTo(points.bottomRight.x, points.bottomRight.y);
+    ctx.lineTo(points.bottomLeft.x, points.bottomLeft.y);
+    ctx.closePath();
+    ctx.stroke();
+    
+    // Draw corner markers
+    const cornerSize = isMobileDevice ? 15 : 20;
+    ctx.fillStyle = `rgba(50, 255, 50, ${pulseAlpha})`;
+    
+    [points.topLeft, points.topRight, points.bottomLeft, points.bottomRight].forEach(corner => {
+      ctx.beginPath();
+      ctx.arc(corner.x, corner.y, cornerSize / 2, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    
+    ctx.restore();
+  }, []);
+
   // Stop camera with cleanup
   const stopCamera = useCallback(() => {
     if (animationRef.current) {
@@ -143,6 +194,8 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
+    releaseCanvas(processingCanvasRef.current);
+    releaseCanvas(overlayCanvasRef.current);
     releaseCanvas(canvasRef.current);
   }, [releaseCanvas]);
 
@@ -223,16 +276,18 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   // Determine if this is a small format document
   const isSmallFormat = ['driver-license', 'insurance', 'violation', 'check', 'cheque'].includes(documentType || '');
 
-  // Detection loop with optimized throttling
+  // Detection loop with overlay canvas for contours
   useEffect(() => {
     if (!isVideoPlaying || !isOpenCVReady) return;
 
     const video = videoRef.current;
-    const canvas = canvasRef.current;
-    if (!video || !canvas) return;
+    const processingCanvas = processingCanvasRef.current;
+    const overlayCanvas = overlayCanvasRef.current;
+    if (!video || !processingCanvas || !overlayCanvas) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const processingCtx = processingCanvas.getContext('2d');
+    const overlayCtx = overlayCanvas.getContext('2d');
+    if (!processingCtx || !overlayCtx) return;
 
     const scanner = new Jscanify();
     scanner.resetStabilizer();
@@ -279,34 +334,41 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         lastDetectionTimeRef.current = timestamp;
         
         if (video.readyState >= 2 && video.videoWidth > 0) {
-          if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+          // Sync canvas sizes with video
+          if (processingCanvas.width !== video.videoWidth || processingCanvas.height !== video.videoHeight) {
+            processingCanvas.width = video.videoWidth;
+            processingCanvas.height = video.videoHeight;
+            overlayCanvas.width = video.videoWidth;
+            overlayCanvas.height = video.videoHeight;
           }
 
-          ctx.drawImage(video, 0, 0);
+          // Draw video to hidden processing canvas
+          processingCtx.drawImage(video, 0, 0);
 
           if (!useFallbackMode) {
             try {
-              const result = scanner.highlightPaper(canvas, { 
-                color: 'lime', 
-                thickness: isMobileDevice ? 4 : 6,
-                isSmallFormat 
-              });
+              // Use detectPaper to get points without drawing on processing canvas
+              const detectedPoints = scanner.detectPaper(processingCanvas, isSmallFormat);
               
-              // Check if document was detected (result !== null means contours were drawn)
-              if (result) {
+              if (detectedPoints) {
+                // Draw contours on transparent overlay canvas
+                drawContours(overlayCtx, detectedPoints, overlayCanvas.width, overlayCanvas.height);
+                
                 lastSuccessfulDetectionRef.current = timestamp;
                 if (!hasDetectedDocument) {
                   setHasDetectedDocument(true);
                   setShowManualCapture(false);
                   setStatusMessage('Document détecté ✓');
                 }
+              } else {
+                // Clear overlay when no detection
+                overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
               }
               
               consecutiveErrorsRef.current = 0;
             } catch (err) {
               consecutiveErrorsRef.current++;
+              overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
               
               if (consecutiveErrorsRef.current >= MAX_CONSECUTIVE_ERRORS) {
                 setUseFallbackMode(true);
@@ -317,6 +379,12 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
               }
             }
           }
+        }
+      } else if (hasDetectedDocument) {
+        // Continue pulsing animation between detection frames
+        const detectedPoints = scanner.detectPaper(processingCanvas, isSmallFormat);
+        if (detectedPoints && overlayCtx) {
+          drawContours(overlayCtx, detectedPoints, overlayCanvas.width, overlayCanvas.height);
         }
       }
 
@@ -331,16 +399,17 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         animationRef.current = null;
       }
     };
-  }, [isVideoPlaying, isOpenCVReady, isSmallFormat, useFallbackMode, toast, showManualCapture, hasDetectedDocument]);
+  }, [isVideoPlaying, isOpenCVReady, isSmallFormat, useFallbackMode, toast, showManualCapture, hasDetectedDocument, drawContours]);
 
   // Capture with OpenCV extraction
   const handleCapture = useCallback(() => {
     if (isCapturing) return;
     
-    const canvas = canvasRef.current;
+    const processingCanvas = processingCanvasRef.current;
     const scanner = scannerRef.current;
+    const video = videoRef.current;
 
-    if (!canvas) {
+    if (!processingCanvas || !video) {
       toast({
         title: "Erreur",
         description: "Scanner non prêt",
@@ -351,6 +420,14 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
 
     setIsCapturing(true);
 
+    // Draw current frame to processing canvas for extraction
+    const ctx = processingCanvas.getContext('2d');
+    if (ctx && video.readyState >= 2) {
+      processingCanvas.width = video.videoWidth;
+      processingCanvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0);
+    }
+
     const { width, height } = getExtractionDimensions(documentType);
 
     try {
@@ -358,7 +435,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       
       // Try OpenCV extraction if scanner is available
       if (scanner && !useFallbackMode) {
-        extracted = scanner.extractPaper(canvas, width, height, undefined, isSmallFormat);
+        extracted = scanner.extractPaper(processingCanvas, width, height, undefined, isSmallFormat);
       }
 
       if (extracted && extracted.width > 0) {
@@ -367,7 +444,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         setShowPreview(true);
       } else {
         // Fallback: raw capture
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+        const dataUrl = processingCanvas.toDataURL('image/jpeg', 0.92);
         setPreviewDataUrl(dataUrl);
         setShowPreview(true);
         
@@ -379,7 +456,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         }
       }
     } catch (err) {
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+      const dataUrl = processingCanvas.toDataURL('image/jpeg', 0.92);
       setPreviewDataUrl(dataUrl);
       setShowPreview(true);
     } finally {
@@ -391,13 +468,22 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   const handleManualCapture = useCallback(() => {
     if (isCapturing) return;
     
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const processingCanvas = processingCanvasRef.current;
+    const video = videoRef.current;
+    if (!processingCanvas || !video) return;
 
     setIsCapturing(true);
 
     try {
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+      // Draw current frame
+      const ctx = processingCanvas.getContext('2d');
+      if (ctx && video.readyState >= 2) {
+        processingCanvas.width = video.videoWidth;
+        processingCanvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0);
+      }
+      
+      const dataUrl = processingCanvas.toDataURL('image/jpeg', 0.92);
       setPreviewDataUrl(dataUrl);
       setShowPreview(true);
     } finally {
@@ -500,6 +586,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
 
       {/* Camera view */}
       <div className="flex-1 relative overflow-hidden">
+        {/* Native video stream - always visible */}
         <video
           ref={videoRef}
           autoPlay
@@ -509,9 +596,23 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
           onPlay={handleVideoPlay}
         />
 
+        {/* Hidden processing canvas for OpenCV */}
+        <canvas
+          ref={processingCanvasRef}
+          className="hidden"
+        />
+
+        {/* Transparent overlay canvas for green contours */}
+        <canvas
+          ref={overlayCanvasRef}
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          style={{ backgroundColor: 'transparent' }}
+        />
+
+        {/* Legacy canvas for fallback capture */}
         <canvas
           ref={canvasRef}
-          className="absolute inset-0 w-full h-full object-cover"
+          className="hidden"
         />
 
         {/* Loading overlay */}
