@@ -21,7 +21,7 @@ const SearchBar = ({ onImportClick, onAtelierClick }: SearchBarProps) => {
       </div>
       <Button 
         variant="secondary"
-        className="bg-gray-200 text-gray-700 hover:bg-gray-300 h-10"
+        className="bg-gray-400 text-white hover:bg-gray-500 h-10"
         size="sm"
         onClick={onAtelierClick}
       >
