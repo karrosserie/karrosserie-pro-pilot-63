@@ -302,6 +302,9 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
 
   // Trigger refocus (tap-to-focus)
   const triggerRefocus = useCallback(async () => {
+    // Don't refocus during capture
+    if (isCapturing) return;
+    
     const track = streamRef.current?.getVideoTracks()[0];
     if (!track) return;
     
@@ -338,10 +341,15 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     } catch (err) {
       // Refocus not supported, silently ignore
     }
-  }, []);
+  }, [isCapturing]);
 
   // Handle tap on video to refocus
   const handleVideoTap = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.stopPropagation();
+    
+    // Don't refocus during capture or when not playing
+    if (isCapturing || !isVideoPlaying) return;
+    
     // Get tap coordinates for visual feedback
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
@@ -356,7 +364,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     
     // Trigger refocus
     triggerRefocus();
-  }, [triggerRefocus]);
+  }, [triggerRefocus, isCapturing, isVideoPlaying]);
 
   // Handle video play event
   const handleVideoPlay = useCallback(() => {
@@ -745,7 +753,6 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
         ref={containerRef} 
         className="flex-1 relative overflow-hidden"
         onClick={handleVideoTap}
-        onTouchStart={handleVideoTap}
       >
         {/* Native video stream - always visible */}
         <video
