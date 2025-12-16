@@ -144,6 +144,7 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
   const [statusMessage, setStatusMessage] = useState('Chargement...');
   const [showManualCapture, setShowManualCapture] = useState(false);
   const [hasDetectedDocument, setHasDetectedDocument] = useState(false);
+  const [containerDimensions, setContainerDimensions] = useState({ width: 0, height: 0 });
 
   // Release canvas memory explicitly
   const releaseCanvas = useCallback((canvas: HTMLCanvasElement | null) => {
@@ -288,8 +289,12 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
     const container = containerRef.current;
     const overlayCanvas = overlayCanvasRef.current;
     if (container && overlayCanvas) {
-      overlayCanvas.width = container.clientWidth;
-      overlayCanvas.height = container.clientHeight;
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+      overlayCanvas.width = width;
+      overlayCanvas.height = height;
+      setContainerDimensions({ width, height });
+      console.log('[Scanner] handleVideoPlay - container dimensions:', { width, height });
     }
   }, []);
 
@@ -411,6 +416,16 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
               // Use detectPaper to get points in VIDEO coordinates
               const detectedPoints = scanner.detectPaper(processingCanvas, isSmallFormat);
               
+              // DIAGNOSTIC LOGS
+              console.log('[Scanner Debug]', {
+                detected: !!detectedPoints,
+                points: detectedPoints,
+                canvasDims: { w: overlayCanvas.width, h: overlayCanvas.height },
+                containerDims: { w: containerWidth, h: containerHeight },
+                videoDims: { w: video.videoWidth, h: video.videoHeight },
+                transform
+              });
+              
               if (detectedPoints) {
                 // Store points for pulsing animation (avoids re-running OpenCV)
                 lastDetectedPointsRef.current = detectedPoints;
@@ -468,8 +483,12 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
       const container = containerRef.current;
       const overlayCanvas = overlayCanvasRef.current;
       if (container && overlayCanvas) {
-        overlayCanvas.width = container.clientWidth;
-        overlayCanvas.height = container.clientHeight;
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        overlayCanvas.width = width;
+        overlayCanvas.height = height;
+        setContainerDimensions({ width, height });
+        console.log('[Scanner] resize - container dimensions:', { width, height });
       }
     };
     
@@ -678,10 +697,16 @@ export const SimpleDocumentScanner: React.FC<SimpleDocumentScannerProps> = ({
           className="hidden"
         />
 
-        {/* Transparent overlay canvas for green contours - NO object-cover, sized to container */}
+        {/* Transparent overlay canvas for green contours - explicit dimensions, no CSS scaling */}
         <canvas
           ref={overlayCanvasRef}
-          className="absolute inset-0 w-full h-full pointer-events-none z-10"
+          width={containerDimensions.width || undefined}
+          height={containerDimensions.height || undefined}
+          className="absolute top-0 left-0 pointer-events-none z-10"
+          style={{
+            width: containerDimensions.width > 0 ? `${containerDimensions.width}px` : '100%',
+            height: containerDimensions.height > 0 ? `${containerDimensions.height}px` : '100%'
+          }}
         />
 
         {/* Legacy canvas for fallback capture */}
