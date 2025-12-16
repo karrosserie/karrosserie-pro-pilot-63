@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Camera, X, ImagePlus } from 'lucide-react';
-import SimpleCaptureMode from '@/components/shared/document-scanner/SimpleCaptureMode';
+import VehiclePhotoCapture from './VehiclePhotoCapture';
 
 interface CapturedPhoto {
   blob: Blob;
@@ -94,7 +94,7 @@ export const AtelierPhotoCapture = ({
       {/* Modal caméra */}
       {showCamera && (
         <div className="fixed inset-0 z-50 bg-black">
-          <SimpleCaptureMode
+          <VehiclePhotoCapture
             onCapture={handleCapture}
             onClose={() => setShowCamera(false)}
           />
