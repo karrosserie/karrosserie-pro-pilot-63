@@ -5,9 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Car, Loader2 } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Car, Loader2, Check, ChevronsUpDown } from 'lucide-react';
 import { isValidFrenchMobilePhone } from '@/utils/phoneValidation';
+import { cn } from '@/lib/utils';
 import { AtelierPhotoCapture } from '../AtelierPhotoCapture';
 import { useCarBrands } from '@/hooks/use-car-brands';
 import { useCarModels } from '@/hooks/use-car-models';
@@ -56,6 +58,8 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit, isSubmitting = f
   });
   const [phoneError, setPhoneError] = useState('');
   const [entryPhotos, setEntryPhotos] = useState<CapturedPhoto[]>([]);
+  const [brandOpen, setBrandOpen] = useState(false);
+  const [modelOpen, setModelOpen] = useState(false);
 
   const { carBrands, isLoading: brandsLoading } = useCarBrands();
   const { carModels, isLoading: modelsLoading } = useCarModels(formData.brand_id);
@@ -176,43 +180,93 @@ export const NewDossierModal = ({ open, onOpenChange, onSubmit, isSubmitting = f
             {/* Marque */}
             <div>
               <Label>Marque</Label>
-              <Select
-                value={formData.brand_id}
-                onValueChange={handleBrandChange}
-                disabled={isSubmitting || brandsLoading}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={brandsLoading ? "Chargement..." : "Sélectionner"} />
-                </SelectTrigger>
-                <SelectContent className="max-h-[200px] overflow-y-auto">
-                  {carBrands?.map(brand => (
-                    <SelectItem key={brand.id} value={brand.id}>
-                      {brand.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover open={brandOpen} onOpenChange={setBrandOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={brandOpen}
+                    className="w-full justify-between font-normal"
+                    disabled={isSubmitting || brandsLoading}
+                  >
+                    {brandsLoading 
+                      ? "Chargement..." 
+                      : formData.brand_id 
+                        ? carBrands?.find(b => b.id === formData.brand_id)?.name 
+                        : "Sélectionner..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[200px] p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Rechercher..." />
+                    <CommandList className="max-h-[200px]">
+                      <CommandEmpty>Aucune marque</CommandEmpty>
+                      <CommandGroup>
+                        {carBrands?.map(brand => (
+                          <CommandItem
+                            key={brand.id}
+                            value={brand.name}
+                            onSelect={() => {
+                              handleBrandChange(brand.id);
+                              setBrandOpen(false);
+                            }}
+                          >
+                            <Check className={cn("mr-2 h-4 w-4", formData.brand_id === brand.id ? "opacity-100" : "opacity-0")} />
+                            {brand.name}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
 
             {/* Modèle */}
             <div>
               <Label>Modèle</Label>
-              <Select
-                value={formData.model_id}
-                onValueChange={value => setFormData({ ...formData, model_id: value })}
-                disabled={isSubmitting || !formData.brand_id || modelsLoading}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={modelsLoading ? "Chargement..." : "Sélectionner"} />
-                </SelectTrigger>
-                <SelectContent className="max-h-[200px] overflow-y-auto">
-                  {carModels?.map(model => (
-                    <SelectItem key={model.id} value={model.id}>
-                      {model.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover open={modelOpen} onOpenChange={setModelOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={modelOpen}
+                    className="w-full justify-between font-normal"
+                    disabled={isSubmitting || !formData.brand_id || modelsLoading}
+                  >
+                    {modelsLoading 
+                      ? "Chargement..." 
+                      : formData.model_id 
+                        ? carModels?.find(m => m.id === formData.model_id)?.name 
+                        : "Sélectionner..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[200px] p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Rechercher..." />
+                    <CommandList className="max-h-[200px]">
+                      <CommandEmpty>Aucun modèle</CommandEmpty>
+                      <CommandGroup>
+                        {carModels?.map(model => (
+                          <CommandItem
+                            key={model.id}
+                            value={model.name}
+                            onSelect={() => {
+                              setFormData({ ...formData, model_id: model.id });
+                              setModelOpen(false);
+                            }}
+                          >
+                            <Check className={cn("mr-2 h-4 w-4", formData.model_id === model.id ? "opacity-100" : "opacity-0")} />
+                            {model.name}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div>
