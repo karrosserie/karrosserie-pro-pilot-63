@@ -22,6 +22,7 @@ import { useInvoices } from '@/hooks/use-invoices';
 import { useCredits } from '@/hooks/use-credits';
 // useReceiptsData import supprimé - non utilisé sur cette page
 import { useCompany } from '@/hooks/use-company';
+import { useCompanyPreferences } from '@/hooks/use-company-preferences';
 import { Invoice } from '@/services/supabase/invoices';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { ErrorMessage } from '@/components/ui/error-message';
@@ -67,6 +68,7 @@ const Invoices = () => {
   const { invoices: allInvoices, isLoading, error, deleteInvoice, createInvoice, updateInvoice, archiveInvoice, restoreInvoice } = useInvoices();
   const { credits, createCredit } = useCredits();
   const { companyData } = useCompany();
+  const { preferences } = useCompanyPreferences();
   
   console.log('[Invoices] useInvoices returned:', { count: allInvoices?.length, isLoading, hasError: !!error });
   
@@ -208,10 +210,10 @@ const Invoices = () => {
     setDialogOpen(true);
   };
 
-  const handleEditInvoice = (invoice: Invoice) => {
+  const handleEditInvoice = useCallback((invoice: Invoice) => {
     setSelectedInvoice(invoice);
     setDialogOpen(true);
-  };
+  }, []);
 
   const handleDelete = async (invoice: Invoice) => {
     const confirmed = await confirm({
@@ -295,20 +297,20 @@ const Invoices = () => {
     }
   };
 
-  const handleSendEmail = (invoice: Invoice) => {
+  const handleSendEmail = useCallback((invoice: Invoice) => {
     setSelectedInvoice(invoice);
     setEmailDialogOpen(true);
-  };
+  }, []);
 
-  const handleAddPayment = (invoice: Invoice) => {
+  const handleAddPayment = useCallback((invoice: Invoice) => {
     setSelectedInvoice(invoice);
     setReceiptDialogOpen(true);
-  };
+  }, []);
 
-  const handleAddCredit = (invoice: Invoice) => {
+  const handleAddCredit = useCallback((invoice: Invoice) => {
     setSelectedInvoice(invoice);
     setCreditDialogOpen(true);
-  };
+  }, []);
 
   const handleViewInvoice = (invoice: Invoice) => {
     setSelectedInvoice(invoice);
@@ -677,6 +679,8 @@ const Invoices = () => {
           onSendEmail={handleSendEmail}
           onCreateReceipt={handleAddPayment}
           onCreateCredit={handleAddCredit}
+          companyData={companyData}
+          preferences={preferences}
         />
       )}
 
