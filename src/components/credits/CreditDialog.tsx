@@ -14,12 +14,12 @@ interface CreditDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   credit?: { invoice_id: string; reference: string; status: string; amount: number; notes: string } | null;
-  // Mutation optionnelle - si fournie depuis parent (Invoices.tsx), évite double fetch
+  // Mutation optionnelle - si non fournie, utilise hook interne
   createCredit?: UseMutationResult<any, Error, any, unknown>;
 }
 
 export const CreditDialog = ({ open, onOpenChange, credit, createCredit: externalCreateCredit }: CreditDialogProps) => {
-  // Toujours appeler le hook (règle des hooks React) - mais utiliser résultat externe si fourni
+  // Utilise le hook uniquement si mutation non fournie en props
   const { createCredit: hookCreateCredit } = useCredits();
   const createCredit = externalCreateCredit || hookCreateCredit;
 
