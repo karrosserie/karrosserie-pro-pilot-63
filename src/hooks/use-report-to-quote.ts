@@ -27,23 +27,17 @@ export const useReportToQuote = () => {
     }
   };
 
-  // Vérifier le statut de conversion pour plusieurs rapports (maintenant synchrone pour le chargement initial)
+  // Vérifier le statut de conversion pour plusieurs rapports en UNE SEULE requête
   const checkMultipleReports = async (reports: ExpertiseReport[]) => {
-    const results: Record<string, any> = {};
+    if (!reports || reports.length === 0) {
+      setConvertedReports({});
+      return {};
+    }
     
-    // Utiliser Promise.all pour charger tous les statuts en parallèle
-    const promises = reports.map(async (report) => {
-      try {
-        const existingQuote = await quotesService.getByReportId(report.id);
-        if (existingQuote) {
-          results[report.id] = existingQuote;
-        }
-      } catch (error) {
-        console.error(`Error checking report ${report.id}:`, error);
-      }
-    });
+    // Utiliser une requête batch au lieu de N requêtes individuelles
+    const reportIds = reports.map(r => r.id);
+    const results = await quotesService.getByReportIds(reportIds);
     
-    await Promise.all(promises);
     setConvertedReports(results);
     return results;
   };
