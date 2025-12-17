@@ -82,6 +82,28 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
     return { clientData: client, vehicleData: vehicle };
   }, [currentInvoice]);
 
+  // Mémoriser les objets passés aux dialogues pour éviter les boucles infinies (AVANT le early return)
+  const receiptPreselect = useMemo(() => {
+    if (!currentInvoice) return null;
+    const totalPaid = receiptsData.reduce((sum, r) => sum + r.amount, 0);
+    const remaining = currentInvoice.amount - totalPaid;
+    return {
+      id: currentInvoice.id,
+      amount: remaining > 0 ? remaining : currentInvoice.amount,
+    };
+  }, [currentInvoice?.id, currentInvoice?.amount, receiptsData]);
+
+  const creditPreselect = useMemo(() => {
+    if (!currentInvoice) return null;
+    return {
+      invoice_id: currentInvoice.id,
+      reference: '',
+      status: 'En attente' as const,
+      amount: 0,
+      notes: ''
+    };
+  }, [currentInvoice?.id]);
+
   if (!currentInvoice) return null;
 
   const template = preferences?.invoice_template || 'default';
@@ -172,19 +194,6 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
   // Vérifier si la facture est entièrement payée
   const isPaid = remainingAmount <= 0 && totalPaidAmount > 0;
 
-  // Mémoriser les objets passés aux dialogues pour éviter les boucles infinies
-  const receiptPreselect = useMemo(() => ({
-    id: currentInvoice.id,
-    amount: remainingAmount > 0 ? remainingAmount : currentInvoice.amount,
-  }), [currentInvoice.id, remainingAmount, currentInvoice.amount]);
-
-  const creditPreselect = useMemo(() => ({
-    invoice_id: currentInvoice.id,
-    reference: '',
-    status: 'En attente' as const,
-    amount: 0,
-    notes: ''
-  }), [currentInvoice.id]);
 
   // Action handlers
   const handleEdit = () => {
