@@ -155,7 +155,22 @@ export const useLoanFormGuide = (
     const { status, action, index, type, lifecycle } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
+    // Gérer la fermeture du guide (bouton X ou Skip)
     if (finishedStatuses.includes(status)) {
+      setRunTour(false);
+      setCurrentStep(0);
+      return;
+    }
+
+    // Gérer l'action de fermeture explicite (bouton X)
+    if (action === ACTIONS.CLOSE) {
+      setRunTour(false);
+      setCurrentStep(0);
+      return;
+    }
+
+    // Gérer l'action Skip (Passer le guide)
+    if (action === ACTIONS.SKIP) {
       setRunTour(false);
       setCurrentStep(0);
       return;
