@@ -46,7 +46,7 @@ import RelanceModal from '@/components/invoices/RelanceModal';
 import { useSendRelance } from '@/hooks/use-send-relance';
 
 const Invoices = () => {
-  console.log('[Invoices] COMPONENT RENDER START');
+  console.log('[Invoices] COMPONENT RENDER START', performance.now());
   const renderStart = performance.now();
   
   const [searchParams, setSearchParams] = useSearchParams();
@@ -65,12 +65,31 @@ const Invoices = () => {
   console.log('[Invoices] Dialog states:', { dialogOpen, emailDialogOpen, receiptDialogOpen, creditDialogOpen, viewerModalOpen, relanceModalOpen });
 
   // Hook avec queryKey stable - retourne TOUTES les factures + toutes les mutations
+  console.log('[Invoices] BEFORE useInvoices', performance.now());
   const { invoices: allInvoices, isLoading, error, deleteInvoice, createInvoice, updateInvoice, archiveInvoice, restoreInvoice } = useInvoices();
+  console.log('[Invoices] AFTER useInvoices', performance.now());
+  
+  console.log('[Invoices] BEFORE useCredits', performance.now());
   const { credits, createCredit } = useCredits();
+  console.log('[Invoices] AFTER useCredits', performance.now());
+  
+  console.log('[Invoices] BEFORE useCompany', performance.now());
   const { companyData } = useCompany();
+  console.log('[Invoices] AFTER useCompany', performance.now());
+  
+  console.log('[Invoices] BEFORE useCompanyPreferences', performance.now());
   const { preferences } = useCompanyPreferences();
+  console.log('[Invoices] AFTER useCompanyPreferences', performance.now());
   
   console.log('[Invoices] useInvoices returned:', { count: allInvoices?.length, isLoading, hasError: !!error });
+  
+  // Callback wrappé pour tracer le changement d'état du modal
+  const handleViewerModalOpenChange = useCallback((open: boolean) => {
+    console.log('[Invoices] handleViewerModalOpenChange CALLED with:', open, 'at', performance.now());
+    const start = performance.now();
+    setViewerModalOpen(open);
+    console.log('[Invoices] setViewerModalOpen COMPLETED in', (performance.now() - start).toFixed(2), 'ms');
+  }, []);
   
   // Filtrage côté client selon showArchived
   const invoices = React.useMemo(() => {
@@ -82,7 +101,7 @@ const Invoices = () => {
   const isMobile = useIsMobile();
   const { sendRelance } = useSendRelance();
 
-  console.log('[Invoices] COMPONENT RENDER took', (performance.now() - renderStart).toFixed(0), 'ms');
+  console.log('[Invoices] COMPONENT RENDER took', (performance.now() - renderStart).toFixed(0), 'ms at', performance.now());
 
   // Mémoriser les objets passés aux dialogues pour éviter les re-renders
   const preselectedInvoiceData = useMemo(() => {
@@ -673,7 +692,7 @@ const Invoices = () => {
         <InvoiceViewerModal
           invoice={selectedInvoice}
           open={viewerModalOpen}
-          onOpenChange={setViewerModalOpen}
+          onOpenChange={handleViewerModalOpenChange}
           deleteInvoice={deleteInvoice}
           onEditInvoice={handleEditInvoice}
           onSendEmail={handleSendEmail}
