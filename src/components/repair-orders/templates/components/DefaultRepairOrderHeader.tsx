@@ -31,13 +31,9 @@ const DefaultRepairOrderHeader = ({ companyData, orderData, clientData, vehicleD
       {/* Colonne 1 - Entreprise */}
       <div className="break-inside-avoid">
         <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white px-2 sm:px-3 py-1 text-center mb-2 sm:mb-3" style={{backgroundColor: 'rgba(64,67,72,255)'}}>ORDRE DE RÉPARATION</h1>
-        {companyData.logo_url ? (
+        {companyData.logo_url && (
           <div className="flex items-center justify-start mb-3" style={{maxWidth: '120px'}}>
             <img src={companyData.logo_url} alt="Logo entreprise" className="max-w-full h-auto object-contain" />
-          </div>
-        ) : (
-          <div className="bg-orange-500 rounded-full p-2 w-fit mb-3">
-            <span className="text-white font-bold text-base">LOGO</span>
           </div>
         )}
         <p className="text-gray-600 font-bold mb-1 sm:mb-2 text-sm sm:text-base">{companyData.name || ''}</p>
