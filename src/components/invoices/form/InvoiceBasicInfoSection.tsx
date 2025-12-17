@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -25,7 +25,7 @@ interface InvoiceBasicInfoSectionProps {
   isNewInvoice?: boolean;
 }
 
-export const InvoiceBasicInfoSection = ({ 
+const InvoiceBasicInfoSectionComponent = ({ 
   formData, 
   errors, 
   onFieldChange,
@@ -272,3 +272,6 @@ export const InvoiceBasicInfoSection = ({
     </Card>
   );
 };
+
+// Memoize to prevent unnecessary re-renders
+export const InvoiceBasicInfoSection = memo(InvoiceBasicInfoSectionComponent);

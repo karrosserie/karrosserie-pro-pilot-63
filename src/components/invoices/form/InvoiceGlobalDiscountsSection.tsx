@@ -1,5 +1,5 @@
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useRef, memo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,7 +13,11 @@ interface InvoiceGlobalDiscountsSectionProps {
   isReadOnly?: boolean;
 }
 
-export const InvoiceGlobalDiscountsSection = ({ discounts, onDiscountsChange, isReadOnly = false }: InvoiceGlobalDiscountsSectionProps) => {
+const InvoiceGlobalDiscountsSectionComponent = ({ discounts, onDiscountsChange, isReadOnly = false }: InvoiceGlobalDiscountsSectionProps) => {
+  // useRef pattern to stabilize callbacks - prevents infinite re-renders
+  const discountsRef = useRef(discounts);
+  discountsRef.current = discounts;
+
   const addDiscount = useCallback(() => {
     if (isReadOnly) return;
     const newDiscount: InvoiceDiscountItem = {
@@ -21,24 +25,24 @@ export const InvoiceGlobalDiscountsSection = ({ discounts, onDiscountsChange, is
       description: '',
       amount: 0
     };
-    onDiscountsChange([...discounts, newDiscount]);
-  }, [isReadOnly, discounts, onDiscountsChange]);
+    onDiscountsChange([...discountsRef.current, newDiscount]);
+  }, [isReadOnly, onDiscountsChange]);
 
   const removeDiscount = useCallback((id: string) => {
     if (isReadOnly) return;
-    onDiscountsChange(discounts.filter(discount => discount.id !== id));
-  }, [isReadOnly, discounts, onDiscountsChange]);
+    onDiscountsChange(discountsRef.current.filter(discount => discount.id !== id));
+  }, [isReadOnly, onDiscountsChange]);
 
   const updateDiscount = useCallback((id: string, field: keyof InvoiceDiscountItem, value: string | number) => {
     if (isReadOnly) return;
-    const updatedDiscounts = discounts.map(discount => {
+    const updatedDiscounts = discountsRef.current.map(discount => {
       if (discount.id === id) {
         return { ...discount, [field]: value };
       }
       return discount;
     });
     onDiscountsChange(updatedDiscounts);
-  }, [isReadOnly, discounts, onDiscountsChange]);
+  }, [isReadOnly, onDiscountsChange]);
 
   const totalDiscounts = useMemo(() => 
     discounts.reduce((sum, discount) => sum + discount.amount, 0),
@@ -126,3 +130,6 @@ export const InvoiceGlobalDiscountsSection = ({ discounts, onDiscountsChange, is
     </Card>
   );
 };
+
+// Memoize to prevent unnecessary re-renders
+export const InvoiceGlobalDiscountsSection = memo(InvoiceGlobalDiscountsSectionComponent);

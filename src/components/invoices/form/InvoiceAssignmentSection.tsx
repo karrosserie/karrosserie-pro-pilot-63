@@ -1,5 +1,5 @@
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useRef, memo } from 'react';
 import { Label } from '@/components/ui/label';
 import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,7 +20,7 @@ interface InvoiceAssignmentSectionProps {
   onSkipVehicleChange?: (value: boolean) => void;
 }
 
-export const InvoiceAssignmentSection = ({
+const InvoiceAssignmentSectionComponent = ({
   formData,
   errors = {},
   onFieldChange,
@@ -31,12 +31,18 @@ export const InvoiceAssignmentSection = ({
 }: InvoiceAssignmentSectionProps) => {
   const { vehicles, isLoading: isLoadingVehicles } = useVehicles();
 
+  // useRef pattern to stabilize callbacks
+  const onFieldChangeRef = useRef(onFieldChange);
+  onFieldChangeRef.current = onFieldChange;
+  const onSkipVehicleChangeRef = useRef(onSkipVehicleChange);
+  onSkipVehicleChangeRef.current = onSkipVehicleChange;
+
   const handleSkipVehicleToggle = useCallback((checked: boolean) => {
-    onSkipVehicleChange?.(checked);
+    onSkipVehicleChangeRef.current?.(checked);
     if (checked) {
-      onFieldChange('vehicle_id', null);
+      onFieldChangeRef.current('vehicle_id', null);
     }
-  }, [onSkipVehicleChange, onFieldChange]);
+  }, []);
   
   // Filtrer les véhicules pour le client sélectionné
   const clientVehicles = useMemo(() => 
@@ -45,14 +51,14 @@ export const InvoiceAssignmentSection = ({
   );
 
   const handleClientChange = useCallback((clientId: string) => {
-    onFieldChange('client_id', clientId);
+    onFieldChangeRef.current('client_id', clientId);
     // Réinitialiser le véhicule quand on change de client
-    onFieldChange('vehicle_id', null);
-  }, [onFieldChange]);
+    onFieldChangeRef.current('vehicle_id', null);
+  }, []);
 
   const handleVehicleChange = useCallback((vehicleId: string) => {
-    onFieldChange('vehicle_id', vehicleId);
-  }, [onFieldChange]);
+    onFieldChangeRef.current('vehicle_id', vehicleId);
+  }, []);
 
   // Préparer les options pour SearchableSelect
   const clientSelectOptions = useMemo(() => 
@@ -151,3 +157,6 @@ export const InvoiceAssignmentSection = ({
     </Card>
   );
 };
+
+// Memoize to prevent unnecessary re-renders
+export const InvoiceAssignmentSection = memo(InvoiceAssignmentSectionComponent);

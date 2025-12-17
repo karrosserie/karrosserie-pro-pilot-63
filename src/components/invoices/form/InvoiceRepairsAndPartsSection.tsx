@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useMemo, useRef, memo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -20,7 +20,7 @@ interface InvoiceRepairsAndPartsSectionProps {
   isReadOnly?: boolean;
 }
 
-export const InvoiceRepairsAndPartsSection = ({ 
+const InvoiceRepairsAndPartsSectionComponent = ({ 
   repairs, 
   parts, 
   onRepairsChange, 
@@ -651,3 +651,6 @@ export const InvoiceRepairsAndPartsSection = ({
     </Card>
   );
 };
+
+// Memoize to prevent unnecessary re-renders
+export const InvoiceRepairsAndPartsSection = memo(InvoiceRepairsAndPartsSectionComponent);
