@@ -13,6 +13,8 @@ export function useInvoices() {
   const { isImpersonating, impersonationData } = useImpersonation();
   const { trackAction } = useDetailedTracking();
 
+  console.log('[useInvoices] Hook initialized, impersonation:', { isImpersonating, companyId: impersonationData?.company_id });
+
   // L'impersonation est gérée via la queryKey dynamique - plus besoin d'invalider manuellement
 
   // QueryKey STABLE - plus de paramètre showArchived
@@ -23,17 +25,22 @@ export function useInvoices() {
   } = useQuery({
     queryKey: ['invoices', impersonationData?.company_id || 'normal'],
     queryFn: async () => {
-      // Récupère TOUTES les factures (archived et non-archived)
-      return await invoicesService.getAll();
+      console.log('[useInvoices] queryFn CALLED - fetching invoices...');
+      const start = performance.now();
+      const result = await invoicesService.getAll();
+      console.log('[useInvoices] queryFn COMPLETED in', (performance.now() - start).toFixed(0), 'ms, count:', result?.length);
+      return result;
     },
     staleTime: 30000
   });
 
   const createInvoice = useMutation({
     mutationFn: async (invoiceData: any) => {
+      console.log('[useInvoices] createInvoice mutationFn CALLED');
       return await invoicesService.create(invoiceData);
     },
     onSuccess: (data) => {
+      console.log('[useInvoices] createInvoice SUCCESS - invalidating queries...');
       // Invalidation immédiate comme use-quotes.ts
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
       
@@ -66,9 +73,11 @@ export function useInvoices() {
 
   const updateInvoice = useMutation({
     mutationFn: async ({ id, data }: { id: string, data: any }) => {
+      console.log('[useInvoices] updateInvoice mutationFn CALLED for id:', id);
       return await invoicesService.update(id, data);
     },
     onSuccess: (updatedInvoice, { id }) => {
+      console.log('[useInvoices] updateInvoice SUCCESS - invalidating queries...');
       // Invalidation unique comme use-quotes.ts
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
       
