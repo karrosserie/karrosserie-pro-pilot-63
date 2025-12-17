@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState, startTransition } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -84,11 +84,25 @@ const Invoices = () => {
   console.log('[Invoices] useInvoices returned:', { count: allInvoices?.length, isLoading, hasError: !!error });
   
   // Callback wrappé pour tracer le changement d'état du modal
+  // Utilise startTransition pour différer le démontage et éviter le freeze
   const handleViewerModalOpenChange = useCallback((open: boolean) => {
     console.log('[Invoices] handleViewerModalOpenChange CALLED with:', open, 'at', performance.now());
     const start = performance.now();
-    setViewerModalOpen(open);
+    if (open) {
+      setViewerModalOpen(true);
+    } else {
+      // Utiliser startTransition pour différer le démontage (priorité basse)
+      startTransition(() => {
+        setViewerModalOpen(false);
+      });
+    }
     console.log('[Invoices] setViewerModalOpen COMPLETED in', (performance.now() - start).toFixed(2), 'ms');
+    // Log après le paint du navigateur
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        console.log('[Invoices] AFTER BROWSER PAINT at', performance.now());
+      });
+    });
   }, []);
   
   // Filtrage côté client selon showArchived
