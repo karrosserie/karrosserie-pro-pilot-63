@@ -207,7 +207,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
         scrollToFirstStep={false}
         scrollOffset={80}
         disableScrollParentFix={false}
-        disableOverlay={true}
+        disableOverlayClose={true}
         callback={handleJoyrideCallback}
         floaterProps={{
           disableAnimation: false,
@@ -217,8 +217,26 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
             zIndex: 100000,
             primaryColor: 'hsl(var(--primary))',
           },
+          overlay: {
+            zIndex: 99998,
+          },
+          spotlight: {
+            zIndex: 99999,
+          },
           tooltip: {
             zIndex: 100000,
+          },
+          buttonClose: {
+            zIndex: 100001,
+          },
+          buttonNext: {
+            zIndex: 100001,
+          },
+          buttonBack: {
+            zIndex: 100001,
+          },
+          buttonSkip: {
+            zIndex: 100001,
           },
         }}
         locale={{
