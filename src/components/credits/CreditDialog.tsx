@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { CreditForm } from './form/CreditForm';
+import { useCredits } from '@/hooks/use-credits';
 
 interface CreditDialogProps {
   open: boolean;
@@ -16,6 +17,9 @@ interface CreditDialogProps {
 }
 
 export const CreditDialog = ({ open, onOpenChange, credit }: CreditDialogProps) => {
+  // Hook appelé UNE SEULE FOIS ici - mutation passée en props au CreditForm
+  const { createCredit } = useCredits();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -30,6 +34,7 @@ export const CreditDialog = ({ open, onOpenChange, credit }: CreditDialogProps) 
           <CreditForm 
             onClose={() => onOpenChange(false)}
             preselectedInvoice={credit}
+            createCredit={createCredit}
           />
         )}
       </DialogContent>

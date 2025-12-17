@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Receipt } from './form/types';
 import { receiptMutations } from '@/services/supabase/receipts/mutations';
 import { useQueryClient } from '@tanstack/react-query';
+import { useInvoices } from '@/hooks/use-invoices';
 
 interface ReceiptDialogProps {
   receipt?: Receipt | null;
@@ -29,6 +30,9 @@ const ReceiptDialog = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Hook appelé UNE SEULE FOIS ici - passé en props au ReceiptForm
+  const { invoices, isLoading: invoicesLoading } = useInvoices();
 
   const handleSubmit = async (formData: Receipt) => {
     if (isSubmitting) return;
@@ -69,8 +73,6 @@ const ReceiptDialog = ({
         payment_proofs: formData.payment_proofs || [],
         invoice_id: invoiceId
       };
-
-      console.log('Submitting receipt data:', dataToSubmit);
 
       if (receipt?.id) {
         await receiptMutations.update(receipt.id, dataToSubmit);
@@ -126,6 +128,8 @@ const ReceiptDialog = ({
             onCancel={() => onOpenChange(false)}
             isSubmitting={isSubmitting}
             preselectedInvoice={preselectedInvoice}
+            invoices={invoices || []}
+            invoicesLoading={invoicesLoading}
           />
         )}
       </DialogContent>

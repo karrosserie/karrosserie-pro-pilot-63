@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { InvoiceForm } from '@/components/invoices/InvoiceForm';
 import { useInvoices } from '@/hooks/use-invoices';
+import { UseMutationResult } from '@tanstack/react-query';
 
 interface InvoiceDialogProps {
   invoice?: any;
@@ -17,6 +18,9 @@ interface InvoiceDialogProps {
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   prefillData?: any;
+  // Mutations optionnelles - si non fournies, utilise le hook interne
+  createInvoice?: UseMutationResult<any, Error, any, unknown>;
+  updateInvoice?: UseMutationResult<any, Error, { id: string; data: any }, unknown>;
 }
 
 const InvoiceDialog = ({
@@ -24,11 +28,17 @@ const InvoiceDialog = ({
   open,
   onOpenChange,
   onSuccess,
-  prefillData
+  prefillData,
+  createInvoice: externalCreateInvoice,
+  updateInvoice: externalUpdateInvoice
 }: InvoiceDialogProps) => {
   const navigate = useNavigate();
-  // Hook appelé une seule fois car queryKey est maintenant stable
-  const { updateInvoice, createInvoice } = useInvoices();
+  
+  // Utilise les mutations externes si fournies, sinon fallback au hook
+  const internalHook = useInvoices();
+  const createInvoice = externalCreateInvoice || internalHook.createInvoice;
+  const updateInvoice = externalUpdateInvoice || internalHook.updateInvoice;
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Déterminer si c'est une conversion depuis un ordre de réparation

@@ -10,12 +10,12 @@ import { InvoiceSelect } from './form/InvoiceSelect';
 import { Receipt } from './form/types';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { useAccounts } from '@/hooks/use-accounts';
-import { useInvoices } from '@/hooks/use-invoices';
 import { receiptsService } from '@/services/supabase/receipts';
 import { SimpleDocumentScanner } from '@/components/shared/document-scanner/SimpleDocumentScanner';
 import { useStorage } from '@/hooks/use-storage';
 import { useToast } from '@/hooks/use-toast';
 import { Camera, X, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { Invoice } from '@/services/supabase/invoices';
 
 interface ReceiptFormProps {
   receipt?: Receipt | null;
@@ -23,13 +23,21 @@ interface ReceiptFormProps {
   onCancel: () => void;
   isSubmitting: boolean;
   preselectedInvoice?: { id: string; amount: number } | null;
+  invoices: Invoice[];
+  invoicesLoading?: boolean;
 }
 
-export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting, preselectedInvoice }: ReceiptFormProps) => {
+export const ReceiptForm = ({ 
+  receipt, 
+  onSubmit, 
+  onCancel, 
+  isSubmitting, 
+  preselectedInvoice,
+  invoices,
+  invoicesLoading 
+}: ReceiptFormProps) => {
   const { receipts } = useReceiptsData();
   const { accounts, isLoading: accountsLoading } = useAccounts();
-  // Hook avec queryKey stable - pas de conflit de cache
-  const { invoices } = useInvoices();
   const { uploadDocument } = useStorage();
   const { toast } = useToast();
   
@@ -225,6 +233,8 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting, presele
         <InvoiceSelect
           value={formData.invoice}
           onChange={(value) => handleFieldChange('invoice', value)}
+          invoices={invoices || []}
+          isLoading={invoicesLoading}
         />
 
         <div className="grid grid-cols-2 gap-4">

@@ -2,18 +2,17 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { SearchableSelect } from '@/components/ui/searchable-select';
-import { useInvoices } from '@/hooks/use-invoices';
+import { Invoice } from '@/services/supabase/invoices';
 
 interface InvoiceSelectProps {
   value: string;
   onChange: (value: string) => void;
+  invoices: Invoice[];
+  isLoading?: boolean;
 }
 
-export const InvoiceSelect = ({ value, onChange }: InvoiceSelectProps) => {
-  // Hook avec queryKey stable - pas de conflit de cache
-  const { invoices, isLoading: isLoadingInvoices } = useInvoices();
-
-  const formatInvoiceDisplay = (invoice: any) => {
+export const InvoiceSelect = ({ value, onChange, invoices, isLoading }: InvoiceSelectProps) => {
+  const formatInvoiceDisplay = (invoice: Invoice) => {
     const clientName = invoice.clients 
       ? `${invoice.clients.first_name} ${invoice.clients.last_name}` 
       : 'Client non assigné';
@@ -41,9 +40,9 @@ export const InvoiceSelect = ({ value, onChange }: InvoiceSelectProps) => {
         options={invoiceOptions}
         value={value}
         onValueChange={onChange}
-        placeholder={isLoadingInvoices ? "Chargement..." : "Sélectionner une facture"}
+        placeholder={isLoading ? "Chargement..." : "Sélectionner une facture"}
         searchPlaceholder="Rechercher une facture..."
-        disabled={isLoadingInvoices}
+        disabled={isLoading}
       />
     </div>
   );
