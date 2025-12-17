@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { invoicesService } from '@/services/supabase/invoices';
 import { useImpersonation } from '@/hooks/use-impersonation';
-import { useEffect } from 'react';
 import { userActionWebhookService } from '@/services/tracking/UserActionWebhookService';
 import { useDetailedTracking } from '@/hooks/tracking/useDetailedTracking';
 

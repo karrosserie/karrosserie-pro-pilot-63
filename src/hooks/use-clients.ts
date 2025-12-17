@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { clientsService, NewClient, UpdateClient } from '@/services/supabase/clients';
 import { useToast } from '@/hooks/use-toast';
 import { useImpersonation } from '@/hooks/use-impersonation';
-import { useEffect } from 'react';
 import { useDetailedTracking } from '@/hooks/tracking/useDetailedTracking';
 
 // Helper function to transform client data from database format to frontend format
@@ -27,11 +26,7 @@ export function useClients() {
   const { isImpersonating, impersonationData } = useImpersonation();
   const { trackAction } = useDetailedTracking();
 
-  // Invalider les requêtes lors du changement d'impersonation
-  useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ['clients'] });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isImpersonating, impersonationData?.company_id]);
+  // QueryKey dynamique basée sur l'impersonation - pas besoin d'invalider manuellement
   
   const {
     data: clients,

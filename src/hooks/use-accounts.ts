@@ -4,7 +4,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
 import { accountsService, Account } from '@/services/supabase/accounts';
 import { useImpersonation } from '@/hooks/use-impersonation';
-import { useEffect } from 'react';
 
 export const useAccounts = () => {
   const { toast } = useToast();
@@ -12,11 +11,7 @@ export const useAccounts = () => {
   const queryClient = useQueryClient();
   const { isImpersonating, impersonationData } = useImpersonation();
 
-  // Invalider les requêtes lors du changement d'impersonation
-  useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ['accounts'] });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isImpersonating, impersonationData?.company_id]);
+  // QueryKey dynamique basée sur l'impersonation - pas besoin d'invalider manuellement
 
   // Fetch accounts
   const {

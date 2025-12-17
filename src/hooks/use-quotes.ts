@@ -14,10 +14,10 @@ export function useQuotes() {
   const { trackAction } = useDetailedTracking();
   const [createdQuote, setCreatedQuote] = useState<{ id: string; client_id: string; reference: string } | null>(null);
 
-  // Invalider les requêtes lors du changement d'impersonation
+  // Invalider UNIQUEMENT les quotes lors du changement d'impersonation
+  // NE PAS invalider invoices - ce n'est pas la responsabilité de use-quotes
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ['quotes'] });
-    queryClient.invalidateQueries({ queryKey: ['invoices'] });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isImpersonating, impersonationData?.company_id]);
 
