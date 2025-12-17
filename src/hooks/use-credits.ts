@@ -13,7 +13,8 @@ export function useCredits() {
     error
   } = useQuery({
     queryKey: ['credits'],
-    queryFn: creditsService.getCredits
+    queryFn: creditsService.getCredits,
+    staleTime: 10000 // 10 secondes avant de considérer les données comme obsolètes
   });
 
   const createCredit = useMutation({

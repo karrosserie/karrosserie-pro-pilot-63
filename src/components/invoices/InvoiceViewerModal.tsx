@@ -1,19 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { toast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
 import { Invoice } from '@/services/supabase/invoices';
 import { useCompany } from '@/hooks/use-company';
 import { useCompanyPreferences } from '@/hooks/use-company-preferences';
 import { useInvoices } from '@/hooks/use-invoices';
-import { useQueryClient } from '@tanstack/react-query';
 import { calculateInvoiceTotals } from '@/utils/invoiceCalculations';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Edit, Trash2, Printer, Download, Mail, CreditCard, FileX, Pencil, Trash } from 'lucide-react';
+import { Printer, Download, Mail, CreditCard, FileX, Pencil, Trash } from 'lucide-react';
 import DefaultInvoicePreview from './templates/DefaultInvoicePreview';
 import AlternativeInvoicePreview from './templates/AlternativeInvoicePreview';
 import InvoiceDialog from './InvoiceDialog';
@@ -28,15 +26,11 @@ interface InvoiceViewerModalProps {
 }
 
 const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalProps) => {
-  const { companyData, reloadCompanyData } = useCompany();
+  const { companyData } = useCompany();
   const { preferences } = useCompanyPreferences();
   const { deleteInvoice } = useInvoices();
   const { confirm } = useConfirmation();
-  const queryClient = useQueryClient();
-  const [clientData, setClientData] = useState<any>(null);
-  const [vehicleData, setVehicleData] = useState<any>(null);
   const [receiptsData, setReceiptsData] = useState<any[]>([]);
-  const [currentInvoice, setCurrentInvoice] = useState<Invoice | null>(invoice);
   
   // States for dialogs
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -44,79 +38,15 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
   const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
   const [creditDialogOpen, setCreditDialogOpen] = useState(false);
 
-  // Mettre à jour la facture actuelle quand la prop change
-  useEffect(() => {
-    setCurrentInvoice(invoice);
-  }, [invoice]);
-
-  // Écouter les mises à jour du cache React Query pour cette facture spécifique
-  useEffect(() => {
-    if (!currentInvoice?.id) return;
-
-    const refetchInvoiceData = async () => {
-      try {
-        // Récupérer les données mises à jour depuis le cache React Query
-        const cachedInvoices = queryClient.getQueryData(['invoices']) as Invoice[] | undefined;
-        if (cachedInvoices) {
-          const updatedInvoice = cachedInvoices.find(i => i.id === currentInvoice.id);
-          if (updatedInvoice) {
-            setCurrentInvoice(updatedInvoice);
-          }
-        }
-      } catch (error) {
-        // Silent fail
-      }
-    };
-
-    // Écouter les invalidations du cache des factures
-    const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
-      if (event?.query?.queryKey?.[0] === 'invoices' && event.type === 'updated') {
-        refetchInvoiceData();
-      }
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, [currentInvoice?.id, queryClient]);
+  // Utiliser directement la prop invoice - plus de souscription au cache
+  const currentInvoice = invoice;
   
-  // Récupérer les données client et véhicule depuis la base de données
+  // Récupérer uniquement les encaissements (client/véhicule sont dans invoice)
   useEffect(() => {
-    const fetchRelatedData = async () => {
-      if (!currentInvoice) return;
+    const fetchReceipts = async () => {
+      if (!currentInvoice?.id || !open) return;
 
       try {
-        // Récupérer les données client
-        if (currentInvoice.client_id) {
-          const { data: client } = await supabase
-            .from('clients')
-            .select('*')
-            .eq('id', currentInvoice.client_id)
-            .single();
-          
-          if (client) {
-            setClientData(client);
-          }
-        }
-
-        // Récupérer les données véhicule avec les informations de marque et modèle
-        if (currentInvoice.vehicle_id) {
-          const { data: vehicle } = await supabase
-            .from('vehicles')
-            .select(`
-              *,
-              car_brands(name),
-              car_models(name)
-            `)
-            .eq('id', currentInvoice.vehicle_id)
-            .single();
-          
-          if (vehicle) {
-            setVehicleData(vehicle);
-          }
-        }
-
-        // Récupérer les encaissements liés à cette facture
         const { data: receipts } = await supabase
           .from('receipts')
           .select('*')
@@ -132,11 +62,20 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
     };
 
     if (open && currentInvoice) {
-      fetchRelatedData();
-      // Forcer le rechargement des données de l'entreprise pour s'assurer d'avoir le logo le plus récent
-      reloadCompanyData();
+      fetchReceipts();
     }
-  }, [currentInvoice, open]);
+  }, [currentInvoice?.id, open]);
+
+  // Memoize les données client et véhicule depuis l'invoice
+  const { clientData, vehicleData } = useMemo(() => {
+    if (!currentInvoice) return { clientData: null, vehicleData: null };
+    
+    // Utiliser les données jointes si disponibles
+    const client = (currentInvoice as any).clients || null;
+    const vehicle = (currentInvoice as any).vehicles || null;
+    
+    return { clientData: client, vehicleData: vehicle };
+  }, [currentInvoice]);
 
   if (!currentInvoice) return null;
 
