@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, memo } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
@@ -181,4 +181,5 @@ const InvoiceViewerModal = ({
   );
 };
 
-export default InvoiceViewerModal;
+// Mémoriser le composant pour éviter les re-renders inutiles
+export default memo(InvoiceViewerModal);
