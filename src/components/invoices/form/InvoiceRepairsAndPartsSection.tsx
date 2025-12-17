@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Combobox } from '@/components/ui/combobox';
+import { AutocompleteInput } from '@/components/ui/autocomplete-input';
 import { AmountInput } from '@/components/ui/amount-input';
 import { Label } from '@/components/ui/label';
 import { Wrench, Settings, Plus, Trash } from 'lucide-react';
@@ -27,7 +27,7 @@ const RepairMobileCard = memo(({ repair, updateRepair, removeRepair, isReadOnly 
   <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
     <div>
       <Label className="text-xs text-muted-foreground">Désignation</Label>
-      <Combobox
+      <AutocompleteInput
         value={repair.description}
         onChange={(value) => updateRepair(repair.id, 'description', value)}
         options={REPAIR_DESIGNATIONS}
@@ -114,7 +114,7 @@ const PartMobileCard = memo(({ part, updatePart, removePart, partDesignations, i
   <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
     <div>
       <Label className="text-xs text-muted-foreground">Désignation</Label>
-      <Combobox
+      <AutocompleteInput
         value={part.description}
         onChange={(value) => updatePart(part.id, 'description', value)}
         options={partDesignations}
@@ -494,7 +494,7 @@ const InvoiceRepairsAndPartsSectionComponent = ({
                 </div>
                 {repairsToShow.map((repair) => (
                   <div key={repair.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
-                    <Combobox
+                    <AutocompleteInput
                       value={repair.description}
                       onChange={(value) => updateRepair(repair.id, 'description', value)}
                       options={REPAIR_DESIGNATIONS}
@@ -597,7 +597,7 @@ const InvoiceRepairsAndPartsSectionComponent = ({
                 </div>
                 {partsToShow.map((part) => (
                   <div key={part.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
-                    <Combobox
+                    <AutocompleteInput
                       value={part.description}
                       onChange={(value) => updatePart(part.id, 'description', value)}
                       options={partDesignations}
