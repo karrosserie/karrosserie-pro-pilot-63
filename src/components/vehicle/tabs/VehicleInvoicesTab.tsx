@@ -337,19 +337,29 @@ const VehicleInvoicesTab: React.FC<VehicleInvoicesTabProps> = ({ vehicleId }) =>
         </div>
       </div>
 
-      <InvoiceDialog invoice={selectedInvoice} open={dialogOpen} onOpenChange={setDialogOpen} />
-      <InvoiceViewerModal invoice={selectedInvoice} open={viewerModalOpen} onOpenChange={setViewerModalOpen} />
-      <InvoiceEmailDialog invoice={selectedInvoice} open={emailDialogOpen} onOpenChange={setEmailDialogOpen} />
-      <ReceiptDialog
-        receipt={selectedInvoice ? { invoice: selectedInvoice.id, reference: '', date: new Date().toISOString().split('T')[0], amount: selectedInvoice.amount || 0, status: 'Encaissé', payment_method: 'Virement', bank_account: '', notes: '', payment_proofs: [] } : null}
-        open={receiptDialogOpen}
-        onOpenChange={setReceiptDialogOpen}
-      />
-      <CreditDialog
-        credit={selectedInvoice ? { invoice_id: selectedInvoice.id, reference: '', status: 'Émis', amount: 0, notes: '' } : null}
-        open={creditDialogOpen}
-        onOpenChange={setCreditDialogOpen}
-      />
+      {dialogOpen && (
+        <InvoiceDialog invoice={selectedInvoice} open={dialogOpen} onOpenChange={setDialogOpen} />
+      )}
+      {viewerModalOpen && (
+        <InvoiceViewerModal invoice={selectedInvoice} open={viewerModalOpen} onOpenChange={setViewerModalOpen} />
+      )}
+      {emailDialogOpen && (
+        <InvoiceEmailDialog invoice={selectedInvoice} open={emailDialogOpen} onOpenChange={setEmailDialogOpen} />
+      )}
+      {receiptDialogOpen && selectedInvoice && (
+        <ReceiptDialog
+          receipt={{ invoice: selectedInvoice.id, reference: '', date: new Date().toISOString().split('T')[0], amount: selectedInvoice.amount || 0, status: 'Encaissé', payment_method: 'Virement', bank_account: '', notes: '', payment_proofs: [] }}
+          open={receiptDialogOpen}
+          onOpenChange={setReceiptDialogOpen}
+        />
+      )}
+      {creditDialogOpen && selectedInvoice && (
+        <CreditDialog
+          credit={{ invoice_id: selectedInvoice.id, reference: '', status: 'Émis', amount: 0, notes: '' }}
+          open={creditDialogOpen}
+          onOpenChange={setCreditDialogOpen}
+        />
+      )}
     </>
   );
 };
