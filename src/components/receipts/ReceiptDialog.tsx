@@ -119,13 +119,15 @@ const ReceiptDialog = ({
           </DialogDescription>
         </DialogHeader>
         
-        <ReceiptForm
-          receipt={receipt}
-          onSubmit={handleSubmit}
-          onCancel={() => onOpenChange(false)}
-          isSubmitting={isSubmitting}
-          preselectedInvoice={preselectedInvoice}
-        />
+        {open && (
+          <ReceiptForm
+            receipt={receipt}
+            onSubmit={handleSubmit}
+            onCancel={() => onOpenChange(false)}
+            isSubmitting={isSubmitting}
+            preselectedInvoice={preselectedInvoice}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );
