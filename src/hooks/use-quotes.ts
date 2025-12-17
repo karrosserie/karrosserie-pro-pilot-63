@@ -18,7 +18,8 @@ export function useQuotes() {
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ['quotes'] });
     queryClient.invalidateQueries({ queryKey: ['invoices'] });
-  }, [isImpersonating, impersonationData?.company_id, queryClient]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isImpersonating, impersonationData?.company_id]);
 
   // Use quote-to-reservation linker
   useQuoteToReservationLinker({

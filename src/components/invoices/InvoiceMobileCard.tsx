@@ -188,4 +188,22 @@ const InvoiceMobileCard: React.FC<InvoiceMobileCardProps> = ({
   );
 };
 
-export default InvoiceMobileCard;
+const areEqual = (prev: InvoiceMobileCardProps, next: InvoiceMobileCardProps) => {
+  const prevInvoice = prev.invoice;
+  const nextInvoice = next.invoice;
+
+  // Comparaison minimale (données affichées) pour éviter les re-renders en rafale
+  return (
+    prevInvoice.id === nextInvoice.id &&
+    prevInvoice.reference === nextInvoice.reference &&
+    prevInvoice.status === nextInvoice.status &&
+    prevInvoice.amount === nextInvoice.amount &&
+    prevInvoice.created_at === nextInvoice.created_at &&
+    prevInvoice.client_id === nextInvoice.client_id &&
+    prevInvoice.vehicle_id === nextInvoice.vehicle_id &&
+    (prev.invoiceCredits?.length || 0) === (next.invoiceCredits?.length || 0) &&
+    prev.showArchived === next.showArchived
+  );
+};
+
+export default React.memo(InvoiceMobileCard, areEqual);
