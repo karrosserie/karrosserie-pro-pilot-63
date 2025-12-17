@@ -4,7 +4,7 @@ import { receiptsService, ReceiptWithClient } from '@/services/supabase/receipts
 import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
 import { useImpersonation } from '@/hooks/use-impersonation';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 
 export function useReceiptsData() {
   const queryClient = useQueryClient();
@@ -25,7 +25,7 @@ export function useReceiptsData() {
   } = useQuery({
     queryKey: ['receipts', impersonationData?.company_id || 'normal'],
     queryFn: receiptsService.getAll,
-    staleTime: 5000 // 5 secondes avant de considérer les données comme obsolètes
+    staleTime: 10000 // 10 secondes avant de considérer les données comme obsolètes
   });
 
   // Transform receipts data to include client names and invoice references - memoized
@@ -45,17 +45,27 @@ export function useReceiptsData() {
       };
     }) || [];
   }, [receiptsData]);
+
+  // Fonction utilitaire pour invalider les queries de manière séquentielle
+  const invalidateQueriesSequentially = useCallback(async () => {
+    // D'abord invalider les receipts
+    await queryClient.invalidateQueries({ queryKey: ['receipts'] });
+    // Puis après un court délai, invalider les invoices
+    setTimeout(() => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+    }, 100);
+  }, [queryClient]);
   
   const createReceipt = useMutation({
     mutationFn: (newReceipt: Omit<Parameters<typeof receiptsService.create>[0], 'company_id'>) => 
       receiptsService.create(newReceipt),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['receipts'] });
-      queryClient.invalidateQueries({ queryKey: ['invoices'] });
       toast({
         title: "Encaissement créé",
         description: "L'encaissement a été créé avec succès."
       });
+      // Invalider de manière séquentielle
+      invalidateQueriesSequentially();
     },
     onError: (error) => {
       console.error('Create receipt error:', error);
@@ -71,12 +81,12 @@ export function useReceiptsData() {
     mutationFn: ({ id, data }: { id: string, data: Parameters<typeof receiptsService.update>[1] }) => 
       receiptsService.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['receipts'] });
-      queryClient.invalidateQueries({ queryKey: ['invoices'] });
       toast({
         title: "Encaissement mis à jour",
         description: "L'encaissement a été mis à jour avec succès."
       });
+      // Invalider de manière séquentielle
+      invalidateQueriesSequentially();
     },
     onError: (error) => {
       console.error('Update receipt error:', error);
@@ -91,12 +101,12 @@ export function useReceiptsData() {
   const deleteReceipt = useMutation({
     mutationFn: (id: string) => receiptsService.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['receipts'] });
-      queryClient.invalidateQueries({ queryKey: ['invoices'] });
       toast({
         title: "Encaissement supprimé",
         description: "L'encaissement a été supprimé avec succès."
       });
+      // Invalider de manière séquentielle
+      invalidateQueriesSequentially();
     },
     onError: (error) => {
       console.error('Delete receipt error:', error);
@@ -150,7 +160,8 @@ export function useReceipt(id?: string) {
   } = useQuery({
     queryKey: ['receipts', id],
     queryFn: () => id ? receiptsService.getById(id) : null,
-    enabled: !!id
+    enabled: !!id,
+    staleTime: 10000
   });
   
   return {

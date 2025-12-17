@@ -1,10 +1,10 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Invoice } from '@/services/supabase/invoices';
 import { InvoiceRepairItem, InvoicePartItem, InvoiceDiscountItem } from '../types';
 
 export const useInvoiceFormData = () => {
-  const [formData, setFormData] = useState<Partial<Invoice>>({
+  const [formData, setFormDataInternal] = useState<Partial<Invoice>>({
     reference: '',
     client_id: '',
     vehicle_id: '',
@@ -15,12 +15,41 @@ export const useInvoiceFormData = () => {
     notes: ''
   });
 
-  const [claimNumber, setClaimNumber] = useState('');
-  const [repairs, setRepairs] = useState<InvoiceRepairItem[]>([]);
-  const [parts, setParts] = useState<InvoicePartItem[]>([]);
-  const [discounts, setDiscounts] = useState<InvoiceDiscountItem[]>([]);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [skipVehicle, setSkipVehicle] = useState(false);
+  const [claimNumber, setClaimNumberInternal] = useState('');
+  const [repairs, setRepairsInternal] = useState<InvoiceRepairItem[]>([]);
+  const [parts, setPartsInternal] = useState<InvoicePartItem[]>([]);
+  const [discounts, setDiscountsInternal] = useState<InvoiceDiscountItem[]>([]);
+  const [errors, setErrorsInternal] = useState<Record<string, string>>({});
+  const [skipVehicle, setSkipVehicleInternal] = useState(false);
+
+  // Setters stabilisés avec useCallback pour éviter les boucles infinies
+  const setFormData = useCallback((value: React.SetStateAction<Partial<Invoice>>) => {
+    setFormDataInternal(value);
+  }, []);
+
+  const setClaimNumber = useCallback((value: React.SetStateAction<string>) => {
+    setClaimNumberInternal(value);
+  }, []);
+
+  const setRepairs = useCallback((value: React.SetStateAction<InvoiceRepairItem[]>) => {
+    setRepairsInternal(value);
+  }, []);
+
+  const setParts = useCallback((value: React.SetStateAction<InvoicePartItem[]>) => {
+    setPartsInternal(value);
+  }, []);
+
+  const setDiscounts = useCallback((value: React.SetStateAction<InvoiceDiscountItem[]>) => {
+    setDiscountsInternal(value);
+  }, []);
+
+  const setErrors = useCallback((value: React.SetStateAction<Record<string, string>>) => {
+    setErrorsInternal(value);
+  }, []);
+
+  const setSkipVehicle = useCallback((value: React.SetStateAction<boolean>) => {
+    setSkipVehicleInternal(value);
+  }, []);
 
   // Permettre la modification de toutes les factures
   const isReadOnly = false;
