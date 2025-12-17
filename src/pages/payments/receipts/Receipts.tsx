@@ -4,6 +4,7 @@ import { ReceiptsHeader } from '@/components/receipts/ReceiptsHeader';
 import { ReceiptsTable } from '@/components/receipts/ReceiptsTable';
 import ReceiptDialog from '@/components/receipts/ReceiptDialog';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
+import { useInvoices } from '@/hooks/use-invoices';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { ReceiptWithClient } from '@/services/supabase/receipts/types';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -14,6 +15,7 @@ const Receipts = () => {
   const [selectedReceipt, setSelectedReceipt] = useState<ReceiptWithClient | null>(null);
   
   const { receipts, isLoading, handleDelete, filterReceipts } = useReceiptsData();
+  const { invoices, isLoading: invoicesLoading } = useInvoices();
   const filteredReceipts = filterReceipts(receipts, searchTerm);
   const isMobile = useIsMobile();
 
@@ -57,6 +59,8 @@ const Receipts = () => {
         receipt={selectedReceipt}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
+        invoices={invoices || []}
+        invoicesLoading={invoicesLoading}
       />
     </div>
   );

@@ -13,34 +13,40 @@ import { Receipt } from './form/types';
 import { receiptMutations } from '@/services/supabase/receipts/mutations';
 import { useQueryClient } from '@tanstack/react-query';
 import { useInvoices } from '@/hooks/use-invoices';
+import { Invoice } from '@/services/supabase/invoices';
 
 interface ReceiptDialogProps {
   receipt?: Receipt | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   preselectedInvoice?: { id: string; amount: number } | null;
+  // Props optionnelles - si non fournies, utilise le hook interne
+  invoices?: Invoice[];
+  invoicesLoading?: boolean;
 }
 
 const ReceiptDialog = ({
   receipt,
   open,
   onOpenChange,
-  preselectedInvoice
+  preselectedInvoice,
+  invoices: externalInvoices,
+  invoicesLoading: externalLoading
 }: ReceiptDialogProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  // Hook appelé UNE SEULE FOIS ici - passé en props au ReceiptForm
-  const { invoices, isLoading: invoicesLoading } = useInvoices();
+  // N'appeler le hook QUE si les props ne sont pas fournies
+  const internalHook = externalInvoices === undefined ? useInvoices() : null;
+  const invoices = externalInvoices ?? internalHook?.invoices ?? [];
+  const invoicesLoading = externalLoading ?? internalHook?.isLoading ?? false;
 
   const handleSubmit = async (formData: Receipt) => {
     if (isSubmitting) return;
-    
     setIsSubmitting(true);
     
     try {
-      // Ensure amount is properly converted to number, handle empty strings
       let amount = 0;
       if (typeof formData.amount === 'string') {
         amount = formData.amount.trim() === '' ? 0 : parseFloat(formData.amount);
@@ -48,17 +54,11 @@ const ReceiptDialog = ({
         amount = formData.amount || 0;
       }
 
-      // Validate and clean invoice_id - must be a valid UUID or null
       let invoiceId = null;
       if (formData.invoice && formData.invoice.trim() !== '') {
-        // Check if it's a valid UUID format (basic check)
         const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
         if (uuidRegex.test(formData.invoice)) {
           invoiceId = formData.invoice;
-        } else {
-          console.warn('Invalid UUID format for invoice_id:', formData.invoice);
-          // If it's not a valid UUID, set to null instead of causing an error
-          invoiceId = null;
         }
       }
       
@@ -82,25 +82,14 @@ const ReceiptDialog = ({
 
       toast({
         title: receipt ? "Encaissement modifié" : "Encaissement créé",
-        description: receipt 
-          ? `L'encaissement a été modifié avec succès.`
-          : "Le nouvel encaissement a été créé avec succès."
+        description: receipt ? `L'encaissement a été modifié avec succès.` : "Le nouvel encaissement a été créé avec succès."
       });
       
-      // Fermer le dialog AVANT d'invalider pour éviter le freeze
       onOpenChange(false);
-      
-      // Invalider uniquement les receipts - les invoices seront rafraîchies par le composant parent si nécessaire
-      setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: ['receipts'] });
-      }, 100);
+      setTimeout(() => { queryClient.invalidateQueries({ queryKey: ['receipts'] }); }, 100);
     } catch (error) {
       console.error('Error saving receipt:', error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de l'enregistrement.",
-        variant: "destructive"
-      });
+      toast({ title: "Erreur", description: "Une erreur est survenue lors de l'enregistrement.", variant: "destructive" });
     } finally {
       setIsSubmitting(false);
     }
@@ -110,17 +99,9 @@ const ReceiptDialog = ({
     <Dialog open={open} onOpenChange={!isSubmitting ? onOpenChange : undefined}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>
-            {receipt ? `Modifier l'encaissement` : "Nouvel encaissement"}
-          </DialogTitle>
-          <DialogDescription>
-            {receipt
-              ? "Modifiez les détails de l'encaissement."
-              : "Créez un nouvel encaissement en remplissant les informations ci-dessous."
-            }
-          </DialogDescription>
+          <DialogTitle>{receipt ? `Modifier l'encaissement` : "Nouvel encaissement"}</DialogTitle>
+          <DialogDescription>{receipt ? "Modifiez les détails de l'encaissement." : "Créez un nouvel encaissement en remplissant les informations ci-dessous."}</DialogDescription>
         </DialogHeader>
-        
         {open && (
           <ReceiptForm
             receipt={receipt}
@@ -128,7 +109,7 @@ const ReceiptDialog = ({
             onCancel={() => onOpenChange(false)}
             isSubmitting={isSubmitting}
             preselectedInvoice={preselectedInvoice}
-            invoices={invoices || []}
+            invoices={invoices}
             invoicesLoading={invoicesLoading}
           />
         )}

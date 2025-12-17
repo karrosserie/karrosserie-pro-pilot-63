@@ -94,7 +94,7 @@ const Credits = () => {
   const { toast } = useToast();
   const { confirm } = useConfirmation();
   
-  const { credits = [], isLoading, deleteCredit, archiveCredit, restoreCredit, error } = useCredits();
+  const { credits = [], isLoading, deleteCredit, archiveCredit, restoreCredit, createCredit, error } = useCredits();
   const { invoices } = useInvoices();
   const { sortedData, sortConfig, handleSort } = useTableSorting(credits, 'created_at');
   const isMobile = useIsMobile();
@@ -583,7 +583,8 @@ const Credits = () => {
 
       <CreditDialog 
         open={isDialogOpen} 
-        onOpenChange={setIsDialogOpen} 
+        onOpenChange={setIsDialogOpen}
+        createCredit={createCredit}
       />
 
       {selectedCredit && (

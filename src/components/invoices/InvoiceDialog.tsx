@@ -34,16 +34,14 @@ const InvoiceDialog = ({
 }: InvoiceDialogProps) => {
   const navigate = useNavigate();
   
-  // Utilise les mutations externes si fournies, sinon fallback au hook
-  const internalHook = useInvoices();
-  const createInvoice = externalCreateInvoice || internalHook.createInvoice;
-  const updateInvoice = externalUpdateInvoice || internalHook.updateInvoice;
+  // N'appeler le hook QUE si les props ne sont pas fournies
+  const internalHook = (!externalCreateInvoice || !externalUpdateInvoice) ? useInvoices() : null;
+  const createInvoice = externalCreateInvoice || internalHook?.createInvoice!;
+  const updateInvoice = externalUpdateInvoice || internalHook?.updateInvoice!;
   
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Déterminer si c'est une conversion depuis un ordre de réparation
   const isConversionFromRepairOrder = prefillData?.repair_order_id;
-  // Déterminer si c'est une modification (facture existante avec ID)
   const isEditing = invoice && invoice.id;
 
   const handleSubmit = async (formData: any) => {
@@ -60,11 +58,8 @@ const InvoiceDialog = ({
         createdInvoice = await createInvoice.mutateAsync(formData);
       }
       
-      // Fermer le dialog après succès
       onOpenChange(false);
 
-      // Si c'est une conversion depuis un ordre de réparation et qu'une facture a été créée,
-      // rediriger vers la page des factures avec la facture ouverte
       if (isConversionFromRepairOrder && createdInvoice) {
         setTimeout(() => {
           navigate(`/documents/factures?openInvoice=${createdInvoice.id}`);
