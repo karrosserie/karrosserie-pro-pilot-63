@@ -1,12 +1,10 @@
-import React, { useEffect, useState, useMemo, useCallback, memo } from 'react';
+import React, { useEffect, useState, useMemo, memo } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
 import { Invoice } from '@/services/supabase/invoices';
-import { useCompany } from '@/hooks/use-company';
-import { useCompanyPreferences } from '@/hooks/use-company-preferences';
 import { calculateInvoiceTotals } from '@/utils/invoiceCalculations';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
@@ -20,12 +18,13 @@ interface InvoiceViewerModalProps {
   invoice: Invoice | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  // Mutation optionnelle - si non fournie, utilise hook interne
   deleteInvoice?: UseMutationResult<boolean, Error, string, unknown>;
   onEditInvoice?: (invoice: Invoice) => void;
   onSendEmail?: (invoice: Invoice) => void;
   onCreateReceipt?: (invoice: Invoice) => void;
   onCreateCredit?: (invoice: Invoice) => void;
+  companyData?: any;
+  preferences?: any;
 }
 
 const InvoiceViewerModal = ({ 
@@ -36,40 +35,30 @@ const InvoiceViewerModal = ({
   onEditInvoice,
   onSendEmail,
   onCreateReceipt,
-  onCreateCredit
+  onCreateCredit,
+  companyData,
+  preferences
 }: InvoiceViewerModalProps) => {
-  console.log('[InvoiceViewerModal] RENDER START - open:', open);
-  const renderStart = performance.now();
-  
-  const { companyData } = useCompany();
-  console.log('[InvoiceViewerModal] useCompany done');
-  
-  const { preferences } = useCompanyPreferences();
-  console.log('[InvoiceViewerModal] useCompanyPreferences done');
-  
   const { confirm } = useConfirmation();
   
-  // Fonction de suppression locale si mutation non fournie
   const handleDeleteMutation = async (id: string) => {
     if (externalDeleteInvoice) {
       return externalDeleteInvoice.mutateAsync(id);
     }
-    // Fallback: import dynamique pour éviter le hook
     const { invoicesService } = await import('@/services/supabase/invoices');
     return invoicesService.delete(id);
   };
+  
   const [receiptsData, setReceiptsData] = useState<any[]>([]);
   const [currentInvoice, setCurrentInvoice] = useState<Invoice | null>(invoice);
   
   useEffect(() => {
-    console.log('[InvoiceViewerModal] useEffect setCurrentInvoice', invoice?.id);
     setCurrentInvoice(invoice);
   }, [invoice]);
   
   useEffect(() => {
     const fetchReceipts = async () => {
       if (!currentInvoice?.id || !open) return;
-      console.log('[InvoiceViewerModal] fetchReceipts START');
       try {
         const { data: receipts } = await supabase
           .from('receipts')
@@ -77,7 +66,6 @@ const InvoiceViewerModal = ({
           .eq('invoice_id', currentInvoice.id)
           .order('date', { ascending: true });
         if (receipts) setReceiptsData(receipts);
-        console.log('[InvoiceViewerModal] fetchReceipts DONE, count:', receipts?.length);
       } catch (error) {
         console.error('[InvoiceViewerModal] fetchReceipts ERROR:', error);
       }
@@ -86,15 +74,12 @@ const InvoiceViewerModal = ({
   }, [currentInvoice?.id, open]);
 
   const { clientData, vehicleData } = useMemo(() => {
-    console.log('[InvoiceViewerModal] useMemo clientData/vehicleData');
     if (!currentInvoice) return { clientData: null, vehicleData: null };
     return { 
       clientData: (currentInvoice as any).clients || null, 
       vehicleData: (currentInvoice as any).vehicles || null 
     };
   }, [currentInvoice]);
-
-  console.log('[InvoiceViewerModal] RENDER took', (performance.now() - renderStart).toFixed(0), 'ms');
 
   if (!currentInvoice) return null;
 
