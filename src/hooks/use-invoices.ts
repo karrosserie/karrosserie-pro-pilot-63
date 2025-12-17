@@ -32,6 +32,8 @@ export function useInvoices(showArchived: boolean = false) {
   });
 
   // Fonction utilitaire pour invalider les queries de manière contrôlée
+  // Délai augmenté à 600ms pour laisser le dialog se fermer et se démonter complètement
+  // avant de déclencher l'invalidation et le refetch
   const invalidateInvoiceQueries = useCallback((invoiceId?: string) => {
     const run = () => {
       // Invalider la liste principale
@@ -42,12 +44,9 @@ export function useInvoices(showArchived: boolean = false) {
       }
     };
 
-    // Déférer l'invalidation pour éviter de bloquer le thread (freeze) pendant la fermeture du dialog.
-    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-      (window as any).requestIdleCallback(run, { timeout: 500 });
-    } else {
-      setTimeout(run, 0);
-    }
+    // Utiliser un délai fixe de 600ms au lieu de requestIdleCallback
+    // pour garantir que le dialog est complètement démonté avant l'invalidation
+    setTimeout(run, 600);
   }, [queryClient]);
 
   const createInvoice = useMutation({
