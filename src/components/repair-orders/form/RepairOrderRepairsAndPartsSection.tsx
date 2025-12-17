@@ -200,12 +200,13 @@ export const RepairOrderRepairsAndPartsSection = ({
       <div className="grid grid-cols-2 gap-3">
         <div>
           <Label className="text-xs text-muted-foreground">Qté</Label>
-          <Input
-            type="text"
-            value={formatForDisplay(repair.quantity)}
-            onChange={(e) => updateRepair(repair.id, 'quantity', parseFromDisplay(e.target.value))}
+          <AmountInput
+            value={repair.quantity}
+            onChange={(value) => updateRepair(repair.id, 'quantity', value)}
+            defaultValue={1}
             readOnly={isReadOnly}
             className={isReadOnly ? 'bg-muted' : ''}
+            step={0.01}
           />
         </div>
         <div>
@@ -275,12 +276,13 @@ export const RepairOrderRepairsAndPartsSection = ({
       <div className="grid grid-cols-2 gap-3">
         <div>
           <Label className="text-xs text-muted-foreground">Qté</Label>
-          <Input
-            type="text"
-            value={formatForDisplay(part.quantity)}
-            onChange={(e) => updatePart(part.id, 'quantity', parseFromDisplay(e.target.value))}
+          <AmountInput
+            value={part.quantity}
+            onChange={(value) => updatePart(part.id, 'quantity', value)}
+            defaultValue={1}
             readOnly={isReadOnly}
             className={isReadOnly ? 'bg-muted' : ''}
+            step={0.01}
           />
         </div>
         <div>
@@ -433,12 +435,13 @@ export const RepairOrderRepairsAndPartsSection = ({
                       readOnly={isReadOnly}
                       className={isReadOnly ? 'bg-muted' : ''}
                     />
-                    <Input
-                      type="text"
-                      value={formatForDisplay(repair.quantity)}
-                      onChange={(e) => updateRepair(repair.id, 'quantity', parseFromDisplay(e.target.value))}
+                    <AmountInput
+                      value={repair.quantity}
+                      onChange={(value) => updateRepair(repair.id, 'quantity', value)}
+                      defaultValue={1}
                       readOnly={isReadOnly}
                       className={isReadOnly ? 'bg-muted' : ''}
+                      step={0.01}
                     />
                     <AmountInput
                       value={repair.unitCost}
@@ -526,12 +529,13 @@ export const RepairOrderRepairsAndPartsSection = ({
                       readOnly={isReadOnly}
                       className={isReadOnly ? 'bg-muted' : ''}
                     />
-                    <Input
-                      type="text"
-                      value={formatForDisplay(part.quantity)}
-                      onChange={(e) => updatePart(part.id, 'quantity', parseFromDisplay(e.target.value))}
+                    <AmountInput
+                      value={part.quantity}
+                      onChange={(value) => updatePart(part.id, 'quantity', value)}
+                      defaultValue={1}
                       readOnly={isReadOnly}
                       className={isReadOnly ? 'bg-muted' : ''}
+                      step={0.01}
                     />
                     <AmountInput
                       value={part.unitCost}
