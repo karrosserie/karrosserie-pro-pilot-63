@@ -12,6 +12,234 @@ import { REPAIR_DESIGNATIONS } from '@/constants/predefined-values';
 import { useAutomotivePartNames } from '@/hooks/use-automotive-parts';
 import { useIsMobile } from '@/hooks/use-mobile';
 
+// ============================================
+// EXTRACTED MEMOIZED COMPONENTS (outside main component to prevent recreation)
+// ============================================
+
+interface RepairMobileCardProps {
+  repair: InvoiceRepairItem;
+  updateRepair: (id: string, field: keyof InvoiceRepairItem, value: string | number) => void;
+  removeRepair: (id: string) => void;
+  isReadOnly: boolean;
+}
+
+const RepairMobileCard = memo(({ repair, updateRepair, removeRepair, isReadOnly }: RepairMobileCardProps) => (
+  <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
+    <div>
+      <Label className="text-xs text-muted-foreground">Désignation</Label>
+      <Combobox
+        value={repair.description}
+        onChange={(value) => updateRepair(repair.id, 'description', value)}
+        options={REPAIR_DESIGNATIONS}
+        placeholder="Désignation de la réparation"
+        disabled={isReadOnly}
+        className={isReadOnly ? 'bg-muted' : ''}
+      />
+    </div>
+    <div className="grid grid-cols-2 gap-3">
+      <div>
+        <Label className="text-xs text-muted-foreground">Qté</Label>
+        <Input
+          type="number"
+          value={repair.quantity}
+          onChange={(e) => updateRepair(repair.id, 'quantity', parseFloat(e.target.value) || 0)}
+          min="0"
+          step="0.01"
+          readOnly={isReadOnly}
+          className={isReadOnly ? 'bg-muted' : ''}
+        />
+      </div>
+      <div>
+        <Label className="text-xs text-muted-foreground">Coût Unitaire (€)</Label>
+        <AmountInput
+          value={repair.unitCost}
+          onChange={(value) => updateRepair(repair.id, 'unitCost', value)}
+          readOnly={isReadOnly}
+          className={isReadOnly ? 'bg-muted' : ''}
+        />
+      </div>
+    </div>
+    <div className="grid grid-cols-2 gap-3">
+      <div>
+        <Label className="text-xs text-muted-foreground">Remise (%)</Label>
+        <AmountInput
+          value={repair.discount}
+          onChange={(value) => updateRepair(repair.id, 'discount', value)}
+          readOnly={isReadOnly}
+          className={isReadOnly ? 'bg-muted' : ''}
+        />
+      </div>
+      <div>
+        <Label className="text-xs text-muted-foreground">TVA (%)</Label>
+        <Input
+          type="number"
+          value={repair.vat}
+          onChange={(e) => updateRepair(repair.id, 'vat', parseFloat(e.target.value) || 0)}
+          min="0"
+          step="0.1"
+          readOnly={isReadOnly}
+          className={isReadOnly ? 'bg-muted' : ''}
+        />
+      </div>
+    </div>
+    <div className="flex items-center justify-between pt-2 border-t">
+      <div className="font-medium text-lg">
+        Total : {repair.total.toFixed(2)} €
+      </div>
+      {!isReadOnly && (
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={() => removeRepair(repair.id)}
+          className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+        >
+          <Trash className="h-4 w-4" />
+        </Button>
+      )}
+    </div>
+  </div>
+));
+RepairMobileCard.displayName = 'RepairMobileCard';
+
+interface PartMobileCardProps {
+  part: InvoicePartItem;
+  updatePart: (id: string, field: keyof InvoicePartItem, value: string | number) => void;
+  removePart: (id: string) => void;
+  partDesignations: string[];
+  isReadOnly: boolean;
+}
+
+const PartMobileCard = memo(({ part, updatePart, removePart, partDesignations, isReadOnly }: PartMobileCardProps) => (
+  <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
+    <div>
+      <Label className="text-xs text-muted-foreground">Désignation</Label>
+      <Combobox
+        value={part.description}
+        onChange={(value) => updatePart(part.id, 'description', value)}
+        options={partDesignations}
+        placeholder="Désignation de la pièce"
+        disabled={isReadOnly}
+        className={isReadOnly ? 'bg-muted' : ''}
+      />
+    </div>
+    <div className="grid grid-cols-2 gap-3">
+      <div>
+        <Label className="text-xs text-muted-foreground">Qté</Label>
+        <Input
+          type="number"
+          value={part.quantity}
+          onChange={(e) => updatePart(part.id, 'quantity', parseFloat(e.target.value) || 0)}
+          min="0"
+          step="0.01"
+          readOnly={isReadOnly}
+          className={isReadOnly ? 'bg-muted' : ''}
+        />
+      </div>
+      <div>
+        <Label className="text-xs text-muted-foreground">Coût Unitaire (€)</Label>
+        <AmountInput
+          value={part.unitCost}
+          onChange={(value) => updatePart(part.id, 'unitCost', value)}
+          readOnly={isReadOnly}
+          className={isReadOnly ? 'bg-muted' : ''}
+        />
+      </div>
+    </div>
+    <div className="grid grid-cols-2 gap-3">
+      <div>
+        <Label className="text-xs text-muted-foreground">Remise (%)</Label>
+        <AmountInput
+          value={part.discount}
+          onChange={(value) => updatePart(part.id, 'discount', value)}
+          readOnly={isReadOnly}
+          className={isReadOnly ? 'bg-muted' : ''}
+        />
+      </div>
+      <div>
+        <Label className="text-xs text-muted-foreground">TVA (%)</Label>
+        <Input
+          type="number"
+          value={part.vat}
+          onChange={(e) => updatePart(part.id, 'vat', parseFloat(e.target.value) || 0)}
+          min="0"
+          step="0.1"
+          readOnly={isReadOnly}
+          className={isReadOnly ? 'bg-muted' : ''}
+        />
+      </div>
+    </div>
+    <div className="flex items-center justify-between pt-2 border-t">
+      <div className="font-medium text-lg">
+        Total : {part.total.toFixed(2)} €
+      </div>
+      {!isReadOnly && (
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={() => removePart(part.id)}
+          className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+        >
+          <Trash className="h-4 w-4" />
+        </Button>
+      )}
+    </div>
+  </div>
+));
+PartMobileCard.displayName = 'PartMobileCard';
+
+interface TotalsSectionProps {
+  totals: {
+    subTotal: number;
+    totalVat: number;
+    totalDiscount: number;
+    total: number;
+  };
+  isMobile: boolean;
+}
+
+const TotalsSection = memo(({ totals, isMobile }: TotalsSectionProps) => (
+  <div className="border-t pt-4 space-y-2">
+    {isMobile ? (
+      <div className="space-y-1 text-sm">
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Sous-total :</span>
+          <span className="font-medium">{totals.subTotal.toFixed(2)} €</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">TVA :</span>
+          <span className="font-medium">{totals.totalVat.toFixed(2)} €</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Remise TTC :</span>
+          <span className="font-medium">{totals.totalDiscount.toFixed(2)} €</span>
+        </div>
+        <div className="flex justify-between text-lg font-bold pt-2 border-t">
+          <span>Total :</span>
+          <span>{totals.total.toFixed(2)} €</span>
+        </div>
+      </div>
+    ) : (
+      <>
+        <div className="flex justify-end space-x-8 text-sm">
+          <div>Sous-total : <span className="font-medium">{totals.subTotal.toFixed(2)} €</span></div>
+          <div>TVA : <span className="font-medium">{totals.totalVat.toFixed(2)} €</span></div>
+          <div>Remise TTC : <span className="font-medium">{totals.totalDiscount.toFixed(2)} €</span></div>
+        </div>
+        <div className="flex justify-end text-lg font-bold">
+          Total : <span className="ml-2">{totals.total.toFixed(2)} €</span>
+        </div>
+      </>
+    )}
+  </div>
+));
+TotalsSection.displayName = 'TotalsSection';
+
+// ============================================
+// MAIN COMPONENT
+// ============================================
+
 interface InvoiceRepairsAndPartsSectionProps {
   repairs: InvoiceRepairItem[];
   parts: InvoicePartItem[];
@@ -206,201 +434,6 @@ const InvoiceRepairsAndPartsSectionComponent = ({
     total: repairTotals.total + partTotals.total
   }), [repairTotals, partTotals]);
 
-  // Mobile card component for repairs
-  const RepairMobileCard = ({ repair }: { repair: InvoiceRepairItem }) => (
-    <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
-      <div>
-        <Label className="text-xs text-muted-foreground">Désignation</Label>
-        <Combobox
-          value={repair.description}
-          onChange={(value) => updateRepair(repair.id, 'description', value)}
-          options={REPAIR_DESIGNATIONS}
-          placeholder="Désignation de la réparation"
-          disabled={isReadOnly}
-          className={isReadOnly ? 'bg-muted' : ''}
-        />
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <Label className="text-xs text-muted-foreground">Qté</Label>
-          <Input
-            type="number"
-            value={repair.quantity}
-            onChange={(e) => updateRepair(repair.id, 'quantity', parseFloat(e.target.value) || 0)}
-            min="0"
-            step="0.01"
-            readOnly={isReadOnly}
-            className={isReadOnly ? 'bg-muted' : ''}
-          />
-        </div>
-        <div>
-          <Label className="text-xs text-muted-foreground">Coût Unitaire (€)</Label>
-          <AmountInput
-            value={repair.unitCost}
-            onChange={(value) => updateRepair(repair.id, 'unitCost', value)}
-            readOnly={isReadOnly}
-            className={isReadOnly ? 'bg-muted' : ''}
-          />
-        </div>
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <Label className="text-xs text-muted-foreground">Remise (%)</Label>
-          <AmountInput
-            value={repair.discount}
-            onChange={(value) => updateRepair(repair.id, 'discount', value)}
-            readOnly={isReadOnly}
-            className={isReadOnly ? 'bg-muted' : ''}
-          />
-        </div>
-        <div>
-          <Label className="text-xs text-muted-foreground">TVA (%)</Label>
-          <Input
-            type="number"
-            value={repair.vat}
-            onChange={(e) => updateRepair(repair.id, 'vat', parseFloat(e.target.value) || 0)}
-            min="0"
-            step="0.1"
-            readOnly={isReadOnly}
-            className={isReadOnly ? 'bg-muted' : ''}
-          />
-        </div>
-      </div>
-      <div className="flex items-center justify-between pt-2 border-t">
-        <div className="font-medium text-lg">
-          Total : {repair.total.toFixed(2)} €
-        </div>
-        {!isReadOnly && (
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={() => removeRepair(repair.id)}
-            className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-    </div>
-  );
-
-  // Mobile card component for parts
-  const PartMobileCard = ({ part }: { part: InvoicePartItem }) => (
-    <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
-      <div>
-        <Label className="text-xs text-muted-foreground">Désignation</Label>
-        <Combobox
-          value={part.description}
-          onChange={(value) => updatePart(part.id, 'description', value)}
-          options={partDesignations}
-          placeholder="Désignation de la pièce"
-          disabled={isReadOnly}
-          className={isReadOnly ? 'bg-muted' : ''}
-        />
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <Label className="text-xs text-muted-foreground">Qté</Label>
-          <Input
-            type="number"
-            value={part.quantity}
-            onChange={(e) => updatePart(part.id, 'quantity', parseFloat(e.target.value) || 0)}
-            min="0"
-            step="0.01"
-            readOnly={isReadOnly}
-            className={isReadOnly ? 'bg-muted' : ''}
-          />
-        </div>
-        <div>
-          <Label className="text-xs text-muted-foreground">Coût Unitaire (€)</Label>
-          <AmountInput
-            value={part.unitCost}
-            onChange={(value) => updatePart(part.id, 'unitCost', value)}
-            readOnly={isReadOnly}
-            className={isReadOnly ? 'bg-muted' : ''}
-          />
-        </div>
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <Label className="text-xs text-muted-foreground">Remise (%)</Label>
-          <AmountInput
-            value={part.discount}
-            onChange={(value) => updatePart(part.id, 'discount', value)}
-            readOnly={isReadOnly}
-            className={isReadOnly ? 'bg-muted' : ''}
-          />
-        </div>
-        <div>
-          <Label className="text-xs text-muted-foreground">TVA (%)</Label>
-          <Input
-            type="number"
-            value={part.vat}
-            onChange={(e) => updatePart(part.id, 'vat', parseFloat(e.target.value) || 0)}
-            min="0"
-            step="0.1"
-            readOnly={isReadOnly}
-            className={isReadOnly ? 'bg-muted' : ''}
-          />
-        </div>
-      </div>
-      <div className="flex items-center justify-between pt-2 border-t">
-        <div className="font-medium text-lg">
-          Total : {part.total.toFixed(2)} €
-        </div>
-        {!isReadOnly && (
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={() => removePart(part.id)}
-            className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-    </div>
-  );
-
-  // Totals component (responsive)
-  const TotalsSection = ({ totals, label }: { totals: typeof repairTotals; label?: string }) => (
-    <div className="border-t pt-4 space-y-2">
-      {isMobile ? (
-        <div className="space-y-1 text-sm">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Sous-total :</span>
-            <span className="font-medium">{totals.subTotal.toFixed(2)} €</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">TVA :</span>
-            <span className="font-medium">{totals.totalVat.toFixed(2)} €</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Remise TTC :</span>
-            <span className="font-medium">{totals.totalDiscount.toFixed(2)} €</span>
-          </div>
-          <div className="flex justify-between text-lg font-bold pt-2 border-t">
-            <span>Total :</span>
-            <span>{totals.total.toFixed(2)} €</span>
-          </div>
-        </div>
-      ) : (
-        <>
-          <div className="flex justify-end space-x-8 text-sm">
-            <div>Sous-total : <span className="font-medium">{totals.subTotal.toFixed(2)} €</span></div>
-            <div>TVA : <span className="font-medium">{totals.totalVat.toFixed(2)} €</span></div>
-            <div>Remise TTC : <span className="font-medium">{totals.totalDiscount.toFixed(2)} €</span></div>
-          </div>
-          <div className="flex justify-end text-lg font-bold">
-            Total : <span className="ml-2">{totals.total.toFixed(2)} €</span>
-          </div>
-        </>
-      )}
-    </div>
-  );
-
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -438,7 +471,13 @@ const InvoiceRepairsAndPartsSectionComponent = ({
               // Mobile: Card layout
               <div className="space-y-4">
                 {repairsToShow.map((repair) => (
-                  <RepairMobileCard key={repair.id} repair={repair} />
+                  <RepairMobileCard 
+                    key={repair.id} 
+                    repair={repair}
+                    updateRepair={updateRepair}
+                    removeRepair={removeRepair}
+                    isReadOnly={isReadOnly}
+                  />
                 ))}
               </div>
             ) : (
@@ -526,7 +565,7 @@ const InvoiceRepairsAndPartsSectionComponent = ({
               </div>
             )}
 
-            {repairs.length > 0 && <TotalsSection totals={repairTotals} />}
+            {repairs.length > 0 && <TotalsSection totals={repairTotals} isMobile={isMobile} />}
           </TabsContent>
 
           <TabsContent value="parts" className="space-y-4">
@@ -534,7 +573,14 @@ const InvoiceRepairsAndPartsSectionComponent = ({
               // Mobile: Card layout
               <div className="space-y-4">
                 {partsToShow.map((part) => (
-                  <PartMobileCard key={part.id} part={part} />
+                  <PartMobileCard 
+                    key={part.id} 
+                    part={part}
+                    updatePart={updatePart}
+                    removePart={removePart}
+                    partDesignations={partDesignations}
+                    isReadOnly={isReadOnly}
+                  />
                 ))}
               </div>
             ) : (
@@ -622,7 +668,7 @@ const InvoiceRepairsAndPartsSectionComponent = ({
               </div>
             )}
 
-            {parts.length > 0 && <TotalsSection totals={partTotals} />}
+            {parts.length > 0 && <TotalsSection totals={partTotals} isMobile={isMobile} />}
           </TabsContent>
         </Tabs>
 
