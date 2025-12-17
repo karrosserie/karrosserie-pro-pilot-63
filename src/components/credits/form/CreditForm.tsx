@@ -5,16 +5,16 @@ import { CreditBasicInfoSection } from './CreditBasicInfoSection';
 import { CreditItemsSection } from './CreditItemsSection';
 import { CreditTotalsSection } from './CreditTotalsSection';
 import { useCreditFormState } from './hooks/useCreditFormState';
-import { useCredits } from '@/hooks/use-credits';
+import { UseMutationResult } from '@tanstack/react-query';
 
 interface CreditFormProps {
   onClose: () => void;
   preselectedInvoice?: { invoice_id: string; reference: string; status: string; amount: number; notes: string } | null;
+  // Mutation passée en prop depuis le parent
+  createCredit: UseMutationResult<any, Error, any, unknown>;
 }
 
-export const CreditForm = ({ onClose, preselectedInvoice }: CreditFormProps) => {
-  // Hook appelé une seule fois - queryKey stable
-  const { createCredit } = useCredits();
+export const CreditForm = ({ onClose, preselectedInvoice, createCredit }: CreditFormProps) => {
   const {
     formData,
     items,

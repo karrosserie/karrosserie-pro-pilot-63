@@ -619,41 +619,54 @@ const Invoices = () => {
       </div>
       )}
 
-      {/* Modales toujours montées - visibilité contrôlée par prop open (pattern Devis) */}
-      <InvoiceDialog
-        invoice={selectedInvoice}
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-      />
+      {/* Modales avec conditional rendering pour éviter les hooks dupliqués */}
+      {dialogOpen && (
+        <InvoiceDialog
+          invoice={selectedInvoice}
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          createInvoice={createInvoice}
+          updateInvoice={undefined}
+        />
+      )}
 
-      <InvoiceEmailDialog
-        invoice={selectedInvoice}
-        open={emailDialogOpen}
-        onOpenChange={setEmailDialogOpen}
-      />
+      {emailDialogOpen && (
+        <InvoiceEmailDialog
+          invoice={selectedInvoice}
+          open={emailDialogOpen}
+          onOpenChange={setEmailDialogOpen}
+        />
+      )}
 
-      <ReceiptDialog
-        receipt={null}
-        open={receiptDialogOpen}
-        onOpenChange={setReceiptDialogOpen}
-        preselectedInvoice={preselectedInvoiceData}
-      />
+      {receiptDialogOpen && (
+        <ReceiptDialog
+          receipt={null}
+          open={receiptDialogOpen}
+          onOpenChange={setReceiptDialogOpen}
+          preselectedInvoice={preselectedInvoiceData}
+        />
+      )}
 
-      <CreditDialog
-        credit={preselectedCreditData}
-        open={creditDialogOpen}
-        onOpenChange={setCreditDialogOpen}
-      />
+      {creditDialogOpen && (
+        <CreditDialog
+          credit={preselectedCreditData}
+          open={creditDialogOpen}
+          onOpenChange={setCreditDialogOpen}
+        />
+      )}
 
-      <InvoiceViewerModal
-        invoice={selectedInvoice}
-        open={viewerModalOpen}
-        onOpenChange={setViewerModalOpen}
-        onEditInvoice={handleEditInvoice}
-        onSendEmail={handleSendEmail}
-        onCreateReceipt={handleAddPayment}
-        onCreateCredit={handleAddCredit}
-      />
+      {viewerModalOpen && (
+        <InvoiceViewerModal
+          invoice={selectedInvoice}
+          open={viewerModalOpen}
+          onOpenChange={setViewerModalOpen}
+          deleteInvoice={deleteInvoice}
+          onEditInvoice={handleEditInvoice}
+          onSendEmail={handleSendEmail}
+          onCreateReceipt={handleAddPayment}
+          onCreateCredit={handleAddCredit}
+        />
+      )}
 
       <RelanceModal
         invoice={selectedInvoice}

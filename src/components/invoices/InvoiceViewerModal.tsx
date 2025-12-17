@@ -15,11 +15,14 @@ import { fr } from 'date-fns/locale';
 import { Printer, Download, Mail, CreditCard, FileX, Pencil, Trash } from 'lucide-react';
 import DefaultInvoicePreview from './templates/DefaultInvoicePreview';
 import AlternativeInvoicePreview from './templates/AlternativeInvoicePreview';
+import { UseMutationResult } from '@tanstack/react-query';
 
 interface InvoiceViewerModalProps {
   invoice: Invoice | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  // Mutation optionnelle - si non fournie, utilise le hook interne
+  deleteInvoice?: UseMutationResult<boolean, Error, string, unknown>;
   // Callbacks pour ouvrir les dialogs depuis le parent (évite les dialogs dupliqués)
   onEditInvoice?: (invoice: Invoice) => void;
   onSendEmail?: (invoice: Invoice) => void;
@@ -31,6 +34,7 @@ const InvoiceViewerModal = ({
   invoice, 
   open, 
   onOpenChange,
+  deleteInvoice: externalDeleteInvoice,
   onEditInvoice,
   onSendEmail,
   onCreateReceipt,
@@ -38,7 +42,11 @@ const InvoiceViewerModal = ({
 }: InvoiceViewerModalProps) => {
   const { companyData } = useCompany();
   const { preferences } = useCompanyPreferences();
-  const { deleteInvoice } = useInvoices();
+  
+  // Utilise la mutation externe si fournie, sinon fallback au hook
+  const internalHook = useInvoices();
+  const deleteInvoice = externalDeleteInvoice || internalHook.deleteInvoice;
+  
   const { confirm } = useConfirmation();
   const [receiptsData, setReceiptsData] = useState<any[]>([]);
 
