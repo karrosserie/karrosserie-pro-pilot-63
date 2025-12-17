@@ -1,5 +1,5 @@
 
-import React, { memo } from 'react';
+import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useClients } from '@/hooks/use-clients';
 import { Invoice } from '@/services/supabase/invoices';
@@ -21,7 +21,7 @@ interface InvoiceFormProps {
   isConversionFromRepairOrder?: boolean;
 }
 
-const InvoiceFormComponent = ({
+export const InvoiceForm = ({
   invoice,
   onSubmit,
   onCancel,
@@ -133,13 +133,3 @@ const InvoiceFormComponent = ({
     </form>
   );
 };
-
-// Mémoïser le composant pour éviter re-renders inutiles lors de la fermeture du dialog
-export const InvoiceForm = memo(InvoiceFormComponent, (prevProps, nextProps) => {
-  return (
-    prevProps.invoice?.id === nextProps.invoice?.id &&
-    prevProps.isSubmitting === nextProps.isSubmitting &&
-    prevProps.isConversionFromRepairOrder === nextProps.isConversionFromRepairOrder &&
-    prevProps.prefillData === nextProps.prefillData
-  );
-});
