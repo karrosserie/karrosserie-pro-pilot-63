@@ -20,7 +20,7 @@ import ReceiptDialog from '@/components/receipts/ReceiptDialog';
 import { CreditDialog } from '@/components/credits/CreditDialog';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useCredits } from '@/hooks/use-credits';
-import { useReceiptsData } from '@/hooks/use-receipts-data';
+// useReceiptsData import supprimé - non utilisé sur cette page
 import { useCompany } from '@/hooks/use-company';
 import { Invoice } from '@/services/supabase/invoices';
 import LoadingSpinner from '@/components/ui/loading-spinner';
@@ -58,9 +58,12 @@ const Invoices = () => {
   const { toast } = useToast();
   const { confirm } = useConfirmation();
 
-  const { invoices, isLoading, error, deleteInvoice, createInvoice, archiveInvoice, restoreInvoice } = useInvoices(showArchived);
-  const { credits } = useCredits();
-  const { receipts } = useReceiptsData();
+  // Désactiver les fetches pendant que les dialogues sont ouverts pour éviter les re-renders en cascade
+  const anyDialogOpen = dialogOpen || emailDialogOpen || receiptDialogOpen || creditDialogOpen || viewerModalOpen || relanceModalOpen;
+  
+  const { invoices, isLoading, error, deleteInvoice, createInvoice, archiveInvoice, restoreInvoice } = useInvoices(showArchived, !anyDialogOpen);
+  const { credits } = useCredits({ enabled: !anyDialogOpen });
+  // useReceiptsData supprimé - n'était pas utilisé
   const { companyData } = useCompany();
   const { sortedData: sortedInvoices, sortConfig, handleSort } = useTableSorting(invoices || [], 'reference');
   const isMobile = useIsMobile();
