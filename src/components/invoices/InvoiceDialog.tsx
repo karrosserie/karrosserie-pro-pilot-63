@@ -76,8 +76,8 @@ const InvoiceDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={!isSubmitting ? onOpenChange : undefined}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={open} onOpenChange={!isSubmitting ? onOpenChange : undefined} modal={false}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>
             {isEditing 
