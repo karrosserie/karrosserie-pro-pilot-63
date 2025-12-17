@@ -52,7 +52,7 @@ const InvoiceDialog = ({
       }
       
       onOpenChange(false);
-      
+
       // Si c'est une conversion depuis un ordre de réparation et qu'une facture a été créée,
       // rediriger vers la page des factures avec la facture ouverte
       if (isConversionFromRepairOrder && createdInvoice) {
@@ -60,7 +60,11 @@ const InvoiceDialog = ({
           navigate(`/documents/factures?openInvoice=${createdInvoice.id}`);
         }, 100);
       } else {
-        onSuccess?.();
+        // Différer le callback de succès pour éviter un burst d'invalidations
+        // pendant la fermeture du dialog (source de freeze)
+        setTimeout(() => {
+          onSuccess?.();
+        }, 0);
       }
     } catch (error: any) {
       console.error('Dialog submission error:', error);

@@ -33,11 +33,20 @@ export function useInvoices(showArchived: boolean = false) {
 
   // Fonction utilitaire pour invalider les queries de manière contrôlée
   const invalidateInvoiceQueries = useCallback((invoiceId?: string) => {
-    // Invalider la liste principale
-    queryClient.invalidateQueries({ queryKey: ['invoices'] });
-    // Si un ID spécifique, invalider aussi cette query
-    if (invoiceId) {
-      queryClient.invalidateQueries({ queryKey: ['invoice', invoiceId] });
+    const run = () => {
+      // Invalider la liste principale
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      // Si un ID spécifique, invalider aussi cette query
+      if (invoiceId) {
+        queryClient.invalidateQueries({ queryKey: ['invoice', invoiceId] });
+      }
+    };
+
+    // Déférer l'invalidation pour éviter de bloquer le thread (freeze) pendant la fermeture du dialog.
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(run, { timeout: 500 });
+    } else {
+      setTimeout(run, 0);
     }
   }, [queryClient]);
 

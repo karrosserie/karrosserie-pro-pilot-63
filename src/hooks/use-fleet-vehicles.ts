@@ -13,7 +13,8 @@ export function useFleetVehicles() {
   // Invalider les requêtes lors du changement d'impersonation
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ['fleetVehicles'] });
-  }, [isImpersonating, impersonationData?.company_id, queryClient]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isImpersonating, impersonationData?.company_id]);
   
   const {
     data: vehicles,

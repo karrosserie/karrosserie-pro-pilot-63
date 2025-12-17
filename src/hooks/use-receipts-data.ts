@@ -54,7 +54,8 @@ export function useReceiptsData() {
     setTimeout(() => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
     }, 100);
-  }, [queryClient]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   const createReceipt = useMutation({
     mutationFn: (newReceipt: Omit<Parameters<typeof receiptsService.create>[0], 'company_id'>) => 
