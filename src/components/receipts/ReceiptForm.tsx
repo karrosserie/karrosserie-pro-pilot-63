@@ -23,13 +23,12 @@ interface ReceiptFormProps {
   onCancel: () => void;
   isSubmitting: boolean;
   preselectedInvoice?: { id: string; amount: number } | null;
-  isActive?: boolean; // Pour conditionner les fetches
 }
 
-export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting, preselectedInvoice, isActive = true }: ReceiptFormProps) => {
-  const { receipts } = useReceiptsData({ enabled: isActive });
-  const { accounts, isLoading: accountsLoading } = useAccounts({ enabled: isActive });
-  const { invoices } = useInvoices(false, isActive);
+export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting, preselectedInvoice }: ReceiptFormProps) => {
+  const { receipts } = useReceiptsData();
+  const { accounts, isLoading: accountsLoading } = useAccounts();
+  const { invoices } = useInvoices(false);
   const { uploadDocument } = useStorage();
   const { toast } = useToast();
   
