@@ -42,8 +42,14 @@ export function Combobox({
   onChangeRef.current = onChange
 
   React.useEffect(() => {
-    setInputValue(value)
-    setDebouncedInputValue(value)
+    // Empêcher la mise à jour si les valeurs sont identiques (évite boucle infinie)
+    if (inputValue !== value) {
+      setInputValue(value)
+    }
+    if (debouncedInputValue !== value) {
+      setDebouncedInputValue(value)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value])
 
   // Debounce filtering for performance
