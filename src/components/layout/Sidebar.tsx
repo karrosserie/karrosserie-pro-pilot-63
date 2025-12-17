@@ -179,7 +179,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
   const DISABLED_ROUTES = ['/planning'];
   
   // Routes "teaser" - visibles mais grisées avec badge "Bientôt"
-  const TEASER_ROUTES = ['/dashboard', '/gestion-atelier'];
+  const TEASER_ROUTES: string[] = [];
 
   // Définir tous les éléments de navigation
   const allNavItems = [
