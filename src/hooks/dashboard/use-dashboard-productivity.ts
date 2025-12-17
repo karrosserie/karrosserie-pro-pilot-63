@@ -134,17 +134,32 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
       // 3. Récupérer les factures pour calculer le CA RÉEL
       const { data: invoicesP2 } = await supabase
         .from('invoices')
-        .select('id, amount, repairs_data')
+        .select('id, amount')
         .eq('company_id', companyData.id)
         .gte('date', format(period2Start, 'yyyy-MM-dd'))
         .lte('date', format(period2End, 'yyyy-MM-dd'));
 
       const { data: invoicesP1 } = await supabase
         .from('invoices')
-        .select('id, amount, repairs_data')
+        .select('id, amount')
         .eq('company_id', companyData.id)
         .gte('date', format(period1Start, 'yyyy-MM-dd'))
         .lte('date', format(period1End, 'yyyy-MM-dd'));
+
+      // 3b. Récupérer les rapports d'expertise pour les heures vendues
+      const { data: expertiseP2 } = await supabase
+        .from('expertise_reports')
+        .select('id, repairs_data')
+        .eq('company_id', companyData.id)
+        .gte('created_at', format(period2Start, 'yyyy-MM-dd'))
+        .lte('created_at', format(period2End, 'yyyy-MM-dd'));
+
+      const { data: expertiseP1 } = await supabase
+        .from('expertise_reports')
+        .select('id, repairs_data')
+        .eq('company_id', companyData.id)
+        .gte('created_at', format(period1Start, 'yyyy-MM-dd'))
+        .lte('created_at', format(period1End, 'yyyy-MM-dd'));
 
       // 4. Récupérer les OR terminés/signés pour compter les véhicules
       const { data: repairOrdersP2 } = await supabase
@@ -173,16 +188,16 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
         dataWarnings.push("Aucune donnée de pointage pour cette période - les heures achetées ne peuvent pas être calculées");
       }
 
-      // === CALCUL DES HEURES DEPUIS repairs_data ===
+      // === CALCUL DES HEURES VENDUES DEPUIS expertise_reports.repairs_data ===
       const soldHoursByTrade = { carrosserie: 0, peinture: 0, mecanique: 0 };
       const soldHoursByTradeP1 = { carrosserie: 0, peinture: 0, mecanique: 0 };
-      let invoicesWithRepairsData = 0;
-      let invoicesWithRepairsDataP1 = 0;
+      let reportsWithRepairsData = 0;
+      let reportsWithRepairsDataP1 = 0;
 
-      invoicesP2?.forEach(invoice => {
-        if (invoice.repairs_data && Array.isArray(invoice.repairs_data) && invoice.repairs_data.length > 0) {
-          invoicesWithRepairsData++;
-          (invoice.repairs_data as any[]).forEach(repair => {
+      expertiseP2?.forEach(report => {
+        if (report.repairs_data && Array.isArray(report.repairs_data) && report.repairs_data.length > 0) {
+          reportsWithRepairsData++;
+          (report.repairs_data as any[]).forEach(repair => {
             const trade = categorizeTrade(repair.designation || repair.description || '');
             const hours = parseFloat(repair.quantity) || 0;
             soldHoursByTrade[trade] += hours;
@@ -190,10 +205,10 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
         }
       });
 
-      invoicesP1?.forEach(invoice => {
-        if (invoice.repairs_data && Array.isArray(invoice.repairs_data) && invoice.repairs_data.length > 0) {
-          invoicesWithRepairsDataP1++;
-          (invoice.repairs_data as any[]).forEach(repair => {
+      expertiseP1?.forEach(report => {
+        if (report.repairs_data && Array.isArray(report.repairs_data) && report.repairs_data.length > 0) {
+          reportsWithRepairsDataP1++;
+          (report.repairs_data as any[]).forEach(repair => {
             const trade = categorizeTrade(repair.designation || repair.description || '');
             const hours = parseFloat(repair.quantity) || 0;
             soldHoursByTradeP1[trade] += hours;
@@ -201,26 +216,24 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
         }
       });
 
-      const hasRepairsData = invoicesWithRepairsData > 0;
-      const totalInvoicesP2 = invoicesP2?.length || 0;
+      const hasRepairsData = reportsWithRepairsData > 0;
+      const totalExpertiseP2 = expertiseP2?.length || 0;
       
-      if (totalInvoicesP2 > 0 && invoicesWithRepairsData < totalInvoicesP2) {
-        const missingPercentage = Math.round(((totalInvoicesP2 - invoicesWithRepairsData) / totalInvoicesP2) * 100);
-        dataWarnings.push(`${missingPercentage}% des factures n'ont pas de détail des heures (${totalInvoicesP2 - invoicesWithRepairsData}/${totalInvoicesP2})`);
+      if (totalExpertiseP2 > 0 && reportsWithRepairsData < totalExpertiseP2) {
+        const missingPercentage = Math.round(((totalExpertiseP2 - reportsWithRepairsData) / totalExpertiseP2) * 100);
+        dataWarnings.push(`${missingPercentage}% des rapports d'expertise n'ont pas de détail des heures (${totalExpertiseP2 - reportsWithRepairsData}/${totalExpertiseP2})`);
       }
 
-      // === CALCUL DES HEURES ACHETÉES RÉELLES (depuis timesheets) ===
+      // === CALCUL DES HEURES ACHETÉES RÉELLES (depuis total_work_minutes des timesheets) ===
       const boughtHoursByEmployee: Record<string, number> = {};
       let totalRealBoughtHours = 0;
 
       timesheets?.forEach(ts => {
-        if (ts.clock_in_time && ts.clock_out_time) {
-          const clockIn = new Date(ts.clock_in_time);
-          const clockOut = new Date(ts.clock_out_time);
-          const hours = (clockOut.getTime() - clockIn.getTime()) / (1000 * 60 * 60);
-          boughtHoursByEmployee[ts.user_id] = (boughtHoursByEmployee[ts.user_id] || 0) + hours;
-          totalRealBoughtHours += hours;
-        }
+        // Utiliser total_work_minutes directement (inclut les pauses déduites)
+        const minutes = ts.total_work_minutes || 0;
+        const hours = minutes / 60;
+        boughtHoursByEmployee[ts.user_id] = (boughtHoursByEmployee[ts.user_id] || 0) + hours;
+        totalRealBoughtHours += hours;
       });
 
       // === LISTE DES EMPLOYÉS ===
