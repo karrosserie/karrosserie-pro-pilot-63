@@ -324,39 +324,47 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
         </DialogContent>
       </Dialog>
 
-      {/* Dialogues pour les actions */}
-      <InvoiceDialog
-        invoice={currentInvoice}
-        open={editDialogOpen}
-        onOpenChange={setEditDialogOpen}
-      />
+      {/* Dialogues pour les actions - rendu conditionnel */}
+      {editDialogOpen && (
+        <InvoiceDialog
+          invoice={currentInvoice}
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+        />
+      )}
 
-      <InvoiceEmailDialog
-        invoice={currentInvoice}
-        open={emailDialogOpen}
-        onOpenChange={setEmailDialogOpen}
-      />
+      {emailDialogOpen && (
+        <InvoiceEmailDialog
+          invoice={currentInvoice}
+          open={emailDialogOpen}
+          onOpenChange={setEmailDialogOpen}
+        />
+      )}
 
-      <ReceiptDialog
-        open={receiptDialogOpen}
-        onOpenChange={setReceiptDialogOpen}
-        preselectedInvoice={{
-          id: currentInvoice.id,
-          amount: remainingAmount > 0 ? remainingAmount : currentInvoice.amount,
-        }}
-      />
+      {receiptDialogOpen && (
+        <ReceiptDialog
+          open={receiptDialogOpen}
+          onOpenChange={setReceiptDialogOpen}
+          preselectedInvoice={{
+            id: currentInvoice.id,
+            amount: remainingAmount > 0 ? remainingAmount : currentInvoice.amount,
+          }}
+        />
+      )}
 
-      <CreditDialog
-        open={creditDialogOpen}
-        onOpenChange={setCreditDialogOpen}
-        credit={{
-          invoice_id: currentInvoice.id,
-          reference: '',
-          status: 'En attente',
-          amount: 0,
-          notes: ''
-        }}
-      />
+      {creditDialogOpen && (
+        <CreditDialog
+          open={creditDialogOpen}
+          onOpenChange={setCreditDialogOpen}
+          credit={{
+            invoice_id: currentInvoice.id,
+            reference: '',
+            status: 'En attente',
+            amount: 0,
+            notes: ''
+          }}
+        />
+      )}
     </>
   );
 };
