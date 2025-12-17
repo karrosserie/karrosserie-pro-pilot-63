@@ -98,13 +98,20 @@ const NavItem = ({ icon, label, path, isActive, hasSubMenu = false, subMenuItems
         to={disabled ? '#' : (hasSubMenu ? '#' : path)}
         onClick={handleClick}
         className={`flex items-center py-3 px-4 rounded-lg text-sm font-medium transition-colors ${
-          isActive 
-            ? 'bg-karrosserie-orange/10 text-karrosserie-orange border border-karrosserie-orange/20' 
-            : 'text-gray-600 hover:bg-gray-100 active:bg-gray-200'
+          disabled
+            ? 'text-gray-400 cursor-not-allowed opacity-60'
+            : isActive 
+              ? 'bg-karrosserie-orange/10 text-karrosserie-orange border border-karrosserie-orange/20' 
+              : 'text-gray-600 hover:bg-gray-100 active:bg-gray-200'
         }`}
       >
-        <span className="mr-3 flex-shrink-0">{icon}</span>
+        <span className={`mr-3 flex-shrink-0 ${disabled ? 'opacity-50' : ''}`}>{icon}</span>
         <span className="flex-1 truncate">{label}</span>
+        {disabled && (
+          <Badge variant="outline" className="ml-2 text-xs bg-gray-100 text-gray-500 border-gray-300">
+            Bientôt
+          </Badge>
+        )}
         {badgeCount !== undefined && badgeCount > 0 && !disabled && (
           <Badge className="ml-2 bg-karrosserie-orange hover:bg-karrosserie-orange text-white">
             {badgeCount}
@@ -170,6 +177,9 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
 
   // Routes temporairement désactivées (facile à réactiver)
   const DISABLED_ROUTES = ['/planning'];
+  
+  // Routes "teaser" - visibles mais grisées avec badge "Bientôt"
+  const TEASER_ROUTES = ['/dashboard', '/gestion-atelier'];
 
   // Définir tous les éléments de navigation
   const allNavItems = [
@@ -333,7 +343,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
                 openMenuPath={openMenuPath}
                 onMenuToggle={setOpenMenuPath}
                 badgeCount={item.path === '/ai-assistant' ? unhandledAlertsCount : undefined}
-                
+                disabled={TEASER_ROUTES.includes(item.path)}
               />
             ))}
           </nav>
