@@ -7,7 +7,8 @@ import { useEffect } from 'react';
 import { userActionWebhookService } from '@/services/tracking/UserActionWebhookService';
 import { useDetailedTracking } from '@/hooks/tracking/useDetailedTracking';
 
-export function useInvoices(showArchived: boolean = false) {
+// Hook sans paramètre - retourne TOUTES les factures, filtrage côté client
+export function useInvoices() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { isImpersonating, impersonationData } = useImpersonation();
@@ -19,14 +20,16 @@ export function useInvoices(showArchived: boolean = false) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isImpersonating, impersonationData?.company_id]);
 
+  // QueryKey STABLE - plus de paramètre showArchived
   const {
     data: invoices,
     isLoading,
     error
   } = useQuery({
-    queryKey: ['invoices', impersonationData?.company_id || 'normal', showArchived],
+    queryKey: ['invoices', impersonationData?.company_id || 'normal'],
     queryFn: async () => {
-      return await invoicesService.getAll(showArchived);
+      // Récupère TOUTES les factures (archived et non-archived)
+      return await invoicesService.getAll(true);
     },
     staleTime: 10000
   });

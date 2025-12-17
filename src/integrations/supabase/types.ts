@@ -2817,18 +2817,38 @@ export type Database = {
       }
       fleet_reservations_assistance: {
         Row: {
+          approved_end_date: string
+          approved_start_date: string
+          assistance_case_number: string | null
           created_at: string
           id: number
+          reservation_id: string
         }
         Insert: {
+          approved_end_date: string
+          approved_start_date: string
+          assistance_case_number?: string | null
           created_at?: string
           id?: number
+          reservation_id: string
         }
         Update: {
+          approved_end_date?: string
+          approved_start_date?: string
+          assistance_case_number?: string | null
           created_at?: string
           id?: number
+          reservation_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fleet_reservations_assistance_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "fleet_reservations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       fleet_returns: {
         Row: {

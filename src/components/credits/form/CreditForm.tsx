@@ -13,6 +13,7 @@ interface CreditFormProps {
 }
 
 export const CreditForm = ({ onClose, preselectedInvoice }: CreditFormProps) => {
+  // Hook appelé une seule fois - queryKey stable
   const { createCredit } = useCredits();
   const {
     formData,
@@ -33,7 +34,7 @@ export const CreditForm = ({ onClose, preselectedInvoice }: CreditFormProps) => 
         ...prev,
         invoice_id: preselectedInvoice.invoice_id,
         reference: preselectedInvoice.reference,
-        status: 'En attente' as const, // Use default status instead of preselectedInvoice.status
+        status: 'En attente' as const,
         notes: preselectedInvoice.notes
       }));
     }
