@@ -4,7 +4,7 @@ import { receiptsService, ReceiptWithClient } from '@/services/supabase/receipts
 import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
 import { useImpersonation } from '@/hooks/use-impersonation';
-import { useEffect, useMemo, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
 
 export function useReceiptsData() {
   const queryClient = useQueryClient();
@@ -12,11 +12,7 @@ export function useReceiptsData() {
   const { confirm } = useConfirmation();
   const { isImpersonating, impersonationData } = useImpersonation();
 
-  // Invalider les requêtes lors du changement d'impersonation
-  useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ['receipts'] });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isImpersonating, impersonationData?.company_id]);
+  // QueryKey dynamique basée sur l'impersonation - pas besoin d'invalider manuellement
   
   const {
     data: receiptsData,

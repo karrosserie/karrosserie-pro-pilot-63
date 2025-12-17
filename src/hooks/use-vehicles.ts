@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { vehiclesService, type Vehicle, type NewVehicle, type UpdateVehicle } from '@/services/supabase/vehicles';
 import { useToast } from '@/hooks/use-toast';
 import { useImpersonation } from '@/hooks/use-impersonation';
-import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useDetailedTracking } from '@/hooks/tracking/useDetailedTracking';
 
@@ -35,11 +34,7 @@ export function useVehicles() {
   const { isImpersonating, impersonationData } = useImpersonation();
   const { trackAction } = useDetailedTracking();
 
-  // Invalider les requêtes lors du changement d'impersonation
-  useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ['vehicles'] });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isImpersonating, impersonationData?.company_id]);
+  // QueryKey dynamique basée sur l'impersonation - pas besoin d'invalider manuellement
 
   const {
     data: vehicles,
