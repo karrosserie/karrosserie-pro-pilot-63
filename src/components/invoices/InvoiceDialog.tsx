@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/dialog";
 import { InvoiceForm } from '@/components/invoices/InvoiceForm';
 import { useInvoices } from '@/hooks/use-invoices';
-import { useToast } from '@/hooks/use-toast';
 
 interface InvoiceDialogProps {
   invoice?: any;
@@ -27,29 +26,9 @@ const InvoiceDialog = ({
   onSuccess,
   prefillData
 }: InvoiceDialogProps) => {
-  const { toast } = useToast();
   const navigate = useNavigate();
   const { updateInvoice, createInvoice } = useInvoices();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // Flag pour indiquer que le dialog est en train de se fermer (évite les re-renders pendant la fermeture)
-  const [isClosing, setIsClosing] = useState(false);
-  
-  // Ref pour vérifier si le composant est toujours monté
-  const isMountedRef = useRef(true);
-  
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
-
-  // Reset isClosing when dialog opens
-  useEffect(() => {
-    if (open) {
-      setIsClosing(false);
-    }
-  }, [open]);
 
   // Déterminer si c'est une conversion depuis un ordre de réparation
   const isConversionFromRepairOrder = prefillData?.repair_order_id;
@@ -57,7 +36,7 @@ const InvoiceDialog = ({
   const isEditing = invoice && invoice.id;
 
   const handleSubmit = async (formData: any) => {
-    if (isSubmitting || isClosing) return;
+    if (isSubmitting) return;
     
     setIsSubmitting(true);
     
@@ -70,34 +49,19 @@ const InvoiceDialog = ({
         createdInvoice = await createInvoice.mutateAsync(formData);
       }
       
-      // Marquer comme "en cours de fermeture" AVANT de fermer le dialog
-      // Cela empêche les re-renders causés par l'invalidation des queries
-      setIsClosing(true);
-      
-      // Fermer le dialog
       onOpenChange(false);
 
       // Si c'est une conversion depuis un ordre de réparation et qu'une facture a été créée,
       // rediriger vers la page des factures avec la facture ouverte
       if (isConversionFromRepairOrder && createdInvoice) {
         setTimeout(() => {
-          if (isMountedRef.current) {
-            navigate(`/documents/factures?openInvoice=${createdInvoice.id}`);
-          }
+          navigate(`/documents/factures?openInvoice=${createdInvoice.id}`);
         }, 100);
       } else {
-        // Différer le callback de succès pour éviter un burst d'invalidations
-        // pendant la fermeture du dialog (source de freeze)
-        // Délai augmenté à 500ms pour laisser le dialog se démonter proprement
-        setTimeout(() => {
-          if (isMountedRef.current) {
-            onSuccess?.();
-          }
-        }, 500);
+        onSuccess?.();
       }
     } catch (error: any) {
       console.error('Dialog submission error:', error);
-      setIsClosing(false);
     } finally {
       setIsSubmitting(false);
     }
@@ -125,17 +89,14 @@ const InvoiceDialog = ({
           </DialogDescription>
         </DialogHeader>
         
-        {/* Ne rendre le formulaire que si le dialog est ouvert ET pas en train de se fermer */}
-        {open && !isClosing && (
-          <InvoiceForm
-            invoice={invoice}
-            onSubmit={handleSubmit}
-            onCancel={() => onOpenChange(false)}
-            isSubmitting={isSubmitting}
-            prefillData={prefillData}
-            isConversionFromRepairOrder={isConversionFromRepairOrder}
-          />
-        )}
+        <InvoiceForm
+          invoice={invoice}
+          onSubmit={handleSubmit}
+          onCancel={() => onOpenChange(false)}
+          isSubmitting={isSubmitting}
+          prefillData={prefillData}
+          isConversionFromRepairOrder={isConversionFromRepairOrder}
+        />
       </DialogContent>
     </Dialog>
   );
