@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@/components/ui/table";
 import { Search, FileText, Plus, Filter, Eye, Pencil, Trash } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -43,7 +43,6 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import InvoiceMobileCard from '@/components/invoices/InvoiceMobileCard';
 import RelanceModal from '@/components/invoices/RelanceModal';
 import { useSendRelance } from '@/hooks/use-send-relance';
-import { formatAmount } from '@/utils/invoiceCalculations';
 
 const Invoices = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -58,7 +57,7 @@ const Invoices = () => {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const { toast } = useToast();
   const { confirm } = useConfirmation();
-  
+
   const { invoices, isLoading, error, deleteInvoice, createInvoice, archiveInvoice, restoreInvoice } = useInvoices(showArchived);
   const { credits } = useCredits();
   const { receipts } = useReceiptsData();
@@ -66,16 +65,61 @@ const Invoices = () => {
   const { sortedData: sortedInvoices, sortConfig, handleSort } = useTableSorting(invoices || [], 'reference');
   const isMobile = useIsMobile();
   const { sendRelance } = useSendRelance();
-  
-  const filteredInvoices = sortedInvoices?.filter(invoice => {
-    const matchesSearch = invoice.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (invoice.clients && `${invoice.clients.first_name} ${invoice.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (invoice.vehicles && `${invoice.vehicles.car_brands?.name || 'Marque inconnue'} ${invoice.vehicles.car_models?.name || 'Modèle inconnu'} - ${invoice.vehicles.license_plate}`.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesArchiveStatus = showArchived ? invoice.archived : !invoice.archived;
-    return matchesSearch && matchesArchiveStatus;
-  }) || [];
-  
+
+  const normalizedSearchTerm = useMemo(() => searchTerm.trim().toLowerCase(), [searchTerm]);
+
+  const creditsByInvoiceId = useMemo(() => {
+    const map = new Map<string, any[]>();
+
+    for (const credit of credits || []) {
+      const invoiceId = credit?.invoice_id;
+      if (!invoiceId) continue;
+
+      const existing = map.get(invoiceId) || [];
+      existing.push(credit);
+      map.set(invoiceId, existing);
+    }
+
+    // Garder le tri existant (par référence croissante) mais en ne le faisant qu'une seule fois.
+    for (const [invoiceId, list] of map.entries()) {
+      map.set(
+        invoiceId,
+        list.sort((a, b) => {
+          const refA = a?.reference || '';
+          const refB = b?.reference || '';
+          return String(refA).localeCompare(String(refB), 'fr', { numeric: true });
+        })
+      );
+    }
+
+    return map;
+  }, [credits]);
+
+  const getInvoiceCredits = useCallback(
+    (invoiceId: string) => creditsByInvoiceId.get(invoiceId) || [],
+    [creditsByInvoiceId]
+  );
+
+  const filteredInvoices = useMemo(() => {
+    const list = sortedInvoices || [];
+    if (!list.length) return [];
+
+    return list.filter((invoice) => {
+      const matchesArchiveStatus = showArchived ? invoice.archived : !invoice.archived;
+      if (!matchesArchiveStatus) return false;
+
+      if (!normalizedSearchTerm) return true;
+
+      const ref = invoice.reference?.toLowerCase() || '';
+      const client = invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}`.toLowerCase() : '';
+      const vehicle = invoice.vehicles
+        ? `${invoice.vehicles.car_brands?.name || 'Marque inconnue'} ${invoice.vehicles.car_models?.name || 'Modèle inconnu'} - ${invoice.vehicles.license_plate}`.toLowerCase()
+        : '';
+
+      return ref.includes(normalizedSearchTerm) || client.includes(normalizedSearchTerm) || vehicle.includes(normalizedSearchTerm);
+    });
+  }, [sortedInvoices, showArchived, normalizedSearchTerm]);
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Payée':
@@ -105,21 +149,11 @@ const Invoices = () => {
     }).format(amount);
   };
 
-  const getInvoiceCredits = (invoiceId: string) => {
-    return credits?.filter(credit => credit.invoice_id === invoiceId)
-      .sort((a, b) => {
-        // Tri par ordre croissant de la référence
-        const refA = a.reference || '';
-        const refB = b.reference || '';
-        return refA.localeCompare(refB, 'fr', { numeric: true });
-      }) || [];
-  };
-
   const renderCreditsBadges = (invoiceCredits: any[]) => {
     if (invoiceCredits.length === 0) {
       return <span className="text-gray-500 text-sm">-</span>;
     }
-    
+
     return (
       <div className="flex flex-col gap-1">
         {invoiceCredits.map((credit) => (
@@ -127,14 +161,14 @@ const Invoices = () => {
             key={credit.id}
             variant="secondary"
             className="bg-orange-100 text-orange-800 hover:bg-orange-100 text-xs"
-           >
-             Avoir n°{credit.reference} - {formatAmount(credit.amount || 0)}
-           </Badge>
+          >
+            Avoir n°{credit.reference} - {formatAmount(credit.amount || 0)}
+          </Badge>
         ))}
       </div>
     );
   };
-  
+
   const handleCreateInvoice = () => {
     setSelectedInvoice(null);
     setDialogOpen(true);

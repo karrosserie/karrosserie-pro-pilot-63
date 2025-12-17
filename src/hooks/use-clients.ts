@@ -30,7 +30,8 @@ export function useClients() {
   // Invalider les requêtes lors du changement d'impersonation
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ['clients'] });
-  }, [isImpersonating, impersonationData?.company_id, queryClient]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isImpersonating, impersonationData?.company_id]);
   
   const {
     data: clients,
