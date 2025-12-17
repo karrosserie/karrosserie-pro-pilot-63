@@ -10,10 +10,11 @@ import { useCredits } from '@/hooks/use-credits';
 interface CreditFormProps {
   onClose: () => void;
   preselectedInvoice?: { invoice_id: string; reference: string; status: string; amount: number; notes: string } | null;
+  isActive?: boolean; // Pour conditionner les fetches
 }
 
-export const CreditForm = ({ onClose, preselectedInvoice }: CreditFormProps) => {
-  const { createCredit } = useCredits();
+export const CreditForm = ({ onClose, preselectedInvoice, isActive = true }: CreditFormProps) => {
+  const { createCredit } = useCredits({ enabled: isActive });
   const {
     formData,
     items,
