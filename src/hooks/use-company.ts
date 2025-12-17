@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import { companyService, CompanyInfo } from '@/services/supabase/company';
@@ -28,6 +28,10 @@ export function useCompany() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Tracker le dernier chargement pour éviter les doublons
+  const lastLoadKeyRef = useRef<string>('');
+  const isLoadingRef = useRef(false);
 
   useEffect(() => {
     const loadCompanyData = async () => {
@@ -35,6 +39,16 @@ export function useCompany() {
         return;
       }
       
+      // Créer une clé unique pour ce chargement
+      const loadKey = `${user.id}-${isImpersonating}-${impersonationData?.company_id || ''}`;
+      
+      // Éviter les chargements en double
+      if (lastLoadKeyRef.current === loadKey || isLoadingRef.current) {
+        return;
+      }
+      
+      lastLoadKeyRef.current = loadKey;
+      isLoadingRef.current = true;
       setIsLoading(true);
       
       try {
@@ -53,6 +67,7 @@ export function useCompany() {
         });
       } finally {
         setIsLoading(false);
+        isLoadingRef.current = false;
       }
     };
 

@@ -25,11 +25,8 @@ export interface CompanyInfo {
 
 export const companyService = {
   async getCompanyInfo(userId?: string): Promise<CompanyInfo | null> {
-    console.log('Chargement des données entreprise...');
-    
     // Use getCurrentUserCompanyId to handle impersonation
     const companyId = await getCurrentUserCompanyId();
-    console.log('Company ID effective (avec impersonation):', companyId);
 
     const { data, error } = await supabase
       .from('company_info')
@@ -38,16 +35,12 @@ export const companyService = {
       .single();
 
     if (error) {
-      console.log('Erreur lors du chargement:', error);
       if (error.code === 'PGRST116') {
         // No rows found
-        console.log('Aucune donnée trouvée pour cet utilisateur');
         return null;
       }
       throw new Error(error.message);
     }
-
-    console.log('Données chargées depuis la DB:', data);
     
     // Transform the data to match our interface
     const transformedData = {
@@ -61,16 +54,12 @@ export const companyService = {
       }
     } as CompanyInfo;
 
-    console.log('Données transformées:', transformedData);
     return transformedData;
   },
 
   async updateCompanyInfo(userId?: string, companyData: Partial<CompanyInfo> = {}): Promise<CompanyInfo> {
-    console.log('Sauvegarde des données entreprise:', companyData);
-    
     // Use getCurrentUserCompanyId to handle impersonation
     const companyId = await getCurrentUserCompanyId();
-    console.log('Company ID effective (avec impersonation):', companyId);
 
     const dataToUpdate = {
       name: companyData.name || '',
@@ -88,8 +77,6 @@ export const companyService = {
       updated_at: new Date().toISOString()
     };
 
-    console.log('Données à sauvegarder:', dataToUpdate);
-
     const { data, error } = await supabase
       .from('company_info')
       .update(dataToUpdate)
@@ -101,8 +88,6 @@ export const companyService = {
       console.error('Erreur lors de la sauvegarde:', error);
       throw new Error(error.message);
     }
-
-    console.log('Données sauvegardées avec succès:', data);
 
     // Transform the data to match our interface
     return {
@@ -120,7 +105,6 @@ export const companyService = {
   async deleteCompanyInfo(userId?: string): Promise<void> {
     // Use getCurrentUserCompanyId to handle impersonation
     const companyId = await getCurrentUserCompanyId();
-    console.log('Company ID effective (avec impersonation):', companyId);
 
     const { error } = await supabase
       .from('company_info')
