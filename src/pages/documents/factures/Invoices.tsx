@@ -66,6 +66,25 @@ const Invoices = () => {
   const isMobile = useIsMobile();
   const { sendRelance } = useSendRelance();
 
+  // Mémoriser les objets passés aux dialogues pour éviter les re-renders
+  const preselectedInvoiceData = useMemo(() => {
+    if (!selectedInvoice) return null;
+    return {
+      id: selectedInvoice.id,
+      amount: selectedInvoice.amount || 0
+    };
+  }, [selectedInvoice?.id, selectedInvoice?.amount]);
+
+  const preselectedCreditData = useMemo(() => {
+    if (!selectedInvoice) return null;
+    return {
+      invoice_id: selectedInvoice.id,
+      reference: '',
+      status: 'Émis' as const,
+      amount: 0,
+      notes: ''
+    };
+  }, [selectedInvoice?.id]);
   const normalizedSearchTerm = useMemo(() => searchTerm.trim().toLowerCase(), [searchTerm]);
 
   const creditsByInvoiceId = useMemo(() => {
@@ -616,22 +635,13 @@ const Invoices = () => {
           receipt={null}
           open={receiptDialogOpen}
           onOpenChange={setReceiptDialogOpen}
-          preselectedInvoice={selectedInvoice ? {
-            id: selectedInvoice.id,
-            amount: selectedInvoice.amount || 0
-          } : null}
+          preselectedInvoice={preselectedInvoiceData}
         />
       )}
 
       {creditDialogOpen && (
         <CreditDialog
-          credit={selectedInvoice ? {
-            invoice_id: selectedInvoice.id,
-            reference: '',
-            status: 'Émis',
-            amount: 0,
-            notes: ''
-          } : null}
+          credit={preselectedCreditData}
           open={creditDialogOpen}
           onOpenChange={setCreditDialogOpen}
         />

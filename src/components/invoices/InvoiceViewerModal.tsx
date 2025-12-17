@@ -167,6 +167,20 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
   // Vérifier si la facture est entièrement payée
   const isPaid = remainingAmount <= 0 && totalPaidAmount > 0;
 
+  // Mémoriser les objets passés aux dialogues pour éviter les boucles infinies
+  const receiptPreselect = useMemo(() => ({
+    id: currentInvoice.id,
+    amount: remainingAmount > 0 ? remainingAmount : currentInvoice.amount,
+  }), [currentInvoice.id, remainingAmount, currentInvoice.amount]);
+
+  const creditPreselect = useMemo(() => ({
+    invoice_id: currentInvoice.id,
+    reference: '',
+    status: 'En attente' as const,
+    amount: 0,
+    notes: ''
+  }), [currentInvoice.id]);
+
   // Action handlers
   const handleEdit = () => {
     setEditDialogOpen(true);
@@ -345,10 +359,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
         <ReceiptDialog
           open={receiptDialogOpen}
           onOpenChange={setReceiptDialogOpen}
-          preselectedInvoice={{
-            id: currentInvoice.id,
-            amount: remainingAmount > 0 ? remainingAmount : currentInvoice.amount,
-          }}
+          preselectedInvoice={receiptPreselect}
         />
       )}
 
@@ -356,13 +367,7 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
         <CreditDialog
           open={creditDialogOpen}
           onOpenChange={setCreditDialogOpen}
-          credit={{
-            invoice_id: currentInvoice.id,
-            reference: '',
-            status: 'En attente',
-            amount: 0,
-            notes: ''
-          }}
+          credit={creditPreselect}
         />
       )}
     </>

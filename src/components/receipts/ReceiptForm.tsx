@@ -99,7 +99,7 @@ export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting, presele
 
       generateReference();
     }
-  }, [receipt, preselectedInvoice]);
+  }, [receipt?.id, preselectedInvoice?.id, preselectedInvoice?.amount]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
