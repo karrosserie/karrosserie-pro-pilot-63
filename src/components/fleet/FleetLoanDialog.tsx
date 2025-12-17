@@ -90,7 +90,7 @@ const FleetLoanDialog: React.FC<FleetLoanDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={mode === 'view' || mode === 'view_return' ? onClose : handleOpenChange}>
-      <DialogContent className="w-[95vw] max-w-5xl h-[90vh] p-0 flex flex-col overflow-hidden">
+      <DialogContent className="w-[95vw] max-w-5xl h-[90vh] p-0 flex flex-col overflow-visible">
         <DialogHeader className="px-4 pt-4 pb-2 shrink-0">
           <DialogTitle>{getTitle()}</DialogTitle>
         </DialogHeader>
