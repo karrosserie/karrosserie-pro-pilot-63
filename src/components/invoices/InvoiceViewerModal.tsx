@@ -178,8 +178,8 @@ const InvoiceViewerModal = ({
   const handlePrint = async () => { const { printInvoicePDFWithTemplate } = await import('@/utils/invoicePDFGeneration'); const result = await printInvoicePDFWithTemplate(invoice, companyData); if (result.success) toast({ title: "Impression", description: `La facture ouverte pour impression.` }); else toast({ title: "Erreur", description: "Impossible d'imprimer.", variant: "destructive" }); };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto p-0">
+    <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
+      <DialogContent className="max-w-4xl w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto p-0" onInteractOutside={(e) => e.preventDefault()}>
         <VisuallyHidden><DialogTitle>Aperçu facture {invoice.reference}</DialogTitle></VisuallyHidden>
         <div className="p-3 sm:p-4 pr-12 sm:pr-16 border-b bg-background">
           <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3">Aperçu de la facture n°{invoice.reference}</h2>
