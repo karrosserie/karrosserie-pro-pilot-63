@@ -12,7 +12,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Receipt } from './form/types';
 import { receiptMutations } from '@/services/supabase/receipts/mutations';
 import { useQueryClient } from '@tanstack/react-query';
-import { useInvoices } from '@/hooks/use-invoices';
 import { Invoice } from '@/services/supabase/invoices';
 
 interface ReceiptDialogProps {
@@ -20,7 +19,7 @@ interface ReceiptDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   preselectedInvoice?: { id: string; amount: number } | null;
-  // Props optionnelles - si non fournies, utilise le hook interne
+  // Props optionnelles - si non fournies, utilise valeurs par défaut
   invoices?: Invoice[];
   invoicesLoading?: boolean;
 }
@@ -30,17 +29,12 @@ const ReceiptDialog = ({
   open,
   onOpenChange,
   preselectedInvoice,
-  invoices: externalInvoices,
-  invoicesLoading: externalLoading
+  invoices = [],
+  invoicesLoading = false
 }: ReceiptDialogProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
-  // Toujours appeler le hook (règle des hooks React) - mais utiliser résultat externe si fourni
-  const { invoices: hookInvoices, isLoading: hookLoading } = useInvoices();
-  const invoices = externalInvoices ?? hookInvoices ?? [];
-  const invoicesLoading = externalLoading ?? hookLoading ?? false;
 
   const handleSubmit = async (formData: Receipt) => {
     if (isSubmitting) return;
