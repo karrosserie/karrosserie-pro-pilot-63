@@ -246,8 +246,8 @@ const CreditViewerModal = ({ credit, open, onOpenChange }: CreditViewerModalProp
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
+      <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0" onInteractOutside={(e) => e.preventDefault()}>
           {/* Barre d'actions en haut */}
           <div className="p-4 pr-16 border-b bg-background">
             <h2 className="text-lg font-semibold mb-3">Aperçu de l'avoir n°{credit.reference}</h2>

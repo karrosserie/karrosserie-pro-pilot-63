@@ -47,8 +47,8 @@ export const InvoiceEmailDialog = ({ invoice, open, onOpenChange }: InvoiceEmail
   const isFormValid = Boolean(emailData.to && emailData.subject && emailData.message);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+    <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
+      <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Envoyer la facture par e-mail</DialogTitle>
         </DialogHeader>

@@ -45,8 +45,8 @@ export const CreditEmailDialog = ({ credit, open, onOpenChange }: CreditEmailDia
   const isFormValid = Boolean(emailData.to && emailData.subject && emailData.message);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+    <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
+      <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Envoyer l'avoir par e-mail</DialogTitle>
         </DialogHeader>
