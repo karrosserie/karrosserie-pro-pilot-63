@@ -7,6 +7,7 @@ import QuoteDialog from '@/components/quotes/QuoteDialog';
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import { CreditDialog } from '@/components/credits/CreditDialog';
 import { useClients } from '@/hooks/use-clients';
+import { useCredits } from '@/hooks/use-credits';
 import { Client } from '@/services/supabase/clients';
 import { TableLoading } from '@/components/ui/loading';
 import { ErrorMessage } from '@/components/ui/error-message';
@@ -26,6 +27,7 @@ const ClientList = () => {
   const [selectedClientForDocument, setSelectedClientForDocument] = useState<Client | null>(null);
   
   const { clients, isLoading, error, createClient, updateClient, deleteClient } = useClients();
+  const { createCredit } = useCredits();
   const { user } = useAuth();
   const { companyId } = useCompanyId();
 
@@ -231,6 +233,7 @@ const ClientList = () => {
           }
         }}
         credit={null}
+        createCredit={createCredit}
       />
     </div>
   );

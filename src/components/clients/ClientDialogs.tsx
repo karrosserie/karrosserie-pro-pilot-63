@@ -4,6 +4,7 @@ import ClientDialog from '@/components/client/ClientDialog';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import { CreditDialog } from '@/components/credits/CreditDialog';
+import { useCredits } from '@/hooks/use-credits';
 
 import { Client } from '@/services/supabase/clients';
 
@@ -41,6 +42,8 @@ const ClientDialogs: React.FC<ClientDialogsProps> = ({
   selectedClientForDocument,
   setSelectedClientForDocument
 }) => {
+  const { createCredit } = useCredits();
+  
   return (
     <>
       <ClientDialog
@@ -133,6 +136,7 @@ const ClientDialogs: React.FC<ClientDialogsProps> = ({
           }
         }}
         credit={null}
+        createCredit={createCredit}
       />
 
     </>

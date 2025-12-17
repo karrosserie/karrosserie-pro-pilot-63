@@ -26,7 +26,7 @@ export function useInvoices() {
       // Récupère TOUTES les factures (archived et non-archived)
       return await invoicesService.getAll();
     },
-    staleTime: 10000
+    staleTime: 30000
   });
 
   const createInvoice = useMutation({

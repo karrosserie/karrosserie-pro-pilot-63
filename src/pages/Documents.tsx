@@ -107,7 +107,7 @@ const Documents = () => {
   const { quotes, isLoading: quotesLoading } = useQuotes();
   const { orders: repairOrders, isLoading: ordersLoading } = useRepairOrders();
   const { invoices, isLoading: invoicesLoading } = useInvoices();
-  const { credits, isLoading: creditsLoading } = useCredits();
+  const { credits, isLoading: creditsLoading, createCredit } = useCredits();
   const { vehicles } = useVehicles();
 
   // Compter les documents et gérer le pluriel
@@ -796,6 +796,7 @@ const Documents = () => {
         credit={selectedCredit}
         open={isCreditDialogOpen}
         onOpenChange={setIsCreditDialogOpen}
+        createCredit={createCredit}
       />
     </div>
   );
