@@ -52,11 +52,11 @@ export const RepairOrderSelector = ({
   const formatRepairOrderDisplay = (order: any) => {
     const clientName = order.clients ? `${order.clients.first_name} ${order.clients.last_name}` : 'Client non assigné';
     
-    // Utiliser d'abord les champs brand et model directs, puis fallback sur les relations
+    // Utiliser uniquement les relations car_brands / car_models (pas de colonnes vehicles.brand/model)
     let vehicleInfo = 'Véhicule non assigné';
     if (order.vehicles) {
-      const brand = order.vehicles.brand || order.vehicles.car_brands?.name || 'Marque inconnue';
-      const model = order.vehicles.model || order.vehicles.car_models?.name || 'Modèle inconnu';
+      const brand = order.vehicles.car_brands?.name || 'Marque inconnue';
+      const model = order.vehicles.car_models?.name || 'Modèle inconnu';
       const licensePlate = order.vehicles.license_plate || '';
       vehicleInfo = `${brand} ${model} - ${licensePlate}`;
     }
