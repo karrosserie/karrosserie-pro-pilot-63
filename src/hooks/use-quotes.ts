@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { getCurrentUserCompanyId } from '@/services/supabase/auth-company';
 import { useImpersonation } from '@/hooks/use-impersonation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useDetailedTracking } from '@/hooks/tracking/useDetailedTracking';
 import { useQuoteToReservationLinker } from './use-quote-to-reservation-linker';
 
@@ -14,12 +14,7 @@ export function useQuotes() {
   const { trackAction } = useDetailedTracking();
   const [createdQuote, setCreatedQuote] = useState<{ id: string; client_id: string; reference: string } | null>(null);
 
-  // Invalider UNIQUEMENT les quotes lors du changement d'impersonation
-  // NE PAS invalider invoices - ce n'est pas la responsabilité de use-quotes
-  useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ['quotes'] });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isImpersonating, impersonationData?.company_id]);
+  // L'impersonation est gérée via la queryKey dynamique - plus besoin d'invalider manuellement
 
   // Use quote-to-reservation linker
   useQuoteToReservationLinker({
