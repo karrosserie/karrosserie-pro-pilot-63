@@ -49,6 +49,7 @@ const InvoiceDialog = ({
         createdInvoice = await createInvoice.mutateAsync(formData);
       }
       
+      // Fermer le dialog après succès - l'invalidation des queries via use-invoices suffit
       onOpenChange(false);
 
       // Si c'est une conversion depuis un ordre de réparation et qu'une facture a été créée,
@@ -57,9 +58,8 @@ const InvoiceDialog = ({
         setTimeout(() => {
           navigate(`/documents/factures?openInvoice=${createdInvoice.id}`);
         }, 100);
-      } else {
-        onSuccess?.();
       }
+      // Supprimé: onSuccess?.() - l'invalidation via React Query est suffisante
     } catch (error: any) {
       console.error('Dialog submission error:', error);
     } finally {
