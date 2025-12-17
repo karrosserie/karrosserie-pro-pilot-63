@@ -67,7 +67,7 @@ export const quotesService = {
     if (vehicleIds.length > 0) {
       const { data: vehicles, error: vehiclesError } = await supabase
         .from('vehicles')
-        .select('id, brand, model, license_plate')
+        .select('id, license_plate, car_brands(id, name), car_models(id, name)')
         .in('id', vehicleIds);
       
       if (!vehiclesError) {
@@ -113,7 +113,7 @@ export const quotesService = {
     if (quote.vehicle_id) {
       const { data: vehicle } = await supabase
         .from('vehicles')
-        .select('id, brand, model, license_plate')
+        .select('id, license_plate, car_brands(id, name), car_models(id, name)')
         .eq('id', quote.vehicle_id)
         .single();
       vehicleData = vehicle;
