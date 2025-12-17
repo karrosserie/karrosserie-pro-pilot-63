@@ -14,7 +14,7 @@ export function useCredits() {
   } = useQuery({
     queryKey: ['credits'],
     queryFn: creditsService.getCredits,
-    staleTime: 10000 // 10 secondes avant de considérer les données comme obsolètes
+    staleTime: 30000 // 30 secondes avant de considérer les données comme obsolètes
   });
 
   const createCredit = useMutation({

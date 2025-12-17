@@ -46,14 +46,10 @@ export function useReceiptsData() {
     }) || [];
   }, [receiptsData]);
 
-  // Fonction utilitaire pour invalider les queries de manière séquentielle
+  // Fonction utilitaire pour invalider les queries - receipts seulement
   const invalidateQueriesSequentially = useCallback(async () => {
-    // D'abord invalider les receipts
     await queryClient.invalidateQueries({ queryKey: ['receipts'] });
-    // Puis après un court délai, invalider les invoices
-    setTimeout(() => {
-      queryClient.invalidateQueries({ queryKey: ['invoices'] });
-    }, 100);
+    // L'invalidation des invoices est gérée par le composant parent si nécessaire
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   

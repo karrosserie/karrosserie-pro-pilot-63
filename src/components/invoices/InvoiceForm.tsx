@@ -21,7 +21,7 @@ interface InvoiceFormProps {
   isConversionFromRepairOrder?: boolean;
 }
 
-export const InvoiceForm = ({
+export const InvoiceForm = React.memo(({
   invoice,
   onSubmit,
   onCancel,
@@ -132,4 +132,4 @@ export const InvoiceForm = ({
       />
     </form>
   );
-};
+});
