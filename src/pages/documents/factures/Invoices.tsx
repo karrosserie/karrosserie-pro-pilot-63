@@ -671,12 +671,14 @@ const Invoices = () => {
         />
       )}
 
-      <RelanceModal
-        invoice={selectedInvoice}
-        open={relanceModalOpen}
-        onOpenChange={setRelanceModalOpen}
-        onRelance={handleSendRelance}
-      />
+      {relanceModalOpen && (
+        <RelanceModal
+          invoice={selectedInvoice}
+          open={relanceModalOpen}
+          onOpenChange={setRelanceModalOpen}
+          onRelance={handleSendRelance}
+        />
+      )}
     </div>
   );
 };
