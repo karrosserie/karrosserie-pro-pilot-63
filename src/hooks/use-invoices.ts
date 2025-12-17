@@ -29,7 +29,7 @@ export function useInvoices() {
     queryKey: ['invoices', impersonationData?.company_id || 'normal'],
     queryFn: async () => {
       // Récupère TOUTES les factures (archived et non-archived)
-      return await invoicesService.getAll(true);
+      return await invoicesService.getAll();
     },
     staleTime: 10000
   });
