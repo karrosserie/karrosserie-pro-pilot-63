@@ -1,7 +1,6 @@
-
 "use client"
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
@@ -44,19 +43,27 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Find the selected option
-  const selectedOption = options.find(option => option.value === value);
-
-  // Filter options based on input
-  const filteredOptions = options.filter(option =>
-    option.label.toLowerCase().includes(inputValue.toLowerCase())
+  // Memoize the selected option to prevent recalculation
+  const selectedOption = useMemo(() => 
+    options.find(option => option.value === value),
+    [options, value]
   );
 
+  // Memoize filtered options with debounce-friendly pattern
+  const filteredOptions = useMemo(() => 
+    options.filter(option =>
+      option.label.toLowerCase().includes(inputValue.toLowerCase())
+    ),
+    [options, inputValue]
+  );
+
+  // Only update input when selectedOption label changes, not on every object reference change
+  const selectedLabel = selectedOption?.label;
   useEffect(() => {
-    if (selectedOption) {
-      setInputValue(selectedOption.label);
+    if (selectedLabel && inputValue !== selectedLabel) {
+      setInputValue(selectedLabel);
     }
-  }, [selectedOption]);
+  }, [selectedLabel]); // Depend on label string, not object
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;

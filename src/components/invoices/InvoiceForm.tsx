@@ -48,11 +48,9 @@ export const InvoiceForm = ({
     handleChange,
     handleClaimNumberChange,
     validateForm,
-    calculateGlobalTotals,
+    globalTotals,
     prepareSubmitData
   } = useInvoiceFormLogic({ invoice, prefillData });
-
-  const globalTotals = calculateGlobalTotals();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
