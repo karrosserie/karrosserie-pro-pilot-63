@@ -37,10 +37,10 @@ const ReceiptDialog = ({
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  // N'appeler le hook QUE si les props ne sont pas fournies
-  const internalHook = externalInvoices === undefined ? useInvoices() : null;
-  const invoices = externalInvoices ?? internalHook?.invoices ?? [];
-  const invoicesLoading = externalLoading ?? internalHook?.isLoading ?? false;
+  // Toujours appeler le hook (règle des hooks React) - mais utiliser résultat externe si fourni
+  const { invoices: hookInvoices, isLoading: hookLoading } = useInvoices();
+  const invoices = externalInvoices ?? hookInvoices ?? [];
+  const invoicesLoading = externalLoading ?? hookLoading ?? false;
 
   const handleSubmit = async (formData: Receipt) => {
     if (isSubmitting) return;

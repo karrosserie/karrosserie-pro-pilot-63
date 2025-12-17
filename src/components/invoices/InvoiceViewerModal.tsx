@@ -21,7 +21,7 @@ interface InvoiceViewerModalProps {
   invoice: Invoice | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  // Mutation optionnelle - si non fournie, utilise le hook interne
+  // Mutation optionnelle - si fournie depuis Invoices.tsx, évite double usage
   deleteInvoice?: UseMutationResult<boolean, Error, string, unknown>;
   onEditInvoice?: (invoice: Invoice) => void;
   onSendEmail?: (invoice: Invoice) => void;
@@ -41,11 +41,9 @@ const InvoiceViewerModal = ({
 }: InvoiceViewerModalProps) => {
   const { companyData } = useCompany();
   const { preferences } = useCompanyPreferences();
-  
-  // Toujours appeler le hook (règle des hooks React), utiliser conditionnellement les résultats
+  // Toujours appeler le hook (règle des hooks React) - utiliser résultat externe si fourni
   const { deleteInvoice: hookDeleteInvoice } = useInvoices();
   const deleteInvoice = externalDeleteInvoice || hookDeleteInvoice;
-  
   const { confirm } = useConfirmation();
   const [receiptsData, setReceiptsData] = useState<any[]>([]);
   const [currentInvoice, setCurrentInvoice] = useState<Invoice | null>(invoice);

@@ -9,7 +9,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { InvoiceForm } from '@/components/invoices/InvoiceForm';
-import { useInvoices } from '@/hooks/use-invoices';
 import { UseMutationResult } from '@tanstack/react-query';
 
 interface InvoiceDialogProps {
@@ -29,15 +28,10 @@ const InvoiceDialog = ({
   onOpenChange,
   onSuccess,
   prefillData,
-  createInvoice: externalCreateInvoice,
-  updateInvoice: externalUpdateInvoice
+  createInvoice,
+  updateInvoice
 }: InvoiceDialogProps) => {
   const navigate = useNavigate();
-  
-  // Toujours appeler le hook (règle des hooks React), utiliser conditionnellement les résultats
-  const { createInvoice: hookCreateInvoice, updateInvoice: hookUpdateInvoice } = useInvoices();
-  const createInvoice = externalCreateInvoice || hookCreateInvoice;
-  const updateInvoice = externalUpdateInvoice || hookUpdateInvoice;
   
   const [isSubmitting, setIsSubmitting] = useState(false);
 
