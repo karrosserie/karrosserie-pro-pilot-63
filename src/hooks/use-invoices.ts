@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import { userActionWebhookService } from '@/services/tracking/UserActionWebhookService';
 import { useDetailedTracking } from '@/hooks/tracking/useDetailedTracking';
 
-export function useInvoices(showArchived: boolean = false, enabled: boolean = true) {
+export function useInvoices(showArchived: boolean = false) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { isImpersonating, impersonationData } = useImpersonation();
@@ -15,11 +15,9 @@ export function useInvoices(showArchived: boolean = false, enabled: boolean = tr
 
   // Invalider les requêtes lors du changement d'impersonation
   useEffect(() => {
-    if (enabled) {
-      queryClient.invalidateQueries({ queryKey: ['invoices'] });
-    }
+    queryClient.invalidateQueries({ queryKey: ['invoices'] });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isImpersonating, impersonationData?.company_id, enabled]);
+  }, [isImpersonating, impersonationData?.company_id]);
 
   const {
     data: invoices,
@@ -30,8 +28,7 @@ export function useInvoices(showArchived: boolean = false, enabled: boolean = tr
     queryFn: async () => {
       return await invoicesService.getAll(showArchived);
     },
-    staleTime: 10000,
-    enabled // Désactive le fetch si false
+    staleTime: 10000
   });
 
   const createInvoice = useMutation({

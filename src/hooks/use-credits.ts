@@ -3,8 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { creditsService } from '@/services/supabase/credits';
 import { useToast } from '@/hooks/use-toast';
 
-export function useCredits(options?: { enabled?: boolean }) {
-  const enabled = options?.enabled ?? true;
+export function useCredits() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -15,8 +14,7 @@ export function useCredits(options?: { enabled?: boolean }) {
   } = useQuery({
     queryKey: ['credits'],
     queryFn: creditsService.getCredits,
-    staleTime: 30000,
-    enabled // Désactive le fetch si false
+    staleTime: 30000
   });
 
   const createCredit = useMutation({

@@ -125,7 +125,6 @@ const ReceiptDialog = ({
           onCancel={() => onOpenChange(false)}
           isSubmitting={isSubmitting}
           preselectedInvoice={preselectedInvoice}
-          isActive={open}
         />
       </DialogContent>
     </Dialog>

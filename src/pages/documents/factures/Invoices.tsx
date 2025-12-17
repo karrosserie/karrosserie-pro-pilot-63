@@ -58,12 +58,8 @@ const Invoices = () => {
   const { toast } = useToast();
   const { confirm } = useConfirmation();
 
-  // Désactiver les fetches pendant que les dialogues sont ouverts pour éviter les re-renders en cascade
-  const anyDialogOpen = dialogOpen || emailDialogOpen || receiptDialogOpen || creditDialogOpen || viewerModalOpen || relanceModalOpen;
-  
-  const { invoices, isLoading, error, deleteInvoice, createInvoice, archiveInvoice, restoreInvoice } = useInvoices(showArchived, !anyDialogOpen);
-  const { credits } = useCredits({ enabled: !anyDialogOpen });
-  // useReceiptsData supprimé - n'était pas utilisé
+  const { invoices, isLoading, error, deleteInvoice, createInvoice, archiveInvoice, restoreInvoice } = useInvoices(showArchived);
+  const { credits } = useCredits();
   const { companyData } = useCompany();
   const { sortedData: sortedInvoices, sortConfig, handleSort } = useTableSorting(invoices || [], 'reference');
   const isMobile = useIsMobile();
