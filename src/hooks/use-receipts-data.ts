@@ -6,7 +6,8 @@ import { useConfirmation } from '@/hooks/use-confirmation';
 import { useImpersonation } from '@/hooks/use-impersonation';
 import { useEffect, useMemo, useCallback } from 'react';
 
-export function useReceiptsData() {
+export function useReceiptsData(options?: { enabled?: boolean }) {
+  const enabled = options?.enabled ?? true;
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { confirm } = useConfirmation();
@@ -14,9 +15,11 @@ export function useReceiptsData() {
 
   // Invalider les requêtes lors du changement d'impersonation
   useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ['receipts'] });
+    if (enabled) {
+      queryClient.invalidateQueries({ queryKey: ['receipts'] });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isImpersonating, impersonationData?.company_id]);
+  }, [isImpersonating, impersonationData?.company_id, enabled]);
   
   const {
     data: receiptsData,
@@ -25,7 +28,8 @@ export function useReceiptsData() {
   } = useQuery({
     queryKey: ['receipts', impersonationData?.company_id || 'normal'],
     queryFn: receiptsService.getAll,
-    staleTime: 10000 // 10 secondes avant de considérer les données comme obsolètes
+    staleTime: 10000,
+    enabled // Désactive le fetch si false
   });
 
   // Transform receipts data to include client names and invoice references - memoized

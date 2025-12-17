@@ -6,7 +6,8 @@ import { accountsService, Account } from '@/services/supabase/accounts';
 import { useImpersonation } from '@/hooks/use-impersonation';
 import { useEffect } from 'react';
 
-export const useAccounts = () => {
+export const useAccounts = (options?: { enabled?: boolean }) => {
+  const enabled = options?.enabled ?? true;
   const { toast } = useToast();
   const { confirm } = useConfirmation();
   const queryClient = useQueryClient();
@@ -14,9 +15,11 @@ export const useAccounts = () => {
 
   // Invalider les requêtes lors du changement d'impersonation
   useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ['accounts'] });
+    if (enabled) {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isImpersonating, impersonationData?.company_id]);
+  }, [isImpersonating, impersonationData?.company_id, enabled]);
 
   // Fetch accounts
   const {
@@ -34,6 +37,7 @@ export const useAccounts = () => {
       return failureCount < 2;
     },
     refetchOnWindowFocus: false,
+    enabled // Désactive le fetch si false
   });
 
   // Create account mutation
