@@ -203,3 +203,26 @@
     }
   }
 }
+
+/* Joyride overlay priority over Radix Dialog */
+.react-joyride__overlay {
+  z-index: 99998 !important;
+}
+
+.react-joyride__spotlight {
+  z-index: 99999 !important;
+}
+
+/* Disable Dialog overlay pointer-events when Joyride is active */
+body:has(.react-joyride__overlay) [data-radix-dialog-overlay] {
+  pointer-events: none !important;
+}
+
+/* Ensure Joyride floater/tooltip is above everything */
+.__floater {
+  z-index: 100000 !important;
+}
+
+.__floater__body {
+  z-index: 100000 !important;
+}
