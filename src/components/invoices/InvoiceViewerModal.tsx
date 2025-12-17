@@ -38,8 +38,13 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
   const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
   const [creditDialogOpen, setCreditDialogOpen] = useState(false);
 
-  // Utiliser directement la prop invoice - plus de souscription au cache
-  const currentInvoice = invoice;
+  // State buffer pour éviter les re-renders (pattern QuoteViewerModal)
+  const [currentInvoice, setCurrentInvoice] = useState<Invoice | null>(invoice);
+  
+  // Synchroniser le state avec la prop
+  useEffect(() => {
+    setCurrentInvoice(invoice);
+  }, [invoice]);
   
   // Récupérer uniquement les encaissements (client/véhicule sont dans invoice)
   useEffect(() => {
@@ -338,38 +343,30 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
         </DialogContent>
       </Dialog>
 
-      {/* Dialogues pour les actions - rendu conditionnel */}
-      {editDialogOpen && (
-        <InvoiceDialog
-          invoice={currentInvoice}
-          open={editDialogOpen}
-          onOpenChange={setEditDialogOpen}
-        />
-      )}
+      {/* Dialogues toujours montés - visibilité contrôlée par prop open (pattern Devis) */}
+      <InvoiceDialog
+        invoice={currentInvoice}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+      />
 
-      {emailDialogOpen && (
-        <InvoiceEmailDialog
-          invoice={currentInvoice}
-          open={emailDialogOpen}
-          onOpenChange={setEmailDialogOpen}
-        />
-      )}
+      <InvoiceEmailDialog
+        invoice={currentInvoice}
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
+      />
 
-      {receiptDialogOpen && (
-        <ReceiptDialog
-          open={receiptDialogOpen}
-          onOpenChange={setReceiptDialogOpen}
-          preselectedInvoice={receiptPreselect}
-        />
-      )}
+      <ReceiptDialog
+        open={receiptDialogOpen}
+        onOpenChange={setReceiptDialogOpen}
+        preselectedInvoice={receiptPreselect}
+      />
 
-      {creditDialogOpen && (
-        <CreditDialog
-          open={creditDialogOpen}
-          onOpenChange={setCreditDialogOpen}
-          credit={creditPreselect}
-        />
-      )}
+      <CreditDialog
+        open={creditDialogOpen}
+        onOpenChange={setCreditDialogOpen}
+        credit={creditPreselect}
+      />
     </>
   );
 };

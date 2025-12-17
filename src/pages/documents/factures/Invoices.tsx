@@ -613,56 +613,44 @@ const Invoices = () => {
       </div>
       )}
 
-      {/* Rendu conditionnel des modales - montées uniquement quand ouvertes */}
-      {dialogOpen && (
-        <InvoiceDialog
-          invoice={selectedInvoice}
-          open={dialogOpen}
-          onOpenChange={setDialogOpen}
-        />
-      )}
+      {/* Modales toujours montées - visibilité contrôlée par prop open (pattern Devis) */}
+      <InvoiceDialog
+        invoice={selectedInvoice}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
 
-      {emailDialogOpen && (
-        <InvoiceEmailDialog
-          invoice={selectedInvoice}
-          open={emailDialogOpen}
-          onOpenChange={setEmailDialogOpen}
-        />
-      )}
+      <InvoiceEmailDialog
+        invoice={selectedInvoice}
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
+      />
 
-      {receiptDialogOpen && (
-        <ReceiptDialog
-          receipt={null}
-          open={receiptDialogOpen}
-          onOpenChange={setReceiptDialogOpen}
-          preselectedInvoice={preselectedInvoiceData}
-        />
-      )}
+      <ReceiptDialog
+        receipt={null}
+        open={receiptDialogOpen}
+        onOpenChange={setReceiptDialogOpen}
+        preselectedInvoice={preselectedInvoiceData}
+      />
 
-      {creditDialogOpen && (
-        <CreditDialog
-          credit={preselectedCreditData}
-          open={creditDialogOpen}
-          onOpenChange={setCreditDialogOpen}
-        />
-      )}
+      <CreditDialog
+        credit={preselectedCreditData}
+        open={creditDialogOpen}
+        onOpenChange={setCreditDialogOpen}
+      />
 
-      {viewerModalOpen && (
-        <InvoiceViewerModal
-          invoice={selectedInvoice}
-          open={viewerModalOpen}
-          onOpenChange={setViewerModalOpen}
-        />
-      )}
+      <InvoiceViewerModal
+        invoice={selectedInvoice}
+        open={viewerModalOpen}
+        onOpenChange={setViewerModalOpen}
+      />
 
-      {relanceModalOpen && (
-        <RelanceModal
-          invoice={selectedInvoice}
-          open={relanceModalOpen}
-          onOpenChange={setRelanceModalOpen}
-          onRelance={handleSendRelance}
-        />
-      )}
+      <RelanceModal
+        invoice={selectedInvoice}
+        open={relanceModalOpen}
+        onOpenChange={setRelanceModalOpen}
+        onRelance={handleSendRelance}
+      />
     </div>
   );
 };
