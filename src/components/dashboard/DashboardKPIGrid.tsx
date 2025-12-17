@@ -110,18 +110,30 @@ export const DashboardKPIGrid = ({ data }: DashboardKPIGridProps) => {
         previousValue={previousVehicles.toString()}
       />
       
-      {/* Marge Brute - seulement si données de pointage disponibles */}
+      {/* Marge Brute - avec données calculées */}
       <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Marge Brute MO</p>
-        {data.hasTimesheetData ? (
+        {data.hasTimesheetData && data.totalRevenue > 0 ? (
           <>
-            <p className="text-2xl font-bold text-foreground mt-1">{data.grossMargin}%</p>
+            <p className="text-2xl font-bold text-foreground mt-1">{data.grossMarginPercent}%</p>
             <p className="text-xs text-muted-foreground mt-0.5">Objectif : 65-75%</p>
+            <div className="flex items-center gap-1.5 mt-2">
+              {data.grossMarginPercent >= 65 ? (
+                <TrendingUp className="w-3 h-3 text-green-600" />
+              ) : (
+                <TrendingDown className="w-3 h-3 text-amber-600" />
+              )}
+              <span className={`text-xs font-medium ${data.grossMarginPercent >= 65 ? 'text-green-600' : 'text-amber-600'}`}>
+                {data.grossMarginPercent >= 65 ? 'Dans l\'objectif' : 'Sous l\'objectif'}
+              </span>
+            </div>
           </>
         ) : (
           <>
             <p className="text-lg font-medium text-muted-foreground mt-1 italic">Données indisponibles</p>
-            <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">Coûts salariaux requis</p>
+            <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
+              {!data.hasTimesheetData ? 'Pointages requis' : 'CA requis'}
+            </p>
           </>
         )}
       </div>
