@@ -64,7 +64,7 @@ const InvoiceDialog = ({
         // pendant la fermeture du dialog (source de freeze)
         setTimeout(() => {
           onSuccess?.();
-        }, 0);
+        }, 150);
       }
     } catch (error: any) {
       console.error('Dialog submission error:', error);

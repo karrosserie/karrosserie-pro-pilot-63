@@ -4,8 +4,6 @@ import { Credit } from './types';
 import { checkTableExists } from './table-utils';
 
 export const getCredits = async (): Promise<Credit[]> => {
-  console.log('Fetching credits...');
-  
   // Check if table exists first
   const tableExists = await checkTableExists();
   if (!tableExists) {
@@ -21,8 +19,6 @@ export const getCredits = async (): Promise<Credit[]> => {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-
-    console.log('Raw credits data:', creditsData);
 
     if (!creditsData || creditsData.length === 0) {
       return [];
@@ -40,15 +36,13 @@ export const getCredits = async (): Promise<Credit[]> => {
         // Get client and vehicle data from the invoice
         if (credit.invoice_id) {
           try {
-            console.log('Fetching invoice details for credit:', credit.id, 'invoice_id:', credit.invoice_id);
             const { data: invoice, error: invoiceError } = await supabase
               .from('invoices')
               .select('id, reference, client_id, vehicle_id')
               .eq('id', credit.invoice_id)
               .maybeSingle();
-            
+
             if (!invoiceError && invoice) {
-              console.log('Found invoice with details:', invoice);
               enrichedCredit.invoices = { id: invoice.id, reference: invoice.reference };
 
               // Get client from invoice if we don't have it yet
@@ -59,9 +53,8 @@ export const getCredits = async (): Promise<Credit[]> => {
                     .select('id, first_name, last_name, email')
                     .eq('id', invoice.client_id)
                     .maybeSingle();
-                  
+
                   if (!clientError && client) {
-                    console.log('Found client from invoice:', client);
                     clientData = client;
                   }
                 } catch (error) {
@@ -82,30 +75,14 @@ export const getCredits = async (): Promise<Credit[]> => {
                     `)
                     .eq('id', invoice.vehicle_id)
                     .maybeSingle();
-                  
+
                   if (!vehicleError && vehicle) {
-                    console.log('Found vehicle from invoice:', vehicle);
                     vehicleData = vehicle;
                   }
                 } catch (error) {
                   console.warn('Error fetching vehicle from invoice:', error);
                 }
               }
-            }
-          } catch (invoiceError) {
-            console.warn(`Could not fetch invoice for credit ${credit.id}:`, invoiceError);
-          }
-        } else if (credit.invoice_id) {
-          // Just fetch invoice reference if we already have client and vehicle
-          try {
-            const { data: invoice, error: invoiceError } = await supabase
-              .from('invoices')
-              .select('id, reference')
-              .eq('id', credit.invoice_id)
-              .maybeSingle();
-            
-            if (!invoiceError && invoice) {
-              enrichedCredit.invoices = invoice;
             }
           } catch (invoiceError) {
             console.warn(`Could not fetch invoice for credit ${credit.id}:`, invoiceError);
@@ -120,12 +97,10 @@ export const getCredits = async (): Promise<Credit[]> => {
           enrichedCredit.vehicles = vehicleData;
         }
 
-        console.log('Final enriched credit:', enrichedCredit);
         return enrichedCredit;
       })
     );
 
-    console.log('Credits with relations fetched:', creditsWithRelations);
     return creditsWithRelations;
   } catch (error) {
     console.error('Error fetching credits:', error);

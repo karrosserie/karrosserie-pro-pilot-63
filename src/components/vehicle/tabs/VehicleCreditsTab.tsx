@@ -65,17 +65,13 @@ const VehicleCreditsTab: React.FC<VehicleCreditsTabProps> = ({ vehicleId }) => {
       let brand = '';
       let model = '';
       
-      if (credit.vehicles.car_brands?.name) {
-        brand = credit.vehicles.car_brands.name;
-      } else if (credit.vehicles.brand) {
-        brand = credit.vehicles.brand;
-      }
-      
-      if (credit.vehicles.car_models?.name) {
-        model = credit.vehicles.car_models.name;
-      } else if (credit.vehicles.model) {
-        model = credit.vehicles.model;
-      }
+       if (credit.vehicles.car_brands?.name) {
+         brand = credit.vehicles.car_brands.name;
+       }
+       
+       if (credit.vehicles.car_models?.name) {
+         model = credit.vehicles.car_models.name;
+       }
       
       const licensePlate = credit.vehicles.license_plate || '';
       
