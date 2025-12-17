@@ -3,6 +3,7 @@ import { format, subMonths } from 'date-fns';
 import { useDashboardProductivity } from '@/hooks/dashboard/use-dashboard-productivity';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { DashboardKPIGrid } from '@/components/dashboard/DashboardKPIGrid';
+import { LaborProfitabilitySection } from '@/components/dashboard/LaborProfitabilitySection';
 import { ProductivityTable } from '@/components/dashboard/ProductivityTable';
 import { EmployeePerformanceTable } from '@/components/dashboard/EmployeePerformanceTable';
 import { PerformanceExplanation } from '@/components/dashboard/PerformanceExplanation';
@@ -59,6 +60,8 @@ const Dashboard = () => {
       )}
 
       <DashboardKPIGrid data={data} />
+
+      <LaborProfitabilitySection data={data} />
 
       <ProductivityTable
         tradeMetrics={data.tradeMetrics}

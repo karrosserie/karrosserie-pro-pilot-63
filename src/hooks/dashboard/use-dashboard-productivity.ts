@@ -42,6 +42,19 @@ export interface DashboardProductivityData {
   grossMargin: number;
   grossMarginEvolution: number;
   
+  // Rentabilité MO
+  laborCost: number;
+  laborMargin: number;
+  grossMarginPercent: number;
+  
+  // Taux horaires utilisés
+  hourlyRates: {
+    carrosserie: number;
+    peinture: number;
+    mecanique: number;
+    laborCost: number;
+  };
+  
   // Par métier
   tradeMetrics: TradeMetrics[];
   
@@ -84,6 +97,40 @@ function categorizeTrade(description: string): 'carrosserie' | 'peinture' | 'mec
   return 'mecanique';
 }
 
+// Fonction pour filtrer les lignes qui sont des heures de travail (exclure pièces, forfaits, fournitures)
+function isHoursLine(repair: any): boolean {
+  const desc = ((repair.designation || repair.description || '') as string).toLowerCase();
+  
+  // Exclure les pièces, fournitures, forfaits
+  const excludedTerms = [
+    'pièce', 'piece', 'fourniture', 'forfait', 'ingrédient', 'ingredient',
+    'consommable', 'matériel', 'materiel', 'produit', 'accessoire',
+    'kit', 'ensemble', 'lot', 'jeu de', 'vis', 'boulon', 'écrou',
+    'colle', 'mastic', 'apprêt', 'appret', 'diluant', 'durcisseur'
+  ];
+  
+  // Vérifier si c'est une ligne exclue
+  if (excludedTerms.some(term => desc.includes(term))) {
+    return false;
+  }
+  
+  // Inclure si c'est clairement du temps de travail
+  const includeTerms = [
+    'tôlerie', 'tolerie', 't1', 't2', 't3', 'peinture', 'main d\'œuvre', 'main d\'oeuvre',
+    'mo ', 'm.o', 'heure', 'temps', 'débosselage', 'redressage', 'remplacement',
+    'démontage', 'remontage', 'préparation', 'application', 'masticage', 'ponçage'
+  ];
+  
+  // Si contient un terme de travail, c'est des heures
+  if (includeTerms.some(term => desc.includes(term))) {
+    return true;
+  }
+  
+  // Par défaut, on considère que c'est des heures si quantity est raisonnable (< 100)
+  const qty = parseFloat(repair.quantity) || 0;
+  return qty > 0 && qty < 100;
+}
+
 // Fonction pour déterminer le niveau de performance
 function getPerformanceLevel(productivity: number): 'excellent' | 'bon' | 'correct' | 'a_ameliorer' {
   if (productivity >= 125) return 'excellent';
@@ -91,6 +138,14 @@ function getPerformanceLevel(productivity: number): 'excellent' | 'bon' | 'corre
   if (productivity >= 100) return 'correct';
   return 'a_ameliorer';
 }
+
+// Constantes de taux horaires (configurables à terme)
+const HOURLY_RATES = {
+  carrosserie: 55,
+  peinture: 50,
+  mecanique: 45,
+  laborCost: 19 // Coût salarial moyen par heure
+};
 
 export const useDashboardProductivity = (period1: string, period2: string) => {
   const { companyData } = useCompany();
@@ -197,22 +252,26 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
       expertiseP2?.forEach(report => {
         if (report.repairs_data && Array.isArray(report.repairs_data) && report.repairs_data.length > 0) {
           reportsWithRepairsData++;
-          (report.repairs_data as any[]).forEach(repair => {
-            const trade = categorizeTrade(repair.designation || repair.description || '');
-            const hours = parseFloat(repair.quantity) || 0;
-            soldHoursByTrade[trade] += hours;
-          });
+          (report.repairs_data as any[])
+            .filter(isHoursLine) // Filtrer pour ne garder que les heures de travail
+            .forEach(repair => {
+              const trade = categorizeTrade(repair.designation || repair.description || '');
+              const hours = parseFloat(repair.quantity) || 0;
+              soldHoursByTrade[trade] += hours;
+            });
         }
       });
 
       expertiseP1?.forEach(report => {
         if (report.repairs_data && Array.isArray(report.repairs_data) && report.repairs_data.length > 0) {
           reportsWithRepairsDataP1++;
-          (report.repairs_data as any[]).forEach(repair => {
-            const trade = categorizeTrade(repair.designation || repair.description || '');
-            const hours = parseFloat(repair.quantity) || 0;
-            soldHoursByTradeP1[trade] += hours;
-          });
+          (report.repairs_data as any[])
+            .filter(isHoursLine) // Filtrer pour ne garder que les heures de travail
+            .forEach(repair => {
+              const trade = categorizeTrade(repair.designation || repair.description || '');
+              const hours = parseFloat(repair.quantity) || 0;
+              soldHoursByTradeP1[trade] += hours;
+            });
         }
       });
 
@@ -387,8 +446,18 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
       const vehiclesEvolution = vehiclesCountP1 > 0 ? 
         Math.round(((vehiclesCount - vehiclesCountP1) / vehiclesCountP1) * 100) : 0;
       
-      // Marge brute : pas de données de coût salarial => on ne peut pas calculer
-      // On affiche 0 avec un warning
+      // === CALCUL DE LA RENTABILITÉ MO ===
+      // Coût salarial = heures achetées × taux horaire moyen
+      const laborCost = Math.round(totalBoughtHours * HOURLY_RATES.laborCost);
+      
+      // Marge MO = CA - Coût salarial
+      const laborMargin = totalRevenueP2 - laborCost;
+      
+      // Marge brute en % = (Marge / CA) × 100
+      const grossMarginPercent = totalRevenueP2 > 0 
+        ? Math.round((laborMargin / totalRevenueP2) * 1000) / 10 
+        : 0;
+
       if (!hasTimesheetData) {
         dataWarnings.push("La marge brute ne peut pas être calculée sans données de pointage");
       }
@@ -400,8 +469,12 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
         revenueEvolution,
         vehiclesCount,
         vehiclesEvolution,
-        grossMargin: 0, // Pas calculable sans coûts salariaux réels
+        grossMargin: grossMarginPercent,
         grossMarginEvolution: 0,
+        laborCost,
+        laborMargin,
+        grossMarginPercent,
+        hourlyRates: HOURLY_RATES,
         tradeMetrics,
         employees: employeeList,
         totalBoughtHours,
