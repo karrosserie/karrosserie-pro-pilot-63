@@ -19,8 +19,8 @@ interface CreditDialogProps {
 
 export const CreditDialog = ({ open, onOpenChange, credit, createCredit }: CreditDialogProps) => {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Créer un avoir</DialogTitle>
           <DialogDescription>Créez un nouvel avoir en remplissant les informations ci-dessous.</DialogDescription>

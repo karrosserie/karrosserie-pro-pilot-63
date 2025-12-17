@@ -90,8 +90,8 @@ const ReceiptDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={!isSubmitting ? onOpenChange : undefined}>
-      <DialogContent className="max-w-2xl">
+    <Dialog open={open} onOpenChange={!isSubmitting ? onOpenChange : undefined} modal={false}>
+      <DialogContent className="max-w-2xl" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>{receipt ? `Modifier l'encaissement` : "Nouvel encaissement"}</DialogTitle>
           <DialogDescription>{receipt ? "Modifiez les détails de l'encaissement." : "Créez un nouvel encaissement en remplissant les informations ci-dessous."}</DialogDescription>

@@ -50,8 +50,8 @@ const RelanceModal = ({ invoice, open, onOpenChange, onRelance }: RelanceModalPr
   if (!invoice) return null;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+    <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
+      <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Envoyer une relance</DialogTitle>
           <DialogDescription>
