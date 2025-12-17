@@ -247,6 +247,35 @@ export const quotesService = {
     return data && data.length > 0 ? data[0] : null;
   },
 
+  // Récupérer les devis pour plusieurs rapports en UNE SEULE requête (évite N+1)
+  getByReportIds: async (reportIds: string[]): Promise<Record<string, { id: string; reference: string }>> => {
+    if (!reportIds || reportIds.length === 0) {
+      return {};
+    }
+    
+    const { data, error } = await supabase
+      .from('quotes')
+      .select('id, reference, report_id')
+      .in('report_id', reportIds);
+      
+    if (error) {
+      console.error('Error fetching quotes by report IDs:', error);
+      return {};
+    }
+    
+    // Transformer en map reportId -> quote
+    const result: Record<string, { id: string; reference: string }> = {};
+    if (data) {
+      for (const quote of data) {
+        if (quote.report_id) {
+          result[quote.report_id] = { id: quote.id, reference: quote.reference };
+        }
+      }
+    }
+    
+    return result;
+  },
+
   archive: async (id: string) => {
     const { error } = await supabase
       .from('quotes')
