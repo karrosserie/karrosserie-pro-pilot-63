@@ -23,7 +23,6 @@ interface InvoiceViewerModalProps {
   onOpenChange: (open: boolean) => void;
   // Mutation optionnelle - si non fournie, utilise le hook interne
   deleteInvoice?: UseMutationResult<boolean, Error, string, unknown>;
-  // Callbacks pour ouvrir les dialogs depuis le parent (évite les dialogs dupliqués)
   onEditInvoice?: (invoice: Invoice) => void;
   onSendEmail?: (invoice: Invoice) => void;
   onCreateReceipt?: (invoice: Invoice) => void;
@@ -43,73 +42,49 @@ const InvoiceViewerModal = ({
   const { companyData } = useCompany();
   const { preferences } = useCompanyPreferences();
   
-  // Utilise la mutation externe si fournie, sinon fallback au hook
-  const internalHook = useInvoices();
-  const deleteInvoice = externalDeleteInvoice || internalHook.deleteInvoice;
+  // N'appeler le hook QUE si la prop n'est pas fournie
+  const internalHook = !externalDeleteInvoice ? useInvoices() : null;
+  const deleteInvoice = externalDeleteInvoice || internalHook?.deleteInvoice!;
   
   const { confirm } = useConfirmation();
   const [receiptsData, setReceiptsData] = useState<any[]>([]);
-
-  // State buffer pour éviter les re-renders (pattern QuoteViewerModal)
   const [currentInvoice, setCurrentInvoice] = useState<Invoice | null>(invoice);
   
-  // Synchroniser le state avec la prop
   useEffect(() => {
     setCurrentInvoice(invoice);
   }, [invoice]);
   
-  // Récupérer uniquement les encaissements (client/véhicule sont dans invoice)
   useEffect(() => {
     const fetchReceipts = async () => {
       if (!currentInvoice?.id || !open) return;
-
       try {
         const { data: receipts } = await supabase
           .from('receipts')
           .select('*')
           .eq('invoice_id', currentInvoice.id)
           .order('date', { ascending: true });
-        
-        if (receipts) {
-          setReceiptsData(receipts);
-        }
-      } catch (error) {
-        // Silent fail
-      }
+        if (receipts) setReceiptsData(receipts);
+      } catch (error) {}
     };
-
-    if (open && currentInvoice) {
-      fetchReceipts();
-    }
+    if (open && currentInvoice) fetchReceipts();
   }, [currentInvoice?.id, open]);
 
-  // Memoize les données client et véhicule depuis l'invoice
   const { clientData, vehicleData } = useMemo(() => {
     if (!currentInvoice) return { clientData: null, vehicleData: null };
-    
-    // Utiliser les données jointes si disponibles
-    const client = (currentInvoice as any).clients || null;
-    const vehicle = (currentInvoice as any).vehicles || null;
-    
-    return { clientData: client, vehicleData: vehicle };
+    return { 
+      clientData: (currentInvoice as any).clients || null, 
+      vehicleData: (currentInvoice as any).vehicles || null 
+    };
   }, [currentInvoice]);
 
   if (!currentInvoice) return null;
 
   const template = preferences?.invoice_template || 'default';
-
-  // Fonction pour formater les dates au format français dd/mm/yyyy
   const formatDateFr = (dateString: string | null | undefined) => {
     if (!dateString) return undefined;
-    try {
-      const date = new Date(dateString);
-      return format(date, 'dd/MM/yyyy', { locale: fr });
-    } catch {
-      return dateString;
-    }
+    try { return format(new Date(dateString), 'dd/MM/yyyy', { locale: fr }); } catch { return dateString; }
   };
 
-  // Préparer les données pour les composants de template
   const invoiceData = {
     number: currentInvoice.reference,
     claimNumber: currentInvoice.claim_number || undefined,
@@ -124,7 +99,6 @@ const InvoiceViewerModal = ({
     payment_details: currentInvoice.payment_details || undefined
   };
 
-  // Préparer les données client pour le template
   const clientDataForTemplate = {
     name: clientData ? `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim() : undefined,
     address: clientData?.address || undefined,
@@ -136,225 +110,52 @@ const InvoiceViewerModal = ({
     vehicle: vehicleData ? `${vehicleData.car_brands?.name || ''} ${vehicleData.car_models?.name || ''}`.trim() : undefined
   };
 
-  // Convertir les données des items
-  const items = [];
+  const items: any[] = [];
   if (currentInvoice.repairs_data) {
     const repairs = Array.isArray(currentInvoice.repairs_data) ? currentInvoice.repairs_data : [];
-    items.push(...repairs.map((repair: any) => ({
-      ref: repair.ref || '',
-      description: repair.description || repair.label || '',
-      quantity: repair.quantity || 1,
-      discount: repair.discount || 0,
-      unitPrice: repair.unitCost || repair.price || 0,
-      vat: repair.vat || 20,
-      totalHT: (repair.unitCost || repair.price || 0) * (repair.quantity || 1) * (1 - (repair.discount || 0) / 100),
-      totalTTC: (repair.unitCost || repair.price || 0) * (repair.quantity || 1) * (1 - (repair.discount || 0) / 100) * (1 + (repair.vat || 20) / 100)
-    })));
+    items.push(...repairs.map((r: any) => ({ ref: r.ref || '', description: r.description || r.label || '', quantity: r.quantity || 1, discount: r.discount || 0, unitPrice: r.unitCost || r.price || 0, vat: r.vat || 20, totalHT: (r.unitCost || r.price || 0) * (r.quantity || 1) * (1 - (r.discount || 0) / 100), totalTTC: (r.unitCost || r.price || 0) * (r.quantity || 1) * (1 - (r.discount || 0) / 100) * (1 + (r.vat || 20) / 100) })));
   }
-
   if (currentInvoice.parts_data) {
     const parts = Array.isArray(currentInvoice.parts_data) ? currentInvoice.parts_data : [];
-    items.push(...parts.map((part: any) => ({
-      ref: part.ref || '',
-      description: part.description || part.label || '',
-      quantity: part.quantity || 1,
-      discount: part.discount || 0,
-      unitPrice: part.unitCost || part.price || 0,
-      vat: part.vat || 20,
-      totalHT: (part.unitCost || part.price || 0) * (part.quantity || 1) * (1 - (part.discount || 0) / 100),
-      totalTTC: (part.unitCost || part.price || 0) * (part.quantity || 1) * (1 - (part.discount || 0) / 100) * (1 + (part.vat || 20) / 100)
-    })));
+    items.push(...parts.map((p: any) => ({ ref: p.ref || '', description: p.description || p.label || '', quantity: p.quantity || 1, discount: p.discount || 0, unitPrice: p.unitCost || p.price || 0, vat: p.vat || 20, totalHT: (p.unitCost || p.price || 0) * (p.quantity || 1) * (1 - (p.discount || 0) / 100), totalTTC: (p.unitCost || p.price || 0) * (p.quantity || 1) * (1 - (p.discount || 0) / 100) * (1 + (p.vat || 20) / 100) })));
   }
 
   const totals = calculateInvoiceTotals(currentInvoice.repairs_data, currentInvoice.parts_data);
-  const totalsData = {
-    subtotal: `${totals.subtotalAfterDiscount.toFixed(2).replace('.', ',')} €`,
-    vat: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`,
-    total: `${totals.finalTotal.toFixed(2).replace('.', ',')} €`,
-    totalHT: `${totals.subtotalAfterDiscount.toFixed(2).replace('.', ',')} €`,
-    totalVAT: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`,
-    totalDiscount: `${totals.totalDiscount.toFixed(2).replace('.', ',')} €`,
-    totalTTC: `${totals.finalTotal.toFixed(2).replace('.', ',')} €`
-  };
+  const totalsData = { subtotal: `${totals.subtotalAfterDiscount.toFixed(2).replace('.', ',')} €`, vat: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`, total: `${totals.finalTotal.toFixed(2).replace('.', ',')} €`, totalHT: `${totals.subtotalAfterDiscount.toFixed(2).replace('.', ',')} €`, totalVAT: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`, totalDiscount: `${totals.totalDiscount.toFixed(2).replace('.', ',')} €`, totalTTC: `${totals.finalTotal.toFixed(2).replace('.', ',')} €` };
 
-  // Calculer les montants de paiement
   const totalPaidAmount = receiptsData.reduce((sum, receipt) => sum + receipt.amount, 0);
   const remainingAmount = currentInvoice.amount - totalPaidAmount;
-  
-  // Vérifier si la facture est entièrement payée
   const isPaid = remainingAmount <= 0 && totalPaidAmount > 0;
 
-  // Action handlers
-  const handleEdit = () => {
-    if (onEditInvoice) {
-      onEditInvoice(currentInvoice);
-    }
-  };
-
+  const handleEdit = () => { if (onEditInvoice) onEditInvoice(currentInvoice); };
   const handleDelete = async () => {
-    const confirmed = await confirm({
-      title: 'Supprimer la facture',
-      description: `Êtes-vous sûr de vouloir supprimer la facture ${currentInvoice.reference} ? Cette action est irréversible.`,
-      confirmText: 'Supprimer',
-      cancelText: 'Annuler',
-      variant: 'destructive'
-    });
-
+    const confirmed = await confirm({ title: 'Supprimer la facture', description: `Êtes-vous sûr de vouloir supprimer la facture ${currentInvoice.reference} ?`, confirmText: 'Supprimer', cancelText: 'Annuler', variant: 'destructive' });
     if (confirmed) {
-      try {
-        await deleteInvoice.mutateAsync(currentInvoice.id);
-        onOpenChange(false);
-        toast({
-          title: "Facture supprimée",
-          description: `La facture ${currentInvoice.reference} a été supprimée avec succès.`,
-        });
-      } catch (error: any) {
-        toast({
-          title: "Erreur",
-          description: "Impossible de supprimer la facture.",
-          variant: "destructive",
-        });
-      }
+      try { await deleteInvoice.mutateAsync(currentInvoice.id); onOpenChange(false); toast({ title: "Facture supprimée", description: `La facture ${currentInvoice.reference} a été supprimée.` }); }
+      catch { toast({ title: "Erreur", description: "Impossible de supprimer la facture.", variant: "destructive" }); }
     }
   };
-
-  const handleDownload = async () => {
-    const { generateInvoicePDFWithTemplate } = await import('@/utils/invoicePDFGeneration');
-    const result = await generateInvoicePDFWithTemplate(currentInvoice, companyData);
-    if (result.success) {
-      toast({
-        title: "Téléchargement réussi",
-        description: `La facture ${currentInvoice.reference} a été téléchargée.`
-      });
-    } else {
-      toast({
-        title: "Erreur",
-        description: "Impossible de télécharger la facture.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handlePrint = async () => {
-    const { printInvoicePDFWithTemplate } = await import('@/utils/invoicePDFGeneration');
-    const result = await printInvoicePDFWithTemplate(currentInvoice, companyData);
-    if (result.success) {
-      toast({
-        title: "Impression",
-        description: `La facture ${currentInvoice.reference} a été ouverte pour impression.`
-      });
-    } else {
-      toast({
-        title: "Erreur",
-        description: "Impossible d'imprimer la facture.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleSendEmailClick = () => {
-    if (onSendEmail) {
-      onSendEmail(currentInvoice);
-    }
-  };
-
-  const handleCreateCreditClick = () => {
-    if (onCreateCredit) {
-      onCreateCredit(currentInvoice);
-    }
-  };
-
-  const handleCreateReceiptClick = () => {
-    if (onCreateReceipt) {
-      onCreateReceipt(currentInvoice);
-    }
-  };
+  const handleDownload = async () => { const { generateInvoicePDFWithTemplate } = await import('@/utils/invoicePDFGeneration'); const result = await generateInvoicePDFWithTemplate(currentInvoice, companyData); if (result.success) toast({ title: "Téléchargement réussi", description: `La facture ${currentInvoice.reference} a été téléchargée.` }); else toast({ title: "Erreur", description: "Impossible de télécharger.", variant: "destructive" }); };
+  const handlePrint = async () => { const { printInvoicePDFWithTemplate } = await import('@/utils/invoicePDFGeneration'); const result = await printInvoicePDFWithTemplate(currentInvoice, companyData); if (result.success) toast({ title: "Impression", description: `La facture ouverte pour impression.` }); else toast({ title: "Erreur", description: "Impossible d'imprimer.", variant: "destructive" }); };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto p-0">
-        <VisuallyHidden>
-          <DialogTitle>Aperçu de la facture {currentInvoice.reference}</DialogTitle>
-        </VisuallyHidden>
-        {/* Barre d'actions en haut */}
+        <VisuallyHidden><DialogTitle>Aperçu facture {currentInvoice.reference}</DialogTitle></VisuallyHidden>
         <div className="p-3 sm:p-4 pr-12 sm:pr-16 border-b bg-background">
           <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3">Aperçu de la facture n°{currentInvoice.reference}</h2>
           <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-            {onEditInvoice && (
-              <Button variant="outline" size="sm" onClick={handleEdit} className="text-xs sm:text-sm h-8 sm:h-9">
-                <Pencil className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                <span className="hidden xs:inline ml-1">Modifier</span>
-              </Button>
-            )}
-
-            <Button variant="outline" size="sm" onClick={handleDownload} className="text-xs sm:text-sm h-8 sm:h-9">
-              <Download className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-              <span className="hidden xs:inline ml-1">Télécharger</span>
-            </Button>
-
-            <Button variant="outline" size="sm" onClick={handlePrint} className="text-xs sm:text-sm h-8 sm:h-9">
-              <Printer className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-              <span className="hidden xs:inline ml-1">Imprimer</span>
-            </Button>
-
-            {onSendEmail && (
-              <Button variant="outline" size="sm" onClick={handleSendEmailClick} className="text-xs sm:text-sm h-8 sm:h-9">
-                <Mail className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                <span className="hidden xs:inline ml-1">Envoyer</span>
-              </Button>
-            )}
-
-            {onCreateReceipt && (
-              <Button variant="outline" size="sm" onClick={handleCreateReceiptClick} className="text-xs sm:text-sm h-8 sm:h-9">
-                <CreditCard className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                <span className="hidden sm:inline ml-1">Paiement</span>
-              </Button>
-            )}
-
-            {onCreateCredit && (
-              <Button variant="outline" size="sm" onClick={handleCreateCreditClick} className="text-xs sm:text-sm h-8 sm:h-9">
-                <FileX className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                <span className="hidden sm:inline ml-1">Avoir</span>
-              </Button>
-            )}
-
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700 text-xs sm:text-sm h-8 sm:h-9" 
-              onClick={handleDelete}
-            >
-              <Trash className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-              <span className="hidden xs:inline ml-1">Supprimer</span>
-            </Button>
+            {onEditInvoice && <Button variant="outline" size="sm" onClick={handleEdit} className="text-xs sm:text-sm h-8 sm:h-9"><Pencil className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" /><span className="hidden xs:inline ml-1">Modifier</span></Button>}
+            <Button variant="outline" size="sm" onClick={handleDownload} className="text-xs sm:text-sm h-8 sm:h-9"><Download className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" /><span className="hidden xs:inline ml-1">Télécharger</span></Button>
+            <Button variant="outline" size="sm" onClick={handlePrint} className="text-xs sm:text-sm h-8 sm:h-9"><Printer className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" /><span className="hidden xs:inline ml-1">Imprimer</span></Button>
+            {onSendEmail && <Button variant="outline" size="sm" onClick={() => onSendEmail(currentInvoice)} className="text-xs sm:text-sm h-8 sm:h-9"><Mail className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" /><span className="hidden xs:inline ml-1">Envoyer</span></Button>}
+            {onCreateReceipt && <Button variant="outline" size="sm" onClick={() => onCreateReceipt(currentInvoice)} className="text-xs sm:text-sm h-8 sm:h-9"><CreditCard className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" /><span className="hidden sm:inline ml-1">Paiement</span></Button>}
+            {onCreateCredit && <Button variant="outline" size="sm" onClick={() => onCreateCredit(currentInvoice)} className="text-xs sm:text-sm h-8 sm:h-9"><FileX className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" /><span className="hidden sm:inline ml-1">Avoir</span></Button>}
+            <Button variant="outline" size="sm" className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700 text-xs sm:text-sm h-8 sm:h-9" onClick={handleDelete}><Trash className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" /><span className="hidden xs:inline ml-1">Supprimer</span></Button>
           </div>
         </div>
         <div className="w-full h-full">
-          {template === 'default' ? (
-            <DefaultInvoicePreview 
-              companyData={companyData}
-              invoiceData={invoiceData}
-              clientData={clientDataForTemplate}
-              items={items}
-              totals={totalsData}
-              payments={receiptsData}
-              totalPaidAmount={totalPaidAmount}
-              remainingAmount={remainingAmount}
-              isPaid={isPaid}
-            />
-          ) : (
-            <AlternativeInvoicePreview 
-              companyData={companyData}
-              invoiceData={invoiceData}
-              clientData={clientDataForTemplate}
-              items={items}
-              totals={totalsData}
-              payments={receiptsData}
-              totalPaidAmount={totalPaidAmount}
-              remainingAmount={remainingAmount}
-              isPaid={isPaid}
-            />
-          )}
+          {template === 'default' ? <DefaultInvoicePreview companyData={companyData} invoiceData={invoiceData} clientData={clientDataForTemplate} items={items} totals={totalsData} payments={receiptsData} totalPaidAmount={totalPaidAmount} remainingAmount={remainingAmount} isPaid={isPaid} /> : <AlternativeInvoicePreview companyData={companyData} invoiceData={invoiceData} clientData={clientDataForTemplate} items={items} totals={totalsData} payments={receiptsData} totalPaidAmount={totalPaidAmount} remainingAmount={remainingAmount} isPaid={isPaid} />}
         </div>
       </DialogContent>
     </Dialog>

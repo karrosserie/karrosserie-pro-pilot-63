@@ -7,6 +7,7 @@ import PaintMetricsInfo from '@/components/dashboard/PaintMetricsInfo';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDashboardData } from '@/hooks/use-dashboard-data';
+import { useInvoices } from '@/hooks/use-invoices';
 import VehicleDialog from '@/components/vehicle/VehicleDialog';
 import QuoteDialog from '@/components/quotes/QuoteDialog';
 import ClientDialog from '@/components/client/ClientDialog';
@@ -29,6 +30,7 @@ const Index = () => {
     recentActivity,
     isLoading
   } = useDashboardData();
+  const { invoices, isLoading: invoicesLoading } = useInvoices();
 
   // États pour les dialogues
   const [isVehicleDialogOpen, setIsVehicleDialogOpen] = useState(false);
@@ -309,7 +311,7 @@ const Index = () => {
 
       <ClientDialog open={isClientDialogOpen} onOpenChange={setIsClientDialogOpen} title="Nouveau client" description="Ajoutez un nouveau client au système" onSubmit={() => setIsClientDialogOpen(false)} mode="create" />
 
-      <ReceiptDialog open={isReceiptDialogOpen} onOpenChange={setIsReceiptDialogOpen} />
+      <ReceiptDialog open={isReceiptDialogOpen} onOpenChange={setIsReceiptDialogOpen} invoices={invoices || []} invoicesLoading={invoicesLoading} />
     </div>;
 };
 export default Index;

@@ -49,8 +49,8 @@ interface ClientInvoicesTabProps {
 }
 
 const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
-  const { invoices, isLoading, deleteInvoice } = useInvoices();
-  const { credits } = useCredits();
+  const { invoices, isLoading, deleteInvoice, createInvoice, updateInvoice } = useInvoices();
+  const { credits, createCredit } = useCredits();
   const { toast } = useToast();
   const { confirm } = useConfirmation();
   const { companyData } = useCompany();
@@ -413,6 +413,8 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
           invoice={selectedInvoice}
           open={dialogOpen}
           onOpenChange={setDialogOpen}
+          createInvoice={createInvoice}
+          updateInvoice={updateInvoice}
         />
       )}
 
@@ -421,6 +423,7 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
           invoice={selectedInvoice}
           open={viewerModalOpen}
           onOpenChange={setViewerModalOpen}
+          deleteInvoice={deleteInvoice}
         />
       )}
 
@@ -447,6 +450,8 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
           }}
           open={receiptDialogOpen}
           onOpenChange={setReceiptDialogOpen}
+          invoices={invoices || []}
+          invoicesLoading={isLoading}
         />
       )}
 
@@ -461,6 +466,7 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
           }}
           open={creditDialogOpen}
           onOpenChange={setCreditDialogOpen}
+          createCredit={createCredit}
         />
       )}
     </>

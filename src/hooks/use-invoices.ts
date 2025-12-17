@@ -14,11 +14,7 @@ export function useInvoices() {
   const { isImpersonating, impersonationData } = useImpersonation();
   const { trackAction } = useDetailedTracking();
 
-  // Invalider les requêtes lors du changement d'impersonation
-  useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ['invoices'] });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isImpersonating, impersonationData?.company_id]);
+  // L'impersonation est gérée via la queryKey dynamique - plus besoin d'invalider manuellement
 
   // QueryKey STABLE - plus de paramètre showArchived
   const {

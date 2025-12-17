@@ -40,8 +40,8 @@ interface VehicleInvoicesTabProps {
 }
 
 const VehicleInvoicesTab: React.FC<VehicleInvoicesTabProps> = ({ vehicleId }) => {
-  const { invoices, isLoading, archiveInvoice } = useInvoices();
-  const { credits } = useCredits();
+  const { invoices, isLoading, archiveInvoice, deleteInvoice, createInvoice, updateInvoice } = useInvoices();
+  const { credits, createCredit } = useCredits();
   const { toast } = useToast();
   const { confirm } = useConfirmation();
   const { companyData } = useCompany();
@@ -338,10 +338,10 @@ const VehicleInvoicesTab: React.FC<VehicleInvoicesTabProps> = ({ vehicleId }) =>
       </div>
 
       {dialogOpen && (
-        <InvoiceDialog invoice={selectedInvoice} open={dialogOpen} onOpenChange={setDialogOpen} />
+        <InvoiceDialog invoice={selectedInvoice} open={dialogOpen} onOpenChange={setDialogOpen} createInvoice={createInvoice} updateInvoice={updateInvoice} />
       )}
       {viewerModalOpen && (
-        <InvoiceViewerModal invoice={selectedInvoice} open={viewerModalOpen} onOpenChange={setViewerModalOpen} />
+        <InvoiceViewerModal invoice={selectedInvoice} open={viewerModalOpen} onOpenChange={setViewerModalOpen} deleteInvoice={deleteInvoice} />
       )}
       {emailDialogOpen && (
         <InvoiceEmailDialog invoice={selectedInvoice} open={emailDialogOpen} onOpenChange={setEmailDialogOpen} />
@@ -351,6 +351,8 @@ const VehicleInvoicesTab: React.FC<VehicleInvoicesTabProps> = ({ vehicleId }) =>
           receipt={{ invoice: selectedInvoice.id, reference: '', date: new Date().toISOString().split('T')[0], amount: selectedInvoice.amount || 0, status: 'Encaissé', payment_method: 'Virement', bank_account: '', notes: '', payment_proofs: [] }}
           open={receiptDialogOpen}
           onOpenChange={setReceiptDialogOpen}
+          invoices={invoices || []}
+          invoicesLoading={isLoading}
         />
       )}
       {creditDialogOpen && selectedInvoice && (
@@ -358,6 +360,7 @@ const VehicleInvoicesTab: React.FC<VehicleInvoicesTabProps> = ({ vehicleId }) =>
           credit={{ invoice_id: selectedInvoice.id, reference: '', status: 'Émis', amount: 0, notes: '' }}
           open={creditDialogOpen}
           onOpenChange={setCreditDialogOpen}
+          createCredit={createCredit}
         />
       )}
     </>

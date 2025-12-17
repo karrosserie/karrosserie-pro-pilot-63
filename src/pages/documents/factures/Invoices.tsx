@@ -58,9 +58,9 @@ const Invoices = () => {
   const { toast } = useToast();
   const { confirm } = useConfirmation();
 
-  // Hook avec queryKey stable - retourne TOUTES les factures
-  const { invoices: allInvoices, isLoading, error, deleteInvoice, createInvoice, archiveInvoice, restoreInvoice } = useInvoices();
-  const { credits } = useCredits();
+  // Hook avec queryKey stable - retourne TOUTES les factures + toutes les mutations
+  const { invoices: allInvoices, isLoading, error, deleteInvoice, createInvoice, updateInvoice, archiveInvoice, restoreInvoice } = useInvoices();
+  const { credits, createCredit } = useCredits();
   const { companyData } = useCompany();
   
   // Filtrage côté client selon showArchived
@@ -619,14 +619,14 @@ const Invoices = () => {
       </div>
       )}
 
-      {/* Modales avec conditional rendering pour éviter les hooks dupliqués */}
+      {/* Modales avec conditional rendering - mutations passées en props obligatoires */}
       {dialogOpen && (
         <InvoiceDialog
           invoice={selectedInvoice}
           open={dialogOpen}
           onOpenChange={setDialogOpen}
           createInvoice={createInvoice}
-          updateInvoice={undefined}
+          updateInvoice={updateInvoice}
         />
       )}
 
@@ -644,6 +644,8 @@ const Invoices = () => {
           open={receiptDialogOpen}
           onOpenChange={setReceiptDialogOpen}
           preselectedInvoice={preselectedInvoiceData}
+          invoices={allInvoices || []}
+          invoicesLoading={isLoading}
         />
       )}
 
@@ -652,6 +654,7 @@ const Invoices = () => {
           credit={preselectedCreditData}
           open={creditDialogOpen}
           onOpenChange={setCreditDialogOpen}
+          createCredit={createCredit}
         />
       )}
 
