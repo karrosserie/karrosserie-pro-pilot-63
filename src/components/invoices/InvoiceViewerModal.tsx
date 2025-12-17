@@ -38,8 +38,15 @@ const InvoiceViewerModal = ({
   onCreateReceipt,
   onCreateCredit
 }: InvoiceViewerModalProps) => {
+  console.log('[InvoiceViewerModal] RENDER START - open:', open);
+  const renderStart = performance.now();
+  
   const { companyData } = useCompany();
+  console.log('[InvoiceViewerModal] useCompany done');
+  
   const { preferences } = useCompanyPreferences();
+  console.log('[InvoiceViewerModal] useCompanyPreferences done');
+  
   const { confirm } = useConfirmation();
   
   // Fonction de suppression locale si mutation non fournie
@@ -55,12 +62,14 @@ const InvoiceViewerModal = ({
   const [currentInvoice, setCurrentInvoice] = useState<Invoice | null>(invoice);
   
   useEffect(() => {
+    console.log('[InvoiceViewerModal] useEffect setCurrentInvoice', invoice?.id);
     setCurrentInvoice(invoice);
   }, [invoice]);
   
   useEffect(() => {
     const fetchReceipts = async () => {
       if (!currentInvoice?.id || !open) return;
+      console.log('[InvoiceViewerModal] fetchReceipts START');
       try {
         const { data: receipts } = await supabase
           .from('receipts')
@@ -68,18 +77,24 @@ const InvoiceViewerModal = ({
           .eq('invoice_id', currentInvoice.id)
           .order('date', { ascending: true });
         if (receipts) setReceiptsData(receipts);
-      } catch (error) {}
+        console.log('[InvoiceViewerModal] fetchReceipts DONE, count:', receipts?.length);
+      } catch (error) {
+        console.error('[InvoiceViewerModal] fetchReceipts ERROR:', error);
+      }
     };
     if (open && currentInvoice) fetchReceipts();
   }, [currentInvoice?.id, open]);
 
   const { clientData, vehicleData } = useMemo(() => {
+    console.log('[InvoiceViewerModal] useMemo clientData/vehicleData');
     if (!currentInvoice) return { clientData: null, vehicleData: null };
     return { 
       clientData: (currentInvoice as any).clients || null, 
       vehicleData: (currentInvoice as any).vehicles || null 
     };
   }, [currentInvoice]);
+
+  console.log('[InvoiceViewerModal] RENDER took', (performance.now() - renderStart).toFixed(0), 'ms');
 
   if (!currentInvoice) return null;
 
