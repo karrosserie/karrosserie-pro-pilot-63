@@ -88,14 +88,10 @@ const ReceiptDialog = ({
       // Fermer le dialog AVANT d'invalider pour éviter le freeze
       onOpenChange(false);
       
-      // Invalider les queries séquentiellement après fermeture du dialog
+      // Invalider uniquement les receipts - les invoices seront rafraîchies par le composant parent si nécessaire
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ['receipts'] });
-        setTimeout(() => {
-          queryClient.invalidateQueries({ queryKey: ['invoices'] });
-          queryClient.invalidateQueries({ queryKey: ['accounting-data'] });
-        }, 50);
-      }, 50);
+      }, 100);
     } catch (error) {
       console.error('Error saving receipt:', error);
       toast({
