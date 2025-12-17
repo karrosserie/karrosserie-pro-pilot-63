@@ -42,9 +42,9 @@ const InvoiceViewerModal = ({
   const { companyData } = useCompany();
   const { preferences } = useCompanyPreferences();
   
-  // N'appeler le hook QUE si la prop n'est pas fournie
-  const internalHook = !externalDeleteInvoice ? useInvoices() : null;
-  const deleteInvoice = externalDeleteInvoice || internalHook?.deleteInvoice!;
+  // Toujours appeler le hook (règle des hooks React), utiliser conditionnellement les résultats
+  const { deleteInvoice: hookDeleteInvoice } = useInvoices();
+  const deleteInvoice = externalDeleteInvoice || hookDeleteInvoice;
   
   const { confirm } = useConfirmation();
   const [receiptsData, setReceiptsData] = useState<any[]>([]);

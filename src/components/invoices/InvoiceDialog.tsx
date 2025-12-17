@@ -34,10 +34,10 @@ const InvoiceDialog = ({
 }: InvoiceDialogProps) => {
   const navigate = useNavigate();
   
-  // N'appeler le hook QUE si les props ne sont pas fournies
-  const internalHook = (!externalCreateInvoice || !externalUpdateInvoice) ? useInvoices() : null;
-  const createInvoice = externalCreateInvoice || internalHook?.createInvoice!;
-  const updateInvoice = externalUpdateInvoice || internalHook?.updateInvoice!;
+  // Toujours appeler le hook (règle des hooks React), utiliser conditionnellement les résultats
+  const { createInvoice: hookCreateInvoice, updateInvoice: hookUpdateInvoice } = useInvoices();
+  const createInvoice = externalCreateInvoice || hookCreateInvoice;
+  const updateInvoice = externalUpdateInvoice || hookUpdateInvoice;
   
   const [isSubmitting, setIsSubmitting] = useState(false);
 
