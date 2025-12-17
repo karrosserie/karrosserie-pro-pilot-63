@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { FileText, Upload, Sparkles } from 'lucide-react';
+import { FileText, Upload, Sparkles, Trash2 } from 'lucide-react';
 import { useStorage } from '@/hooks/use-storage';
 import { useCompany } from '@/hooks/use-company';
 import { useAuth } from '@/contexts/AuthContext';
@@ -122,6 +122,27 @@ const CompanyTab: React.FC = () => {
       });
     } finally {
       setIsGeneratingLogo(false);
+    }
+  };
+
+  const handleRemoveLogo = async () => {
+    try {
+      const updatedCompanyData = { ...companyData, logo_url: null };
+      updateCompanyData({ logo_url: null });
+      await companyService.updateCompanyInfo(undefined, updatedCompanyData);
+      await reloadCompanyData();
+      
+      toast({
+        title: "Logo supprimé",
+        description: "Le logo a été supprimé. Aucun logo ne sera affiché sur vos documents.",
+      });
+    } catch (error) {
+      console.error('Erreur lors de la suppression du logo:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer le logo.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -238,8 +259,20 @@ const CompanyTab: React.FC = () => {
                   <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   {isGeneratingLogo ? 'Génération...' : 'Générer automatiquement'}
                 </Button>
+                {companyData.logo_url && (
+                  <Button 
+                    type="button" 
+                    variant="destructive"
+                    size={isMobile ? "sm" : "default"}
+                    onClick={handleRemoveLogo}
+                    className={isMobile ? "text-xs" : ""}
+                  >
+                    <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    Supprimer le logo
+                  </Button>
+                )}
               </div>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Formats acceptés : PNG, JPG. Taille maximale : 2 MB.
               </p>
             </div>
