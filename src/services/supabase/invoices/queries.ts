@@ -3,11 +3,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { Invoice } from './types';
 
 export const invoiceQueries = {
-  getAll: async (showArchived: boolean = false): Promise<Invoice[]> => {
+  getAll: async (showArchived?: boolean): Promise<Invoice[]> => {
     const { getCurrentUserCompanyId } = await import('../auth-company');
     const companyId = await getCurrentUserCompanyId();
     
-    const { data: invoicesWithJoins, error } = await supabase
+    let query = supabase
       .from('invoices')
       .select(`
         *,
@@ -33,9 +33,14 @@ export const invoiceQueries = {
           reference
         )
       `)
-      .eq('company_id', companyId)
-      .eq('archived', showArchived)
-      .order('created_at', { ascending: false });
+      .eq('company_id', companyId);
+    
+    // Only filter by archived if explicitly specified
+    if (showArchived !== undefined) {
+      query = query.eq('archived', showArchived);
+    }
+    
+    const { data: invoicesWithJoins, error } = await query.order('created_at', { ascending: false });
 
     if (error) {
       console.error('Error fetching invoices:', error);
