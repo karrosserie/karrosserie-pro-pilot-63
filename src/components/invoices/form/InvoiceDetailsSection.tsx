@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -14,7 +14,7 @@ interface InvoiceDetailsSectionProps {
   isReadOnly: boolean;
 }
 
-export const InvoiceDetailsSection = ({
+const InvoiceDetailsSectionComponent = ({
   paymentDetails,
   notes,
   onFieldChange,
@@ -86,3 +86,6 @@ export const InvoiceDetailsSection = ({
     </Card>
   );
 };
+
+// Memoize to prevent unnecessary re-renders
+export const InvoiceDetailsSection = memo(InvoiceDetailsSectionComponent);
