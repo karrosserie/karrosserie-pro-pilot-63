@@ -37,7 +37,7 @@ export const CreditForm = ({ onClose, preselectedInvoice }: CreditFormProps) => 
         notes: preselectedInvoice.notes
       }));
     }
-  }, [preselectedInvoice, setFormData]);
+  }, [preselectedInvoice?.invoice_id]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
