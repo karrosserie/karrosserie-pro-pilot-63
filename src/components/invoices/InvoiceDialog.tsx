@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
@@ -31,6 +31,16 @@ const InvoiceDialog = ({
   const navigate = useNavigate();
   const { updateInvoice, createInvoice } = useInvoices();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Ref pour vérifier si le composant est toujours monté
+  const isMountedRef = useRef(true);
+  
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   // Déterminer si c'est une conversion depuis un ordre de réparation
   const isConversionFromRepairOrder = prefillData?.repair_order_id;
@@ -57,14 +67,19 @@ const InvoiceDialog = ({
       // rediriger vers la page des factures avec la facture ouverte
       if (isConversionFromRepairOrder && createdInvoice) {
         setTimeout(() => {
-          navigate(`/documents/factures?openInvoice=${createdInvoice.id}`);
+          if (isMountedRef.current) {
+            navigate(`/documents/factures?openInvoice=${createdInvoice.id}`);
+          }
         }, 100);
       } else {
         // Différer le callback de succès pour éviter un burst d'invalidations
         // pendant la fermeture du dialog (source de freeze)
+        // Délai augmenté à 300ms pour laisser le dialog se démonter proprement
         setTimeout(() => {
-          onSuccess?.();
-        }, 150);
+          if (isMountedRef.current) {
+            onSuccess?.();
+          }
+        }, 300);
       }
     } catch (error: any) {
       console.error('Dialog submission error:', error);
