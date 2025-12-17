@@ -43,21 +43,6 @@ const styles = StyleSheet.create({
     height: 45,
     marginBottom: 10,
   },
-  logoFallback: {
-    backgroundColor: '#f97316',
-    borderRadius: 6,
-    padding: 3,
-    width: 40,
-    height: 12,
-    marginBottom: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logoText: {
-    color: 'white',
-    fontSize: 8,
-    fontWeight: 'bold',
-  },
   companyName: {
     fontSize: 10,
     fontWeight: 'bold',
@@ -306,12 +291,8 @@ const AttestationPDF = ({ loanData, companyData, userPosition }: AttestationPDFP
         <View style={styles.threeColumnGrid}>
           {/* Colonne 1 - Entreprise */}
           <View style={styles.column1}>
-            {companyData?.logo_url ? (
+            {companyData?.logo_url && (
               <Image src={companyData.logo_url} style={styles.logo} />
-            ) : (
-              <View style={styles.logoFallback}>
-                <Text style={styles.logoText}>{companyData?.name || ''}</Text>
-              </View>
             )}
             <Text style={styles.companyName}>{companyData?.name || ''}</Text>
             <Text style={styles.companyInfo}>{companyData?.address || ''}</Text>

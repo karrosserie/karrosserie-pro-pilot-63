@@ -61,13 +61,9 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
         <div className="grid grid-cols-[1fr_1.5fr_1fr] gap-6 mb-6">
           {/* Colonne 1 - Entreprise */}
           <div>
-            {companyData.logo_url ? (
+            {companyData.logo_url && (
               <div className="flex items-center justify-start mb-3" style={{maxWidth: '120px'}}>
                 <img src={companyData.logo_url} alt="Logo entreprise" className="max-w-full h-auto object-contain" />
-              </div>
-            ) : (
-              <div className="bg-orange-500 rounded-full p-2 w-fit mb-3">
-                <span className="text-white font-bold text-base">LOGO</span>
               </div>
             )}
             <p className="text-black font-bold mb-2 text-sm">{companyData.name || ''}</p>
