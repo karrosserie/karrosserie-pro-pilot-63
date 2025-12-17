@@ -45,6 +45,9 @@ import RelanceModal from '@/components/invoices/RelanceModal';
 import { useSendRelance } from '@/hooks/use-send-relance';
 
 const Invoices = () => {
+  console.log('[Invoices] COMPONENT RENDER START');
+  const renderStart = performance.now();
+  
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
   const [showArchived, setShowArchived] = useState(false);
@@ -58,10 +61,14 @@ const Invoices = () => {
   const { toast } = useToast();
   const { confirm } = useConfirmation();
 
+  console.log('[Invoices] Dialog states:', { dialogOpen, emailDialogOpen, receiptDialogOpen, creditDialogOpen, viewerModalOpen, relanceModalOpen });
+
   // Hook avec queryKey stable - retourne TOUTES les factures + toutes les mutations
   const { invoices: allInvoices, isLoading, error, deleteInvoice, createInvoice, updateInvoice, archiveInvoice, restoreInvoice } = useInvoices();
   const { credits, createCredit } = useCredits();
   const { companyData } = useCompany();
+  
+  console.log('[Invoices] useInvoices returned:', { count: allInvoices?.length, isLoading, hasError: !!error });
   
   // Filtrage côté client selon showArchived
   const invoices = React.useMemo(() => {
@@ -72,6 +79,8 @@ const Invoices = () => {
   const { sortedData: sortedInvoices, sortConfig, handleSort } = useTableSorting(invoices, 'reference');
   const isMobile = useIsMobile();
   const { sendRelance } = useSendRelance();
+
+  console.log('[Invoices] COMPONENT RENDER took', (performance.now() - renderStart).toFixed(0), 'ms');
 
   // Mémoriser les objets passés aux dialogues pour éviter les re-renders
   const preselectedInvoiceData = useMemo(() => {

@@ -35,10 +35,13 @@ const InvoiceDialog = ({
   
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  console.log('[InvoiceDialog] RENDER - open:', open, 'isSubmitting:', isSubmitting, 'invoiceId:', invoice?.id);
+
   const isConversionFromRepairOrder = prefillData?.repair_order_id;
   const isEditing = invoice && invoice.id;
 
   const handleSubmit = async (formData: any) => {
+    console.log('[InvoiceDialog] handleSubmit CALLED, isSubmitting:', isSubmitting);
     if (isSubmitting) return;
     
     setIsSubmitting(true);
@@ -47,11 +50,16 @@ const InvoiceDialog = ({
       let createdInvoice;
       
       if (isEditing) {
+        console.log('[InvoiceDialog] Calling updateInvoice...');
         await updateInvoice.mutateAsync({ id: invoice.id, data: formData });
+        console.log('[InvoiceDialog] updateInvoice COMPLETED');
       } else {
+        console.log('[InvoiceDialog] Calling createInvoice...');
         createdInvoice = await createInvoice.mutateAsync(formData);
+        console.log('[InvoiceDialog] createInvoice COMPLETED');
       }
       
+      console.log('[InvoiceDialog] Closing dialog...');
       onOpenChange(false);
 
       if (isConversionFromRepairOrder && createdInvoice) {
@@ -60,8 +68,9 @@ const InvoiceDialog = ({
         }, 100);
       }
     } catch (error: any) {
-      console.error('Dialog submission error:', error);
+      console.error('[InvoiceDialog] submission error:', error);
     } finally {
+      console.log('[InvoiceDialog] handleSubmit FINISHED, setting isSubmitting=false');
       setIsSubmitting(false);
     }
   };

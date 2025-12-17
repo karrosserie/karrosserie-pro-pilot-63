@@ -58,9 +58,12 @@ export const parseInvoiceNotes = (notes: string) => {
 };
 
 export const generateNextInvoiceNumber = async (): Promise<string> => {
+  console.log('[generateNextInvoiceNumber] CALLED');
+  const start = performance.now();
   try {
     // Utilise getLastInvoiceByUser au lieu de getAll pour éviter de charger toutes les factures
     const lastInvoice = await invoicesService.getLastInvoiceByUser();
+    console.log('[generateNextInvoiceNumber] getLastInvoiceByUser returned:', lastInvoice?.reference, 'in', (performance.now() - start).toFixed(0), 'ms');
     
     if (!lastInvoice?.reference) {
       return '1';
@@ -73,7 +76,7 @@ export const generateNextInvoiceNumber = async (): Promise<string> => {
 
     return (lastNumber + 1).toString();
   } catch (error) {
-    console.error('Erreur lors de la génération du numéro de facture:', error);
+    console.error('[generateNextInvoiceNumber] ERROR:', error);
     return '1';
   }
 };
