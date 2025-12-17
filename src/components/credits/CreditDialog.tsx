@@ -26,12 +26,10 @@ export const CreditDialog = ({ open, onOpenChange, credit }: CreditDialogProps) 
           </DialogDescription>
         </DialogHeader>
         
-        {open && (
-          <CreditForm 
-            onClose={() => onOpenChange(false)}
-            preselectedInvoice={credit}
-          />
-        )}
+        <CreditForm 
+          onClose={() => onOpenChange(false)}
+          preselectedInvoice={credit}
+        />
       </DialogContent>
     </Dialog>
   );

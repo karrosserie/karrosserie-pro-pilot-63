@@ -89,16 +89,14 @@ const InvoiceDialog = ({
           </DialogDescription>
         </DialogHeader>
         
-        {open && (
-          <InvoiceForm
-            invoice={invoice}
-            onSubmit={handleSubmit}
-            onCancel={() => onOpenChange(false)}
-            isSubmitting={isSubmitting}
-            prefillData={prefillData}
-            isConversionFromRepairOrder={isConversionFromRepairOrder}
-          />
-        )}
+        <InvoiceForm
+          invoice={invoice}
+          onSubmit={handleSubmit}
+          onCancel={() => onOpenChange(false)}
+          isSubmitting={isSubmitting}
+          prefillData={prefillData}
+          isConversionFromRepairOrder={isConversionFromRepairOrder}
+        />
       </DialogContent>
     </Dialog>
   );
