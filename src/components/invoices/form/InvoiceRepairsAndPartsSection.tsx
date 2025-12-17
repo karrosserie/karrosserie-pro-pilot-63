@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -30,7 +30,13 @@ export const InvoiceRepairsAndPartsSection = ({
   const { data: partDesignations = [] } = useAutomotivePartNames();
   const isMobile = useIsMobile();
 
-  // Repair functions - memoized
+  // Use refs to access current values without triggering callback recreation
+  const repairsRef = useRef(repairs);
+  repairsRef.current = repairs;
+  const partsRef = useRef(parts);
+  partsRef.current = parts;
+
+  // Repair functions - stabilized with useRef pattern
   const addRepair = useCallback(() => {
     if (isReadOnly) return;
     const newRepair: InvoiceRepairItem = {
@@ -42,13 +48,13 @@ export const InvoiceRepairsAndPartsSection = ({
       vat: 20,
       total: 0
     };
-    onRepairsChange([...repairs, newRepair]);
-  }, [isReadOnly, repairs, onRepairsChange]);
+    onRepairsChange([...repairsRef.current, newRepair]);
+  }, [isReadOnly, onRepairsChange]);
 
   const removeRepair = useCallback((id: string) => {
     if (isReadOnly) return;
-    onRepairsChange(repairs.filter(repair => repair.id !== id));
-  }, [isReadOnly, repairs, onRepairsChange]);
+    onRepairsChange(repairsRef.current.filter(repair => repair.id !== id));
+  }, [isReadOnly, onRepairsChange]);
 
   const updateRepair = useCallback((id: string, field: keyof InvoiceRepairItem, value: string | number) => {
     if (isReadOnly) return;
@@ -75,7 +81,7 @@ export const InvoiceRepairsAndPartsSection = ({
       return;
     }
     
-    const updatedRepairs = repairs.map(repair => {
+    const updatedRepairs = repairsRef.current.map(repair => {
       if (repair.id === id) {
         const updated = { ...repair, [field]: value };
         // Calculate total
@@ -89,9 +95,9 @@ export const InvoiceRepairsAndPartsSection = ({
       return repair;
     });
     onRepairsChange(updatedRepairs);
-  }, [isReadOnly, repairs, onRepairsChange]);
+  }, [isReadOnly, onRepairsChange]);
 
-  // Part functions - memoized
+  // Part functions - stabilized with useRef pattern
   const addPart = useCallback(() => {
     if (isReadOnly) return;
     const newPart: InvoicePartItem = {
@@ -103,13 +109,13 @@ export const InvoiceRepairsAndPartsSection = ({
       vat: 20,
       total: 0
     };
-    onPartsChange([...parts, newPart]);
-  }, [isReadOnly, parts, onPartsChange]);
+    onPartsChange([...partsRef.current, newPart]);
+  }, [isReadOnly, onPartsChange]);
 
   const removePart = useCallback((id: string) => {
     if (isReadOnly) return;
-    onPartsChange(parts.filter(part => part.id !== id));
-  }, [isReadOnly, parts, onPartsChange]);
+    onPartsChange(partsRef.current.filter(part => part.id !== id));
+  }, [isReadOnly, onPartsChange]);
 
   const updatePart = useCallback((id: string, field: keyof InvoicePartItem, value: string | number) => {
     if (isReadOnly) return;
@@ -136,7 +142,7 @@ export const InvoiceRepairsAndPartsSection = ({
       return;
     }
     
-    const updatedParts = parts.map(part => {
+    const updatedParts = partsRef.current.map(part => {
       if (part.id === id) {
         const updated = { ...part, [field]: value };
         // Calculate total
@@ -150,7 +156,7 @@ export const InvoiceRepairsAndPartsSection = ({
       return part;
     });
     onPartsChange(updatedParts);
-  }, [isReadOnly, parts, onPartsChange]);
+  }, [isReadOnly, onPartsChange]);
 
   // Calculate totals - memoized
   const repairTotals = useMemo(() => {

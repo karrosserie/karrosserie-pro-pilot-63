@@ -1,5 +1,4 @@
-
-
+import { useMemo } from 'react';
 import { Invoice } from '@/services/supabase/invoices';
 import { calculateGlobalTotals } from './hooks/useInvoiceCalculations';
 import { useInvoiceFormData } from './hooks/useInvoiceFormData';
@@ -64,6 +63,11 @@ export const useInvoiceFormLogic = ({ invoice, prefillData }: UseInvoiceFormLogi
     setDiscounts
   });
 
+  // Memoize global totals to prevent recalculation on every render
+  const globalTotals = useMemo(() => 
+    calculateGlobalTotals(repairs, parts, discounts),
+    [repairs, parts, discounts]
+  );
 
   return {
     formData,
@@ -81,7 +85,7 @@ export const useInvoiceFormLogic = ({ invoice, prefillData }: UseInvoiceFormLogi
     handleChange,
     handleClaimNumberChange,
     validateForm,
-    calculateGlobalTotals: () => calculateGlobalTotals(repairs, parts, discounts),
+    globalTotals,
     prepareSubmitData
   };
 };
