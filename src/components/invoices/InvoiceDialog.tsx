@@ -27,6 +27,7 @@ const InvoiceDialog = ({
   prefillData
 }: InvoiceDialogProps) => {
   const navigate = useNavigate();
+  // Hook appelé une seule fois car queryKey est maintenant stable
   const { updateInvoice, createInvoice } = useInvoices();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -49,7 +50,7 @@ const InvoiceDialog = ({
         createdInvoice = await createInvoice.mutateAsync(formData);
       }
       
-      // Fermer le dialog après succès - l'invalidation des queries via use-invoices suffit
+      // Fermer le dialog après succès
       onOpenChange(false);
 
       // Si c'est une conversion depuis un ordre de réparation et qu'une facture a été créée,
@@ -59,7 +60,6 @@ const InvoiceDialog = ({
           navigate(`/documents/factures?openInvoice=${createdInvoice.id}`);
         }, 100);
       }
-      // Supprimé: onSuccess?.() - l'invalidation via React Query est suffisante
     } catch (error: any) {
       console.error('Dialog submission error:', error);
     } finally {
@@ -89,14 +89,16 @@ const InvoiceDialog = ({
           </DialogDescription>
         </DialogHeader>
         
-        <InvoiceForm
-          invoice={invoice}
-          onSubmit={handleSubmit}
-          onCancel={() => onOpenChange(false)}
-          isSubmitting={isSubmitting}
-          prefillData={prefillData}
-          isConversionFromRepairOrder={isConversionFromRepairOrder}
-        />
+        {open && (
+          <InvoiceForm
+            invoice={invoice}
+            onSubmit={handleSubmit}
+            onCancel={() => onOpenChange(false)}
+            isSubmitting={isSubmitting}
+            prefillData={prefillData}
+            isConversionFromRepairOrder={isConversionFromRepairOrder}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );

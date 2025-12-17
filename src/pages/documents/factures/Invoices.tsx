@@ -58,10 +58,18 @@ const Invoices = () => {
   const { toast } = useToast();
   const { confirm } = useConfirmation();
 
-  const { invoices, isLoading, error, deleteInvoice, createInvoice, archiveInvoice, restoreInvoice } = useInvoices(showArchived);
+  // Hook avec queryKey stable - retourne TOUTES les factures
+  const { invoices: allInvoices, isLoading, error, deleteInvoice, createInvoice, archiveInvoice, restoreInvoice } = useInvoices();
   const { credits } = useCredits();
   const { companyData } = useCompany();
-  const { sortedData: sortedInvoices, sortConfig, handleSort } = useTableSorting(invoices || [], 'reference');
+  
+  // Filtrage côté client selon showArchived
+  const invoices = React.useMemo(() => {
+    if (!allInvoices) return [];
+    return allInvoices.filter(inv => showArchived ? inv.archived : !inv.archived);
+  }, [allInvoices, showArchived]);
+  
+  const { sortedData: sortedInvoices, sortConfig, handleSort } = useTableSorting(invoices, 'reference');
   const isMobile = useIsMobile();
   const { sendRelance } = useSendRelance();
 
@@ -122,10 +130,9 @@ const Invoices = () => {
     const list = sortedInvoices || [];
     if (!list.length) return [];
 
+    // Les factures sont déjà filtrées par showArchived via le useMemo ci-dessus
+    // On applique uniquement le filtre de recherche
     return list.filter((invoice) => {
-      const matchesArchiveStatus = showArchived ? invoice.archived : !invoice.archived;
-      if (!matchesArchiveStatus) return false;
-
       if (!normalizedSearchTerm) return true;
 
       const ref = invoice.reference?.toLowerCase() || '';
@@ -136,7 +143,7 @@ const Invoices = () => {
 
       return ref.includes(normalizedSearchTerm) || client.includes(normalizedSearchTerm) || vehicle.includes(normalizedSearchTerm);
     });
-  }, [sortedInvoices, showArchived, normalizedSearchTerm]);
+  }, [sortedInvoices, normalizedSearchTerm]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -642,6 +649,10 @@ const Invoices = () => {
         invoice={selectedInvoice}
         open={viewerModalOpen}
         onOpenChange={setViewerModalOpen}
+        onEditInvoice={handleEditInvoice}
+        onSendEmail={handleSendEmail}
+        onCreateReceipt={handleAddPayment}
+        onCreateCredit={handleAddCredit}
       />
 
       <RelanceModal

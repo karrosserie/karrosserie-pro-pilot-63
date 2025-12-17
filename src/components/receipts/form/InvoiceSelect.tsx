@@ -10,6 +10,7 @@ interface InvoiceSelectProps {
 }
 
 export const InvoiceSelect = ({ value, onChange }: InvoiceSelectProps) => {
+  // Hook avec queryKey stable - pas de conflit de cache
   const { invoices, isLoading: isLoadingInvoices } = useInvoices();
 
   const formatInvoiceDisplay = (invoice: any) => {
@@ -22,8 +23,11 @@ export const InvoiceSelect = ({ value, onChange }: InvoiceSelectProps) => {
     return `Facture n°${invoice.reference} - ${clientName} - ${amount} €`;
   };
 
+  // Filtrer pour n'afficher que les factures non archivées
+  const activeInvoices = (invoices || []).filter(inv => !inv.archived);
+
   // Préparer les options pour SearchableSelect
-  const invoiceOptions = (invoices || []).map(invoice => ({
+  const invoiceOptions = activeInvoices.map(invoice => ({
     value: invoice.id,
     label: formatInvoiceDisplay(invoice)
   }));

@@ -28,7 +28,8 @@ interface ReceiptFormProps {
 export const ReceiptForm = ({ receipt, onSubmit, onCancel, isSubmitting, preselectedInvoice }: ReceiptFormProps) => {
   const { receipts } = useReceiptsData();
   const { accounts, isLoading: accountsLoading } = useAccounts();
-  const { invoices } = useInvoices(false);
+  // Hook avec queryKey stable - pas de conflit de cache
+  const { invoices } = useInvoices();
   const { uploadDocument } = useStorage();
   const { toast } = useToast();
   

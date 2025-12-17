@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
@@ -14,29 +15,32 @@ import { fr } from 'date-fns/locale';
 import { Printer, Download, Mail, CreditCard, FileX, Pencil, Trash } from 'lucide-react';
 import DefaultInvoicePreview from './templates/DefaultInvoicePreview';
 import AlternativeInvoicePreview from './templates/AlternativeInvoicePreview';
-import InvoiceDialog from './InvoiceDialog';
-import InvoiceEmailDialog from './InvoiceEmailDialog';
-import ReceiptDialog from '../receipts/ReceiptDialog';
-import { CreditDialog } from '../credits/CreditDialog';
 
 interface InvoiceViewerModalProps {
   invoice: Invoice | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  // Callbacks pour ouvrir les dialogs depuis le parent (évite les dialogs dupliqués)
+  onEditInvoice?: (invoice: Invoice) => void;
+  onSendEmail?: (invoice: Invoice) => void;
+  onCreateReceipt?: (invoice: Invoice) => void;
+  onCreateCredit?: (invoice: Invoice) => void;
 }
 
-const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalProps) => {
+const InvoiceViewerModal = ({ 
+  invoice, 
+  open, 
+  onOpenChange,
+  onEditInvoice,
+  onSendEmail,
+  onCreateReceipt,
+  onCreateCredit
+}: InvoiceViewerModalProps) => {
   const { companyData } = useCompany();
   const { preferences } = useCompanyPreferences();
   const { deleteInvoice } = useInvoices();
   const { confirm } = useConfirmation();
   const [receiptsData, setReceiptsData] = useState<any[]>([]);
-  
-  // States for dialogs
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
-  const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
-  const [creditDialogOpen, setCreditDialogOpen] = useState(false);
 
   // State buffer pour éviter les re-renders (pattern QuoteViewerModal)
   const [currentInvoice, setCurrentInvoice] = useState<Invoice | null>(invoice);
@@ -81,28 +85,6 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
     
     return { clientData: client, vehicleData: vehicle };
   }, [currentInvoice]);
-
-  // Mémoriser les objets passés aux dialogues pour éviter les boucles infinies (AVANT le early return)
-  const receiptPreselect = useMemo(() => {
-    if (!currentInvoice) return null;
-    const totalPaid = receiptsData.reduce((sum, r) => sum + r.amount, 0);
-    const remaining = currentInvoice.amount - totalPaid;
-    return {
-      id: currentInvoice.id,
-      amount: remaining > 0 ? remaining : currentInvoice.amount,
-    };
-  }, [currentInvoice?.id, currentInvoice?.amount, receiptsData]);
-
-  const creditPreselect = useMemo(() => {
-    if (!currentInvoice) return null;
-    return {
-      invoice_id: currentInvoice.id,
-      reference: '',
-      status: 'En attente' as const,
-      amount: 0,
-      notes: ''
-    };
-  }, [currentInvoice?.id]);
 
   if (!currentInvoice) return null;
 
@@ -194,10 +176,11 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
   // Vérifier si la facture est entièrement payée
   const isPaid = remainingAmount <= 0 && totalPaidAmount > 0;
 
-
   // Action handlers
   const handleEdit = () => {
-    setEditDialogOpen(true);
+    if (onEditInvoice) {
+      onEditInvoice(currentInvoice);
+    }
   };
 
   const handleDelete = async () => {
@@ -261,122 +244,112 @@ const InvoiceViewerModal = ({ invoice, open, onOpenChange }: InvoiceViewerModalP
     }
   };
 
-  const handleSendEmail = () => {
-    setEmailDialogOpen(true);
+  const handleSendEmailClick = () => {
+    if (onSendEmail) {
+      onSendEmail(currentInvoice);
+    }
   };
 
-  const handleCreateCredit = () => {
-    setCreditDialogOpen(true);
+  const handleCreateCreditClick = () => {
+    if (onCreateCredit) {
+      onCreateCredit(currentInvoice);
+    }
   };
 
-  const handleCreateReceipt = () => {
-    setReceiptDialogOpen(true);
+  const handleCreateReceiptClick = () => {
+    if (onCreateReceipt) {
+      onCreateReceipt(currentInvoice);
+    }
   };
 
   return (
-    <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto p-0">
-          {/* Barre d'actions en haut */}
-          <div className="p-3 sm:p-4 pr-12 sm:pr-16 border-b bg-background">
-            <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3">Aperçu de la facture n°{currentInvoice.reference}</h2>
-            <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-4xl w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto p-0">
+        <VisuallyHidden>
+          <DialogTitle>Aperçu de la facture {currentInvoice.reference}</DialogTitle>
+        </VisuallyHidden>
+        {/* Barre d'actions en haut */}
+        <div className="p-3 sm:p-4 pr-12 sm:pr-16 border-b bg-background">
+          <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3">Aperçu de la facture n°{currentInvoice.reference}</h2>
+          <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+            {onEditInvoice && (
               <Button variant="outline" size="sm" onClick={handleEdit} className="text-xs sm:text-sm h-8 sm:h-9">
                 <Pencil className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
                 <span className="hidden xs:inline ml-1">Modifier</span>
               </Button>
+            )}
 
-              <Button variant="outline" size="sm" onClick={handleDownload} className="text-xs sm:text-sm h-8 sm:h-9">
-                <Download className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                <span className="hidden xs:inline ml-1">Télécharger</span>
-              </Button>
+            <Button variant="outline" size="sm" onClick={handleDownload} className="text-xs sm:text-sm h-8 sm:h-9">
+              <Download className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+              <span className="hidden xs:inline ml-1">Télécharger</span>
+            </Button>
 
-              <Button variant="outline" size="sm" onClick={handlePrint} className="text-xs sm:text-sm h-8 sm:h-9">
-                <Printer className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                <span className="hidden xs:inline ml-1">Imprimer</span>
-              </Button>
+            <Button variant="outline" size="sm" onClick={handlePrint} className="text-xs sm:text-sm h-8 sm:h-9">
+              <Printer className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+              <span className="hidden xs:inline ml-1">Imprimer</span>
+            </Button>
 
-              <Button variant="outline" size="sm" onClick={handleSendEmail} className="text-xs sm:text-sm h-8 sm:h-9">
+            {onSendEmail && (
+              <Button variant="outline" size="sm" onClick={handleSendEmailClick} className="text-xs sm:text-sm h-8 sm:h-9">
                 <Mail className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
                 <span className="hidden xs:inline ml-1">Envoyer</span>
               </Button>
+            )}
 
-              <Button variant="outline" size="sm" onClick={handleCreateReceipt} className="text-xs sm:text-sm h-8 sm:h-9">
+            {onCreateReceipt && (
+              <Button variant="outline" size="sm" onClick={handleCreateReceiptClick} className="text-xs sm:text-sm h-8 sm:h-9">
                 <CreditCard className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
                 <span className="hidden sm:inline ml-1">Paiement</span>
               </Button>
+            )}
 
-              <Button variant="outline" size="sm" onClick={handleCreateCredit} className="text-xs sm:text-sm h-8 sm:h-9">
+            {onCreateCredit && (
+              <Button variant="outline" size="sm" onClick={handleCreateCreditClick} className="text-xs sm:text-sm h-8 sm:h-9">
                 <FileX className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
                 <span className="hidden sm:inline ml-1">Avoir</span>
               </Button>
-
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700 text-xs sm:text-sm h-8 sm:h-9" 
-                onClick={handleDelete}
-              >
-                <Trash className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                <span className="hidden xs:inline ml-1">Supprimer</span>
-              </Button>
-            </div>
-          </div>
-          <div className="w-full h-full">
-            {template === 'default' ? (
-              <DefaultInvoicePreview 
-                companyData={companyData}
-                invoiceData={invoiceData}
-                clientData={clientDataForTemplate}
-                items={items}
-                totals={totalsData}
-                payments={receiptsData}
-                totalPaidAmount={totalPaidAmount}
-                remainingAmount={remainingAmount}
-                isPaid={isPaid}
-              />
-            ) : (
-              <AlternativeInvoicePreview 
-                companyData={companyData}
-                invoiceData={invoiceData}
-                clientData={clientDataForTemplate}
-                items={items}
-                totals={totalsData}
-                payments={receiptsData}
-                totalPaidAmount={totalPaidAmount}
-                remainingAmount={remainingAmount}
-                isPaid={isPaid}
-              />
             )}
+
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700 text-xs sm:text-sm h-8 sm:h-9" 
+              onClick={handleDelete}
+            >
+              <Trash className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+              <span className="hidden xs:inline ml-1">Supprimer</span>
+            </Button>
           </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Dialogues toujours montés - visibilité contrôlée par prop open (pattern Devis) */}
-      <InvoiceDialog
-        invoice={currentInvoice}
-        open={editDialogOpen}
-        onOpenChange={setEditDialogOpen}
-      />
-
-      <InvoiceEmailDialog
-        invoice={currentInvoice}
-        open={emailDialogOpen}
-        onOpenChange={setEmailDialogOpen}
-      />
-
-      <ReceiptDialog
-        open={receiptDialogOpen}
-        onOpenChange={setReceiptDialogOpen}
-        preselectedInvoice={receiptPreselect}
-      />
-
-      <CreditDialog
-        open={creditDialogOpen}
-        onOpenChange={setCreditDialogOpen}
-        credit={creditPreselect}
-      />
-    </>
+        </div>
+        <div className="w-full h-full">
+          {template === 'default' ? (
+            <DefaultInvoicePreview 
+              companyData={companyData}
+              invoiceData={invoiceData}
+              clientData={clientDataForTemplate}
+              items={items}
+              totals={totalsData}
+              payments={receiptsData}
+              totalPaidAmount={totalPaidAmount}
+              remainingAmount={remainingAmount}
+              isPaid={isPaid}
+            />
+          ) : (
+            <AlternativeInvoicePreview 
+              companyData={companyData}
+              invoiceData={invoiceData}
+              clientData={clientDataForTemplate}
+              items={items}
+              totals={totalsData}
+              payments={receiptsData}
+              totalPaidAmount={totalPaidAmount}
+              remainingAmount={remainingAmount}
+              isPaid={isPaid}
+            />
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 
