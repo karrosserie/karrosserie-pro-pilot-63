@@ -163,8 +163,8 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
     const totalPaidAmount = receiptsData.reduce((sum, receipt) => sum + receipt.amount, 0);
     const remainingAmount = invoice.amount - totalPaidAmount - globalDiscountTotal;
     
-    // Vérifier si la facture est entièrement payée
-    const isPaid = remainingAmount <= 0 && totalPaidAmount > 0;
+    // Vérifier si la facture est entièrement payée (via receipts OU statut "Payée")
+    const isPaid = (remainingAmount <= 0 && totalPaidAmount > 0) || invoice.status === 'Payée';
     
     const totalsData = {
       subtotal: `${totals.subtotalAfterDiscount.toFixed(2).replace('.', ',')} €`,

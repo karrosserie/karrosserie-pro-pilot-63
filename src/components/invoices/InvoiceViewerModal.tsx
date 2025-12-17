@@ -125,7 +125,7 @@ const InvoiceViewerModal = ({
 
   const totalPaidAmount = receiptsData.reduce((sum, receipt) => sum + receipt.amount, 0);
   const remainingAmount = currentInvoice.amount - totalPaidAmount;
-  const isPaid = remainingAmount <= 0 && totalPaidAmount > 0;
+  const isPaid = (remainingAmount <= 0 && totalPaidAmount > 0) || currentInvoice.status === 'Payée';
 
   const handleEdit = () => { if (onEditInvoice) onEditInvoice(currentInvoice); };
   const handleDelete = async () => {
