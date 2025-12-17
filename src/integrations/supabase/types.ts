@@ -2685,6 +2685,7 @@ export type Database = {
           client_insurance: boolean | null
           client_signature: string | null
           company_id: string | null
+          coverage_duration: string | null
           created_at: string
           damages: Json | null
           end_mileage: number | null
@@ -2704,7 +2705,6 @@ export type Database = {
           insurance_postal_code: string | null
           insurance_status: string | null
           last_reminder_at: string | null
-          loan_duration: string | null
           notes: string | null
           quote_id: string | null
           start_date: string
@@ -2724,6 +2724,7 @@ export type Database = {
           client_insurance?: boolean | null
           client_signature?: string | null
           company_id?: string | null
+          coverage_duration?: string | null
           created_at?: string
           damages?: Json | null
           end_mileage?: number | null
@@ -2743,7 +2744,6 @@ export type Database = {
           insurance_postal_code?: string | null
           insurance_status?: string | null
           last_reminder_at?: string | null
-          loan_duration?: string | null
           notes?: string | null
           quote_id?: string | null
           start_date: string
@@ -2763,6 +2763,7 @@ export type Database = {
           client_insurance?: boolean | null
           client_signature?: string | null
           company_id?: string | null
+          coverage_duration?: string | null
           created_at?: string
           damages?: Json | null
           end_mileage?: number | null
@@ -2782,7 +2783,6 @@ export type Database = {
           insurance_postal_code?: string | null
           insurance_status?: string | null
           last_reminder_at?: string | null
-          loan_duration?: string | null
           notes?: string | null
           quote_id?: string | null
           start_date?: string
