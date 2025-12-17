@@ -2815,6 +2815,21 @@ export type Database = {
           },
         ]
       }
+      fleet_reservations_assistance: {
+        Row: {
+          created_at: string
+          id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+        }
+        Relationships: []
+      }
       fleet_returns: {
         Row: {
           attestation_accepted: boolean | null
