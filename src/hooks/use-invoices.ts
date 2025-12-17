@@ -71,9 +71,8 @@ export function useInvoices(showArchived: boolean = false) {
       return await invoicesService.update(id, data);
     },
     onSuccess: (updatedInvoice, { id }) => {
-      // Invalidation immédiate comme use-quotes.ts
+      // Invalidation unique comme use-quotes.ts
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
-      queryClient.invalidateQueries({ queryKey: ['invoice', id] });
       
       toast({
         title: "Facture mise à jour",
