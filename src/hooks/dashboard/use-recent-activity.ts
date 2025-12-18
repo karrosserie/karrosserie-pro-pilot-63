@@ -9,6 +9,7 @@ import { useCredits } from '@/hooks/use-credits';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { useExpenses } from '@/hooks/use-expenses';
 import { formatCurrency } from '@/lib/utils';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 export const useRecentActivity = () => {
   const { vehicles } = useVehicles();
@@ -53,7 +54,7 @@ export const useRecentActivity = () => {
             icon: 'User',
             iconBackground: 'bg-green-500',
             title: 'Nouveau client créé',
-            description: `${client.first_name} ${client.last_name}`,
+            description: getClientDisplayName(client),
             time: `${createdDate.toLocaleDateString('fr-FR')} à ${createdDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
             timestamp: createdDate.getTime()
           });
@@ -65,7 +66,7 @@ export const useRecentActivity = () => {
               icon: 'User',
               iconBackground: 'bg-blue-500',
               title: 'Client mis à jour',
-              description: `${client.first_name} ${client.last_name}`,
+              description: getClientDisplayName(client),
               time: `${updatedDate.toLocaleDateString('fr-FR')} à ${updatedDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
               timestamp: updatedDate.getTime()
             });
@@ -84,7 +85,7 @@ export const useRecentActivity = () => {
           if (receipt.invoice_id) {
             const invoice = invoices.find(inv => inv.id === receipt.invoice_id);
             if (invoice && invoice.reference) {
-              const clientName = invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client';
+              const clientName = invoice.clients ? getClientDisplayName(invoice.clients) : 'Client';
               description = `Facture n°${invoice.reference} - ${clientName} (${formatCurrency(receipt.amount)})`;
             }
           }
@@ -162,7 +163,7 @@ export const useRecentActivity = () => {
           
           let description = `Devis n°${quote.reference || 'N/A'} - ${vehicleInfo}`;
           if (quote.clients) {
-            description += ` - ${quote.clients.first_name} ${quote.clients.last_name}`;
+            description += ` - ${getClientDisplayName(quote.clients)}`;
           }
           
           // Devis créé
@@ -200,7 +201,7 @@ export const useRecentActivity = () => {
           
           let description = `Ordre n°${order.reference || 'N/A'} - ${vehicleInfo}`;
           if (order.clients) {
-            description += ` - ${order.clients.first_name} ${order.clients.last_name}`;
+            description += ` - ${getClientDisplayName(order.clients)}`;
           }
           
           // Ordre de réparation créé
@@ -237,7 +238,7 @@ export const useRecentActivity = () => {
           
           let description = `Facture n°${invoice.reference || 'N/A'} - ${vehicleInfo}`;
           if (invoice.clients) {
-            description += ` - ${invoice.clients.first_name} ${invoice.clients.last_name}`;
+            description += ` - ${getClientDisplayName(invoice.clients)}`;
           }
           
           // Facture créée
@@ -262,7 +263,7 @@ export const useRecentActivity = () => {
           
           let description = `Avoir n°${credit.reference || 'N/A'} - ${vehicleInfo}`;
           if (credit.clients) {
-            description += ` - ${credit.clients.first_name} ${credit.clients.last_name}`;
+            description += ` - ${getClientDisplayName(credit.clients)}`;
           }
           
           // Avoir créé

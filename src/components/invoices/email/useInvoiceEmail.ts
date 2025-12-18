@@ -9,6 +9,7 @@ import { prepareInvoiceDataForPDF } from '@/utils/invoicePDFGeneration';
 import { pdf } from '@react-pdf/renderer';
 import InvoicePDF from '@/components/invoices/InvoicePDF';
 import { supabase } from '@/integrations/supabase/client';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 export const useInvoiceEmail = (invoice: Invoice | null) => {
   const { toast } = useToast();
@@ -23,7 +24,7 @@ export const useInvoiceEmail = (invoice: Invoice | null) => {
       try {
         const client = await clientsService.getById(invoice.client_id);
         clientEmail = client.email || '';
-        clientName = `${client.first_name} ${client.last_name}`;
+        clientName = getClientDisplayName(client);
       } catch (error) {
         console.error('Error fetching client:', error);
       }
@@ -31,7 +32,7 @@ export const useInvoiceEmail = (invoice: Invoice | null) => {
 
     // Si on n'a pas pu récupérer le nom du client depuis l'API, on utilise les données de l'invoice
     if (!clientName && invoice?.clients) {
-      clientName = `${invoice.clients.first_name} ${invoice.clients.last_name}`;
+      clientName = getClientDisplayName(invoice.clients);
     }
 
     // Construction des informations du véhicule
