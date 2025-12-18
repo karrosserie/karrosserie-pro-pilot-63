@@ -13,7 +13,7 @@ export function useFleetReservations() {
     error
   } = useQuery({
     queryKey: ['fleetReservations'],
-    queryFn: fleetReservationsService.getAll
+    queryFn: () => fleetReservationsService.getAll()
   });
   
   const createReservation = useMutation({
