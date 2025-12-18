@@ -170,7 +170,7 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
     // Calculer le montant total payé
     const totalPaidAmount = receiptsData.reduce((sum, receipt) => sum + receipt.amount, 0);
     // Inclure les avoirs dans le calcul du montant restant
-    const remainingAmount = invoice.amount - totalPaidAmount - globalDiscountTotal - totalCreditsAmount;
+    const remainingAmount = Math.max(0, invoice.amount - totalPaidAmount - globalDiscountTotal - totalCreditsAmount);
     
     // Vérifier si la facture est entièrement payée (via receipts, avoirs OU statut "Payée")
     const isPaid = (remainingAmount <= 0 && (totalPaidAmount > 0 || totalCreditsAmount > 0)) || invoice.status === 'Payée';

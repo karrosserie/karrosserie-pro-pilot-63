@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Credit, CreditCreateData, CreditUpdateData } from './types';
 import { getCurrentUserCompanyId } from '../auth-company';
+import { updateInvoiceStatus } from '../receipts/mutations';
 
 export const createCredit = async (creditData: CreditCreateData): Promise<Credit> => {
   console.log('Creating credit with data:', creditData);
@@ -62,6 +63,12 @@ export const createCredit = async (creditData: CreditCreateData): Promise<Credit
     }
 
     console.log('Credit created successfully:', data);
+    
+    // Update invoice status after creating credit
+    if (data?.invoice_id) {
+      await updateInvoiceStatus(data.invoice_id);
+    }
+    
     return data;
   } catch (error: any) {
     console.error('Error in createCredit:', error);
@@ -76,6 +83,13 @@ export const createCredit = async (creditData: CreditCreateData): Promise<Credit
 
 export const updateCredit = async (id: string, creditData: CreditUpdateData): Promise<Credit> => {
   try {
+    // Get the current credit to know which invoice to update
+    const { data: currentCredit } = await (supabase as any)
+      .from('credits')
+      .select('invoice_id')
+      .eq('id', id)
+      .single();
+
     // Test if table exists first
     const { error: testError } = await (supabase as any)
       .from('credits')
@@ -100,6 +114,18 @@ export const updateCredit = async (id: string, creditData: CreditUpdateData): Pr
       }
       throw new Error(`Failed to update credit: ${error.message || 'Unknown error'}`);
     }
+    
+    // Update invoice status after updating credit
+    const invoiceIdToUpdate = data?.invoice_id || currentCredit?.invoice_id;
+    if (invoiceIdToUpdate) {
+      await updateInvoiceStatus(invoiceIdToUpdate);
+    }
+    
+    // If invoice_id changed, also update the old invoice status
+    if (currentCredit?.invoice_id && data?.invoice_id !== currentCredit.invoice_id) {
+      await updateInvoiceStatus(currentCredit.invoice_id);
+    }
+    
     return data;
   } catch (error: any) {
     if (error.message === 'TABLE_MISSING') {
@@ -111,6 +137,13 @@ export const updateCredit = async (id: string, creditData: CreditUpdateData): Pr
 
 export const deleteCredit = async (id: string): Promise<boolean> => {
   try {
+    // Get the credit to know which invoice to update
+    const { data: creditToDelete } = await (supabase as any)
+      .from('credits')
+      .select('invoice_id')
+      .eq('id', id)
+      .single();
+
     // Test if table exists first
     const { error: testError } = await (supabase as any)
       .from('credits')
@@ -133,6 +166,12 @@ export const deleteCredit = async (id: string): Promise<boolean> => {
       }
       throw new Error(`Failed to delete credit: ${error.message || 'Unknown error'}`);
     }
+    
+    // Update invoice status after deleting credit
+    if (creditToDelete?.invoice_id) {
+      await updateInvoiceStatus(creditToDelete.invoice_id);
+    }
+    
     return true;
   } catch (error: any) {
     if (error.message === 'TABLE_MISSING') {
