@@ -16,6 +16,7 @@ interface EditCreditFormProps {
     status: 'En attente' | 'Payé';
     notes?: string;
     items?: any[];
+    is_franchise_credit?: boolean;
   };
   onClose: () => void;
   readOnly?: boolean;
@@ -76,7 +77,8 @@ export const EditCreditForm = ({
           status: formData.status,
           amount: calculateTotal(),
           items_data: JSON.stringify(items),
-          notes: formData.notes || ''
+          notes: formData.notes || '',
+          is_franchise_credit: formData.is_franchise_credit
         }
       });
       

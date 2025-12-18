@@ -19,6 +19,7 @@ interface EditCreditDialogProps {
     status: 'En attente' | 'Payé';
     notes?: string;
     items?: any[];
+    is_franchise_credit?: boolean;
   };
   readOnly?: boolean;
 }

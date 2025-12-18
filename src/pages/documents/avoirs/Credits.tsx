@@ -598,7 +598,8 @@ const Credits = () => {
               invoice_id: selectedCredit.invoice_id,
               status: selectedCredit.status,
               notes: selectedCredit.notes,
-              items: selectedCredit.items
+              items: selectedCredit.items,
+              is_franchise_credit: selectedCredit.is_franchise_credit
             }}
           />
 
@@ -611,7 +612,8 @@ const Credits = () => {
               invoice_id: selectedCredit.invoice_id,
               status: selectedCredit.status,
               notes: selectedCredit.notes,
-              items: selectedCredit.items
+              items: selectedCredit.items,
+              is_franchise_credit: selectedCredit.is_franchise_credit
             }}
             readOnly={true}
           />

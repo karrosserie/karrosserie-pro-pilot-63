@@ -381,7 +381,7 @@ const VehicleCreditsTab: React.FC<VehicleCreditsTabProps> = ({ vehicleId }) => {
 
       {selectedCredit && (
         <EditCreditDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} creditId={selectedCredit.id}
-          initialData={{ reference: selectedCredit.reference, invoice_id: selectedCredit.invoice_id, status: selectedCredit.status, notes: selectedCredit.notes, items: selectedCredit.items }} />
+          initialData={{ reference: selectedCredit.reference, invoice_id: selectedCredit.invoice_id, status: selectedCredit.status, notes: selectedCredit.notes, items: selectedCredit.items, is_franchise_credit: selectedCredit.is_franchise_credit }} />
       )}
       <InvoiceViewerModal invoice={selectedInvoice} open={invoiceViewerModalOpen} onOpenChange={setInvoiceViewerModalOpen} />
       <CreditEmailDialog credit={selectedCredit} open={emailDialogOpen} onOpenChange={setEmailDialogOpen} />

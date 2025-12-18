@@ -315,7 +315,8 @@ const CreditViewerModal = ({ credit, open, onOpenChange }: CreditViewerModalProp
           invoice_id: credit.invoice_id,
           status: credit.status as "En attente" | "Payé",
           notes: credit.notes,
-          items: items
+          items: items,
+          is_franchise_credit: credit.is_franchise_credit
         }}
       />
 
