@@ -17,8 +17,6 @@ export type UpdateClient = Database['public']['Tables']['clients']['Update'] & {
 
 export const clientsService = {
   getAll: async () => {
-    console.log('Fetching all clients...');
-    
     // Utiliser getCurrentUserCompanyId pour gérer correctement l'impersonation
     const companyId = await getCurrentUserCompanyId();
     
@@ -33,12 +31,10 @@ export const clientsService = {
       throw new Error(error.message);
     }
     
-    console.log('Clients fetched successfully:', data);
     return data;
   },
 
   getById: async (id: string) => {
-    console.log(`Fetching client with id: ${id}`);
     const { data, error } = await supabase
       .from('clients')
       .select('*')
@@ -50,7 +46,6 @@ export const clientsService = {
       throw new Error(error.message);
     }
     
-    console.log('Client fetched successfully:', data);
     return data;
   },
   
@@ -59,7 +54,7 @@ export const clientsService = {
     const company = client.company;
     const companyId = await getCurrentUserCompanyId();
     
-    const clientData = {
+    const clientData: Record<string, any> = {
       first_name: client.firstName,
       last_name: client.lastName,
       email: client.email,
@@ -71,16 +66,13 @@ export const clientsService = {
       driver_license_front_url: client.driverLicenseFrontUrl || null,
       driver_license_back_url: client.driverLicenseBackUrl || null,
       auto_relances_disabled: client.autoRelancesDisabled || false,
-      oodrive_recipient_id: client.oodrive_recipient_id || null
+      oodrive_recipient_id: client.oodrive_recipient_id || null,
+      // Nouveaux champs entreprise
+      client_type: client.clientType || 'particulier',
+      company_name: client.companyName || null,
+      manager_id_url: client.managerIdUrl || null,
+      kbis_url: client.kbisUrl || null
     };
-
-    console.log('Creating client with data:', clientData);
-    console.log('Client data structure:', {
-      hasDriverLicenseFront: !!clientData.driver_license_front_url,
-      hasDriverLicenseBack: !!clientData.driver_license_back_url,
-      frontUrl: clientData.driver_license_front_url,
-      backUrl: clientData.driver_license_back_url
-    });
 
     const { data, error } = await supabase
       .from('clients')
@@ -90,16 +82,9 @@ export const clientsService = {
       
     if (error) {
       console.error('Error creating client:', error);
-      console.error('Error details:', {
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-        code: error.code
-      });
       throw new Error(error.message);
     }
     
-    console.log('Client created successfully:', data);
     // Add back the company field to the returned data for the frontend
     return { ...data, company };
   },
@@ -122,9 +107,12 @@ export const clientsService = {
     if (client.driverLicenseBackUrl !== undefined) clientData.driver_license_back_url = client.driverLicenseBackUrl || null;
     if (client.autoRelancesDisabled !== undefined) clientData.auto_relances_disabled = client.autoRelancesDisabled;
     if (client.oodrive_recipient_id !== undefined) clientData.oodrive_recipient_id = client.oodrive_recipient_id || null;
-
-    console.log('📝 Client Service - Updating client with data:', clientData);
-    console.log('📝 Client Service - auto_relances_disabled value:', clientData.auto_relances_disabled);
+    
+    // Nouveaux champs entreprise
+    if (client.clientType !== undefined) clientData.client_type = client.clientType;
+    if (client.companyName !== undefined) clientData.company_name = client.companyName || null;
+    if (client.managerIdUrl !== undefined) clientData.manager_id_url = client.managerIdUrl || null;
+    if (client.kbisUrl !== undefined) clientData.kbis_url = client.kbisUrl || null;
 
     const { data, error } = await supabase
       .from('clients')
@@ -138,13 +126,11 @@ export const clientsService = {
       throw new Error(error.message);
     }
     
-    console.log('Client updated successfully:', data);
     // Add back the company field to the returned data for the frontend
     return { ...data, company };
   },
   
   delete: async (id: string) => {
-    console.log(`Deleting client with id: ${id}`);
     const { error } = await supabase
       .from('clients')
       .delete()
@@ -155,7 +141,6 @@ export const clientsService = {
       throw new Error(error.message);
     }
     
-    console.log('Client deleted successfully');
     return true;
   }
 };

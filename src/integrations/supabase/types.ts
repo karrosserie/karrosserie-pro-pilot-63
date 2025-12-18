@@ -1529,7 +1529,9 @@ export type Database = {
           address: string | null
           auto_relances_disabled: boolean
           city: string | null
+          client_type: string | null
           company_id: string | null
+          company_name: string | null
           created_at: string
           date_of_birth: string | null
           driver_license_back_url: string | null
@@ -1538,9 +1540,11 @@ export type Database = {
           first_name: string | null
           id: string
           insurance_representation_consent: boolean | null
+          kbis_url: string | null
           last_name: string | null
           license_issue_date: string | null
           license_number: string | null
+          manager_id_url: string | null
           oodrive_recipient_id: string | null
           phone: string | null
           place_of_birth: string | null
@@ -1553,7 +1557,9 @@ export type Database = {
           address?: string | null
           auto_relances_disabled?: boolean
           city?: string | null
+          client_type?: string | null
           company_id?: string | null
+          company_name?: string | null
           created_at?: string
           date_of_birth?: string | null
           driver_license_back_url?: string | null
@@ -1562,9 +1568,11 @@ export type Database = {
           first_name?: string | null
           id?: string
           insurance_representation_consent?: boolean | null
+          kbis_url?: string | null
           last_name?: string | null
           license_issue_date?: string | null
           license_number?: string | null
+          manager_id_url?: string | null
           oodrive_recipient_id?: string | null
           phone?: string | null
           place_of_birth?: string | null
@@ -1577,7 +1585,9 @@ export type Database = {
           address?: string | null
           auto_relances_disabled?: boolean
           city?: string | null
+          client_type?: string | null
           company_id?: string | null
+          company_name?: string | null
           created_at?: string
           date_of_birth?: string | null
           driver_license_back_url?: string | null
@@ -1586,9 +1596,11 @@ export type Database = {
           first_name?: string | null
           id?: string
           insurance_representation_consent?: boolean | null
+          kbis_url?: string | null
           last_name?: string | null
           license_issue_date?: string | null
           license_number?: string | null
+          manager_id_url?: string | null
           oodrive_recipient_id?: string | null
           phone?: string | null
           place_of_birth?: string | null

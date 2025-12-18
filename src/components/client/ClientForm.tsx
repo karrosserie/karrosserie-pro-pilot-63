@@ -23,6 +23,7 @@ const ClientForm: React.FC<ClientFormProps> = ({
   const { error } = useNotification();
   const [phoneIsValid, setPhoneIsValid] = useState(true);
   const [formData, setFormData] = useState({
+    clientType: defaultValues?.clientType || 'particulier',
     firstName: defaultValues?.firstName || '',
     lastName: defaultValues?.lastName || '',
     email: defaultValues?.email || '',
@@ -31,8 +32,11 @@ const ClientForm: React.FC<ClientFormProps> = ({
     city: defaultValues?.city || '',
     zipCode: defaultValues?.zipCode || '',
     company: defaultValues?.company || '',
+    companyName: defaultValues?.companyName || '',
     driverLicenseFrontUrl: defaultValues?.driverLicenseFrontUrl || '',
     driverLicenseBackUrl: defaultValues?.driverLicenseBackUrl || '',
+    managerIdUrl: defaultValues?.managerIdUrl || '',
+    kbisUrl: defaultValues?.kbisUrl || '',
     autoRelancesDisabled: defaultValues?.autoRelancesDisabled ?? false
   });
 
@@ -49,6 +53,11 @@ const ClientForm: React.FC<ClientFormProps> = ({
 
   const handlePhoneValidationChange = (isValid: boolean) => {
     setPhoneIsValid(isValid);
+  };
+
+  const handleClientTypeChange = (type: 'particulier' | 'entreprise') => {
+    setFormData(prev => ({ ...prev, clientType: type }));
+    onFormChange?.();
   };
 
   const handleDriverLicenseFrontUpload = (url: string) => {
@@ -71,21 +80,46 @@ const ClientForm: React.FC<ClientFormProps> = ({
     onFormChange?.();
   };
 
+  const handleManagerIdUpload = (url: string) => {
+    setFormData(prev => ({ ...prev, managerIdUrl: url }));
+    onFormChange?.();
+  };
+
+  const handleManagerIdDelete = () => {
+    setFormData(prev => ({ ...prev, managerIdUrl: '' }));
+    onFormChange?.();
+  };
+
+  const handleKbisUpload = (url: string) => {
+    setFormData(prev => ({ ...prev, kbisUrl: url }));
+    onFormChange?.();
+  };
+
+  const handleKbisDelete = () => {
+    setFormData(prev => ({ ...prev, kbisUrl: '' }));
+    onFormChange?.();
+  };
+
   const handleAutoRelancesToggle = (checked: boolean) => {
-    console.log('🔧 AutoRelances Toggle - checked:', checked);
-    console.log('🔧 AutoRelances Toggle - before update:', formData.autoRelancesDisabled);
     const newValue = !checked;
-    console.log('🔧 AutoRelances Toggle - setting autoRelancesDisabled to:', newValue);
     setFormData(prev => ({ ...prev, autoRelancesDisabled: newValue }));
-    console.log('🔧 AutoRelances Toggle - after update, formData will have autoRelancesDisabled:', newValue);
     onFormChange?.();
   };
 
   const validateForm = () => {
-    const requiredFields = ['firstName', 'lastName', 'phone', 'address', 'city', 'zipCode'];
+    const isEnterprise = formData.clientType === 'entreprise';
+    
+    // Champs obligatoires communs
+    const commonRequiredFields = ['phone', 'address', 'city', 'zipCode'];
+    
+    // Champs obligatoires spécifiques au type
+    const requiredFields = isEnterprise 
+      ? [...commonRequiredFields, 'firstName', 'lastName', 'companyName']
+      : [...commonRequiredFields, 'firstName', 'lastName'];
+    
     for (const field of requiredFields) {
       if (!formData[field]?.trim()) {
-        error(`Le champ ${getFieldLabel(field)} est obligatoire.`, 'Champ manquant');
+        error(`Le champ ${getFieldLabel(field, isEnterprise)} est obligatoire.`, 'Champ manquant');
         return false;
       }
     }
@@ -99,14 +133,15 @@ const ClientForm: React.FC<ClientFormProps> = ({
     return true;
   };
 
-  const getFieldLabel = (field: string) => {
-    const labels = {
-      firstName: 'Prénom',
-      lastName: 'Nom',
+  const getFieldLabel = (field: string, isEnterprise: boolean = false) => {
+    const labels: Record<string, string> = {
+      firstName: isEnterprise ? 'Prénom du Gérant' : 'Prénom',
+      lastName: isEnterprise ? 'Nom du Gérant' : 'Nom',
       phone: 'Téléphone',
       address: 'Adresse',
       city: 'Ville',
-      zipCode: 'Code postal'
+      zipCode: 'Code postal',
+      companyName: 'Raison Sociale'
     };
     return labels[field] || field;
   };
@@ -137,6 +172,7 @@ const ClientForm: React.FC<ClientFormProps> = ({
             handlePhoneChange={handlePhoneChange}
             handlePhoneValidationChange={handlePhoneValidationChange}
             handleAutoRelancesToggle={handleAutoRelancesToggle}
+            handleClientTypeChange={handleClientTypeChange}
             isViewMode={isViewMode}
           />
         </TabsContent>
@@ -145,10 +181,15 @@ const ClientForm: React.FC<ClientFormProps> = ({
           <DocumentsTab
             clientId={clientId}
             formData={formData}
+            clientType={formData.clientType}
             handleDriverLicenseFrontUpload={handleDriverLicenseFrontUpload}
             handleDriverLicenseBackUpload={handleDriverLicenseBackUpload}
             handleDriverLicenseFrontDelete={handleDriverLicenseFrontDelete}
             handleDriverLicenseBackDelete={handleDriverLicenseBackDelete}
+            handleManagerIdUpload={handleManagerIdUpload}
+            handleManagerIdDelete={handleManagerIdDelete}
+            handleKbisUpload={handleKbisUpload}
+            handleKbisDelete={handleKbisDelete}
             isViewMode={isViewMode}
           />
         </TabsContent>
