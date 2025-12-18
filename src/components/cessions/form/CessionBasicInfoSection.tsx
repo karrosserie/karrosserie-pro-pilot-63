@@ -30,6 +30,15 @@ export const CessionBasicInfoSection = ({
   onClearValidationError,
   isEditing = false
 }: CessionBasicInfoSectionProps) => {
+  React.useEffect(() => {
+    if (import.meta.env.DEV) {
+      console.debug('[CessionBasicInfoSection]', {
+        cession_type: formData.cession_type,
+        isEditing,
+      });
+    }
+  }, [formData.cession_type, isEditing]);
+
   return (
     <>
       <div className="space-y-4">

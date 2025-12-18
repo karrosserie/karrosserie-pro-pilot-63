@@ -15,6 +15,12 @@ export const CessionTypeSelector = ({
   onChange,
   disabled = false
 }: CessionTypeSelectorProps) => {
+  React.useEffect(() => {
+    if (import.meta.env.DEV) {
+      console.debug('[CessionTypeSelector]', { value, disabled });
+    }
+  }, [value, disabled]);
+
   return (
     <div className="space-y-3">
       <Label>Type de cession <span className="text-red-500">*</span></Label>
