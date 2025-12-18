@@ -35,9 +35,9 @@ const Receipts = () => {
           return bName.localeCompare(aName, 'fr', { sensitivity: 'base' });
         }
         case 'recent-first':
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
         case 'oldest-first':
-          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          return new Date(a.date).getTime() - new Date(b.date).getTime();
         default:
           return 0;
       }
