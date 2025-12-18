@@ -65,27 +65,44 @@ export default function DocumentUploadFlow() {
         const missing: string[] = [];
         const available: string[] = [];
 
-        // Vérifier les documents du client (permis de conduire)
+        // Vérifier les documents du client selon le type (particulier ou entreprise)
         if (tokenResult.client_id) {
           const { data: clientData, error: clientError } = await supabase
             .from('clients')
-            .select('driver_license_front_url, driver_license_back_url')
+            .select('driver_license_front_url, driver_license_back_url, client_type, manager_id_url, kbis_url')
             .eq('id', tokenResult.client_id)
             .single();
 
           if (!clientError && clientData) {
-            if (!clientData.driver_license_front_url) {
-              missing.push('driver_license_front');
+            const isEnterprise = clientData.client_type === 'entreprise';
+            
+            if (isEnterprise) {
+              // Pour les entreprises : CNI gérant + Kbis
+              if (!clientData.manager_id_url) {
+                missing.push('manager_id_front', 'manager_id_back');
+              } else {
+                available.push('manager_id_front', 'manager_id_back');
+              }
+              if (!clientData.kbis_url) {
+                missing.push('kbis');
+              } else {
+                available.push('kbis');
+              }
             } else {
-              available.push('driver_license_front');
-            }
-            if (!clientData.driver_license_back_url) {
-              missing.push('driver_license_back');
-            } else {
-              available.push('driver_license_back');
+              // Pour les particuliers : permis de conduire
+              if (!clientData.driver_license_front_url) {
+                missing.push('driver_license_front');
+              } else {
+                available.push('driver_license_front');
+              }
+              if (!clientData.driver_license_back_url) {
+                missing.push('driver_license_back');
+              } else {
+                available.push('driver_license_back');
+              }
             }
           } else {
-            // Si erreur ou pas de client, on considère que les deux documents manquent
+            // Si erreur ou pas de client, on considère que les documents particuliers manquent par défaut
             missing.push('driver_license_front', 'driver_license_back');
           }
         }
@@ -179,6 +196,8 @@ export default function DocumentUploadFlow() {
         const clientUpdates: { 
           driver_license_front_url?: string; 
           driver_license_back_url?: string;
+          manager_id_url?: string;
+          kbis_url?: string;
           whatsapp_consent: boolean;
           insurance_representation_consent: boolean;
         } = {
@@ -186,7 +205,7 @@ export default function DocumentUploadFlow() {
           insurance_representation_consent: insuranceRepresentationConsent
         };
 
-        // Upload des documents du permis si présents
+        // Upload des documents du permis si présents (particuliers)
         if (documents.driver_license_front) {
           try {
             const frontFilePath = `${tokenData.client_id}/driver-license/front_${Date.now()}.jpg`;
@@ -235,6 +254,81 @@ export default function DocumentUploadFlow() {
             console.log("[MOBILE DEBUG] Back license URL:", backUrl.publicUrl);
           } catch (error) {
             console.error("[MOBILE DEBUG] Back license upload failed:", error);
+            throw error;
+          }
+        }
+
+        // Upload CNI du gérant (entreprises) - recto et verso combinés dans manager_id_url
+        if (documents.manager_id_front || documents.manager_id_back) {
+          try {
+            const urls: string[] = [];
+            
+            if (documents.manager_id_front) {
+              const frontFilePath = `${tokenData.client_id}/manager-id/front_${Date.now()}.jpg`;
+              console.log("[MOBILE DEBUG] Uploading manager ID front to:", frontFilePath);
+              
+              const { error: uploadError } = await supabase.storage
+                .from('documents')
+                .upload(frontFilePath, documents.manager_id_front);
+              
+              if (uploadError) throw uploadError;
+              
+              const { data: frontUrl } = supabase.storage
+                .from('documents')
+                .getPublicUrl(frontFilePath);
+              
+              urls.push(frontUrl.publicUrl);
+            }
+            
+            if (documents.manager_id_back) {
+              const backFilePath = `${tokenData.client_id}/manager-id/back_${Date.now()}.jpg`;
+              console.log("[MOBILE DEBUG] Uploading manager ID back to:", backFilePath);
+              
+              const { error: uploadError } = await supabase.storage
+                .from('documents')
+                .upload(backFilePath, documents.manager_id_back);
+              
+              if (uploadError) throw uploadError;
+              
+              const { data: backUrl } = supabase.storage
+                .from('documents')
+                .getPublicUrl(backFilePath);
+              
+              urls.push(backUrl.publicUrl);
+            }
+            
+            // Stocker les URLs séparées par virgule ou la première URL
+            clientUpdates.manager_id_url = urls.join(',');
+            console.log("[MOBILE DEBUG] Manager ID URLs:", clientUpdates.manager_id_url);
+          } catch (error) {
+            console.error("[MOBILE DEBUG] Manager ID upload failed:", error);
+            throw error;
+          }
+        }
+
+        // Upload Kbis (entreprises)
+        if (documents.kbis) {
+          try {
+            const kbisFilePath = `${tokenData.client_id}/kbis/kbis_${Date.now()}.jpg`;
+            console.log("[MOBILE DEBUG] Uploading Kbis to:", kbisFilePath);
+            
+            const { error: uploadError } = await supabase.storage
+              .from('documents')
+              .upload(kbisFilePath, documents.kbis);
+            
+            if (uploadError) {
+              console.error("[MOBILE DEBUG] Kbis upload error:", uploadError);
+              throw uploadError;
+            }
+            
+            const { data: kbisUrl } = supabase.storage
+              .from('documents')
+              .getPublicUrl(kbisFilePath);
+            
+            clientUpdates.kbis_url = kbisUrl.publicUrl;
+            console.log("[MOBILE DEBUG] Kbis URL:", kbisUrl.publicUrl);
+          } catch (error) {
+            console.error("[MOBILE DEBUG] Kbis upload failed:", error);
             throw error;
           }
         }
