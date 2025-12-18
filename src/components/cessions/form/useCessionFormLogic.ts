@@ -6,6 +6,7 @@ import { useClient } from '@/hooks/use-clients';
 import { useClientVehicles } from '@/hooks/use-vehicles';
 import { useAccounts } from '@/hooks/use-accounts';
 import { useFleetReservation } from '@/hooks/use-fleet-reservations';
+import { useInsuranceCompanies } from '@/hooks/use-insurance-companies';
 import { validateCessionForm } from './utils/validation';
 import { validateRepairOrderData } from './utils/dataValidation';
 import { getInitialFormData, mapCessionToFormData, prepareSubmitData } from './utils/formState';
@@ -32,6 +33,9 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
   const { reservation: fleetReservation, isLoading: isLoadingReservation } = useFleetReservation(
     formData.cession_type === 'fleet_loan' ? (formData.fleet_reservation_id || undefined) : undefined
   );
+  
+  // Get insurance companies list for matching by name
+  const { insuranceCompanies } = useInsuranceCompanies();
 
   // Find the specific vehicle for this repair order
   const repairOrderVehicle = vehicles?.find(v => v.id === order?.vehicle_id);
@@ -66,10 +70,22 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
         loanAmount = fleetReservation.quotes.amount;
       }
 
+      // Find insurance company by name
+      let insuranceCompanyId = formData.insurance_company_id;
+      if (fleetReservation.insurance_company_name && insuranceCompanies) {
+        const matchedCompany = insuranceCompanies.find(
+          company => company.name.toLowerCase() === fleetReservation.insurance_company_name?.toLowerCase()
+        );
+        if (matchedCompany) {
+          insuranceCompanyId = matchedCompany.id;
+        }
+      }
+
       setFormData(prev => ({
         ...prev,
         incident_number: fleetReservation.claim_number || prev.incident_number,
         policy_number: fleetReservation.insurance_contract_number || prev.policy_number,
+        insurance_company_id: insuranceCompanyId,
         loan_amount: loanAmount,
         // Clear repair-specific fields
         report_number: '',
@@ -79,7 +95,7 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
       setValidationErrorMessage(null);
       setValidationBlocked(false);
     }
-  }, [formData.cession_type, fleetReservation, cession]);
+  }, [formData.cession_type, fleetReservation, cession, insuranceCompanies]);
 
   // Effect to validate repair order data and pre-fill form when all data is loaded
   // Only for new cessions (not when editing existing ones)
