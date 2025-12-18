@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { ExpensesHeader } from '@/components/expenses/ExpensesHeader';
+import React, { useState, useMemo } from 'react';
+import { ExpensesHeader, ExpenseSortOption } from '@/components/expenses/ExpensesHeader';
 import { ExpensesTable } from '@/components/expenses/ExpensesTable';
 import ExpenseDialog from '@/components/expenses/ExpenseDialog';
 import { useExpenses } from '@/hooks/use-expenses';
@@ -9,12 +9,37 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 const Expenses = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortOption, setSortOption] = useState<ExpenseSortOption>('recent-first');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<ExpenseWithRelations | null>(null);
   
   const { expenses, isLoading, handleDelete, filterExpenses } = useExpenses();
-  const filteredExpenses = filterExpenses(expenses, searchTerm);
   const isMobile = useIsMobile();
+
+  const filteredAndSortedExpenses = useMemo(() => {
+    const filtered = filterExpenses(expenses, searchTerm);
+    
+    return [...filtered].sort((a, b) => {
+      switch (sortOption) {
+        case 'alphabetical-asc': {
+          const aName = (a.supplier || '').toLowerCase();
+          const bName = (b.supplier || '').toLowerCase();
+          return aName.localeCompare(bName, 'fr', { sensitivity: 'base' });
+        }
+        case 'alphabetical-desc': {
+          const aName = (a.supplier || '').toLowerCase();
+          const bName = (b.supplier || '').toLowerCase();
+          return bName.localeCompare(aName, 'fr', { sensitivity: 'base' });
+        }
+        case 'recent-first':
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        case 'oldest-first':
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        default:
+          return 0;
+      }
+    });
+  }, [expenses, searchTerm, sortOption, filterExpenses]);
 
   const handleCreateExpense = () => {
     setSelectedExpense(null);
@@ -32,10 +57,12 @@ const Expenses = () => {
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         onCreateExpense={handleCreateExpense}
+        sortOption={sortOption}
+        onSortChange={setSortOption}
       />
       
       <ExpensesTable
-        expenses={filteredExpenses}
+        expenses={filteredAndSortedExpenses}
         onEdit={handleEdit}
         onDelete={handleDelete}
         isLoading={isLoading}
