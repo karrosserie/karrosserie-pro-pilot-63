@@ -53,6 +53,14 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
       receiptsData = receipts;
     }
 
+    // Récupérer les avoirs liés à cette facture
+    const { data: creditsData } = await supabase
+      .from('credits')
+      .select('*')
+      .eq('invoice_id', invoice.id);
+    
+    const totalCreditsAmount = (creditsData || []).reduce((sum, credit) => sum + (credit.amount || 0), 0);
+
     // Récupérer les préférences d'entreprise pour le template
     let template = 'default';
     try {
@@ -161,10 +169,11 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
     
     // Calculer le montant total payé
     const totalPaidAmount = receiptsData.reduce((sum, receipt) => sum + receipt.amount, 0);
-    const remainingAmount = invoice.amount - totalPaidAmount - globalDiscountTotal;
+    // Inclure les avoirs dans le calcul du montant restant
+    const remainingAmount = invoice.amount - totalPaidAmount - globalDiscountTotal - totalCreditsAmount;
     
-    // Vérifier si la facture est entièrement payée (via receipts OU statut "Payée")
-    const isPaid = (remainingAmount <= 0 && totalPaidAmount > 0) || invoice.status === 'Payée';
+    // Vérifier si la facture est entièrement payée (via receipts, avoirs OU statut "Payée")
+    const isPaid = (remainingAmount <= 0 && (totalPaidAmount > 0 || totalCreditsAmount > 0)) || invoice.status === 'Payée';
     
     const totalsData = {
       subtotal: `${totals.subtotalAfterDiscount.toFixed(2).replace('.', ',')} €`,

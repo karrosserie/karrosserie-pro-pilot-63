@@ -51,6 +51,7 @@ const InvoiceViewerModal = ({
   };
   
   const [receiptsData, setReceiptsData] = useState<any[]>([]);
+  const [creditsData, setCreditsData] = useState<any[]>([]);
   
   // Reset mounted ref on mount/unmount
   useEffect(() => {
@@ -58,34 +59,43 @@ const InvoiceViewerModal = ({
     return () => { isMountedRef.current = false; };
   }, []);
   
-  // Fetch receipts with abort controller
+  // Fetch receipts and credits with abort controller
   useEffect(() => {
     if (!invoice?.id || !open) {
       setReceiptsData([]);
+      setCreditsData([]);
       return;
     }
     
     let cancelled = false;
     
-    const fetchReceipts = async () => {
+    const fetchData = async () => {
       try {
+        // Fetch receipts
         const { data: receipts } = await supabase
           .from('receipts')
           .select('*')
           .eq('invoice_id', invoice.id)
           .order('date', { ascending: true });
         
-        if (!cancelled && isMountedRef.current && receipts) {
-          setReceiptsData(receipts);
+        // Fetch credits (avoirs) linked to this invoice
+        const { data: credits } = await supabase
+          .from('credits')
+          .select('*')
+          .eq('invoice_id', invoice.id);
+        
+        if (!cancelled && isMountedRef.current) {
+          if (receipts) setReceiptsData(receipts);
+          if (credits) setCreditsData(credits);
         }
       } catch (error) {
         if (!cancelled) {
-          console.error('[InvoiceViewerModal] fetchReceipts ERROR:', error);
+          console.error('[InvoiceViewerModal] fetchData ERROR:', error);
         }
       }
     };
     
-    fetchReceipts();
+    fetchData();
     
     return () => { cancelled = true; };
   }, [invoice?.id, open]);
@@ -145,7 +155,7 @@ const InvoiceViewerModal = ({
     return result;
   }, [invoice.repairs_data, invoice.parts_data]);
 
-  const { totalsData, totalPaidAmount, remainingAmount, isPaid } = useMemo(() => {
+  const { totalsData, totalPaidAmount, totalCreditsAmount, remainingAmount, isPaid } = useMemo(() => {
     const totals = calculateInvoiceTotals(invoice.repairs_data, invoice.parts_data);
     const totalsFormatted = { 
       subtotal: `${totals.subtotalAfterDiscount.toFixed(2).replace('.', ',')} €`, 
@@ -157,14 +167,17 @@ const InvoiceViewerModal = ({
       totalTTC: `${totals.finalTotal.toFixed(2).replace('.', ',')} €` 
     };
     const paid = receiptsData.reduce((sum, receipt) => sum + receipt.amount, 0);
-    const remaining = invoice.amount - paid;
+    // Calculer le total des avoirs liés à cette facture
+    const creditsTotal = creditsData.reduce((sum, credit) => sum + (credit.amount || 0), 0);
+    const remaining = invoice.amount - paid - creditsTotal;
     return {
       totalsData: totalsFormatted,
       totalPaidAmount: paid,
+      totalCreditsAmount: creditsTotal,
       remainingAmount: remaining,
-      isPaid: (remaining <= 0 && paid > 0) || invoice.status === 'Payée'
+      isPaid: (remaining <= 0 && (paid > 0 || creditsTotal > 0)) || invoice.status === 'Payée'
     };
-  }, [invoice.repairs_data, invoice.parts_data, invoice.amount, invoice.status, receiptsData]);
+  }, [invoice.repairs_data, invoice.parts_data, invoice.amount, invoice.status, receiptsData, creditsData]);
 
   const handleEdit = () => { if (onEditInvoice) onEditInvoice(invoice); };
   const handleDelete = async () => {
