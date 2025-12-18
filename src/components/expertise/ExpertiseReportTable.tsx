@@ -5,14 +5,10 @@ import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { ExpertiseReportTableHeader } from './table/ExpertiseReportTableHeader';
 import { ExpertiseReportTableRow } from './table/ExpertiseReportTableRow';
-import { ExpertiseReportTableEmpty } from './table/ExpertiseReportTableEmpty';
-import { ExpertiseReportTableLoading } from './table/ExpertiseReportTableLoading';
-import { ExpertiseReportTableError } from './table/ExpertiseReportTableError';
 import ExpertiseReportMobileCard from './ExpertiseReportMobileCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { FileText } from 'lucide-react';
 import { TableCell, TableRow } from "@/components/ui/table";
-import { useTableSorting } from '@/hooks/use-table-sorting';
 
 interface ExpertiseReportTableProps {
   reports: ExpertiseReport[];
@@ -36,13 +32,12 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
   convertedReports = {}
 }) => {
   const isMobile = useIsMobile();
-  const { sortedData, sortConfig, handleSort } = useTableSorting(reports, 'created_at');
 
   // Mobile view: cards
   if (isMobile) {
     return (
       <div className="space-y-3 p-4">
-        {sortedData.map((report) => (
+        {reports.map((report) => (
           <ExpertiseReportMobileCard
             key={report.id}
             report={report}
@@ -59,10 +54,7 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
     <TooltipProvider>
       <div className="overflow-x-auto">
         <Table>
-          <ExpertiseReportTableHeader 
-            sortConfig={sortConfig}
-            onSort={handleSort}
-          />
+          <ExpertiseReportTableHeader />
           <TableBody>
             {isLoading ? (
               <TableRow>
@@ -76,8 +68,8 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
                   Erreur lors du chargement des rapports: {error.message}
                 </TableCell>
               </TableRow>
-            ) : sortedData.length > 0 ? (
-              sortedData.map((report) => (
+            ) : reports.length > 0 ? (
+              reports.map((report) => (
                 <ExpertiseReportTableRow
                   key={report.id}
                   report={report}
