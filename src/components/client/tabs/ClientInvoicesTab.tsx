@@ -206,6 +206,12 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
       }) || [];
   };
 
+  const getCreditStatusColor = (status: string) => {
+    return status === 'Payé' 
+      ? 'bg-green-100 text-green-800 hover:bg-green-100' 
+      : 'bg-orange-100 text-orange-800 hover:bg-orange-100';
+  };
+
   const renderCreditsBadges = (invoiceCredits: any[]) => {
     if (invoiceCredits.length === 0) {
       return <span className="text-gray-500 text-sm">-</span>;
@@ -217,10 +223,10 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
           <Badge
             key={credit.id}
             variant="secondary"
-            className="bg-orange-100 text-orange-800 hover:bg-orange-100 text-xs"
-           >
-             Avoir n°{credit.reference} - {formatAmount(credit.amount || 0)}
-           </Badge>
+            className={`${getCreditStatusColor(credit.status)} text-xs`}
+          >
+            Avoir n°{credit.reference} - {formatAmount(credit.amount || 0)}
+          </Badge>
         ))}
       </div>
     );
