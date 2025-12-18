@@ -46,7 +46,8 @@ export const useCreditFormState = () => {
       unit_price: 0,
       discount: 0,
       vat: 20,
-      total: 0
+      total: 0,
+      total_ttc: 0
     };
     setItems(prev => [...prev, newItem]);
   }, []);
@@ -55,12 +56,22 @@ export const useCreditFormState = () => {
     setItems(prev => prev.map(item => {
       if (item.id === id) {
         const updatedItem = { ...item, [field]: value };
-        // Calculate total with discount and VAT
-        const subtotal = updatedItem.quantity * updatedItem.unit_price;
-        const discountAmount = subtotal * (updatedItem.discount / 100);
-        const afterDiscount = subtotal - discountAmount;
-        const vatAmount = afterDiscount * (updatedItem.vat / 100);
-        updatedItem.total = afterDiscount + vatAmount;
+        
+        // Calcul inverse : du TTC vers le HT
+        // TTC = HT * (1 + TVA/100) après remise
+        // HT après remise = TTC / (1 + TVA/100)
+        // HT avant remise = HT après remise / (1 - remise/100)
+        // Prix unitaire = HT avant remise / quantité
+        const ttc = updatedItem.total_ttc;
+        const vatMultiplier = 1 + (updatedItem.vat / 100);
+        const htAfterDiscount = ttc / vatMultiplier;
+        const discountMultiplier = 1 - (updatedItem.discount / 100);
+        const htBeforeDiscount = discountMultiplier > 0 ? htAfterDiscount / discountMultiplier : 0;
+        const unitPrice = updatedItem.quantity > 0 ? htBeforeDiscount / updatedItem.quantity : 0;
+        
+        updatedItem.unit_price = unitPrice;
+        updatedItem.total = ttc; // Le total est le TTC saisi
+        
         return updatedItem;
       }
       return item;
