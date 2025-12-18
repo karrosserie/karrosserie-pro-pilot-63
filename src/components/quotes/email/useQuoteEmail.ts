@@ -89,7 +89,7 @@ ${companyInfo?.name || 'L\'équipe'}`;
       const doc = InvoicePDF({ 
         invoice: data.quote as any, // Cast to invoice type since they have compatible structures
         companyData: data.companyData, 
-        receipts: [],
+        payments: [],
         clientData: data.clientData,
         vehicleData: data.vehicleData,
         template: data.template || 'default',

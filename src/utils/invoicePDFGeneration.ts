@@ -61,6 +61,24 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
     
     const totalCreditsAmount = (creditsData || []).reduce((sum, credit) => sum + (credit.amount || 0), 0);
 
+    // Fusionner receipts et credits en une liste de paiements unifiée
+    const allPayments = [
+      ...receiptsData.map(receipt => ({
+        id: receipt.id,
+        date: receipt.created_at || receipt.date,
+        payment_method: receipt.payment_method || '-',
+        amount: receipt.amount || 0,
+        type: 'receipt' as const
+      })),
+      ...(creditsData || []).map(credit => ({
+        id: credit.id,
+        date: credit.created_at,
+        payment_method: `Avoir ${credit.reference}${credit.is_franchise_credit ? ' (Franchise)' : ''}`,
+        amount: credit.amount || 0,
+        type: 'credit' as const
+      }))
+    ].sort((a, b) => new Date(a.date || '').getTime() - new Date(b.date || '').getTime());
+
     // Récupérer les préférences d'entreprise pour le template
     let template = 'default';
     try {
@@ -193,8 +211,8 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
       clientData: clientDataForTemplate,
       items,
       totals: totalsData,
-      receipts: receiptsData,
-      totalPaidAmount,
+      payments: allPayments,
+      totalPaidAmount: totalPaidAmount + totalCreditsAmount,
       remainingAmount,
       isPaid
     };
@@ -227,7 +245,7 @@ export const generateInvoicePDFBlob = async (invoice: Invoice, companyData: any)
     const doc = InvoicePDF({ 
       invoice, 
       companyData: data.companyData, 
-      receipts: data.receipts,
+      payments: data.payments,
       clientData: pdfData,
       vehicleData: null,
       template: data.template,
@@ -266,7 +284,7 @@ export const generateInvoicePDFWithTemplate = async (invoice: Invoice, companyDa
     const doc = InvoicePDF({ 
       invoice, 
       companyData: data.companyData, 
-      receipts: data.receipts,
+      payments: data.payments,
       clientData: pdfData,
       vehicleData: null,
       template: data.template,
@@ -320,7 +338,7 @@ export const printInvoicePDFWithTemplate = async (invoice: Invoice, companyData:
     const doc = InvoicePDF({ 
       invoice, 
       companyData: data.companyData, 
-      receipts: data.receipts,
+      payments: data.payments,
       clientData: pdfData,
       vehicleData: null,
       template: data.template,

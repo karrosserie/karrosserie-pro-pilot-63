@@ -383,7 +383,7 @@ const Documents = () => {
           doc = InvoicePDF({ 
             invoice: preparedData.quote as any,
             companyData: preparedData.companyData, 
-            receipts: [],
+            payments: [],
             clientData: preparedData.clientData,
             vehicleData: preparedData.vehicleData,
             template: preparedData.template || 'default',
@@ -398,7 +398,7 @@ const Documents = () => {
           doc = InvoicePDF({ 
             invoice: preparedData.repairOrder as any,
             companyData: preparedData.companyData, 
-            receipts: [],
+            payments: [],
             clientData: preparedData.clientData,
             vehicleData: preparedData.vehicleData,
             template: preparedData.template || 'default',
@@ -428,7 +428,7 @@ const Documents = () => {
           doc = InvoicePDF({ 
             invoice: data,
             companyData: preparedData.companyData, 
-            receipts: [],
+            payments: [],
             clientData: pdfData,
             vehicleData: null,
             template: preparedData.template || 'default',
@@ -443,7 +443,7 @@ const Documents = () => {
           doc = InvoicePDF({ 
             invoice: preparedData.credit as any,
             companyData: preparedData.companyData, 
-            receipts: [],
+            payments: [],
             clientData: preparedData.clientData,
             vehicleData: preparedData.vehicleData,
             template: preparedData.template || 'default',

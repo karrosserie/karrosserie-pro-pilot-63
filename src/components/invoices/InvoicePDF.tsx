@@ -3,10 +3,18 @@ import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/render
 import { Invoice } from '@/services/supabase/invoices';
 import InvoicePDFPaymentsTable from './pdf/InvoicePDFPaymentsTable';
 
+interface Payment {
+  id: string;
+  date?: string;
+  payment_method?: string;
+  amount?: number;
+  type?: 'receipt' | 'credit';
+}
+
 interface InvoicePDFProps {
   invoice: Invoice;
   companyData: any;
-  receipts?: any[];
+  payments?: Payment[];
   clientData?: any;
   vehicleData?: any;
   signatureData?: {
@@ -365,7 +373,7 @@ const alternativeStyles = StyleSheet.create({
   },
 });
 
-const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleData, signatureData, template = 'default', documentType = 'invoice', showItemsDetails = true, isPaid = false }: InvoicePDFProps) => {
+const InvoicePDF = ({ invoice, companyData, payments = [], clientData, vehicleData, signatureData, template = 'default', documentType = 'invoice', showItemsDetails = true, isPaid = false }: InvoicePDFProps) => {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '-';
     try {
@@ -387,9 +395,9 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
   };
 
   // Calculer les montants de paiement
-  const totalPaidAmount = receipts.reduce((sum, receipt) => sum + receipt.amount, 0);
+  const totalPaidAmount = payments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
   const invoiceAmount = typeof invoice.amount === 'number' ? invoice.amount : 0;
-  const remainingAmount = invoiceAmount - totalPaidAmount;
+  const remainingAmount = Math.max(0, invoiceAmount - totalPaidAmount);
 
   if (template === 'alternative') {
     return (
@@ -992,7 +1000,7 @@ const InvoicePDF = ({ invoice, companyData, receipts = [], clientData, vehicleDa
         {/* Section Paiements - seulement pour les factures */}
         {documentType === 'invoice' && (
           <InvoicePDFPaymentsTable 
-            payments={receipts} 
+            payments={payments} 
             totalPaidAmount={totalPaidAmount} 
             remainingAmount={remainingAmount} 
           />

@@ -3,6 +3,14 @@ import { formatAmount } from '@/utils/invoiceCalculations';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
+interface Payment {
+  id: string;
+  date?: string;
+  payment_method?: string;
+  amount?: number;
+  type?: 'receipt' | 'credit';
+}
+
 interface DefaultInvoicePaymentsTableProps {
   clientData?: {
     notes?: string;
@@ -10,7 +18,7 @@ interface DefaultInvoicePaymentsTableProps {
   invoiceData?: {
     payment_details?: string;
   };
-  payments?: any[];
+  payments?: Payment[];
   totalPaidAmount?: number;
   remainingAmount?: number;
 }
@@ -63,8 +71,12 @@ const DefaultInvoicePaymentsTable = ({
                 <td className="p-3">
                   {payment.date ? format(new Date(payment.date), 'dd/MM/yyyy', { locale: fr }) : '-'}
                 </td>
-                <td className="p-3">{payment.payment_method || '-'}</td>
-                <td className="p-3 text-right">{formatAmount(payment.amount || 0)}</td>
+                <td className={`p-3 ${payment.type === 'credit' ? 'text-green-600 font-medium' : ''}`}>
+                  {payment.payment_method || '-'}
+                </td>
+                <td className={`p-3 text-right ${payment.type === 'credit' ? 'text-green-600 font-medium' : ''}`}>
+                  {formatAmount(payment.amount || 0)}
+                </td>
               </tr>
             ))}
           </tbody>

@@ -5,13 +5,13 @@ import InvoicePDF from '@/components/invoices/InvoicePDF';
 export const printInvoicePDF = async (
   invoice: Invoice, 
   companyData: any, 
-  receipts: any[] = [],
+  payments: any[] = [],
   clientData?: any,
   vehicleData?: any
 ) => {
   try {
     // Créer le document PDF
-    const doc = InvoicePDF({ invoice, companyData, receipts, clientData, vehicleData });
+    const doc = InvoicePDF({ invoice, companyData, payments, clientData, vehicleData });
     
     // Générer le blob PDF
     const asPdf = pdf(doc);

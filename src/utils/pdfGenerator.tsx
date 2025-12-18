@@ -12,13 +12,13 @@ import { supabase } from '@/integrations/supabase/client';
 export const generateInvoicePDF = async (
   invoice: Invoice, 
   companyData: any, 
-  receipts: any[] = [],
+  payments: any[] = [],
   clientData?: any,
   vehicleData?: any
 ) => {
   try {
     // Créer le document PDF
-    const doc = <InvoicePDF invoice={invoice} companyData={companyData} receipts={receipts} clientData={clientData} vehicleData={vehicleData} />;
+    const doc = <InvoicePDF invoice={invoice} companyData={companyData} payments={payments} clientData={clientData} vehicleData={vehicleData} />;
     
     // Générer le blob PDF
     const asPdf = pdf(doc);
