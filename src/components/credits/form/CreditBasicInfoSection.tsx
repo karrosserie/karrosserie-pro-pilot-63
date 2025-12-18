@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -24,7 +24,7 @@ export const CreditBasicInfoSection = ({
   onFieldChange,
   readOnly = false
 }: CreditBasicInfoSectionProps) => {
-  const [isFranchiseCredit, setIsFranchiseCredit] = useState(false);
+  const isFranchiseCredit = formData.is_franchise_credit || false;
   const { invoices } = useInvoices();
 
   const statusOptions = [
@@ -39,7 +39,7 @@ export const CreditBasicInfoSection = ({
 
   const handleFranchiseSwitchChange = (checked: boolean) => {
     if (readOnly) return;
-    setIsFranchiseCredit(checked);
+    onFieldChange('is_franchise_credit', checked);
     if (checked) {
       // Franchise offerte = avoir automatiquement payé
       onFieldChange('status', 'Payé');

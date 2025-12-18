@@ -4,6 +4,7 @@ export interface CreditFormData {
   invoice_id: string | null;
   status: 'En attente' | 'Payé';
   notes?: string;
+  is_franchise_credit?: boolean;
 }
 
 export interface CreditItem {

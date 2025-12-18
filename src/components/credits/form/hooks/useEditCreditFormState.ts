@@ -8,6 +8,7 @@ interface UseEditCreditFormStateProps {
     invoice_id: string | null;
     status: 'En attente' | 'Payé';
     notes?: string;
+    is_franchise_credit?: boolean;
     items?: CreditItem[];
   };
 }
@@ -17,7 +18,8 @@ export const useEditCreditFormState = ({ initialData }: UseEditCreditFormStatePr
     reference: initialData?.reference || '',
     invoice_id: initialData?.invoice_id || null,
     status: initialData?.status || 'En attente',
-    notes: initialData?.notes || ''
+    notes: initialData?.notes || '',
+    is_franchise_credit: initialData?.is_franchise_credit || false
   });
 
   const [items, setItems] = useState<CreditItem[]>(initialData?.items || []);
