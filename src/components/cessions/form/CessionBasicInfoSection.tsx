@@ -88,6 +88,7 @@ export const CessionBasicInfoSection = ({
           formData={formData}
           errors={errors}
           onFieldChange={onFieldChange}
+          cessionType={formData.cession_type}
         />
       </div>
 
