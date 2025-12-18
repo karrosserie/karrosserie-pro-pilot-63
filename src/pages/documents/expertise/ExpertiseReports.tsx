@@ -60,7 +60,7 @@ const ExpertiseReports = () => {
                           pendingImports.length > 0;
   
   const filteredAndSortedReports = React.useMemo(() => {
-    let result = reports?.filter(report => {
+    const filtered = reports?.filter(report => {
       const matchesSearch = report.report_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (report.clients && `${report.clients.first_name} ${report.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()));
       
@@ -82,8 +82,8 @@ const ExpertiseReports = () => {
       return matchesSearch || vehicleMatch;
     }) || [];
 
-    // Apply sorting
-    return result.sort((a, b) => {
+    // Create a copy and sort - spread operator ensures new array reference
+    const sorted = [...filtered].sort((a, b) => {
       switch (sortOption) {
         case 'alphabetical-asc': {
           const aName = `${a.clients?.last_name || ''} ${a.clients?.first_name || ''}`.trim().toLowerCase();
@@ -103,6 +103,8 @@ const ExpertiseReports = () => {
           return 0;
       }
     });
+
+    return sorted;
   }, [reports, searchTerm, sortOption]);
   
   const handleEditReport = (report: ExpertiseReport) => {
