@@ -1544,6 +1544,8 @@ export type Database = {
           last_name: string | null
           license_issue_date: string | null
           license_number: string | null
+          manager_id_back_url: string | null
+          manager_id_front_url: string | null
           manager_id_url: string | null
           oodrive_recipient_id: string | null
           phone: string | null
@@ -1572,6 +1574,8 @@ export type Database = {
           last_name?: string | null
           license_issue_date?: string | null
           license_number?: string | null
+          manager_id_back_url?: string | null
+          manager_id_front_url?: string | null
           manager_id_url?: string | null
           oodrive_recipient_id?: string | null
           phone?: string | null
@@ -1600,6 +1604,8 @@ export type Database = {
           last_name?: string | null
           license_issue_date?: string | null
           license_number?: string | null
+          manager_id_back_url?: string | null
+          manager_id_front_url?: string | null
           manager_id_url?: string | null
           oodrive_recipient_id?: string | null
           phone?: string | null

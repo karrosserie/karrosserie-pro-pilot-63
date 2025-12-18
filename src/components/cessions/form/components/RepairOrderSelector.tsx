@@ -13,12 +13,14 @@ interface RepairOrderSelectorProps {
   formData: CessionFormData;
   errors: CessionFormErrors;
   onFieldChange: (field: keyof CessionFormData, value: any) => void;
+  filterByClientType?: 'particulier' | 'entreprise';
 }
 
 export const RepairOrderSelector = ({
   formData,
   errors,
-  onFieldChange
+  onFieldChange,
+  filterByClientType
 }: RepairOrderSelectorProps) => {
   const { orders, isLoading: isLoadingOrders } = useRepairOrders();
   const { shouldShowCessionSelectOrderHelp, markHelpAsSeen } = useUserOnboardingProgress();
@@ -66,8 +68,13 @@ export const RepairOrderSelector = ({
     return `Ordre n°${order.reference} du ${orderDate} - ${clientName} - ${vehicleInfo}`;
   };
 
+  // Filtrer les ordres par type de client si spécifié
+  const filteredOrders = filterByClientType 
+    ? (orders || []).filter(order => order.clients?.client_type === filterByClientType)
+    : orders || [];
+
   // Préparer les options pour SearchableSelect
-  const repairOrderOptions = (orders || []).map(order => ({
+  const repairOrderOptions = filteredOrders.map(order => ({
     value: order.id,
     label: formatRepairOrderDisplay(order)
   }));

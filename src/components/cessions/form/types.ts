@@ -11,7 +11,7 @@ export type CessionStatus =
   | 'lettre_recommandee_presentee'
   | 'payee';
 
-export type CessionType = 'repair' | 'fleet_loan';
+export type CessionType = 'repair' | 'repair_enterprise' | 'fleet_loan';
 
 export interface CessionFormData {
   cession_type: CessionType;

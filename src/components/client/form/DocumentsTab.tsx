@@ -7,7 +7,8 @@ interface DocumentsTabProps {
   formData: {
     driverLicenseFrontUrl: string;
     driverLicenseBackUrl: string;
-    managerIdUrl?: string;
+    managerIdFrontUrl?: string;
+    managerIdBackUrl?: string;
     kbisUrl?: string;
   };
   clientType?: 'particulier' | 'entreprise';
@@ -15,8 +16,10 @@ interface DocumentsTabProps {
   handleDriverLicenseBackUpload: (url: string) => void;
   handleDriverLicenseFrontDelete?: () => void;
   handleDriverLicenseBackDelete?: () => void;
-  handleManagerIdUpload?: (url: string) => void;
-  handleManagerIdDelete?: () => void;
+  handleManagerIdFrontUpload?: (url: string) => void;
+  handleManagerIdFrontDelete?: () => void;
+  handleManagerIdBackUpload?: (url: string) => void;
+  handleManagerIdBackDelete?: () => void;
   handleKbisUpload?: (url: string) => void;
   handleKbisDelete?: () => void;
   isViewMode?: boolean;
@@ -30,8 +33,10 @@ const DocumentsTab: React.FC<DocumentsTabProps> = ({
   handleDriverLicenseBackUpload,
   handleDriverLicenseFrontDelete,
   handleDriverLicenseBackDelete,
-  handleManagerIdUpload,
-  handleManagerIdDelete,
+  handleManagerIdFrontUpload,
+  handleManagerIdFrontDelete,
+  handleManagerIdBackUpload,
+  handleManagerIdBackDelete,
   handleKbisUpload,
   handleKbisDelete,
   isViewMode = false
@@ -56,13 +61,26 @@ const DocumentsTab: React.FC<DocumentsTabProps> = ({
         <>
           {/* Documents entreprise */}
           <div className="space-y-2">
-            <Label>CNI du Gérant</Label>
+            <Label>CNI du Gérant (Recto)</Label>
             <DocumentUploader
               documentType="driver-license"
-              documentId={`${clientId}-manager-id`}
-              currentDocumentUrl={formData.managerIdUrl || ''}
-              onUploadComplete={handleManagerIdUpload || (() => {})}
-              onDelete={handleManagerIdDelete || (() => {})}
+              documentId={`${clientId}-manager-id-front`}
+              currentDocumentUrl={formData.managerIdFrontUrl || ''}
+              onUploadComplete={handleManagerIdFrontUpload || (() => {})}
+              onDelete={handleManagerIdFrontDelete || (() => {})}
+              isViewMode={isViewMode}
+              allowDeleteInViewMode={true}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label>CNI du Gérant (Verso)</Label>
+            <DocumentUploader
+              documentType="driver-license"
+              documentId={`${clientId}-manager-id-back`}
+              currentDocumentUrl={formData.managerIdBackUrl || ''}
+              onUploadComplete={handleManagerIdBackUpload || (() => {})}
+              onDelete={handleManagerIdBackDelete || (() => {})}
               isViewMode={isViewMode}
               allowDeleteInViewMode={true}
             />

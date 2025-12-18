@@ -35,7 +35,8 @@ const ClientForm: React.FC<ClientFormProps> = ({
     companyName: defaultValues?.companyName || '',
     driverLicenseFrontUrl: defaultValues?.driverLicenseFrontUrl || '',
     driverLicenseBackUrl: defaultValues?.driverLicenseBackUrl || '',
-    managerIdUrl: defaultValues?.managerIdUrl || '',
+    managerIdFrontUrl: defaultValues?.managerIdFrontUrl || '',
+    managerIdBackUrl: defaultValues?.managerIdBackUrl || '',
     kbisUrl: defaultValues?.kbisUrl || '',
     autoRelancesDisabled: defaultValues?.autoRelancesDisabled ?? false
   });
@@ -55,7 +56,8 @@ const ClientForm: React.FC<ClientFormProps> = ({
       companyName: defaultValues?.companyName || '',
       driverLicenseFrontUrl: defaultValues?.driverLicenseFrontUrl || '',
       driverLicenseBackUrl: defaultValues?.driverLicenseBackUrl || '',
-      managerIdUrl: defaultValues?.managerIdUrl || '',
+      managerIdFrontUrl: defaultValues?.managerIdFrontUrl || '',
+      managerIdBackUrl: defaultValues?.managerIdBackUrl || '',
       kbisUrl: defaultValues?.kbisUrl || '',
       autoRelancesDisabled: defaultValues?.autoRelancesDisabled ?? false
     });
@@ -101,13 +103,23 @@ const ClientForm: React.FC<ClientFormProps> = ({
     onFormChange?.();
   };
 
-  const handleManagerIdUpload = (url: string) => {
-    setFormData(prev => ({ ...prev, managerIdUrl: url }));
+  const handleManagerIdFrontUpload = (url: string) => {
+    setFormData(prev => ({ ...prev, managerIdFrontUrl: url }));
     onFormChange?.();
   };
 
-  const handleManagerIdDelete = () => {
-    setFormData(prev => ({ ...prev, managerIdUrl: '' }));
+  const handleManagerIdFrontDelete = () => {
+    setFormData(prev => ({ ...prev, managerIdFrontUrl: '' }));
+    onFormChange?.();
+  };
+
+  const handleManagerIdBackUpload = (url: string) => {
+    setFormData(prev => ({ ...prev, managerIdBackUrl: url }));
+    onFormChange?.();
+  };
+
+  const handleManagerIdBackDelete = () => {
+    setFormData(prev => ({ ...prev, managerIdBackUrl: '' }));
     onFormChange?.();
   };
 
@@ -207,8 +219,10 @@ const ClientForm: React.FC<ClientFormProps> = ({
             handleDriverLicenseBackUpload={handleDriverLicenseBackUpload}
             handleDriverLicenseFrontDelete={handleDriverLicenseFrontDelete}
             handleDriverLicenseBackDelete={handleDriverLicenseBackDelete}
-            handleManagerIdUpload={handleManagerIdUpload}
-            handleManagerIdDelete={handleManagerIdDelete}
+            handleManagerIdFrontUpload={handleManagerIdFrontUpload}
+            handleManagerIdFrontDelete={handleManagerIdFrontDelete}
+            handleManagerIdBackUpload={handleManagerIdBackUpload}
+            handleManagerIdBackDelete={handleManagerIdBackDelete}
             handleKbisUpload={handleKbisUpload}
             handleKbisDelete={handleKbisDelete}
             isViewMode={isViewMode}

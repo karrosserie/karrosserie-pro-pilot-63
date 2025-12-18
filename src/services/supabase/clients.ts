@@ -67,10 +67,11 @@ export const clientsService = {
       driver_license_back_url: client.driverLicenseBackUrl || null,
       auto_relances_disabled: client.autoRelancesDisabled || false,
       oodrive_recipient_id: client.oodrive_recipient_id || null,
-      // Nouveaux champs entreprise
+      // Champs entreprise
       client_type: client.clientType || 'particulier',
       company_name: client.companyName || null,
-      manager_id_url: client.managerIdUrl || null,
+      manager_id_front_url: client.managerIdFrontUrl || null,
+      manager_id_back_url: client.managerIdBackUrl || null,
       kbis_url: client.kbisUrl || null
     };
 
@@ -108,10 +109,11 @@ export const clientsService = {
     if (client.autoRelancesDisabled !== undefined) clientData.auto_relances_disabled = client.autoRelancesDisabled;
     if (client.oodrive_recipient_id !== undefined) clientData.oodrive_recipient_id = client.oodrive_recipient_id || null;
     
-    // Nouveaux champs entreprise
+    // Champs entreprise
     if (client.clientType !== undefined) clientData.client_type = client.clientType;
     if (client.companyName !== undefined) clientData.company_name = client.companyName || null;
-    if (client.managerIdUrl !== undefined) clientData.manager_id_url = client.managerIdUrl || null;
+    if (client.managerIdFrontUrl !== undefined) clientData.manager_id_front_url = client.managerIdFrontUrl || null;
+    if (client.managerIdBackUrl !== undefined) clientData.manager_id_back_url = client.managerIdBackUrl || null;
     if (client.kbisUrl !== undefined) clientData.kbis_url = client.kbisUrl || null;
 
     const { data, error } = await supabase

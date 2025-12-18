@@ -1,5 +1,5 @@
 
-export type CessionType = 'repair' | 'fleet_loan';
+export type CessionType = 'repair' | 'repair_enterprise' | 'fleet_loan';
 
 export interface Cession {
   id: string;
