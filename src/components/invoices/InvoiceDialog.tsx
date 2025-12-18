@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { InvoiceForm } from '@/components/invoices/InvoiceForm';
 import { UseMutationResult } from '@tanstack/react-query';
+import { useInvoices } from '@/hooks/use-invoices';
 
 interface InvoiceDialogProps {
   invoice?: any;
@@ -34,6 +35,11 @@ const InvoiceDialog = ({
   const navigate = useNavigate();
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Utiliser le hook interne si les mutations ne sont pas fournies
+  const { createInvoice: internalCreate, updateInvoice: internalUpdate } = useInvoices();
+  const effectiveCreateInvoice = createInvoice || internalCreate;
+  const effectiveUpdateInvoice = updateInvoice || internalUpdate;
 
   console.log('[InvoiceDialog] RENDER - open:', open, 'isSubmitting:', isSubmitting, 'invoiceId:', invoice?.id);
 
@@ -51,11 +57,11 @@ const InvoiceDialog = ({
       
       if (isEditing) {
         console.log('[InvoiceDialog] Calling updateInvoice...');
-        await updateInvoice.mutateAsync({ id: invoice.id, data: formData });
+        await effectiveUpdateInvoice.mutateAsync({ id: invoice.id, data: formData });
         console.log('[InvoiceDialog] updateInvoice COMPLETED');
       } else {
         console.log('[InvoiceDialog] Calling createInvoice...');
-        createdInvoice = await createInvoice.mutateAsync(formData);
+        createdInvoice = await effectiveCreateInvoice.mutateAsync(formData);
         console.log('[InvoiceDialog] createInvoice COMPLETED');
       }
       
