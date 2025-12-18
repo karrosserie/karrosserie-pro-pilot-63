@@ -124,10 +124,7 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
       <>
         <div className="card-container p-0">
             <Table>
-              <ExpertiseReportTableHeader 
-                sortConfig={sortConfig}
-                onSort={handleSort}
-              />
+              <ExpertiseReportTableHeader />
             <TableBody>
               {sortedData.length > 0 ? (
                 sortedData.map((report) => (
