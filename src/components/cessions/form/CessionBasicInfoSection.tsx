@@ -1,9 +1,13 @@
 
 import React from 'react';
 import { CessionFormData, CessionFormErrors } from './types';
+import { CessionTypeSelector } from './components/CessionTypeSelector';
 import { RepairOrderSelector } from './components/RepairOrderSelector';
+import { FleetReservationSelector } from './components/FleetReservationSelector';
 import { CessionFormFields } from './components/CessionFormFields';
 import { ValidationErrorDialog } from './components/ValidationErrorDialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface CessionBasicInfoSectionProps {
   formData: CessionFormData;
@@ -13,6 +17,7 @@ interface CessionBasicInfoSectionProps {
   companyId?: string;
   onFieldChange: (field: keyof CessionFormData, value: any) => void;
   onClearValidationError?: () => void;
+  isEditing?: boolean;
 }
 
 export const CessionBasicInfoSection = ({
@@ -22,17 +27,53 @@ export const CessionBasicInfoSection = ({
   client,
   companyId,
   onFieldChange,
-  onClearValidationError
+  onClearValidationError,
+  isEditing = false
 }: CessionBasicInfoSectionProps) => {
   return (
     <>
       <div className="space-y-4">
-        {/* Ordre de réparation seul sur sa ligne */}
-        <RepairOrderSelector 
-          formData={formData}
-          errors={errors}
-          onFieldChange={onFieldChange}
+        {/* Type de cession - disabled if editing */}
+        <CessionTypeSelector
+          value={formData.cession_type}
+          onChange={(value) => onFieldChange('cession_type', value)}
+          disabled={isEditing}
         />
+
+        {/* Sélecteur basé sur le type */}
+        {formData.cession_type === 'repair' ? (
+          <RepairOrderSelector 
+            formData={formData}
+            errors={errors}
+            onFieldChange={onFieldChange}
+          />
+        ) : (
+          <>
+            <FleetReservationSelector 
+              formData={formData}
+              errors={errors}
+              onFieldChange={onFieldChange}
+            />
+            {/* Montant du prêt */}
+            <div className="space-y-2">
+              <Label htmlFor="loan_amount">
+                Montant du prêt (€) <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="loan_amount"
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.loan_amount || ''}
+                onChange={(e) => onFieldChange('loan_amount', parseFloat(e.target.value) || null)}
+                placeholder="Montant en euros"
+              />
+              {errors.loan_amount && (
+                <div className="text-sm text-red-600">{errors.loan_amount}</div>
+              )}
+            </div>
+          </>
+        )}
 
         <CessionFormFields 
           formData={formData}
@@ -52,3 +93,4 @@ export const CessionBasicInfoSection = ({
     </>
   );
 };
+

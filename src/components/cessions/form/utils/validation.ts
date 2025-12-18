@@ -7,9 +7,21 @@ export const validateCessionForm = (formData: CessionFormData): { errors: Cessio
 
   const newErrors: CessionFormErrors = {};
 
-  if (!formData.repair_order_id) {
-    console.log('Missing repair_order_id');
-    newErrors.repair_order_id = 'L\'ordre de réparation est obligatoire';
+  // Validation based on cession type
+  if (formData.cession_type === 'repair') {
+    if (!formData.repair_order_id) {
+      console.log('Missing repair_order_id');
+      newErrors.repair_order_id = 'L\'ordre de réparation est obligatoire';
+    }
+  } else if (formData.cession_type === 'fleet_loan') {
+    if (!formData.fleet_reservation_id) {
+      console.log('Missing fleet_reservation_id');
+      newErrors.fleet_reservation_id = 'Le prêt de véhicule est obligatoire';
+    }
+    if (!formData.loan_amount || formData.loan_amount <= 0) {
+      console.log('Missing or invalid loan_amount');
+      newErrors.loan_amount = 'Le montant du prêt est obligatoire';
+    }
   }
 
   if (!formData.bank_account_id) {
@@ -32,14 +44,17 @@ export const validateCessionForm = (formData: CessionFormData): { errors: Cessio
     newErrors.policy_number = 'Le numéro de police est obligatoire';
   }
 
-  if (!formData.report_number.trim()) {
-    console.log('Missing report_number');
-    newErrors.report_number = 'Le numéro de rapport est obligatoire';
-  }
+  // report_number et expert_name optionnels pour les prêts
+  if (formData.cession_type === 'repair') {
+    if (!formData.report_number.trim()) {
+      console.log('Missing report_number');
+      newErrors.report_number = 'Le numéro de rapport est obligatoire';
+    }
 
-  if (!formData.expert_name.trim()) {
-    console.log('Missing expert_name');
-    newErrors.expert_name = 'Le nom de l\'expert est obligatoire';
+    if (!formData.expert_name.trim()) {
+      console.log('Missing expert_name');
+      newErrors.expert_name = 'Le nom de l\'expert est obligatoire';
+    }
   }
 
   if (!formData.insurance_company_id) {
