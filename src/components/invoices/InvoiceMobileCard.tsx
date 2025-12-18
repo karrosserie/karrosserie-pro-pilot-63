@@ -1,4 +1,5 @@
 import React from 'react';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Eye, Pencil, Send, Download, Printer, Mail, CreditCard, FileX, Calendar, User, Car, Euro, Trash } from 'lucide-react';
@@ -87,10 +88,7 @@ const InvoiceMobileCard: React.FC<InvoiceMobileCardProps> = ({
         <div className="flex items-center text-sm">
           <User className="h-4 w-4 mr-2 text-gray-400" />
           <span>
-            {invoice.clients 
-              ? `${invoice.clients.first_name} ${invoice.clients.last_name}`
-              : '-'
-            }
+            {invoice.clients ? getClientDisplayName(invoice.clients) : '-'}
           </span>
         </div>
         

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 import {
   Dialog,
   DialogContent,
@@ -55,7 +56,7 @@ const RelanceModal = ({ invoice, open, onOpenChange, onRelance }: RelanceModalPr
         <DialogHeader>
           <DialogTitle>Envoyer une relance</DialogTitle>
           <DialogDescription>
-            Facture {invoice.reference} - {invoice.clients && `${invoice.clients.first_name} ${invoice.clients.last_name}`}
+            Facture {invoice.reference} - {invoice.clients && getClientDisplayName(invoice.clients)}
           </DialogDescription>
         </DialogHeader>
         
