@@ -29,19 +29,22 @@ export const validateCessionForm = (formData: CessionFormData): { errors: Cessio
     newErrors.bank_account_id = 'Le compte bancaire est obligatoire';
   }
 
-  if (!formData.incident_number.trim()) {
-    console.log('Missing incident_number');
-    newErrors.incident_number = 'Le numéro de sinistre est obligatoire';
-  }
+  // Champs sinistre/police - obligatoires uniquement pour les réparations
+  if (formData.cession_type === 'repair') {
+    if (!formData.incident_number.trim()) {
+      console.log('Missing incident_number');
+      newErrors.incident_number = 'Le numéro de sinistre est obligatoire';
+    }
 
-  if (!formData.incident_date) {
-    console.log('Missing incident_date');
-    newErrors.incident_date = 'La date du sinistre est obligatoire';
-  }
+    if (!formData.incident_date) {
+      console.log('Missing incident_date');
+      newErrors.incident_date = 'La date du sinistre est obligatoire';
+    }
 
-  if (!formData.policy_number.trim()) {
-    console.log('Missing policy_number');
-    newErrors.policy_number = 'Le numéro de police est obligatoire';
+    if (!formData.policy_number.trim()) {
+      console.log('Missing policy_number');
+      newErrors.policy_number = 'Le numéro de police est obligatoire';
+    }
   }
 
   // report_number et expert_name optionnels pour les prêts
