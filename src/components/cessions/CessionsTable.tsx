@@ -806,7 +806,7 @@ export const CessionsTable = ({
                     {format(new Date(cession.created_at), 'dd/MM/yyyy', { locale: fr })}
                   </TableCell>
                   <TableCell>
-                    {formatRepairOrderDisplay(cession)}
+                    {formatCessionSourceDisplay(cession)}
                   </TableCell>
                   <TableCell>
                     {cession.insurance_companies ? 
