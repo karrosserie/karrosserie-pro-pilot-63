@@ -18,10 +18,6 @@ export const validateCessionForm = (formData: CessionFormData): { errors: Cessio
       console.log('Missing fleet_reservation_id');
       newErrors.fleet_reservation_id = 'Le prêt de véhicule est obligatoire';
     }
-    if (!formData.loan_amount || formData.loan_amount <= 0) {
-      console.log('Missing or invalid loan_amount');
-      newErrors.loan_amount = 'Le montant du prêt est obligatoire';
-    }
   }
 
   if (!formData.bank_account_id) {
