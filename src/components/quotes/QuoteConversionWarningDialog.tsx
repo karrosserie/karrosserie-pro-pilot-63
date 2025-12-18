@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Quote } from '@/services/supabase/quotes';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 interface QuoteConversionWarningDialogProps {
   open: boolean;
@@ -82,9 +83,9 @@ export function QuoteConversionWarningDialog({
                       Devis n°{quote.reference}
                     </div>
                     <div className="text-sm text-muted-foreground mt-1">
-                      {quote.clients && (
+                    {quote.clients && (
                         <div>
-                          Client : {quote.clients.first_name} {quote.clients.last_name}
+                          Client : {getClientDisplayName(quote.clients)}
                         </div>
                       )}
                       {quote.vehicles && (
