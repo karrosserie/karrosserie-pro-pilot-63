@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
+import { useCredits } from '@/hooks/use-credits';
 import { formatAmount } from '@/utils/invoiceCalculations';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -11,17 +12,38 @@ interface InvoicePaymentsTableProps {
 
 const InvoicePaymentsTable = ({ invoiceId, invoiceTotal }: InvoicePaymentsTableProps) => {
   const { receipts } = useReceiptsData();
+  const { credits } = useCredits();
   
-  // Filtrer et trier les encaissements pour cette facture par date croissante
-  const invoicePayments = receipts?.filter(receipt => receipt.invoice_id === invoiceId)
-    .sort((a, b) => new Date(a.created_at || '').getTime() - new Date(b.created_at || '').getTime()) || [];
+  // Fusionner et trier les paiements (receipts + avoirs)
+  const allPayments = useMemo(() => {
+    const receiptPayments = (receipts?.filter(r => r.invoice_id === invoiceId) || [])
+      .map(r => ({
+        id: r.id,
+        date: r.created_at,
+        payment_method: r.payment_method || '-',
+        amount: r.amount || 0,
+        type: 'receipt' as const
+      }));
+    
+    const creditPayments = (credits?.filter(c => c.invoice_id === invoiceId) || [])
+      .map(c => ({
+        id: c.id,
+        date: c.created_at,
+        payment_method: `Avoir ${c.reference}${c.is_franchise_credit ? ' (Franchise)' : ''}`,
+        amount: c.amount || 0,
+        type: 'credit' as const
+      }));
+    
+    return [...receiptPayments, ...creditPayments]
+      .sort((a, b) => new Date(a.date || '').getTime() - new Date(b.date || '').getTime());
+  }, [receipts, credits, invoiceId]);
   
   // Calculer le total encaissé et le solde restant
-  const totalPaid = invoicePayments.reduce((total, payment) => total + (payment.amount || 0), 0);
-  const remainingBalance = invoiceTotal - totalPaid;
+  const totalPaid = allPayments.reduce((total, payment) => total + payment.amount, 0);
+  const remainingBalance = Math.max(0, invoiceTotal - totalPaid);
   
-  // Ne pas afficher le tableau s'il n'y a pas d'encaissements
-  if (invoicePayments.length === 0) {
+  // Ne pas afficher le tableau s'il n'y a pas de paiements
+  if (allPayments.length === 0) {
     return null;
   }
 
@@ -37,14 +59,16 @@ const InvoicePaymentsTable = ({ invoiceId, invoiceTotal }: InvoicePaymentsTableP
           </tr>
         </thead>
         <tbody>
-          {invoicePayments.map((payment, index) => (
+          {allPayments.map((payment) => (
             <tr key={payment.id} className="bg-transparent">
               <td className="p-3 text-sm">
-                {payment.created_at ? format(new Date(payment.created_at), 'dd/MM/yyyy', { locale: fr }) : '-'}
+                {payment.date ? format(new Date(payment.date), 'dd/MM/yyyy', { locale: fr }) : '-'}
               </td>
-              <td className="p-3 text-sm">{payment.payment_method || '-'}</td>
-              <td className="p-3 text-sm text-right font-medium">
-                {formatAmount(payment.amount || 0)}
+              <td className={`p-3 text-sm ${payment.type === 'credit' ? 'text-green-600 font-medium' : ''}`}>
+                {payment.payment_method}
+              </td>
+              <td className={`p-3 text-sm text-right font-medium ${payment.type === 'credit' ? 'text-green-600' : ''}`}>
+                {formatAmount(payment.amount)}
               </td>
             </tr>
           ))}

@@ -248,7 +248,7 @@ export const generateQuotePDFBlob = async (quote: Quote, companyData: any) => {
     const doc = InvoicePDF({ 
       invoice: data.quote as any,
       companyData: data.companyData, 
-      receipts: [],
+      payments: [],
       clientData: data.clientData,
       vehicleData: data.vehicleData,
       template: data.template
@@ -270,7 +270,7 @@ export const generateQuotePDFWithTemplate = async (quote: Quote, companyData: an
     const doc = InvoicePDF({ 
       invoice: data.quote as any, // Cast to invoice type since they have compatible structures
       companyData: data.companyData, 
-      receipts: [],
+      payments: [],
       clientData: data.clientData,
       vehicleData: data.vehicleData,
       template: data.template || 'default',
@@ -308,7 +308,7 @@ export const printQuotePDFWithTemplate = async (quote: Quote, companyData: any) 
     const doc = InvoicePDF({ 
       invoice: data.quote as any, // Cast to invoice type since they have compatible structures
       companyData: data.companyData, 
-      receipts: [],
+      payments: [],
       clientData: data.clientData,
       vehicleData: data.vehicleData,
       template: data.template || 'default',

@@ -5,8 +5,16 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { pdfStyles } from './styles';
 
+interface Payment {
+  id: string;
+  date?: string;
+  payment_method?: string;
+  amount?: number;
+  type?: 'receipt' | 'credit';
+}
+
 interface InvoicePDFPaymentsTableProps {
-  payments: any[];
+  payments: Payment[];
   totalPaidAmount: number;
   remainingAmount: number;
 }
@@ -23,13 +31,23 @@ const InvoicePDFPaymentsTable = ({ payments, totalPaidAmount, remainingAmount }:
         <Text style={[pdfStyles.tableHeaderText, { flex: 1, textAlign: 'right' }]}>Montant</Text>
       </View>
       
-      {payments.map((payment, index) => (
+      {payments.map((payment) => (
         <View key={payment.id} style={pdfStyles.tableRow}>
           <Text style={[pdfStyles.tableCell, { flex: 2 }]}>
-            {payment.created_at ? format(new Date(payment.created_at), 'dd/MM/yyyy', { locale: fr }) : '-'}
+            {payment.date ? format(new Date(payment.date), 'dd/MM/yyyy', { locale: fr }) : '-'}
           </Text>
-          <Text style={[pdfStyles.tableCell, { flex: 2 }]}>{payment.payment_method_name || payment.payment_method || '-'}</Text>
-          <Text style={[pdfStyles.tableCellRight, { flex: 1, fontWeight: 'bold' }]}>
+          <Text style={[
+            pdfStyles.tableCell, 
+            { flex: 2 },
+            payment.type === 'credit' ? { color: '#16a34a', fontWeight: 'bold' } : {}
+          ]}>
+            {payment.payment_method || '-'}
+          </Text>
+          <Text style={[
+            pdfStyles.tableCellRight, 
+            { flex: 1, fontWeight: 'bold' },
+            payment.type === 'credit' ? { color: '#16a34a' } : {}
+          ]}>
             {formatAmount(payment.amount || 0)}
           </Text>
         </View>

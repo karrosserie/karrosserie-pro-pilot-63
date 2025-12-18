@@ -212,7 +212,7 @@ export const generateCreditPDFWithTemplate = async (credit: any, companyData: an
     const doc = InvoicePDF({ 
       invoice: invoiceData, 
       companyData: data.companyData, 
-      receipts: [],
+      payments: [],
       clientData: data.clientData,
       vehicleData: data.vehicleData,
       template: data.template,
@@ -261,7 +261,7 @@ export const printCreditPDFWithTemplate = async (credit: any, companyData: any) 
     const doc = InvoicePDF({ 
       invoice: invoiceData, 
       companyData: data.companyData, 
-      receipts: [],
+      payments: [],
       clientData: data.clientData,
       vehicleData: data.vehicleData,
       template: data.template,

@@ -93,7 +93,7 @@ ${companyInfo?.name || 'L\'équipe'}`;
       const doc = InvoicePDF({ 
         invoice, 
         companyData: data.companyData, 
-        receipts: [],
+        payments: [],
         clientData: pdfData,
         vehicleData: null,
         template: data.template

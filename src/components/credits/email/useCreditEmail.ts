@@ -94,7 +94,7 @@ AUTO PAINT`;
       const doc = InvoicePDF({ 
         invoice: invoiceData, 
         companyData: data.companyData, 
-        receipts: [],
+        payments: [],
         clientData: data.clientData,
         vehicleData: data.vehicleData,
         template: data.template,

@@ -259,7 +259,7 @@ export const generateRepairOrderPDFBlob = async (repairOrder: RepairOrder, compa
     const doc = InvoicePDF({ 
       invoice: invoiceData, 
       companyData: data.companyData, 
-      receipts: [],
+      payments: [],
       clientData: data.clientData,
       vehicleData: data.vehicleData,
       signatureData: data.signatureData,
@@ -297,7 +297,7 @@ export const generateRepairOrderPDFWithTemplate = async (repairOrder: RepairOrde
     const doc = InvoicePDF({ 
       invoice: invoiceData, 
       companyData: data.companyData, 
-      receipts: [],
+      payments: [],
       clientData: data.clientData,
       vehicleData: data.vehicleData,
       signatureData: data.signatureData,
@@ -348,7 +348,7 @@ export const printRepairOrderPDFWithTemplate = async (repairOrder: RepairOrder, 
     const doc = InvoicePDF({ 
       invoice: invoiceData, 
       companyData: data.companyData, 
-      receipts: [],
+      payments: [],
       clientData: data.clientData,
       vehicleData: data.vehicleData,
       signatureData: data.signatureData,
