@@ -4,8 +4,8 @@ import { NewReceipt, UpdateReceipt } from './types';
 import { invoicesService } from '../invoices';
 import { getCurrentUserCompanyId } from '../auth-company';
 
-// Helper function to calculate and update invoice status based on receipts
-const updateInvoiceStatus = async (invoiceId: string) => {
+// Helper function to calculate and update invoice status based on receipts AND credits
+export const updateInvoiceStatus = async (invoiceId: string) => {
   // Get invoice details
   const { data: invoice, error: invoiceError } = await supabase
     .from('invoices')
@@ -29,15 +29,28 @@ const updateInvoiceStatus = async (invoiceId: string) => {
     return;
   }
 
-  // Calculate total receipts amount
+  // Get all credits (avoirs) for this invoice
+  const { data: credits, error: creditsError } = await supabase
+    .from('credits')
+    .select('amount')
+    .eq('invoice_id', invoiceId);
+    
+  if (creditsError) {
+    console.error('Error fetching credits:', creditsError);
+    return;
+  }
+
+  // Calculate total amounts (receipts + credits)
   const totalReceiptsAmount = receipts?.reduce((sum, receipt) => sum + (receipt.amount || 0), 0) || 0;
+  const totalCreditsAmount = credits?.reduce((sum, credit) => sum + (credit.amount || 0), 0) || 0;
+  const totalPaidAmount = totalReceiptsAmount + totalCreditsAmount;
   const invoiceAmount = invoice.amount || 0;
 
   // Determine new status
   let newStatus: string;
-  if (totalReceiptsAmount === 0) {
+  if (totalPaidAmount === 0) {
     newStatus = 'En attente de paiement';
-  } else if (totalReceiptsAmount >= invoiceAmount) {
+  } else if (totalPaidAmount >= invoiceAmount) {
     newStatus = 'Payée';
   } else {
     newStatus = 'Paiement partiel';

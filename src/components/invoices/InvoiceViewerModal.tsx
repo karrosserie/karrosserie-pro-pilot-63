@@ -169,7 +169,7 @@ const InvoiceViewerModal = ({
     const paid = receiptsData.reduce((sum, receipt) => sum + receipt.amount, 0);
     // Calculer le total des avoirs liés à cette facture
     const creditsTotal = creditsData.reduce((sum, credit) => sum + (credit.amount || 0), 0);
-    const remaining = invoice.amount - paid - creditsTotal;
+    const remaining = Math.max(0, invoice.amount - paid - creditsTotal);
     return {
       totalsData: totalsFormatted,
       totalPaidAmount: paid,
