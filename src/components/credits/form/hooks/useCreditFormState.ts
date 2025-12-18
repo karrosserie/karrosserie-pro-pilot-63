@@ -10,7 +10,18 @@ export const useCreditFormState = () => {
     notes: ''
   });
 
-  const [items, setItems] = useState<CreditItem[]>([]);
+  const [items, setItems] = useState<CreditItem[]>([
+    {
+      id: Date.now().toString(),
+      description: '',
+      quantity: 1,
+      unit_price: 0,
+      discount: 0,
+      vat: 20,
+      total: 0,
+      total_ttc: 0
+    }
+  ]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Auto-générer la référence au chargement
