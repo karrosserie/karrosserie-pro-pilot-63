@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNotification } from '@/hooks/use-notification';
 import PersonalInfoTab from './form/PersonalInfoTab';
@@ -39,6 +39,27 @@ const ClientForm: React.FC<ClientFormProps> = ({
     kbisUrl: defaultValues?.kbisUrl || '',
     autoRelancesDisabled: defaultValues?.autoRelancesDisabled ?? false
   });
+
+  // Resynchroniser le state quand le client change
+  useEffect(() => {
+    setFormData({
+      clientType: defaultValues?.clientType || 'particulier',
+      firstName: defaultValues?.firstName || '',
+      lastName: defaultValues?.lastName || '',
+      email: defaultValues?.email || '',
+      phone: defaultValues?.phone || '',
+      address: defaultValues?.address || '',
+      city: defaultValues?.city || '',
+      zipCode: defaultValues?.zipCode || '',
+      company: defaultValues?.company || '',
+      companyName: defaultValues?.companyName || '',
+      driverLicenseFrontUrl: defaultValues?.driverLicenseFrontUrl || '',
+      driverLicenseBackUrl: defaultValues?.driverLicenseBackUrl || '',
+      managerIdUrl: defaultValues?.managerIdUrl || '',
+      kbisUrl: defaultValues?.kbisUrl || '',
+      autoRelancesDisabled: defaultValues?.autoRelancesDisabled ?? false
+    });
+  }, [defaultValues?.id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
