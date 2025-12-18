@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { pdf } from '@react-pdf/renderer';
 import InvoicePDF from '@/components/invoices/InvoicePDF';
 import { prepareRepairOrderDataForPDF } from '@/utils/repairOrderPDFGeneration';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 export const useRepairOrderEmail = (repairOrder: SimpleRepairOrder | null, open: boolean) => {
   const { toast } = useToast();
@@ -22,7 +23,7 @@ export const useRepairOrderEmail = (repairOrder: SimpleRepairOrder | null, open:
   useEffect(() => {
     if (open && repairOrder) {
       const clientName = repairOrder.clients 
-        ? `${repairOrder.clients.first_name} ${repairOrder.clients.last_name}`
+        ? getClientDisplayName(repairOrder.clients)
         : '';
       
       const vehicleInfo = repairOrder.vehicles 

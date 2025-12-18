@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Edit, Trash2, Printer, Download, Mail, FileText, DollarSign, Signature, Pencil, ArrowRight, Trash, FileCheck } from 'lucide-react';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 import DefaultRepairOrderPreview from './templates/DefaultRepairOrderPreview';
 import AlternativeRepairOrderPreview from './templates/AlternativeRepairOrderPreview';
 import RepairOrderDialog from './RepairOrderDialog';
@@ -192,7 +193,7 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
 
   // Préparer les données client pour le template
   const clientDataForTemplate = {
-    name: clientData ? `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim() : undefined,
+    name: clientData ? getClientDisplayName(clientData) : undefined,
     address: clientData?.address || undefined,
     city: clientData ? `${clientData.postal_code || ''} ${clientData.city || ''}`.trim() : undefined,
     phone: clientData?.phone || undefined,

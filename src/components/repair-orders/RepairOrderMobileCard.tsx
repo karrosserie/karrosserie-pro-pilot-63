@@ -5,6 +5,7 @@ import { RepairOrder } from '@/services/supabase/repair-orders';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { calculateOrderAmount, formatAmount } from './utils/orderCalculations';
 import { isValidFrenchMobilePhone } from '@/utils/phoneValidation';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 interface RepairOrderMobileCardProps {
   order: RepairOrder;
@@ -52,10 +53,7 @@ const RepairOrderMobileCard: React.FC<RepairOrderMobileCardProps> = ({
         <div className="flex items-center text-sm">
           <User className="h-4 w-4 mr-2 text-gray-400" />
           <span>
-            {order.clients 
-              ? `${order.clients.first_name} ${order.clients.last_name}` 
-              : '-'
-            }
+            {order.clients ? getClientDisplayName(order.clients) : '-'}
           </span>
         </div>
         
