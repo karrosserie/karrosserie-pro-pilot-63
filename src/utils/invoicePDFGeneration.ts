@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { calculateInvoiceTotals } from '@/utils/invoiceCalculations';
 import InvoicePDF from '@/components/invoices/InvoicePDF';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: any) => {
   try {
@@ -124,7 +125,7 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
 
     // Préparer les données client pour le template - exactement comme dans InvoiceViewerModal
     const clientDataForTemplate = {
-      name: clientData ? `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim() : undefined,
+      name: clientData ? getClientDisplayName(clientData) : undefined,
       address: clientData?.address || undefined,
       city: clientData ? `${clientData.postal_code || ''} ${clientData.city || ''}`.trim() : undefined,
       phone: clientData?.phone || undefined,

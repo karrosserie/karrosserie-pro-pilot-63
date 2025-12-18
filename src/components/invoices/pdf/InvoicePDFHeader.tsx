@@ -5,6 +5,7 @@ import { formatAmount } from '@/utils/invoiceCalculations';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { pdfStyles } from './styles';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 interface InvoicePDFHeaderProps {
   invoice: Invoice;
@@ -101,7 +102,7 @@ const InvoicePDFHeader = ({ invoice, companyData, totalPaidAmount, finalTotal }:
         <Text style={pdfStyles.sectionTitle}>Facture pour</Text>
         <View style={pdfStyles.companyInfo}>
           <Text style={pdfStyles.companyName}>
-            {invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client non spécifié'}
+            {invoice.clients ? getClientDisplayName(invoice.clients) : 'Client non spécifié'}
           </Text>
           <Text>{invoice.clients?.address || 'Adresse non renseignée'}</Text>
           <Text>{invoice.clients?.postal_code || ''} {invoice.clients?.city || 'Ville non renseignée'}</Text>

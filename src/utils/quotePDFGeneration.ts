@@ -3,6 +3,7 @@ import { Quote } from '@/services/supabase/quotes';
 import InvoicePDF from '@/components/invoices/InvoicePDF';
 import { supabase } from '@/integrations/supabase/client';
 import { clientsService } from '@/services/supabase/clients';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 export const prepareQuoteDataForPDF = async (quote: Quote, companyData: any) => {
   try {
@@ -39,7 +40,7 @@ export const prepareQuoteDataForPDF = async (quote: Quote, companyData: any) => 
       try {
         const client = await clientsService.getById(quote.client_id);
         clientData = {
-          clientName: `${client.first_name} ${client.last_name}`,
+          clientName: getClientDisplayName(client),
           address: client.address || '',
           postalCode: client.postal_code || '',
           city: client.city || '',

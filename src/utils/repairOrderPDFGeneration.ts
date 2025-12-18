@@ -3,6 +3,7 @@ import { RepairOrder } from '@/services/supabase/repair-orders';
 import InvoicePDF from '@/components/invoices/InvoicePDF';
 import { supabase } from '@/integrations/supabase/client';
 import { clientsService } from '@/services/supabase/clients';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 export const prepareRepairOrderDataForPDF = async (repairOrder: RepairOrder, companyData: any) => {
   try {
@@ -39,7 +40,7 @@ export const prepareRepairOrderDataForPDF = async (repairOrder: RepairOrder, com
       try {
         const client = await clientsService.getById(repairOrder.client_id);
         clientData = {
-          clientName: `${client.first_name} ${client.last_name}`,
+          clientName: getClientDisplayName(client),
           address: client.address || '',
           postalCode: client.postal_code || '',
           city: client.city || '',
