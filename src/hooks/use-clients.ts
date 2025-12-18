@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { clientsService, NewClient, UpdateClient } from '@/services/supabase/clients';
 import { useToast } from '@/hooks/use-toast';
@@ -17,6 +16,11 @@ const transformClientFromDB = (client: any) => {
     driverLicenseFrontUrl: client.driver_license_front_url || '',
     driverLicenseBackUrl: client.driver_license_back_url || '',
     autoRelancesDisabled: client.auto_relances_disabled || false,
+    // Nouveaux champs entreprise
+    clientType: client.client_type || 'particulier',
+    companyName: client.company_name || '',
+    managerIdUrl: client.manager_id_url || '',
+    kbisUrl: client.kbis_url || '',
   };
 };
 
@@ -43,7 +47,6 @@ export function useClients() {
   
   const createClient = useMutation({
     mutationFn: (newClient: any) => {
-      console.log('Creating client with data:', newClient);
       return clientsService.create(newClient);
     },
     onSuccess: (data) => {
@@ -58,7 +61,8 @@ export function useClients() {
         client_id: data?.id,
         client_name: `${data?.first_name} ${data?.last_name}`,
         email: data?.email,
-        phone: data?.phone
+        phone: data?.phone,
+        client_type: data?.client_type
       });
     },
     onError: (error) => {
@@ -73,7 +77,6 @@ export function useClients() {
   
   const updateClient = useMutation({
     mutationFn: ({ id, data }: { id: string, data: any }) => {
-      console.log('Updating client with id and data:', id, data);
       return clientsService.update(id, data);
     },
     onSuccess: (updatedData, { id, data }) => {

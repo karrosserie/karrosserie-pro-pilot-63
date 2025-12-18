@@ -222,13 +222,27 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
   const partsAmount = calculatePartsAmount();
   const taxAmount = calculateTaxAmount();
 
-  const clientName = cession.repair_orders?.clients 
-    ? `${cession.repair_orders.clients.first_name} ${cession.repair_orders.clients.last_name}`
-    : 'Client non assigné';
-
   // Utiliser les données passées en paramètres en priorité, sinon fallback sur cession.repair_orders
   const finalClientData = clientData || cession.repair_orders?.clients;
   const finalVehicleData = vehicleData || cession.repair_orders?.vehicles;
+
+  // Détecter si le client est une entreprise
+  const isEnterprise = finalClientData?.client_type === 'entreprise';
+  
+  // Nom du gérant (utilisé pour les signatures)
+  const managerName = finalClientData 
+    ? `${finalClientData.first_name || ''} ${finalClientData.last_name || ''}`.trim()
+    : '';
+  
+  // Nom à afficher : Raison sociale pour entreprise, nom complet pour particulier
+  const clientName = isEnterprise && finalClientData?.company_name
+    ? finalClientData.company_name
+    : (cession.repair_orders?.clients 
+        ? `${cession.repair_orders.clients.first_name} ${cession.repair_orders.clients.last_name}`
+        : 'Client non assigné');
+  
+  // Nom du signataire : Gérant pour entreprise, client pour particulier
+  const signatoryName = isEnterprise ? managerName : clientName;
 
   return (
     <Document>
@@ -282,7 +296,14 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
         {/* Cedant info */}
         <View style={styles.sectionLarge}>
           <Text>LE CÉDANT</Text>
-          <Text style={styles.boldText}>{clientName.toUpperCase()}</Text>
+          {isEnterprise ? (
+            <>
+              <Text style={styles.boldText}>{clientName.toUpperCase()}</Text>
+              <Text>Représenté par {managerName.toUpperCase()}, Gérant</Text>
+            </>
+          ) : (
+            <Text style={styles.boldText}>{clientName.toUpperCase()}</Text>
+          )}
           {finalClientData?.address && <Text>{finalClientData.address}</Text>}
           {finalClientData?.postal_code && finalClientData?.city && <Text>{finalClientData.postal_code} {finalClientData.city}</Text>}
           {finalClientData?.email && <Text>{finalClientData.email}</Text>}
@@ -381,19 +402,26 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
         <Text style={styles.section}>Madame, Monsieur,</Text>
 
         {/* Main confirmation text */}
-        <Text style={[styles.section, styles.justifyText]}>
-          Je soussigné(e) {clientName.toUpperCase()}, assuré(e) sous le contrat n°{cession.policy_number || ''}, vous confirme avoir cédé ma 
-          créance d'indemnisation à {companyData.name?.toUpperCase() || ''} concernant les réparations de mon véhicule {cession.repair_orders?.vehicles?.car_brands?.name || ''} {cession.repair_orders?.vehicles?.car_models?.name || ''} immatriculé {cession.repair_orders?.vehicles?.license_plate || ''}.
-        </Text>
+        {isEnterprise ? (
+          <Text style={[styles.section, styles.justifyText]}>
+            La société {clientName.toUpperCase()}, représentée par {managerName.toUpperCase()} en qualité de Gérant, assurée sous le contrat n°{cession.policy_number || ''}, confirme avoir cédé sa 
+            créance d'indemnisation à {companyData.name?.toUpperCase() || ''} concernant les réparations du véhicule {cession.repair_orders?.vehicles?.car_brands?.name || ''} {cession.repair_orders?.vehicles?.car_models?.name || ''} immatriculé {cession.repair_orders?.vehicles?.license_plate || ''}.
+          </Text>
+        ) : (
+          <Text style={[styles.section, styles.justifyText]}>
+            Je soussigné(e) {clientName.toUpperCase()}, assuré(e) sous le contrat n°{cession.policy_number || ''}, vous confirme avoir cédé ma 
+            créance d'indemnisation à {companyData.name?.toUpperCase() || ''} concernant les réparations de mon véhicule {cession.repair_orders?.vehicles?.car_brands?.name || ''} {cession.repair_orders?.vehicles?.car_models?.name || ''} immatriculé {cession.repair_orders?.vehicles?.license_plate || ''}.
+          </Text>
+        )}
 
         {/* Legal reference */}
         <Text style={[styles.section, styles.justifyText]}>
-          En application de l'article L.121-13 du Code des assurances, je vous demande expressément de verser 
+          En application de l'article L.121-13 du Code des assurances, {isEnterprise ? 'nous vous demandons' : 'je vous demande'} expressément de verser 
           l'indemnité directement au réparateur.
         </Text>
 
         <Text style={[styles.textLarge, styles.justifyText]}>
-          Veuillez agréer, Madame, Monsieur, l'expression de mes salutations distinguées.
+          Veuillez agréer, Madame, Monsieur, l'expression de {isEnterprise ? 'nos' : 'mes'} salutations distinguées.
         </Text>
 
         {/* Date and place */}
@@ -401,7 +429,14 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
 
         {/* Signature section */}
         <View style={styles.sectionLarge}>
-          <Text style={styles.boldText}>{clientName.toUpperCase()}</Text>
+          {isEnterprise ? (
+            <>
+              <Text style={styles.boldText}>{clientName.toUpperCase()}</Text>
+              <Text>Représenté par {managerName.toUpperCase()}, Gérant</Text>
+            </>
+          ) : (
+            <Text style={styles.boldText}>{clientName.toUpperCase()}</Text>
+          )}
           <Text>[Signature2/]</Text>
         </View>
       </Page>
@@ -424,7 +459,14 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
         {/* Le Cédant */}
         <View style={styles.section}>
           <Text style={styles.text}>LE CÉDANT</Text>
-          <Text style={styles.boldText}>{clientName.toUpperCase()}</Text>
+          {isEnterprise ? (
+            <>
+              <Text style={styles.boldText}>{clientName.toUpperCase()}</Text>
+              <Text>Représenté par {managerName.toUpperCase()}, Gérant</Text>
+            </>
+          ) : (
+            <Text style={styles.boldText}>{clientName.toUpperCase()}</Text>
+          )}
           {finalClientData?.address && <Text>{finalClientData.address}</Text>}
           {finalClientData?.postal_code && finalClientData?.city && <Text>{finalClientData.postal_code} {finalClientData.city}</Text>}
           {finalClientData?.email && <Text>{finalClientData.email}</Text>}
@@ -691,8 +733,33 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
 
       {/* Documents annexes */}
       
-      {/* Permis de conduire recto */}
-      {finalClientData?.driver_license_front_url && (
+      {/* Documents entreprise : CNI du Gérant et Kbis */}
+      {isEnterprise && finalClientData?.manager_id_url && (
+        <Page size="A4" style={styles.page} break>
+          <View style={styles.imageSection}>
+            <Text style={styles.imageTitle}>CNI DU GÉRANT</Text>
+            <Image 
+              style={styles.documentImage} 
+              src={finalClientData.manager_id_url} 
+            />
+          </View>
+        </Page>
+      )}
+
+      {isEnterprise && finalClientData?.kbis_url && (
+        <Page size="A4" style={styles.page} break>
+          <View style={styles.imageSection}>
+            <Text style={styles.imageTitle}>EXTRAIT KBIS</Text>
+            <Image 
+              style={styles.documentImage} 
+              src={finalClientData.kbis_url} 
+            />
+          </View>
+        </Page>
+      )}
+
+      {/* Documents particulier : Permis de conduire */}
+      {!isEnterprise && finalClientData?.driver_license_front_url && (
         <Page size="A4" style={styles.page} break>
           <View style={styles.imageSection}>
             <Text style={styles.imageTitle}>PERMIS DE CONDUIRE - RECTO</Text>
@@ -704,8 +771,7 @@ export const CessionPDF = ({ cession, companyData, selectedInsuranceCompany, cli
         </Page>
       )}
 
-      {/* Permis de conduire verso */}
-      {finalClientData?.driver_license_back_url && (
+      {!isEnterprise && finalClientData?.driver_license_back_url && (
         <Page size="A4" style={styles.page} break>
           <View style={styles.imageSection}>
             <Text style={styles.imageTitle}>PERMIS DE CONDUIRE - VERSO</Text>
