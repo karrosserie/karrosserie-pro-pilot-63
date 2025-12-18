@@ -16,6 +16,7 @@ import AlternativeCreditPreview from './templates/AlternativeCreditPreview';
 import { EditCreditDialog } from './EditCreditDialog';
 import { CreditEmailDialog } from './email/CreditEmailDialog';
 import { generateCreditPDFWithTemplate, printCreditPDFWithTemplate } from '@/utils/creditPDFGeneration';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 interface CreditViewerModalProps {
   credit: Credit | null;
@@ -122,7 +123,7 @@ const CreditViewerModal = ({ credit, open, onOpenChange }: CreditViewerModalProp
 
   // Préparer les données client pour le template
   const clientDataForTemplate = {
-    name: clientData ? `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim() : undefined,
+    name: clientData ? getClientDisplayName(clientData) : undefined,
     address: clientData?.address || undefined,
     city: clientData ? `${clientData.postal_code || ''} ${clientData.city || ''}`.trim() : undefined,
     phone: clientData?.phone || undefined,
