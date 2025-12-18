@@ -40,7 +40,10 @@ export const CreditBasicInfoSection = ({
   const handleFranchiseSwitchChange = (checked: boolean) => {
     if (readOnly) return;
     setIsFranchiseCredit(checked);
-    if (!checked) {
+    if (checked) {
+      // Franchise offerte = avoir automatiquement payé
+      onFieldChange('status', 'Payé');
+    } else {
       // Si on désactive le switch, on remet le statut par défaut
       onFieldChange('status', 'En attente');
     }
