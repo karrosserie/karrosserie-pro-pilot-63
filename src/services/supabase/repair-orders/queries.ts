@@ -14,7 +14,9 @@ export const getRepairOrders = async (): Promise<RepairOrder[]> => {
         last_name,
         email,
         phone,
-        oodrive_recipient_id
+        oodrive_recipient_id,
+        client_type,
+        company_name
       ),
       vehicles(
         id,
@@ -60,7 +62,9 @@ export const getRepairOrderById = async (id: string): Promise<RepairOrder> => {
         city,
         postal_code,
         driver_license_front_url,
-        driver_license_back_url
+        driver_license_back_url,
+        client_type,
+        company_name
       ),
       vehicles(
         id,

@@ -53,7 +53,7 @@ export const quotesService = {
     if (clientIds.length > 0) {
       const { data: clients, error: clientsError } = await supabase
         .from('clients')
-        .select('id, first_name, last_name')
+        .select('id, first_name, last_name, client_type, company_name')
         .in('id', clientIds);
       
       if (!clientsError) {
@@ -102,7 +102,7 @@ export const quotesService = {
     if (quote.client_id) {
       const { data: client } = await supabase
         .from('clients')
-        .select('id, first_name, last_name')
+        .select('id, first_name, last_name, client_type, company_name')
         .eq('id', quote.client_id)
         .single();
       clientData = client;
@@ -468,7 +468,7 @@ export const quotesService = {
     if (clientIds.length > 0) {
       const { data: clients } = await supabase
         .from('clients')
-        .select('id, first_name, last_name')
+        .select('id, first_name, last_name, client_type, company_name')
         .in('id', clientIds);
       
       if (clients) {
