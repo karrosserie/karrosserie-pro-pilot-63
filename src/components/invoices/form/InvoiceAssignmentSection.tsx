@@ -9,6 +9,7 @@ import { Invoice } from '@/services/supabase/invoices';
 import { Client } from '@/services/supabase/clients';
 import { useVehicles } from '@/hooks/use-vehicles';
 import { cn } from '@/lib/utils';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 interface InvoiceAssignmentSectionProps {
   formData: Partial<Invoice>;
@@ -64,7 +65,7 @@ const InvoiceAssignmentSectionComponent = ({
   const clientSelectOptions = useMemo(() => 
     (clientOptions || []).map(client => ({
       value: client.id,
-      label: `${client.first_name} ${client.last_name}`
+      label: getClientDisplayName(client)
     })),
     [clientOptions]
   );
