@@ -20,6 +20,8 @@ export interface Credit {
     id: string;
     first_name: string;
     last_name: string;
+    client_type?: string;
+    company_name?: string;
   } | null;
   vehicles?: {
     id: string;

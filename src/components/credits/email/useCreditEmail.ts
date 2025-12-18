@@ -6,6 +6,7 @@ import { prepareCreditDataForPDF } from '@/utils/creditPDFGeneration';
 import { pdf } from '@react-pdf/renderer';
 import InvoicePDF from '@/components/invoices/InvoicePDF';
 import { supabase } from '@/integrations/supabase/client';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 export const useCreditEmail = (credit: any | null) => {
   const { toast } = useToast();
@@ -19,7 +20,7 @@ export const useCreditEmail = (credit: any | null) => {
     // Récupérer les informations client depuis l'avoir
     if (credit?.clients) {
       clientEmail = credit.clients.email || '';
-      clientName = `${credit.clients.first_name || ''} ${credit.clients.last_name || ''}`.trim();
+      clientName = getClientDisplayName(credit.clients);
     }
 
     // Récupérer les informations du véhicule via la facture associée
