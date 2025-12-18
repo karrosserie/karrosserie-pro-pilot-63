@@ -6,6 +6,7 @@ import InsuranceRepresentationConsentStep from "./InsuranceRepresentationConsent
 import DocumentSkipInfoStep from "./DocumentSkipInfoStep";
 
 const ALL_DOCUMENT_STEPS = [
+  // Documents particuliers (permis de conduire)
   {
     title: "Permis de conduire (recto)",
     description: "Veuillez photographier le recto de votre permis de conduire",
@@ -18,6 +19,26 @@ const ALL_DOCUMENT_STEPS = [
     documentType: "driver-license",
     key: "driver_license_back"
   },
+  // Documents entreprise (CNI gérant + Kbis)
+  {
+    title: "CNI du gérant (recto)",
+    description: "Veuillez photographier le recto de la carte d'identité du gérant",
+    documentType: "driver-license",
+    key: "manager_id_front"
+  },
+  {
+    title: "CNI du gérant (verso)",
+    description: "Veuillez photographier le verso de la carte d'identité du gérant",
+    documentType: "driver-license",
+    key: "manager_id_back"
+  },
+  {
+    title: "Extrait Kbis",
+    description: "Veuillez photographier votre extrait Kbis (moins de 3 mois)",
+    documentType: "driver-license",
+    key: "kbis"
+  },
+  // Documents véhicule
   {
     title: "Carte grise (recto)",
     description: "Veuillez photographier le recto de votre carte grise",
