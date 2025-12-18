@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo, memo, useRef } from 'react';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
@@ -132,7 +133,7 @@ const InvoiceViewerModal = ({
   }), [invoice, vehicleData]);
 
   const clientDataForTemplate = useMemo(() => ({
-    name: clientData ? `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim() : undefined,
+    name: clientData ? getClientDisplayName(clientData) : undefined,
     address: clientData?.address || undefined,
     city: clientData ? `${clientData.postal_code || ''} ${clientData.city || ''}`.trim() : undefined,
     phone: clientData?.phone || undefined,
