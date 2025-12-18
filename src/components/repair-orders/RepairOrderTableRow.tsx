@@ -7,6 +7,7 @@ import { RepairOrder } from '@/services/supabase/repair-orders';
 import { RepairOrderActionsDropdown } from './RepairOrderActionsDropdown';
 import { calculateOrderAmount, formatAmount } from './utils/orderCalculations';
 import { isValidFrenchMobilePhone } from '@/utils/phoneValidation';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 interface RepairOrderTableRowProps {
   order: RepairOrder;
@@ -71,10 +72,7 @@ export const RepairOrderTableRow = ({ order, onEditOrder, onDeleteOrder, onResto
         <TableCell className="font-medium">{order.reference}</TableCell>
         <TableCell>{formatDate(order.created_at)}</TableCell>
         <TableCell>
-          {order.clients 
-            ? `${order.clients.first_name} ${order.clients.last_name}`
-            : '-'
-          }
+          {order.clients ? getClientDisplayName(order.clients) : '-'}
         </TableCell>
         <TableCell>
           {formatVehicleDisplay(order)}

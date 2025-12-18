@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -16,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { Signature } from 'lucide-react';
 import { userActionWebhookService } from '@/services/tracking/UserActionWebhookService';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 interface RepairOrderSignatureDialogProps {
   open: boolean;
@@ -39,7 +39,7 @@ const RepairOrderSignatureDialog: React.FC<RepairOrderSignatureDialogProps> = ({
 
   React.useEffect(() => {
     if (open && repairOrder?.clients) {
-      setClientName(`${repairOrder.clients.first_name} ${repairOrder.clients.last_name}`);
+      setClientName(getClientDisplayName(repairOrder.clients));
     }
   }, [open, repairOrder]);
 

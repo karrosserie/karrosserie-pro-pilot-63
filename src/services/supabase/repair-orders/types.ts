@@ -9,6 +9,8 @@ export type RepairOrder = Database['public']['Tables']['repair_orders']['Row'] &
     email?: string;
     phone?: string;
     oodrive_recipient_id?: string;
+    client_type?: string;
+    company_name?: string;
   } | null;
   vehicles?: {
     id: string;
