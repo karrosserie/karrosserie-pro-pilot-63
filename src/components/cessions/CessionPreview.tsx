@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useCompany } from '@/hooks/use-company';
 import { useInsuranceCompanies } from '@/hooks/use-insurance-companies';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 interface CessionPreviewProps {
   cession: Cession | null;
@@ -159,7 +160,7 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
   const taxAmount = calculateTaxAmount();
 
   const clientName = cession.repair_orders?.clients 
-    ? `${cession.repair_orders.clients.first_name} ${cession.repair_orders.clients.last_name}`
+    ? getClientDisplayName(cession.repair_orders.clients)
     : 'Client non assigné';
 
   const vehicleInfo = cession.repair_orders?.vehicles 

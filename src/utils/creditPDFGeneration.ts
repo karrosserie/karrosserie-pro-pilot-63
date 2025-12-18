@@ -1,6 +1,7 @@
 import { pdf } from '@react-pdf/renderer';
 import { supabase } from '@/integrations/supabase/client';
 import InvoicePDF from '@/components/invoices/InvoicePDF';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 export const prepareCreditDataForPDF = async (credit: any, companyData: any) => {
   try {
@@ -140,7 +141,7 @@ export const prepareCreditDataForPDF = async (credit: any, companyData: any) => 
       creditData,
       clientData: {
         number: credit.reference,
-        name: clientData ? `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim() : '',
+        name: clientData ? getClientDisplayName(clientData) : '',
         phone: clientData?.phone || '',
         email: clientData?.email || '',
         address: clientData?.address || '',

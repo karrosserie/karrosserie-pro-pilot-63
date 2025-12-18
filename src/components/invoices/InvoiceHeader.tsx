@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { formatAmount } from '@/utils/invoiceCalculations';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 interface InvoiceHeaderProps {
   invoice: Invoice;
@@ -110,7 +111,7 @@ const InvoiceHeader = ({ invoice, companyData, finalTotal }: InvoiceHeaderProps)
         <div>
           <h3 className="text-lg font-semibold mb-4 text-gray-800">Facture pour</h3>
           <div className="text-sm mb-4">
-            <p className="font-medium">{invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client non spécifié'}</p>
+            <p className="font-medium">{invoice.clients ? getClientDisplayName(invoice.clients) : 'Client non spécifié'}</p>
             <p>{invoice.clients?.address || 'Adresse non renseignée'}</p>
             <p>{invoice.clients?.postal_code || ''} {invoice.clients?.city || 'Ville non renseignée'}</p>
             {invoice.clients?.phone && (
