@@ -2,18 +2,37 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Filter, Plus } from 'lucide-react';
+import { Search, ArrowUpDown, Plus } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
+export type ExpenseSortOption = 'alphabetical-asc' | 'alphabetical-desc' | 'recent-first' | 'oldest-first';
+
+const SORT_OPTIONS: { value: ExpenseSortOption; label: string }[] = [
+  { value: 'alphabetical-asc', label: 'Par ordre alphabétique (A → Z)' },
+  { value: 'alphabetical-desc', label: 'Par ordre alphabétique (Z → A)' },
+  { value: 'recent-first', label: 'Plus récents d\'abord' },
+  { value: 'oldest-first', label: 'Plus anciens d\'abord' },
+];
 
 interface ExpensesHeaderProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
   onCreateExpense: () => void;
+  sortOption?: ExpenseSortOption;
+  onSortChange?: (option: ExpenseSortOption) => void;
 }
 
 export const ExpensesHeader = ({ 
   searchTerm, 
   onSearchChange, 
-  onCreateExpense 
+  onCreateExpense,
+  sortOption = 'recent-first',
+  onSortChange
 }: ExpensesHeaderProps) => {
   return (
     <>
@@ -38,9 +57,24 @@ export const ExpensesHeader = ({
             />
           </div>
           
-          <Button variant="outline" size="icon">
-            <Filter className="h-4 w-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <ArrowUpDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              {SORT_OPTIONS.map((option) => (
+                <DropdownMenuItem
+                  key={option.value}
+                  onClick={() => onSortChange?.(option.value)}
+                  className={sortOption === option.value ? 'bg-accent' : ''}
+                >
+                  {option.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
           
           <Button 
             className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"

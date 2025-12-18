@@ -3,6 +3,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
@@ -17,8 +18,6 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from 'react';
 import { ReceiptWithClient } from '@/services/supabase/receipts/types';
-import { useTableSorting } from '@/hooks/use-table-sorting';
-import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 
 interface SimpleReceiptsTableProps {
   receipts: ReceiptWithClient[];
@@ -31,7 +30,6 @@ export const SimpleReceiptsTable = ({
   onEdit,
   onDelete
 }: SimpleReceiptsTableProps) => {
-  const { sortedData, sortConfig, handleSort } = useTableSorting(receipts, 'date');
   const [checkViewUrl, setCheckViewUrl] = useState<string | null>(null);
 
   const getStatusColor = (status: string) => {
@@ -78,7 +76,7 @@ export const SimpleReceiptsTable = ({
            receipt.payment_proofs.length > 0;
   };
 
-  if (sortedData.length === 0) {
+  if (receipts.length === 0) {
     return (
       <EmptyState
         icon={Receipt}
@@ -93,28 +91,16 @@ export const SimpleReceiptsTable = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>
-              Numéro
-            </SortableTableHeader>
-            <SortableTableHeader sortKey="date" sortConfig={sortConfig} onSort={handleSort}>
-              Date
-            </SortableTableHeader>
-            <SortableTableHeader sortKey="invoice" sortConfig={sortConfig} onSort={handleSort}>
-              Facture
-            </SortableTableHeader>
-            <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>
-              Montant
-            </SortableTableHeader>
-            <SortableTableHeader sortKey="payment_method" sortConfig={sortConfig} onSort={handleSort}>
-              Méthode de paiement
-            </SortableTableHeader>
-            <SortableTableHeader sortKey="status" sortConfig={sortConfig} onSort={handleSort}>
-              Statut
-            </SortableTableHeader>
+            <TableHead>Numéro</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Facture</TableHead>
+            <TableHead>Montant</TableHead>
+            <TableHead>Méthode de paiement</TableHead>
+            <TableHead>Statut</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sortedData.map((receipt) => (
+          {receipts.map((receipt) => (
             <React.Fragment key={receipt.id}>
               <TableRow className="border-b-0">
                 <TableCell>{receipt.reference || 'N/A'}</TableCell>
