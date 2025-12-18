@@ -43,8 +43,10 @@ export const updateInvoiceStatus = async (invoiceId: string) => {
   // Calculate total amounts (receipts + credits)
   const totalReceiptsAmount = receipts?.reduce((sum, receipt) => sum + (receipt.amount || 0), 0) || 0;
   const totalCreditsAmount = credits?.reduce((sum, credit) => sum + (credit.amount || 0), 0) || 0;
-  const totalPaidAmount = totalReceiptsAmount + totalCreditsAmount;
-  const invoiceAmount = invoice.amount || 0;
+  
+  // Arrondir à 2 décimales pour éviter les erreurs de précision JavaScript
+  const totalPaidAmount = Math.round((totalReceiptsAmount + totalCreditsAmount) * 100) / 100;
+  const invoiceAmount = Math.round((invoice.amount || 0) * 100) / 100;
 
   // Determine new status
   let newStatus: string;
