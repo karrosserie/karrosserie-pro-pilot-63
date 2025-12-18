@@ -15,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Edit, Trash, Printer, Download, Mail, FileText, Wrench, Eye, Pencil, FileCheck, ArrowRight, ShoppingCart } from 'lucide-react';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 import DefaultQuotePreview from './templates/DefaultQuotePreview';
 import AlternativeQuotePreview from './templates/AlternativeQuotePreview';
 import QuoteDialog from './QuoteDialog';
@@ -221,7 +222,7 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
   };
 
   const clientDataForTemplate = {
-    name: clientData ? `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim() : undefined,
+    name: clientData ? getClientDisplayName(clientData) : undefined,
     address: clientData?.address || undefined,
     city: clientData ? `${clientData.postal_code || ''} ${clientData.city || ''}`.trim() : undefined,
     phone: clientData?.phone || undefined,

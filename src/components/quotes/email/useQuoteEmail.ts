@@ -9,6 +9,7 @@ import { prepareQuoteDataForPDF } from '@/utils/quotePDFGeneration';
 import { pdf } from '@react-pdf/renderer';
 import InvoicePDF from '@/components/invoices/InvoicePDF';
 import { supabase } from '@/integrations/supabase/client';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 export const useQuoteEmail = (quote: Quote | null) => {
   const { toast } = useToast();
@@ -23,7 +24,7 @@ export const useQuoteEmail = (quote: Quote | null) => {
       try {
         const client = await clientsService.getById(quote.client_id);
         clientEmail = client.email || '';
-        clientName = `${client.first_name} ${client.last_name}`;
+        clientName = getClientDisplayName(client);
       } catch (error) {
         console.error('Error fetching client:', error);
       }

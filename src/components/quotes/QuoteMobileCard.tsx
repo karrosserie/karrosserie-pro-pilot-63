@@ -4,6 +4,7 @@ import { Eye, Pencil, Archive, Download, Printer, Mail, FileCheck, ArrowRight, C
 import { Quote } from '@/services/supabase/quotes';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { calculateGlobalTotals } from '@/components/quotes/form/utils/calculations';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 interface QuoteMobileCardProps {
   quote: Quote;
@@ -100,10 +101,7 @@ const QuoteMobileCard: React.FC<QuoteMobileCardProps> = ({
         <div className="flex items-center text-xs sm:text-sm">
           <User className="h-3 w-3 sm:h-4 sm:w-4 mr-2 text-gray-400 flex-shrink-0" />
           <span className="truncate">
-            {quote.clients 
-              ? `${quote.clients.first_name} ${quote.clients.last_name}` 
-              : '-'
-            }
+            {quote.clients ? getClientDisplayName(quote.clients) : '-'}
           </span>
         </div>
         
