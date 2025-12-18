@@ -37,27 +37,6 @@ export const CessionFormFields = ({
 
   return (
     <div className="space-y-4">
-      {/* Montant du prêt - uniquement pour les prêts de véhicule */}
-      {cessionType === 'fleet_loan' && (
-        <div className="space-y-2">
-          <Label htmlFor="loan_amount">
-            Montant du prêt <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            id="loan_amount"
-            type="number"
-            step="0.01"
-            min="0"
-            value={formData.loan_amount || ''}
-            onChange={(e) => onFieldChange('loan_amount', parseFloat(e.target.value) || 0)}
-            placeholder="Montant journalier ou total du prêt en €"
-          />
-          {errors.loan_amount && (
-            <div className="text-sm text-red-600">{errors.loan_amount}</div>
-          )}
-        </div>
-      )}
-
       {/* Numéro de sinistre, Date du sinistre et Numéro de police sur la même ligne */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         {/* Numéro de sinistre */}
