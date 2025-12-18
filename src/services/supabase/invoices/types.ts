@@ -32,6 +32,8 @@ export interface Invoice {
     address?: string;
     postal_code?: string;
     city?: string;
+    client_type?: string;
+    company_name?: string;
   };
   vehicles?: {
     id: string;
