@@ -119,12 +119,12 @@ export const DrivingLicenseUpload: React.FC<DrivingLicenseUploadProps> = ({
   const handleInputFileChange = (e: React.ChangeEvent<HTMLInputElement>, isFront: boolean) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validate file type
-      const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      // Validate file type - now accepts PDFs as well
+      const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
       if (!validTypes.includes(file.type)) {
         toast({
           title: "Type de fichier non supporté",
-          description: "Veuillez sélectionner une image (JPEG, PNG, WebP).",
+          description: "Veuillez sélectionner une image (JPEG, PNG, WebP) ou un PDF.",
           variant: "destructive"
         });
         return;
@@ -278,7 +278,7 @@ export const DrivingLicenseUpload: React.FC<DrivingLicenseUploadProps> = ({
               <Input
                 id={`document-upload-${isFront ? 'front' : 'back'}`}
                 type="file"
-                accept="image/*"
+                accept="image/*,application/pdf"
                 onChange={(e) => handleInputFileChange(e, isFront)}
                 disabled={isUploading || isAnalyzing}
                 className="hidden"
@@ -345,7 +345,7 @@ export const DrivingLicenseUpload: React.FC<DrivingLicenseUploadProps> = ({
       </div>
       
       <p className="text-sm text-muted-foreground">
-        Formats acceptés: JPEG, PNG, WebP (max 10MB)
+        Formats acceptés: JPEG, PNG, WebP, PDF (max 10MB)
       </p>
       
       {(isUploading || isAnalyzing) && (
