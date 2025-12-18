@@ -130,9 +130,9 @@ export const useInvoiceFormLogic = ({ invoice, prefillData }: UseInvoiceFormLogi
       discounts_data: JSON.stringify(discounts),
       report_number: (formData as any).report_number || '',
       policy_number: (formData as any).policy_number || '',
-      report_date: (formData as any).report_date || '',
+      report_date: (formData as any).report_date || null,
       expert_name: (formData as any).expert_name || '',
-      incident_date: (formData as any).incident_date || ''
+      incident_date: (formData as any).incident_date || null
     };
   }, [formData, claimNumber, repairs, parts, discounts, skipVehicle]);
 
