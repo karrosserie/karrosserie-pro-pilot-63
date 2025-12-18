@@ -23,12 +23,15 @@ export const getAllCessions = async (): Promise<Cession[]> => {
   
   console.log('Raw cessions data:', cessions);
   
-  // Enrich each cession with repair order data
+  // Enrich each cession with repair order or fleet reservation data
   const enrichedCessions = await Promise.all(
     (cessions || []).map(async (cession) => {
       let repairOrderData = null;
+      let fleetReservationData = null;
+      const cessionType = (cession as any).cession_type || 'repair';
       
-      if (cession.repair_order_id) {
+      // Fetch repair order data for repair type cessions
+      if (cessionType === 'repair' && cession.repair_order_id) {
         console.log(`Fetching repair order for cession ${cession.id}, repair_order_id: ${cession.repair_order_id}`);
         
         try {
@@ -109,6 +112,43 @@ export const getAllCessions = async (): Promise<Cession[]> => {
         }
       }
       
+      // Fetch fleet reservation data for fleet_loan type cessions
+      if (cessionType === 'fleet_loan' && (cession as any).fleet_reservation_id) {
+        console.log(`Fetching fleet reservation for cession ${cession.id}`);
+        
+        try {
+          const { data: reservation, error: reservationError } = await supabase
+            .from('fleet_reservations')
+            .select(`
+              id,
+              start_date,
+              expected_return_date,
+              actual_return_date,
+              status,
+              insurance_company_name,
+              insurance_contract_number,
+              insurance_email,
+              claim_number,
+              clients(id, first_name, last_name, email, phone, address, city, postal_code, oodrive_recipient_id),
+              fleet_vehicles(id, license_plate, car_brands(name), car_models(name)),
+              quotes(id, amount)
+            `)
+            .eq('id', (cession as any).fleet_reservation_id)
+            .single();
+            
+          if (reservationError) {
+            console.error(`Error fetching fleet reservation:`, reservationError);
+          } else if (reservation) {
+            fleetReservationData = {
+              ...reservation,
+              end_date: reservation.expected_return_date || reservation.actual_return_date
+            };
+          }
+        } catch (error) {
+          console.error(`Error in fleet reservation enrichment:`, error);
+        }
+      }
+      
       // Get bank account data if bank_account_id exists
       let bankAccountData = null;
       if (cession.bank_account_id) {
@@ -126,7 +166,9 @@ export const getAllCessions = async (): Promise<Cession[]> => {
         ...cession,
         reference: cession.reference || '',
         status: cession.status || 'en_attente',
+        cession_type: cessionType,
         repair_orders: repairOrderData,
+        fleet_reservations: fleetReservationData,
         bank_accounts: bankAccountData,
         expertise_date: cessionData.expertise_date ?? null,
         expertise_amount: cessionData.expertise_amount ?? null,

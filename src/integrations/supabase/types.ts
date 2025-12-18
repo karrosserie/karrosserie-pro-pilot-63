@@ -929,14 +929,17 @@ export type Database = {
       cessions: {
         Row: {
           bank_account_id: string | null
+          cession_type: string | null
           company_id: string | null
           created_at: string
           document_url: string | null
           expert_name: string | null
+          fleet_reservation_id: string | null
           id: string
           incident_date: string | null
           incident_number: string | null
           insurance_company_id: string | null
+          loan_amount: number | null
           oodrive_contract_id: string | null
           policy_number: string | null
           reference: string
@@ -948,14 +951,17 @@ export type Database = {
         }
         Insert: {
           bank_account_id?: string | null
+          cession_type?: string | null
           company_id?: string | null
           created_at?: string
           document_url?: string | null
           expert_name?: string | null
+          fleet_reservation_id?: string | null
           id?: string
           incident_date?: string | null
           incident_number?: string | null
           insurance_company_id?: string | null
+          loan_amount?: number | null
           oodrive_contract_id?: string | null
           policy_number?: string | null
           reference?: string
@@ -967,14 +973,17 @@ export type Database = {
         }
         Update: {
           bank_account_id?: string | null
+          cession_type?: string | null
           company_id?: string | null
           created_at?: string
           document_url?: string | null
           expert_name?: string | null
+          fleet_reservation_id?: string | null
           id?: string
           incident_date?: string | null
           incident_number?: string | null
           insurance_company_id?: string | null
+          loan_amount?: number | null
           oodrive_contract_id?: string | null
           policy_number?: string | null
           reference?: string
@@ -985,6 +994,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "cessions_fleet_reservation_id_fkey"
+            columns: ["fleet_reservation_id"]
+            isOneToOne: false
+            referencedRelation: "fleet_reservations"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "cessions_insurance_company_id_fkey"
             columns: ["insurance_company_id"]

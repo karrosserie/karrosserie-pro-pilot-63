@@ -213,7 +213,31 @@ export const CessionsTable = ({
     }
   };
 
-  const formatRepairOrderDisplay = (cession: Cession) => {
+  const formatCessionSourceDisplay = (cession: Cession) => {
+    const cessionType = (cession as any).cession_type || 'repair';
+    
+    if (cessionType === 'fleet_loan') {
+      const reservation = (cession as any).fleet_reservations;
+      if (!reservation) {
+        return 'Prêt de véhicule (données non disponibles)';
+      }
+      
+      const clientName = reservation.clients 
+        ? `${reservation.clients.first_name} ${reservation.clients.last_name}` 
+        : 'Client non assigné';
+      
+      const vehicleInfo = reservation.fleet_vehicles
+        ? `${reservation.fleet_vehicles.car_brands?.name || ''} ${reservation.fleet_vehicles.car_models?.name || ''} - ${reservation.fleet_vehicles.license_plate}`
+        : 'Véhicule non assigné';
+      
+      const amount = (cession as any).loan_amount 
+        ? `${Number((cession as any).loan_amount).toFixed(2)}€` 
+        : '';
+      
+      return `Prêt véhicule - ${clientName} - ${vehicleInfo}${amount ? ` - ${amount}` : ''}`;
+    }
+    
+    // Default: repair type
     if (!cession.repair_orders) {
       return cession.repair_order_id ? `Ordre lié (ID: ${cession.repair_order_id})` : '-';
     }
@@ -231,6 +255,14 @@ export const CessionsTable = ({
       format(new Date(order.created_at), 'dd/MM/yyyy', { locale: fr }) : '';
     
     return `Ordre n°${order.reference} du ${orderDate} - ${clientName} - ${vehicleInfo}`;
+  };
+
+  const getCessionTypeBadge = (cession: Cession) => {
+    const cessionType = (cession as any).cession_type || 'repair';
+    if (cessionType === 'fleet_loan') {
+      return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 mr-2">Prêt</span>;
+    }
+    return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 mr-2">Réparation</span>;
   };
 
   const handleDownloadPDF = async (cession: Cession) => {
@@ -363,13 +395,32 @@ export const CessionsTable = ({
 
   const handleInitializeProcedure = async (cession: Cession) => {
     console.log('Initializing procedure for cession:', cession.id);
+    const cessionType = (cession as any).cession_type || 'repair';
     
-    // Vérifier qu'il y a un repair_order_id
-    if (!cession.repair_order_id) {
+    // Vérifier qu'il y a un repair_order_id ou fleet_reservation_id selon le type
+    if (cessionType === 'repair' && !cession.repair_order_id) {
       toast({
         title: "Erreur",
         description: "Aucun ordre de réparation n'est associé à cette cession.",
         variant: "destructive",
+      });
+      return;
+    }
+    
+    if (cessionType === 'fleet_loan' && !(cession as any).fleet_reservation_id) {
+      toast({
+        title: "Erreur",
+        description: "Aucun prêt de véhicule n'est associé à cette cession.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Pour les cessions fleet_loan, afficher un message temporaire
+    if (cessionType === 'fleet_loan') {
+      toast({
+        title: "Fonctionnalité en développement",
+        description: "La génération de PDF pour les cessions de prêt de véhicule sera bientôt disponible.",
       });
       return;
     }

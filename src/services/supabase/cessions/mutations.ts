@@ -17,12 +17,14 @@ export const createCession = async (cession: NewCession): Promise<Cession> => {
   
   const companyId = await getCurrentUserCompanyId();
   
-  // Only include fields that exist in the new cessions table structure
+  // Only include fields that exist in the cessions table structure
   const processedCession = {
     company_id: companyId,
     reference,
     status: cession.status || 'en_attente',
+    cession_type: cession.cession_type || 'repair',
     repair_order_id: cession.repair_order_id || null,
+    fleet_reservation_id: cession.fleet_reservation_id || null,
     bank_account_id: cession.bank_account_id || null,
     incident_number: cession.incident_number || null,
     incident_date: cession.incident_date || null,
@@ -30,6 +32,7 @@ export const createCession = async (cession: NewCession): Promise<Cession> => {
     report_number: cession.report_number || null,
     expert_name: cession.expert_name || null,
     insurance_company_id: cession.insurance_company_id || null,
+    loan_amount: cession.loan_amount || null,
     document_url: cession.document_url || null,
     oodrive_contract_id: cession.oodrive_contract_id || null
   };
@@ -51,11 +54,13 @@ export const createCession = async (cession: NewCession): Promise<Cession> => {
 };
 
 export const updateCession = async (id: string, cession: UpdateCession): Promise<Cession> => {
-  // Only include fields that exist in the new cessions table structure
+  // Only include fields that exist in the cessions table structure
   const processedCession = {
     reference: cession.reference,
     status: cession.status,
+    cession_type: cession.cession_type,
     repair_order_id: cession.repair_order_id,
+    fleet_reservation_id: cession.fleet_reservation_id,
     bank_account_id: cession.bank_account_id,
     incident_number: cession.incident_number,
     incident_date: cession.incident_date,
@@ -63,6 +68,7 @@ export const updateCession = async (id: string, cession: UpdateCession): Promise
     report_number: cession.report_number,
     expert_name: cession.expert_name,
     insurance_company_id: cession.insurance_company_id,
+    loan_amount: cession.loan_amount,
     document_url: cession.document_url,
     oodrive_contract_id: cession.oodrive_contract_id
   };
