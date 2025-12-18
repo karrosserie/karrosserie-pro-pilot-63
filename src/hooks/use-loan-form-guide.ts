@@ -153,11 +153,24 @@ export const useLoanFormGuide = (
 
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status, action, index, type, lifecycle } = data;
-    const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
-    if (finishedStatuses.includes(status)) {
+    // Cas 1: L'utilisateur clique sur "Passer le guide" - désactiver complètement
+    if (status === STATUS.SKIPPED) {
       setRunTour(false);
       setCurrentStep(0);
+      return;
+    }
+
+    // Cas 2: Tour terminé normalement
+    if (status === STATUS.FINISHED) {
+      setRunTour(false);
+      return;
+    }
+
+    // Cas 3: L'utilisateur clique sur X (close) - fermer temporairement
+    // Ne PAS reset currentStep, le tour reprendra à l'onglet suivant
+    if (action === ACTIONS.CLOSE) {
+      setRunTour(false);
       return;
     }
 
