@@ -6,8 +6,6 @@ import { RepairOrderSelector } from './components/RepairOrderSelector';
 import { FleetReservationSelector } from './components/FleetReservationSelector';
 import { CessionFormFields } from './components/CessionFormFields';
 import { ValidationErrorDialog } from './components/ValidationErrorDialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 
 interface CessionBasicInfoSectionProps {
   formData: CessionFormData;
@@ -57,31 +55,11 @@ export const CessionBasicInfoSection = ({
             onFieldChange={onFieldChange}
           />
         ) : (
-          <>
-            <FleetReservationSelector 
-              formData={formData}
-              errors={errors}
-              onFieldChange={onFieldChange}
-            />
-            {/* Montant du prêt */}
-            <div className="space-y-2">
-              <Label htmlFor="loan_amount">
-                Montant du prêt (€) <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="loan_amount"
-                type="number"
-                step="0.01"
-                min="0"
-                value={formData.loan_amount || ''}
-                onChange={(e) => onFieldChange('loan_amount', parseFloat(e.target.value) || null)}
-                placeholder="Montant en euros"
-              />
-              {errors.loan_amount && (
-                <div className="text-sm text-red-600">{errors.loan_amount}</div>
-              )}
-            </div>
-          </>
+          <FleetReservationSelector 
+            formData={formData}
+            errors={errors}
+            onFieldChange={onFieldChange}
+          />
         )}
 
         <CessionFormFields 
