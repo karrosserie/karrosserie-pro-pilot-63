@@ -98,6 +98,7 @@ export const CessionForm = ({
           companyId={undefined}
           onFieldChange={handleChange}
           onClearValidationError={clearValidationError}
+          isEditing={!!cession}
         />
 
         <CessionFormActions 
