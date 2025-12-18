@@ -16,7 +16,7 @@ import { ExpertiseReportUploader } from '@/components/expertise/ExpertiseReportU
 import ExpertiseReportDialog from '@/components/expertise/ExpertiseReportDialog';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 import ExpertiseReportHeader from '@/components/expertise/ExpertiseReportHeader';
-import ExpertiseReportFilters from '@/components/expertise/ExpertiseReportFilters';
+import ExpertiseReportFilters, { ExpertiseSortOption } from '@/components/expertise/ExpertiseReportFilters';
 import ExpertiseReportTable from '@/components/expertise/ExpertiseReportTable';
 import ImportTable from '@/components/expertise/ImportTable';
 import { useClientValidationNotification } from '@/contexts/ClientValidationNotificationContext';
@@ -30,6 +30,7 @@ const ExpertiseReports = () => {
   const [initialCheckComplete, setInitialCheckComplete] = useState(false);
   const { pendingImports, isLoading: importsLoading } = useImports();
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortOption, setSortOption] = useState<ExpertiseSortOption>('recent-first');
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
@@ -58,27 +59,51 @@ const ExpertiseReports = () => {
                           pendingImports && 
                           pendingImports.length > 0;
   
-  const filteredReports = reports?.filter(report => {
-    const matchesSearch = report.report_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (report.clients && `${report.clients.first_name} ${report.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    // Safe vehicle search with proper null checking
-    let vehicleMatch = false;
-    const vehicle = report.vehicles;
-    
-    // Use a type guard function to properly narrow the type
-    const isValidVehicle = (v: any): v is { car_brands?: { name?: string }; car_models?: { name?: string }; license_plate?: string } => {
-      return v !== null && v !== undefined && typeof v === 'object' && 
-             'car_brands' in v && 'car_models' in v && 'license_plate' in v;
-    };
-    
-    if (isValidVehicle(vehicle)) {
-      const vehicleString = `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate || ''}`;
-      vehicleMatch = vehicleString.toLowerCase().includes(searchTerm.toLowerCase());
-    }
-    
-    return matchesSearch || vehicleMatch;
-  }) || [];
+  const filteredAndSortedReports = React.useMemo(() => {
+    let result = reports?.filter(report => {
+      const matchesSearch = report.report_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (report.clients && `${report.clients.first_name} ${report.clients.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      // Safe vehicle search with proper null checking
+      let vehicleMatch = false;
+      const vehicle = report.vehicles;
+      
+      // Use a type guard function to properly narrow the type
+      const isValidVehicle = (v: any): v is { car_brands?: { name?: string }; car_models?: { name?: string }; license_plate?: string } => {
+        return v !== null && v !== undefined && typeof v === 'object' && 
+               'car_brands' in v && 'car_models' in v && 'license_plate' in v;
+      };
+      
+      if (isValidVehicle(vehicle)) {
+        const vehicleString = `${vehicle.car_brands?.name || 'Marque inconnue'} ${vehicle.car_models?.name || 'Modèle inconnu'} - ${vehicle.license_plate || ''}`;
+        vehicleMatch = vehicleString.toLowerCase().includes(searchTerm.toLowerCase());
+      }
+      
+      return matchesSearch || vehicleMatch;
+    }) || [];
+
+    // Apply sorting
+    return result.sort((a, b) => {
+      switch (sortOption) {
+        case 'alphabetical-asc': {
+          const aName = `${a.clients?.last_name || ''} ${a.clients?.first_name || ''}`.trim().toLowerCase();
+          const bName = `${b.clients?.last_name || ''} ${b.clients?.first_name || ''}`.trim().toLowerCase();
+          return aName.localeCompare(bName, 'fr', { sensitivity: 'base' });
+        }
+        case 'alphabetical-desc': {
+          const aName = `${a.clients?.last_name || ''} ${a.clients?.first_name || ''}`.trim().toLowerCase();
+          const bName = `${b.clients?.last_name || ''} ${b.clients?.first_name || ''}`.trim().toLowerCase();
+          return bName.localeCompare(aName, 'fr', { sensitivity: 'base' });
+        }
+        case 'recent-first':
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        case 'oldest-first':
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        default:
+          return 0;
+      }
+    });
+  }, [reports, searchTerm, sortOption]);
   
   const handleEditReport = (report: ExpertiseReport) => {
     setSelectedReport(report);
@@ -102,14 +127,14 @@ const ExpertiseReports = () => {
   // Effet pour vérifier le statut de conversion des rapports au chargement initial
   useEffect(() => {
     const initializeReports = async () => {
-      if (reports && reports.length > 0 && !initialCheckComplete) {
-        await checkMultipleReports(reports);
+      if (filteredAndSortedReports && filteredAndSortedReports.length > 0 && !initialCheckComplete) {
+        await checkMultipleReports(filteredAndSortedReports);
         setInitialCheckComplete(true);
       }
     };
     
     initializeReports();
-  }, [reports, checkMultipleReports, initialCheckComplete]);
+  }, [filteredAndSortedReports, checkMultipleReports, initialCheckComplete]);
 
   const handleConvertToQuote = async (report: ExpertiseReport) => {
     if (!report.client_id || !report.vehicle_id) {
@@ -199,6 +224,8 @@ const ExpertiseReports = () => {
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         onImportClick={() => setImportDialogOpen(true)}
+        sortOption={sortOption}
+        onSortChange={setSortOption}
       />
       
       {/* Tableau conditionnel des imports en cours d'analyse */}
@@ -211,7 +238,7 @@ const ExpertiseReports = () => {
       
       <div className="card-container">
         <ExpertiseReportTable 
-          reports={filteredReports}
+          reports={filteredAndSortedReports}
           isLoading={isLoading || !initialCheckComplete}
           error={error as Error | null}
           onEditReport={handleEditReport}
