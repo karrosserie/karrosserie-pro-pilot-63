@@ -1,8 +1,8 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { CessionFormData, CessionType } from '../types';
-import { Car, Wrench } from 'lucide-react';
+import { CessionType } from '../types';
+import { Building, Car, Wrench } from 'lucide-react';
 
 interface CessionTypeSelectorProps {
   value: CessionType;
@@ -27,7 +27,7 @@ export const CessionTypeSelector = ({
       <RadioGroup
         value={value}
         onValueChange={(val) => onChange(val as CessionType)}
-        className="grid grid-cols-2 gap-4"
+        className="grid grid-cols-3 gap-4"
         disabled={disabled}
       >
         <div className="flex items-center space-x-2">
@@ -38,6 +38,16 @@ export const CessionTypeSelector = ({
           >
             <Wrench className="h-4 w-4" />
             Réparation
+          </Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="repair_enterprise" id="cession-repair-enterprise" />
+          <Label 
+            htmlFor="cession-repair-enterprise" 
+            className="flex items-center gap-2 cursor-pointer font-normal"
+          >
+            <Building className="h-4 w-4" />
+            Réparation Entreprise
           </Label>
         </div>
         <div className="flex items-center space-x-2">

@@ -7,8 +7,11 @@ export const validateCessionForm = (formData: CessionFormData): { errors: Cessio
 
   const newErrors: CessionFormErrors = {};
 
+  // Déterminer si c'est une cession de type réparation
+  const isRepairType = formData.cession_type === 'repair' || formData.cession_type === 'repair_enterprise';
+
   // Validation based on cession type
-  if (formData.cession_type === 'repair') {
+  if (isRepairType) {
     if (!formData.repair_order_id) {
       console.log('Missing repair_order_id');
       newErrors.repair_order_id = 'L\'ordre de réparation est obligatoire';
@@ -26,7 +29,7 @@ export const validateCessionForm = (formData: CessionFormData): { errors: Cessio
   }
 
   // Champs sinistre/police - obligatoires uniquement pour les réparations
-  if (formData.cession_type === 'repair') {
+  if (isRepairType) {
     if (!formData.incident_number.trim()) {
       console.log('Missing incident_number');
       newErrors.incident_number = 'Le numéro de sinistre est obligatoire';
@@ -44,7 +47,7 @@ export const validateCessionForm = (formData: CessionFormData): { errors: Cessio
   }
 
   // report_number et expert_name optionnels pour les prêts
-  if (formData.cession_type === 'repair') {
+  if (isRepairType) {
     if (!formData.report_number.trim()) {
       console.log('Missing report_number');
       newErrors.report_number = 'Le numéro de rapport est obligatoire';

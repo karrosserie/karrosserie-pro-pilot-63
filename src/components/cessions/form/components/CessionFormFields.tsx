@@ -12,7 +12,7 @@ interface CessionFormFieldsProps {
   formData: CessionFormData;
   errors: CessionFormErrors;
   onFieldChange: (field: keyof CessionFormData, value: any) => void;
-  cessionType: 'repair' | 'fleet_loan';
+  cessionType: 'repair' | 'repair_enterprise' | 'fleet_loan';
 }
 
 export const CessionFormFields = ({
@@ -35,6 +35,9 @@ export const CessionFormFields = ({
     label: `${account.name} - ${account.bank}`
   }));
 
+  // Déterminer si c'est une cession de type réparation (particulier ou entreprise)
+  const isRepairType = cessionType === 'repair' || cessionType === 'repair_enterprise';
+
   return (
     <div className="space-y-4">
       {/* Numéro de sinistre, Date du sinistre et Numéro de police sur la même ligne */}
@@ -42,13 +45,13 @@ export const CessionFormFields = ({
         {/* Numéro de sinistre */}
         <div className="md:col-span-2 space-y-2">
           <Label htmlFor="incident_number">
-            Numéro de sinistre {cessionType === 'repair' && <span className="text-red-500">*</span>}
+            Numéro de sinistre {isRepairType && <span className="text-red-500">*</span>}
           </Label>
           <Input
             id="incident_number"
             value={formData.incident_number}
             onChange={(e) => onFieldChange('incident_number', e.target.value)}
-            placeholder={cessionType === 'fleet_loan' ? "Optionnel - si lié à un sinistre" : "Numéro de sinistre"}
+            placeholder={!isRepairType ? "Optionnel - si lié à un sinistre" : "Numéro de sinistre"}
           />
           {errors.incident_number && (
             <div className="text-sm text-red-600">{errors.incident_number}</div>
@@ -58,7 +61,7 @@ export const CessionFormFields = ({
         {/* Date du sinistre / Date de début du prêt */}
         <div className="space-y-2">
           <Label htmlFor="incident_date">
-            {cessionType === 'fleet_loan' ? 'Date de début du prêt' : 'Date du sinistre'} {cessionType === 'repair' && <span className="text-red-500">*</span>}
+            {cessionType === 'fleet_loan' ? 'Date de début du prêt' : 'Date du sinistre'} {isRepairType && <span className="text-red-500">*</span>}
           </Label>
           <Input
             id="incident_date"
@@ -74,13 +77,13 @@ export const CessionFormFields = ({
         {/* Numéro de police */}
         <div className="md:col-span-2 space-y-2">
           <Label htmlFor="policy_number">
-            Numéro de police {cessionType === 'repair' && <span className="text-red-500">*</span>}
+            Numéro de police {isRepairType && <span className="text-red-500">*</span>}
           </Label>
           <Input
             id="policy_number"
             value={formData.policy_number}
             onChange={(e) => onFieldChange('policy_number', e.target.value)}
-            placeholder={cessionType === 'fleet_loan' ? "Optionnel" : "Numéro de police d'assurance"}
+            placeholder={!isRepairType ? "Optionnel" : "Numéro de police d'assurance"}
           />
           {errors.policy_number && (
             <div className="text-sm text-red-600">{errors.policy_number}</div>
@@ -89,7 +92,7 @@ export const CessionFormFields = ({
       </div>
 
       {/* Numéro de rapport et Nom de l'expert - uniquement pour les réparations */}
-      {cessionType === 'repair' && (
+      {isRepairType && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Numéro de rapport */}
           <div className="space-y-2">

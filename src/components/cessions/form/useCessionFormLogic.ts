@@ -8,7 +8,7 @@ import { useAccounts } from '@/hooks/use-accounts';
 import { useFleetReservation } from '@/hooks/use-fleet-reservations';
 import { useInsuranceCompanies } from '@/hooks/use-insurance-companies';
 import { validateCessionForm } from './utils/validation';
-import { validateRepairOrderData } from './utils/dataValidation';
+import { validateRepairOrderData, validateEnterpriseCessionData } from './utils/dataValidation';
 import { getInitialFormData, mapCessionToFormData, prepareSubmitData } from './utils/formState';
 
 interface UseCessionFormLogicProps {
@@ -21,9 +21,12 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
   const [validationBlocked, setValidationBlocked] = useState(false);
   const [validationErrorMessage, setValidationErrorMessage] = useState<string | null>(null);
 
-  // Get repair order data when one is selected (for repair type)
+  // Déterminer si c'est une cession de type réparation
+  const isRepairType = formData.cession_type === 'repair' || formData.cession_type === 'repair_enterprise';
+
+  // Get repair order data when one is selected (for repair types)
   const { order, isLoading: isLoadingOrder } = useRepairOrder(
-    formData.cession_type === 'repair' ? (formData.repair_order_id || undefined) : undefined
+    isRepairType ? (formData.repair_order_id || undefined) : undefined
   );
   const { client, isLoading: isLoadingClient } = useClient(order?.client_id || undefined);
   const { vehicles, isLoading: isLoadingVehicles } = useClientVehicles(order?.client_id || undefined);
@@ -103,16 +106,21 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
   // Effect to validate repair order data and pre-fill form when all data is loaded
   // Only for new cessions (not when editing existing ones)
   useEffect(() => {
-    // Ne faire la validation que pour les nouvelles cessions de type repair
-    if (!cession && formData.cession_type === 'repair' && formData.repair_order_id && !isLoadingOrder && !isLoadingClient && !isLoadingVehicles) {
+    // Ne faire la validation que pour les nouvelles cessions de type repair/repair_enterprise
+    if (!cession && isRepairType && formData.repair_order_id && !isLoadingOrder && !isLoadingClient && !isLoadingVehicles) {
       console.log('Validating repair order data for new cession:', {
         order,
         client,
         repairOrderVehicle,
-        vehicles: vehicles?.length
+        vehicles: vehicles?.length,
+        cession_type: formData.cession_type
       });
       
-      const validationError = validateRepairOrderData(order, client, repairOrderVehicle);
+      // Utiliser la bonne fonction de validation selon le type de cession
+      const validationError = formData.cession_type === 'repair_enterprise'
+        ? validateEnterpriseCessionData(order, client, repairOrderVehicle)
+        : validateRepairOrderData(order, client, repairOrderVehicle);
+        
       if (validationError) {
         setValidationErrorMessage(validationError);
         setValidationBlocked(true);
@@ -133,12 +141,12 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
           }));
         }
       }
-    } else if (!formData.repair_order_id && formData.cession_type === 'repair' && !cession) {
+    } else if (!formData.repair_order_id && isRepairType && !cession) {
       // Clear errors and unblock validation when no repair order is selected (only for new cessions)
       setValidationErrorMessage(null);
       setValidationBlocked(false);
     }
-  }, [formData.repair_order_id, formData.cession_type, order, client, repairOrderVehicle, isLoadingOrder, isLoadingClient, isLoadingVehicles, cession]);
+  }, [formData.repair_order_id, formData.cession_type, order, client, repairOrderVehicle, isLoadingOrder, isLoadingClient, isLoadingVehicles, cession, isRepairType]);
 
   const handleChange = (field: keyof CessionFormData, value: any) => {
     console.log(`Field changed: ${field} = ${value}`);
@@ -201,7 +209,7 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
     isReadOnly,
     validationBlocked,
     validationErrorMessage,
-    client: formData.cession_type === 'repair' ? client : fleetReservation?.clients,
+    client: isRepairType ? client : fleetReservation?.clients,
     repairOrder: order,
     fleetReservation,
     handleChange,

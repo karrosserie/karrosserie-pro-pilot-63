@@ -48,11 +48,12 @@ export const CessionBasicInfoSection = ({
         />
 
         {/* Sélecteur basé sur le type */}
-        {formData.cession_type === 'repair' ? (
+        {(formData.cession_type === 'repair' || formData.cession_type === 'repair_enterprise') ? (
           <RepairOrderSelector 
             formData={formData}
             errors={errors}
             onFieldChange={onFieldChange}
+            filterByClientType={formData.cession_type === 'repair_enterprise' ? 'entreprise' : undefined}
           />
         ) : (
           <FleetReservationSelector 
