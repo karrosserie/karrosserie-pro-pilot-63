@@ -11,6 +11,7 @@ export const useLoanFormGuide = (
 ) => {
   const [runTour, setRunTour] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const [isSkipped, setIsSkipped] = useState(false);
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
   const previousLicenseRef = useRef({ front: '', back: '' });
 
@@ -77,6 +78,7 @@ export const useLoanFormGuide = (
   // Initialiser le tour
   useEffect(() => {
     if (!isViewMode && isOpen) {
+      setIsSkipped(false); // Réinitialiser pour le nouveau prêt
       setTimeout(() => {
         setCurrentStep(0);
         // D'abord scroller vers l'élément, PUIS activer le tour
@@ -94,7 +96,7 @@ export const useLoanFormGuide = (
 
   // Synchroniser le guide avec les changements d'onglets manuels
   useEffect(() => {
-    if (!isOpen || isViewMode || !activeTab) return;
+    if (!isOpen || isViewMode || !activeTab || isSkipped) return;
 
     const newStep = tabToStep[activeTab];
     if (newStep !== undefined && newStep !== currentStep) {
@@ -107,7 +109,7 @@ export const useLoanFormGuide = (
         scrollToTarget(steps[newStep].target as string);
       }
     }
-  }, [activeTab, isOpen, isViewMode]);
+  }, [activeTab, isOpen, isViewMode, isSkipped]);
 
   // Nettoyer le timer à la destruction
   useEffect(() => {
@@ -120,7 +122,7 @@ export const useLoanFormGuide = (
 
   // Détecter l'upload du permis pour avancer automatiquement
   useEffect(() => {
-    if (!isOpen || isViewMode || currentStep !== 0) return;
+    if (!isOpen || isViewMode || currentStep !== 0 || isSkipped) return;
 
     const hasNewFrontUrl = driverLicenseFrontUrl && driverLicenseFrontUrl !== previousLicenseRef.current.front;
     const hasNewBackUrl = driverLicenseBackUrl && driverLicenseBackUrl !== previousLicenseRef.current.back;
@@ -149,13 +151,14 @@ export const useLoanFormGuide = (
         scrollToTarget('[data-tour="insurance-switch"]');
       }, 500);
     }
-  }, [driverLicenseFrontUrl, driverLicenseBackUrl, currentStep, isOpen, isViewMode, setActiveTab]);
+  }, [driverLicenseFrontUrl, driverLicenseBackUrl, currentStep, isOpen, isViewMode, setActiveTab, isSkipped]);
 
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status, action, index, type, lifecycle } = data;
 
-    // Cas 1: L'utilisateur clique sur "Passer le guide" - désactiver complètement
+    // Cas 1: L'utilisateur clique sur "Passer le guide" - désactiver pour toute la session
     if (status === STATUS.SKIPPED) {
+      setIsSkipped(true);
       setRunTour(false);
       setCurrentStep(0);
       return;
