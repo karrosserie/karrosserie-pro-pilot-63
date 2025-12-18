@@ -23,7 +23,8 @@ export const createCredit = async (creditData: CreditCreateData): Promise<Credit
     status: creditData.status,
     amount: creditData.amount,
     items_data: creditData.items_data,
-    notes: creditData.notes
+    notes: creditData.notes,
+    is_franchise_credit: creditData.is_franchise_credit || false
   };
 
   console.log('Inserting data:', insertData);

@@ -2040,6 +2040,7 @@ export type Database = {
           created_at: string
           id: string
           invoice_id: string | null
+          is_franchise_credit: boolean | null
           items_data: Json | null
           notes: string | null
           reference: string
@@ -2053,6 +2054,7 @@ export type Database = {
           created_at?: string
           id?: string
           invoice_id?: string | null
+          is_franchise_credit?: boolean | null
           items_data?: Json | null
           notes?: string | null
           reference: string
@@ -2066,6 +2068,7 @@ export type Database = {
           created_at?: string
           id?: string
           invoice_id?: string | null
+          is_franchise_credit?: boolean | null
           items_data?: Json | null
           notes?: string | null
           reference?: string

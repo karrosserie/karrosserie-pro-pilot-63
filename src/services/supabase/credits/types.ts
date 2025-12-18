@@ -12,6 +12,7 @@ export interface Credit {
   notes: string | null;
   created_date: string | null;
   archived: boolean;
+  is_franchise_credit: boolean;
   created_at: string;
   updated_at: string;
   // Relations (optionnelles, ajoutées par les joins)
@@ -62,6 +63,7 @@ export interface CreditCreateData {
   amount: number;
   items_data: string;
   notes?: string;
+  is_franchise_credit?: boolean;
 }
 
 export interface CreditUpdateData {
@@ -71,4 +73,5 @@ export interface CreditUpdateData {
   amount?: number;
   items_data?: string;
   notes?: string;
+  is_franchise_credit?: boolean;
 }

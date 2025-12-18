@@ -7,7 +7,8 @@ export const useCreditFormState = () => {
     reference: '',
     invoice_id: null,
     status: 'En attente',
-    notes: ''
+    notes: '',
+    is_franchise_credit: false
   });
 
   const [items, setItems] = useState<CreditItem[]>([
