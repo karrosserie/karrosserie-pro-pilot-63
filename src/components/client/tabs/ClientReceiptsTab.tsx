@@ -18,6 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
 import { useInvoices } from '@/hooks/use-invoices';
 import ReceiptDialog from '@/components/receipts/ReceiptDialog';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 interface ClientReceiptsTabProps {
   clientId: string;
@@ -59,7 +60,7 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
     }
     
     const clientName = invoice.clients 
-      ? `${invoice.clients.first_name} ${invoice.clients.last_name}` 
+      ? getClientDisplayName(invoice.clients)
       : 'Client non assigné';
     
     const amount = typeof invoice.amount === 'number' 

@@ -10,6 +10,7 @@ import { FileText, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SearchableSelect } from '@/components/ui/searchable-select';
 import { useInvoices } from '@/hooks/use-invoices';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 interface CreditBasicInfoSectionProps {
   formData: any;
@@ -34,7 +35,7 @@ export const CreditBasicInfoSection = ({
 
   const invoiceOptions = (invoices || []).map(invoice => ({
     value: invoice.id,
-    label: `Facture n°${invoice.reference} - ${invoice.clients ? `${invoice.clients.first_name} ${invoice.clients.last_name}` : 'Client non assigné'} - ${invoice.amount?.toFixed(2).replace('.', ',')} €`
+    label: `Facture n°${invoice.reference} - ${invoice.clients ? getClientDisplayName(invoice.clients) : 'Client non assigné'} - ${invoice.amount?.toFixed(2).replace('.', ',')} €`
   }));
 
   const handleFranchiseSwitchChange = (checked: boolean) => {

@@ -43,6 +43,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
 import { useCompany } from '@/hooks/use-company';
 import { generateInvoicePDFWithTemplate, printInvoicePDFWithTemplate } from '@/utils/invoicePDFGeneration';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 interface ClientInvoicesTabProps {
   clientId: string;
@@ -321,7 +322,7 @@ const ClientInvoicesTab: React.FC<ClientInvoicesTabProps> = ({ clientId }) => {
                         <TableCell>{formatDate(invoice.created_at)}</TableCell>
                         <TableCell>
                           {invoice.clients 
-                            ? `${invoice.clients.first_name} ${invoice.clients.last_name}`
+                            ? getClientDisplayName(invoice.clients)
                             : '-'
                           }
                         </TableCell>

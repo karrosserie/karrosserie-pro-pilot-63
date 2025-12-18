@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Eye, Pencil, Download, Printer, Mail, CreditCard, FileX, Trash, MoreVertical } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -152,12 +153,12 @@ const ClientInvoiceMobileCard: React.FC<ClientInvoiceMobileCardProps> = ({
           </div>
         </div>
 
-        <div className="space-y-2 text-sm">
+          <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Client:</span>
             <span className="font-medium">
               {invoice.clients 
-                ? `${invoice.clients.first_name} ${invoice.clients.last_name}`
+                ? getClientDisplayName(invoice.clients)
                 : '-'
               }
             </span>

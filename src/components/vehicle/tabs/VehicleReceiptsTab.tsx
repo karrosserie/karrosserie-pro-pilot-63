@@ -12,6 +12,7 @@ import {
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { Banknote, Pencil, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
@@ -58,7 +59,7 @@ const VehicleReceiptsTab: React.FC<VehicleReceiptsTabProps> = ({ vehicleId }) =>
     }
     
     const clientName = invoice.clients 
-      ? `${invoice.clients.first_name} ${invoice.clients.last_name}` 
+      ? getClientDisplayName(invoice.clients)
       : 'Client non assigné';
     
     const amount = typeof invoice.amount === 'number' 
