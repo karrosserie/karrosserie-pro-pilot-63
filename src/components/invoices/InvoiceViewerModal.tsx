@@ -167,17 +167,38 @@ const InvoiceViewerModal = ({
       totalTTC: `${totals.finalTotal.toFixed(2).replace('.', ',')} €` 
     };
     const paid = receiptsData.reduce((sum, receipt) => sum + receipt.amount, 0);
-    // Calculer le total des avoirs liés à cette facture
     const creditsTotal = creditsData.reduce((sum, credit) => sum + (credit.amount || 0), 0);
     const remaining = Math.max(0, invoice.amount - paid - creditsTotal);
     return {
       totalsData: totalsFormatted,
-      totalPaidAmount: paid,
+      totalPaidAmount: paid + creditsTotal,
       totalCreditsAmount: creditsTotal,
       remainingAmount: remaining,
       isPaid: (remaining <= 0 && (paid > 0 || creditsTotal > 0)) || invoice.status === 'Payée'
     };
   }, [invoice.repairs_data, invoice.parts_data, invoice.amount, invoice.status, receiptsData, creditsData]);
+
+  // Fusionner encaissements et avoirs pour l'affichage
+  const allPayments = useMemo(() => {
+    const receiptPayments = receiptsData.map(r => ({
+      id: r.id,
+      date: r.date || r.created_at,
+      payment_method: r.payment_method || '-',
+      amount: r.amount || 0,
+      type: 'receipt' as const
+    }));
+    
+    const creditPayments = creditsData.map(c => ({
+      id: c.id,
+      date: c.created_at,
+      payment_method: `Avoir ${c.reference}${c.is_franchise_credit ? ' (Franchise)' : ''}`,
+      amount: c.amount || 0,
+      type: 'credit' as const
+    }));
+    
+    return [...receiptPayments, ...creditPayments]
+      .sort((a, b) => new Date(a.date || '').getTime() - new Date(b.date || '').getTime());
+  }, [receiptsData, creditsData]);
 
   const handleEdit = () => { if (onEditInvoice) onEditInvoice(invoice); };
   const handleDelete = async () => {
@@ -207,7 +228,7 @@ const InvoiceViewerModal = ({
           </div>
         </div>
         <div className="w-full h-full">
-          {template === 'default' ? <DefaultInvoicePreview companyData={companyData} invoiceData={invoiceData} clientData={clientDataForTemplate} items={items} totals={totalsData} payments={receiptsData} totalPaidAmount={totalPaidAmount} remainingAmount={remainingAmount} isPaid={isPaid} /> : <AlternativeInvoicePreview companyData={companyData} invoiceData={invoiceData} clientData={clientDataForTemplate} items={items} totals={totalsData} payments={receiptsData} totalPaidAmount={totalPaidAmount} remainingAmount={remainingAmount} isPaid={isPaid} />}
+          {template === 'default' ? <DefaultInvoicePreview companyData={companyData} invoiceData={invoiceData} clientData={clientDataForTemplate} items={items} totals={totalsData} payments={allPayments} totalPaidAmount={totalPaidAmount} remainingAmount={remainingAmount} isPaid={isPaid} /> : <AlternativeInvoicePreview companyData={companyData} invoiceData={invoiceData} clientData={clientDataForTemplate} items={items} totals={totalsData} payments={allPayments} totalPaidAmount={totalPaidAmount} remainingAmount={remainingAmount} isPaid={isPaid} />}
         </div>
       </DialogContent>
     </Dialog>
