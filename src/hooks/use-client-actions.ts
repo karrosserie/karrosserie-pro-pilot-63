@@ -116,7 +116,11 @@ export const useClientActions = () => {
         driverLicenseFrontUrl: data.driverLicenseFrontUrl,
         driverLicenseBackUrl: data.driverLicenseBackUrl,
         autoRelancesDisabled: data.autoRelancesDisabled,
-        company_id: companyId
+        company_id: companyId,
+        clientType: data.clientType || 'particulier',
+        companyName: data.companyName || '',
+        managerIdUrl: data.managerIdUrl || '',
+        kbisUrl: data.kbisUrl || ''
       };
       console.log('🚀 Creating client with data:', clientData);
       createClient.mutate(clientData);
@@ -132,7 +136,11 @@ export const useClientActions = () => {
         company: data.company,
         driverLicenseFrontUrl: data.driverLicenseFrontUrl,
         driverLicenseBackUrl: data.driverLicenseBackUrl,
-        autoRelancesDisabled: data.autoRelancesDisabled
+        autoRelancesDisabled: data.autoRelancesDisabled,
+        clientType: data.clientType,
+        companyName: data.companyName,
+        managerIdUrl: data.managerIdUrl,
+        kbisUrl: data.kbisUrl
       };
       console.log('🚀 Updating client with id:', selectedClient.id, 'and data:', updateData);
       updateClient.mutate({
