@@ -30,15 +30,15 @@ export const FleetReservationSelector = ({
       : 'Client non assigné';
     
     const vehicleInfo = reservation.fleet_vehicles
-      ? `${reservation.fleet_vehicles.brand || ''} ${reservation.fleet_vehicles.model || ''} - ${reservation.fleet_vehicles.license_plate}`
+      ? `${reservation.fleet_vehicles.car_brands?.name || ''} ${reservation.fleet_vehicles.car_models?.name || ''} - ${reservation.fleet_vehicles.license_plate}`
       : 'Véhicule non assigné';
     
     const startDate = reservation.start_date 
       ? format(new Date(reservation.start_date), 'dd/MM/yyyy', { locale: fr }) 
       : '';
     
-    const endDate = reservation.end_date 
-      ? format(new Date(reservation.end_date), 'dd/MM/yyyy', { locale: fr }) 
+    const endDate = reservation.expected_return_date 
+      ? format(new Date(reservation.expected_return_date), 'dd/MM/yyyy', { locale: fr }) 
       : 'en cours';
 
     const amount = reservation.quotes?.amount 
