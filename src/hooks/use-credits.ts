@@ -21,6 +21,7 @@ export function useCredits() {
     mutationFn: creditsService.createCredit,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['credits'] });
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
       toast({
         title: "Avoir créé",
         description: "L'avoir a été créé avec succès."
@@ -40,6 +41,7 @@ export function useCredits() {
       creditsService.updateCredit(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['credits'] });
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
       toast({
         title: "Avoir mis à jour",
         description: "L'avoir a été mis à jour avec succès."
@@ -58,6 +60,7 @@ export function useCredits() {
     mutationFn: creditsService.deleteCredit,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['credits'] });
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
       toast({
         title: "Avoir supprimé",
         description: "L'avoir a été supprimé avec succès."
