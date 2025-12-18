@@ -486,6 +486,39 @@ export function useMessageries() {
     }
   };
 
+  // Abonnement temps réel aux changements de messageries
+  useEffect(() => {
+    fetchMessageries();
+
+    const channel = supabase
+      .channel('messageries-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'messageries'
+        },
+        (payload) => {
+          console.log('Messagerie mise à jour (realtime):', payload);
+          fetchMessageries();
+        }
+      )
+      .subscribe();
+
+    // Polling de secours toutes les 30 secondes
+    const interval = setInterval(() => {
+      if (document.hasFocus()) {
+        fetchMessageries();
+      }
+    }, 30000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(interval);
+    };
+  }, []);
+
   // Actions pour les boutons
   const handleReply = (id: string) => {
     const messagerie = messageries.find(m => m.id === id);
@@ -502,10 +535,6 @@ export function useMessageries() {
     });
   };
 
-  // Charger les données au montage
-  useEffect(() => {
-    fetchMessageries();
-  }, []);
 
   return {
     messageries,

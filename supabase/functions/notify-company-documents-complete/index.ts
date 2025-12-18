@@ -137,6 +137,29 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Email de notification envoyé à ${companyData.email} pour le client ${clientName}`);
 
+    // Marquer la messagerie liée comme résolue
+    try {
+      const { error: updateMessagerieError } = await supabase
+        .from('messageries')
+        .update({ 
+          status: 'resolu',
+          resolved: true,
+          updated_at: new Date().toISOString()
+        })
+        .eq('client_id', clientId)
+        .eq('company_id', companyId)
+        .eq('resolved', false)
+        .ilike('title', '%justificatifs%');
+
+      if (updateMessagerieError) {
+        console.error('Erreur mise à jour messagerie:', updateMessagerieError);
+      } else {
+        console.log(`Messagerie(s) marquée(s) comme résolue(s) pour le client ${clientId}`);
+      }
+    } catch (messagerieError) {
+      console.error('Erreur lors de la mise à jour des messageries:', messagerieError);
+    }
+
     // Déclencher le webhook n8n
     try {
       const webhookResponse = await fetch('https://n8n.karrosserie.pro/webhook/3b7decda-859c-46bc-836a-cfe53eed5b70', {
