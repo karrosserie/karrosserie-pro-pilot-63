@@ -52,10 +52,10 @@ export const CreditItemsSection = ({
           />
         </div>
         <div>
-          <Label className="text-xs text-muted-foreground">Prix Unitaire (€)</Label>
+          <Label className="text-xs text-muted-foreground">Montant TTC (€)</Label>
           <AmountInput
-            value={item.unit_price}
-            onChange={(value) => !readOnly && onUpdateItem(item.id, 'unit_price', value)}
+            value={item.total_ttc}
+            onChange={(value) => !readOnly && onUpdateItem(item.id, 'total_ttc', value)}
             readOnly={readOnly}
             className={readOnly ? "bg-muted cursor-not-allowed" : ""}
           />
@@ -85,8 +85,13 @@ export const CreditItemsSection = ({
         </div>
       </div>
       <div className="flex items-center justify-between pt-2 border-t">
-        <div className="font-medium text-lg">
-          Total : {item.total.toFixed(2)} €
+        <div>
+          <div className="font-medium text-lg">
+            Total TTC : {item.total_ttc.toFixed(2)} €
+          </div>
+          <div className="text-sm text-muted-foreground">
+            P.U. HT : {item.unit_price.toFixed(2)} €
+          </div>
         </div>
         {!readOnly && (
           <Button
@@ -130,19 +135,19 @@ export const CreditItemsSection = ({
           // Desktop: Grid layout
           <div className="space-y-2">
             {/* Header */}
-            <div className="grid gap-2 text-sm font-medium text-muted-foreground pb-2 border-b" style={{ gridTemplateColumns: readOnly ? '4fr 1fr 1.5fr 1fr 1fr 1.5fr' : '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
+            <div className="grid gap-2 text-sm font-medium text-muted-foreground pb-2 border-b" style={{ gridTemplateColumns: readOnly ? '4fr 1fr 1.5fr 1fr 1fr 1.5fr' : '4fr 1fr 1.5fr 1fr 1fr auto' }}>
               <div>Désignation</div>
               <div>Qté</div>
-              <div>Prix Unitaire (€)</div>
+              <div>Montant TTC (€)</div>
               <div>Remise (%)</div>
               <div>TVA (%)</div>
-              <div>Total (€)</div>
+              <div>P.U. HT (€)</div>
               {!readOnly && <div></div>}
             </div>
 
             {/* Item rows */}
             {items.map((item) => (
-              <div key={item.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: readOnly ? '4fr 1fr 1.5fr 1fr 1fr 1.5fr' : '4fr 1fr 1.5fr 1fr 1fr 1.5fr auto' }}>
+              <div key={item.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: readOnly ? '4fr 1fr 1.5fr 1fr 1fr 1.5fr' : '4fr 1fr 1.5fr 1fr 1fr auto' }}>
                 <Input
                   value={item.description}
                   onChange={(e) => !readOnly && onUpdateItem(item.id, 'description', e.target.value)}
@@ -160,8 +165,8 @@ export const CreditItemsSection = ({
                   className={readOnly ? "bg-muted cursor-not-allowed" : ""}
                 />
                 <AmountInput
-                  value={item.unit_price}
-                  onChange={(value) => !readOnly && onUpdateItem(item.id, 'unit_price', value)}
+                  value={item.total_ttc}
+                  onChange={(value) => !readOnly && onUpdateItem(item.id, 'total_ttc', value)}
                   readOnly={readOnly}
                   className={readOnly ? "bg-muted cursor-not-allowed" : ""}
                 />
@@ -180,8 +185,8 @@ export const CreditItemsSection = ({
                   readOnly={readOnly}
                   className={readOnly ? "bg-muted cursor-not-allowed" : ""}
                 />
-                <div className="text-right font-medium">
-                  {item.total.toFixed(2)} €
+                <div className="text-right font-medium text-muted-foreground text-sm">
+                  {item.unit_price.toFixed(2)} €
                 </div>
                 {!readOnly && (
                   <Button

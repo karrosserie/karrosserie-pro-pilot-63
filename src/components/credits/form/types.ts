@@ -10,8 +10,9 @@ export interface CreditItem {
   id: string;
   description: string;
   quantity: number;
-  unit_price: number;
+  unit_price: number; // Calculé automatiquement à partir du TTC
   discount: number;
   vat: number;
   total: number;
+  total_ttc: number; // Montant TTC saisi par l'utilisateur
 }
