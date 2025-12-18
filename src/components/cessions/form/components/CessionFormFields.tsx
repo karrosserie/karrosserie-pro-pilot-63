@@ -12,12 +12,14 @@ interface CessionFormFieldsProps {
   formData: CessionFormData;
   errors: CessionFormErrors;
   onFieldChange: (field: keyof CessionFormData, value: any) => void;
+  cessionType: 'repair' | 'fleet_loan';
 }
 
 export const CessionFormFields = ({
   formData,
   errors,
-  onFieldChange
+  onFieldChange,
+  cessionType
 }: CessionFormFieldsProps) => {
   const { accounts: bankAccounts, isLoading: isLoadingBankAccounts } = useAccounts();
   const { insuranceCompanies, isLoading: isLoadingInsuranceCompanies } = useInsuranceCompanies();
@@ -86,40 +88,42 @@ export const CessionFormFields = ({
         </div>
       </div>
 
-      {/* Numéro de rapport et Nom de l'expert sur une ligne */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Numéro de rapport */}
-        <div className="space-y-2">
-          <Label htmlFor="report_number">
-            Numéro de rapport <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            id="report_number"
-            value={formData.report_number}
-            onChange={(e) => onFieldChange('report_number', e.target.value)}
-            placeholder="Numéro de rapport d'expertise"
-          />
-          {errors.report_number && (
-            <div className="text-sm text-red-600">{errors.report_number}</div>
-          )}
-        </div>
+      {/* Numéro de rapport et Nom de l'expert - uniquement pour les réparations */}
+      {cessionType === 'repair' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Numéro de rapport */}
+          <div className="space-y-2">
+            <Label htmlFor="report_number">
+              Numéro de rapport <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="report_number"
+              value={formData.report_number}
+              onChange={(e) => onFieldChange('report_number', e.target.value)}
+              placeholder="Numéro de rapport d'expertise"
+            />
+            {errors.report_number && (
+              <div className="text-sm text-red-600">{errors.report_number}</div>
+            )}
+          </div>
 
-        {/* Nom de l'expert */}
-        <div className="space-y-2">
-          <Label htmlFor="expert_name">
-            Nom de l'expert <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            id="expert_name"
-            value={formData.expert_name}
-            onChange={(e) => onFieldChange('expert_name', e.target.value)}
-            placeholder="Nom de l'expert"
-          />
-          {errors.expert_name && (
-            <div className="text-sm text-red-600">{errors.expert_name}</div>
-          )}
+          {/* Nom de l'expert */}
+          <div className="space-y-2">
+            <Label htmlFor="expert_name">
+              Nom de l'expert <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="expert_name"
+              value={formData.expert_name}
+              onChange={(e) => onFieldChange('expert_name', e.target.value)}
+              placeholder="Nom de l'expert"
+            />
+            {errors.expert_name && (
+              <div className="text-sm text-red-600">{errors.expert_name}</div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Compagnie d'assurance et Compte bancaire sur la même ligne */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
