@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import { Search, FileText, Plus, Filter, Eye, Pencil, Trash } from 'lucide-react';
+import { Search, FileText, Plus, Eye, Pencil, Trash, ChevronDown } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { useTableSorting } from '@/hooks/use-table-sorting';
@@ -45,6 +45,15 @@ import InvoiceMobileCard from '@/components/invoices/InvoiceMobileCard';
 import RelanceModal from '@/components/invoices/RelanceModal';
 import { useSendRelance } from '@/hooks/use-send-relance';
 
+export type InvoiceSortOption = 'alphabetical-asc' | 'alphabetical-desc' | 'recent-first' | 'oldest-first';
+
+const SORT_OPTIONS: { value: InvoiceSortOption; label: string }[] = [
+  { value: 'alphabetical-asc', label: 'Par ordre alphabétique (A → Z)' },
+  { value: 'alphabetical-desc', label: 'Par ordre alphabétique (Z → A)' },
+  { value: 'recent-first', label: 'Plus récents d\'abord' },
+  { value: 'oldest-first', label: 'Plus anciens d\'abord' },
+];
+
 const Invoices = () => {
   console.log('[Invoices] COMPONENT RENDER START', performance.now());
   const renderStart = performance.now();
@@ -52,6 +61,7 @@ const Invoices = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
   const [showArchived, setShowArchived] = useState(false);
+  const [sortOption, setSortOption] = useState<InvoiceSortOption>('recent-first');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
@@ -163,12 +173,11 @@ const Invoices = () => {
   );
 
   const filteredInvoices = useMemo(() => {
-    const list = sortedInvoices || [];
+    const list = invoices || [];
     if (!list.length) return [];
 
-    // Les factures sont déjà filtrées par showArchived via le useMemo ci-dessus
-    // On applique uniquement le filtre de recherche
-    return list.filter((invoice) => {
+    // Filtrer par recherche
+    let filtered = list.filter((invoice) => {
       if (!normalizedSearchTerm) return true;
 
       const ref = invoice.reference?.toLowerCase() || '';
@@ -179,7 +188,26 @@ const Invoices = () => {
 
       return ref.includes(normalizedSearchTerm) || client.includes(normalizedSearchTerm) || vehicle.includes(normalizedSearchTerm);
     });
-  }, [sortedInvoices, normalizedSearchTerm]);
+
+    // Appliquer le tri selon sortOption
+    return [...filtered].sort((a, b) => {
+      const clientA = a.clients ? `${a.clients.first_name || ''} ${a.clients.last_name || ''}`.trim().toLowerCase() : '';
+      const clientB = b.clients ? `${b.clients.first_name || ''} ${b.clients.last_name || ''}`.trim().toLowerCase() : '';
+      
+      switch (sortOption) {
+        case 'alphabetical-asc':
+          return clientA.localeCompare(clientB, 'fr', { sensitivity: 'base' });
+        case 'alphabetical-desc':
+          return clientB.localeCompare(clientA, 'fr', { sensitivity: 'base' });
+        case 'recent-first':
+          return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+        case 'oldest-first':
+          return new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime();
+        default:
+          return 0;
+      }
+    });
+  }, [invoices, normalizedSearchTerm, sortOption]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -453,9 +481,26 @@ const Invoices = () => {
             />
           </div>
           
-          <Button variant="outline" size="icon">
-            <Filter className="h-4 w-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="bg-background whitespace-nowrap">
+                <span className="hidden sm:inline">{SORT_OPTIONS.find(opt => opt.value === sortOption)?.label || 'Trier'}</span>
+                <span className="sm:hidden">Trier</span>
+                <ChevronDown className="h-4 w-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              {SORT_OPTIONS.map((option) => (
+                <DropdownMenuItem
+                  key={option.value}
+                  onClick={() => setSortOption(option.value)}
+                  className={sortOption === option.value ? 'bg-accent' : ''}
+                >
+                  {option.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
           
           {!showArchived && (
             <Button 

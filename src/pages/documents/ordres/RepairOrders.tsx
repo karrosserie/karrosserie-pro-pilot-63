@@ -2,7 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Filter, Plus } from 'lucide-react';
+import { Search, Plus, ChevronDown } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+export type RepairOrderSortOption = 'alphabetical-asc' | 'alphabetical-desc' | 'recent-first' | 'oldest-first';
+
+const SORT_OPTIONS: { value: RepairOrderSortOption; label: string }[] = [
+  { value: 'alphabetical-asc', label: 'Par ordre alphabétique (A → Z)' },
+  { value: 'alphabetical-desc', label: 'Par ordre alphabétique (Z → A)' },
+  { value: 'recent-first', label: 'Plus récents d\'abord' },
+  { value: 'oldest-first', label: 'Plus anciens d\'abord' },
+];
 import { RepairOrdersTable } from '@/components/repair-orders/RepairOrdersTable';
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
 import RepairOrderEmailDialog from '@/components/repair-orders/RepairOrderEmailDialog';
@@ -26,6 +41,7 @@ const RepairOrders = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortOption, setSortOption] = useState<RepairOrderSortOption>('recent-first');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [signatureDialogOpen, setSignatureDialogOpen] = useState(false);
@@ -63,40 +79,60 @@ const RepairOrders = () => {
     restoreOrder,
     updateOrder
   } = useRepairOrders();
-  const filteredOrders = orders?.filter(order => {
+  const filteredOrders = React.useMemo(() => {
+    if (!orders) return [];
+    
     const searchLower = searchTerm.toLowerCase();
 
-    // Search by reference
-    let matchesSearch = false;
-    if (order.reference?.toLowerCase().includes(searchLower)) {
-      matchesSearch = true;
-    }
-
-    // Search by client name
-    if (order.clients && `${order.clients.first_name} ${order.clients.last_name}`.toLowerCase().includes(searchLower)) {
-      matchesSearch = true;
-    }
-
-    // Search by vehicle info
-    if (order.vehicles) {
-      const brand = order.vehicles.car_brands?.name || '';
-      const model = order.vehicles.car_models?.name || '';
-      const licensePlate = order.vehicles.license_plate || '';
-      const vehicleInfo = `${brand} ${model} - ${licensePlate}`.toLowerCase();
-      if (vehicleInfo.includes(searchLower)) {
+    // Filtrer
+    let filtered = orders.filter(order => {
+      let matchesSearch = false;
+      
+      if (order.reference?.toLowerCase().includes(searchLower)) {
         matchesSearch = true;
       }
-    }
 
-    // Apply search filter
-    if (searchTerm && !matchesSearch) {
-      return false;
-    }
+      if (order.clients && `${order.clients.first_name} ${order.clients.last_name}`.toLowerCase().includes(searchLower)) {
+        matchesSearch = true;
+      }
 
-    // Apply archive filter
-    const matchesArchiveStatus = showArchived ? order.archived : !order.archived;
-    return matchesArchiveStatus;
-  }) || [];
+      if (order.vehicles) {
+        const brand = order.vehicles.car_brands?.name || '';
+        const model = order.vehicles.car_models?.name || '';
+        const licensePlate = order.vehicles.license_plate || '';
+        const vehicleInfo = `${brand} ${model} - ${licensePlate}`.toLowerCase();
+        if (vehicleInfo.includes(searchLower)) {
+          matchesSearch = true;
+        }
+      }
+
+      if (searchTerm && !matchesSearch) {
+        return false;
+      }
+
+      const matchesArchiveStatus = showArchived ? order.archived : !order.archived;
+      return matchesArchiveStatus;
+    });
+
+    // Trier
+    return [...filtered].sort((a, b) => {
+      const clientA = a.clients ? `${a.clients.first_name || ''} ${a.clients.last_name || ''}`.trim().toLowerCase() : '';
+      const clientB = b.clients ? `${b.clients.first_name || ''} ${b.clients.last_name || ''}`.trim().toLowerCase() : '';
+      
+      switch (sortOption) {
+        case 'alphabetical-asc':
+          return clientA.localeCompare(clientB, 'fr', { sensitivity: 'base' });
+        case 'alphabetical-desc':
+          return clientB.localeCompare(clientA, 'fr', { sensitivity: 'base' });
+        case 'recent-first':
+          return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+        case 'oldest-first':
+          return new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime();
+        default:
+          return 0;
+      }
+    });
+  }, [orders, searchTerm, showArchived, sortOption]);
 
   // Effet pour ouvrir automatiquement un ordre de réparation depuis l'URL
   useEffect(() => {
@@ -657,9 +693,26 @@ const RepairOrders = () => {
             <Input placeholder="Rechercher un ordre..." className="pl-10" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
           </div>
           
-          <Button variant="outline" size="icon">
-            <Filter className="h-4 w-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="bg-background whitespace-nowrap">
+                <span className="hidden sm:inline">{SORT_OPTIONS.find(opt => opt.value === sortOption)?.label || 'Trier'}</span>
+                <span className="sm:hidden">Trier</span>
+                <ChevronDown className="h-4 w-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              {SORT_OPTIONS.map((option) => (
+                <DropdownMenuItem
+                  key={option.value}
+                  onClick={() => setSortOption(option.value)}
+                  className={sortOption === option.value ? 'bg-accent' : ''}
+                >
+                  {option.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
           
           {!showArchived && <Button className="bg-karrosserie-orange hover:bg-karrosserie-orange/90" onClick={handleCreateOrder}>
               <Plus className="h-4 w-4 mr-2" />
