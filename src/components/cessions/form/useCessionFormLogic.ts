@@ -84,6 +84,9 @@ export const useCessionFormLogic = ({ cession }: UseCessionFormLogicProps) => {
       setFormData(prev => ({
         ...prev,
         incident_number: fleetReservation.claim_number || prev.incident_number,
+        incident_date: fleetReservation.start_date 
+          ? new Date(fleetReservation.start_date).toISOString().split('T')[0] 
+          : prev.incident_date,
         policy_number: fleetReservation.insurance_contract_number || prev.policy_number,
         insurance_company_id: insuranceCompanyId,
         loan_amount: loanAmount,

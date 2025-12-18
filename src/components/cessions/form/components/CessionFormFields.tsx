@@ -76,10 +76,10 @@ export const CessionFormFields = ({
           )}
         </div>
 
-        {/* Date du sinistre */}
+        {/* Date du sinistre / Date de début du prêt */}
         <div className="space-y-2">
           <Label htmlFor="incident_date">
-            Date du sinistre {cessionType === 'repair' && <span className="text-red-500">*</span>}
+            {cessionType === 'fleet_loan' ? 'Date de début du prêt' : 'Date du sinistre'} {cessionType === 'repair' && <span className="text-red-500">*</span>}
           </Label>
           <Input
             id="incident_date"
