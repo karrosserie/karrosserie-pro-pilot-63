@@ -244,6 +244,11 @@ const Invoices = () => {
       : 'bg-orange-100 text-orange-800 hover:bg-orange-100';
   };
 
+  const getCreditAmountTextColor = (invoiceCredits: any[]) => {
+    const allPaid = invoiceCredits.every(credit => credit.status === 'Payé');
+    return allPaid ? 'text-green-600' : 'text-orange-600';
+  };
+
   const renderCreditsBadges = (invoiceCredits: any[]) => {
     if (invoiceCredits.length === 0) {
       return <span className="text-gray-500 text-sm">-</span>;
@@ -605,15 +610,15 @@ const Invoices = () => {
                      <TableCell className="text-right font-medium">
                        {formatAmount(invoice.amount || 0)}
                      </TableCell>
-                     <TableCell>
-                       {invoiceCredits.length > 0 ? (
-                         <div className="flex items-center gap-1">
-                           <span className="text-orange-600">
-                             {formatAmount(invoiceCredits.reduce((sum, credit) => sum + (credit.amount || 0), 0))}
-                           </span>
-                         </div>
-                       ) : '-'}
-                     </TableCell>
+                      <TableCell>
+                        {invoiceCredits.length > 0 ? (
+                          <div className="flex items-center gap-1">
+                            <span className={getCreditAmountTextColor(invoiceCredits)}>
+                              {formatAmount(invoiceCredits.reduce((sum, credit) => sum + (credit.amount || 0), 0))}
+                            </span>
+                          </div>
+                        ) : '-'}
+                      </TableCell>
                      <TableCell>
                        <div className="flex items-center gap-1">
                          <Badge 
