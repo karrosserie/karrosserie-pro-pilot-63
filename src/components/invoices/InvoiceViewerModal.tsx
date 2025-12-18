@@ -144,14 +144,59 @@ const InvoiceViewerModal = ({
 
   const items = useMemo(() => {
     const result: any[] = [];
-    if (invoice.repairs_data) {
-      const repairs = Array.isArray(invoice.repairs_data) ? invoice.repairs_data : [];
-      result.push(...repairs.map((r: any) => ({ ref: r.ref || '', description: r.description || r.label || '', quantity: r.quantity || 1, discount: r.discount || 0, unitPrice: r.unitCost || r.price || 0, vat: r.vat || 20, totalHT: (r.unitCost || r.price || 0) * (r.quantity || 1) * (1 - (r.discount || 0) / 100), totalTTC: (r.unitCost || r.price || 0) * (r.quantity || 1) * (1 - (r.discount || 0) / 100) * (1 + (r.vat || 20) / 100) })));
+    
+    // Parser repairs_data (peut être un string JSON ou un array)
+    let repairs: any[] = [];
+    try {
+      if (invoice.repairs_data) {
+        repairs = Array.isArray(invoice.repairs_data) 
+          ? invoice.repairs_data 
+          : typeof invoice.repairs_data === 'string' 
+            ? JSON.parse(invoice.repairs_data) 
+            : [];
+      }
+    } catch (e) {
+      console.error('Error parsing repairs_data:', e);
     }
-    if (invoice.parts_data) {
-      const parts = Array.isArray(invoice.parts_data) ? invoice.parts_data : [];
-      result.push(...parts.map((p: any) => ({ ref: p.ref || '', description: p.description || p.label || '', quantity: p.quantity || 1, discount: p.discount || 0, unitPrice: p.unitCost || p.price || 0, vat: p.vat || 20, totalHT: (p.unitCost || p.price || 0) * (p.quantity || 1) * (1 - (p.discount || 0) / 100), totalTTC: (p.unitCost || p.price || 0) * (p.quantity || 1) * (1 - (p.discount || 0) / 100) * (1 + (p.vat || 20) / 100) })));
+    
+    // Parser parts_data (peut être un string JSON ou un array)
+    let parts: any[] = [];
+    try {
+      if (invoice.parts_data) {
+        parts = Array.isArray(invoice.parts_data) 
+          ? invoice.parts_data 
+          : typeof invoice.parts_data === 'string' 
+            ? JSON.parse(invoice.parts_data) 
+            : [];
+      }
+    } catch (e) {
+      console.error('Error parsing parts_data:', e);
     }
+    
+    // Mapper les réparations
+    result.push(...repairs.map((r: any) => ({
+      ref: r.ref || '',
+      description: r.description || r.label || '',
+      quantity: r.quantity || 1,
+      discount: r.discount || 0,
+      unitPrice: r.unitCost || r.price || 0,
+      vat: r.vat || 20,
+      totalHT: (r.unitCost || r.price || 0) * (r.quantity || 1) * (1 - (r.discount || 0) / 100),
+      totalTTC: (r.unitCost || r.price || 0) * (r.quantity || 1) * (1 - (r.discount || 0) / 100) * (1 + (r.vat || 20) / 100)
+    })));
+    
+    // Mapper les pièces
+    result.push(...parts.map((p: any) => ({
+      ref: p.ref || '',
+      description: p.description || p.label || '',
+      quantity: p.quantity || 1,
+      discount: p.discount || 0,
+      unitPrice: p.unitCost || p.price || 0,
+      vat: p.vat || 20,
+      totalHT: (p.unitCost || p.price || 0) * (p.quantity || 1) * (1 - (p.discount || 0) / 100),
+      totalTTC: (p.unitCost || p.price || 0) * (p.quantity || 1) * (1 - (p.discount || 0) / 100) * (1 + (p.vat || 20) / 100)
+    })));
+    
     return result;
   }, [invoice.repairs_data, invoice.parts_data]);
 
