@@ -159,5 +159,21 @@ export const invoiceQueries = {
     }
 
     return invoice;
+  },
+
+  // Nouvelle fonction utilisant la séquence SQL atomique pour éviter les doublons
+  getNextInvoiceNumber: async (): Promise<string> => {
+    const { getCurrentUserCompanyId } = await import('../auth-company');
+    const companyId = await getCurrentUserCompanyId();
+
+    const { data, error } = await supabase
+      .rpc('get_next_invoice_number', { p_company_id: companyId });
+
+    if (error) {
+      console.error('Error getting next invoice number:', error);
+      throw new Error(error.message);
+    }
+
+    return data.toString();
   }
 };

@@ -58,25 +58,16 @@ export const parseInvoiceNotes = (notes: string) => {
 };
 
 export const generateNextInvoiceNumber = async (): Promise<string> => {
-  console.log('[generateNextInvoiceNumber] CALLED');
+  console.log('[generateNextInvoiceNumber] CALLED - using SQL sequence');
   const start = performance.now();
   try {
-    // Utilise getLastInvoiceByUser au lieu de getAll pour éviter de charger toutes les factures
-    const lastInvoice = await invoicesService.getLastInvoiceByUser();
-    console.log('[generateNextInvoiceNumber] getLastInvoiceByUser returned:', lastInvoice?.reference, 'in', (performance.now() - start).toFixed(0), 'ms');
-    
-    if (!lastInvoice?.reference) {
-      return '1';
-    }
-
-    const lastNumber = parseInt(lastInvoice.reference, 10);
-    if (isNaN(lastNumber)) {
-      return '1';
-    }
-
-    return (lastNumber + 1).toString();
+    // Utilise la fonction RPC atomique pour garantir l'unicité du numéro
+    const nextNumber = await invoicesService.getNextInvoiceNumber();
+    console.log('[generateNextInvoiceNumber] Got:', nextNumber, 'in', (performance.now() - start).toFixed(0), 'ms');
+    return nextNumber;
   } catch (error) {
     console.error('[generateNextInvoiceNumber] ERROR:', error);
-    return '1';
+    // Ne PAS retourner "1" - propager l'erreur pour forcer l'utilisateur à réessayer
+    throw error;
   }
 };
