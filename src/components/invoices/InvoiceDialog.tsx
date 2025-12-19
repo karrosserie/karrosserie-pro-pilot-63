@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { InvoiceForm } from '@/components/invoices/InvoiceForm';
+import { InvoiceForm, InvoiceFormRef } from '@/components/invoices/InvoiceForm';
 import { UseMutationResult } from '@tanstack/react-query';
 import { useInvoices } from '@/hooks/use-invoices';
 
@@ -33,6 +33,7 @@ const InvoiceDialog = ({
   updateInvoice
 }: InvoiceDialogProps) => {
   const navigate = useNavigate();
+  const formRef = useRef<InvoiceFormRef>(null);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -45,6 +46,16 @@ const InvoiceDialog = ({
 
   const isConversionFromRepairOrder = prefillData?.repair_order_id;
   const isEditing = invoice && invoice.id;
+  const isNewInvoice = !isEditing;
+
+  // Wrapper pour gérer la fermeture du dialogue (croix, Escape, etc.)
+  const handleOpenChange = useCallback(async (newOpen: boolean) => {
+    if (!newOpen && isNewInvoice && formRef.current) {
+      // Libérer le numéro réservé si on ferme le dialogue pour une nouvelle facture
+      await formRef.current.releaseReservedNumber();
+    }
+    onOpenChange(newOpen);
+  }, [isNewInvoice, onOpenChange]);
 
   const handleSubmit = async (formData: any) => {
     console.log('[InvoiceDialog] handleSubmit CALLED, isSubmitting:', isSubmitting);
@@ -82,7 +93,7 @@ const InvoiceDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={!isSubmitting ? onOpenChange : undefined} modal={false}>
+    <Dialog open={open} onOpenChange={!isSubmitting ? handleOpenChange : undefined} modal={false}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>
@@ -105,9 +116,10 @@ const InvoiceDialog = ({
         
         {open && (
           <InvoiceForm
+            ref={formRef}
             invoice={invoice}
             onSubmit={handleSubmit}
-            onCancel={() => onOpenChange(false)}
+            onCancel={() => handleOpenChange(false)}
             isSubmitting={isSubmitting}
             prefillData={prefillData}
             isConversionFromRepairOrder={isConversionFromRepairOrder}
