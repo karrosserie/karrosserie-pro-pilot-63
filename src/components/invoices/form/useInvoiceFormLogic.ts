@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Invoice } from '@/services/supabase/invoices';
+import { Invoice, invoicesService } from '@/services/supabase/invoices';
 import { InvoiceRepairItem, InvoicePartItem, InvoiceDiscountItem } from './types';
 import { validateInvoiceForm } from './utils/validation';
 import { calculateGlobalTotals } from './hooks/useInvoiceCalculations';
@@ -28,6 +28,9 @@ export const useInvoiceFormLogic = ({ invoice, prefillData }: UseInvoiceFormLogi
   // Ref pour éviter les ré-initialisations
   const initializedRef = useRef(false);
   const invoiceIdRef = useRef<string | null>(null);
+  
+  // Ref pour le numéro réservé (pour libération si annulation)
+  const reservedNumberRef = useRef<string | null>(null);
 
   const [formData, setFormData] = useState<Partial<Invoice>>(() => {
     const initialData: Partial<Invoice> = {
@@ -183,21 +186,38 @@ export const useInvoiceFormLogic = ({ invoice, prefillData }: UseInvoiceFormLogi
         setParts(partsData);
         setDiscounts(discountsData);
       } else {
-        // Nouvelle facture - le numéro sera généré à la soumission
+        // Nouvelle facture - réserver un numéro
         const today = new Date().toISOString().split('T')[0];
         const dueDate = new Date();
         dueDate.setDate(dueDate.getDate() + 30);
         const dueDateString = dueDate.toISOString().split('T')[0];
 
-        setFormData(prev => ({
-          ...prev,
-          reference: '', // Sera généré automatiquement à la soumission
-          date: today,
-          due_date: dueDateString,
-          client_id: prefillData?.client_id || prev.client_id,
-          vehicle_id: prefillData?.vehicle_id || prev.vehicle_id,
-          repair_order_id: prefillData?.repair_order_id || null
-        }));
+        try {
+          // Réserver un numéro de facture
+          const reservedNumber = await invoicesService.reserveInvoiceNumber();
+          reservedNumberRef.current = reservedNumber;
+          
+          setFormData(prev => ({
+            ...prev,
+            reference: reservedNumber,
+            date: today,
+            due_date: dueDateString,
+            client_id: prefillData?.client_id || prev.client_id,
+            vehicle_id: prefillData?.vehicle_id || prev.vehicle_id,
+            repair_order_id: prefillData?.repair_order_id || null
+          }));
+        } catch (error) {
+          console.error('Error reserving invoice number:', error);
+          setFormData(prev => ({
+            ...prev,
+            reference: '',
+            date: today,
+            due_date: dueDateString,
+            client_id: prefillData?.client_id || prev.client_id,
+            vehicle_id: prefillData?.vehicle_id || prev.vehicle_id,
+            repair_order_id: prefillData?.repair_order_id || null
+          }));
+        }
 
         // Appliquer prefillData pour réparations/pièces/remises
         if (prefillData) {
@@ -221,6 +241,18 @@ export const useInvoiceFormLogic = ({ invoice, prefillData }: UseInvoiceFormLogi
     [repairs, parts, discounts]
   );
 
+  // Fonction pour libérer le numéro réservé (appelée lors de l'annulation)
+  const releaseReservedNumber = useCallback(async () => {
+    if (reservedNumberRef.current && !invoice?.id) {
+      try {
+        await invoicesService.releaseInvoiceNumber(reservedNumberRef.current);
+        reservedNumberRef.current = null;
+      } catch (error) {
+        console.error('Error releasing reserved invoice number:', error);
+      }
+    }
+  }, [invoice?.id]);
+
   return {
     formData,
     claimNumber,
@@ -238,6 +270,7 @@ export const useInvoiceFormLogic = ({ invoice, prefillData }: UseInvoiceFormLogi
     handleClaimNumberChange,
     validateForm,
     globalTotals,
-    prepareSubmitData
+    prepareSubmitData,
+    releaseReservedNumber
   };
 };

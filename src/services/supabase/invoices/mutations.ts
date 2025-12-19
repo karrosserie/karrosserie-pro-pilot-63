@@ -9,11 +9,11 @@ export const invoiceMutations = {
     const { getCurrentUserCompanyId } = await import('../auth-company');
     const companyId = await getCurrentUserCompanyId();
 
-    // Générer le numéro de facture maintenant, au moment de la création
+    // Utiliser le numéro réservé ou en générer un nouveau si nécessaire
     let reference = invoice.reference;
     if (!reference || reference === '') {
       const { data: nextNum, error: numError } = await supabase
-        .rpc('get_next_invoice_number', { p_company_id: companyId });
+        .rpc('reserve_invoice_number', { p_company_id: companyId });
       
       if (numError) {
         console.error('Error generating invoice number:', numError);
@@ -56,6 +56,17 @@ export const invoiceMutations = {
     if (error) {
       console.error('Error creating invoice:', error);
       throw new Error(error.message);
+    }
+    
+    // Confirmer le numéro réservé après création réussie
+    try {
+      await supabase.rpc('confirm_invoice_number', { 
+        p_company_id: companyId, 
+        p_number: parseInt(reference) 
+      });
+    } catch (confirmError) {
+      console.error('Error confirming invoice number:', confirmError);
+      // Ne pas throw car la facture est déjà créée
     }
     
     return data;

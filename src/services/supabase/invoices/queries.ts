@@ -175,5 +175,55 @@ export const invoiceQueries = {
     }
 
     return data.toString();
+  },
+
+  // Réserver un numéro temporairement (à l'ouverture du formulaire)
+  reserveInvoiceNumber: async (): Promise<string> => {
+    const { getCurrentUserCompanyId } = await import('../auth-company');
+    const companyId = await getCurrentUserCompanyId();
+
+    const { data, error } = await supabase
+      .rpc('reserve_invoice_number', { p_company_id: companyId });
+
+    if (error) {
+      console.error('Error reserving invoice number:', error);
+      throw new Error(error.message);
+    }
+
+    return data.toString();
+  },
+
+  // Confirmer le numéro après création réussie
+  confirmInvoiceNumber: async (number: string): Promise<void> => {
+    const { getCurrentUserCompanyId } = await import('../auth-company');
+    const companyId = await getCurrentUserCompanyId();
+
+    const { error } = await supabase
+      .rpc('confirm_invoice_number', { 
+        p_company_id: companyId, 
+        p_number: parseInt(number) 
+      });
+
+    if (error) {
+      console.error('Error confirming invoice number:', error);
+      throw new Error(error.message);
+    }
+  },
+
+  // Libérer un numéro réservé (si annulation)
+  releaseInvoiceNumber: async (number: string): Promise<void> => {
+    const { getCurrentUserCompanyId } = await import('../auth-company');
+    const companyId = await getCurrentUserCompanyId();
+
+    const { error } = await supabase
+      .rpc('release_invoice_number', { 
+        p_company_id: companyId, 
+        p_number: parseInt(number) 
+      });
+
+    if (error) {
+      console.error('Error releasing invoice number:', error);
+      // Ne pas throw ici car c'est une opération de nettoyage
+    }
   }
 };

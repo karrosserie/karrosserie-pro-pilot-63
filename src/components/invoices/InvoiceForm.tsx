@@ -49,8 +49,15 @@ export const InvoiceForm = React.memo(({
     handleClaimNumberChange,
     validateForm,
     globalTotals,
-    prepareSubmitData
+    prepareSubmitData,
+    releaseReservedNumber
   } = useInvoiceFormLogic({ invoice, prefillData });
+
+  // Gestion de l'annulation avec libération du numéro réservé
+  const handleCancel = async () => {
+    await releaseReservedNumber();
+    onCancel();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,7 +134,7 @@ export const InvoiceForm = React.memo(({
       <InvoiceFormActions 
         invoice={invoice}
         isSubmitting={isSubmitting}
-        onCancel={onCancel}
+        onCancel={handleCancel}
         isConversionFromRepairOrder={isConversionFromRepairOrder}
       />
     </form>
