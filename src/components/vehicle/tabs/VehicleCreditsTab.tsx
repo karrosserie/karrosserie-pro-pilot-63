@@ -58,7 +58,7 @@ const VehicleCreditsTab: React.FC<VehicleCreditsTabProps> = ({ vehicleId }) => {
     }
     return false;
   }) || [];
-  const { sortedData, sortConfig, handleSort } = useTableSorting(vehicleCredits, 'reference');
+  const { sortedData, sortConfig, handleSort } = useTableSorting(vehicleCredits, 'created_at', 'desc');
 
   const formatVehicleDisplay = (credit: any) => {
     if (credit.vehicles) {
@@ -324,7 +324,7 @@ const VehicleCreditsTab: React.FC<VehicleCreditsTabProps> = ({ vehicleId }) => {
               <TableHeader>
                 <TableRow>
                   <SortableTableHeader sortKey="reference" sortConfig={sortConfig} onSort={handleSort}>Numéro</SortableTableHeader>
-                  <SortableTableHeader sortKey="created_date" sortConfig={sortConfig} onSort={handleSort}>Date</SortableTableHeader>
+                  <SortableTableHeader sortKey="created_at" sortConfig={sortConfig} onSort={handleSort}>Date</SortableTableHeader>
                   <TableHead>Véhicule</TableHead>
                   <TableHead>Facture d'origine</TableHead>
                   <SortableTableHeader sortKey="amount" sortConfig={sortConfig} onSort={handleSort}>Montant</SortableTableHeader>
