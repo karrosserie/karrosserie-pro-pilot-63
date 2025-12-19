@@ -30,8 +30,8 @@ export const getAllCessions = async (): Promise<Cession[]> => {
       let fleetReservationData = null;
       const cessionType = (cession as any).cession_type || 'repair';
       
-      // Fetch repair order data for repair type cessions
-      if (cessionType === 'repair' && cession.repair_order_id) {
+      // Fetch repair order data for repair type cessions (including enterprise)
+      if ((cessionType === 'repair' || cessionType === 'repair_enterprise') && cession.repair_order_id) {
         console.log(`Fetching repair order for cession ${cession.id}, repair_order_id: ${cession.repair_order_id}`);
         
         try {
