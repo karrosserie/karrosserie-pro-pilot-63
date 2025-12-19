@@ -58,6 +58,9 @@ export function useMessageries() {
   const [messageries, setMessageries] = useState<Messagerie[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  
+  // Référence stable pour toast pour éviter les re-renders
+  const toastRef = { current: toast };
 
   // Charger les messageries avec les infos clients
   const fetchMessageries = async () => {
@@ -114,14 +117,14 @@ export function useMessageries() {
       return data || [];
     } catch (error) {
       console.error('Erreur lors du chargement de l\'historique client:', error);
-      toast({
+      toastRef.current({
         title: "Erreur",
         description: "Impossible de charger l'historique du client",
         variant: "destructive",
       });
       return [];
     }
-  }, [toast]);
+  }, []);
 
   // Récupérer les réponses d'un fil de conversation (mémorisé pour éviter les boucles infinies)
   const fetchReplies = useCallback(async (messagerieId: string): Promise<MessagerieReply[]> => {
