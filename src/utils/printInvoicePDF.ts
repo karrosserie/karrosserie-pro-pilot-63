@@ -20,17 +20,39 @@ export const printInvoicePDF = async (
     // Créer une URL pour le blob
     const url = URL.createObjectURL(blob);
     
-    // Ouvrir le PDF dans un nouvel onglet pour impression
-    const printWindow = window.open(url, '_blank');
-    
-    if (printWindow) {
-      printWindow.onload = () => {
-        // Nettoyer l'URL après un délai
-        setTimeout(() => {
-          URL.revokeObjectURL(url);
-        }, 1000);
-      };
-    }
+    // Utiliser un iframe caché pour l'impression (évite le blocage par les extensions)
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = 'none';
+    iframe.src = url;
+
+    iframe.onload = () => {
+      setTimeout(() => {
+        try {
+          iframe.contentWindow?.focus();
+          iframe.contentWindow?.print();
+        } catch (error) {
+          console.error('Erreur impression iframe:', error);
+          // Fallback: télécharger le PDF
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `Facture_${invoice.reference}.pdf`;
+          link.click();
+        }
+      }, 500);
+      
+      // Nettoyer après impression (laisser 60s)
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+        URL.revokeObjectURL(url);
+      }, 60000);
+    };
+
+    document.body.appendChild(iframe);
     
     return { success: true };
   } catch (error) {
