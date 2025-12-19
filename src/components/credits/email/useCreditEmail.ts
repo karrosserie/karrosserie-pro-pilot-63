@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { InvoiceEmailFormData } from '../../invoices/email/types';
 import { clientsService } from '@/services/supabase/clients';
+import { companyService } from '@/services/supabase/company';
 import { prepareCreditDataForPDF } from '@/utils/creditPDFGeneration';
 import { pdf } from '@react-pdf/renderer';
 import InvoicePDF from '@/components/invoices/InvoicePDF';
@@ -17,6 +18,9 @@ export const useCreditEmail = (credit: any | null) => {
     let clientEmail = '';
     let clientName = '';
     let vehicleInfo = '';
+    
+    // Récupérer les informations de l'entreprise pour la signature
+    const companyInfo = await companyService.getCompanyInfo();
     
     // Récupérer les informations client depuis l'avoir
     if (credit?.clients) {
@@ -58,7 +62,7 @@ export const useCreditEmail = (credit: any | null) => {
 Veuillez trouver en pièce jointe l'avoir n°${credit?.reference || ''} pour votre véhicule ${vehicleInfo}.
 
 Cordialement,
-AUTO PAINT`;
+${companyInfo?.name || 'L\'équipe'}`;
 
     return {
       to: clientEmail,
