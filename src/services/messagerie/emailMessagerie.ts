@@ -89,28 +89,6 @@ export const registerEmailInMessagerie = async (data: EmailMessagerieData): Prom
       return false;
     }
 
-    // Créer la réponse associée dans messagerie_replies
-    const { error: replyError } = await supabase
-      .from('messagerie_replies')
-      .insert({
-        messagerie_id: messagerie.id,
-        company_id: companyData.company_id,
-        sender_type: 'carrosserie',
-        sender_id: userData.user.id,
-        content: data.message,
-        channel: 'Mail',
-        actual_communication_date: now,
-        is_inbound: false,
-        sent_at: now,
-        read_by_client: false,
-        read_by_company: true
-      });
-
-    if (replyError) {
-      console.error('Erreur lors de la création de la réponse:', replyError);
-      // Ne pas retourner false car la messagerie a été créée
-    }
-
     console.log(`[emailMessagerie] Email ${data.documentType} enregistré dans la messagerie:`, messagerie.id);
     return true;
   } catch (error) {
