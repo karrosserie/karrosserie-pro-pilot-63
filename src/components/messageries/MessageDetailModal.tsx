@@ -148,6 +148,8 @@ export function MessageDetailModal({
 
   const ChannelIcon = getChannelIcon(message.channel);
   const priorityInfo = getPriorityLabel(message.priority);
+  const isInboundMessage = message.is_inbound !== false;
+  const isOutboundMessage = message.is_inbound === false;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -360,22 +362,28 @@ export function MessageDetailModal({
           {/* Actions de changement de statut */}
           <div className="space-y-3 pt-4 border-t">
             <div className="flex gap-2 flex-wrap">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => handleStatusChange('en_cours')}
-                disabled={message.status === 'en_cours'}
-              >
-                Mettre en cours
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => handleStatusChange('en_attente_client')}
-                disabled={message.status === 'en_attente_client'}
-              >
-                En attente client
-              </Button>
+              {/* Boutons uniquement pour messages entrants */}
+              {isInboundMessage && (
+                <>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleStatusChange('en_cours')}
+                    disabled={message.status === 'en_cours'}
+                  >
+                    Mettre en cours
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleStatusChange('en_attente_client')}
+                    disabled={message.status === 'en_attente_client'}
+                  >
+                    En attente client
+                  </Button>
+                </>
+              )}
+              {/* Bouton résolu - toujours visible */}
               <Button 
                 variant="outline" 
                 size="sm"
@@ -388,9 +396,18 @@ export function MessageDetailModal({
 
             {/* Actions principales */}
             <div className="flex gap-2">
-              <Button onClick={() => onReply(message.id)} className="flex-1">
-                Répondre
-              </Button>
+              {/* Répondre - uniquement pour messages entrants */}
+              {isInboundMessage && (
+                <Button onClick={() => onReply(message.id)} className="flex-1">
+                  Répondre
+                </Button>
+              )}
+              {/* Ajouter un suivi - uniquement pour messages sortants */}
+              {isOutboundMessage && (
+                <Button onClick={() => onReply(message.id)} className="flex-1" variant="outline">
+                  Ajouter un suivi
+                </Button>
+              )}
               <Button 
                 variant="outline" 
                 onClick={() => {
