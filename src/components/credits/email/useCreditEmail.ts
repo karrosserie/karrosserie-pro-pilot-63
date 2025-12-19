@@ -129,7 +129,7 @@ ${companyInfo?.name || 'L\'équipe'}`;
           to: emailData.to,
           subject: emailData.subject,
           message: emailData.message,
-          pdfBase64: pdfBase64,
+          fileBase64: pdfBase64,
           invoiceReference: credit.reference,
           documentType: 'credit'
         }
