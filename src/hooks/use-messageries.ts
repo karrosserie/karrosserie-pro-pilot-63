@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -101,8 +101,8 @@ export function useMessageries() {
     }
   };
 
-  // Récupérer l'historique complet d'un client
-  const getClientHistory = async (clientId: string) => {
+  // Récupérer l'historique complet d'un client (mémorisé pour éviter les boucles infinies)
+  const getClientHistory = useCallback(async (clientId: string) => {
     try {
       const { data, error } = await supabase
         .from('messageries')
@@ -121,10 +121,10 @@ export function useMessageries() {
       });
       return [];
     }
-  };
+  }, [toast]);
 
-  // Récupérer les réponses d'un fil de conversation
-  const fetchReplies = async (messagerieId: string): Promise<MessagerieReply[]> => {
+  // Récupérer les réponses d'un fil de conversation (mémorisé pour éviter les boucles infinies)
+  const fetchReplies = useCallback(async (messagerieId: string): Promise<MessagerieReply[]> => {
     try {
       const { data, error } = await supabase
         .from('messagerie_replies')
@@ -138,7 +138,7 @@ export function useMessageries() {
       console.error('Erreur lors du chargement des réponses:', error);
       return [];
     }
-  };
+  }, []);
 
   // Ajouter une réponse au fil de conversation
   const addReply = async (
