@@ -9,6 +9,7 @@ import { pdf } from '@react-pdf/renderer';
 import InvoicePDF from '@/components/invoices/InvoicePDF';
 import { prepareRepairOrderDataForPDF } from '@/utils/repairOrderPDFGeneration';
 import { getClientDisplayName } from '@/utils/clientDisplayUtils';
+import { registerEmailInMessagerie } from '@/services/messagerie/emailMessagerie';
 
 export const useRepairOrderEmail = (repairOrder: SimpleRepairOrder | null, open: boolean) => {
   const { toast } = useToast();
@@ -143,6 +144,20 @@ ${companyName}`
 
       if (error) {
         throw error;
+      }
+
+      // Enregistrer l'envoi dans le centre de messagerie
+      const clientId = repairOrder.clients?.id;
+      if (clientId) {
+        await registerEmailInMessagerie({
+          clientId: clientId,
+          documentType: 'repair_order',
+          documentReference: repairOrder.reference || '',
+          recipientEmail: formData.recipient,
+          subject: formData.subject,
+          message: formData.message,
+          vehicleId: repairOrder.vehicles?.id || undefined
+        });
       }
       
       toast({
