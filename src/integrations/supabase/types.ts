@@ -3485,18 +3485,27 @@ export type Database = {
           company_id: string
           created_at: string | null
           last_number: number
+          reserved_at: string | null
+          reserved_by: string | null
+          reserved_number: number | null
           updated_at: string | null
         }
         Insert: {
           company_id: string
           created_at?: string | null
           last_number?: number
+          reserved_at?: string | null
+          reserved_by?: string | null
+          reserved_number?: number | null
           updated_at?: string | null
         }
         Update: {
           company_id?: string
           created_at?: string | null
           last_number?: number
+          reserved_at?: string | null
+          reserved_by?: string | null
+          reserved_number?: number | null
           updated_at?: string | null
         }
         Relationships: [
@@ -7041,6 +7050,10 @@ export type Database = {
       }
       check_token_for_upload: { Args: { file_path: string }; Returns: boolean }
       cleanup_expired_otp_codes: { Args: never; Returns: undefined }
+      confirm_invoice_number: {
+        Args: { p_company_id: string; p_number: number }
+        Returns: boolean
+      }
       create_campaign_log: {
         Args: {
           p_anomaly_type?: string
@@ -7318,6 +7331,14 @@ export type Database = {
         Returns: string
       }
       refresh_company_business_metrics: { Args: never; Returns: undefined }
+      release_invoice_number: {
+        Args: { p_company_id: string; p_number: number }
+        Returns: boolean
+      }
+      reserve_invoice_number: {
+        Args: { p_company_id: string }
+        Returns: number
+      }
       set_config: {
         Args: {
           is_local?: boolean

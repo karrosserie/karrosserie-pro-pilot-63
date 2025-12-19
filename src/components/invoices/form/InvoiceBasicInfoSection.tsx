@@ -62,8 +62,8 @@ const InvoiceBasicInfoSectionComponent = ({
                 errors.reference && "border-red-500 focus-visible:ring-red-500",
                 isNewInvoice && !formData.reference && "bg-muted text-muted-foreground"
               )}
-              placeholder={isNewInvoice && !formData.reference ? "Auto-généré à la création" : undefined}
-              readOnly={isNewInvoice && !formData.reference}
+              placeholder={isNewInvoice && !formData.reference ? "Chargement..." : undefined}
+              readOnly={isNewInvoice}
             />
             {errors.reference && (
               <p className="text-sm text-red-500 mt-1 flex items-center">
