@@ -40,6 +40,7 @@ import { clientsService } from '@/services/supabase/clients';
 import { useTableSorting } from '@/hooks/use-table-sorting';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 import { CessionMobileCard } from './CessionMobileCard';
 import { useSubscription } from '@/hooks/use-subscription';
 import { CessionProgressDialog } from './CessionProgressDialog';
@@ -223,7 +224,7 @@ export const CessionsTable = ({
       }
       
       const clientName = reservation.clients 
-        ? `${reservation.clients.first_name} ${reservation.clients.last_name}` 
+        ? getClientDisplayName(reservation.clients) 
         : 'Client non assigné';
       
       const vehicleInfo = reservation.fleet_vehicles
@@ -244,7 +245,7 @@ export const CessionsTable = ({
     
     const order = cession.repair_orders;
     const clientName = order.clients ? 
-      `${order.clients.first_name} ${order.clients.last_name}` : 
+      getClientDisplayName(order.clients) : 
       'Client non assigné';
     
     const vehicleInfo = order.vehicles ? 
