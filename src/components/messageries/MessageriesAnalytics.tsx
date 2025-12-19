@@ -130,8 +130,15 @@ export default function MessageriesAnalytics() {
       );
     }
 
-    // Tri intelligent : non résolus d'abord, puis par priorité (1 = plus urgent), puis par date
+    // Tri : dépend de la vue active
     return filtered.sort((a, b) => {
+      // Vue "Tous" ou "Résolus" : tri chronologique simple (plus récent en premier)
+      if (activeView === "all" || activeView === "resolved") {
+        return new Date(b.actual_communication_date || b.created_at).getTime() - 
+               new Date(a.actual_communication_date || a.created_at).getTime();
+      }
+      
+      // Autres vues : tri intelligent
       // 1. Messages non résolus d'abord
       if (a.resolved !== b.resolved) {
         return a.resolved ? 1 : -1;
