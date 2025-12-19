@@ -52,7 +52,7 @@ export const getAllCessions = async (): Promise<Cession[]> => {
             if (repairOrder.client_id) {
               const { data: client } = await supabase
                 .from('clients')
-                .select('first_name, last_name, address, city, postal_code, email, phone, driver_license_front_url, driver_license_back_url')
+                .select('first_name, last_name, address, city, postal_code, email, phone, driver_license_front_url, driver_license_back_url, client_type, company_name')
                 .eq('id', repairOrder.client_id)
                 .single();
               clientData = client;
@@ -129,7 +129,7 @@ export const getAllCessions = async (): Promise<Cession[]> => {
               insurance_contract_number,
               insurance_email,
               claim_number,
-              clients(id, first_name, last_name, email, phone, address, city, postal_code, oodrive_recipient_id),
+              clients(id, first_name, last_name, email, phone, address, city, postal_code, oodrive_recipient_id, client_type, company_name),
               fleet_vehicles(id, license_plate, car_brands(name), car_models(name)),
               quotes(id, amount)
             `)
@@ -216,7 +216,7 @@ export const getCessionById = async (id: string): Promise<Cession> => {
         client_signature,
         client_name_signature,
         signature_date,
-        clients(first_name, last_name, address, city, postal_code, email, phone, driver_license_front_url, driver_license_back_url),
+        clients(first_name, last_name, address, city, postal_code, email, phone, driver_license_front_url, driver_license_back_url, client_type, company_name),
         vehicles(
           license_plate,
           vin,
