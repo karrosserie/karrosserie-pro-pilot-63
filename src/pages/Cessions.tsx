@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useCessions } from '@/hooks/use-cessions';
 import { CessionDialog } from '@/components/cessions/CessionDialog';
 import { CessionsHeader } from '@/components/cessions/CessionsHeader';
@@ -19,6 +19,9 @@ const Cessions = () => {
   const [showHelpDialog, setShowHelpDialog] = useState(false);
   const [showCourtesyVehicleDialog, setShowCourtesyVehicleDialog] = useState(false);
   const [cessionJustCreated, setCessionJustCreated] = useState(false);
+  
+  // Ref pour tracker les cessions en cours de traitement (évite les appels multiples)
+  const processingCessionsRef = useRef<Set<string>>(new Set());
 
   const { cessions, isLoading, createCession, updateCession, deleteCession } = useCessions();
   const { toast } = useToast();
@@ -62,6 +65,14 @@ const Cessions = () => {
       })));
 
       for (const cession of cessionsEnAttente) {
+        // Éviter les appels multiples pour la même cession
+        if (processingCessionsRef.current.has(cession.id)) {
+          console.log(`Cession ${cession.id} déjà en cours de traitement, skip`);
+          continue;
+        }
+        
+        processingCessionsRef.current.add(cession.id);
+        
         try {
           console.log(`=== APPEL API POUR CESSION ${cession.id} ===`);
           console.log(`Contract ID: ${cession.oodrive_contract_id}`);
@@ -114,7 +125,7 @@ const Cessions = () => {
                 // Déclencher automatiquement l'envoi du courrier électronique
                 console.log('Déclenchement automatique de l\'envoi du courrier électronique');
                 
-                const { error: sendError } = await supabase.functions.invoke('send-cession-registered-mail', {
+                const { data: sendResult, error: sendError } = await supabase.functions.invoke('send-cession-registered-mail', {
                   body: { cessionId: cession.id }
                 });
                 
@@ -125,6 +136,8 @@ const Cessions = () => {
                     description: "La cession a été signée mais l'envoi du courrier a échoué. Vous pouvez le renvoyer manuellement.",
                     variant: "destructive"
                   });
+                } else if (sendResult?.alreadySent) {
+                  console.log('Courrier déjà envoyé pour cette cession');
                 } else {
                   console.log('Courrier électronique envoyé automatiquement avec succès');
                   toast({
@@ -141,6 +154,9 @@ const Cessions = () => {
           }
         } catch (error) {
           console.error(`Erreur lors de la vérification du statut pour la cession ${cession.id}:`, error);
+        } finally {
+          // Retirer de la liste des cessions en cours de traitement
+          processingCessionsRef.current.delete(cession.id);
         }
       }
     };

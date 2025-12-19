@@ -48,6 +48,23 @@ serve(async (req) => {
       throw new Error('Cession non trouvée');
     }
 
+    // Vérification d'idempotence : si déjà envoyée, ne pas renvoyer
+    if (cession.status === 'lettre_recommandee_envoyee') {
+      console.log('Cession already sent, skipping:', cessionId);
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: 'Cession déjà envoyée par courrier',
+          alreadySent: true,
+          tokensConsumed: 0
+        }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders },
+        }
+      );
+    }
+
     // Vérifier que la cession est signée
     if (cession.status !== 'signee') {
       throw new Error('La cession doit être signée avant d\'être envoyée par courrier');
@@ -61,6 +78,24 @@ serve(async (req) => {
     // Vérifier qu'il y a un document signé
     if (!cession.signed_document_url) {
       throw new Error('Aucun document signé disponible pour cette cession');
+    }
+
+    // IMPORTANT: Vérifier les jetons AVANT d'appeler le webhook
+    const { data: subscription, error: subscriptionError } = await supabase
+      .from('company_subscriptions')
+      .select('*')
+      .eq('company_id', cession.company_id)
+      .eq('status', 'active')
+      .single();
+
+    if (subscriptionError || !subscription) {
+      console.error('Error fetching subscription:', subscriptionError);
+      throw new Error('Aucun abonnement actif trouvé');
+    }
+
+    if (subscription.tokens_remaining < 10) {
+      console.error('Insufficient tokens:', subscription.tokens_remaining);
+      throw new Error('Jetons insuffisants pour cette opération (10 jetons requis)');
     }
 
     const insuranceCompany = cession.insurance_companies;
@@ -94,7 +129,7 @@ serve(async (req) => {
 
     console.log('Sending webhook data:', webhookData);
 
-    // Appeler le webhook N8N
+    // Appeler le webhook N8N (maintenant APRÈS la vérification des jetons)
     const webhookResponse = await fetch('https://n8n.karrosserie.pro/webhook/5f39c262-4fa4-477b-8635-f04c9bb61308', {
       method: 'POST',
       headers: {
@@ -112,23 +147,6 @@ serve(async (req) => {
     console.log('Webhook called successfully');
 
     // Consommer les jetons (10 jetons pour l'envoi de cession)
-    const { data: subscription, error: subscriptionError } = await supabase
-      .from('company_subscriptions')
-      .select('*')
-      .eq('company_id', cession.company_id)
-      .eq('status', 'active')
-      .single();
-
-    if (subscriptionError || !subscription) {
-      console.error('Error fetching subscription:', subscriptionError);
-      throw new Error('Aucun abonnement actif trouvé');
-    }
-
-    if (subscription.tokens_remaining < 10) {
-      throw new Error('Jetons insuffisants pour cette opération (10 jetons requis)');
-    }
-
-    // Consommer les jetons
     const { error: tokenError } = await supabase
       .from('company_subscriptions')
       .update({
