@@ -59,9 +59,11 @@ const InvoiceBasicInfoSectionComponent = ({
               value={formData.reference || ''}
               onChange={(e) => onFieldChange('reference', e.target.value)}
               className={cn(
-                errors.reference && "border-red-500 focus-visible:ring-red-500"
+                errors.reference && "border-red-500 focus-visible:ring-red-500",
+                isNewInvoice && !formData.reference && "bg-muted text-muted-foreground"
               )}
-              placeholder={!formData.reference ? "Généré automatiquement" : undefined}
+              placeholder={isNewInvoice && !formData.reference ? "Auto-généré à la création" : undefined}
+              readOnly={isNewInvoice && !formData.reference}
             />
             {errors.reference && (
               <p className="text-sm text-red-500 mt-1 flex items-center">

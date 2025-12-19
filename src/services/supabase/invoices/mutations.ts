@@ -9,9 +9,22 @@ export const invoiceMutations = {
     const { getCurrentUserCompanyId } = await import('../auth-company');
     const companyId = await getCurrentUserCompanyId();
 
+    // Générer le numéro de facture maintenant, au moment de la création
+    let reference = invoice.reference;
+    if (!reference || reference === '') {
+      const { data: nextNum, error: numError } = await supabase
+        .rpc('get_next_invoice_number', { p_company_id: companyId });
+      
+      if (numError) {
+        console.error('Error generating invoice number:', numError);
+        throw new Error('Impossible de générer le numéro de facture: ' + numError.message);
+      }
+      reference = nextNum.toString();
+    }
+
     // Clean the invoice data to only include fields that exist in the database
     const cleanInvoice = {
-      reference: invoice.reference,
+      reference,
       repair_order_id: invoice.repair_order_id,
       client_id: invoice.client_id,
       vehicle_id: invoice.vehicle_id,

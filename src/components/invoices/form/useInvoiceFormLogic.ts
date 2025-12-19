@@ -3,7 +3,7 @@ import { Invoice } from '@/services/supabase/invoices';
 import { InvoiceRepairItem, InvoicePartItem, InvoiceDiscountItem } from './types';
 import { validateInvoiceForm } from './utils/validation';
 import { calculateGlobalTotals } from './hooks/useInvoiceCalculations';
-import { parseInvoiceNotes, generateNextInvoiceNumber } from './utils/invoiceFormUtils';
+import { parseInvoiceNotes } from './utils/invoiceFormUtils';
 
 interface UseInvoiceFormLogicProps {
   invoice?: Invoice | null;
@@ -183,32 +183,21 @@ export const useInvoiceFormLogic = ({ invoice, prefillData }: UseInvoiceFormLogi
         setParts(partsData);
         setDiscounts(discountsData);
       } else {
-        // Nouvelle facture
+        // Nouvelle facture - le numéro sera généré à la soumission
         const today = new Date().toISOString().split('T')[0];
         const dueDate = new Date();
         dueDate.setDate(dueDate.getDate() + 30);
         const dueDateString = dueDate.toISOString().split('T')[0];
 
-        try {
-          const nextNumber = await generateNextInvoiceNumber();
-          
-          setFormData(prev => ({
-            ...prev,
-            reference: nextNumber,
-            date: today,
-            due_date: dueDateString,
-            client_id: prefillData?.client_id || prev.client_id,
-            vehicle_id: prefillData?.vehicle_id || prev.vehicle_id,
-            repair_order_id: prefillData?.repair_order_id || null
-          }));
-        } catch {
-          setFormData(prev => ({
-            ...prev,
-            reference: '1',
-            date: today,
-            due_date: dueDateString
-          }));
-        }
+        setFormData(prev => ({
+          ...prev,
+          reference: '', // Sera généré automatiquement à la soumission
+          date: today,
+          due_date: dueDateString,
+          client_id: prefillData?.client_id || prev.client_id,
+          vehicle_id: prefillData?.vehicle_id || prev.vehicle_id,
+          repair_order_id: prefillData?.repair_order_id || null
+        }));
 
         // Appliquer prefillData pour réparations/pièces/remises
         if (prefillData) {
