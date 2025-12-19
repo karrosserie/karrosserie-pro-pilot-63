@@ -75,8 +75,14 @@ ${companyInfo?.name || 'L\'équipe'}`;
 
     setIsLoading(true);
     try {
+      // Récupérer les données de l'entreprise pour le PDF
+      const companyData = await companyService.getCompanyInfo();
+      if (!companyData) {
+        throw new Error('Données de l\'entreprise non trouvées');
+      }
+      
       // Préparer les données pour le PDF (comme dans generateInvoicePDFWithTemplate)
-      const data = await prepareInvoiceDataForPDF(invoice, {});
+      const data = await prepareInvoiceDataForPDF(invoice, companyData);
       
       // Adapter les données pour le composant PDF
       const pdfData = {
