@@ -33,6 +33,7 @@ export const ClientMobileCard = ({
   highlightedRef
 }: ClientMobileCardProps) => {
   const clientData = client as any;
+  const isEntreprise = clientData.client_type === 'entreprise';
   const hasFrontLicense = clientData.driver_license_front_url;
   const hasBackLicense = clientData.driver_license_back_url;
   const hasCompleteLicense = hasFrontLicense && hasBackLicense;
@@ -51,10 +52,17 @@ export const ClientMobileCard = ({
             <h3 className="font-semibold text-card-foreground">
               {client.first_name} {client.last_name}
             </h3>
-            <StatusBadge 
-              status={hasCompleteLicense ? "Permis importé" : "Pas de permis"}
-              className={hasCompleteLicense ? "bg-green-100 text-green-800 hover:bg-green-100" : "bg-amber-100 text-amber-800 hover:bg-amber-100"}
-            />
+            {isEntreprise ? (
+              <StatusBadge 
+                status="Entreprise"
+                className="bg-blue-100 text-blue-800 hover:bg-blue-100"
+              />
+            ) : (
+              <StatusBadge 
+                status={hasCompleteLicense ? "Permis importé" : "Pas de permis"}
+                className={hasCompleteLicense ? "bg-green-100 text-green-800 hover:bg-green-100" : "bg-amber-100 text-amber-800 hover:bg-amber-100"}
+              />
+            )}
           </div>
         </div>
       </div>
