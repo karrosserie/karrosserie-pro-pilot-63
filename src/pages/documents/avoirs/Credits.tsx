@@ -96,7 +96,7 @@ const Credits = () => {
   
   const { credits = [], isLoading, deleteCredit, archiveCredit, restoreCredit, createCredit, error } = useCredits();
   const { invoices } = useInvoices();
-  const { sortedData, sortConfig, handleSort } = useTableSorting(credits, 'created_at');
+  const { sortedData, sortConfig, handleSort } = useTableSorting(credits, 'created_at', 'desc');
   const isMobile = useIsMobile();
   
   const formatVehicleDisplay = (credit: any) => {
