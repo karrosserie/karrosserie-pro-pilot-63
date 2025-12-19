@@ -14,6 +14,7 @@ import { QuoteConversionWarningDialog } from "@/components/quotes/QuoteConversio
 import { useQuoteConversionWarning } from "@/hooks/use-quote-conversion-warning";
 import { ClientValidationNotificationProvider } from "@/contexts/ClientValidationNotificationContext";
 import { ClientValidationWatcher } from "@/components/expertise/ClientValidationWatcher";
+import { MessageriesProvider } from "@/contexts/MessageriesContext";
 
 const queryClient = new QueryClient();
 
@@ -43,11 +44,13 @@ const App = () => (
     <TooltipProvider>
       <ConfirmationProvider>
         <ClientValidationNotificationProvider>
-          <BrowserRouter>
-            <AuthProvider>
-              <AppContent />
-            </AuthProvider>
-          </BrowserRouter>
+          <MessageriesProvider>
+            <BrowserRouter>
+              <AuthProvider>
+                <AppContent />
+              </AuthProvider>
+            </BrowserRouter>
+          </MessageriesProvider>
         </ClientValidationNotificationProvider>
       </ConfirmationProvider>
     </TooltipProvider>
