@@ -119,7 +119,8 @@ export const useClientActions = () => {
         company_id: companyId,
         clientType: data.clientType || 'particulier',
         companyName: data.companyName || '',
-        managerIdUrl: data.managerIdUrl || '',
+        managerIdFrontUrl: data.managerIdFrontUrl || '',
+        managerIdBackUrl: data.managerIdBackUrl || '',
         kbisUrl: data.kbisUrl || ''
       };
       console.log('🚀 Creating client with data:', clientData);
@@ -139,7 +140,8 @@ export const useClientActions = () => {
         autoRelancesDisabled: data.autoRelancesDisabled,
         clientType: data.clientType,
         companyName: data.companyName,
-        managerIdUrl: data.managerIdUrl,
+        managerIdFrontUrl: data.managerIdFrontUrl,
+        managerIdBackUrl: data.managerIdBackUrl,
         kbisUrl: data.kbisUrl
       };
       console.log('🚀 Updating client with id:', selectedClient.id, 'and data:', updateData);
