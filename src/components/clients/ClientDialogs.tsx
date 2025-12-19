@@ -78,7 +78,8 @@ const ClientDialogs: React.FC<ClientDialogsProps> = ({
           autoRelancesDisabled: (selectedClient as any).auto_relances_disabled ?? false,
           clientType: (selectedClient as any).client_type || 'particulier',
           companyName: (selectedClient as any).company_name || '',
-          managerIdUrl: (selectedClient as any).manager_id_url || '',
+          managerIdFrontUrl: (selectedClient as any).manager_id_front_url || '',
+          managerIdBackUrl: (selectedClient as any).manager_id_back_url || '',
           kbisUrl: (selectedClient as any).kbis_url || ''
         } : {}}
         onSubmit={onClientSubmit}
