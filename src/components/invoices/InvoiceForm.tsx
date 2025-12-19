@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useImperativeHandle, forwardRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useClients } from '@/hooks/use-clients';
 import { Invoice } from '@/services/supabase/invoices';
@@ -21,14 +21,18 @@ interface InvoiceFormProps {
   isConversionFromRepairOrder?: boolean;
 }
 
-export const InvoiceForm = React.memo(({
+export interface InvoiceFormRef {
+  releaseReservedNumber: () => Promise<void>;
+}
+
+export const InvoiceForm = React.memo(forwardRef<InvoiceFormRef, InvoiceFormProps>(({
   invoice,
   onSubmit,
   onCancel,
   isSubmitting,
   prefillData,
   isConversionFromRepairOrder
-}: InvoiceFormProps) => {
+}, ref) => {
   const { toast } = useToast();
   const { clients, isLoading: isLoadingClients } = useClients();
   
@@ -52,6 +56,11 @@ export const InvoiceForm = React.memo(({
     prepareSubmitData,
     releaseReservedNumber
   } = useInvoiceFormLogic({ invoice, prefillData });
+
+  // Exposer la fonction releaseReservedNumber au parent via ref
+  useImperativeHandle(ref, () => ({
+    releaseReservedNumber
+  }), [releaseReservedNumber]);
 
   // Gestion de l'annulation avec libération du numéro réservé
   const handleCancel = async () => {
@@ -139,4 +148,4 @@ export const InvoiceForm = React.memo(({
       />
     </form>
   );
-});
+}));
