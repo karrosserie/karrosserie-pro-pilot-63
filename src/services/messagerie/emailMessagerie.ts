@@ -66,7 +66,7 @@ export const registerEmailInMessagerie = async (data: EmailMessagerieData): Prom
         company_id: companyData.company_id,
         client_id: data.clientId,
         title: title,
-        channel: 'email',
+        channel: 'Mail',
         category: category,
         priority: 3, // Priorité normale pour les envois automatiques
         message: data.message,
@@ -98,7 +98,7 @@ export const registerEmailInMessagerie = async (data: EmailMessagerieData): Prom
         sender_type: 'carrosserie',
         sender_id: userData.user.id,
         content: data.message,
-        channel: 'email',
+        channel: 'Mail',
         actual_communication_date: now,
         is_inbound: false,
         sent_at: now,
