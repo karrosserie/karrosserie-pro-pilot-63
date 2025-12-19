@@ -92,7 +92,7 @@ export const CessionsTable = ({
   
   const { companyData } = useCompany();
   const { insuranceCompanies } = useInsuranceCompanies();
-  const { sortedData, sortConfig, handleSort } = useTableSorting(cessions, 'created_at');
+  const { sortedData, sortConfig, handleSort } = useTableSorting(cessions, 'created_at', 'desc');
   const isMobile = useIsMobile();
   const { tokensRemaining, canPerformOperation } = useSubscription();
 
