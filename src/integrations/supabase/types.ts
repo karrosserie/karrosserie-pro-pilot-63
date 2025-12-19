@@ -3480,6 +3480,49 @@ export type Database = {
         }
         Relationships: []
       }
+      invoice_sequences: {
+        Row: {
+          company_id: string
+          created_at: string | null
+          last_number: number
+          updated_at: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string | null
+          last_number?: number
+          updated_at?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string | null
+          last_number?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_sequences_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "invoice_sequences_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "invoice_sequences_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoices: {
         Row: {
           amount: number
@@ -7126,6 +7169,10 @@ export type Database = {
       }
       get_current_user_role: { Args: never; Returns: string }
       get_effective_company_id: { Args: never; Returns: string }
+      get_next_invoice_number: {
+        Args: { p_company_id: string }
+        Returns: number
+      }
       http: {
         Args: { request: Database["public"]["CompositeTypes"]["http_request"] }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
