@@ -1,5 +1,4 @@
 import { formatToInternational, validateAndFormatForWebhook } from '@/utils/phoneValidation';
-import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 interface SignatureData {
   firstname: string;
@@ -109,22 +108,16 @@ export const sendForSignature = async (
     }
 
     // Préparer les données du client avec l'ID Oodrive si disponible
-    // Pour les entreprises : utiliser la raison sociale
+    // Pour les entreprises : le signataire est le gérant (first_name/last_name)
+    // mais on ajoute company_name pour indiquer qu'il représente l'entreprise
     const isEnterprise = clientData?.client_type === 'entreprise';
-    const clientDisplayName = getClientDisplayName(clientData);
-    
-    // Pour entreprise: utiliser le nom de la société comme nom de famille
-    // Pour particulier: utiliser prénom + nom classique
-    const clientFirstName = isEnterprise 
-      ? (clientDisplayName.split(' ')[0] || clientDisplayName)
-      : (clientData?.first_name || '');
-    const clientLastName = isEnterprise 
-      ? (clientDisplayName.split(' ').slice(1).join(' ') || '')
-      : (clientData?.last_name || '');
 
     const clientSignatureData: SignatureData = {
-      firstname: clientFirstName,
-      lastname: clientLastName,
+      // Pour TOUS les types de clients, utiliser first_name/last_name 
+      // car c'est la personne physique qui signe
+      firstname: clientData?.first_name || '',
+      lastname: clientData?.last_name || '',
+      // Ajouter company_name UNIQUEMENT pour les entreprises
       company_name: isEnterprise ? clientData?.company_name : undefined,
       address_1: clientData?.address || '',
       postal_code: clientData?.postal_code || '',
