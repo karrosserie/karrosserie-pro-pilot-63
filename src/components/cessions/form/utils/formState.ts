@@ -39,7 +39,7 @@ export const prepareSubmitData = (formData: CessionFormData): Partial<Cession> =
   console.log('Preparing submit data...');
   const submitData = {
     cession_type: formData.cession_type,
-    repair_order_id: formData.cession_type === 'repair' ? formData.repair_order_id : null,
+    repair_order_id: (formData.cession_type === 'repair' || formData.cession_type === 'repair_enterprise') ? formData.repair_order_id : null,
     fleet_reservation_id: formData.cession_type === 'fleet_loan' ? formData.fleet_reservation_id : null,
     bank_account_id: formData.bank_account_id,
     incident_number: formData.incident_number,
