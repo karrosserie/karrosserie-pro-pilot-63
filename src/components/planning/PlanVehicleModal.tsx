@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Clock, User } from 'lucide-react';
+import { Calendar, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { userActionWebhookService } from '@/services/tracking/UserActionWebhookService';
@@ -53,12 +52,10 @@ export const PlanVehicleModal = ({
 }: PlanVehicleModalProps) => {
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>('');
   const [selectedTaskType, setSelectedTaskType] = useState<string>('');
-  const [selectedDate, setSelectedDate] = useState<string>('');
-  const [selectedTime, setSelectedTime] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePlan = async () => {
-    if (!vehicle || !selectedEmployeeId || !selectedTaskType || !selectedDate || !selectedTime || !companyId) {
+    if (!vehicle || !selectedEmployeeId || !selectedTaskType || !companyId) {
       toast.error('Veuillez remplir tous les champs obligatoires');
       return;
     }
@@ -66,9 +63,9 @@ export const PlanVehicleModal = ({
     setIsLoading(true);
 
     try {
-      // Calculer les heures de début et fin
+      // Utiliser la date et l'heure actuelles
       const taskType = TASK_TYPES.find(t => t.value === selectedTaskType);
-      const startDateTime = new Date(`${selectedDate}T${selectedTime}:00`);
+      const startDateTime = new Date();
       const endDateTime = new Date(startDateTime.getTime() + (taskType?.duration || 1) * 60 * 60 * 1000);
 
       // D'abord, nettoyer toutes les anciennes tâches en attente avec waiting_reason pour ce véhicule
@@ -138,8 +135,6 @@ export const PlanVehicleModal = ({
       // Réinitialiser le formulaire
       setSelectedEmployeeId('');
       setSelectedTaskType('');
-      setSelectedDate('');
-      setSelectedTime('');
       
       onSuccess();
       onClose();
@@ -156,14 +151,9 @@ export const PlanVehicleModal = ({
     if (!isLoading) {
       setSelectedEmployeeId('');
       setSelectedTaskType('');
-      setSelectedDate('');
-      setSelectedTime('');
       onClose();
     }
   };
-
-  // Obtenir la date d'aujourd'hui au format YYYY-MM-DD
-  const today = new Date().toISOString().split('T')[0];
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -224,60 +214,6 @@ export const PlanVehicleModal = ({
                       {task.label} ({task.duration}h)
                     </SelectItem>
                   ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Sélection de la date */}
-            <div className="space-y-2">
-              <Label htmlFor="date" className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                Date *
-              </Label>
-              <Input
-                id="date"
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                min={today}
-              />
-            </div>
-
-            {/* Sélection de l'heure */}
-            <div className="space-y-2">
-              <Label htmlFor="time" className="flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                Heure de début *
-              </Label>
-              <Select value={selectedTime} onValueChange={setSelectedTime}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner une heure" />
-                </SelectTrigger>
-                <SelectContent 
-                  className="bg-white border shadow-lg z-50 rounded-md"
-                  position="popper"
-                  side="bottom"
-                  align="start"
-                  sideOffset={4}
-                >
-                  <div className="max-h-[240px] overflow-y-scroll p-1">
-                    {Array.from({ length: 20 }, (_, index) => {
-                      const hour = Math.floor(8 + index / 2);
-                      const minute = index % 2 === 0 ? '00' : '30';
-                      const timeValue = `${hour.toString().padStart(2, '0')}:${minute}`;
-                      const displayTime = `${hour}h${minute === '00' ? '' : minute}`;
-                      
-                      return (
-                        <SelectItem 
-                          key={timeValue} 
-                          value={timeValue}
-                          className="cursor-pointer hover:bg-slate-100 px-3 py-2.5 rounded-sm text-sm"
-                        >
-                          {displayTime}
-                        </SelectItem>
-                      );
-                    })}
-                  </div>
                 </SelectContent>
               </Select>
             </div>
