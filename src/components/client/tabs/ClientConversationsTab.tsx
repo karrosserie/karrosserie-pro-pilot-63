@@ -36,63 +36,52 @@ const ClientConversationsTab: React.FC<ClientConversationsTabProps> = ({ clientI
   const [vehicleNames, setVehicleNames] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    const fetchClientHistory = async () => {
-      if (clientId) {
-        // Récupérer les messages de messageries
-        const history = await getClientHistory(clientId);
-        setClientMessages(history as Messagerie[]);
+    const fetchClientHistoryData = async () => {
+      if (!clientId) return;
+      
+      // Récupérer les messages de messageries
+      const history = await getClientHistory(clientId);
+      setClientMessages(history as Messagerie[]);
+      
+      // Récupérer les demandes de signature
+      const { data: signatures, error: sigError } = await supabase
+        .from('signature_requests' as any)
+        .select('*')
+        .eq('client_id', clientId)
+        .order('created_at', { ascending: false });
+      
+      if (!sigError && signatures) {
+        setSignatureRequests(signatures as any as SignatureRequest[]);
+      }
+      
+      // Collecter tous les vehicle_ids (de messageries et signatures)
+      const messageVehicleIds = (history as any[])
+        .filter((msg: any) => msg.vehicle_id)
+        .map((msg: any) => msg.vehicle_id as string);
+      
+      const signatureVehicleIds = (signatures || [])
+        .filter((sig: any) => sig.vehicle_id)
+        .map((sig: any) => sig.vehicle_id as string);
+      
+      const allVehicleIds = [...new Set([...messageVehicleIds, ...signatureVehicleIds])];
+      
+      if (allVehicleIds.length > 0) {
+        const { data: vehicles } = await supabase
+          .from('vehicles')
+          .select('id, make, model, registration')
+          .in('id', allVehicleIds);
         
-        // Récupérer les demandes de signature
-        const { data: signatures, error: sigError } = await supabase
-          .from('signature_requests' as any)
-          .select('*')
-          .eq('client_id', clientId)
-          .order('created_at', { ascending: false });
-        
-        if (!sigError && signatures) {
-          console.log('✅ Signatures récupérées:', signatures);
-          setSignatureRequests(signatures as any as SignatureRequest[]);
-        } else {
-          console.error('❌ Erreur lors de la récupération des signatures:', sigError);
-        }
-        
-        // Collecter tous les vehicle_ids (de messageries et signatures)
-        const messageVehicleIds = (history as any[])
-          .filter((msg: any) => msg.vehicle_id)
-          .map((msg: any) => msg.vehicle_id as string);
-        
-        const signatureVehicleIds = (signatures || [])
-          .filter((sig: any) => sig.vehicle_id)
-          .map((sig: any) => sig.vehicle_id as string);
-        
-        console.log('🚗 Vehicle IDs des signatures:', signatureVehicleIds);
-        console.log('📧 Vehicle IDs des messages:', messageVehicleIds);
-        
-        const allVehicleIds = [...new Set([...messageVehicleIds, ...signatureVehicleIds])];
-        console.log('🔍 Tous les vehicle IDs à récupérer:', allVehicleIds);
-        
-        if (allVehicleIds.length > 0) {
-          const { data: vehicles } = await supabase
-            .from('vehicles')
-            .select('id, make, model, registration')
-            .in('id', allVehicleIds);
-          
-          console.log('🚙 Véhicules récupérés:', vehicles);
-          
-          if (vehicles) {
-            const vehicleMap: Record<string, string> = {};
-            vehicles.forEach((v: any) => {
-              vehicleMap[v.id] = `${v.make} ${v.model} (${v.registration})`;
-            });
-            console.log('📋 VehicleMap final:', vehicleMap);
-            setVehicleNames(vehicleMap);
-          }
-        } else {
-          console.warn('⚠️ Aucun vehicle_id trouvé dans les données');
+        if (vehicles) {
+          const vehicleMap: Record<string, string> = {};
+          vehicles.forEach((v: any) => {
+            vehicleMap[v.id] = `${v.make} ${v.model} (${v.registration})`;
+          });
+          setVehicleNames(vehicleMap);
         }
       }
     };
-    fetchClientHistory();
+    
+    fetchClientHistoryData();
   }, [clientId, getClientHistory]);
 
   const toggleExpanded = async (messageId: string) => {
