@@ -56,6 +56,8 @@ export const registerEmailInMessagerie = async (data: EmailMessagerieData): Prom
     const documentLabel = documentLabelMap[data.documentType];
     const title = `Envoi ${documentLabel} n°${data.documentReference}`;
     const now = new Date().toISOString();
+    const dateFormatted = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
+    const timeFormatted = new Date().toTimeString().split(' ')[0]; // Format HH:MM:SS
 
     // Créer l'entrée dans messageries
     const { data: messagerie, error: messagerieError } = await supabase
@@ -70,8 +72,8 @@ export const registerEmailInMessagerie = async (data: EmailMessagerieData): Prom
         message: data.message,
         summary: `${documentLabel} envoyé(e) à ${data.recipientEmail}`,
         eta: '',
-        time: now,
-        date: new Date().toLocaleDateString('fr-FR'),
+        time: timeFormatted,
+        date: dateFormatted,
         actual_communication_date: now,
         is_inbound: false, // Message sortant (carrosserie → client)
         resolved: true, // Un envoi d'email est considéré comme traité
