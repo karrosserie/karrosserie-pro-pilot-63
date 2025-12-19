@@ -138,33 +138,58 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
 
     // Convertir les données des items - exactement comme dans InvoiceViewerModal
     const items = [];
-    if (invoice.repairs_data) {
-      const repairs = Array.isArray(invoice.repairs_data) ? invoice.repairs_data : [];
-      items.push(...repairs.map((repair: any) => ({
-        ref: repair.ref || '',
-        description: repair.description || repair.label || '',
-        quantity: repair.quantity || 1,
-        discount: repair.discount || 0,
-        unitPrice: repair.unitCost || repair.price || 0,
-        vat: repair.vat || 20,
-        totalHT: (repair.unitCost || repair.price || 0) * (repair.quantity || 1) * (1 - (repair.discount || 0) / 100),
-        totalTTC: (repair.unitCost || repair.price || 0) * (repair.quantity || 1) * (1 - (repair.discount || 0) / 100) * (1 + (repair.vat || 20) / 100)
-      })));
+    
+    // Parser repairs_data (peut être un string JSON ou un array)
+    let repairs: any[] = [];
+    try {
+      if (invoice.repairs_data) {
+        repairs = Array.isArray(invoice.repairs_data) 
+          ? invoice.repairs_data 
+          : typeof invoice.repairs_data === 'string' 
+            ? JSON.parse(invoice.repairs_data) 
+            : [];
+      }
+    } catch (e) {
+      console.error('Error parsing repairs_data:', e);
     }
-
-    if (invoice.parts_data) {
-      const parts = Array.isArray(invoice.parts_data) ? invoice.parts_data : [];
-      items.push(...parts.map((part: any) => ({
-        ref: part.ref || '',
-        description: part.description || part.label || '',
-        quantity: part.quantity || 1,
-        discount: part.discount || 0,
-        unitPrice: part.unitCost || part.price || 0,
-        vat: part.vat || 20,
-        totalHT: (part.unitCost || part.price || 0) * (part.quantity || 1) * (1 - (part.discount || 0) / 100),
-        totalTTC: (part.unitCost || part.price || 0) * (part.quantity || 1) * (1 - (part.discount || 0) / 100) * (1 + (part.vat || 20) / 100)
-      })));
+    
+    // Parser parts_data (peut être un string JSON ou un array)
+    let parts: any[] = [];
+    try {
+      if (invoice.parts_data) {
+        parts = Array.isArray(invoice.parts_data) 
+          ? invoice.parts_data 
+          : typeof invoice.parts_data === 'string' 
+            ? JSON.parse(invoice.parts_data) 
+            : [];
+      }
+    } catch (e) {
+      console.error('Error parsing parts_data:', e);
     }
+    
+    // Mapper les réparations
+    items.push(...repairs.map((repair: any) => ({
+      ref: repair.ref || '',
+      description: repair.description || repair.label || '',
+      quantity: repair.quantity || 1,
+      discount: repair.discount || 0,
+      unitPrice: repair.unitCost || repair.price || 0,
+      vat: repair.vat || 20,
+      totalHT: (repair.unitCost || repair.price || 0) * (repair.quantity || 1) * (1 - (repair.discount || 0) / 100),
+      totalTTC: (repair.unitCost || repair.price || 0) * (repair.quantity || 1) * (1 - (repair.discount || 0) / 100) * (1 + (repair.vat || 20) / 100)
+    })));
+    
+    // Mapper les pièces
+    items.push(...parts.map((part: any) => ({
+      ref: part.ref || '',
+      description: part.description || part.label || '',
+      quantity: part.quantity || 1,
+      discount: part.discount || 0,
+      unitPrice: part.unitCost || part.price || 0,
+      vat: part.vat || 20,
+      totalHT: (part.unitCost || part.price || 0) * (part.quantity || 1) * (1 - (part.discount || 0) / 100),
+      totalTTC: (part.unitCost || part.price || 0) * (part.quantity || 1) * (1 - (part.discount || 0) / 100) * (1 + (part.vat || 20) / 100)
+    })));
 
     // Parser les remises globales - support string et array
     let discounts: any[] = [];
