@@ -188,6 +188,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
           {paginatedClients.length > 0 ? (
             paginatedClients.map((client) => {
               const clientData = client as any;
+              const isEntreprise = clientData.client_type === 'entreprise';
               const hasFrontLicense = clientData.driver_license_front_url;
               const hasBackLicense = clientData.driver_license_back_url;
               const hasCompleteLicense = hasFrontLicense && hasBackLicense;
@@ -207,10 +208,17 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                     <TableCell>{client.phone}</TableCell>
                     <TableCell>{client.city}</TableCell>
                     <TableCell>
-                      <StatusBadge 
-                        status={hasCompleteLicense ? "Permis importé" : "Pas de permis"}
-                        className={hasCompleteLicense ? "bg-green-100 text-green-800 hover:bg-green-100" : "bg-amber-100 text-amber-800 hover:bg-amber-100"}
-                      />
+                      {isEntreprise ? (
+                        <StatusBadge 
+                          status="Entreprise"
+                          className="bg-blue-100 text-blue-800 hover:bg-blue-100"
+                        />
+                      ) : (
+                        <StatusBadge 
+                          status={hasCompleteLicense ? "Permis importé" : "Pas de permis"}
+                          className={hasCompleteLicense ? "bg-green-100 text-green-800 hover:bg-green-100" : "bg-amber-100 text-amber-800 hover:bg-amber-100"}
+                        />
+                      )}
                     </TableCell>
                   </TableRow>
                   <TableRow className={`border-t-0 ${isHighlighted ? 'highlight-client' : ''}`}>

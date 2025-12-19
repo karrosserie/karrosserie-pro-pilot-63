@@ -51,9 +51,19 @@ const ClientListTable: React.FC<ClientListTableProps> = ({
       header: "Permis de conduire",
       cell: ({ row }) => {
         const client = row.original as any;
+        const isEntreprise = client.client_type === 'entreprise';
         const hasFrontLicense = client.driver_license_front_url;
         const hasBackLicense = client.driver_license_back_url;
         const hasCompleteLicense = hasFrontLicense && hasBackLicense;
+        
+        if (isEntreprise) {
+          return (
+            <StatusBadge 
+              status="Entreprise"
+              className="bg-blue-100 text-blue-800 hover:bg-blue-100"
+            />
+          );
+        }
         
         return (
           <StatusBadge 
