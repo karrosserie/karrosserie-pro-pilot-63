@@ -7,6 +7,7 @@ import { pdf } from '@react-pdf/renderer';
 import InvoicePDF from '@/components/invoices/InvoicePDF';
 import { supabase } from '@/integrations/supabase/client';
 import { getClientDisplayName } from '@/utils/clientDisplayUtils';
+import { registerEmailInMessagerie } from '@/services/messagerie/emailMessagerie';
 
 export const useCreditEmail = (credit: any | null) => {
   const { toast } = useToast();
@@ -132,6 +133,33 @@ AUTO PAINT`;
 
       if (error) {
         throw error;
+      }
+
+      // Enregistrer l'envoi dans le centre de messagerie
+      // Récupérer le client_id depuis la facture associée si nécessaire
+      let clientId = credit.clients?.id;
+      if (!clientId && credit.invoice_id) {
+        try {
+          const { data: invoice } = await supabase
+            .from('invoices')
+            .select('client_id')
+            .eq('id', credit.invoice_id)
+            .single();
+          clientId = invoice?.client_id;
+        } catch (error) {
+          console.error('Error fetching client from invoice:', error);
+        }
+      }
+
+      if (clientId) {
+        await registerEmailInMessagerie({
+          clientId: clientId,
+          documentType: 'credit',
+          documentReference: credit.reference,
+          recipientEmail: emailData.to,
+          subject: emailData.subject,
+          message: emailData.message
+        });
       }
       
       toast({

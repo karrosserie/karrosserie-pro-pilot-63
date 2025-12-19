@@ -10,6 +10,7 @@ import { pdf } from '@react-pdf/renderer';
 import InvoicePDF from '@/components/invoices/InvoicePDF';
 import { supabase } from '@/integrations/supabase/client';
 import { getClientDisplayName } from '@/utils/clientDisplayUtils';
+import { registerEmailInMessagerie } from '@/services/messagerie/emailMessagerie';
 
 export const useQuoteEmail = (quote: Quote | null) => {
   const { toast } = useToast();
@@ -126,6 +127,19 @@ ${companyInfo?.name || 'L\'équipe'}`;
 
       if (error) {
         throw error;
+      }
+
+      // Enregistrer l'envoi dans le centre de messagerie
+      if (quote.client_id) {
+        await registerEmailInMessagerie({
+          clientId: quote.client_id,
+          documentType: 'quote',
+          documentReference: quote.reference,
+          recipientEmail: emailData.to,
+          subject: emailData.subject,
+          message: emailData.message,
+          vehicleId: quote.vehicle_id || undefined
+        });
       }
       
       toast({
