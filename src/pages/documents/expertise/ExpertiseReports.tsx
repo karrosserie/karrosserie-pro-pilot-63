@@ -96,13 +96,13 @@ const ExpertiseReports = () => {
           return bName.localeCompare(aName, 'fr', { sensitivity: 'base' });
         }
         case 'recent-first': {
-          const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
-          const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+          const dateA = a.report_date ? new Date(a.report_date).getTime() : 0;
+          const dateB = b.report_date ? new Date(b.report_date).getTime() : 0;
           return dateB - dateA;
         }
         case 'oldest-first': {
-          const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
-          const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+          const dateA = a.report_date ? new Date(a.report_date).getTime() : 0;
+          const dateB = b.report_date ? new Date(b.report_date).getTime() : 0;
           return dateA - dateB;
         }
         default:
