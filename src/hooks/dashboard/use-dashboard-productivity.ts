@@ -223,7 +223,67 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
         .gte('date', format(period1Start, 'yyyy-MM-dd'))
         .lte('date', format(period1End, 'yyyy-MM-dd'));
 
-      // 3b. Récupérer les rapports d'expertise pour les heures vendues
+      // === LOGIQUE PRIORITÉ: FACTURE > DEVIS > RAPPORT D'EXPERTISE ===
+      // Pour éviter les doublons: si facturé → on prend la facture, sinon devis, sinon rapport
+
+      // 3b. Récupérer les factures avec repairs_data (priorité 1)
+      const { data: invoicesWithRepairsP2 } = await supabase
+        .from('invoices')
+        .select('id, repairs_data, repair_order_id')
+        .eq('company_id', companyData.id)
+        .gte('date', format(period2Start, 'yyyy-MM-dd'))
+        .lte('date', format(period2End, 'yyyy-MM-dd'));
+
+      const { data: invoicesWithRepairsP1 } = await supabase
+        .from('invoices')
+        .select('id, repairs_data, repair_order_id')
+        .eq('company_id', companyData.id)
+        .gte('date', format(period1Start, 'yyyy-MM-dd'))
+        .lte('date', format(period1End, 'yyyy-MM-dd'));
+
+      // 3c. Récupérer les repair_orders pour faire le lien avec les quotes
+      const invoiceROIdsP2 = invoicesWithRepairsP2?.map(inv => inv.repair_order_id).filter(Boolean) || [];
+      const invoiceROIdsP1 = invoicesWithRepairsP1?.map(inv => inv.repair_order_id).filter(Boolean) || [];
+      
+      // Récupérer les quote_id des OR facturés
+      const { data: invoicedROsP2 } = invoiceROIdsP2.length > 0 ? await supabase
+        .from('repair_orders')
+        .select('id, quote_id')
+        .in('id', invoiceROIdsP2) : { data: [] };
+
+      const { data: invoicedROsP1 } = invoiceROIdsP1.length > 0 ? await supabase
+        .from('repair_orders')
+        .select('id, quote_id')
+        .in('id', invoiceROIdsP1) : { data: [] };
+
+      // IDs des quotes déjà facturées
+      const invoicedQuoteIdsP2 = new Set(invoicedROsP2?.map(ro => ro.quote_id).filter(Boolean) || []);
+      const invoicedQuoteIdsP1 = new Set(invoicedROsP1?.map(ro => ro.quote_id).filter(Boolean) || []);
+
+      // 3d. Récupérer les devis NON facturés avec repairs_data (priorité 2)
+      const { data: quotesP2 } = await supabase
+        .from('quotes')
+        .select('id, report_id, repairs_data')
+        .eq('company_id', companyData.id)
+        .gte('created_at', format(period2Start, 'yyyy-MM-dd'))
+        .lte('created_at', format(period2End, 'yyyy-MM-dd'));
+
+      const { data: quotesP1 } = await supabase
+        .from('quotes')
+        .select('id, report_id, repairs_data')
+        .eq('company_id', companyData.id)
+        .gte('created_at', format(period1Start, 'yyyy-MM-dd'))
+        .lte('created_at', format(period1End, 'yyyy-MM-dd'));
+
+      // Filtrer pour ne garder que les devis non facturés
+      const nonInvoicedQuotesP2 = quotesP2?.filter(q => !invoicedQuoteIdsP2.has(q.id)) || [];
+      const nonInvoicedQuotesP1 = quotesP1?.filter(q => !invoicedQuoteIdsP1.has(q.id)) || [];
+
+      // IDs des rapports couverts par des devis (facturés ou non)
+      const quotedReportIdsP2 = new Set(quotesP2?.map(q => q.report_id).filter(Boolean) || []);
+      const quotedReportIdsP1 = new Set(quotesP1?.map(q => q.report_id).filter(Boolean) || []);
+
+      // 3e. Récupérer les rapports SANS devis (priorité 3)
       const { data: expertiseP2 } = await supabase
         .from('expertise_reports')
         .select('id, repairs_data')
@@ -237,6 +297,10 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
         .eq('company_id', companyData.id)
         .gte('created_at', format(period1Start, 'yyyy-MM-dd'))
         .lte('created_at', format(period1End, 'yyyy-MM-dd'));
+
+      // Filtrer pour ne garder que les rapports sans devis
+      const nonQuotedExpertiseP2 = expertiseP2?.filter(r => !quotedReportIdsP2.has(r.id)) || [];
+      const nonQuotedExpertiseP1 = expertiseP1?.filter(r => !quotedReportIdsP1.has(r.id)) || [];
 
       // 4. Récupérer les OR terminés/signés pour compter les véhicules
       const { data: repairOrdersP2 } = await supabase
@@ -265,44 +329,84 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
         dataWarnings.push("Aucune donnée de pointage pour cette période - les heures achetées ne peuvent pas être calculées");
       }
 
-      // === CALCUL DES HEURES VENDUES DEPUIS expertise_reports.repairs_data ===
+      // === CALCUL DES HEURES VENDUES AVEC PRIORITÉ: FACTURE > DEVIS > RAPPORT ===
       const soldHoursByTrade = { carrosserie: 0, peinture: 0, mecanique: 0 };
       const soldHoursByTradeP1 = { carrosserie: 0, peinture: 0, mecanique: 0 };
-      let reportsWithRepairsData = 0;
-      let reportsWithRepairsDataP1 = 0;
+      let sourcesCountP2 = { invoices: 0, quotes: 0, reports: 0 };
+      let sourcesCountP1 = { invoices: 0, quotes: 0, reports: 0 };
 
-      expertiseP2?.forEach(report => {
-        if (report.repairs_data && Array.isArray(report.repairs_data) && report.repairs_data.length > 0) {
-          reportsWithRepairsData++;
-          (report.repairs_data as any[])
-            .filter(isHoursLine) // Filtrer pour ne garder que les heures de travail
-            .forEach(repair => {
-              const trade = categorizeTrade(repair.designation || repair.description || '');
-              const hours = parseFloat(repair.quantity) || 0;
-              soldHoursByTrade[trade] += hours;
-            });
+      // Fonction helper pour parser les heures d'un repairs_data
+      const parseRepairsHours = (repairsData: any, target: typeof soldHoursByTrade) => {
+        if (!repairsData || !Array.isArray(repairsData)) return false;
+        let hasData = false;
+        repairsData
+          .filter(isHoursLine)
+          .forEach((repair: any) => {
+            const trade = categorizeTrade(repair.designation || repair.description || '');
+            const hours = parseFloat(repair.quantity) || 0;
+            target[trade] += hours;
+            hasData = true;
+          });
+        return hasData;
+      };
+
+      // PRIORITÉ 1: Heures des factures (P2)
+      invoicesWithRepairsP2?.forEach(inv => {
+        if (parseRepairsHours(inv.repairs_data, soldHoursByTrade)) {
+          sourcesCountP2.invoices++;
         }
       });
 
-      expertiseP1?.forEach(report => {
-        if (report.repairs_data && Array.isArray(report.repairs_data) && report.repairs_data.length > 0) {
-          reportsWithRepairsDataP1++;
-          (report.repairs_data as any[])
-            .filter(isHoursLine) // Filtrer pour ne garder que les heures de travail
-            .forEach(repair => {
-              const trade = categorizeTrade(repair.designation || repair.description || '');
-              const hours = parseFloat(repair.quantity) || 0;
-              soldHoursByTradeP1[trade] += hours;
-            });
+      // PRIORITÉ 1: Heures des factures (P1)
+      invoicesWithRepairsP1?.forEach(inv => {
+        if (parseRepairsHours(inv.repairs_data, soldHoursByTradeP1)) {
+          sourcesCountP1.invoices++;
         }
       });
 
-      const hasRepairsData = reportsWithRepairsData > 0;
-      const totalExpertiseP2 = expertiseP2?.length || 0;
-      
-      if (totalExpertiseP2 > 0 && reportsWithRepairsData < totalExpertiseP2) {
-        const missingPercentage = Math.round(((totalExpertiseP2 - reportsWithRepairsData) / totalExpertiseP2) * 100);
-        dataWarnings.push(`${missingPercentage}% des rapports d'expertise n'ont pas de détail des heures (${totalExpertiseP2 - reportsWithRepairsData}/${totalExpertiseP2})`);
+      // PRIORITÉ 2: Heures des devis NON facturés (P2)
+      nonInvoicedQuotesP2.forEach(quote => {
+        if (parseRepairsHours(quote.repairs_data, soldHoursByTrade)) {
+          sourcesCountP2.quotes++;
+        }
+      });
+
+      // PRIORITÉ 2: Heures des devis NON facturés (P1)
+      nonInvoicedQuotesP1.forEach(quote => {
+        if (parseRepairsHours(quote.repairs_data, soldHoursByTradeP1)) {
+          sourcesCountP1.quotes++;
+        }
+      });
+
+      // PRIORITÉ 3: Heures des rapports SANS devis (P2)
+      nonQuotedExpertiseP2.forEach(report => {
+        if (parseRepairsHours(report.repairs_data, soldHoursByTrade)) {
+          sourcesCountP2.reports++;
+        }
+      });
+
+      // PRIORITÉ 3: Heures des rapports SANS devis (P1)
+      nonQuotedExpertiseP1.forEach(report => {
+        if (parseRepairsHours(report.repairs_data, soldHoursByTradeP1)) {
+          sourcesCountP1.reports++;
+        }
+      });
+
+      const totalSourcesP2 = sourcesCountP2.invoices + sourcesCountP2.quotes + sourcesCountP2.reports;
+      const hasRepairsData = totalSourcesP2 > 0;
+
+      // Log pour debug (peut être retiré ensuite)
+      console.log('Dashboard heures vendues P2:', {
+        sources: sourcesCountP2,
+        heures: soldHoursByTrade,
+        total: soldHoursByTrade.carrosserie + soldHoursByTrade.peinture + soldHoursByTrade.mecanique
+      });
+
+      // Avertissement si peu de données
+      const totalDossiersP2 = (invoicesWithRepairsP2?.length || 0) + nonInvoicedQuotesP2.length + nonQuotedExpertiseP2.length;
+      if (totalDossiersP2 > 0 && totalSourcesP2 < totalDossiersP2) {
+        const missingPercentage = Math.round(((totalDossiersP2 - totalSourcesP2) / totalDossiersP2) * 100);
+        dataWarnings.push(`${missingPercentage}% des dossiers n'ont pas de détail des heures (${totalDossiersP2 - totalSourcesP2}/${totalDossiersP2})`);
       }
 
       // === CALCUL DES HEURES ACHETÉES RÉELLES (depuis total_work_minutes des timesheets) ===
