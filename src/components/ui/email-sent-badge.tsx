@@ -10,9 +10,9 @@ export const EmailSentBadge: React.FC<EmailSentBadgeProps> = ({ className = '' }
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <div className={`inline-flex items-center justify-center relative ${className}`}>
-          <Mail className="h-4 w-4 text-green-600" />
-          <Check className="h-2.5 w-2.5 text-green-600 absolute -bottom-0.5 -right-0.5 bg-white rounded-full" />
+        <div className={`inline-flex items-center gap-1 px-1.5 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium ${className}`}>
+          <Mail className="h-3 w-3" />
+          <span className="hidden sm:inline">Envoyé</span>
         </div>
       </TooltipTrigger>
       <TooltipContent>
