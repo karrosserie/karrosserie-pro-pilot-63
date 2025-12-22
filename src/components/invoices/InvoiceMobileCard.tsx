@@ -6,7 +6,8 @@ import { Eye, Pencil, Send, Download, Printer, Mail, CreditCard, FileX, Calendar
 import { Invoice } from '@/services/supabase/invoices';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-
+import { EmailSentBadge } from '@/components/ui/email-sent-badge';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 interface InvoiceMobileCardProps {
   invoice: Invoice;
   onViewInvoice: (invoice: Invoice) => void;
@@ -21,6 +22,7 @@ interface InvoiceMobileCardProps {
   onRestoreInvoice?: (invoice: Invoice) => void;
   invoiceCredits?: any[];
   showArchived?: boolean;
+  isEmailSent?: boolean;
 }
 
 const InvoiceMobileCard: React.FC<InvoiceMobileCardProps> = ({
@@ -36,7 +38,8 @@ const InvoiceMobileCard: React.FC<InvoiceMobileCardProps> = ({
   onDeleteInvoice,
   onRestoreInvoice,
   invoiceCredits = [],
-  showArchived = false
+  showArchived = false,
+  isEmailSent = false
 }) => {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '-';
@@ -68,11 +71,15 @@ const InvoiceMobileCard: React.FC<InvoiceMobileCardProps> = ({
   };
 
   return (
+    <TooltipProvider>
     <div className="card-container p-4 space-y-3">
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h3 className="font-medium text-gray-900">{invoice.reference}</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="font-medium text-gray-900">{invoice.reference}</h3>
+            {isEmailSent && <EmailSentBadge />}
+          </div>
           <p className="text-sm text-gray-500">
             <Calendar className="h-4 w-4 inline mr-1" />
             {formatDate(invoice.created_at)}
@@ -183,6 +190,7 @@ const InvoiceMobileCard: React.FC<InvoiceMobileCardProps> = ({
         )}
       </div>
     </div>
+    </TooltipProvider>
   );
 };
 
