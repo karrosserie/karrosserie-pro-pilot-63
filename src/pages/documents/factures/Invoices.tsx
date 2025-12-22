@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Search, FileText, Plus, Eye, Pencil, Trash, ChevronDown } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { EmailSentBadge } from '@/components/ui/email-sent-badge';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { useTableSorting } from '@/hooks/use-table-sorting';
 import InvoiceDialog from '@/components/invoices/InvoiceDialog';
@@ -594,7 +595,12 @@ const Invoices = () => {
                 const invoiceCredits = getInvoiceCredits(invoice.id);
                 return (
                   <TableRow key={invoice.id} className="hover:bg-gray-50 border-b-0">
-                    <TableCell className="font-medium">{invoice.reference}</TableCell>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        {invoice.reference}
+                        {(invoice as any).email_sent && <EmailSentBadge />}
+                      </div>
+                    </TableCell>
                     <TableCell>{formatDate(invoice.created_at)}</TableCell>
                     <TableCell>
                       {invoice.clients 
