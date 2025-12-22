@@ -33,10 +33,26 @@ export const quotesService = {
     const { getCurrentUserCompanyId } = await import('./auth-company');
     const companyId = await getCurrentUserCompanyId();
     
-    // Récupérer les devis filtrés par company_id
+    // Récupérer les devis avec les clients et véhicules en une seule requête (JOIN)
+    // Cela évite le problème de limite d'URL avec .in() pour les entreprises avec beaucoup de devis
     const { data: quotes, error: quotesError } = await supabase
       .from('quotes')
-      .select('*')
+      .select(`
+        *,
+        clients:client_id (
+          id,
+          first_name,
+          last_name,
+          client_type,
+          company_name
+        ),
+        vehicles:vehicle_id (
+          id,
+          license_plate,
+          car_brands (id, name),
+          car_models (id, name)
+        )
+      `)
       .eq('company_id', companyId)
       .order('created_at', { ascending: false });
 
@@ -45,46 +61,7 @@ export const quotesService = {
       throw new Error(quotesError.message);
     }
 
-    if (!quotes || quotes.length === 0) {
-      return [];
-    }
-
-    // Récupérer les clients associés
-    const clientIds = quotes.map(quote => quote.client_id).filter(id => id);
-    let clientsData = [];
-    if (clientIds.length > 0) {
-      const { data: clients, error: clientsError } = await supabase
-        .from('clients')
-        .select('id, first_name, last_name, client_type, company_name')
-        .in('id', clientIds);
-      
-      if (!clientsError) {
-        clientsData = clients || [];
-      }
-    }
-
-    // Récupérer les véhicules associés
-    const vehicleIds = quotes.map(quote => quote.vehicle_id).filter(id => id);
-    let vehiclesData = [];
-    if (vehicleIds.length > 0) {
-      const { data: vehicles, error: vehiclesError } = await supabase
-        .from('vehicles')
-        .select('id, license_plate, car_brands(id, name), car_models(id, name)')
-        .in('id', vehicleIds);
-      
-      if (!vehiclesError) {
-        vehiclesData = vehicles || [];
-      }
-    }
-
-    // Combiner les données
-    const quotesWithRelations = quotes.map(quote => ({
-      ...quote,
-      clients: clientsData.find(client => client.id === quote.client_id) || null,
-      vehicles: vehiclesData.find(vehicle => vehicle.id === quote.vehicle_id) || null
-    }));
-    
-    return quotesWithRelations;
+    return quotes || [];
   },
 
   getById: async (id: string) => {
