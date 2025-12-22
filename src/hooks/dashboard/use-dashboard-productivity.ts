@@ -169,6 +169,24 @@ const HOURLY_RATES = {
   laborCost: 19 // Coût salarial moyen par heure
 };
 
+// Mapping des types de tâches employee_schedule vers les métiers
+const TASK_TYPE_TO_TRADE: Record<string, 'carrosserie' | 'peinture' | 'mecanique' | 'admin'> = {
+  'Remplacement ou débosselage': 'carrosserie',
+  'Préparation peinture': 'peinture',
+  'Mise en peinture': 'peinture',
+  'Finitions & remontage': 'carrosserie',
+  'Accueil & Préparation du dossier': 'admin',
+  'Clôture & livraison': 'admin',
+  'Contrôle technique de sécurité': 'admin',
+  // Variantes possibles
+  'Remplacement': 'carrosserie',
+  'Débosselage': 'carrosserie',
+  'Peinture': 'peinture',
+  'Finitions': 'carrosserie',
+  'Remontage': 'carrosserie',
+  'Mécanique': 'mecanique',
+};
+
 export const useDashboardProductivity = (period1: string, period2: string) => {
   const { companyData } = useCompany();
 
@@ -200,7 +218,28 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
         .eq('company_id', companyData.id)
         .eq('active', true);
 
-      // 2. Récupérer les timesheets pour la période 2 (période courante)
+      // 2. Récupérer les tâches terminées depuis employee_schedule (SOURCE PRINCIPALE pour heures réalisées)
+      const { data: completedTasksP2 } = await supabase
+        .from('employee_schedule')
+        .select('user_id, task_type, real_start_datetime, real_end_datetime')
+        .eq('company_id', companyData.id)
+        .eq('status', 'Terminé')
+        .not('real_start_datetime', 'is', null)
+        .not('real_end_datetime', 'is', null)
+        .gte('real_start_datetime', format(period2Start, 'yyyy-MM-dd'))
+        .lte('real_end_datetime', format(period2End, 'yyyy-MM-dd\'T\'23:59:59'));
+
+      const { data: completedTasksP1 } = await supabase
+        .from('employee_schedule')
+        .select('user_id, task_type, real_start_datetime, real_end_datetime')
+        .eq('company_id', companyData.id)
+        .eq('status', 'Terminé')
+        .not('real_start_datetime', 'is', null)
+        .not('real_end_datetime', 'is', null)
+        .gte('real_start_datetime', format(period1Start, 'yyyy-MM-dd'))
+        .lte('real_end_datetime', format(period1End, 'yyyy-MM-dd\'T\'23:59:59'));
+
+      // 2b. Fallback: timesheets (si pas de données employee_schedule)
       const { data: timesheets } = await supabase
         .from('employee_timesheets')
         .select('*')
@@ -323,10 +362,70 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
       const totalRevenueP2 = invoicesP2?.reduce((sum, inv) => sum + (inv.amount || 0), 0) || 0;
       const totalRevenueP1 = invoicesP1?.reduce((sum, inv) => sum + (inv.amount || 0), 0) || 0;
 
-      // === VÉRIFICATION DES DONNÉES DE POINTAGE ===
-      const hasTimesheetData = (timesheets?.length || 0) > 0;
+      // === CALCUL DES HEURES RÉALISÉES DEPUIS EMPLOYEE_SCHEDULE (SOURCE PRINCIPALE) ===
+      const workedHoursByEmployee: Record<string, { carrosserie: number, peinture: number, mecanique: number, total: number }> = {};
+      const workedHoursByTradeP2 = { carrosserie: 0, peinture: 0, mecanique: 0 };
+      const workedHoursByTradeP1 = { carrosserie: 0, peinture: 0, mecanique: 0 };
+
+      // Calculer heures réalisées P2
+      completedTasksP2?.forEach(task => {
+        const trade = TASK_TYPE_TO_TRADE[task.task_type];
+        if (!trade || trade === 'admin') return; // Exclure les tâches admin
+        
+        const startTime = new Date(task.real_start_datetime!);
+        const endTime = new Date(task.real_end_datetime!);
+        const durationHours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
+        
+        if (durationHours <= 0 || durationHours > 24) return; // Ignorer les durées invalides
+        
+        // Par employé
+        if (!workedHoursByEmployee[task.user_id]) {
+          workedHoursByEmployee[task.user_id] = { carrosserie: 0, peinture: 0, mecanique: 0, total: 0 };
+        }
+        workedHoursByEmployee[task.user_id][trade] += durationHours;
+        workedHoursByEmployee[task.user_id].total += durationHours;
+        
+        // Par métier global
+        workedHoursByTradeP2[trade] += durationHours;
+      });
+
+      // Calculer heures réalisées P1
+      completedTasksP1?.forEach(task => {
+        const trade = TASK_TYPE_TO_TRADE[task.task_type];
+        if (!trade || trade === 'admin') return;
+        
+        const startTime = new Date(task.real_start_datetime!);
+        const endTime = new Date(task.real_end_datetime!);
+        const durationHours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
+        
+        if (durationHours <= 0 || durationHours > 24) return;
+        workedHoursByTradeP1[trade] += durationHours;
+      });
+
+      const totalWorkedHoursFromTasks = workedHoursByTradeP2.carrosserie + workedHoursByTradeP2.peinture + workedHoursByTradeP2.mecanique;
+      const hasScheduleData = totalWorkedHoursFromTasks > 0;
+
+      // Fallback: timesheets si pas de données employee_schedule
+      const boughtHoursByEmployeeFromTimesheets: Record<string, number> = {};
+      let totalTimesheetHours = 0;
+
+      timesheets?.forEach(ts => {
+        const minutes = ts.total_work_minutes || 0;
+        const hours = minutes / 60;
+        boughtHoursByEmployeeFromTimesheets[ts.user_id] = (boughtHoursByEmployeeFromTimesheets[ts.user_id] || 0) + hours;
+        totalTimesheetHours += hours;
+      });
+
+      const hasTimesheetData = hasScheduleData || totalTimesheetHours > 0;
+      
       if (!hasTimesheetData) {
-        dataWarnings.push("Aucune donnée de pointage pour cette période - les heures achetées ne peuvent pas être calculées");
+        dataWarnings.push("Aucune donnée de pointage ou de tâches terminées pour cette période");
+      } else if (hasScheduleData) {
+        console.log('Dashboard heures réalisées P2 (employee_schedule):', {
+          parMetier: workedHoursByTradeP2,
+          total: totalWorkedHoursFromTasks,
+          nbTaches: completedTasksP2?.length || 0
+        });
       }
 
       // === CALCUL DES HEURES VENDUES AVEC PRIORITÉ: FACTURE > DEVIS > RAPPORT ===
@@ -395,7 +494,7 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
       const totalSourcesP2 = sourcesCountP2.invoices + sourcesCountP2.quotes + sourcesCountP2.reports;
       const hasRepairsData = totalSourcesP2 > 0;
 
-      // Log pour debug (peut être retiré ensuite)
+      // Log pour debug
       console.log('Dashboard heures vendues P2:', {
         sources: sourcesCountP2,
         heures: soldHoursByTrade,
@@ -409,17 +508,24 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
         dataWarnings.push(`${missingPercentage}% des dossiers n'ont pas de détail des heures (${totalDossiersP2 - totalSourcesP2}/${totalDossiersP2})`);
       }
 
-      // === CALCUL DES HEURES ACHETÉES RÉELLES (depuis total_work_minutes des timesheets) ===
+      // === HEURES ACHETÉES (RÉALISÉES) PAR EMPLOYÉ ===
+      // Priorité: employee_schedule > timesheets
       const boughtHoursByEmployee: Record<string, number> = {};
       let totalRealBoughtHours = 0;
 
-      timesheets?.forEach(ts => {
-        // Utiliser total_work_minutes directement (inclut les pauses déduites)
-        const minutes = ts.total_work_minutes || 0;
-        const hours = minutes / 60;
-        boughtHoursByEmployee[ts.user_id] = (boughtHoursByEmployee[ts.user_id] || 0) + hours;
-        totalRealBoughtHours += hours;
-      });
+      if (hasScheduleData) {
+        // Utiliser employee_schedule
+        Object.entries(workedHoursByEmployee).forEach(([userId, hours]) => {
+          boughtHoursByEmployee[userId] = hours.total;
+          totalRealBoughtHours += hours.total;
+        });
+      } else {
+        // Fallback timesheets
+        Object.entries(boughtHoursByEmployeeFromTimesheets).forEach(([userId, hours]) => {
+          boughtHoursByEmployee[userId] = hours;
+          totalRealBoughtHours += hours;
+        });
+      }
 
       // === LISTE DES EMPLOYÉS ===
       const employeesByTrade = { carrosserie: 0, peinture: 0, mecanique: 0 };
