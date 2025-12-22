@@ -95,10 +95,16 @@ const ExpertiseReports = () => {
           const bName = `${b.clients?.last_name || ''} ${b.clients?.first_name || ''}`.trim().toLowerCase();
           return bName.localeCompare(aName, 'fr', { sensitivity: 'base' });
         }
-        case 'recent-first':
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-        case 'oldest-first':
-          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        case 'recent-first': {
+          const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+          const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+          return dateB - dateA;
+        }
+        case 'oldest-first': {
+          const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+          const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+          return dateA - dateB;
+        }
         default:
           return 0;
       }
