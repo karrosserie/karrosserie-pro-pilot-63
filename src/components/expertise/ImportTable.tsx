@@ -10,16 +10,19 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Clock, FileText } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Clock, FileText, Trash2 } from 'lucide-react';
 import { Import } from '@/services/supabase/imports';
 import { useEnvironment } from '@/hooks/use-environment';
 
 interface ImportTableProps {
   imports: Import[];
   isLoading: boolean;
+  onDeleteImport?: (importId: string, reportId?: string) => void;
 }
 
-const ImportTable: React.FC<ImportTableProps> = ({ imports, isLoading }) => {
+const ImportTable: React.FC<ImportTableProps> = ({ imports, isLoading, onDeleteImport }) => {
   const { settings: environmentSettings } = useEnvironment();
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -117,11 +120,23 @@ const ImportTable: React.FC<ImportTableProps> = ({ imports, isLoading }) => {
             <div className="text-xs text-muted-foreground">
               {format(new Date(importItem.created_at), 'dd/MM/yyyy HH:mm', { locale: fr })}
             </div>
-            <div className="flex items-center gap-2 pt-2 border-t">
-              <Clock className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm font-medium">
-                Temps restant: {formatSecondsToTime(calculateRemainingTime(importItem.created_at))}
-              </span>
+            <div className="flex items-center justify-between gap-2 pt-2 border-t">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm font-medium">
+                  Temps restant: {formatSecondsToTime(calculateRemainingTime(importItem.created_at))}
+                </span>
+              </div>
+              {onDeleteImport && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={() => onDeleteImport(importItem.id, importItem.expertise_reports?.id)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              )}
             </div>
           </div>
         ))}
@@ -136,6 +151,7 @@ const ImportTable: React.FC<ImportTableProps> = ({ imports, isLoading }) => {
               <TableHead className="min-w-[140px]">Statut</TableHead>
               <TableHead className="min-w-[140px]">Date d'import</TableHead>
               <TableHead className="min-w-[180px]">Temps restant estimé</TableHead>
+              {onDeleteImport && <TableHead className="w-[80px]">Actions</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -163,6 +179,23 @@ const ImportTable: React.FC<ImportTableProps> = ({ imports, isLoading }) => {
                     </span>
                   </div>
                 </TableCell>
+                {onDeleteImport && (
+                  <TableCell>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          onClick={() => onDeleteImport(importItem.id, importItem.expertise_reports?.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Supprimer</TooltipContent>
+                    </Tooltip>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>
