@@ -25,7 +25,7 @@ interface RepairOrdersTableProps {
 }
 
 export const RepairOrdersTable = ({ orders, onEditOrder, onDeleteOrder, onRestoreOrder, onViewOrder, contextMenuProps }: RepairOrdersTableProps) => {
-  const { sortedData: sortedOrders, sortConfig, handleSort } = useTableSorting(orders || [], 'reference');
+  const { sortedData: sortedOrders, sortConfig, handleSort } = useTableSorting(orders || [], 'created_at', 'desc');
   return (
     <div className="card-container">
       <Table>
