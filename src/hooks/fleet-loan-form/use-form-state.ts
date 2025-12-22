@@ -45,6 +45,7 @@ export const useFleetLoanFormState = (vehicle: FleetVehicle, defaultValues?: any
     hasAssistance: defaultValues?.has_assistance || false,
     assistanceCaseNumber: defaultValues?.assistance_case_number || '',
     assistanceEmail: defaultValues?.assistance_email || '',
+    assistanceFormula: defaultValues?.coverage_duration || '',
     attestationAccepted: defaultValues?.attestation_accepted || false,
     clientSignature: defaultValues?.client_signature || ''
   });

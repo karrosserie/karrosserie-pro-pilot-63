@@ -62,6 +62,7 @@ export interface LoanFormData {
   hasAssistance?: boolean;
   assistanceCaseNumber?: string;
   assistanceEmail?: string;
+  assistanceFormula?: '8' | '14';
   // Attestation fields
   attestationAccepted?: boolean;
   clientSignature?: string;
@@ -110,6 +111,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
     handleInsuranceSwitchChange,
     handleInsurancePhoneChange,
     handleAssistanceSwitchChange,
+    handleAssistanceFormulaChange,
     handleSignatureChange,
     handleSubmit
   } = useFleetLoanForm(vehicle, onSubmit, defaultValues);
@@ -268,6 +270,7 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
             onSwitchChange={handleInsuranceSwitchChange}
             onPhoneChange={handleInsurancePhoneChange}
             onAssistanceSwitchChange={handleAssistanceSwitchChange}
+            onAssistanceFormulaChange={handleAssistanceFormulaChange}
             isViewMode={isViewMode}
           />
         </TabsContent>

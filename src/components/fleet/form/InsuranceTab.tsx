@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { PhoneInputField } from '@/components/ui/phone-input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LoanFormData } from '../FleetLoanForm';
 
 interface InsuranceTabProps {
@@ -12,6 +13,7 @@ interface InsuranceTabProps {
   onSwitchChange: (checked: boolean) => void;
   onPhoneChange: (value: string | undefined) => void;
   onAssistanceSwitchChange: (checked: boolean) => void;
+  onAssistanceFormulaChange: (value: string) => void;
   isViewMode?: boolean;
 }
 
@@ -21,6 +23,7 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
   onSwitchChange,
   onPhoneChange,
   onAssistanceSwitchChange,
+  onAssistanceFormulaChange,
   isViewMode = false
 }) => {
   return (
@@ -156,7 +159,7 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
         </div>
 
         {formData.hasAssistance && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
               <Label htmlFor="assistanceCaseNumber">
                 Numéro de dossier d'assistance <span className="text-destructive">*</span>
@@ -184,6 +187,25 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
                 disabled={isViewMode}
                 required
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="assistanceFormula">
+                Formule d'assistance <span className="text-destructive">*</span>
+              </Label>
+              <Select
+                value={formData.assistanceFormula || ''}
+                onValueChange={onAssistanceFormulaChange}
+                disabled={isViewMode}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Choisir une formule" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="8">8 jours</SelectItem>
+                  <SelectItem value="14">14 jours</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         )}

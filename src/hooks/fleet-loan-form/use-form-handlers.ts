@@ -174,6 +174,10 @@ export const useFleetLoanFormHandlers = (
     setFormData(prev => ({ ...prev, hasAssistance: checked }));
   };
 
+  const handleAssistanceFormulaChange = (value: string) => {
+    setFormData(prev => ({ ...prev, assistanceFormula: value as '8' | '14' }));
+  };
+
   const handleSignatureChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -259,6 +263,7 @@ export const useFleetLoanFormHandlers = (
     handleInsuranceSwitchChange,
     handleInsurancePhoneChange,
     handleAssistanceSwitchChange,
+    handleAssistanceFormulaChange,
     handleSignatureChange,
     handleSubmit
   };
