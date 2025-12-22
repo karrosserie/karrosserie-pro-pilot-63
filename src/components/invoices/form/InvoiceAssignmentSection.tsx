@@ -4,7 +4,8 @@ import { Label } from '@/components/ui/label';
 import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import { Users, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Users, AlertCircle, Pencil } from 'lucide-react';
 import { Invoice } from '@/services/supabase/invoices';
 import { Client } from '@/services/supabase/clients';
 import { useVehicles } from '@/hooks/use-vehicles';
@@ -19,6 +20,7 @@ interface InvoiceAssignmentSectionProps {
   isLoadingClients: boolean;
   skipVehicle?: boolean;
   onSkipVehicleChange?: (value: boolean) => void;
+  onEditClient?: (clientId: string) => void;
 }
 
 const InvoiceAssignmentSectionComponent = ({
@@ -28,7 +30,8 @@ const InvoiceAssignmentSectionComponent = ({
   clientOptions,
   isLoadingClients,
   skipVehicle = false,
-  onSkipVehicleChange
+  onSkipVehicleChange,
+  onEditClient
 }: InvoiceAssignmentSectionProps) => {
   const { vehicles, isLoading: isLoadingVehicles } = useVehicles();
 
@@ -104,17 +107,32 @@ const InvoiceAssignmentSectionComponent = ({
         <div className={cn("grid gap-4", skipVehicle ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2")}>
           <div>
             <Label htmlFor="client_id" required>Client</Label>
-            <SearchableSelect
-              options={clientSelectOptions}
-              value={formData.client_id || ''}
-              onValueChange={handleClientChange}
-              placeholder={isLoadingClients ? "Chargement..." : "Sélectionner un client"}
-              searchPlaceholder="Rechercher un client..."
-              disabled={isLoadingClients}
-              className={cn(
-                errors.client_id && "border-red-500 focus-visible:ring-red-500"
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <SearchableSelect
+                  options={clientSelectOptions}
+                  value={formData.client_id || ''}
+                  onValueChange={handleClientChange}
+                  placeholder={isLoadingClients ? "Chargement..." : "Sélectionner un client"}
+                  searchPlaceholder="Rechercher un client..."
+                  disabled={isLoadingClients}
+                  className={cn(
+                    errors.client_id && "border-red-500 focus-visible:ring-red-500"
+                  )}
+                />
+              </div>
+              {onEditClient && formData.client_id && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => onEditClient(formData.client_id!)}
+                  title="Modifier le client"
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
               )}
-            />
+            </div>
             {errors.client_id && (
               <p className="text-sm text-red-500 mt-1 flex items-center">
                 <AlertCircle className="h-4 w-4 mr-1" />

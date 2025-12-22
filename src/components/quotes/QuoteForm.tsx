@@ -35,10 +35,12 @@ export const QuoteForm = ({
   isConversionFromReport
 }: QuoteFormProps) => {
   const { toast } = useToast();
-  const { clients, isLoading: isLoadingClients, createClient } = useClients();
+  const { clients, isLoading: isLoadingClients, createClient, updateClient } = useClients();
   const { createVehicle } = useVehicles();
   const [isClientDialogOpen, setIsClientDialogOpen] = useState(false);
   const [isVehicleDialogOpen, setIsVehicleDialogOpen] = useState(false);
+  const [isEditClientDialogOpen, setIsEditClientDialogOpen] = useState(false);
+  const [editingClient, setEditingClient] = useState<any>(null);
   const [showModificatifAlert, setShowModificatifAlert] = useState(false);
   const [showContactExpertDialog, setShowContactExpertDialog] = useState(false);
   const [pendingSubmitData, setPendingSubmitData] = useState<any>(null);
@@ -160,6 +162,36 @@ export const QuoteForm = ({
     setIsVehicleDialogOpen(true);
   };
 
+  // Gestion de l'édition du client
+  const handleEditClient = (clientId: string) => {
+    const client = clientOptions.find(c => c.id === clientId);
+    if (client) {
+      setEditingClient(client);
+      setIsEditClientDialogOpen(true);
+    }
+  };
+
+  const handleEditClientSubmit = async (clientData: any) => {
+    if (editingClient) {
+      try {
+        await updateClient.mutateAsync({ id: editingClient.id, data: clientData });
+        setIsEditClientDialogOpen(false);
+        setEditingClient(null);
+        toast({
+          title: "Client modifié",
+          description: "Les informations du client ont été mises à jour."
+        });
+      } catch (error) {
+        console.error('Error updating client:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de modifier le client.",
+          variant: "destructive"
+        });
+      }
+    }
+  };
+
   const handleNewVehicleSubmit = async (vehicleData: any) => {
     try {
       // Convert camelCase to snake_case for database
@@ -226,6 +258,7 @@ export const QuoteForm = ({
           errors={errors}
           onNewClientClick={handleNewClientClick}
           onNewVehicleClick={handleNewVehicleClick}
+          onEditClient={handleEditClient}
         />
 
         <QuoteRepairsAndPartsSection 
@@ -295,6 +328,16 @@ export const QuoteForm = ({
         defaultValues={{
           client_id: formData.client_id
         }}
+      />
+
+      <ClientDialog
+        open={isEditClientDialogOpen}
+        onOpenChange={setIsEditClientDialogOpen}
+        title="Modifier le client"
+        description="Modifier les informations du client"
+        defaultValues={editingClient || undefined}
+        onSubmit={handleEditClientSubmit}
+        mode="edit"
       />
     </>
   );
