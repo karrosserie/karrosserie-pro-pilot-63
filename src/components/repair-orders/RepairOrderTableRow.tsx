@@ -8,6 +8,7 @@ import { RepairOrderActionsDropdown } from './RepairOrderActionsDropdown';
 import { calculateOrderAmount, formatAmount } from './utils/orderCalculations';
 import { isValidFrenchMobilePhone } from '@/utils/phoneValidation';
 import { getClientDisplayName } from '@/utils/clientDisplayUtils';
+import { EmailSentBadge } from '@/components/ui/email-sent-badge';
 
 interface RepairOrderTableRowProps {
   order: RepairOrder;
@@ -69,7 +70,12 @@ export const RepairOrderTableRow = ({ order, onEditOrder, onDeleteOrder, onResto
   return (
     <React.Fragment>
       <TableRow className="hover:bg-gray-50 border-b-0">
-        <TableCell className="font-medium">{order.reference}</TableCell>
+        <TableCell className="font-medium">
+          <div className="flex items-center gap-2">
+            {order.reference}
+            {(order as any).email_sent && <EmailSentBadge />}
+          </div>
+        </TableCell>
         <TableCell>{formatDate(order.created_at)}</TableCell>
         <TableCell>
           {order.clients ? getClientDisplayName(order.clients) : '-'}
