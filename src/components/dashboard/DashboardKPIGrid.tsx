@@ -52,14 +52,23 @@ interface DashboardKPIGridProps {
 }
 
 export const DashboardKPIGrid = ({ data }: DashboardKPIGridProps) => {
-  const previousRevenue = data.revenueEvolution !== 0 
-    ? Math.round(data.totalRevenue / (1 + data.revenueEvolution / 100)) 
-    : data.totalRevenue;
-  const previousVehicles = data.vehiclesEvolution !== 0 
-    ? Math.round(data.vehiclesCount / (1 + data.vehiclesEvolution / 100)) 
-    : data.vehiclesCount;
+  // Valeurs sécurisées avec fallback à 0
+  const totalSoldHours = data.totalSoldHours ?? 0;
+  const totalSoldHoursP1 = data.totalSoldHoursP1 ?? 0;
+  const soldHoursEvolution = data.soldHoursEvolution ?? 0;
+  const totalRevenue = data.totalRevenue ?? 0;
+  const revenueEvolution = data.revenueEvolution ?? 0;
+  const vehiclesCount = data.vehiclesCount ?? 0;
+  const vehiclesEvolution = data.vehiclesEvolution ?? 0;
 
-  const hasProductivityData = data.hasTimesheetData && data.globalProductivity > 0;
+  const previousRevenue = revenueEvolution !== 0 
+    ? Math.round(totalRevenue / (1 + revenueEvolution / 100)) 
+    : totalRevenue;
+  const previousVehicles = vehiclesEvolution !== 0 
+    ? Math.round(vehiclesCount / (1 + vehiclesEvolution / 100)) 
+    : vehiclesCount;
+
+  const hasProductivityData = data.hasTimesheetData && (data.globalProductivity ?? 0) > 0;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
@@ -71,13 +80,13 @@ export const DashboardKPIGrid = ({ data }: DashboardKPIGridProps) => {
             <p className="text-2xl font-bold text-foreground mt-1">{data.globalProductivity}%</p>
             <p className="text-xs text-muted-foreground mt-0.5">Objectif : 120%</p>
             <div className="flex items-center gap-1.5 mt-2">
-              {data.globalProductivityEvolution >= 0 ? (
+              {(data.globalProductivityEvolution ?? 0) >= 0 ? (
                 <TrendingUp className="w-3 h-3 text-green-600" />
               ) : (
                 <TrendingDown className="w-3 h-3 text-red-600" />
               )}
-              <span className={`text-xs font-medium ${data.globalProductivityEvolution >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {data.globalProductivityEvolution >= 0 ? '+' : ''}{data.globalProductivityEvolution.toFixed(1)}%
+              <span className={`text-xs font-medium ${(data.globalProductivityEvolution ?? 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {(data.globalProductivityEvolution ?? 0) >= 0 ? '+' : ''}{(data.globalProductivityEvolution ?? 0).toFixed(1)}%
               </span>
             </div>
           </>
@@ -92,28 +101,28 @@ export const DashboardKPIGrid = ({ data }: DashboardKPIGridProps) => {
       {/* Heures Expertisées - EXCLUSIVEMENT depuis expertise_reports */}
       <KPICard
         title="Heures Expertisées"
-        value={data.totalSoldHours > 0 ? `${data.totalSoldHours.toFixed(0)}h` : '0h'}
+        value={totalSoldHours > 0 ? `${totalSoldHours.toFixed(0)}h` : '0h'}
         subtitle="Total heures vendues"
-        evolution={data.soldHoursEvolution}
-        currentValue={`${data.totalSoldHours.toFixed(1)}h`}
-        previousValue={`${(data.totalSoldHoursP1 || 0).toFixed(1)}h`}
+        evolution={soldHoursEvolution}
+        currentValue={`${totalSoldHours.toFixed(1)}h`}
+        previousValue={`${totalSoldHoursP1.toFixed(1)}h`}
       />
       
       <KPICard
         title="CA Main d'Œuvre"
-        value={data.totalRevenue > 0 ? `${(data.totalRevenue / 1000).toFixed(1)}k€` : '0€'}
+        value={totalRevenue > 0 ? `${(totalRevenue / 1000).toFixed(1)}k€` : '0€'}
         subtitle="Somme des factures"
-        evolution={data.revenueEvolution}
-        currentValue={`${data.totalRevenue.toLocaleString('fr-FR')}€`}
+        evolution={revenueEvolution}
+        currentValue={`${totalRevenue.toLocaleString('fr-FR')}€`}
         previousValue={`${previousRevenue.toLocaleString('fr-FR')}€`}
       />
       
       <KPICard
         title="Véhicules Traités"
-        value={data.vehiclesCount.toString()}
+        value={vehiclesCount.toString()}
         subtitle="OR signés/en cours"
-        evolution={data.vehiclesEvolution}
-        currentValue={data.vehiclesCount.toString()}
+        evolution={vehiclesEvolution}
+        currentValue={vehiclesCount.toString()}
         previousValue={previousVehicles.toString()}
       />
       
