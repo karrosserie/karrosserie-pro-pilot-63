@@ -60,12 +60,9 @@ export const DashboardKPIGrid = ({ data }: DashboardKPIGridProps) => {
     : data.vehiclesCount;
 
   const hasProductivityData = data.hasTimesheetData && data.globalProductivity > 0;
-  const previousProductivity = hasProductivityData && data.globalProductivityEvolution !== 0
-    ? Math.round(data.globalProductivity / (1 + data.globalProductivityEvolution / 100))
-    : 0;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
       {/* Productivité - seulement si données de pointage disponibles */}
       <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Productivité Globale</p>
@@ -91,6 +88,16 @@ export const DashboardKPIGrid = ({ data }: DashboardKPIGridProps) => {
           </>
         )}
       </div>
+      
+      {/* Heures Expertisées - EXCLUSIVEMENT depuis expertise_reports */}
+      <KPICard
+        title="Heures Expertisées"
+        value={data.totalSoldHours > 0 ? `${data.totalSoldHours.toFixed(0)}h` : '0h'}
+        subtitle="Total heures vendues"
+        evolution={data.soldHoursEvolution}
+        currentValue={`${data.totalSoldHours.toFixed(1)}h`}
+        previousValue={`${(data.totalSoldHoursP1 || 0).toFixed(1)}h`}
+      />
       
       <KPICard
         title="CA Main d'Œuvre"

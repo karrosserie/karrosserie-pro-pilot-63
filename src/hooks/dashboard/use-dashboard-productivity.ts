@@ -42,6 +42,10 @@ export interface DashboardProductivityData {
   grossMargin: number;
   grossMarginEvolution: number;
   
+  // Heures expertisées (vendues) - EXCLUSIVEMENT depuis expertise_reports
+  soldHoursEvolution: number;
+  totalSoldHoursP1: number;
+  
   // Rentabilité MO
   laborCost: number;
   laborMargin: number;
@@ -581,6 +585,11 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
       const globalProductivityP1 = (hasTimesheetData && totalBoughtHours > 0) ? (totalSoldHoursP1 / totalBoughtHours) * 100 : 0;
       const globalProductivityEvolution = Math.round((globalProductivity - globalProductivityP1) * 10) / 10;
       
+      // Évolution des heures vendues/expertisées
+      const soldHoursEvolution = totalSoldHoursP1 > 0 
+        ? Math.round(((totalSoldHours - totalSoldHoursP1) / totalSoldHoursP1) * 100) 
+        : 0;
+      
       // Évolution du CA réel
       const revenueEvolution = totalRevenueP1 > 0 ? Math.round(((totalRevenueP2 - totalRevenueP1) / totalRevenueP1) * 100) : 0;
       
@@ -615,6 +624,8 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
         vehiclesEvolution,
         grossMargin: grossMarginPercent,
         grossMarginEvolution: 0,
+        soldHoursEvolution,
+        totalSoldHoursP1,
         laborCost,
         laborMargin,
         grossMarginPercent,
