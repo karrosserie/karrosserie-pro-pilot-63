@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { InvoiceEmailFormData } from './types';
 import { Invoice } from '@/services/supabase/invoices';
@@ -14,6 +15,7 @@ import { registerEmailInMessagerie } from '@/services/messagerie/emailMessagerie
 
 export const useInvoiceEmail = (invoice: Invoice | null) => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
 
   const getDefaultEmailData = async (): Promise<InvoiceEmailFormData> => {
@@ -156,6 +158,9 @@ ${companyInfo?.name || 'L\'équipe'}`;
         .from('invoices')
         .update({ email_sent: true })
         .eq('id', invoice.id);
+
+      // Rafraîchir la liste des factures pour afficher la pastille
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
       
       toast({
         title: "E-mail envoyé",

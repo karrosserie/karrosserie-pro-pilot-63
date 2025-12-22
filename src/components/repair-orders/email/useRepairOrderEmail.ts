@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { useCompany } from '@/hooks/use-company';
 import { EmailFormData } from './types';
@@ -13,6 +14,7 @@ import { registerEmailInMessagerie } from '@/services/messagerie/emailMessagerie
 
 export const useRepairOrderEmail = (repairOrder: SimpleRepairOrder | null, open: boolean) => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { companyData } = useCompany();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<EmailFormData>({
@@ -165,6 +167,9 @@ ${companyName}`
         .from('repair_orders')
         .update({ email_sent: true })
         .eq('id', repairOrder.id);
+
+      // Rafraîchir la liste des ordres de réparation pour afficher la pastille
+      queryClient.invalidateQueries({ queryKey: ['repair-orders'] });
       
       toast({
         title: "Email envoyé",
