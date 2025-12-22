@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, User } from 'lucide-react';
+import { Calendar, Wrench, Paintbrush, Settings } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { userActionWebhookService } from '@/services/tracking/UserActionWebhookService';
@@ -21,6 +21,7 @@ interface Employee {
   user_id: string;
   nom: string;
   role: string;
+  qualifications?: string[];
 }
 
 interface PlanVehicleModalProps {
@@ -32,15 +33,12 @@ interface PlanVehicleModalProps {
   onSuccess: () => void;
 }
 
-const TASK_TYPES = [
-  { value: 'Accueil & Préparation du dossier', label: 'Accueil & Préparation du dossier', duration: 1 },
-  { value: 'Remplacement ou débosselage', label: 'Remplacement ou débosselage', duration: 2.5 },
-  { value: 'Contrôle technique de sécurité', label: 'Contrôle technique de sécurité', duration: 1.5 },
-  { value: 'Préparation peinture', label: 'Préparation peinture', duration: 2.5 },
-  { value: 'Mise en peinture', label: 'Mise en peinture', duration: 5 },
-  { value: 'Finitions & remontage', label: 'Finitions & remontage', duration: 2 },
-  { value: 'Clôture & livraison', label: 'Clôture & livraison', duration: 0.5 }
-];
+// Tâches par section
+const SECTION_TASKS = {
+  carrosserie: { value: 'Remplacement ou débosselage', duration: 2.5 },
+  peinture: { value: 'Mise en peinture', duration: 5 },
+  mecanique: { value: 'Contrôle technique de sécurité', duration: 1.5 }
+};
 
 export const PlanVehicleModal = ({
   isOpen,
@@ -50,25 +48,32 @@ export const PlanVehicleModal = ({
   companyId,
   onSuccess
 }: PlanVehicleModalProps) => {
-  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>('');
-  const [selectedTaskType, setSelectedTaskType] = useState<string>('');
+  const [selectedCarrossier, setSelectedCarrossier] = useState<string>('');
+  const [selectedPeintre, setSelectedPeintre] = useState<string>('');
+  const [selectedMecanicien, setSelectedMecanicien] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Filtrer les employés par classe
+  const carrossiers = employees.filter(e => e.qualifications?.includes('carrossier'));
+  const peintres = employees.filter(e => e.qualifications?.includes('peintre'));
+  const mecaniciens = employees.filter(e => e.qualifications?.includes('mecanicien'));
+
   const handlePlan = async () => {
-    if (!vehicle || !selectedEmployeeId || !selectedTaskType || !companyId) {
-      toast.error('Veuillez remplir tous les champs obligatoires');
+    if (!vehicle || !companyId) {
+      toast.error('Données du véhicule manquantes');
+      return;
+    }
+
+    // Au moins un employé doit être sélectionné
+    if (!selectedCarrossier && !selectedPeintre && !selectedMecanicien) {
+      toast.error('Veuillez sélectionner au moins un employé');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      // Utiliser la date et l'heure actuelles
-      const taskType = TASK_TYPES.find(t => t.value === selectedTaskType);
-      const startDateTime = new Date();
-      const endDateTime = new Date(startDateTime.getTime() + (taskType?.duration || 1) * 60 * 60 * 1000);
-
-      // D'abord, nettoyer toutes les anciennes tâches en attente avec waiting_reason pour ce véhicule
+      // D'abord, nettoyer toutes les anciennes tâches en attente pour ce véhicule
       const { error: cleanupError } = await supabase
         .from('employee_schedule')
         .delete()
@@ -78,63 +83,95 @@ export const PlanVehicleModal = ({
 
       if (cleanupError) {
         console.error('Erreur lors du nettoyage des anciennes tâches:', cleanupError);
-        // Ne pas bloquer la planification
       }
 
-      // Créer la tâche dans employee_schedule
-      const { data, error } = await supabase
-        .from('employee_schedule')
-        .insert({
+      const startDateTime = new Date();
+      const tasksToCreate: any[] = [];
+
+      // Créer les tâches pour chaque section si un employé est sélectionné
+      if (selectedCarrossier) {
+        const task = SECTION_TASKS.carrosserie;
+        const endDateTime = new Date(startDateTime.getTime() + task.duration * 60 * 60 * 1000);
+        tasksToCreate.push({
           company_id: companyId,
-          user_id: selectedEmployeeId,
+          user_id: selectedCarrossier,
           vehicle_id: vehicle.id,
-          task_type: selectedTaskType as any, // Cast pour éviter l'erreur TypeScript
+          task_type: task.value,
           start_datetime: startDateTime.toISOString(),
           end_datetime: endDateTime.toISOString(),
-          status: 'En attente' as any
-        })
-        .select()
-        .single();
+          status: 'En attente'
+        });
+      }
+
+      if (selectedPeintre) {
+        const task = SECTION_TASKS.peinture;
+        const endDateTime = new Date(startDateTime.getTime() + task.duration * 60 * 60 * 1000);
+        tasksToCreate.push({
+          company_id: companyId,
+          user_id: selectedPeintre,
+          vehicle_id: vehicle.id,
+          task_type: task.value,
+          start_datetime: startDateTime.toISOString(),
+          end_datetime: endDateTime.toISOString(),
+          status: 'En attente'
+        });
+      }
+
+      if (selectedMecanicien) {
+        const task = SECTION_TASKS.mecanique;
+        const endDateTime = new Date(startDateTime.getTime() + task.duration * 60 * 60 * 1000);
+        tasksToCreate.push({
+          company_id: companyId,
+          user_id: selectedMecanicien,
+          vehicle_id: vehicle.id,
+          task_type: task.value,
+          start_datetime: startDateTime.toISOString(),
+          end_datetime: endDateTime.toISOString(),
+          status: 'En attente'
+        });
+      }
+
+      // Insérer toutes les tâches
+      const { data, error } = await supabase
+        .from('employee_schedule')
+        .insert(tasksToCreate)
+        .select();
 
       if (error) {
-        console.error('Erreur lors de la création de la tâche:', error);
+        console.error('Erreur lors de la création des tâches:', error);
         toast.error('Erreur lors de la planification');
         return;
       }
 
-      // Remettre waiting_reason à NULL dans la table vehicles (au cas où)
-      const { error: updateError } = await supabase
+      // Remettre waiting_reason à NULL dans la table vehicles
+      await supabase
         .from('vehicles')
         .update({ waiting_reason: null } as any)
         .eq('id', vehicle.id);
 
-      if (updateError) {
-        console.error('Erreur lors de la mise à jour du véhicule:', updateError);
-        // Ne pas bloquer la planification si cette mise à jour échoue
-      }
-
-      console.log('Tâche planifiée avec succès:', data);
-      toast.success(`Véhicule ${vehicle.licensePlate} planifié avec succès`);
+      console.log('Tâches planifiées avec succès:', data);
+      toast.success(`Véhicule ${vehicle.licensePlate} planifié avec ${tasksToCreate.length} tâche(s)`);
       
-      // Envoyer le webhook pour l'action mise_planning
+      // Envoyer le webhook
       try {
         await userActionWebhookService.sendUserAction('mise_planning', {
           vehicle_id: vehicle.id,
           vehicle_license_plate: vehicle.licensePlate,
-          employee_id: selectedEmployeeId,
-          task_type: selectedTaskType,
+          carrossier_id: selectedCarrossier || null,
+          peintre_id: selectedPeintre || null,
+          mecanicien_id: selectedMecanicien || null,
+          tasks_count: tasksToCreate.length,
           scheduled_date: startDateTime.toISOString(),
           company_id: companyId
         });
-        console.log('✅ Webhook mise_planning envoyé avec succès');
       } catch (webhookError) {
-        console.error('⚠️ Erreur lors de l\'envoi du webhook mise_planning:', webhookError);
-        // Ne pas bloquer la planification si le webhook échoue
+        console.error('⚠️ Erreur webhook:', webhookError);
       }
       
       // Réinitialiser le formulaire
-      setSelectedEmployeeId('');
-      setSelectedTaskType('');
+      setSelectedCarrossier('');
+      setSelectedPeintre('');
+      setSelectedMecanicien('');
       
       onSuccess();
       onClose();
@@ -149,8 +186,9 @@ export const PlanVehicleModal = ({
 
   const handleClose = () => {
     if (!isLoading) {
-      setSelectedEmployeeId('');
-      setSelectedTaskType('');
+      setSelectedCarrossier('');
+      setSelectedPeintre('');
+      setSelectedMecanicien('');
       onClose();
     }
   };
@@ -168,54 +206,84 @@ export const PlanVehicleModal = ({
         {vehicle && (
           <div className="space-y-4">
             {/* Informations du véhicule */}
-            <div className="bg-slate-50 p-4 rounded-lg">
-              <h4 className="font-semibold text-slate-900">
+            <div className="bg-muted p-4 rounded-lg">
+              <h4 className="font-semibold">
                 {vehicle.brand} {vehicle.model}
               </h4>
-              <p className="text-sm text-slate-600">{vehicle.licensePlate}</p>
-              <p className="text-sm text-slate-600">Client: {vehicle.client}</p>
+              <p className="text-sm text-muted-foreground">{vehicle.licensePlate}</p>
+              <p className="text-sm text-muted-foreground">Client: {vehicle.client}</p>
             </div>
 
-            {/* Sélection de l'employé */}
-            <div className="space-y-2">
-              <Label htmlFor="employee" className="flex items-center gap-2">
-                <User className="w-4 h-4" />
-                Employé *
+            {/* Section Carrosserie */}
+            <div className="space-y-2 p-3 border rounded-lg">
+              <Label className="flex items-center gap-2 text-base font-semibold">
+                <Wrench className="w-4 h-4 text-orange-500" />
+                🔧 Carrosserie
               </Label>
-          <Select value={selectedEmployeeId} onValueChange={setSelectedEmployeeId}>
-            <SelectTrigger>
-              <SelectValue placeholder="Sélectionner un employé" />
-            </SelectTrigger>
-            <SelectContent>
-              {employees
-                .filter(employee => 
-                  employee.role === 'carrossier' || 
-                  employee.role === 'carrossier-vehicule de courtoisie'
-                )
-                .map((employee) => (
-                <SelectItem key={employee.user_id} value={employee.user_id}>
-                  {employee.nom}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-            </div>
-
-            {/* Sélection du type de tâche */}
-            <div className="space-y-2">
-              <Label htmlFor="taskType">Type de tâche *</Label>
-              <Select value={selectedTaskType} onValueChange={setSelectedTaskType}>
+              <Select value={selectedCarrossier} onValueChange={setSelectedCarrossier}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner une tâche" />
+                  <SelectValue placeholder="Sélectionner un carrossier" />
                 </SelectTrigger>
                 <SelectContent>
-                  {TASK_TYPES.map((task) => (
-                    <SelectItem key={task.value} value={task.value}>
-                      {task.label} ({task.duration}h)
+                  <SelectItem value="">Aucun</SelectItem>
+                  {carrossiers.map((employee) => (
+                    <SelectItem key={employee.user_id} value={employee.user_id}>
+                      {employee.nom}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              <p className="text-xs text-muted-foreground">
+                Tâche: {SECTION_TASKS.carrosserie.value} ({SECTION_TASKS.carrosserie.duration}h)
+              </p>
+            </div>
+
+            {/* Section Peinture */}
+            <div className="space-y-2 p-3 border rounded-lg">
+              <Label className="flex items-center gap-2 text-base font-semibold">
+                <Paintbrush className="w-4 h-4 text-blue-500" />
+                🎨 Peinture
+              </Label>
+              <Select value={selectedPeintre} onValueChange={setSelectedPeintre}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner un peintre" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Aucun</SelectItem>
+                  {peintres.map((employee) => (
+                    <SelectItem key={employee.user_id} value={employee.user_id}>
+                      {employee.nom}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Tâche: {SECTION_TASKS.peinture.value} ({SECTION_TASKS.peinture.duration}h)
+              </p>
+            </div>
+
+            {/* Section Mécanique */}
+            <div className="space-y-2 p-3 border rounded-lg">
+              <Label className="flex items-center gap-2 text-base font-semibold">
+                <Settings className="w-4 h-4 text-green-500" />
+                ⚙️ Mécanique
+              </Label>
+              <Select value={selectedMecanicien} onValueChange={setSelectedMecanicien}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner un mécanicien" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Aucun</SelectItem>
+                  {mecaniciens.map((employee) => (
+                    <SelectItem key={employee.user_id} value={employee.user_id}>
+                      {employee.nom}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Tâche: {SECTION_TASKS.mecanique.value} ({SECTION_TASKS.mecanique.duration}h)
+              </p>
             </div>
 
             {/* Boutons d'action */}
@@ -230,8 +298,8 @@ export const PlanVehicleModal = ({
               </Button>
               <Button
                 onClick={handlePlan}
-                disabled={isLoading}
-                className="flex-1 bg-blue-600 hover:bg-blue-700"
+                disabled={isLoading || (!selectedCarrossier && !selectedPeintre && !selectedMecanicien)}
+                className="flex-1"
               >
                 {isLoading ? 'Planification...' : 'Planifier'}
               </Button>
