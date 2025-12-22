@@ -28,7 +28,7 @@ const ExpertiseReports = () => {
   const { convertToQuote, checkMultipleReports, isConverting, isConverted, convertedReports } = useReportToQuote();
   const { settings: environmentSettings } = useEnvironment();
   const [initialCheckComplete, setInitialCheckComplete] = useState(false);
-  const { pendingImports, isLoading: importsLoading } = useImports();
+  const { pendingImports, isLoading: importsLoading, deleteImport } = useImports();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOption, setSortOption] = useState<ExpertiseSortOption>('recent-first');
   const [importDialogOpen, setImportDialogOpen] = useState(false);
@@ -123,6 +123,25 @@ const ExpertiseReports = () => {
 
     if (confirmed) {
       await deleteReport.mutateAsync(id);
+    }
+  };
+
+  const handleDeleteImport = async (importId: string, reportId?: string) => {
+    const confirmed = await confirm({
+      title: 'Supprimer l\'import en cours',
+      description: 'Êtes-vous sûr de vouloir supprimer cet import en cours d\'analyse ? Cette action est irréversible.',
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive'
+    });
+
+    if (confirmed) {
+      // Supprimer d'abord le rapport d'expertise associé s'il existe
+      if (reportId) {
+        await deleteReport.mutateAsync(reportId);
+      }
+      // Puis supprimer l'import
+      await deleteImport.mutateAsync(importId);
     }
   };
 
@@ -235,6 +254,7 @@ const ExpertiseReports = () => {
         <ImportTable 
           imports={pendingImports}
           isLoading={importsLoading}
+          onDeleteImport={handleDeleteImport}
         />
       )}
       
