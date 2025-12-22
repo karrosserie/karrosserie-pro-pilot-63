@@ -64,8 +64,12 @@ export const PlanVehicleModal = ({
       return;
     }
 
-    // Au moins un employé doit être sélectionné
-    if (!selectedCarrossier && !selectedPeintre && !selectedMecanicien) {
+    // Au moins un employé doit être sélectionné (valeur non vide et différente de "none")
+    const hasCarrossier = selectedCarrossier && selectedCarrossier !== 'none';
+    const hasPeintre = selectedPeintre && selectedPeintre !== 'none';
+    const hasMecanicien = selectedMecanicien && selectedMecanicien !== 'none';
+    
+    if (!hasCarrossier && !hasPeintre && !hasMecanicien) {
       toast.error('Veuillez sélectionner au moins un employé');
       return;
     }
@@ -89,7 +93,7 @@ export const PlanVehicleModal = ({
       const tasksToCreate: any[] = [];
 
       // Créer les tâches pour chaque section si un employé est sélectionné
-      if (selectedCarrossier) {
+      if (hasCarrossier) {
         const task = SECTION_TASKS.carrosserie;
         const endDateTime = new Date(startDateTime.getTime() + task.duration * 60 * 60 * 1000);
         tasksToCreate.push({
@@ -103,7 +107,7 @@ export const PlanVehicleModal = ({
         });
       }
 
-      if (selectedPeintre) {
+      if (hasPeintre) {
         const task = SECTION_TASKS.peinture;
         const endDateTime = new Date(startDateTime.getTime() + task.duration * 60 * 60 * 1000);
         tasksToCreate.push({
@@ -117,7 +121,7 @@ export const PlanVehicleModal = ({
         });
       }
 
-      if (selectedMecanicien) {
+      if (hasMecanicien) {
         const task = SECTION_TASKS.mecanique;
         const endDateTime = new Date(startDateTime.getTime() + task.duration * 60 * 60 * 1000);
         tasksToCreate.push({
@@ -225,7 +229,7 @@ export const PlanVehicleModal = ({
                   <SelectValue placeholder="Sélectionner un carrossier" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Aucun</SelectItem>
+                  <SelectItem value="none">Aucun</SelectItem>
                   {carrossiers.map((employee) => (
                     <SelectItem key={employee.user_id} value={employee.user_id}>
                       {employee.nom}
@@ -249,7 +253,7 @@ export const PlanVehicleModal = ({
                   <SelectValue placeholder="Sélectionner un peintre" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Aucun</SelectItem>
+                  <SelectItem value="none">Aucun</SelectItem>
                   {peintres.map((employee) => (
                     <SelectItem key={employee.user_id} value={employee.user_id}>
                       {employee.nom}
@@ -273,7 +277,7 @@ export const PlanVehicleModal = ({
                   <SelectValue placeholder="Sélectionner un mécanicien" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Aucun</SelectItem>
+                  <SelectItem value="none">Aucun</SelectItem>
                   {mecaniciens.map((employee) => (
                     <SelectItem key={employee.user_id} value={employee.user_id}>
                       {employee.nom}
@@ -298,7 +302,7 @@ export const PlanVehicleModal = ({
               </Button>
               <Button
                 onClick={handlePlan}
-                disabled={isLoading || (!selectedCarrossier && !selectedPeintre && !selectedMecanicien)}
+                disabled={isLoading || ((!selectedCarrossier || selectedCarrossier === 'none') && (!selectedPeintre || selectedPeintre === 'none') && (!selectedMecanicien || selectedMecanicien === 'none'))}
                 className="flex-1"
               >
                 {isLoading ? 'Planification...' : 'Planifier'}
