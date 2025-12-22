@@ -37,7 +37,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import RepairOrderMobileCard from '@/components/repair-orders/RepairOrderMobileCard';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserOnboardingProgress } from '@/hooks/use-user-onboarding-progress';
-import { useDocumentEmailStatus } from '@/hooks/use-document-email-status';
+
 const RepairOrders = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -71,7 +71,6 @@ const RepairOrders = () => {
   } = useToast();
   const isMobile = useIsMobile();
   const { shouldShowRepairOrderHelp, markHelpAsSeen } = useUserOnboardingProgress();
-  const { sentRepairOrders } = useDocumentEmailStatus();
   const {
     orders,
     isLoading,
@@ -732,7 +731,7 @@ const RepairOrders = () => {
         onSendForOodriveSignature: handleSendForOodriveSignature,
         onRequestDocuments: handleRequestDocuments,
         onConvertToInvoice: handleConvertToInvoice
-      }} isEmailSent={sentRepairOrders.has(order.reference || '')} />) : <div className="card-container">
+      }} />) : <div className="card-container">
               <div className="flex flex-col items-center justify-center py-8">
                 <div className="h-10 w-10 text-gray-400 mb-2" />
                 <h3 className="font-medium text-gray-900">Aucun résultat</h3>

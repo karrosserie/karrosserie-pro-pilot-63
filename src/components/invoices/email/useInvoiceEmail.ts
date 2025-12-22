@@ -150,6 +150,12 @@ ${companyInfo?.name || 'L\'équipe'}`;
           vehicleId: invoice.vehicle_id || undefined
         });
       }
+
+      // Marquer la facture comme envoyée par email
+      await supabase
+        .from('invoices')
+        .update({ email_sent: true })
+        .eq('id', invoice.id);
       
       toast({
         title: "E-mail envoyé",

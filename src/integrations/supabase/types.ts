@@ -3544,6 +3544,7 @@ export type Database = {
           discounts_data: Json | null
           document_url: string | null
           due_date: string | null
+          email_sent: boolean | null
           expert_name: string | null
           id: string
           incident_date: string | null
@@ -3572,6 +3573,7 @@ export type Database = {
           discounts_data?: Json | null
           document_url?: string | null
           due_date?: string | null
+          email_sent?: boolean | null
           expert_name?: string | null
           id?: string
           incident_date?: string | null
@@ -3600,6 +3602,7 @@ export type Database = {
           discounts_data?: Json | null
           document_url?: string | null
           due_date?: string | null
+          email_sent?: boolean | null
           expert_name?: string | null
           id?: string
           incident_date?: string | null
@@ -4841,6 +4844,7 @@ export type Database = {
           created_at: string
           discounts_data: string | null
           document_url: string | null
+          email_sent: boolean | null
           expert_name: string | null
           id: string
           incident_date: string | null
@@ -4872,6 +4876,7 @@ export type Database = {
           created_at?: string
           discounts_data?: string | null
           document_url?: string | null
+          email_sent?: boolean | null
           expert_name?: string | null
           id?: string
           incident_date?: string | null
@@ -4903,6 +4908,7 @@ export type Database = {
           created_at?: string
           discounts_data?: string | null
           document_url?: string | null
+          email_sent?: boolean | null
           expert_name?: string | null
           id?: string
           incident_date?: string | null
@@ -5068,6 +5074,7 @@ export type Database = {
           created_at: string
           discounts_data: Json | null
           document_url: string | null
+          email_sent: boolean | null
           end_date: string | null
           estimated_hours: number | null
           expert_name: string | null
@@ -5115,6 +5122,7 @@ export type Database = {
           created_at?: string
           discounts_data?: Json | null
           document_url?: string | null
+          email_sent?: boolean | null
           end_date?: string | null
           estimated_hours?: number | null
           expert_name?: string | null
@@ -5162,6 +5170,7 @@ export type Database = {
           created_at?: string
           discounts_data?: Json | null
           document_url?: string | null
+          email_sent?: boolean | null
           end_date?: string | null
           estimated_hours?: number | null
           expert_name?: string | null

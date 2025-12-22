@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { EmailSentBadge } from "@/components/ui/email-sent-badge";
 import { Eye, Pencil, Download, Printer, Mail, FileCheck, ArrowRight, Trash, MoreVertical } from 'lucide-react';
 import {
   DropdownMenu,
@@ -49,7 +50,10 @@ const ClientQuoteMobileCard: React.FC<ClientQuoteMobileCardProps> = ({
       <CardContent className="p-4">
         <div className="flex justify-between items-start mb-3">
           <div>
-            <h3 className="font-semibold text-lg">{quote.reference}</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-lg">{quote.reference}</h3>
+              {quote.email_sent && <EmailSentBadge />}
+            </div>
             <p className="text-sm text-muted-foreground">
               {new Date(quote.created_at).toLocaleDateString('fr-FR')}
             </p>
