@@ -77,58 +77,80 @@ export interface DashboardProductivityData {
 }
 
 // Fonction pour catégoriser les réparations par métier
+// Règles : T1, T2, T3, M1, tôlerie = Carrosserie | Peinture (sans ingrédients) = Peinture
 function categorizeTrade(description: string): 'carrosserie' | 'peinture' | 'mecanique' {
   const desc = description.toLowerCase();
   
-  // Peinture
-  if (desc.includes('peinture') || desc.includes('ingr') || desc.includes('vernis') || 
-      desc.includes('teinte') || desc.includes('laqu')) {
+  // Exclure les ingrédients/matériaux de la catégorisation peinture
+  const isIngredient = desc.includes('ingrédient') || desc.includes('ingredient') || 
+                       desc.includes('métal vernis') || desc.includes('metal vernis');
+  
+  // Peinture - uniquement si c'est explicitement de la peinture (pas des ingrédients)
+  if (!isIngredient && desc.includes('peinture')) {
     return 'peinture';
   }
   
-  // Carrosserie
-  if (desc.includes('tôlerie') || desc.includes('tolerie') || desc.includes('t1') || 
-      desc.includes('t2') || desc.includes('t3') || desc.includes('débosselage') ||
-      desc.includes('redressage') || desc.includes('soudure') || desc.includes('remplacement')) {
+  // Carrosserie - T1, T2, T3, M1, tôlerie, débosselage
+  if (desc.includes('tôlerie') || desc.includes('tolerie') ||
+      desc.includes('/ mo 1') || desc.includes('/ mo 2') || desc.includes('/ mo 3') ||
+      desc.includes('mo 1') || desc.includes('mo 2') || desc.includes('mo 3') ||
+      desc.includes(' t1') || desc.includes(' t2') || desc.includes(' t3') ||
+      desc.includes('/t1') || desc.includes('/t2') || desc.includes('/t3') ||
+      desc.includes('débosselage') || desc.includes('redressage') ||
+      desc.includes('soudure') || desc.includes('remplacement')) {
     return 'carrosserie';
   }
   
-  // Par défaut: mécanique
-  return 'mecanique';
+  // Mécanique - explicitement mécanique
+  if (desc.includes('mécanique') || desc.includes('mecanique')) {
+    return 'mecanique';
+  }
+  
+  // Par défaut: carrosserie (la plupart des travaux en carrosserie)
+  return 'carrosserie';
 }
 
-// Fonction pour filtrer les lignes qui sont des heures de travail (exclure pièces, forfaits, fournitures)
+// Fonction pour filtrer les lignes qui sont des heures de travail (exclure pièces, matériaux, ingrédients)
 function isHoursLine(repair: any): boolean {
   const desc = ((repair.designation || repair.description || '') as string).toLowerCase();
   
-  // Exclure les pièces, fournitures, forfaits
-  const excludedTerms = [
-    'pièce', 'piece', 'fourniture', 'forfait', 'ingrédient', 'ingredient',
+  // Lignes explicitement exclues (matériel, pas des heures)
+  const excludedPatterns = [
+    'pièce', 'piece', 'fourniture', 'forfait',
+    'ingrédient', 'ingredient', 'ingredients',
+    'métal vernis', 'metal vernis',
     'consommable', 'matériel', 'materiel', 'produit', 'accessoire',
     'kit', 'ensemble', 'lot', 'jeu de', 'vis', 'boulon', 'écrou',
-    'colle', 'mastic', 'apprêt', 'appret', 'diluant', 'durcisseur'
+    'colle', 'mastic', 'apprêt', 'appret', 'diluant', 'durcisseur',
+    'rechange', 'enlèvement', 'recyclage', 'déchets'
   ];
   
   // Vérifier si c'est une ligne exclue
-  if (excludedTerms.some(term => desc.includes(term))) {
+  if (excludedPatterns.some(term => desc.includes(term))) {
     return false;
   }
   
-  // Inclure si c'est clairement du temps de travail
-  const includeTerms = [
-    'tôlerie', 'tolerie', 't1', 't2', 't3', 'peinture', 'main d\'œuvre', 'main d\'oeuvre',
-    'mo ', 'm.o', 'heure', 'temps', 'débosselage', 'redressage', 'remplacement',
+  // Lignes explicitement incluses (heures de travail)
+  const hoursPatterns = [
+    'tôlerie', 'tolerie',
+    '/ mo 1', '/ mo 2', '/ mo 3',
+    'mo 1', 'mo 2', 'mo 3',
+    ' t1', ' t2', ' t3',
+    '/t1', '/t2', '/t3',
+    'peinture',
+    'main d\'œuvre', 'main d\'oeuvre',
+    'heure', 'temps',
+    'débosselage', 'redressage', 'remplacement',
     'démontage', 'remontage', 'préparation', 'application', 'masticage', 'ponçage'
   ];
   
   // Si contient un terme de travail, c'est des heures
-  if (includeTerms.some(term => desc.includes(term))) {
+  if (hoursPatterns.some(term => desc.includes(term))) {
     return true;
   }
   
-  // Par défaut, on considère que c'est des heures si quantity est raisonnable (< 100)
-  const qty = parseFloat(repair.quantity) || 0;
-  return qty > 0 && qty < 100;
+  // Par défaut, on ne compte pas les lignes non reconnues
+  return false;
 }
 
 // Fonction pour déterminer le niveau de performance
