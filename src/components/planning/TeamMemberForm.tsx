@@ -7,7 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { X } from 'lucide-react';
 import { useTeamMembers, TeamMember, CreateTeamMemberData, UpdateTeamMemberData } from '@/hooks/use-team-members';
-import { STANDARD_QUALIFICATIONS } from '@/hooks/useEmployeeData';
+import { EMPLOYEE_CLASSES } from '@/hooks/useEmployeeData';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
@@ -172,29 +172,32 @@ export const TeamMemberForm: React.FC<TeamMemberFormProps> = ({
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <Label>
-              Qualifications {(formData.role === 'Carrossier' || formData.role === 'Carrossier-Véhicule de courtoisie') ? '* ' : ''}
+              Classe {(formData.role === 'Carrossier' || formData.role === 'Carrossier-Véhicule de courtoisie') ? '* ' : ''}
               (sélectionnez une ou plusieurs)
             </Label>
             {formData.qualifications.length > 0 && (
               <span className="text-sm text-muted-foreground">
-                {formData.qualifications.length} qualification(s) sélectionnée(s)
+                {formData.qualifications.length} classe(s) sélectionnée(s)
               </span>
             )}
           </div>
-          <div className="space-y-2 max-h-60 overflow-y-auto border rounded-lg p-3">
-            {STANDARD_QUALIFICATIONS.map((qualification) => (
-              <div key={qualification.id} className="flex items-center space-x-3">
+          <div className="space-y-2 border rounded-lg p-3">
+            {EMPLOYEE_CLASSES.map((employeeClass) => (
+              <div key={employeeClass.id} className="flex items-center space-x-3">
                 <Checkbox
-                  id={qualification.id}
-                  checked={formData.qualifications.includes(qualification.id)}
-                  onCheckedChange={() => handleQualificationToggle(qualification.id)}
+                  id={employeeClass.id}
+                  checked={formData.qualifications.includes(employeeClass.id)}
+                  onCheckedChange={() => handleQualificationToggle(employeeClass.id)}
                 />
                 <Label 
-                  htmlFor={qualification.id} 
+                  htmlFor={employeeClass.id} 
                   className="text-sm font-normal flex-1 cursor-pointer"
                 >
-                  <span className={`inline-block px-2 py-1 rounded-sm text-xs mr-2 ${qualification.color}`}>
-                    {qualification.name}
+                  <span className={`inline-block px-2 py-1 rounded-md text-sm font-medium ${employeeClass.color}`}>
+                    {employeeClass.id === 'carrossier' && '🔧 '}
+                    {employeeClass.id === 'peintre' && '🎨 '}
+                    {employeeClass.id === 'mecanicien' && '⚙️ '}
+                    {employeeClass.name}
                   </span>
                 </Label>
               </div>
