@@ -255,7 +255,12 @@ const InvoiceViewerModal = ({
     }
   };
   const handleDownload = async () => { const { generateInvoicePDFWithTemplate } = await import('@/utils/invoicePDFGeneration'); const result = await generateInvoicePDFWithTemplate(invoice, companyData); if (result.success) toast({ title: "Téléchargement réussi", description: `La facture ${invoice.reference} a été téléchargée.` }); else toast({ title: "Erreur", description: "Impossible de télécharger.", variant: "destructive" }); };
-  const handlePrint = async () => { const { printInvoicePDFWithTemplate } = await import('@/utils/invoicePDFGeneration'); const result = await printInvoicePDFWithTemplate(invoice, companyData); if (result.success) toast({ title: "Impression", description: `La facture ouverte pour impression.` }); else toast({ title: "Erreur", description: "Impossible d'imprimer.", variant: "destructive" }); };
+  const handlePrint = async () => { 
+    const { printEnvelopePDF } = await import('@/utils/printEnvelopePDF'); 
+    const result = await printEnvelopePDF(invoice, companyData, clientData); 
+    if (result.success) toast({ title: "Impression", description: "L'enveloppe a été ouverte pour impression." }); 
+    else toast({ title: "Erreur", description: "Impossible d'imprimer l'enveloppe.", variant: "destructive" }); 
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
