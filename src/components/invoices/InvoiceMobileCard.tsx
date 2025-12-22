@@ -22,7 +22,6 @@ interface InvoiceMobileCardProps {
   onRestoreInvoice?: (invoice: Invoice) => void;
   invoiceCredits?: any[];
   showArchived?: boolean;
-  isEmailSent?: boolean;
 }
 
 const InvoiceMobileCard: React.FC<InvoiceMobileCardProps> = ({
@@ -38,8 +37,7 @@ const InvoiceMobileCard: React.FC<InvoiceMobileCardProps> = ({
   onDeleteInvoice,
   onRestoreInvoice,
   invoiceCredits = [],
-  showArchived = false,
-  isEmailSent = false
+  showArchived = false
 }) => {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '-';
@@ -78,7 +76,7 @@ const InvoiceMobileCard: React.FC<InvoiceMobileCardProps> = ({
         <div>
           <div className="flex items-center gap-2">
             <h3 className="font-medium text-gray-900">{invoice.reference}</h3>
-            {isEmailSent && <EmailSentBadge />}
+            {(invoice as any).email_sent && <EmailSentBadge />}
           </div>
           <p className="text-sm text-gray-500">
             <Calendar className="h-4 w-4 inline mr-1" />

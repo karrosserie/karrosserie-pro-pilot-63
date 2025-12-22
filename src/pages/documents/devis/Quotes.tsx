@@ -39,7 +39,7 @@ import {
   DrawerDescription,
 } from '@/components/ui/drawer';
 import { QuotesFilters, QuoteSortOption } from '@/components/quotes/QuotesFilters';
-import { useDocumentEmailStatus } from '@/hooks/use-document-email-status';
+
 
 const Quotes = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -64,7 +64,7 @@ const Quotes = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const { shouldShowQuoteConvertHelp, markHelpAsSeen } = useUserOnboardingProgress();
-  const { sentQuotes } = useDocumentEmailStatus();
+  
 
   // Ajouter le nom complet du client pour le tri alphabétique
   const quotesWithClientName = useMemo(() => {
@@ -466,7 +466,6 @@ const Quotes = () => {
                 onRequestDocuments={handleRequestDocuments}
                 onConvertToRepairOrder={handleConvertToRepairOrder}
                 showConvertHelp={index === 0 && shouldShowQuoteConvertHelp}
-                isEmailSent={sentQuotes.has(quote.reference || '')}
               />
             ))
           ) : (

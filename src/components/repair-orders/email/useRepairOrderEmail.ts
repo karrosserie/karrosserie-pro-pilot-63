@@ -159,6 +159,12 @@ ${companyName}`
           vehicleId: repairOrder.vehicles?.id || undefined
         });
       }
+
+      // Marquer l'ordre de réparation comme envoyé par email
+      await supabase
+        .from('repair_orders')
+        .update({ email_sent: true })
+        .eq('id', repairOrder.id);
       
       toast({
         title: "Email envoyé",

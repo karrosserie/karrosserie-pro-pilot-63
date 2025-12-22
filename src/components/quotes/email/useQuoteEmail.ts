@@ -141,6 +141,12 @@ ${companyInfo?.name || 'L\'équipe'}`;
           vehicleId: quote.vehicle_id || undefined
         });
       }
+
+      // Marquer le devis comme envoyé par email
+      await supabase
+        .from('quotes')
+        .update({ email_sent: true })
+        .eq('id', quote.id);
       
       toast({
         title: "E-mail envoyé",

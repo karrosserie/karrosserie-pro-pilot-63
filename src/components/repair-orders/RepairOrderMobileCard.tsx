@@ -23,7 +23,6 @@ interface RepairOrderMobileCardProps {
     onRequestDocuments?: (order: RepairOrder) => void;
     onConvertToInvoice?: (order: RepairOrder) => void;
   };
-  isEmailSent?: boolean;
 }
 
 const RepairOrderMobileCard: React.FC<RepairOrderMobileCardProps> = ({
@@ -31,8 +30,7 @@ const RepairOrderMobileCard: React.FC<RepairOrderMobileCardProps> = ({
   onViewOrder,
   onEditOrder,
   onArchiveOrder,
-  contextMenuProps,
-  isEmailSent = false
+  contextMenuProps
 }) => {
   const hasValidClientPhone = isValidFrenchMobilePhone(order.clients?.phone);
   const isSignatureInProgress = order.oodrive_contract_id && !order.signed_document_url;
@@ -46,7 +44,7 @@ const RepairOrderMobileCard: React.FC<RepairOrderMobileCardProps> = ({
         <div>
           <div className="flex items-center gap-2">
             <h3 className="font-medium text-gray-900">{order.reference}</h3>
-            {isEmailSent && <EmailSentBadge />}
+            {(order as any).email_sent && <EmailSentBadge />}
           </div>
           <p className="text-sm text-gray-500">
             <Calendar className="h-4 w-4 inline mr-1" />
