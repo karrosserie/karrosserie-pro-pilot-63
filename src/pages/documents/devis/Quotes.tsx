@@ -26,6 +26,7 @@ import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
 import { Quote } from '@/services/supabase/quotes';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { StatusBadge } from '@/components/ui/status-badge';
+import { EmailSentBadge } from '@/components/ui/email-sent-badge';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
 import QuoteMobileCard from '@/components/quotes/QuoteMobileCard';
@@ -510,7 +511,12 @@ const Quotes = () => {
               filteredQuotes.map((quote, index) => (
                 <React.Fragment key={quote.id}>
                   <TableRow className="border-b-0">
-                    <TableCell className="font-medium">{quote.reference}</TableCell>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        {quote.reference}
+                        {(quote as any).email_sent && <EmailSentBadge />}
+                      </div>
+                    </TableCell>
                     <TableCell>{new Date(quote.created_at).toLocaleDateString('fr-FR')}</TableCell>
                     <TableCell>{quote.clients ? `${quote.clients.first_name} ${quote.clients.last_name}` : '-'}</TableCell>
                     <TableCell>
