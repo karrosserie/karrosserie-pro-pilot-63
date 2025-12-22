@@ -2,7 +2,8 @@ import React, { useCallback, useMemo } from 'react';
 import { Label } from '@/components/ui/label';
 import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Users, AlertCircle, Pencil } from 'lucide-react';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { Client } from '@/services/supabase/clients';
 import { useVehicles } from '@/hooks/use-vehicles';
@@ -15,6 +16,7 @@ interface RepairOrderAssignmentSectionProps {
   onFieldChange: (field: string, value: any) => void;
   clientOptions: Client[];
   isLoadingClients: boolean;
+  onEditClient?: (clientId: string) => void;
 }
 
 export const RepairOrderAssignmentSection = React.memo(({
@@ -22,7 +24,8 @@ export const RepairOrderAssignmentSection = React.memo(({
   errors,
   onFieldChange,
   clientOptions,
-  isLoadingClients
+  isLoadingClients,
+  onEditClient
 }: RepairOrderAssignmentSectionProps) => {
   const { vehicles, isLoading: isLoadingVehicles } = useVehicles();
   
@@ -74,17 +77,32 @@ export const RepairOrderAssignmentSection = React.memo(({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label htmlFor="client_id" required>Client</Label>
-            <SearchableSelect
-              options={clientSelectOptions}
-              value={formData.client_id || ''}
-              onValueChange={handleClientChange}
-              placeholder={isLoadingClients ? "Chargement..." : "Sélectionner un client"}
-              searchPlaceholder="Rechercher un client..."
-              disabled={isLoadingClients}
-              className={cn(
-                errors.client_id && "border-red-500 focus-visible:ring-red-500"
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <SearchableSelect
+                  options={clientSelectOptions}
+                  value={formData.client_id || ''}
+                  onValueChange={handleClientChange}
+                  placeholder={isLoadingClients ? "Chargement..." : "Sélectionner un client"}
+                  searchPlaceholder="Rechercher un client..."
+                  disabled={isLoadingClients}
+                  className={cn(
+                    errors.client_id && "border-red-500 focus-visible:ring-red-500"
+                  )}
+                />
+              </div>
+              {onEditClient && formData.client_id && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => onEditClient(formData.client_id!)}
+                  title="Modifier le client"
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
               )}
-            />
+            </div>
             {errors.client_id && (
               <p className="text-sm text-red-500 mt-1 flex items-center">
                 <AlertCircle className="h-4 w-4 mr-1" />

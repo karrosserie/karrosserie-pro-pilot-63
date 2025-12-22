@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useClients } from '@/hooks/use-clients';
 import { RepairOrder } from '@/services/supabase/repair-orders';
@@ -7,10 +7,10 @@ import { RepairOrderBasicInfoSection } from './form/RepairOrderBasicInfoSection'
 import { RepairOrderAssignmentSection } from './form/RepairOrderAssignmentSection';
 import { RepairOrderRepairsAndPartsSection } from './form/RepairOrderRepairsAndPartsSection';
 import { RepairOrderDiscountsSection } from './form/RepairOrderDiscountsSection';
-
 import { RepairOrderDetailsSection } from './form/RepairOrderDetailsSection';
 import { RepairOrderFormActions } from './form/RepairOrderFormActions';
 import { useRepairOrderFormLogic } from './form/useRepairOrderFormLogic';
+import ClientDialog from '@/components/client/ClientDialog';
 
 interface RepairOrderFormProps {
   order?: RepairOrder | null;
@@ -30,7 +30,11 @@ export const RepairOrderForm = ({
   isConversionFromQuote
 }: RepairOrderFormProps) => {
   const { toast } = useToast();
-  const { clients, isLoading: isLoadingClients } = useClients();
+  const { clients, isLoading: isLoadingClients, updateClient } = useClients();
+  
+  // État pour le dialog d'édition du client
+  const [isEditClientDialogOpen, setIsEditClientDialogOpen] = useState(false);
+  const [editingClient, setEditingClient] = useState<any>(null);
   
   const {
     formData,
@@ -77,7 +81,38 @@ export const RepairOrderForm = ({
 
   const clientOptions = clients?.filter(client => !!client) || [];
 
+  // Gestion de l'édition du client
+  const handleEditClient = (clientId: string) => {
+    const client = clientOptions.find(c => c.id === clientId);
+    if (client) {
+      setEditingClient(client);
+      setIsEditClientDialogOpen(true);
+    }
+  };
+
+  const handleEditClientSubmit = async (clientData: any) => {
+    if (editingClient) {
+      try {
+        await updateClient.mutateAsync({ id: editingClient.id, data: clientData });
+        setIsEditClientDialogOpen(false);
+        setEditingClient(null);
+        toast({
+          title: "Client modifié",
+          description: "Les informations du client ont été mises à jour."
+        });
+      } catch (error) {
+        console.error('Error updating client:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de modifier le client.",
+          variant: "destructive"
+        });
+      }
+    }
+  };
+
   return (
+    <>
     <form onSubmit={handleSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto">
       <RepairOrderBasicInfoSection 
         formData={formData}
@@ -93,6 +128,7 @@ export const RepairOrderForm = ({
         onFieldChange={handleChange}
         clientOptions={clientOptions}
         isLoadingClients={isLoadingClients}
+        onEditClient={handleEditClient}
       />
 
       <RepairOrderRepairsAndPartsSection
@@ -124,5 +160,16 @@ export const RepairOrderForm = ({
         isConversionFromQuote={isConversionFromQuote}
       />
     </form>
+
+    <ClientDialog
+      open={isEditClientDialogOpen}
+      onOpenChange={setIsEditClientDialogOpen}
+      title="Modifier le client"
+      description="Modifier les informations du client"
+      defaultValues={editingClient || undefined}
+      onSubmit={handleEditClientSubmit}
+      mode="edit"
+    />
+    </>
   );
 };
