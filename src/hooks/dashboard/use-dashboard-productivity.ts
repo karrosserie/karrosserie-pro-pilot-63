@@ -378,9 +378,21 @@ export const useDashboardProductivity = (period1: string, period2: string) => {
 
       // Fonction helper pour parser les heures d'un repairs_data
       const parseRepairsHours = (repairsData: any, target: typeof soldHoursByTrade) => {
-        if (!repairsData || !Array.isArray(repairsData)) return false;
+        // Sécurité : parser si c'est une chaîne JSON
+        let repairs = repairsData;
+        if (typeof repairsData === 'string') {
+          try {
+            repairs = JSON.parse(repairsData);
+          } catch (e) {
+            console.warn('Impossible de parser repairs_data JSON:', e);
+            return false;
+          }
+        }
+        
+        if (!repairs || !Array.isArray(repairs)) return false;
+        
         let hasData = false;
-        repairsData
+        repairs
           .filter(isHoursLine)
           .forEach((repair: any) => {
             const trade = categorizeTrade(repair.designation || repair.description || '');
