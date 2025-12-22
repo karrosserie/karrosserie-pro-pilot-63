@@ -21,7 +21,10 @@ import * as z from 'zod';
 import { isValidPhoneNumber } from 'react-phone-number-input';
 import { useIsMobile } from '@/hooks/use-mobile';
 import TeamMobileCard from './TeamMobileCard';
-import { STANDARD_QUALIFICATIONS } from '@/hooks/useEmployeeData';
+import { EMPLOYEE_CLASSES } from '@/hooks/useEmployeeData';
+
+// IDs valides pour les nouvelles classes
+const VALID_CLASS_IDS = ['carrossier', 'peintre', 'mecanicien'];
 
 interface TeamMember {
   id: string;
@@ -382,6 +385,10 @@ const TeamTab = () => {
 
   const openEditDialog = (member: TeamMember) => {
     setEditingMember(member);
+    // Filtrer les anciennes qualifications pour ne garder que les classes valides
+    const filteredQualifications = (member.qualifications || []).filter(
+      q => VALID_CLASS_IDS.includes(q)
+    );
     editForm.reset({
       firstName: member.profiles?.first_name || '',
       lastName: member.profiles?.last_name || '',
@@ -389,7 +396,7 @@ const TeamTab = () => {
       phoneNumber: member.profiles?.phone_number || '',
       role: member.role as 'carrossier' | 'carrossier-vehicule de courtoisie' | 'responsable' | 'responsable administratif',
       active: member.active,
-      qualifications: member.qualifications || []
+      qualifications: filteredQualifications
     });
     setIsEditDialogOpen(true);
   };
@@ -553,48 +560,51 @@ const TeamTab = () => {
                   )}
                 />
                 
-                {/* Qualifications - shown for all roles */}
+                {/* Classes - shown for all roles */}
                 {addForm.watch('role') && (
                   <FormField
                     control={addForm.control}
                     name="qualifications"
                     render={({ field }) => {
-                      const handleQualificationToggle = (qualificationId: string) => {
-                        const currentQualifications = field.value || [];
-                        const newQualifications = currentQualifications.includes(qualificationId)
-                          ? currentQualifications.filter(q => q !== qualificationId)
-                          : [...currentQualifications, qualificationId];
-                        field.onChange(newQualifications);
+                      const handleClassToggle = (classId: string) => {
+                        const currentClasses = field.value || [];
+                        const newClasses = currentClasses.includes(classId)
+                          ? currentClasses.filter(q => q !== classId)
+                          : [...currentClasses, classId];
+                        field.onChange(newClasses);
                       };
                       
                       return (
                         <FormItem>
                           <div className="flex items-center justify-between">
                             <FormLabel>
-                              Qualifications {(addForm.watch('role') === 'carrossier' || addForm.watch('role') === 'carrossier-vehicule de courtoisie') ? '* ' : ''}
+                              Classe {(addForm.watch('role') === 'carrossier' || addForm.watch('role') === 'carrossier-vehicule de courtoisie') ? '* ' : ''}
                               (sélectionnez une ou plusieurs)
                             </FormLabel>
                             {field.value && field.value.length > 0 && (
                               <span className="text-sm text-muted-foreground">
-                                {field.value.length} qualification(s) sélectionnée(s)
+                                {field.value.length} classe(s) sélectionnée(s)
                               </span>
                             )}
                           </div>
                           <FormControl>
-                            <div className="space-y-2 max-h-60 overflow-y-auto border rounded-lg p-3">
-                              {STANDARD_QUALIFICATIONS.map((qualification) => (
-                                <div key={qualification.id} className="flex items-center space-x-3">
+                            <div className="space-y-2 border rounded-lg p-3">
+                              {EMPLOYEE_CLASSES.map((employeeClass) => (
+                                <div key={employeeClass.id} className="flex items-center space-x-3">
                                   <Checkbox
-                                    id={qualification.id}
-                                    checked={field.value?.includes(qualification.id) || false}
-                                    onCheckedChange={() => handleQualificationToggle(qualification.id)}
+                                    id={`add-${employeeClass.id}`}
+                                    checked={field.value?.includes(employeeClass.id) || false}
+                                    onCheckedChange={() => handleClassToggle(employeeClass.id)}
                                   />
                                   <label 
-                                    htmlFor={qualification.id} 
+                                    htmlFor={`add-${employeeClass.id}`} 
                                     className="text-sm font-normal flex-1 cursor-pointer"
                                   >
-                                    <span className={`inline-block px-2 py-1 rounded-sm text-xs mr-2 ${qualification.color}`}>
-                                      {qualification.name}
+                                    <span className={`inline-block px-2 py-1 rounded-md text-sm font-medium ${employeeClass.color}`}>
+                                      {employeeClass.id === 'carrossier' && '🔧 '}
+                                      {employeeClass.id === 'peintre' && '🎨 '}
+                                      {employeeClass.id === 'mecanicien' && '⚙️ '}
+                                      {employeeClass.name}
                                     </span>
                                   </label>
                                 </div>
@@ -842,48 +852,51 @@ const TeamTab = () => {
                 />
                )}
                
-               {/* Qualifications - shown for all roles */}
+               {/* Classes - shown for all roles */}
                {editForm.watch('role') && (
                  <FormField
                    control={editForm.control}
                    name="qualifications"
                    render={({ field }) => {
-                     const handleQualificationToggle = (qualificationId: string) => {
-                       const currentQualifications = field.value || [];
-                       const newQualifications = currentQualifications.includes(qualificationId)
-                         ? currentQualifications.filter(q => q !== qualificationId)
-                         : [...currentQualifications, qualificationId];
-                       field.onChange(newQualifications);
+                     const handleClassToggle = (classId: string) => {
+                       const currentClasses = field.value || [];
+                       const newClasses = currentClasses.includes(classId)
+                         ? currentClasses.filter(q => q !== classId)
+                         : [...currentClasses, classId];
+                       field.onChange(newClasses);
                      };
                      
                      return (
                        <FormItem>
                           <div className="flex items-center justify-between">
                             <FormLabel>
-                              Qualifications {(editForm.watch('role') === 'carrossier' || editForm.watch('role') === 'carrossier-vehicule de courtoisie') ? '* ' : ''}
+                              Classe {(editForm.watch('role') === 'carrossier' || editForm.watch('role') === 'carrossier-vehicule de courtoisie') ? '* ' : ''}
                               (sélectionnez une ou plusieurs)
                             </FormLabel>
                             {field.value && field.value.length > 0 && (
                               <span className="text-sm text-muted-foreground">
-                                {field.value.length} qualification(s) sélectionnée(s)
+                                {field.value.length} classe(s) sélectionnée(s)
                               </span>
                             )}
                           </div>
                          <FormControl>
-                           <div className="space-y-2 max-h-60 overflow-y-auto border rounded-lg p-3">
-                             {STANDARD_QUALIFICATIONS.map((qualification) => (
-                               <div key={qualification.id} className="flex items-center space-x-3">
+                           <div className="space-y-2 border rounded-lg p-3">
+                             {EMPLOYEE_CLASSES.map((employeeClass) => (
+                               <div key={employeeClass.id} className="flex items-center space-x-3">
                                  <Checkbox
-                                   id={qualification.id}
-                                   checked={field.value?.includes(qualification.id) || false}
-                                   onCheckedChange={() => handleQualificationToggle(qualification.id)}
+                                   id={`edit-${employeeClass.id}`}
+                                   checked={field.value?.includes(employeeClass.id) || false}
+                                   onCheckedChange={() => handleClassToggle(employeeClass.id)}
                                  />
                                  <label 
-                                   htmlFor={qualification.id} 
+                                   htmlFor={`edit-${employeeClass.id}`} 
                                    className="text-sm font-normal flex-1 cursor-pointer"
                                  >
-                                   <span className={`inline-block px-2 py-1 rounded-sm text-xs mr-2 ${qualification.color}`}>
-                                     {qualification.name}
+                                   <span className={`inline-block px-2 py-1 rounded-md text-sm font-medium ${employeeClass.color}`}>
+                                     {employeeClass.id === 'carrossier' && '🔧 '}
+                                     {employeeClass.id === 'peintre' && '🎨 '}
+                                     {employeeClass.id === 'mecanicien' && '⚙️ '}
+                                     {employeeClass.name}
                                    </span>
                                  </label>
                                </div>
