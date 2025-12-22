@@ -3,10 +3,23 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { User, Mail, Phone, MessageCircle, Clock, Calendar } from "lucide-react";
+import { User, Mail, Phone, MessageCircle, Clock, Calendar, FileSignature, Car, CheckCircle, Send, Loader2 } from "lucide-react";
 import { Messagerie, Client } from "@/hooks/use-messageries";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { supabase } from "@/integrations/supabase/client";
+
+interface SignatureRequest {
+  id: string;
+  request_type: 'ordre_reparation' | 'cession_creance';
+  document_reference: string;
+  status: string;
+  signature_mode: 'electronique' | 'en_personne';
+  vehicle_id?: string;
+  sent_at?: string;
+  signed_at?: string;
+  created_at: string;
+}
 
 interface ClientHistoryModalProps {
   isOpen: boolean;
@@ -22,6 +35,8 @@ export function ClientHistoryModal({
   messages 
 }: ClientHistoryModalProps) {
   const [filteredMessages, setFilteredMessages] = useState<Messagerie[]>([]);
+  const [signatureRequests, setSignatureRequests] = useState<SignatureRequest[]>([]);
+  const [loadingSignatures, setLoadingSignatures] = useState(false);
 
   useEffect(() => {
     if (client && messages) {
@@ -30,13 +45,43 @@ export function ClientHistoryModal({
     }
   }, [client, messages]);
 
+  useEffect(() => {
+    async function fetchSignatureRequests() {
+      if (!client?.id || !isOpen) return;
+      
+      setLoadingSignatures(true);
+      try {
+        const { data: signatures, error } = await supabase
+          .from('signature_requests')
+          .select('*')
+          .eq('client_id', client.id)
+          .order('created_at', { ascending: false });
+        
+        if (error) {
+          console.error('Error fetching signature requests:', error);
+          return;
+        }
+        
+        if (signatures) {
+          setSignatureRequests(signatures as SignatureRequest[]);
+        }
+      } catch (error) {
+        console.error('Error fetching signature requests:', error);
+      } finally {
+        setLoadingSignatures(false);
+      }
+    }
+
+    fetchSignatureRequests();
+  }, [client?.id, isOpen]);
+
   if (!client) return null;
 
   const stats = {
     total: filteredMessages.length,
     resolved: filteredMessages.filter(m => m.resolved).length,
     pending: filteredMessages.filter(m => !m.resolved && !m.archived).length,
-    avgResponseTime: "2h 30min", // TODO: Calculate from replies
+    signatures: signatureRequests.length,
   };
 
   const getPriorityBadge = (priority: number) => {
@@ -47,6 +92,34 @@ export function ClientHistoryModal({
     };
     const config = variants[priority as keyof typeof variants] || variants[2];
     return <Badge variant={config.variant}>{config.label}</Badge>;
+  };
+
+  const getSignatureStatusBadge = (status: string) => {
+    switch (status) {
+      case 'signed':
+        return (
+          <Badge variant="outline" className="bg-green-500/10 text-green-700 border-green-200">
+            <CheckCircle className="h-3 w-3 mr-1" />
+            Signé
+          </Badge>
+        );
+      case 'sent':
+        return (
+          <Badge variant="outline" className="bg-blue-500/10 text-blue-700 border-blue-200">
+            <Send className="h-3 w-3 mr-1" />
+            Envoyé
+          </Badge>
+        );
+      case 'pending':
+        return (
+          <Badge variant="outline" className="bg-orange-500/10 text-orange-700 border-orange-200">
+            <Loader2 className="h-3 w-3 mr-1" />
+            En attente
+          </Badge>
+        );
+      default:
+        return <Badge variant="secondary">{status}</Badge>;
+    }
   };
 
   return (
@@ -87,7 +160,7 @@ export function ClientHistoryModal({
           <div className="grid grid-cols-4 gap-4">
             <Card className="p-4">
               <div className="text-2xl font-bold text-primary">{stats.total}</div>
-              <div className="text-xs text-muted-foreground mt-1">Total messages</div>
+              <div className="text-xs text-muted-foreground mt-1">Messages</div>
             </Card>
             <Card className="p-4">
               <div className="text-2xl font-bold text-green-600">{stats.resolved}</div>
@@ -98,10 +171,62 @@ export function ClientHistoryModal({
               <div className="text-xs text-muted-foreground mt-1">En attente</div>
             </Card>
             <Card className="p-4">
-              <div className="text-sm font-bold">{stats.avgResponseTime}</div>
-              <div className="text-xs text-muted-foreground mt-1">Temps moyen</div>
+              <div className="text-2xl font-bold text-blue-600">{stats.signatures}</div>
+              <div className="text-xs text-muted-foreground mt-1">Signatures</div>
             </Card>
           </div>
+
+          {/* Demandes de signature */}
+          {signatureRequests.length > 0 && (
+            <div className="space-y-3">
+              <h4 className="font-semibold flex items-center gap-2">
+                <FileSignature className="h-4 w-4" />
+                Demandes de signature
+              </h4>
+              <div className="space-y-3">
+                {signatureRequests.map((request) => (
+                  <Card key={request.id} className="p-4 hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Car className="h-4 w-4 text-muted-foreground" />
+                          <span className="font-medium">
+                            {request.request_type === 'ordre_reparation' 
+                              ? 'Ordre de réparation' 
+                              : 'Cession de créance'}
+                          </span>
+                          {getSignatureStatusBadge(request.status)}
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Réf: {request.document_reference}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Mode: {request.signature_mode === 'electronique' ? 'Signature électronique' : 'Signature en personne'}
+                        </p>
+                        {request.sent_at && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Envoyé le: {format(new Date(request.sent_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
+                          </p>
+                        )}
+                        {request.signed_at && (
+                          <p className="text-xs text-green-600 mt-1">
+                            Signé le: {format(new Date(request.signed_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
+                          </p>
+                        )}
+                      </div>
+                      <div className="text-right text-xs text-muted-foreground flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {formatDistanceToNow(new Date(request.created_at), {
+                          addSuffix: true,
+                          locale: fr,
+                        })}
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Timeline des messages */}
           <div className="space-y-3">
