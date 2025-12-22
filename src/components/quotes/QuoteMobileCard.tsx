@@ -5,6 +5,8 @@ import { Quote } from '@/services/supabase/quotes';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { calculateGlobalTotals } from '@/components/quotes/form/utils/calculations';
 import { getClientDisplayName } from '@/utils/clientDisplayUtils';
+import { EmailSentBadge } from '@/components/ui/email-sent-badge';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
 interface QuoteMobileCardProps {
   quote: Quote;
@@ -17,6 +19,7 @@ interface QuoteMobileCardProps {
   onRequestDocuments?: (quote: Quote) => void;
   onConvertToRepairOrder?: (quote: Quote) => void;
   showConvertHelp?: boolean;
+  isEmailSent?: boolean;
 }
 
 const QuoteMobileCard: React.FC<QuoteMobileCardProps> = ({
@@ -29,7 +32,8 @@ const QuoteMobileCard: React.FC<QuoteMobileCardProps> = ({
   onSendEmail,
   onRequestDocuments,
   onConvertToRepairOrder,
-  showConvertHelp = false
+  showConvertHelp = false,
+  isEmailSent = false
 }) => {
   const formatAmount = (amount: number | null | undefined): string => {
     if (amount === null || amount === undefined) return '-';
@@ -83,11 +87,15 @@ const QuoteMobileCard: React.FC<QuoteMobileCardProps> = ({
   };
 
   return (
+    <TooltipProvider>
     <div className="card-container p-3 sm:p-4 space-y-3 animate-fade-in">
       {/* Header */}
       <div className="flex flex-col xs:flex-row xs:justify-between xs:items-start gap-2">
         <div className="min-w-0 flex-1">
-          <h3 className="font-medium text-gray-900 text-sm sm:text-base truncate">{quote.reference}</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="font-medium text-gray-900 text-sm sm:text-base truncate">{quote.reference}</h3>
+            {isEmailSent && <EmailSentBadge />}
+          </div>
           <p className="text-xs sm:text-sm text-gray-500">
             <Calendar className="h-3 w-3 sm:h-4 sm:w-4 inline mr-1" />
             {new Date(quote.created_at).toLocaleDateString('fr-FR')}
@@ -180,6 +188,7 @@ const QuoteMobileCard: React.FC<QuoteMobileCardProps> = ({
         </Button>
       </div>
     </div>
+    </TooltipProvider>
   );
 };
 

@@ -44,6 +44,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import InvoiceMobileCard from '@/components/invoices/InvoiceMobileCard';
 import RelanceModal from '@/components/invoices/RelanceModal';
 import { useSendRelance } from '@/hooks/use-send-relance';
+import { useDocumentEmailStatus } from '@/hooks/use-document-email-status';
 
 export type InvoiceSortOption = 'alphabetical-asc' | 'alphabetical-desc' | 'recent-first' | 'oldest-first';
 
@@ -116,6 +117,7 @@ const Invoices = () => {
   const { sortedData: sortedInvoices, sortConfig, handleSort } = useTableSorting(invoices, 'reference');
   const isMobile = useIsMobile();
   const { sendRelance } = useSendRelance();
+  const { sentInvoices } = useDocumentEmailStatus();
 
   console.log('[Invoices] COMPONENT RENDER took', (performance.now() - renderStart).toFixed(0), 'ms at', performance.now());
 
@@ -546,6 +548,7 @@ const Invoices = () => {
                    onRestoreInvoice={showArchived ? handleRestore : undefined}
                    invoiceCredits={invoiceCredits}
                    showArchived={showArchived}
+                   isEmailSent={sentInvoices.has(invoice.reference || '')}
                  />
               );
             })

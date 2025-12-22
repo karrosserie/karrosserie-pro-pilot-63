@@ -6,6 +6,8 @@ import { StatusBadge } from '@/components/ui/status-badge';
 import { calculateOrderAmount, formatAmount } from './utils/orderCalculations';
 import { isValidFrenchMobilePhone } from '@/utils/phoneValidation';
 import { getClientDisplayName } from '@/utils/clientDisplayUtils';
+import { EmailSentBadge } from '@/components/ui/email-sent-badge';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
 interface RepairOrderMobileCardProps {
   order: RepairOrder;
@@ -21,6 +23,7 @@ interface RepairOrderMobileCardProps {
     onRequestDocuments?: (order: RepairOrder) => void;
     onConvertToInvoice?: (order: RepairOrder) => void;
   };
+  isEmailSent?: boolean;
 }
 
 const RepairOrderMobileCard: React.FC<RepairOrderMobileCardProps> = ({
@@ -28,18 +31,23 @@ const RepairOrderMobileCard: React.FC<RepairOrderMobileCardProps> = ({
   onViewOrder,
   onEditOrder,
   onArchiveOrder,
-  contextMenuProps
+  contextMenuProps,
+  isEmailSent = false
 }) => {
   const hasValidClientPhone = isValidFrenchMobilePhone(order.clients?.phone);
   const isSignatureInProgress = order.oodrive_contract_id && !order.signed_document_url;
   const isAlreadySignedOodrive = order.signed_document_url;
 
   return (
+    <TooltipProvider>
     <div className="card-container p-4 space-y-3">
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h3 className="font-medium text-gray-900">{order.reference}</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="font-medium text-gray-900">{order.reference}</h3>
+            {isEmailSent && <EmailSentBadge />}
+          </div>
           <p className="text-sm text-gray-500">
             <Calendar className="h-4 w-4 inline mr-1" />
             {new Date(order.created_at).toLocaleDateString('fr-FR')}
@@ -152,6 +160,7 @@ const RepairOrderMobileCard: React.FC<RepairOrderMobileCardProps> = ({
         </Button>
       </div>
     </div>
+    </TooltipProvider>
   );
 };
 
