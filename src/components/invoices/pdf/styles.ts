@@ -149,4 +149,24 @@ export const pdfStyles = StyleSheet.create({
     marginTop: 15,
     marginBottom: 15,
   },
+  // Zone d'adresse destinataire positionnée pour fenêtre d'enveloppe DL
+  clientAddressWindow: {
+    position: 'absolute',
+    top: 140,        // ~50mm du haut (en points: 1mm ≈ 2.83 points)
+    right: 57,       // ~20mm du bord droit
+    width: 255,      // ~90mm de large
+    height: 85,      // ~30mm de haut
+    padding: 8,
+    fontSize: 9,
+    lineHeight: 1.4,
+  },
+  clientAddressName: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    marginBottom: 3,
+  },
+  clientAddressText: {
+    fontSize: 9,
+    lineHeight: 1.4,
+  },
 });
