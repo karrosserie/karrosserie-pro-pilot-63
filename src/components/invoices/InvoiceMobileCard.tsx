@@ -58,13 +58,13 @@ const InvoiceMobileCard: React.FC<InvoiceMobileCardProps> = ({
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Payée':
-        return 'bg-green-100 text-green-800';
+        return 'bg-emerald-500 text-white';
       case 'En attente de paiement':
-        return 'bg-amber-100 text-amber-800';
+        return 'bg-orange-500 text-white';
       case 'Paiement partiel':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-500 text-white';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-slate-500 text-white';
     }
   };
 
