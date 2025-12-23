@@ -1,5 +1,8 @@
 project_id = "jukdsypvuehnniskgpfd"
 
+[functions.send-assistance-notification]
+verify_jwt = true
+
 [functions.send-insurance-loan-notification]
 verify_jwt = true
 

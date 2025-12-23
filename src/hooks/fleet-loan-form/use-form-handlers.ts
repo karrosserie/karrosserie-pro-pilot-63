@@ -208,27 +208,53 @@ export const useFleetLoanFormHandlers = (
           onboardingService.updateOnboardingStep('tunnel3', 'vehicleLoanCreated', { reservationId: result.id });
         }
 
-        // Notification de l'assurance via edge function
+        // Notification via edge function - selon le type choisi (assistance OU assurance)
         if (result?.id) {
           try {
-            console.log('📧 Envoi de notification à l\'assurance du client via edge function...');
-            
-            const { data, error } = await supabase.functions.invoke('send-insurance-loan-notification', {
-              body: {
-                reservationId: result.id,
-                clientName: formData.clientName,
-                clientEmail: formData.clientEmail || '',
-                insuranceEmail: formData.insuranceEmail || '',
-                insuranceCompanyName: formData.insuranceCompanyName || '',
-                insuranceContractNumber: formData.insuranceContractNumber || null,
-                companyEmail: companyData?.email || ''
-              }
-            });
+            if (formData.hasAssistance) {
+              // ➡️ Webhook ASSISTANCE uniquement
+              console.log('🆘 Envoi de notification d\'assistance via edge function...');
+              
+              const { data, error } = await supabase.functions.invoke('send-assistance-notification', {
+                body: {
+                  reservationId: result.id,
+                  clientName: formData.clientName,
+                  clientEmail: formData.clientEmail || null,
+                  insuranceEmail: formData.insuranceEmail || '',
+                  insuranceCompanyName: formData.insuranceCompanyName || '',
+                  insuranceContractNumber: formData.insuranceContractNumber || null,
+                  companyEmail: companyData?.email || '',
+                  assistanceCaseNumber: formData.assistanceCaseNumber || '',
+                  assistanceEmail: formData.assistanceEmail || ''
+                }
+              });
 
-            if (error) {
-              console.error('❌ Erreur lors de la notification de l\'assurance:', error);
+              if (error) {
+                console.error('❌ Erreur lors de la notification d\'assistance:', error);
+              } else {
+                console.log('✅ Notification d\'assistance envoyée avec succès:', data);
+              }
             } else {
-              console.log('✅ Notification d\'assurance envoyée avec succès:', data);
+              // ➡️ Webhook ASSURANCE uniquement
+              console.log('📧 Envoi de notification à l\'assurance du client via edge function...');
+              
+              const { data, error } = await supabase.functions.invoke('send-insurance-loan-notification', {
+                body: {
+                  reservationId: result.id,
+                  clientName: formData.clientName,
+                  clientEmail: formData.clientEmail || '',
+                  insuranceEmail: formData.insuranceEmail || '',
+                  insuranceCompanyName: formData.insuranceCompanyName || '',
+                  insuranceContractNumber: formData.insuranceContractNumber || null,
+                  companyEmail: companyData?.email || ''
+                }
+              });
+
+              if (error) {
+                console.error('❌ Erreur lors de la notification de l\'assurance:', error);
+              } else {
+                console.log('✅ Notification d\'assurance envoyée avec succès:', data);
+              }
             }
           } catch (webhookError) {
             console.error('❌ Erreur lors de l\'appel de l\'edge function:', webhookError);
