@@ -37,6 +37,8 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import RepairOrderMobileCard from '@/components/repair-orders/RepairOrderMobileCard';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserOnboardingProgress } from '@/hooks/use-user-onboarding-progress';
+import { usePagination } from '@/hooks/use-pagination';
+import { DocumentPagination } from '@/components/ui/document-pagination';
 
 const RepairOrders = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -134,6 +136,19 @@ const RepairOrders = () => {
       }
     });
   }, [orders, searchTerm, showArchived, sortOption]);
+
+  // Pagination
+  const {
+    currentPage,
+    totalPages,
+    paginatedData: paginatedOrders,
+    setCurrentPage,
+    goToNextPage,
+    goToPreviousPage,
+    startIndex,
+    endIndex,
+    totalItems
+  } = usePagination({ data: filteredOrders, itemsPerPage: 10 });
 
   // Effet pour ouvrir automatiquement un ordre de réparation depuis l'URL
   useEffect(() => {
@@ -723,7 +738,7 @@ const RepairOrders = () => {
       </div>
       
       {isMobile ? <div className="space-y-3">
-          {filteredOrders.length > 0 ? filteredOrders.map(order => <RepairOrderMobileCard key={order.id} order={order} onViewOrder={handleViewOrder} onEditOrder={handleEditOrder} onArchiveOrder={showArchived ? handleDeleteOrder : handleArchiveOrder} contextMenuProps={{
+          {paginatedOrders.length > 0 ? paginatedOrders.map(order => <RepairOrderMobileCard key={order.id} order={order} onViewOrder={handleViewOrder} onEditOrder={handleEditOrder} onArchiveOrder={showArchived ? handleDeleteOrder : handleArchiveOrder} contextMenuProps={{
         onDownload: handleDownload,
         onPrint: handlePrint,
         onSendEmail: handleSendEmail,
@@ -740,7 +755,17 @@ const RepairOrders = () => {
                 </p>
               </div>
             </div>}
-        </div> : <RepairOrdersTable orders={filteredOrders} onEditOrder={handleEditOrder} onDeleteOrder={handleDeleteOrder} onRestoreOrder={handleRestoreOrder} onViewOrder={handleViewOrder} contextMenuProps={{
+          <DocumentPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            startIndex={startIndex}
+            endIndex={endIndex}
+            totalItems={totalItems}
+            onPageChange={setCurrentPage}
+            onPrevious={goToPreviousPage}
+            onNext={goToNextPage}
+          />
+        </div> : <><RepairOrdersTable orders={paginatedOrders} onEditOrder={handleEditOrder} onDeleteOrder={handleDeleteOrder} onRestoreOrder={handleRestoreOrder} onViewOrder={handleViewOrder} contextMenuProps={{
       onDownload: handleDownload,
       onPrint: handlePrint,
       onSendEmail: handleSendEmail,
@@ -748,7 +773,18 @@ const RepairOrders = () => {
       onSendForOodriveSignature: handleSendForOodriveSignature,
       onRequestDocuments: handleRequestDocuments,
       onConvertToInvoice: handleConvertToInvoice
-    }} />}
+    }} />
+    <DocumentPagination
+      currentPage={currentPage}
+      totalPages={totalPages}
+      startIndex={startIndex}
+      endIndex={endIndex}
+      totalItems={totalItems}
+      onPageChange={setCurrentPage}
+      onPrevious={goToPreviousPage}
+      onNext={goToNextPage}
+    />
+    </>}
 
       <RepairOrderDialog order={selectedOrder} open={dialogOpen} onOpenChange={setDialogOpen} />
 

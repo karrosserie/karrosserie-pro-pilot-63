@@ -40,6 +40,8 @@ import {
   DrawerDescription,
 } from '@/components/ui/drawer';
 import { QuotesFilters, QuoteSortOption } from '@/components/quotes/QuotesFilters';
+import { usePagination } from '@/hooks/use-pagination';
+import { DocumentPagination } from '@/components/ui/document-pagination';
 
 
 const Quotes = () => {
@@ -105,6 +107,19 @@ const Quotes = () => {
     
     return matchesSearch && matchesArchiveStatus;
   }) || [];
+
+  // Pagination
+  const {
+    currentPage,
+    totalPages,
+    paginatedData: paginatedQuotes,
+    setCurrentPage,
+    goToNextPage,
+    goToPreviousPage,
+    startIndex,
+    endIndex,
+    totalItems
+  } = usePagination({ data: filteredQuotes, itemsPerPage: 10 });
 
   // Afficher le popover d'aide au chargement
   useEffect(() => {
@@ -453,8 +468,8 @@ const Quotes = () => {
       
       {isMobile ? (
         <div className="space-y-3">
-          {filteredQuotes.length > 0 ? (
-            filteredQuotes.map((quote, index) => (
+          {paginatedQuotes.length > 0 ? (
+            paginatedQuotes.map((quote, index) => (
               <QuoteMobileCard
                 key={quote.id}
                 quote={quote}
@@ -466,7 +481,7 @@ const Quotes = () => {
                 onSendEmail={handleSendEmail}
                 onRequestDocuments={handleRequestDocuments}
                 onConvertToRepairOrder={handleConvertToRepairOrder}
-                showConvertHelp={index === 0 && shouldShowQuoteConvertHelp}
+                showConvertHelp={index === 0 && currentPage === 1 && shouldShowQuoteConvertHelp}
               />
             ))
           ) : (
@@ -480,6 +495,16 @@ const Quotes = () => {
               </div>
             </div>
           )}
+          <DocumentPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            startIndex={startIndex}
+            endIndex={endIndex}
+            totalItems={totalItems}
+            onPageChange={setCurrentPage}
+            onPrevious={goToPreviousPage}
+            onNext={goToNextPage}
+          />
         </div>
       ) : (
         <div className="card-container">
@@ -507,8 +532,8 @@ const Quotes = () => {
                   Erreur lors du chargement des devis: {error.message}
                 </TableCell>
               </TableRow>
-            ) : filteredQuotes.length > 0 ? (
-              filteredQuotes.map((quote, index) => (
+            ) : paginatedQuotes.length > 0 ? (
+              paginatedQuotes.map((quote, index) => (
                 <React.Fragment key={quote.id}>
                   <TableRow className="border-b-0">
                     <TableCell className="font-medium">
@@ -661,6 +686,16 @@ const Quotes = () => {
             )}
           </TableBody>
         </Table>
+        <DocumentPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          startIndex={startIndex}
+          endIndex={endIndex}
+          totalItems={totalItems}
+          onPageChange={setCurrentPage}
+          onPrevious={goToPreviousPage}
+          onNext={goToNextPage}
+        />
       </div>
       )}
 
