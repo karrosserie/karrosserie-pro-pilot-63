@@ -27,9 +27,11 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { toast } from '@/hooks/use-toast';
 import { repairOrdersService } from '@/services/supabase/repair-orders';
+import { fleetReservationsService } from '@/services/supabase/fleet-reservations';
 import { validateCessionProcedureData } from '@/components/cessions/form/utils/dataValidation';
+import { validateFleetLoanCessionData } from '@/components/cessions/form/utils/fleetLoanValidation';
 import { CessionPreview } from './CessionPreview';
-import { generateAndUploadCessionPDF } from '@/services/pdf/pdfService';
+import { generateAndUploadCessionPDF, generateAndUploadFleetLoanCessionPDF } from '@/services/pdf/pdfService';
 import { updateCession } from '@/services/supabase/cessions';
 import { useCompany } from '@/hooks/use-company';
 import { useInsuranceCompanies } from '@/hooks/use-insurance-companies';
@@ -417,12 +419,205 @@ export const CessionsTable = ({
       return;
     }
     
-    // Pour les cessions fleet_loan, afficher un message temporaire
+    // Pour les cessions fleet_loan, utiliser la logique spécifique
     if (cessionType === 'fleet_loan') {
-      toast({
-        title: "Fonctionnalité en développement",
-        description: "La génération de PDF pour les cessions de prêt de véhicule sera bientôt disponible.",
-      });
+      setProcessingCessionIds(prev => new Set(prev).add(cession.id));
+      
+      try {
+        // Récupérer les données de la réservation avec client et véhicule
+        const fleetReservation = await fleetReservationsService.getById((cession as any).fleet_reservation_id);
+        
+        if (!fleetReservation) {
+          toast({
+            title: "Erreur",
+            description: "Impossible de récupérer les données de la réservation.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        const clientData = fleetReservation.clients;
+        const vehicleData = fleetReservation.fleet_vehicles;
+        
+        // Valider les données
+        const validationError = validateFleetLoanCessionData(
+          fleetReservation,
+          clientData,
+          vehicleData
+        );
+        
+        if (validationError) {
+          setErrorMessage(validationError);
+          setSelectedClient(clientData);
+          setErrorDialogOpen(true);
+          return;
+        }
+        
+        toast({
+          title: "Validation réussie",
+          description: "Génération du PDF en cours...",
+        });
+        
+        // Trouver la compagnie d'assurance
+        const selectedInsuranceCompany = insuranceCompanies.find(
+          company => company.id === cession.insurance_company_id
+        );
+        
+        if (!selectedInsuranceCompany) {
+          toast({
+            title: "Erreur",
+            description: "Compagnie d'assurance introuvable.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        // Générer et uploader le PDF
+        const pdfUrl = await generateAndUploadFleetLoanCessionPDF(
+          cession,
+          fleetReservation,
+          companyData,
+          selectedInsuranceCompany,
+          clientData,
+          vehicleData
+        );
+        
+        // Mettre à jour la cession avec l'URL du PDF
+        await updateCession(cession.id, {
+          document_url: pdfUrl
+        });
+        
+        toast({
+          title: "PDF généré avec succès",
+          description: "Le document de cession a été généré et sauvegardé.",
+        });
+        
+        // Envoyer pour signature
+        try {
+          toast({
+            title: "Envoi pour signature",
+            description: "Envoi du document pour signature en cours...",
+          });
+          
+          // Récupérer les données complètes du client
+          const fullClientData = await clientsService.getById(clientData.id);
+          
+          const signatureResponse = await sendForSignature(
+            cession.id,
+            pdfUrl,
+            companyData,
+            fullClientData
+          );
+          
+          console.log('Signature response for fleet_loan:', signatureResponse);
+          
+          if (signatureResponse.contract?.contract_id) {
+            // Sauvegarder l'ID du contrat dans la cession
+            await updateCession(cession.id, {
+              oodrive_contract_id: signatureResponse.contract.contract_id.toString(),
+              status: 'en_attente_signature'
+            });
+            
+            // Créer une demande de signature
+            try {
+              const { error: sigError } = await supabase
+                .from('signature_requests' as any)
+                .insert({
+                  company_id: fleetReservation.company_id,
+                  client_id: clientData.id,
+                  vehicle_id: vehicleData?.id,
+                  request_type: 'cession_creance',
+                  cession_id: cession.id,
+                  fleet_reservation_id: (cession as any).fleet_reservation_id,
+                  document_reference: cession.reference,
+                  status: 'envoye',
+                  signature_mode: 'electronique',
+                  oodrive_contract_id: signatureResponse.contract.contract_id.toString(),
+                  sent_at: new Date().toISOString()
+                });
+              
+              if (sigError) {
+                console.error('❌ Failed to create signature request for fleet_loan:', sigError);
+              } else {
+                console.log('✅ Signature request created for fleet_loan cession:', cession.reference);
+              }
+            } catch (sigError) {
+              console.error('❌ Error creating signature request:', sigError);
+            }
+            
+            // Sauvegarder les recipient IDs
+            if (signatureResponse.recipients && signatureResponse.recipients.length >= 2) {
+              if (companyData?.id) {
+                try {
+                  await companyService.updateCompanyInfo(undefined, {
+                    ...companyData,
+                    oodrive_recipient_id: signatureResponse.recipients[0].id.toString()
+                  });
+                } catch (companyError) {
+                  console.error('Error updating company:', companyError);
+                }
+              }
+              
+              if (clientData?.id) {
+                try {
+                  await supabase
+                    .from('clients')
+                    .update({ 
+                      oodrive_recipient_id: signatureResponse.recipients[1].id.toString() 
+                    })
+                    .eq('id', clientData.id);
+                } catch (clientError) {
+                  console.error('Error updating client:', clientError);
+                }
+              }
+            }
+            
+            toast({
+              title: "Document envoyé",
+              description: "Le document a été envoyé pour signature avec succès.",
+            });
+            
+            onInitializationComplete?.();
+          } else {
+            toast({
+              title: "Erreur",
+              description: "La réponse de signature ne contient pas d'ID de contrat.",
+              variant: "destructive",
+            });
+          }
+        } catch (signatureError: any) {
+          console.error('Signature error:', signatureError);
+          
+          // Vérifier si c'est une erreur de téléphone
+          if (signatureError.message && signatureError.message.includes('téléphone')) {
+            setPhoneErrorModal({
+              isOpen: true,
+              message: signatureError.message,
+              clientId: clientData?.id,
+              clientName: `${clientData?.first_name || ''} ${clientData?.last_name || ''}`.trim()
+            });
+          } else {
+            toast({
+              title: "Erreur de signature",
+              description: signatureError.message || "Impossible d'envoyer le document pour signature.",
+              variant: "destructive",
+            });
+          }
+        }
+      } catch (error: any) {
+        console.error('Error initializing fleet_loan cession:', error);
+        toast({
+          title: "Erreur",
+          description: error.message || "Une erreur est survenue lors de l'initialisation.",
+          variant: "destructive",
+        });
+      } finally {
+        setProcessingCessionIds(prev => {
+          const next = new Set(prev);
+          next.delete(cession.id);
+          return next;
+        });
+      }
       return;
     }
 

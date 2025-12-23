@@ -1,6 +1,7 @@
 import { pdf } from '@react-pdf/renderer';
 import { supabase } from '@/integrations/supabase/client';
 import { CessionPDF } from './CessionPDFGenerator';
+import { FleetLoanCessionPDF } from './FleetLoanCessionPDFGenerator';
 import { Cession } from '@/services/supabase/cessions';
 import { prepareRepairOrderDataForPDF } from '@/utils/repairOrderPDFGeneration';
 import InvoicePDF from '@/components/invoices/InvoicePDF';
@@ -185,6 +186,81 @@ export const generateAndUploadCessionPDF = async (
     return publicUrl;
   } catch (error) {
     console.error('Error generating PDF:', error);
+    throw error;
+  }
+};
+
+/**
+ * Génère et upload un PDF de cession pour prêt de véhicule (fleet_loan)
+ */
+export const generateAndUploadFleetLoanCessionPDF = async (
+  cession: Cession,
+  fleetReservation: any,
+  companyData: any,
+  selectedInsuranceCompany: any,
+  clientData: any,
+  vehicleData: any
+): Promise<string> => {
+  try {
+    console.log('Génération du PDF de cession fleet_loan...');
+    console.log('Données de la réservation:', fleetReservation);
+    console.log('Données du client:', clientData);
+    console.log('Données du véhicule:', vehicleData);
+
+    // Generate PDF blob
+    const pdfBlob = await pdf(
+      FleetLoanCessionPDF({
+        cession,
+        companyData,
+        selectedInsuranceCompany,
+        fleetReservation,
+        clientData,
+        vehicleData
+      })
+    ).toBlob();
+
+    console.log('PDF de cession fleet_loan généré, taille:', pdfBlob.size, 'bytes');
+
+    // Get current user and company
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      throw new Error('Utilisateur non authentifié');
+    }
+
+    // Get company ID for the current user
+    const companyId = await getCurrentUserCompanyId();
+
+    // Create filename with company-based path structure
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const filename = `cession-fleet-${cession.reference}-${timestamp}.pdf`;
+    const filePath = `company/${companyId}/cessions/${filename}`;
+
+    // Upload to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('documents')
+      .upload(filePath, pdfBlob, {
+        contentType: 'application/pdf',
+        upsert: false
+      });
+
+    if (uploadError) {
+      console.error('Error uploading PDF:', uploadError);
+      throw new Error(`Erreur lors du téléchargement du PDF: ${uploadError.message}`);
+    }
+
+    // Get public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from('documents')
+      .getPublicUrl(filePath);
+
+    console.log('PDF fleet_loan uploadé avec succès, URL publique:', publicUrl);
+
+    // Vérifier que le fichier est accessible avant de retourner l'URL
+    await verifyFileAccessibility(publicUrl);
+
+    return publicUrl;
+  } catch (error) {
+    console.error('Error generating fleet loan cession PDF:', error);
     throw error;
   }
 };
