@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Search, Filter, TrendingUp, TrendingDown, CreditCard, ArrowUpCircle, ArrowDownCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ReceiptsHeader } from '@/components/receipts/ReceiptsHeader';
+import { ReceiptsHeader, ReceiptSortOption } from '@/components/receipts/ReceiptsHeader';
 import { ReceiptsTable } from '@/components/receipts/ReceiptsTable';
 import ReceiptDialog from '@/components/receipts/ReceiptDialog';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
@@ -30,6 +30,7 @@ const PaymentManagement = () => {
   
   // Receipts state
   const [searchTerm, setSearchTerm] = useState('');
+  const [receiptSortOption, setReceiptSortOption] = useState<ReceiptSortOption>('recent-first');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState<ReceiptWithClient | null>(null);
   
@@ -47,7 +48,31 @@ const PaymentManagement = () => {
   
   // Receipts data
   const { receipts, isLoading, handleDelete, filterReceipts } = useReceiptsData();
-  const filteredReceipts = filterReceipts(receipts, searchTerm);
+  
+  const filteredAndSortedReceipts = useMemo(() => {
+    const filtered = filterReceipts(receipts, searchTerm);
+    
+    return [...filtered].sort((a, b) => {
+      switch (receiptSortOption) {
+        case 'alphabetical-asc': {
+          const aName = (a.client || a.clients?.last_name || '').toLowerCase();
+          const bName = (b.client || b.clients?.last_name || '').toLowerCase();
+          return aName.localeCompare(bName, 'fr', { sensitivity: 'base' });
+        }
+        case 'alphabetical-desc': {
+          const aName = (a.client || a.clients?.last_name || '').toLowerCase();
+          const bName = (b.client || b.clients?.last_name || '').toLowerCase();
+          return bName.localeCompare(aName, 'fr', { sensitivity: 'base' });
+        }
+        case 'recent-first':
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+        case 'oldest-first':
+          return new Date(a.date).getTime() - new Date(b.date).getTime();
+        default:
+          return 0;
+      }
+    });
+  }, [receipts, searchTerm, receiptSortOption, filterReceipts]);
 
   // Expenses data
   const { expenses, isLoading: expensesLoading, handleDelete: handleExpenseDelete, filterExpenses } = useExpenses();
@@ -171,11 +196,13 @@ const PaymentManagement = () => {
                       searchTerm={searchTerm}
                       onSearchChange={setSearchTerm}
                       onCreateReceipt={handleCreateReceipt}
+                      sortOption={receiptSortOption}
+                      onSortChange={setReceiptSortOption}
                     />
                     
                     <div className="card-container">
                       <ReceiptsTable
-                        receipts={filteredReceipts}
+                        receipts={filteredAndSortedReceipts}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
                       />
