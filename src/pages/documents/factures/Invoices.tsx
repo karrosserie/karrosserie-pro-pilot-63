@@ -45,6 +45,8 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import InvoiceMobileCard from '@/components/invoices/InvoiceMobileCard';
 import RelanceModal from '@/components/invoices/RelanceModal';
 import { useSendRelance } from '@/hooks/use-send-relance';
+import { usePagination } from '@/hooks/use-pagination';
+import { DocumentPagination } from '@/components/ui/document-pagination';
 
 
 export type InvoiceSortOption = 'alphabetical-asc' | 'alphabetical-desc' | 'recent-first' | 'oldest-first';
@@ -229,6 +231,19 @@ const Invoices = () => {
       }
     });
   }, [invoices, normalizedSearchTerm, sortOption]);
+
+  // Pagination
+  const {
+    currentPage,
+    totalPages,
+    paginatedData: paginatedInvoices,
+    setCurrentPage,
+    goToNextPage,
+    goToPreviousPage,
+    startIndex,
+    endIndex,
+    totalItems
+  } = usePagination({ data: filteredInvoices, itemsPerPage: 10 });
 
   const getStatusColor = (status: string) => {
     switch (status) {

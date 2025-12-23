@@ -22,6 +22,8 @@ import ImportTable from '@/components/expertise/ImportTable';
 import { useClientValidationNotification } from '@/contexts/ClientValidationNotificationContext';
 import { ClientDataValidationReport } from '@/components/expertise/ClientDataValidationReport';
 import { useNavigate } from 'react-router-dom';
+import { usePagination } from '@/hooks/use-pagination';
+import { DocumentPagination } from '@/components/ui/document-pagination';
 
 const ExpertiseReports = () => {
   const { reports, isLoading, error, deleteReport } = useExpertiseReports();
@@ -264,18 +266,17 @@ const ExpertiseReports = () => {
         />
       )}
       
-      <div className="card-container">
-        <ExpertiseReportTable 
-          reports={filteredAndSortedReports}
-          isLoading={isLoading || !initialCheckComplete}
-          error={error as Error | null}
-          onEditReport={handleEditReport}
-          onDeleteReport={handleDeleteReport}
-          onConvertToQuote={handleConvertToQuote}
-          convertingReportId={getConvertingReportId()}
-          convertedReports={convertedReports}
-        />
-      </div>
+      <PaginatedReportsSection
+        filteredAndSortedReports={filteredAndSortedReports}
+        isLoading={isLoading}
+        initialCheckComplete={initialCheckComplete}
+        error={error as Error | null}
+        onEditReport={handleEditReport}
+        onDeleteReport={handleDeleteReport}
+        onConvertToQuote={handleConvertToQuote}
+        getConvertingReportId={getConvertingReportId}
+        convertedReports={convertedReports}
+      />
 
       {/* Import Rapport Dialog */}
       <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
@@ -333,5 +334,67 @@ const ExpertiseReports = () => {
     </div>
   );
 };
+
+// Composant séparé pour gérer la pagination des rapports
+interface PaginatedReportsSectionProps {
+  filteredAndSortedReports: ExpertiseReport[];
+  isLoading: boolean;
+  initialCheckComplete: boolean;
+  error: Error | null;
+  onEditReport: (report: ExpertiseReport) => void;
+  onDeleteReport: (id: string) => void;
+  onConvertToQuote: (report: ExpertiseReport) => void;
+  getConvertingReportId: () => string | null;
+  convertedReports: Record<string, boolean>;
+}
+
+function PaginatedReportsSection({
+  filteredAndSortedReports,
+  isLoading,
+  initialCheckComplete,
+  error,
+  onEditReport,
+  onDeleteReport,
+  onConvertToQuote,
+  getConvertingReportId,
+  convertedReports
+}: PaginatedReportsSectionProps) {
+  const {
+    currentPage,
+    totalPages,
+    paginatedData: paginatedReports,
+    setCurrentPage,
+    goToNextPage,
+    goToPreviousPage,
+    startIndex,
+    endIndex,
+    totalItems
+  } = usePagination({ data: filteredAndSortedReports, itemsPerPage: 10 });
+
+  return (
+    <div className="card-container">
+      <ExpertiseReportTable 
+        reports={paginatedReports}
+        isLoading={isLoading || !initialCheckComplete}
+        error={error}
+        onEditReport={onEditReport}
+        onDeleteReport={onDeleteReport}
+        onConvertToQuote={onConvertToQuote}
+        convertingReportId={getConvertingReportId()}
+        convertedReports={convertedReports}
+      />
+      <DocumentPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        startIndex={startIndex}
+        endIndex={endIndex}
+        totalItems={totalItems}
+        onPageChange={setCurrentPage}
+        onPrevious={goToPreviousPage}
+        onNext={goToNextPage}
+      />
+    </div>
+  );
+}
 
 export default ExpertiseReports;

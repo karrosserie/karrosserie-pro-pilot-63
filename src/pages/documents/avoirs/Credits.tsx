@@ -31,6 +31,8 @@ import { useTableSorting } from '@/hooks/use-table-sorting';
 import { SortableTableHeader } from '@/components/ui/sortable-table-header';
 import { useIsMobile } from '@/hooks/use-mobile';
 import CreditMobileCard from '@/components/credits/CreditMobileCard';
+import { usePagination } from '@/hooks/use-pagination';
+import { DocumentPagination } from '@/components/ui/document-pagination';
 
 // Mock data for credits - to be replaced with real data later
 const mockCredits = [
@@ -158,6 +160,19 @@ const Credits = () => {
     
     return matchesSearch && matchesArchiveStatus;
   }) || [];
+
+  // Pagination
+  const {
+    currentPage,
+    totalPages,
+    paginatedData: paginatedCredits,
+    setCurrentPage,
+    goToNextPage,
+    goToPreviousPage,
+    startIndex,
+    endIndex,
+    totalItems
+  } = usePagination({ data: filteredCredits, itemsPerPage: 10 });
 
   const getStatusColor = (status: string) => {
     switch (status) {
