@@ -2,7 +2,21 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Filter, Plus } from 'lucide-react';
+import { Search, Filter, Plus, Check } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+const statusOptions = [
+  { value: 'all', label: 'Tous les statuts' },
+  { value: 'brouillon', label: 'Brouillon' },
+  { value: 'en_attente_signature', label: 'En attente de signature' },
+  { value: 'signee', label: 'Signée' },
+  { value: 'envoyee', label: 'Envoyée' },
+];
 
 interface CessionsFiltersProps {
   searchTerm: string;
@@ -34,9 +48,30 @@ export const CessionsFilters = ({
           />
         </div>
         
-        <Button variant="outline" size="icon">
-          <Filter className="h-4 w-4" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon" className="relative">
+              <Filter className="h-4 w-4" />
+              {selectedStatus !== 'all' && (
+                <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-karrosserie-orange" />
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="bg-background">
+            {statusOptions.map((option) => (
+              <DropdownMenuItem
+                key={option.value}
+                onClick={() => onStatusChange(option.value)}
+                className="flex items-center justify-between cursor-pointer"
+              >
+                {option.label}
+                {selectedStatus === option.value && (
+                  <Check className="h-4 w-4 ml-2" />
+                )}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
         
         <Button 
           className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
