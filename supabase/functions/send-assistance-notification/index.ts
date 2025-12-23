@@ -56,12 +56,20 @@ serve(async (req: Request) => {
 
     console.log('📤 Envoi au webhook n8n assistance:', JSON.stringify(webhookPayload, null, 2));
 
-    const response = await fetch('https://n8n.karrosserie.pro/webhook/e4b8fb4c-9503-4fd0-9d35-6bd743b4fb65', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(webhookPayload),
+    // n8n semble refuser les POST sur ce webhook ("not registered for POST"), on bascule donc en GET
+    const url = new URL('https://n8n.karrosserie.pro/webhook/e4b8fb4c-9503-4fd0-9d35-6bd743b4fb65');
+
+    // On envoie les champs attendus via query params
+    const paramsSource = webhookPayload?.[0]?.body ?? {};
+    for (const [key, value] of Object.entries(paramsSource)) {
+      if (value === null || value === undefined) continue;
+      url.searchParams.set(key, String(value));
+    }
+
+    console.log('🔗 Appel webhook n8n assistance (GET):', url.toString());
+
+    const response = await fetch(url.toString(), {
+      method: 'GET',
     });
 
     const responseText = await response.text();
