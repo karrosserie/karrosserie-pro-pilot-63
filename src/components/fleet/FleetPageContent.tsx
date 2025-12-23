@@ -395,7 +395,6 @@ const FleetPageContent = () => {
         open={isAttestationDialogOpen}
         onOpenChange={handleCloseAttestationDialog}
         loanId={selectedLoanForAttestation}
-        loanData={reservations?.find(r => r.id === selectedLoanForAttestation)}
       />
 
       <LinkQuoteDialog
