@@ -21,7 +21,7 @@ import ReceiptDialog from '@/components/receipts/ReceiptDialog';
 import { CreditDialog } from '@/components/credits/CreditDialog';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useCredits } from '@/hooks/use-credits';
-// useReceiptsData import supprimé - non utilisé sur cette page
+import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { useCompany } from '@/hooks/use-company';
 import { useCompanyPreferences } from '@/hooks/use-company-preferences';
 import { Invoice } from '@/services/supabase/invoices';
@@ -85,6 +85,8 @@ const Invoices = () => {
   const { credits, createCredit } = useCredits();
   console.log('[Invoices] AFTER useCredits', performance.now());
   
+  const { receipts } = useReceiptsData();
+  
   console.log('[Invoices] BEFORE useCompany', performance.now());
   const { companyData } = useCompany();
   console.log('[Invoices] AFTER useCompany', performance.now());
@@ -122,13 +124,30 @@ const Invoices = () => {
   console.log('[Invoices] COMPONENT RENDER took', (performance.now() - renderStart).toFixed(0), 'ms at', performance.now());
 
   // Mémoriser les objets passés aux dialogues pour éviter les re-renders
+  // Calculer le montant restant à encaisser (total - encaissements - avoirs)
   const preselectedInvoiceData = useMemo(() => {
     if (!selectedInvoice) return null;
+    
+    const invoiceTotal = selectedInvoice.amount || 0;
+    
+    // Total des encaissements pour cette facture
+    const totalReceipts = receipts
+      ?.filter(r => r.invoice_id === selectedInvoice.id)
+      .reduce((sum, r) => sum + (r.amount || 0), 0) || 0;
+    
+    // Total des avoirs pour cette facture
+    const totalCredits = credits
+      ?.filter(c => c.invoice_id === selectedInvoice.id)
+      .reduce((sum, c) => sum + (c.amount || 0), 0) || 0;
+    
+    // Montant restant à payer
+    const remainingAmount = Math.max(0, invoiceTotal - totalReceipts - totalCredits);
+    
     return {
       id: selectedInvoice.id,
-      amount: selectedInvoice.amount || 0
+      amount: remainingAmount
     };
-  }, [selectedInvoice?.id, selectedInvoice?.amount]);
+  }, [selectedInvoice?.id, selectedInvoice?.amount, receipts, credits]);
 
   const preselectedCreditData = useMemo(() => {
     if (!selectedInvoice) return null;
