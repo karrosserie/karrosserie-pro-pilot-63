@@ -97,22 +97,21 @@ const InvoicePDFHeader = ({ invoice, companyData, totalPaidAmount, finalTotal }:
         </View>
       </View>
 
-      {/* Colonne 3 - Facture pour */}
+      {/* Colonne 3 - Espace réservé (l'adresse est positionnée en absolu) */}
       <View style={pdfStyles.headerColumn}>
         <Text style={pdfStyles.sectionTitle}>Facture pour</Text>
-        <View style={pdfStyles.companyInfo}>
-          <Text style={pdfStyles.companyName}>
-            {invoice.clients ? getClientDisplayName(invoice.clients) : 'Client non spécifié'}
-          </Text>
-          <Text>{invoice.clients?.address || 'Adresse non renseignée'}</Text>
-          <Text>{invoice.clients?.postal_code || ''} {invoice.clients?.city || 'Ville non renseignée'}</Text>
-          {invoice.clients?.phone && (
-            <Text>Téléphone : {invoice.clients.phone}</Text>
-          )}
-          {invoice.clients?.email && (
-            <Text>E-mail : {invoice.clients.email}</Text>
-          )}
-        </View>
+        <Text style={{ fontSize: 7, color: '#666' }}>(Voir adresse destinataire ci-contre)</Text>
+      </View>
+
+      {/* Zone d'adresse destinataire positionnée pour fenêtre d'enveloppe */}
+      <View style={pdfStyles.clientAddressWindow}>
+        <Text style={pdfStyles.clientAddressName}>
+          {invoice.clients ? getClientDisplayName(invoice.clients) : 'Client non spécifié'}
+        </Text>
+        <Text style={pdfStyles.clientAddressText}>{invoice.clients?.address || ''}</Text>
+        <Text style={pdfStyles.clientAddressText}>
+          {invoice.clients?.postal_code || ''} {invoice.clients?.city || ''}
+        </Text>
       </View>
     </View>
   );
