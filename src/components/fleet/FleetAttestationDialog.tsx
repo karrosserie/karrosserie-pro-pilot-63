@@ -8,22 +8,25 @@ import {
 import { useCompany } from '@/hooks/use-company';
 import { formatDate } from '@/utils/date-formatter';
 import { getCurrentPosition, getDepartmentFromZipCode } from '@/utils/geolocation';
+import { useFleetReservation } from '@/hooks/use-fleet-reservations';
+import { Loader2 } from 'lucide-react';
 
 interface FleetAttestationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   loanId: string | null;
-  loanData?: any; // Données complètes de la réservation avec relations
 }
 
 const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
   open,
   onOpenChange,
   loanId,
-  loanData
 }) => {
   const { companyData } = useCompany();
   const [userPosition, setUserPosition] = useState<string>('[position en cours...]');
+  
+  // Charger les données du prêt avec toutes les relations via le hook
+  const { reservation: loanData, isLoading } = useFleetReservation(open && loanId ? loanId : undefined);
 
   const loanCreationDate = loanData?.created_at ? formatDate(loanData.created_at) : formatDate(new Date().toISOString());
 
@@ -44,10 +47,22 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
     }
   }, [open]);
 
-  if (!loanData) return null;
-  
   // Debug pour voir la structure des données
   console.log('FleetAttestationDialog loanData:', loanData);
+
+  if (isLoading) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-4xl">
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  if (!loanData) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
