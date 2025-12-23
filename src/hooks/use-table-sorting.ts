@@ -19,12 +19,10 @@ export function useTableSorting<T>(
 
   // Synchroniser quand les props initiales changent (tri externe)
   useEffect(() => {
-    if (initialSortKey) {
-      setSortConfig({
-        key: initialSortKey,
-        direction: initialDirection ?? 'asc'
-      });
-    }
+    setSortConfig({
+      key: initialSortKey || '',
+      direction: initialSortKey ? (initialDirection ?? 'asc') : null
+    });
   }, [initialSortKey, initialDirection]);
 
   const sortedData = useMemo(() => {
