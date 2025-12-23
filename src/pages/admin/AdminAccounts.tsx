@@ -7,9 +7,12 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Building2, Users, CreditCard, UserCheck, Coins, Search, ChevronUp, ChevronDown } from 'lucide-react';
+import { Building2, Users, CreditCard, UserCheck, Coins, Search, ChevronUp, ChevronDown, Calendar, RotateCcw } from 'lucide-react';
 
 interface Company {
   id: string;
@@ -21,6 +24,7 @@ interface Company {
   user_count: number;
   subscription?: {
     id: string;
+    plan_id: string;
     plan_name: string;
     status: string;
     tokens_remaining: number;
@@ -43,7 +47,10 @@ const AdminAccounts = () => {
   const [loading, setLoading] = useState(true);
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
   const [newTokens, setNewTokens] = useState('');
+  const [setTokensValue, setSetTokensValue] = useState('');
   const [selectedPlan, setSelectedPlan] = useState('');
+  const [customEndDate, setCustomEndDate] = useState('');
+  const [resetTokensOnPlanChange, setResetTokensOnPlanChange] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState<keyof Company | 'subscription.plan_name' | 'subscription.end_date' | 'subscription.tokens_remaining'>('name');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
@@ -85,6 +92,7 @@ const AdminAccounts = () => {
             .from('company_subscriptions')
             .select(`
               id,
+              subscription_plan_id,
               status,
               tokens_remaining,
               tokens_used,
@@ -100,6 +108,7 @@ const AdminAccounts = () => {
              user_count: userCount || 0,
              subscription: subscriptionData ? {
                id: subscriptionData.id,
+               plan_id: subscriptionData.subscription_plan_id,
                plan_name: subscriptionData.subscription_plans?.name || 'Unknown',
                status: subscriptionData.status,
                tokens_remaining: subscriptionData.tokens_remaining,
@@ -177,35 +186,40 @@ const AdminAccounts = () => {
       const plan = subscriptionPlans.find(p => p.id === selectedPlan);
       if (!plan) return;
 
-      if (editingCompany.subscription) {
-        // Update existing subscription
-        const endDate = new Date();
+      // Calculate end date
+      let endDate: Date;
+      if (customEndDate) {
+        endDate = new Date(customEndDate);
+      } else {
+        endDate = new Date();
         if (plan.billing_period === 'yearly' || plan.billing_period === 'annual') {
           endDate.setFullYear(endDate.getFullYear() + 1);
         } else {
           endDate.setMonth(endDate.getMonth() + 1);
         }
+      }
+
+      if (editingCompany.subscription) {
+        // Update existing subscription - only reset tokens if checkbox is checked
+        const updateData: any = {
+          subscription_plan_id: selectedPlan,
+          end_date: endDate.toISOString()
+        };
+
+        // Only reset tokens if the option is checked
+        if (resetTokensOnPlanChange) {
+          updateData.tokens_remaining = plan.tokens_included;
+          updateData.tokens_used = 0;
+        }
 
         const { error } = await supabase
           .from('company_subscriptions')
-          .update({
-            subscription_plan_id: selectedPlan,
-            tokens_remaining: plan.tokens_included,
-            tokens_used: 0,
-            end_date: endDate.toISOString()
-          })
+          .update(updateData)
           .eq('id', editingCompany.subscription.id);
 
         if (error) throw error;
       } else {
         // Create new subscription
-        const endDate = new Date();
-        if (plan.billing_period === 'yearly' || plan.billing_period === 'annual') {
-          endDate.setFullYear(endDate.getFullYear() + 1);
-        } else {
-          endDate.setMonth(endDate.getMonth() + 1);
-        }
-
         const { error } = await supabase
           .from('company_subscriptions')
           .insert({
@@ -223,17 +237,134 @@ const AdminAccounts = () => {
 
       toast({
         title: "Succès",
-        description: `Abonnement mis à jour pour ${editingCompany.name}`
+        description: `Abonnement mis à jour pour ${editingCompany.name}${resetTokensOnPlanChange ? ' (jetons réinitialisés)' : ''}`
       });
 
       setEditingCompany(null);
       setSelectedPlan('');
+      setCustomEndDate('');
+      setResetTokensOnPlanChange(false);
       fetchCompanies();
     } catch (error) {
       console.error('Error changing subscription:', error);
       toast({
         title: "Erreur",
         description: "Impossible de changer l'abonnement",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSetTokens = async () => {
+    if (!editingCompany?.subscription || !setTokensValue) return;
+
+    try {
+      const newBalance = parseInt(setTokensValue);
+      const { error } = await supabase
+        .from('company_subscriptions')
+        .update({
+          tokens_remaining: newBalance
+        })
+        .eq('id', editingCompany.subscription.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: `Solde de jetons défini à ${newBalance} pour ${editingCompany.name}`
+      });
+
+      setSetTokensValue('');
+      fetchCompanies();
+      // Update local state
+      setEditingCompany({
+        ...editingCompany,
+        subscription: {
+          ...editingCompany.subscription,
+          tokens_remaining: newBalance
+        }
+      });
+    } catch (error) {
+      console.error('Error setting tokens:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de définir les jetons",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleResetTokens = async () => {
+    if (!editingCompany?.subscription) return;
+
+    try {
+      const { error } = await supabase
+        .from('company_subscriptions')
+        .update({
+          tokens_remaining: 0,
+          tokens_used: 0
+        })
+        .eq('id', editingCompany.subscription.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: `Jetons remis à zéro pour ${editingCompany.name}`
+      });
+
+      fetchCompanies();
+      // Update local state
+      setEditingCompany({
+        ...editingCompany,
+        subscription: {
+          ...editingCompany.subscription,
+          tokens_remaining: 0,
+          tokens_used: 0
+        }
+      });
+    } catch (error) {
+      console.error('Error resetting tokens:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de remettre les jetons à zéro",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleUpdateEndDate = async () => {
+    if (!editingCompany?.subscription || !customEndDate) return;
+
+    try {
+      const { error } = await supabase
+        .from('company_subscriptions')
+        .update({
+          end_date: new Date(customEndDate).toISOString()
+        })
+        .eq('id', editingCompany.subscription.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: `Date de fin mise à jour pour ${editingCompany.name}`
+      });
+
+      fetchCompanies();
+      // Update local state
+      setEditingCompany({
+        ...editingCompany,
+        subscription: {
+          ...editingCompany.subscription,
+          end_date: new Date(customEndDate).toISOString()
+        }
+      });
+    } catch (error) {
+      console.error('Error updating end date:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour la date de fin",
         variant: "destructive"
       });
     }
@@ -444,61 +575,185 @@ const AdminAccounts = () => {
                             size="sm"
                             onClick={() => {
                               setEditingCompany(company);
-                              setSelectedPlan(company.subscription?.id || '');
+                              setSelectedPlan(company.subscription?.plan_id || '');
+                              setCustomEndDate('');
+                              setResetTokensOnPlanChange(false);
+                              setNewTokens('');
+                              setSetTokensValue('');
                             }}
                           >
                             <CreditCard className="h-4 w-4 mr-1" />
                             Gérer
                           </Button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="max-w-lg">
                           <DialogHeader>
                             <DialogTitle>Gérer {company.name}</DialogTitle>
                           </DialogHeader>
-                          <div className="space-y-4">
-                            <div>
-                              <Label htmlFor="plan">Changer d'abonnement</Label>
-                              <Select value={selectedPlan} onValueChange={setSelectedPlan}>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Sélectionner un plan" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {subscriptionPlans.map((plan) => (
-                                    <SelectItem key={plan.id} value={plan.id}>
-                                      {plan.name} - {plan.price}€ ({plan.tokens_included} jetons)
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <Button 
-                                onClick={handleChangeSubscription} 
-                                className="mt-2 w-full"
-                                disabled={!selectedPlan}
-                              >
-                                Mettre à jour l'abonnement
-                              </Button>
-                            </div>
+                          
+                          <Tabs defaultValue="subscription" className="w-full">
+                            <TabsList className="grid w-full grid-cols-2">
+                              <TabsTrigger value="subscription">
+                                <CreditCard className="h-4 w-4 mr-2" />
+                                Abonnement
+                              </TabsTrigger>
+                              <TabsTrigger value="tokens">
+                                <Coins className="h-4 w-4 mr-2" />
+                                Jetons
+                              </TabsTrigger>
+                            </TabsList>
                             
-                            {company.subscription && (
-                              <div>
-                                <Label htmlFor="tokens">Ajouter des jetons</Label>
-                                <Input
-                                  id="tokens"
-                                  type="number"
-                                  value={newTokens}
-                                  onChange={(e) => setNewTokens(e.target.value)}
-                                  placeholder="Nombre de jetons à ajouter"
-                                />
-                                <Button 
-                                  onClick={handleAddTokens} 
-                                  className="mt-2 w-full"
-                                  disabled={!newTokens}
-                                >
-                                  Ajouter {newTokens} jetons
-                                </Button>
+                            {/* Onglet Abonnement */}
+                            <TabsContent value="subscription" className="space-y-4 mt-4">
+                              <div className="space-y-3">
+                                <div>
+                                  <Label htmlFor="plan">Plan d'abonnement</Label>
+                                  <Select value={selectedPlan} onValueChange={setSelectedPlan}>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Sélectionner un plan" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {subscriptionPlans.map((plan) => (
+                                        <SelectItem key={plan.id} value={plan.id}>
+                                          {plan.name} - {plan.price}€/{plan.billing_period === 'yearly' ? 'an' : 'mois'}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                
+                                <div>
+                                  <Label htmlFor="endDate">Date de fin d'abonnement</Label>
+                                  <Input
+                                    id="endDate"
+                                    type="date"
+                                    value={customEndDate || (company.subscription?.end_date ? new Date(company.subscription.end_date).toISOString().split('T')[0] : '')}
+                                    onChange={(e) => setCustomEndDate(e.target.value)}
+                                  />
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    Laissez vide pour calculer automatiquement selon le plan
+                                  </p>
+                                </div>
+                                
+                                {company.subscription && (
+                                  <div className="flex items-center space-x-2 p-3 bg-muted/50 rounded-lg">
+                                    <Checkbox
+                                      id="resetTokens"
+                                      checked={resetTokensOnPlanChange}
+                                      onCheckedChange={(checked) => setResetTokensOnPlanChange(checked === true)}
+                                    />
+                                    <Label htmlFor="resetTokens" className="text-sm cursor-pointer">
+                                      Réinitialiser les jetons avec le nouveau plan
+                                    </Label>
+                                  </div>
+                                )}
+                                
+                                <div className="flex gap-2">
+                                  <Button 
+                                    onClick={handleChangeSubscription} 
+                                    className="flex-1"
+                                    disabled={!selectedPlan}
+                                  >
+                                    Mettre à jour l'abonnement
+                                  </Button>
+                                  {company.subscription && customEndDate && (
+                                    <Button 
+                                      onClick={handleUpdateEndDate}
+                                      variant="outline"
+                                    >
+                                      <Calendar className="h-4 w-4" />
+                                    </Button>
+                                  )}
+                                </div>
                               </div>
-                            )}
-                          </div>
+
+                              {company.subscription && (
+                                <>
+                                  <Separator />
+                                  <div className="p-3 bg-muted/30 rounded-lg text-sm">
+                                    <p><strong>Plan actuel :</strong> {company.subscription.plan_name}</p>
+                                    <p><strong>Fin :</strong> {new Date(company.subscription.end_date).toLocaleDateString('fr-FR')}</p>
+                                    <p><strong>Statut :</strong> {company.subscription.status}</p>
+                                  </div>
+                                </>
+                              )}
+                            </TabsContent>
+                            
+                            {/* Onglet Jetons */}
+                            <TabsContent value="tokens" className="space-y-4 mt-4">
+                              {company.subscription ? (
+                                <>
+                                  <div className="p-4 bg-muted/30 rounded-lg text-center">
+                                    <p className="text-sm text-muted-foreground">Solde actuel</p>
+                                    <p className="text-3xl font-bold">{editingCompany?.subscription?.tokens_remaining ?? company.subscription.tokens_remaining}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                      ({editingCompany?.subscription?.tokens_used ?? company.subscription.tokens_used} utilisés)
+                                    </p>
+                                  </div>
+                                  
+                                  <Separator />
+                                  
+                                  <div className="space-y-3">
+                                    <div>
+                                      <Label htmlFor="addTokens">Ajouter des jetons</Label>
+                                      <div className="flex gap-2">
+                                        <Input
+                                          id="addTokens"
+                                          type="number"
+                                          value={newTokens}
+                                          onChange={(e) => setNewTokens(e.target.value)}
+                                          placeholder="Nombre à ajouter"
+                                        />
+                                        <Button 
+                                          onClick={handleAddTokens} 
+                                          disabled={!newTokens}
+                                        >
+                                          +{newTokens || 0}
+                                        </Button>
+                                      </div>
+                                    </div>
+                                    
+                                    <div>
+                                      <Label htmlFor="setTokens">Définir un nouveau solde</Label>
+                                      <div className="flex gap-2">
+                                        <Input
+                                          id="setTokens"
+                                          type="number"
+                                          value={setTokensValue}
+                                          onChange={(e) => setSetTokensValue(e.target.value)}
+                                          placeholder="Nouveau solde"
+                                        />
+                                        <Button 
+                                          onClick={handleSetTokens}
+                                          variant="secondary"
+                                          disabled={!setTokensValue}
+                                        >
+                                          Définir
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  <Separator />
+                                  
+                                  <Button 
+                                    onClick={handleResetTokens}
+                                    variant="destructive"
+                                    className="w-full"
+                                  >
+                                    <RotateCcw className="h-4 w-4 mr-2" />
+                                    Remettre les jetons à zéro
+                                  </Button>
+                                </>
+                              ) : (
+                                <div className="text-center py-8 text-muted-foreground">
+                                  <Coins className="h-12 w-12 mx-auto mb-2 opacity-30" />
+                                  <p>Aucun abonnement actif</p>
+                                  <p className="text-sm">Créez d'abord un abonnement dans l'onglet "Abonnement"</p>
+                                </div>
+                              )}
+                            </TabsContent>
+                          </Tabs>
                         </DialogContent>
                       </Dialog>
                       
