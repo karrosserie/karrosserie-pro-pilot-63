@@ -17,9 +17,14 @@ export const useAmountInput = ({ value, onChange, defaultValue = 0 }: UseAmountI
   const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
     setIsFocused(true);
     const currentValue = e.target.value;
-    // Si la valeur est "0" ou vide, vider le champ
-    if (currentValue === '0' || currentValue === '' || parseFloat(currentValue) === 0) {
+    const numericValue = parseFloat(currentValue);
+    
+    // Ne vider le champ QUE si la valeur est exactement 0 ou vide
+    // Si la valeur est différente de 0, la conserver pour édition manuelle
+    if (currentValue === '' || (numericValue === 0 && !isNaN(numericValue))) {
       setDisplayValue('');
+    } else {
+      setDisplayValue(currentValue);
     }
   }, []);
 
