@@ -177,6 +177,25 @@ const defaultStyles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#e5e5e5',
   },
+  // Zone d'adresse positionnée pour fenêtre d'enveloppe DL
+  clientAddressEnvelope: {
+    position: 'absolute',
+    top: 140,
+    right: 30,
+    width: 200,
+    height: 80,
+    padding: 8,
+    backgroundColor: 'white',
+  },
+  clientAddressName: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  clientAddressText: {
+    fontSize: 10,
+    lineHeight: 1.4,
+  },
 });
 
 // Styles spécifiques au template alternatif
@@ -940,6 +959,19 @@ const InvoicePDF = ({ invoice, companyData, payments = [], clientData, vehicleDa
               </View>
             )}
           </View>
+        </View>
+
+        {/* Zone d'adresse positionnée pour fenêtre d'enveloppe DL */}
+        <View style={defaultStyles.clientAddressEnvelope}>
+          <Text style={defaultStyles.clientAddressName}>
+            {clientData?.name || 'Client non spécifié'}
+          </Text>
+          <Text style={defaultStyles.clientAddressText}>
+            {clientData?.address || ''}
+          </Text>
+          <Text style={defaultStyles.clientAddressText}>
+            {clientData?.city || ''}
+          </Text>
         </View>
 
         {/* Tableau des articles par défaut */}
