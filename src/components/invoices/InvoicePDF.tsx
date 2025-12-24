@@ -938,8 +938,6 @@ const InvoicePDF = ({ invoice, companyData, payments = [], clientData, vehicleDa
             </Text>
             <View style={defaultStyles.companyInfo}>
               <Text style={defaultStyles.companyName}>{clientData?.name || 'Client non spécifié'}</Text>
-              <Text>{clientData?.address || 'Adresse non renseignée'}</Text>
-              <Text>{clientData?.city || 'Ville non renseignée'}</Text>
               {clientData?.phone && <Text>Téléphone : {clientData.phone}</Text>}
               {clientData?.email && <Text>E-mail : {clientData.email}</Text>}
             </View>
