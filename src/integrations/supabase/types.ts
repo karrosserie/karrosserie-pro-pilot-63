@@ -2215,6 +2215,88 @@ export type Database = {
         }
         Relationships: []
       }
+      dossiers: {
+        Row: {
+          archived: boolean | null
+          claim_number: string | null
+          client_id: string | null
+          company_id: string
+          created_at: string
+          expert_name: string | null
+          id: string
+          incident_date: string | null
+          incident_number: string | null
+          insurance_company_id: string | null
+          notes: string | null
+          policy_number: string | null
+          reference: string
+          report_number: string | null
+          status: string | null
+          updated_at: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          archived?: boolean | null
+          claim_number?: string | null
+          client_id?: string | null
+          company_id: string
+          created_at?: string
+          expert_name?: string | null
+          id?: string
+          incident_date?: string | null
+          incident_number?: string | null
+          insurance_company_id?: string | null
+          notes?: string | null
+          policy_number?: string | null
+          reference?: string
+          report_number?: string | null
+          status?: string | null
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          archived?: boolean | null
+          claim_number?: string | null
+          client_id?: string | null
+          company_id?: string
+          created_at?: string
+          expert_name?: string | null
+          id?: string
+          incident_date?: string | null
+          incident_number?: string | null
+          insurance_company_id?: string | null
+          notes?: string | null
+          policy_number?: string | null
+          reference?: string
+          report_number?: string | null
+          status?: string | null
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dossiers_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dossiers_insurance_company_id_fkey"
+            columns: ["insurance_company_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dossiers_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_breaks: {
         Row: {
           break_end_time: string | null
@@ -2637,6 +2719,7 @@ export type Database = {
           company_id: string | null
           created_at: string
           document_url: string | null
+          dossier_id: string | null
           expert_mail: string | null
           expert_name: string | null
           global_discount_data: string | null
@@ -2658,6 +2741,7 @@ export type Database = {
           company_id?: string | null
           created_at?: string
           document_url?: string | null
+          dossier_id?: string | null
           expert_mail?: string | null
           expert_name?: string | null
           global_discount_data?: string | null
@@ -2679,6 +2763,7 @@ export type Database = {
           company_id?: string | null
           created_at?: string
           document_url?: string | null
+          dossier_id?: string | null
           expert_mail?: string | null
           expert_name?: string | null
           global_discount_data?: string | null
@@ -2725,6 +2810,7 @@ export type Database = {
           coverage_duration: string | null
           created_at: string
           damages: Json | null
+          dossier_id: string | null
           end_mileage: number | null
           expected_return_date: string | null
           fleet_vehicle_id: string
@@ -2764,6 +2850,7 @@ export type Database = {
           coverage_duration?: string | null
           created_at?: string
           damages?: Json | null
+          dossier_id?: string | null
           end_mileage?: number | null
           expected_return_date?: string | null
           fleet_vehicle_id: string
@@ -2803,6 +2890,7 @@ export type Database = {
           coverage_duration?: string | null
           created_at?: string
           damages?: Json | null
+          dossier_id?: string | null
           end_mileage?: number | null
           expected_return_date?: string | null
           fleet_vehicle_id?: string
@@ -4056,6 +4144,7 @@ export type Database = {
           contact: string | null
           created_at: string
           date: string
+          dossier_id: string | null
           eta: string
           id: string
           is_inbound: boolean | null
@@ -4083,6 +4172,7 @@ export type Database = {
           contact?: string | null
           created_at?: string
           date?: string
+          dossier_id?: string | null
           eta: string
           id?: string
           is_inbound?: boolean | null
@@ -4110,6 +4200,7 @@ export type Database = {
           contact?: string | null
           created_at?: string
           date?: string
+          dossier_id?: string | null
           eta?: string
           id?: string
           is_inbound?: boolean | null
@@ -4844,6 +4935,7 @@ export type Database = {
           created_at: string
           discounts_data: string | null
           document_url: string | null
+          dossier_id: string | null
           email_sent: boolean | null
           expert_name: string | null
           id: string
@@ -4876,6 +4968,7 @@ export type Database = {
           created_at?: string
           discounts_data?: string | null
           document_url?: string | null
+          dossier_id?: string | null
           email_sent?: boolean | null
           expert_name?: string | null
           id?: string
@@ -4908,6 +5001,7 @@ export type Database = {
           created_at?: string
           discounts_data?: string | null
           document_url?: string | null
+          dossier_id?: string | null
           email_sent?: boolean | null
           expert_name?: string | null
           id?: string
@@ -5074,6 +5168,7 @@ export type Database = {
           created_at: string
           discounts_data: Json | null
           document_url: string | null
+          dossier_id: string | null
           email_sent: boolean | null
           end_date: string | null
           estimated_hours: number | null
@@ -5122,6 +5217,7 @@ export type Database = {
           created_at?: string
           discounts_data?: Json | null
           document_url?: string | null
+          dossier_id?: string | null
           email_sent?: boolean | null
           end_date?: string | null
           estimated_hours?: number | null
@@ -5170,6 +5266,7 @@ export type Database = {
           created_at?: string
           discounts_data?: Json | null
           document_url?: string | null
+          dossier_id?: string | null
           email_sent?: boolean | null
           end_date?: string | null
           estimated_hours?: number | null

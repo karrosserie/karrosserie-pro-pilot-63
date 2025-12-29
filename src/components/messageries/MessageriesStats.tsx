@@ -1,5 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertTriangle, AlertCircle, Clock, CheckCircle, LucideIcon } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 interface StatCardProps {
   icon: LucideIcon;
@@ -7,9 +9,28 @@ interface StatCardProps {
   value: number;
   bgColor: string;
   iconColor: string;
+  compact?: boolean;
 }
 
-function StatCard({ icon: Icon, label, value, bgColor, iconColor }: StatCardProps) {
+function StatCard({ icon: Icon, label, value, bgColor, iconColor, compact }: StatCardProps) {
+  if (compact) {
+    return (
+      <Card className="border-none shadow-sm">
+        <CardContent className="p-3">
+          <div className="flex items-center gap-2">
+            <div className={`w-8 h-8 rounded-full ${bgColor} flex items-center justify-center`}>
+              <Icon className={`h-4 w-4 ${iconColor}`} />
+            </div>
+            <div>
+              <p className="text-lg font-bold leading-none">{value}</p>
+              <p className="text-[10px] text-muted-foreground truncate">{label}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="border-none shadow-sm hover:shadow-md transition-shadow">
       <CardContent className="p-6">
@@ -40,14 +61,20 @@ export function MessageriesStats({
   highPriorityMessages, 
   unresolvedMessages 
 }: MessageriesStatsProps) {
+  const isMobile = useIsMobile();
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div className={cn(
+      "gap-3 mb-4 sm:mb-6",
+      isMobile ? "grid grid-cols-2" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+    )}>
       <StatCard
         icon={AlertTriangle}
         label="🔴 Urgents"
         value={urgentMessages}
         bgColor="bg-red-100"
         iconColor="text-red-600"
+        compact={isMobile}
       />
       <StatCard
         icon={AlertCircle}
@@ -55,6 +82,7 @@ export function MessageriesStats({
         value={highPriorityMessages}
         bgColor="bg-orange-100"
         iconColor="text-orange-600"
+        compact={isMobile}
       />
       <StatCard
         icon={Clock}
@@ -62,6 +90,7 @@ export function MessageriesStats({
         value={unresolvedMessages}
         bgColor="bg-blue-100"
         iconColor="text-blue-600"
+        compact={isMobile}
       />
       <StatCard
         icon={CheckCircle}
@@ -69,6 +98,7 @@ export function MessageriesStats({
         value={totalMessages}
         bgColor="bg-gray-100"
         iconColor="text-gray-600"
+        compact={isMobile}
       />
     </div>
   );

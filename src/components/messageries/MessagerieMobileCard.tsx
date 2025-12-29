@@ -95,7 +95,7 @@ export const MessagerieMobileCard = ({
   onSemiAuto,
   showResolved 
 }: MessagerieMobileCardProps) => {
-  const meta = PRIORITY_META[item.priority];
+  const meta = PRIORITY_META[item.priority as keyof typeof PRIORITY_META];
   const IconComponent = meta.icon;
   const ChannelIcon = getChannelIcon(item.channel);
 
