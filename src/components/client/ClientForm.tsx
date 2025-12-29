@@ -1,9 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNotification } from '@/hooks/use-notification';
+import { useIsMobile } from '@/hooks/use-mobile';
 import PersonalInfoTab from './form/PersonalInfoTab';
 import DocumentsTab from './form/DocumentsTab';
 import ClientFormActions from './form/ClientFormActions';
+import { User, FileText } from 'lucide-react';
+
+export interface ClientFormRef {
+  submit: () => void;
+}
 
 interface ClientFormProps {
   onSubmit: (data: any) => void;
@@ -11,16 +17,19 @@ interface ClientFormProps {
   isViewMode?: boolean;
   onCancel: () => void;
   onFormChange?: () => void;
+  hideActions?: boolean;
 }
 
-const ClientForm: React.FC<ClientFormProps> = ({
+const ClientForm = forwardRef<ClientFormRef, ClientFormProps>(({
   onSubmit,
   defaultValues = {},
   isViewMode = false,
   onCancel,
-  onFormChange
-}) => {
+  onFormChange,
+  hideActions = false
+}, ref) => {
   const { error } = useNotification();
+  const isMobile = useIsMobile();
   const [phoneIsValid, setPhoneIsValid] = useState(true);
   const [formData, setFormData] = useState({
     clientType: defaultValues?.clientType || 'particulier',
@@ -179,13 +188,18 @@ const ClientForm: React.FC<ClientFormProps> = ({
     return labels[field] || field;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (!isViewMode && !validateForm()) {
       return;
     }
     onSubmit(formData);
   };
+
+  // Expose submit method to parent via ref
+  useImperativeHandle(ref, () => ({
+    submit: () => handleSubmit()
+  }));
 
   // Generate unique document IDs for this client
   const clientId = defaultValues?.id || `new-client-${Date.now()}`;
@@ -194,8 +208,14 @@ const ClientForm: React.FC<ClientFormProps> = ({
     <form onSubmit={handleSubmit} className="space-y-6">
       <Tabs defaultValue="info" className="w-full">
         <TabsList className="grid grid-cols-2 mb-6 w-full">
-          <TabsTrigger value="info" className="text-sm">Informations personnelles</TabsTrigger>
-          <TabsTrigger value="documents" className="text-sm">Documents</TabsTrigger>
+          <TabsTrigger value="info" className="text-sm flex items-center gap-1.5">
+            <User className="h-4 w-4" />
+            {isMobile ? "Infos" : "Informations personnelles"}
+          </TabsTrigger>
+          <TabsTrigger value="documents" className="text-sm flex items-center gap-1.5">
+            <FileText className="h-4 w-4" />
+            Documents
+          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="info">
@@ -230,13 +250,17 @@ const ClientForm: React.FC<ClientFormProps> = ({
         </TabsContent>
       </Tabs>
       
-      <ClientFormActions 
-        isViewMode={isViewMode}
-        onCancel={onCancel}
-        hasId={!!defaultValues?.id}
-      />
+      {!hideActions && (
+        <ClientFormActions 
+          isViewMode={isViewMode}
+          onCancel={onCancel}
+          hasId={!!defaultValues?.id}
+        />
+      )}
     </form>
   );
-};
+});
+
+ClientForm.displayName = 'ClientForm';
 
 export default ClientForm;
