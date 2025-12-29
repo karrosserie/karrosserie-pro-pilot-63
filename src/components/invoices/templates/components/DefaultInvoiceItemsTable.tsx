@@ -1,4 +1,6 @@
 import React from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import InvoiceMobileItemCard from './InvoiceMobileItemCard';
 
 interface Item {
   ref?: string;
@@ -16,6 +18,22 @@ interface DefaultInvoiceItemsTableProps {
 }
 
 const DefaultInvoiceItemsTable = ({ items }: DefaultInvoiceItemsTableProps) => {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <div className="space-y-2">
+        {items.length > 0 ? (
+          items.map((item, index) => (
+            <InvoiceMobileItemCard key={index} item={item} />
+          ))
+        ) : (
+          <p className="text-sm text-gray-500 text-center py-4">Aucun article</p>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-xs sm:text-sm md:text-base bg-white border-collapse min-w-[600px]">
