@@ -23,10 +23,10 @@ interface DefaultCreditHeaderProps {
 
 const DefaultCreditHeader = ({ companyData, creditData, clientData }: DefaultCreditHeaderProps) => {
   return (
-    <div className="grid grid-cols-3 gap-6 mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
       {/* Colonne 1 - Entreprise */}
       <div className="break-inside-avoid">
-        <h1 className="text-2xl font-bold text-white px-3 py-1 text-center mb-3" style={{backgroundColor: 'rgba(64,67,72,255)'}}>AVOIR</h1>
+        <h1 className="text-lg sm:text-2xl font-bold text-white px-3 py-1 text-center mb-3" style={{backgroundColor: 'rgba(64,67,72,255)'}}>AVOIR</h1>
         {companyData.logo_url && (
           <div className="flex items-center justify-start mb-3" style={{maxWidth: '120px'}}>
             <img src={companyData.logo_url} alt="Logo entreprise" className="max-w-full h-auto object-contain" />
@@ -45,8 +45,8 @@ const DefaultCreditHeader = ({ companyData, creditData, clientData }: DefaultCre
 
       {/* Colonne 2 - Détails de l'avoir */}
       <div>
-        <h3 className="text-lg font-semibold mb-3 text-gray-800">Détails de l'avoir</h3>
-        <div className="text-base space-y-1">
+        <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800">Détails de l'avoir</h3>
+        <div className="text-sm sm:text-base space-y-1">
           <div className="flex justify-between">
             <span className="font-medium">Avoir</span>
             <span>{creditData.number}</span>
@@ -78,16 +78,16 @@ const DefaultCreditHeader = ({ companyData, creditData, clientData }: DefaultCre
         </div>
         
         {/* Encadré Montant à avoir */}
-        <div className="bg-blue-600 text-white p-2 text-center mt-3">
-          <p className="text-base mb-1">Montant à avoir</p>
-          <p className="text-lg font-bold">{creditData.amountDue}</p>
+        <div className="bg-blue-600 text-white p-2 text-center mt-2 sm:mt-3">
+          <p className="text-sm sm:text-base mb-1">Montant à avoir</p>
+          <p className="text-base sm:text-lg font-bold">{creditData.amountDue}</p>
         </div>
       </div>
 
       {/* Colonne 3 - Avoir pour */}
       <div>
-        <h3 className="text-lg font-semibold mb-3 text-gray-800">Avoir pour</h3>
-        <div className="text-base space-y-1">
+        <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800">Avoir pour</h3>
+        <div className="text-sm sm:text-base space-y-1">
           <p className="font-medium">{clientData.name}</p>
           <p>{clientData.address}</p>
           <p>{clientData.city}</p>
