@@ -242,7 +242,7 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
       
       {/* Section relances automatiques */}
       <div className="border-t pt-4 space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="space-y-0.5">
             <Label className="text-base font-medium">
               Relances automatiques

@@ -13,6 +13,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 import { useFormDialog } from '@/hooks/use-form-dialog';
 import ClientForm from './ClientForm';
 import ClientVehiclesTab from './tabs/ClientVehiclesTab';
@@ -301,23 +302,63 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
     );
   }
 
-  // Pour les modes create et edit, on garde l'ancien comportement
+  // Pour les modes create et edit
+  const formRef = React.useRef<{ submit: () => void } | null>(null);
+
+  // Version mobile avec Sheet
+  if (isMobile) {
+    return (
+      <Sheet open={open} onOpenChange={handleOpenChange}>
+        <SheetContent side="bottom" className="h-[95vh] p-0 flex flex-col">
+          <SheetHeader className="px-4 pt-4 pb-3 border-b flex-shrink-0">
+            <SheetTitle>{title}</SheetTitle>
+            {description && <p className="text-sm text-muted-foreground">{description}</p>}
+          </SheetHeader>
+          
+          <div className="flex-1 overflow-y-auto p-4">
+            <ClientForm 
+              ref={formRef}
+              onSubmit={handleSubmit}
+              defaultValues={defaultValues || {}}
+              isViewMode={false}
+              onCancel={handleCancel}
+              onFormChange={() => setHasUnsavedChanges(true)}
+              hideActions={true}
+            />
+          </div>
+          
+          <div className="flex-shrink-0 border-t p-4 bg-background flex flex-col gap-2">
+            <Button 
+              variant="validation" 
+              className="w-full"
+              onClick={() => formRef.current?.submit()}
+            >
+              {defaultValues?.id ? "Mettre à jour" : "Enregistrer"}
+            </Button>
+            <Button variant="outline" className="w-full" onClick={handleCancel}>
+              Annuler
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  // Version desktop avec Dialog
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className={isMobile ? "w-[95vw] h-[95vh] max-w-none" : "max-w-4xl"}>
+      <DialogContent className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle className={isMobile ? "text-lg" : ""}>{title}</DialogTitle>
-          {description && <DialogDescription className={isMobile ? "text-sm" : ""}>{description}</DialogDescription>}
+          <DialogTitle>{title}</DialogTitle>
+          {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
-        <div className={isMobile ? "overflow-y-auto flex-1" : ""}>
-          <ClientForm 
-            onSubmit={handleSubmit}
-            defaultValues={defaultValues || {}}
-            isViewMode={false}
-            onCancel={handleCancel}
-            onFormChange={() => setHasUnsavedChanges(true)}
-          />
-        </div>
+        <ClientForm 
+          onSubmit={handleSubmit}
+          defaultValues={defaultValues || {}}
+          isViewMode={false}
+          onCancel={handleCancel}
+          onFormChange={() => setHasUnsavedChanges(true)}
+        />
       </DialogContent>
     </Dialog>
   );
