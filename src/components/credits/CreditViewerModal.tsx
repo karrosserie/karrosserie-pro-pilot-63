@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
@@ -7,10 +9,11 @@ import { Credit } from '@/services/supabase/credits';
 import { useCompany } from '@/hooks/use-company';
 import { useCompanyPreferences } from '@/hooks/use-company-preferences';
 import { useCredits } from '@/hooks/use-credits';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Pencil, Download, Printer, Mail, Trash } from 'lucide-react';
+import { Pencil, Download, Printer, Mail, Trash, MoreVertical } from 'lucide-react';
 import DefaultCreditPreview from './templates/DefaultCreditPreview';
 import AlternativeCreditPreview from './templates/AlternativeCreditPreview';
 import { EditCreditDialog } from './EditCreditDialog';
@@ -29,6 +32,7 @@ const CreditViewerModal = ({ credit, open, onOpenChange }: CreditViewerModalProp
   const { preferences } = useCompanyPreferences();
   const { deleteCredit } = useCredits();
   const { confirm } = useConfirmation();
+  const isMobile = useIsMobile();
   const [clientData, setClientData] = useState<any>(null);
   const [vehicleData, setVehicleData] = useState<any>(null);
   const [invoiceData, setInvoiceData] = useState<any>(null);
@@ -245,6 +249,108 @@ const CreditViewerModal = ({ credit, open, onOpenChange }: CreditViewerModalProp
     setEmailDialogOpen(true);
   };
 
+  // Contenu de prévisualisation réutilisable
+  const previewContent = template === 'default' ? (
+    <DefaultCreditPreview 
+      companyData={companyData}
+      creditData={creditData}
+      clientData={clientDataForTemplate}
+      items={processedItems}
+      totals={totalsData}
+    />
+  ) : (
+    <AlternativeCreditPreview 
+      companyData={companyData}
+      creditData={creditData}
+      clientData={clientDataForTemplate}
+      items={processedItems}
+      totals={totalsData}
+    />
+  );
+
+  // Dialogues communs
+  const dialogs = (
+    <>
+      <EditCreditDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        creditId={credit.id}
+        initialData={{
+          reference: credit.reference,
+          invoice_id: credit.invoice_id,
+          status: credit.status as "En attente" | "Payé",
+          notes: credit.notes,
+          items: items,
+          is_franchise_credit: credit.is_franchise_credit
+        }}
+      />
+      <CreditEmailDialog
+        credit={credit}
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
+      />
+    </>
+  );
+
+  // Mobile: Sheet plein écran
+  if (isMobile) {
+    return (
+      <>
+        <Sheet open={open} onOpenChange={onOpenChange}>
+          <SheetContent side="bottom" className="h-[95vh] p-0 flex flex-col">
+            <SheetHeader className="px-4 py-3 border-b flex-shrink-0">
+              <SheetTitle className="text-base font-semibold">
+                Avoir n°{credit.reference}
+              </SheetTitle>
+            </SheetHeader>
+            
+            {/* Contenu scrollable */}
+            <div className="flex-1 overflow-y-auto">
+              {previewContent}
+            </div>
+            
+            {/* Footer sticky avec actions */}
+            <div className="flex-shrink-0 border-t bg-background p-3 flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={handleEdit} className="flex-1">
+                <Pencil className="h-4 w-4 mr-1" />
+                Modifier
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleDownload} className="flex-1">
+                <Download className="h-4 w-4 mr-1" />
+                Télécharger
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleSendEmail} className="flex-1">
+                <Mail className="h-4 w-4 mr-1" />
+                Envoyer
+              </Button>
+              
+              {/* Menu déroulant pour actions secondaires */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon" className="h-9 w-9 flex-shrink-0">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handlePrint}>
+                    <Printer className="h-4 w-4 mr-2" />
+                    Imprimer
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleDelete} className="text-destructive">
+                    <Trash className="h-4 w-4 mr-2" />
+                    Supprimer
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </SheetContent>
+        </Sheet>
+        {dialogs}
+      </>
+    );
+  }
+
+  // Desktop: Dialog classique
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
@@ -276,7 +382,7 @@ const CreditViewerModal = ({ credit, open, onOpenChange }: CreditViewerModalProp
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700" 
+                className="text-destructive hover:text-destructive border-destructive hover:border-destructive" 
                 onClick={handleDelete}
               >
                 <Trash className="h-4 w-4 mr-1" />
@@ -285,47 +391,11 @@ const CreditViewerModal = ({ credit, open, onOpenChange }: CreditViewerModalProp
             </div>
           </div>
           <div className="w-full h-full">
-            {template === 'default' ? (
-              <DefaultCreditPreview 
-                companyData={companyData}
-                creditData={creditData}
-                clientData={clientDataForTemplate}
-                items={processedItems}
-                totals={totalsData}
-              />
-            ) : (
-              <AlternativeCreditPreview 
-                companyData={companyData}
-                creditData={creditData}
-                clientData={clientDataForTemplate}
-                items={processedItems}
-                totals={totalsData}
-              />
-            )}
+            {previewContent}
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Dialogues pour les actions */}
-      <EditCreditDialog
-        open={editDialogOpen}
-        onOpenChange={setEditDialogOpen}
-        creditId={credit.id}
-        initialData={{
-          reference: credit.reference,
-          invoice_id: credit.invoice_id,
-          status: credit.status as "En attente" | "Payé",
-          notes: credit.notes,
-          items: items,
-          is_franchise_credit: credit.is_franchise_credit
-        }}
-      />
-
-      <CreditEmailDialog
-        credit={credit}
-        open={emailDialogOpen}
-        onOpenChange={setEmailDialogOpen}
-      />
+      {dialogs}
     </>
   );
 };
