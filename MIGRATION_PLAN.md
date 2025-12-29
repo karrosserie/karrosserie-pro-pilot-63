@@ -1,4 +1,4 @@
-# Plan de Migration - Modèle Dossier
+# Plan de Migration - Architecture Dossier-Centrique
 
 ## Table des Matières
 
@@ -18,10 +18,17 @@
 
 ### Objectif
 
-Introduire une entité **Dossier** (sinistre) qui centralise toutes les informations relatives à un accident/sinistre :
-- Un client peut avoir plusieurs dossiers (plusieurs sinistres)
-- Chaque dossier est lié à un seul véhicule
-- Tous les documents (expertises, devis, OR, factures, cessions) sont rattachés au dossier
+Restructurer l'application autour d'une entité **Dossier** (sinistre) qui centralise toutes les informations relatives à un accident/sinistre avec des **relations 1:1** strictes :
+
+- Un **Dossier** représente un sinistre unique
+- Un **Dossier** contient **exactement un** véhicule (le véhicule sinistré)
+- Un **Dossier** contient **exactement un** rapport d'expertise
+- Un **Dossier** contient **exactement un** devis
+- Un **Dossier** contient **exactement un** ordre de réparation
+- Un **Dossier** contient **exactement une** cession
+- Un **Dossier** contient **exactement une** réservation de véhicule de prêt
+- Un **Dossier** peut contenir **plusieurs** factures (1:N)
+- Un **Dossier** peut contenir **plusieurs** messages (1:N)
 
 ### Principes de Migration
 
@@ -40,34 +47,38 @@ Introduire une entité **Dossier** (sinistre) qui centralise toutes les informat
 ### Schéma Relationnel
 
 ```
-┌─────────────┐
-│   clients   │
-└──────┬──────┘
-       │ 1:N
-       ▼
-┌─────────────┐
-│  dossiers   │──────────────────────────────────────┐
-└──────┬──────┘                                      │
-       │ 1:1                                         │
-       ▼                                             │
-┌─────────────┐                                      │
-│  vehicles   │                                      │
-└─────────────┘                                      │
-                                                     │
-       ┌─────────────────────────────────────────────┼─────────────────────────────┐
-       │                                             │                             │
-       ▼                                             ▼                             ▼
-┌──────────────────┐                    ┌────────────────────┐          ┌──────────────────┐
-│ expertise_reports│                    │    repair_orders   │          │fleet_reservations│
-└──────────────────┘                    └─────────┬──────────┘          └────────┬─────────┘
-       │                                          │                              │
-       │ 1:N                              ┌───────┴───────┐                      │
-       ▼                                  │               │                      │
-┌─────────────┐                           ▼               ▼                      │
-│   quotes    │                    ┌──────────┐    ┌──────────┐                  │
-└─────────────┘                    │ invoices │    │ cessions │◄─────────────────┘
-                                   └──────────┘    └──────────┘
-                                                   (via repair_order_id OU fleet_reservation_id)
+                              ┌─────────────┐
+                              │   clients   │
+                              └──────┬──────┘
+                                     │ 1:N
+                                     ▼
+                              ┌─────────────┐
+                              │  dossiers   │ (sinistre)
+                              └──────┬──────┘
+                                     │
+          ┌──────────────────────────┼──────────────────────────┐
+          │                          │                          │
+          │         ┌────────────────┼────────────────┐         │
+          │         │                │                │         │
+          ▼         ▼                ▼                ▼         ▼
+    ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────────┐
+    │ vehicles │ │expertise │ │  quotes  │ │  repair  │ │ fleet_reservations│
+    │   (1:1)  │ │ _reports │ │   (1:1)  │ │  orders  │ │       (1:1)       │
+    └──────────┘ │   (1:1)  │ └──────────┘ │   (1:1)  │ └────────┬─────────┘
+                 └──────────┘              └────┬─────┘          │
+                                                │                │
+                                     ┌──────────┼────────┐       │
+                                     │          │        │       │
+                                     ▼          ▼        ▼       │
+                              ┌──────────┐ ┌──────────┐  │       │
+                              │ invoices │ │ cessions │◄─┼───────┘
+                              │   (1:N)  │ │   (1:1)  │  │
+                              └──────────┘ └──────────┘  │
+                                                         │
+                                                  ┌──────────────┐
+                                                  │  messageries │
+                                                  │     (1:N)    │
+                                                  └──────────────┘
 ```
 
 ### Relations Clés
@@ -75,14 +86,27 @@ Introduire une entité **Dossier** (sinistre) qui centralise toutes les informat
 | Relation | Type | Description |
 |----------|------|-------------|
 | `clients` → `dossiers` | 1:N | Un client peut avoir plusieurs sinistres |
-| `dossiers` → `vehicles` | 1:1 | Un dossier = un véhicule concerné |
-| `dossiers` → `expertise_reports` | 1:N | Rapports d'expertise du sinistre |
-| `dossiers` → `quotes` | 1:N | Devis liés au sinistre |
-| `dossiers` → `repair_orders` | 1:N | Ordres de réparation du sinistre |
-| `dossiers` → `fleet_reservations` | 1:N | Prêts de véhicule pour le sinistre |
-| `repair_orders` → `invoices` | 1:N | **PRÉSERVÉ** - Factures de l'OR |
-| `repair_orders` → `cessions` | 1:1 | **PRÉSERVÉ** - Cession de créance de l'OR |
-| `fleet_reservations` → `cessions` | 1:1 | **PRÉSERVÉ** - Cession pour prêt véhicule |
+| `dossiers` → `vehicles` | **1:1** | Un dossier = un véhicule sinistré |
+| `dossiers` → `expertise_reports` | **1:1** | Un seul rapport d'expertise par sinistre |
+| `dossiers` → `quotes` | **1:1** | Un seul devis par sinistre |
+| `dossiers` → `repair_orders` | **1:1** | Un seul OR par sinistre |
+| `dossiers` → `cessions` | **1:1** | Une seule cession par sinistre |
+| `dossiers` → `fleet_reservations` | **1:1** | Une seule réservation de prêt par sinistre |
+| `dossiers` → `invoices` | 1:N | **EXCEPTION** - Plusieurs factures possibles (acomptes, solde, franchise) |
+| `dossiers` → `messageries` | 1:N | Plusieurs messages/conversations par dossier |
+
+### Justification de l'Architecture 1:1
+
+L'architecture 1:1 reflète la réalité métier d'un garage de réparation :
+
+1. **Un sinistre = Un véhicule** : Un client peut avoir plusieurs véhicules, mais un sinistre concerne un seul véhicule à la fois
+2. **Un sinistre = Un rapport** : L'expert produit un seul rapport pour un sinistre donné
+3. **Un rapport = Un devis** : Le devis est directement dérivé du rapport d'expertise
+4. **Un devis = Un OR** : L'ordre de réparation correspond au devis validé
+5. **Un OR = Une cession** : La cession de créance correspond à un OR spécifique
+6. **Un sinistre = Un prêt** : Le client reçoit un véhicule de prêt pendant la durée de réparation
+
+**Exception pour les factures** : Un OR peut générer plusieurs factures (facture d'acompte, facture de solde, avoir pour franchise).
 
 ---
 
@@ -92,335 +116,310 @@ Introduire une entité **Dossier** (sinistre) qui centralise toutes les informat
 
 | Règle Actuelle | Statut | Implémentation Cible |
 |----------------|--------|----------------------|
-| Cession liée à un repair_order | ✅ Préservé | `repair_order_id` conservé |
-| Cession liée à une fleet_reservation | ✅ Préservé | `fleet_reservation_id` conservé |
-| Cession type `repair` / `repair_enterprise` | ✅ Préservé | Logique inchangée |
-| Cession type `fleet_loan` | ✅ Préservé | Logique inchangée |
+| Cession liée à un repair_order | ✅ Adapté | Via `dossier_id` (1:1) |
+| Cession liée à une fleet_reservation | ✅ Adapté | Via `dossier_id` (1:1) - même dossier |
+| Cession type `repair` / `repair_enterprise` | ✅ Préservé | Déterminé par présence de `repair_order_id` dans dossier |
+| Cession type `fleet_loan` | ✅ Préservé | Déterminé par présence de `fleet_reservation_id` dans dossier |
 | Statuts de cession | ✅ Préservé | Workflow inchangé |
-| Validation données client/véhicule | ✅ Préservé | Via `repair_order.dossier.client/vehicle` |
-
-**Code concerné :**
-- `src/components/cessions/form/types.ts` - Types inchangés
-- `src/components/cessions/form/utils/formState.ts` - Logique préservée
-- `src/components/cessions/form/useCessionFormLogic.ts` - Enrichissement via dossier
-- `src/services/supabase/cessions/` - Requêtes adaptées
+| Validation données client/véhicule | ✅ Préservé | Via `dossier.client` et `dossier.vehicle` |
 
 ### ✅ Invoices (Factures)
 
 | Règle Actuelle | Statut | Implémentation Cible |
 |----------------|--------|----------------------|
-| Facture liée à un repair_order | ✅ Préservé | `repair_order_id` conservé |
-| Calcul montants depuis OR | ✅ Préservé | Logique inchangée |
+| Factures liées à un repair_order | ✅ Adapté | Via `dossier_id` (1:N) |
+| Calcul montants depuis OR | ✅ Préservé | Via `dossier.repair_order` |
 | Statuts de facture | ✅ Préservé | Workflow inchangé |
+| Multiples factures (acompte, solde) | ✅ Préservé | Relation 1:N maintenue |
 
 ### ✅ Quotes (Devis)
 
 | Règle Actuelle | Statut | Implémentation Cible |
 |----------------|--------|----------------------|
-| Devis créé depuis expertise | ✅ Préservé | `source_report_id` conservé |
-| Devis hérite du client/véhicule | ✅ Préservé | Via `dossier_id` |
-| Transformation en OR | ✅ Préservé | Logique inchangée |
+| Devis créé depuis expertise | ✅ Préservé | Via `dossier_id` (1:1) |
+| Devis hérite du client/véhicule | ✅ Préservé | Via `dossier.client` et `dossier.vehicle` |
+| Transformation en OR | ✅ Préservé | Création de `repair_order` dans le même dossier |
 
 ### ✅ Repair Orders (Ordres de Réparation)
 
 | Règle Actuelle | Statut | Implémentation Cible |
 |----------------|--------|----------------------|
 | OR lié à client + véhicule | ✅ Adapté | Via `dossier_id` uniquement |
-| OR depuis devis | ✅ Préservé | `quote_id` conservé |
+| OR depuis devis | ✅ Préservé | Même `dossier_id` que le devis source |
 | Workflow statuts OR | ✅ Préservé | Inchangé |
 
 ### ✅ Vehicles (Véhicules)
 
 | Règle Actuelle | Statut | Implémentation Cible |
 |----------------|--------|----------------------|
-| Véhicule lié à un client | ✅ Adapté | Via `dossier.client_id` |
-| Un véhicule = plusieurs OR possibles | ✅ Adapté | Via différents dossiers |
+| Véhicule lié à un client | ✅ Maintenu | `vehicle.client_id` conservé + `dossier.vehicle_id` |
+| Un véhicule = plusieurs sinistres possibles | ✅ Adapté | Un nouveau dossier pour chaque sinistre |
 
 ---
 
 ## Phase 1 - Migration Base de Données
 
-### Étape 1.1 - Création de la table `dossiers`
+### Étape 1.1 - Modification de la table `dossiers` existante
+
+La table `dossiers` existe déjà. Nous devons la modifier pour refléter l'architecture 1:1 :
 
 ```sql
 -- ============================================
--- MIGRATION 001: Création table dossiers
+-- MIGRATION 001: Mise à jour table dossiers
 -- ============================================
 
--- 1. Créer la table dossiers
-CREATE TABLE public.dossiers (
-  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-  reference TEXT NOT NULL DEFAULT '',
-  
-  -- Relations principales
-  client_id UUID REFERENCES public.clients(id) ON DELETE SET NULL,
-  vehicle_id UUID REFERENCES public.vehicles(id) ON DELETE SET NULL,
-  company_id UUID NOT NULL,
-  
-  -- Informations sinistre (centralisées)
-  claim_number TEXT,           -- Numéro de sinistre
-  policy_number TEXT,          -- Numéro de police
-  incident_date DATE,          -- Date du sinistre
-  incident_number TEXT,        -- Numéro d'incident
-  report_number TEXT,          -- Numéro de rapport
-  expert_name TEXT,            -- Nom de l'expert
-  insurance_company_id UUID REFERENCES public.insurance_companies(id),
-  
-  -- Métadonnées
-  status TEXT DEFAULT 'nouveau' CHECK (status IN ('nouveau', 'en_cours', 'terminé', 'archivé')),
-  archived BOOLEAN DEFAULT false,
-  notes TEXT,
-  
-  -- Timestamps
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  
-  -- Contraintes
-  CONSTRAINT unique_vehicle_per_dossier UNIQUE (vehicle_id, company_id)
-);
+-- 1. Ajouter les références 1:1 vers les entités liées
+ALTER TABLE public.dossiers 
+  ADD COLUMN IF NOT EXISTS expertise_report_id UUID REFERENCES public.expertise_reports(id) ON DELETE SET NULL,
+  ADD COLUMN IF NOT EXISTS quote_id UUID REFERENCES public.quotes(id) ON DELETE SET NULL,
+  ADD COLUMN IF NOT EXISTS repair_order_id UUID REFERENCES public.repair_orders(id) ON DELETE SET NULL,
+  ADD COLUMN IF NOT EXISTS cession_id UUID REFERENCES public.cessions(id) ON DELETE SET NULL,
+  ADD COLUMN IF NOT EXISTS fleet_reservation_id UUID REFERENCES public.fleet_reservations(id) ON DELETE SET NULL;
 
--- 2. Index pour performances
-CREATE INDEX idx_dossiers_client_id ON public.dossiers(client_id);
-CREATE INDEX idx_dossiers_vehicle_id ON public.dossiers(vehicle_id);
-CREATE INDEX idx_dossiers_company_id ON public.dossiers(company_id);
-CREATE INDEX idx_dossiers_claim_number ON public.dossiers(claim_number);
-CREATE INDEX idx_dossiers_status ON public.dossiers(status);
+-- 2. Créer les contraintes UNIQUE pour garantir le 1:1
+ALTER TABLE public.dossiers 
+  ADD CONSTRAINT unique_expertise_report_per_dossier UNIQUE (expertise_report_id),
+  ADD CONSTRAINT unique_quote_per_dossier UNIQUE (quote_id),
+  ADD CONSTRAINT unique_repair_order_per_dossier UNIQUE (repair_order_id),
+  ADD CONSTRAINT unique_cession_per_dossier UNIQUE (cession_id),
+  ADD CONSTRAINT unique_fleet_reservation_per_dossier UNIQUE (fleet_reservation_id);
 
--- 3. Trigger updated_at
-CREATE TRIGGER update_dossiers_updated_at
-  BEFORE UPDATE ON public.dossiers
-  FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at_column();
+-- 3. Index pour performances
+CREATE INDEX IF NOT EXISTS idx_dossiers_expertise_report_id ON public.dossiers(expertise_report_id);
+CREATE INDEX IF NOT EXISTS idx_dossiers_quote_id ON public.dossiers(quote_id);
+CREATE INDEX IF NOT EXISTS idx_dossiers_repair_order_id ON public.dossiers(repair_order_id);
+CREATE INDEX IF NOT EXISTS idx_dossiers_cession_id ON public.dossiers(cession_id);
+CREATE INDEX IF NOT EXISTS idx_dossiers_fleet_reservation_id ON public.dossiers(fleet_reservation_id);
 
--- 4. RLS Policies
-ALTER TABLE public.dossiers ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Company members can manage dossiers"
-  ON public.dossiers
-  FOR ALL
-  USING (user_belongs_to_company(auth.uid(), company_id))
-  WITH CHECK (user_belongs_to_company(auth.uid(), company_id));
-
-CREATE POLICY "Admin users can manage all dossiers"
-  ON public.dossiers
-  FOR ALL
-  USING (get_current_user_role() = 'admin');
-
--- 5. Fonction de génération de référence
-CREATE OR REPLACE FUNCTION generate_dossier_reference()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF NEW.reference IS NULL OR NEW.reference = '' THEN
-    NEW.reference := 'DOS-' || TO_CHAR(NOW(), 'YYYYMMDD') || '-' || 
-                     LPAD(FLOOR(RANDOM() * 10000)::TEXT, 4, '0');
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER set_dossier_reference
-  BEFORE INSERT ON public.dossiers
-  FOR EACH ROW
-  EXECUTE FUNCTION generate_dossier_reference();
+-- 4. Colonnes pour le statut global du dossier (déjà existantes potentiellement)
+ALTER TABLE public.dossiers
+  ADD COLUMN IF NOT EXISTS overall_status TEXT DEFAULT 'ouvert' 
+    CHECK (overall_status IN ('ouvert', 'en_cours', 'expertise', 'devis', 'reparation', 'facturation', 'cloture', 'archive'));
 ```
 
-### Étape 1.2 - Ajout des colonnes `dossier_id`
+### Étape 1.2 - Ajout de `dossier_id` aux tables existantes
 
 ```sql
 -- ============================================
--- MIGRATION 002: Ajout dossier_id aux tables
+-- MIGRATION 002: Ajout dossier_id aux tables (références inverses optionnelles)
 -- ============================================
 
--- 1. Table vehicles (relation 1:1 avec dossier)
--- Note: vehicle_id est dans dossiers, pas l'inverse pour la relation 1:1
+-- Note: Ces colonnes permettent une navigation bidirectionnelle mais 
+-- la source de vérité est dans la table dossiers
 
--- 2. Table expertise_reports
-ALTER TABLE public.expertise_reports 
+-- 1. Table invoices (relation 1:N - seule exception)
+ALTER TABLE public.invoices 
   ADD COLUMN IF NOT EXISTS dossier_id UUID REFERENCES public.dossiers(id) ON DELETE SET NULL;
-CREATE INDEX IF NOT EXISTS idx_expertise_reports_dossier_id ON public.expertise_reports(dossier_id);
+CREATE INDEX IF NOT EXISTS idx_invoices_dossier_id ON public.invoices(dossier_id);
 
--- 3. Table quotes
-ALTER TABLE public.quotes 
-  ADD COLUMN IF NOT EXISTS dossier_id UUID REFERENCES public.dossiers(id) ON DELETE SET NULL;
-CREATE INDEX IF NOT EXISTS idx_quotes_dossier_id ON public.quotes(dossier_id);
-
--- 4. Table repair_orders
-ALTER TABLE public.repair_orders 
-  ADD COLUMN IF NOT EXISTS dossier_id UUID REFERENCES public.dossiers(id) ON DELETE SET NULL;
-CREATE INDEX IF NOT EXISTS idx_repair_orders_dossier_id ON public.repair_orders(dossier_id);
-
--- 5. Table fleet_reservations
-ALTER TABLE public.fleet_reservations 
-  ADD COLUMN IF NOT EXISTS dossier_id UUID REFERENCES public.dossiers(id) ON DELETE SET NULL;
-CREATE INDEX IF NOT EXISTS idx_fleet_reservations_dossier_id ON public.fleet_reservations(dossier_id);
-
--- 6. Table messageries
+-- 2. Table messageries (relation 1:N)
 ALTER TABLE public.messageries 
   ADD COLUMN IF NOT EXISTS dossier_id UUID REFERENCES public.dossiers(id) ON DELETE SET NULL;
 CREATE INDEX IF NOT EXISTS idx_messageries_dossier_id ON public.messageries(dossier_id);
 
--- Note: cessions garde UNIQUEMENT repair_order_id et fleet_reservation_id
--- La relation avec le dossier passe par ces entités parentes
+-- Note: Les tables expertise_reports, quotes, repair_orders, cessions, fleet_reservations
+-- n'ont PAS besoin de dossier_id car la relation 1:1 est stockée dans la table dossiers
+-- (chaque entité est référencée par son ID dans dossiers)
 ```
 
 ### Étape 1.3 - Migration des données existantes
 
 ```sql
 -- ============================================
--- MIGRATION 003: Population des dossiers
+-- MIGRATION 003: Population des dossiers avec relations 1:1
 -- ============================================
 
--- Stratégie: Créer un dossier par combinaison unique (client_id, vehicle_id)
--- en récupérant les infos sinistre depuis les documents existants
+-- Stratégie: Pour chaque repair_order existant, créer ou mettre à jour un dossier
+-- en liant tous les documents associés
 
--- 1. Créer les dossiers depuis les repair_orders (source principale)
+-- 1. Créer les dossiers depuis les repair_orders existants (source principale)
 INSERT INTO public.dossiers (
   client_id,
   vehicle_id,
   company_id,
+  repair_order_id,
   claim_number,
   policy_number,
   incident_date,
-  incident_number,
   report_number,
   expert_name,
-  insurance_company_id,
-  status,
+  overall_status,
   created_at
 )
-SELECT DISTINCT ON (ro.client_id, ro.vehicle_id)
+SELECT 
   ro.client_id,
   ro.vehicle_id,
   ro.company_id,
+  ro.id as repair_order_id,
   ro.claim_number,
   ro.policy_number,
   ro.incident_date,
-  NULL as incident_number,  -- À récupérer depuis cessions si besoin
   ro.report_number,
   ro.expert_name,
-  NULL as insurance_company_id,
   CASE 
-    WHEN ro.status = 'completed' THEN 'terminé'
-    WHEN ro.status IN ('cancelled', 'archived') THEN 'archivé'
-    ELSE 'en_cours'
-  END as status,
+    WHEN ro.status = 'completed' THEN 'cloture'
+    WHEN ro.status IN ('cancelled', 'archived') THEN 'archive'
+    WHEN ro.status = 'invoiced' THEN 'facturation'
+    ELSE 'reparation'
+  END as overall_status,
   ro.created_at
 FROM public.repair_orders ro
 WHERE ro.client_id IS NOT NULL 
   AND ro.vehicle_id IS NOT NULL
-ORDER BY ro.client_id, ro.vehicle_id, ro.created_at DESC;
+  AND NOT EXISTS (
+    SELECT 1 FROM public.dossiers d WHERE d.repair_order_id = ro.id
+  );
 
--- 2. Créer les dossiers depuis les expertise_reports sans OR
-INSERT INTO public.dossiers (
-  client_id,
-  vehicle_id,
-  company_id,
-  claim_number,
-  status,
-  created_at
-)
-SELECT DISTINCT ON (er.client_id, v.id)
-  er.client_id,
-  v.id as vehicle_id,
-  er.company_id,
-  er.claim_number,
-  'en_cours' as status,
-  er.created_at
+-- 2. Lier les devis aux dossiers via quote_id
+UPDATE public.dossiers d
+SET quote_id = q.id
+FROM public.quotes q
+WHERE d.repair_order_id IS NOT NULL
+  AND EXISTS (
+    SELECT 1 FROM public.repair_orders ro 
+    WHERE ro.id = d.repair_order_id AND ro.quote_id = q.id
+  )
+  AND d.quote_id IS NULL;
+
+-- 3. Lier les expertises aux dossiers via expertise_report_id
+UPDATE public.dossiers d
+SET expertise_report_id = er.id
 FROM public.expertise_reports er
-LEFT JOIN public.vehicles v ON v.client_id = er.client_id
-WHERE NOT EXISTS (
-  SELECT 1 FROM public.dossiers d 
-  WHERE d.client_id = er.client_id AND d.vehicle_id = v.id
-)
-AND er.client_id IS NOT NULL
-AND v.id IS NOT NULL
-ORDER BY er.client_id, v.id, er.created_at DESC;
+JOIN public.quotes q ON q.source_report_id = er.id
+WHERE d.quote_id = q.id
+  AND d.expertise_report_id IS NULL;
 
--- 3. Mettre à jour les repair_orders avec dossier_id
-UPDATE public.repair_orders ro
-SET dossier_id = d.id
-FROM public.dossiers d
-WHERE ro.client_id = d.client_id 
-  AND ro.vehicle_id = d.vehicle_id
-  AND ro.dossier_id IS NULL;
+-- 4. Lier les cessions aux dossiers via cession_id
+UPDATE public.dossiers d
+SET cession_id = c.id
+FROM public.cessions c
+WHERE c.repair_order_id = d.repair_order_id
+  AND d.cession_id IS NULL;
 
--- 4. Mettre à jour les expertise_reports avec dossier_id
-UPDATE public.expertise_reports er
-SET dossier_id = d.id
-FROM public.dossiers d
-JOIN public.vehicles v ON v.id = d.vehicle_id
-WHERE er.client_id = d.client_id 
-  AND er.dossier_id IS NULL;
-
--- 5. Mettre à jour les quotes avec dossier_id
-UPDATE public.quotes q
-SET dossier_id = d.id
-FROM public.dossiers d
-WHERE q.client_id = d.client_id 
-  AND q.vehicle_id = d.vehicle_id
-  AND q.dossier_id IS NULL;
-
--- 6. Mettre à jour les fleet_reservations avec dossier_id
-UPDATE public.fleet_reservations fr
-SET dossier_id = d.id
-FROM public.dossiers d
+-- 5. Lier les fleet_reservations aux dossiers
+UPDATE public.dossiers d
+SET fleet_reservation_id = fr.id
+FROM public.fleet_reservations fr
 WHERE fr.client_id = d.client_id 
   AND fr.vehicle_id = d.vehicle_id
-  AND fr.dossier_id IS NULL;
+  AND d.fleet_reservation_id IS NULL;
+
+-- 6. Mettre à jour les factures avec dossier_id
+UPDATE public.invoices inv
+SET dossier_id = d.id
+FROM public.dossiers d
+WHERE inv.repair_order_id = d.repair_order_id
+  AND inv.dossier_id IS NULL;
 
 -- 7. Enrichir les dossiers avec insurance_company_id depuis cessions
 UPDATE public.dossiers d
 SET insurance_company_id = c.insurance_company_id,
-    incident_number = c.incident_number
+    incident_number = COALESCE(d.incident_number, c.incident_number)
 FROM public.cessions c
-JOIN public.repair_orders ro ON ro.id = c.repair_order_id
-WHERE ro.dossier_id = d.id
+WHERE d.cession_id = c.id
   AND c.insurance_company_id IS NOT NULL
   AND d.insurance_company_id IS NULL;
 ```
 
-### Étape 1.4 - Validation de la migration
+### Étape 1.4 - Triggers pour maintenir la cohérence
+
+```sql
+-- ============================================
+-- MIGRATION 004: Triggers de cohérence
+-- ============================================
+
+-- Trigger pour mettre à jour le statut global du dossier
+CREATE OR REPLACE FUNCTION update_dossier_status()
+RETURNS TRIGGER AS $$
+DECLARE
+  v_dossier_id UUID;
+  v_new_status TEXT;
+BEGIN
+  -- Trouver le dossier associé
+  SELECT id INTO v_dossier_id
+  FROM public.dossiers
+  WHERE repair_order_id = NEW.id
+     OR quote_id = NEW.id
+     OR expertise_report_id = NEW.id
+     OR cession_id = NEW.id;
+  
+  IF v_dossier_id IS NOT NULL THEN
+    -- Déterminer le nouveau statut basé sur les entités présentes
+    SELECT 
+      CASE
+        WHEN d.cession_id IS NOT NULL AND c.status = 'paid' THEN 'cloture'
+        WHEN EXISTS (SELECT 1 FROM invoices i WHERE i.dossier_id = d.id AND i.status = 'paid') THEN 'cloture'
+        WHEN EXISTS (SELECT 1 FROM invoices i WHERE i.dossier_id = d.id) THEN 'facturation'
+        WHEN d.repair_order_id IS NOT NULL THEN 'reparation'
+        WHEN d.quote_id IS NOT NULL THEN 'devis'
+        WHEN d.expertise_report_id IS NOT NULL THEN 'expertise'
+        ELSE 'ouvert'
+      END INTO v_new_status
+    FROM public.dossiers d
+    LEFT JOIN public.cessions c ON c.id = d.cession_id
+    WHERE d.id = v_dossier_id;
+    
+    UPDATE public.dossiers
+    SET overall_status = v_new_status,
+        updated_at = now()
+    WHERE id = v_dossier_id;
+  END IF;
+  
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+```
+
+### Étape 1.5 - Validation de la migration
 
 ```sql
 -- ============================================
 -- VALIDATION: Vérifications post-migration
 -- ============================================
 
--- 1. Vérifier que tous les OR ont un dossier_id
-SELECT COUNT(*) as orphan_repair_orders
-FROM public.repair_orders
-WHERE dossier_id IS NULL 
-  AND client_id IS NOT NULL 
-  AND vehicle_id IS NOT NULL;
+-- 1. Vérifier les contraintes 1:1 (pas de doublons)
+SELECT 'repair_orders dupliqués' as issue, repair_order_id, COUNT(*) 
+FROM public.dossiers 
+WHERE repair_order_id IS NOT NULL
+GROUP BY repair_order_id 
+HAVING COUNT(*) > 1;
 
--- 2. Vérifier la cohérence client/véhicule
-SELECT d.id, d.client_id, d.vehicle_id, v.client_id as vehicle_client_id
-FROM public.dossiers d
-JOIN public.vehicles v ON v.id = d.vehicle_id
-WHERE d.client_id != v.client_id;
+SELECT 'quotes dupliqués' as issue, quote_id, COUNT(*) 
+FROM public.dossiers 
+WHERE quote_id IS NOT NULL
+GROUP BY quote_id 
+HAVING COUNT(*) > 1;
 
--- 3. Statistiques de migration
+-- 2. Vérifier la cohérence des données
 SELECT 
-  'dossiers' as table_name, COUNT(*) as count FROM public.dossiers
+  'Dossiers total' as metric, COUNT(*) as count FROM public.dossiers
 UNION ALL
 SELECT 
-  'repair_orders avec dossier' as table_name, 
-  COUNT(*) FROM public.repair_orders WHERE dossier_id IS NOT NULL
+  'Dossiers avec OR' as metric, COUNT(*) FROM public.dossiers WHERE repair_order_id IS NOT NULL
 UNION ALL
 SELECT 
-  'quotes avec dossier' as table_name, 
-  COUNT(*) FROM public.quotes WHERE dossier_id IS NOT NULL
+  'Dossiers avec devis' as metric, COUNT(*) FROM public.dossiers WHERE quote_id IS NOT NULL
 UNION ALL
 SELECT 
-  'expertise_reports avec dossier' as table_name, 
-  COUNT(*) FROM public.expertise_reports WHERE dossier_id IS NOT NULL;
+  'Dossiers avec expertise' as metric, COUNT(*) FROM public.dossiers WHERE expertise_report_id IS NOT NULL
+UNION ALL
+SELECT 
+  'Dossiers avec cession' as metric, COUNT(*) FROM public.dossiers WHERE cession_id IS NOT NULL
+UNION ALL
+SELECT 
+  'Factures avec dossier' as metric, COUNT(*) FROM public.invoices WHERE dossier_id IS NOT NULL;
+
+-- 3. Orphelins (entités sans dossier)
+SELECT 'repair_orders orphelins' as issue, COUNT(*) 
+FROM public.repair_orders ro
+WHERE NOT EXISTS (SELECT 1 FROM public.dossiers d WHERE d.repair_order_id = ro.id);
 ```
 
 ---
 
 ## Phase 2 - Migration Application
 
-### Étape 2.1 - Création des types TypeScript
+### Étape 2.1 - Types TypeScript mis à jour
 
 **Fichier: `src/types/dossier.ts`**
 
@@ -428,17 +427,40 @@ SELECT
 import { Client } from '@/services/supabase/clients';
 import { Vehicle } from '@/services/supabase/vehicles';
 import { InsuranceCompany } from '@/services/supabase/insurance-companies';
+import { RepairOrder } from '@/types/repair-order';
+import { Quote } from '@/types/quote';
+import { ExpertiseReport } from '@/types/expertise-report';
+import { Cession } from '@/types/cession';
+import { FleetReservation } from '@/types/fleet-reservation';
+import { Invoice } from '@/types/invoice';
 
-export type DossierStatus = 'nouveau' | 'en_cours' | 'terminé' | 'archivé';
+export type DossierStatus = 
+  | 'ouvert' 
+  | 'en_cours' 
+  | 'expertise' 
+  | 'devis' 
+  | 'reparation' 
+  | 'facturation' 
+  | 'cloture' 
+  | 'archive';
 
 export interface Dossier {
   id: string;
   reference: string;
+  
+  // Relations principales
   client_id: string | null;
   vehicle_id: string | null;
   company_id: string;
   
-  // Informations sinistre
+  // Relations 1:1 (stockées dans dossiers)
+  expertise_report_id: string | null;
+  quote_id: string | null;
+  repair_order_id: string | null;
+  cession_id: string | null;
+  fleet_reservation_id: string | null;
+  
+  // Informations sinistre (centralisées)
   claim_number: string | null;
   policy_number: string | null;
   incident_date: string | null;
@@ -448,7 +470,7 @@ export interface Dossier {
   insurance_company_id: string | null;
   
   // Métadonnées
-  status: DossierStatus;
+  overall_status: DossierStatus;
   archived: boolean;
   notes: string | null;
   
@@ -456,22 +478,36 @@ export interface Dossier {
   created_at: string;
   updated_at: string;
   
-  // Relations (optionnelles, pour enrichissement)
+  // Relations chargées (optionnelles)
   client?: Client;
   vehicle?: Vehicle;
   insurance_company?: InsuranceCompany;
+  expertise_report?: ExpertiseReport;
+  quote?: Quote;
+  repair_order?: RepairOrder;
+  cession?: Cession;
+  fleet_reservation?: FleetReservation;
+  invoices?: Invoice[];
 }
 
-export interface NewDossier {
+export interface DossierWithRelations extends Dossier {
+  client: Client;
+  vehicle: Vehicle;
+  expertise_report?: ExpertiseReport;
+  quote?: Quote;
+  repair_order?: RepairOrder;
+  cession?: Cession;
+  fleet_reservation?: FleetReservation;
+  invoices: Invoice[];
+}
+
+export interface CreateDossier {
   client_id: string;
   vehicle_id?: string | null;
   company_id: string;
   claim_number?: string | null;
   policy_number?: string | null;
   incident_date?: string | null;
-  incident_number?: string | null;
-  report_number?: string | null;
-  expert_name?: string | null;
   insurance_company_id?: string | null;
   notes?: string | null;
 }
@@ -486,54 +522,70 @@ export interface UpdateDossier {
   report_number?: string | null;
   expert_name?: string | null;
   insurance_company_id?: string | null;
-  status?: DossierStatus;
+  overall_status?: DossierStatus;
   archived?: boolean;
   notes?: string | null;
-}
-
-// Types pour les statistiques
-export interface DossierStats {
-  total_dossiers: number;
-  dossiers_en_cours: number;
-  dossiers_termines: number;
-  dossiers_archives: number;
+  
+  // Mise à jour des relations 1:1
+  expertise_report_id?: string | null;
+  quote_id?: string | null;
+  repair_order_id?: string | null;
+  cession_id?: string | null;
+  fleet_reservation_id?: string | null;
 }
 
 // Type pour la timeline du dossier
 export interface DossierTimelineEvent {
   id: string;
-  type: 'expertise' | 'quote' | 'repair_order' | 'invoice' | 'cession' | 'message';
+  type: 'creation' | 'expertise' | 'quote' | 'repair_order' | 'invoice' | 'cession' | 'fleet_loan' | 'message' | 'status_change';
   title: string;
   description?: string;
   status?: string;
   amount?: number;
   created_at: string;
-  entity_id: string;
+  entity_id?: string;
 }
 ```
 
-### Étape 2.2 - Création du service `dossiersService`
+### Étape 2.2 - Service `dossiersService` mis à jour
 
 **Fichier: `src/services/supabase/dossiers.ts`**
 
 ```typescript
 import { supabase } from '@/integrations/supabase/client';
-import { Dossier, NewDossier, UpdateDossier, DossierTimelineEvent } from '@/types/dossier';
+import { 
+  Dossier, 
+  DossierWithRelations, 
+  CreateDossier, 
+  UpdateDossier, 
+  DossierTimelineEvent 
+} from '@/types/dossier';
 
 const DOSSIER_SELECT = `
   *,
   client:clients(*),
   vehicle:vehicles(*),
-  insurance_company:insurance_companies(*)
+  insurance_company:insurance_companies(*),
+  expertise_report:expertise_reports(*),
+  quote:quotes(*),
+  repair_order:repair_orders(*),
+  cession:cessions(*),
+  fleet_reservation:fleet_reservations(*)
+`;
+
+const DOSSIER_WITH_INVOICES_SELECT = `
+  ${DOSSIER_SELECT},
+  invoices:invoices(*)
 `;
 
 export const dossiersService = {
   // ===== CRUD de base =====
   
-  async getAll(): Promise<Dossier[]> {
+  async getAll(companyId: string): Promise<Dossier[]> {
     const { data, error } = await supabase
       .from('dossiers')
       .select(DOSSIER_SELECT)
+      .eq('company_id', companyId)
       .eq('archived', false)
       .order('created_at', { ascending: false });
 
@@ -541,10 +593,10 @@ export const dossiersService = {
     return data || [];
   },
 
-  async getById(id: string): Promise<Dossier | null> {
+  async getById(id: string): Promise<DossierWithRelations | null> {
     const { data, error } = await supabase
       .from('dossiers')
-      .select(DOSSIER_SELECT)
+      .select(DOSSIER_WITH_INVOICES_SELECT)
       .eq('id', id)
       .single();
 
@@ -560,17 +612,30 @@ export const dossiersService = {
       .from('dossiers')
       .select(DOSSIER_SELECT)
       .eq('client_id', clientId)
+      .eq('archived', false)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
     return data || [];
   },
 
-  async getByVehicleId(vehicleId: string): Promise<Dossier | null> {
+  async getByVehicleId(vehicleId: string): Promise<Dossier[]> {
     const { data, error } = await supabase
       .from('dossiers')
       .select(DOSSIER_SELECT)
       .eq('vehicle_id', vehicleId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  // Trouver le dossier par une de ses entités 1:1
+  async getByRepairOrderId(repairOrderId: string): Promise<Dossier | null> {
+    const { data, error } = await supabase
+      .from('dossiers')
+      .select(DOSSIER_SELECT)
+      .eq('repair_order_id', repairOrderId)
       .single();
 
     if (error) {
@@ -580,10 +645,41 @@ export const dossiersService = {
     return data;
   },
 
-  async create(dossier: NewDossier): Promise<Dossier> {
+  async getByQuoteId(quoteId: string): Promise<Dossier | null> {
     const { data, error } = await supabase
       .from('dossiers')
-      .insert(dossier)
+      .select(DOSSIER_SELECT)
+      .eq('quote_id', quoteId)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') return null;
+      throw error;
+    }
+    return data;
+  },
+
+  async getByExpertiseReportId(reportId: string): Promise<Dossier | null> {
+    const { data, error } = await supabase
+      .from('dossiers')
+      .select(DOSSIER_SELECT)
+      .eq('expertise_report_id', reportId)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') return null;
+      throw error;
+    }
+    return data;
+  },
+
+  async create(dossier: CreateDossier): Promise<Dossier> {
+    const { data, error } = await supabase
+      .from('dossiers')
+      .insert({
+        ...dossier,
+        overall_status: 'ouvert'
+      })
       .select(DOSSIER_SELECT)
       .single();
 
@@ -613,102 +709,120 @@ export const dossiersService = {
   },
 
   async archive(id: string): Promise<Dossier> {
-    return this.update(id, { archived: true, status: 'archivé' });
+    return this.update(id, { archived: true, overall_status: 'archive' });
   },
 
-  // ===== Méthodes spécialisées =====
+  // ===== Liaison des entités 1:1 =====
+
+  async linkExpertiseReport(dossierId: string, reportId: string): Promise<Dossier> {
+    return this.update(dossierId, { expertise_report_id: reportId });
+  },
+
+  async linkQuote(dossierId: string, quoteId: string): Promise<Dossier> {
+    return this.update(dossierId, { quote_id: quoteId });
+  },
+
+  async linkRepairOrder(dossierId: string, repairOrderId: string): Promise<Dossier> {
+    return this.update(dossierId, { repair_order_id: repairOrderId });
+  },
+
+  async linkCession(dossierId: string, cessionId: string): Promise<Dossier> {
+    return this.update(dossierId, { cession_id: cessionId });
+  },
+
+  async linkFleetReservation(dossierId: string, reservationId: string): Promise<Dossier> {
+    return this.update(dossierId, { fleet_reservation_id: reservationId });
+  },
+
+  // ===== Timeline =====
 
   async getTimeline(dossierId: string): Promise<DossierTimelineEvent[]> {
+    const dossier = await this.getById(dossierId);
+    if (!dossier) return [];
+
     const events: DossierTimelineEvent[] = [];
 
-    // Récupérer les expertises
-    const { data: expertises } = await supabase
-      .from('expertise_reports')
-      .select('id, created_at, status')
-      .eq('dossier_id', dossierId);
+    // Événement de création
+    events.push({
+      id: `creation-${dossier.id}`,
+      type: 'creation',
+      title: 'Dossier créé',
+      description: `Référence: ${dossier.reference}`,
+      created_at: dossier.created_at
+    });
 
-    expertises?.forEach(e => {
+    // Expertise
+    if (dossier.expertise_report) {
       events.push({
-        id: e.id,
+        id: dossier.expertise_report.id,
         type: 'expertise',
         title: 'Rapport d\'expertise',
-        status: e.status,
-        created_at: e.created_at,
-        entity_id: e.id
+        status: dossier.expertise_report.status,
+        created_at: dossier.expertise_report.created_at,
+        entity_id: dossier.expertise_report.id
       });
-    });
+    }
 
-    // Récupérer les devis
-    const { data: quotes } = await supabase
-      .from('quotes')
-      .select('id, reference, created_at, status, total_ttc')
-      .eq('dossier_id', dossierId);
-
-    quotes?.forEach(q => {
+    // Devis
+    if (dossier.quote) {
       events.push({
-        id: q.id,
+        id: dossier.quote.id,
         type: 'quote',
-        title: `Devis ${q.reference}`,
-        status: q.status,
-        amount: q.total_ttc,
-        created_at: q.created_at,
-        entity_id: q.id
+        title: `Devis ${dossier.quote.reference}`,
+        status: dossier.quote.status,
+        amount: dossier.quote.total_ttc,
+        created_at: dossier.quote.created_at,
+        entity_id: dossier.quote.id
       });
-    });
+    }
 
-    // Récupérer les OR
-    const { data: repairOrders } = await supabase
-      .from('repair_orders')
-      .select('id, reference, created_at, status, total_ttc')
-      .eq('dossier_id', dossierId);
-
-    repairOrders?.forEach(ro => {
+    // Ordre de réparation
+    if (dossier.repair_order) {
       events.push({
-        id: ro.id,
+        id: dossier.repair_order.id,
         type: 'repair_order',
-        title: `Ordre de réparation ${ro.reference}`,
-        status: ro.status,
-        amount: ro.total_ttc,
-        created_at: ro.created_at,
-        entity_id: ro.id
+        title: `OR ${dossier.repair_order.reference}`,
+        status: dossier.repair_order.status,
+        amount: dossier.repair_order.total_ttc,
+        created_at: dossier.repair_order.created_at,
+        entity_id: dossier.repair_order.id
+      });
+    }
+
+    // Factures (1:N)
+    dossier.invoices?.forEach(inv => {
+      events.push({
+        id: inv.id,
+        type: 'invoice',
+        title: `Facture ${inv.reference}`,
+        status: inv.status,
+        amount: inv.total_ttc,
+        created_at: inv.created_at,
+        entity_id: inv.id
       });
     });
 
-    // Récupérer les factures via les OR
-    if (repairOrders && repairOrders.length > 0) {
-      const roIds = repairOrders.map(ro => ro.id);
-      const { data: invoices } = await supabase
-        .from('invoices')
-        .select('id, reference, created_at, status, total_ttc')
-        .in('repair_order_id', roIds);
-
-      invoices?.forEach(inv => {
-        events.push({
-          id: inv.id,
-          type: 'invoice',
-          title: `Facture ${inv.reference}`,
-          status: inv.status,
-          amount: inv.total_ttc,
-          created_at: inv.created_at,
-          entity_id: inv.id
-        });
+    // Cession
+    if (dossier.cession) {
+      events.push({
+        id: dossier.cession.id,
+        type: 'cession',
+        title: `Cession ${dossier.cession.reference}`,
+        status: dossier.cession.status,
+        created_at: dossier.cession.created_at,
+        entity_id: dossier.cession.id
       });
+    }
 
-      // Récupérer les cessions via les OR
-      const { data: cessions } = await supabase
-        .from('cessions')
-        .select('id, reference, created_at, status')
-        .in('repair_order_id', roIds);
-
-      cessions?.forEach(c => {
-        events.push({
-          id: c.id,
-          type: 'cession',
-          title: `Cession ${c.reference}`,
-          status: c.status,
-          created_at: c.created_at,
-          entity_id: c.id
-        });
+    // Prêt véhicule
+    if (dossier.fleet_reservation) {
+      events.push({
+        id: dossier.fleet_reservation.id,
+        type: 'fleet_loan',
+        title: 'Véhicule de prêt',
+        status: dossier.fleet_reservation.status,
+        created_at: dossier.fleet_reservation.created_at,
+        entity_id: dossier.fleet_reservation.id
       });
     }
 
@@ -718,102 +832,51 @@ export const dossiersService = {
     );
   },
 
-  async getDocumentCounts(dossierId: string): Promise<{
-    expertises: number;
-    quotes: number;
-    repair_orders: number;
-    invoices: number;
-    cessions: number;
+  // ===== Statistiques =====
+
+  async getStats(companyId: string): Promise<{
+    total: number;
+    byStatus: Record<string, number>;
   }> {
-    const [expertises, quotes, repairOrders] = await Promise.all([
-      supabase.from('expertise_reports').select('id', { count: 'exact' }).eq('dossier_id', dossierId),
-      supabase.from('quotes').select('id', { count: 'exact' }).eq('dossier_id', dossierId),
-      supabase.from('repair_orders').select('id', { count: 'exact' }).eq('dossier_id', dossierId)
-    ]);
+    const { data, error } = await supabase
+      .from('dossiers')
+      .select('overall_status')
+      .eq('company_id', companyId)
+      .eq('archived', false);
 
-    // Récupérer les IDs des OR pour compter factures et cessions
-    const { data: roData } = await supabase
-      .from('repair_orders')
-      .select('id')
-      .eq('dossier_id', dossierId);
+    if (error) throw error;
 
-    let invoicesCount = 0;
-    let cessionsCount = 0;
-
-    if (roData && roData.length > 0) {
-      const roIds = roData.map(ro => ro.id);
-      const [invoices, cessions] = await Promise.all([
-        supabase.from('invoices').select('id', { count: 'exact' }).in('repair_order_id', roIds),
-        supabase.from('cessions').select('id', { count: 'exact' }).in('repair_order_id', roIds)
-      ]);
-      invoicesCount = invoices.count || 0;
-      cessionsCount = cessions.count || 0;
-    }
-
-    return {
-      expertises: expertises.count || 0,
-      quotes: quotes.count || 0,
-      repair_orders: repairOrders.count || 0,
-      invoices: invoicesCount,
-      cessions: cessionsCount
-    };
-  },
-
-  // ===== Création automatique depuis autres entités =====
-
-  async getOrCreateFromRepairOrder(repairOrderId: string): Promise<Dossier> {
-    // Récupérer l'OR
-    const { data: ro } = await supabase
-      .from('repair_orders')
-      .select('*, dossier_id')
-      .eq('id', repairOrderId)
-      .single();
-
-    if (!ro) throw new Error('Repair order not found');
-
-    // Si déjà un dossier, le retourner
-    if (ro.dossier_id) {
-      const dossier = await this.getById(ro.dossier_id);
-      if (dossier) return dossier;
-    }
-
-    // Créer un nouveau dossier
-    const dossier = await this.create({
-      client_id: ro.client_id,
-      vehicle_id: ro.vehicle_id,
-      company_id: ro.company_id,
-      claim_number: ro.claim_number,
-      policy_number: ro.policy_number,
-      incident_date: ro.incident_date,
-      report_number: ro.report_number,
-      expert_name: ro.expert_name
+    const byStatus: Record<string, number> = {};
+    data?.forEach(d => {
+      byStatus[d.overall_status] = (byStatus[d.overall_status] || 0) + 1;
     });
 
-    // Mettre à jour l'OR avec le dossier_id
-    await supabase
-      .from('repair_orders')
-      .update({ dossier_id: dossier.id })
-      .eq('id', repairOrderId);
-
-    return dossier;
+    return {
+      total: data?.length || 0,
+      byStatus
+    };
   }
 };
 ```
 
-### Étape 2.3 - Création des hooks
+### Étape 2.3 - Hooks mis à jour
 
 **Fichier: `src/hooks/use-dossiers.ts`**
 
 ```typescript
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { dossiersService } from '@/services/supabase/dossiers';
-import { NewDossier, UpdateDossier } from '@/types/dossier';
+import { CreateDossier, UpdateDossier } from '@/types/dossier';
+import { useCompany } from '@/hooks/use-company';
 import { toast } from 'sonner';
 
 export function useDossiers() {
+  const { company } = useCompany();
+  
   return useQuery({
-    queryKey: ['dossiers'],
-    queryFn: () => dossiersService.getAll()
+    queryKey: ['dossiers', company?.id],
+    queryFn: () => dossiersService.getAll(company!.id),
+    enabled: !!company?.id
   });
 }
 
@@ -833,11 +896,19 @@ export function useClientDossiers(clientId?: string) {
   });
 }
 
-export function useVehicleDossier(vehicleId?: string) {
+export function useDossierByRepairOrder(repairOrderId?: string) {
   return useQuery({
-    queryKey: ['dossiers', 'vehicle', vehicleId],
-    queryFn: () => dossiersService.getByVehicleId(vehicleId!),
-    enabled: !!vehicleId
+    queryKey: ['dossiers', 'repair_order', repairOrderId],
+    queryFn: () => dossiersService.getByRepairOrderId(repairOrderId!),
+    enabled: !!repairOrderId
+  });
+}
+
+export function useDossierByQuote(quoteId?: string) {
+  return useQuery({
+    queryKey: ['dossiers', 'quote', quoteId],
+    queryFn: () => dossiersService.getByQuoteId(quoteId!),
+    enabled: !!quoteId
   });
 }
 
@@ -849,11 +920,13 @@ export function useDossierTimeline(dossierId?: string) {
   });
 }
 
-export function useDossierDocumentCounts(dossierId?: string) {
+export function useDossierStats() {
+  const { company } = useCompany();
+  
   return useQuery({
-    queryKey: ['dossiers', dossierId, 'counts'],
-    queryFn: () => dossiersService.getDocumentCounts(dossierId!),
-    enabled: !!dossierId
+    queryKey: ['dossiers', 'stats', company?.id],
+    queryFn: () => dossiersService.getStats(company!.id),
+    enabled: !!company?.id
   });
 }
 
@@ -861,7 +934,7 @@ export function useCreateDossier() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: NewDossier) => dossiersService.create(data),
+    mutationFn: (data: CreateDossier) => dossiersService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dossiers'] });
       toast.success('Dossier créé avec succès');
@@ -891,6 +964,39 @@ export function useUpdateDossier() {
   });
 }
 
+export function useLinkEntityToDossier() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ 
+      dossierId, 
+      entityType, 
+      entityId 
+    }: { 
+      dossierId: string; 
+      entityType: 'expertise_report' | 'quote' | 'repair_order' | 'cession' | 'fleet_reservation';
+      entityId: string;
+    }) => {
+      switch (entityType) {
+        case 'expertise_report':
+          return dossiersService.linkExpertiseReport(dossierId, entityId);
+        case 'quote':
+          return dossiersService.linkQuote(dossierId, entityId);
+        case 'repair_order':
+          return dossiersService.linkRepairOrder(dossierId, entityId);
+        case 'cession':
+          return dossiersService.linkCession(dossierId, entityId);
+        case 'fleet_reservation':
+          return dossiersService.linkFleetReservation(dossierId, entityId);
+      }
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['dossiers'] });
+      queryClient.invalidateQueries({ queryKey: ['dossiers', variables.dossierId] });
+    }
+  });
+}
+
 export function useArchiveDossier() {
   const queryClient = useQueryClient();
 
@@ -908,330 +1014,55 @@ export function useArchiveDossier() {
 }
 ```
 
-### Étape 2.4 - Modification des services existants (Mode Hybride)
-
-**Modifications à appliquer à chaque service :**
-
-#### `src/services/supabase/repair-orders/queries.ts`
-
-```typescript
-// AJOUTER au select existant
-const REPAIR_ORDER_SELECT = `
-  *,
-  dossier:dossiers(*),  // NOUVEAU
-  client:clients(*),
-  vehicle:vehicles(*),
-  // ... reste inchangé
-`;
-
-// AJOUTER nouvelle méthode
-async getByDossierId(dossierId: string): Promise<RepairOrder[]> {
-  const { data, error } = await supabase
-    .from('repair_orders')
-    .select(REPAIR_ORDER_SELECT)
-    .eq('dossier_id', dossierId)
-    .order('created_at', { ascending: false });
-
-  if (error) throw error;
-  return data || [];
-}
-```
-
-#### `src/services/supabase/quotes.ts`
-
-```typescript
-// AJOUTER au select
-const QUOTE_SELECT = `
-  *,
-  dossier:dossiers(*),  // NOUVEAU
-  client:clients(*),
-  // ... reste inchangé
-`;
-
-// AJOUTER nouvelle méthode
-async getByDossierId(dossierId: string): Promise<Quote[]> {
-  const { data, error } = await supabase
-    .from('quotes')
-    .select(QUOTE_SELECT)
-    .eq('dossier_id', dossierId)
-    .order('created_at', { ascending: false });
-
-  if (error) throw error;
-  return data || [];
-}
-```
-
-#### `src/services/supabase/cessions/queries.ts`
-
-```typescript
-// Le service cessions N'A PAS de dossier_id direct
-// L'enrichissement passe par repair_order.dossier
-
-const CESSION_SELECT = `
-  *,
-  repair_order:repair_orders(
-    *,
-    dossier:dossiers(*)  // NOUVEAU: accès indirect au dossier
-  ),
-  fleet_reservation:fleet_reservations(
-    *,
-    dossier:dossiers(*)  // NOUVEAU: accès indirect au dossier
-  ),
-  // ... reste inchangé
-`;
-
-// L'accès au dossier se fait via:
-// cession.repair_order?.dossier
-// OU cession.fleet_reservation?.dossier
-```
-
 ---
 
 ## Phase 3 - Migration UI
 
-### Étape 3.1 - Composant DossierSelector
+### Étape 3.1 - Page Dossiers
 
-**Fichier: `src/components/dossier/DossierSelector.tsx`**
+**Route**: `/dossiers`
 
-```typescript
-import React from 'react';
-import { useClientDossiers } from '@/hooks/use-dossiers';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Folder, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+La page dossiers affiche la liste de tous les dossiers avec :
+- Filtres par statut (ouvert, en_cours, expertise, devis, reparation, facturation, cloture)
+- Recherche par référence, client, véhicule
+- Vue cards ou tableau
+- Accès rapide au détail du dossier
 
-interface DossierSelectorProps {
-  clientId?: string;
-  value?: string;
-  onChange: (dossierId: string) => void;
-  onCreateNew?: () => void;
-  disabled?: boolean;
-  error?: string;
-}
+### Étape 3.2 - Vue Détail Dossier
 
-export function DossierSelector({
-  clientId,
-  value,
-  onChange,
-  onCreateNew,
-  disabled,
-  error
-}: DossierSelectorProps) {
-  const { data: dossiers, isLoading } = useClientDossiers(clientId);
+La vue détail d'un dossier affiche :
 
-  if (!clientId) {
-    return (
-      <Select disabled>
-        <SelectTrigger>
-          <SelectValue placeholder="Sélectionnez d'abord un client" />
-        </SelectTrigger>
-      </Select>
-    );
-  }
+1. **En-tête** : Référence, statut, client, véhicule
+2. **Informations sinistre** : Numéro sinistre, date, assurance, expert
+3. **Documents liés** (1:1) :
+   - Carte Expertise (si `expertise_report_id`)
+   - Carte Devis (si `quote_id`)
+   - Carte OR (si `repair_order_id`)
+   - Carte Cession (si `cession_id`)
+   - Carte Prêt véhicule (si `fleet_reservation_id`)
+4. **Factures** (1:N) : Liste des factures
+5. **Timeline** : Historique chronologique
+6. **Actions** : Créer expertise, créer devis, créer OR, etc.
 
-  return (
-    <div className="space-y-2">
-      <Select
-        value={value}
-        onValueChange={onChange}
-        disabled={disabled || isLoading}
-      >
-        <SelectTrigger className={error ? 'border-destructive' : ''}>
-          <SelectValue placeholder="Sélectionner un dossier" />
-        </SelectTrigger>
-        <SelectContent>
-          {dossiers?.map((dossier) => (
-            <SelectItem key={dossier.id} value={dossier.id}>
-              <div className="flex items-center gap-2">
-                <Folder className="h-4 w-4" />
-                <span>{dossier.reference}</span>
-                {dossier.claim_number && (
-                  <span className="text-muted-foreground text-xs">
-                    ({dossier.claim_number})
-                  </span>
-                )}
-                {dossier.incident_date && (
-                  <span className="text-muted-foreground text-xs">
-                    - {format(new Date(dossier.incident_date), 'dd/MM/yyyy', { locale: fr })}
-                  </span>
-                )}
-              </div>
-            </SelectItem>
-          ))}
-          
-          {(!dossiers || dossiers.length === 0) && (
-            <div className="p-2 text-center text-muted-foreground text-sm">
-              Aucun dossier pour ce client
-            </div>
-          )}
-        </SelectContent>
-      </Select>
+### Étape 3.3 - Intégration dans les formulaires existants
 
-      {onCreateNew && (
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={onCreateNew}
-          className="w-full"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Créer un nouveau dossier
-        </Button>
-      )}
+Chaque formulaire de création (expertise, devis, OR, cession) doit :
 
-      {error && (
-        <p className="text-destructive text-sm">{error}</p>
-      )}
-    </div>
-  );
-}
-```
-
-### Étape 3.2 - Composant DossierCard
-
-**Fichier: `src/components/dossier/DossierCard.tsx`**
+1. **Recevoir un `dossier_id` optionnel** comme prop
+2. **Si `dossier_id` fourni** : Pré-remplir client/véhicule depuis le dossier
+3. **Après création** : Mettre à jour automatiquement le dossier avec l'ID de l'entité créée
 
 ```typescript
-import React from 'react';
-import { Dossier } from '@/types/dossier';
-import { useDossierDocumentCounts } from '@/hooks/use-dossiers';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Folder, 
-  Car, 
-  FileText, 
-  Receipt, 
-  Wrench,
-  CreditCard 
-} from 'lucide-react';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-
-interface DossierCardProps {
-  dossier: Dossier;
-  onClick?: () => void;
+// Exemple: Création d'un OR depuis un dossier
+async function createRepairOrderForDossier(dossierId: string, roData: CreateRepairOrder) {
+  // 1. Créer l'OR
+  const repairOrder = await repairOrdersService.create(roData);
+  
+  // 2. Lier au dossier
+  await dossiersService.linkRepairOrder(dossierId, repairOrder.id);
+  
+  return repairOrder;
 }
-
-const statusColors: Record<string, string> = {
-  nouveau: 'bg-blue-100 text-blue-800',
-  en_cours: 'bg-yellow-100 text-yellow-800',
-  terminé: 'bg-green-100 text-green-800',
-  archivé: 'bg-gray-100 text-gray-800'
-};
-
-const statusLabels: Record<string, string> = {
-  nouveau: 'Nouveau',
-  en_cours: 'En cours',
-  terminé: 'Terminé',
-  archivé: 'Archivé'
-};
-
-export function DossierCard({ dossier, onClick }: DossierCardProps) {
-  const { data: counts } = useDossierDocumentCounts(dossier.id);
-
-  return (
-    <Card 
-      className="cursor-pointer hover:shadow-md transition-shadow"
-      onClick={onClick}
-    >
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Folder className="h-5 w-5 text-primary" />
-            <CardTitle className="text-lg">{dossier.reference}</CardTitle>
-          </div>
-          <Badge className={statusColors[dossier.status]}>
-            {statusLabels[dossier.status]}
-          </Badge>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {/* Véhicule */}
-          {dossier.vehicle && (
-            <div className="flex items-center gap-2 text-sm">
-              <Car className="h-4 w-4 text-muted-foreground" />
-              <span>
-                {dossier.vehicle.brand} {dossier.vehicle.model} - {dossier.vehicle.license_plate}
-              </span>
-            </div>
-          )}
-
-          {/* Infos sinistre */}
-          {dossier.claim_number && (
-            <div className="text-sm text-muted-foreground">
-              N° sinistre: {dossier.claim_number}
-            </div>
-          )}
-          {dossier.incident_date && (
-            <div className="text-sm text-muted-foreground">
-              Date: {format(new Date(dossier.incident_date), 'dd MMMM yyyy', { locale: fr })}
-            </div>
-          )}
-
-          {/* Compteurs documents */}
-          {counts && (
-            <div className="flex flex-wrap gap-2 pt-2 border-t">
-              {counts.expertises > 0 && (
-                <Badge variant="outline" className="text-xs">
-                  <FileText className="h-3 w-3 mr-1" />
-                  {counts.expertises} expertise{counts.expertises > 1 ? 's' : ''}
-                </Badge>
-              )}
-              {counts.quotes > 0 && (
-                <Badge variant="outline" className="text-xs">
-                  <Receipt className="h-3 w-3 mr-1" />
-                  {counts.quotes} devis
-                </Badge>
-              )}
-              {counts.repair_orders > 0 && (
-                <Badge variant="outline" className="text-xs">
-                  <Wrench className="h-3 w-3 mr-1" />
-                  {counts.repair_orders} OR
-                </Badge>
-              )}
-              {counts.cessions > 0 && (
-                <Badge variant="outline" className="text-xs">
-                  <CreditCard className="h-3 w-3 mr-1" />
-                  {counts.cessions} cession{counts.cessions > 1 ? 's' : ''}
-                </Badge>
-              )}
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-```
-
-### Étape 3.3 - Modifications des formulaires existants
-
-#### CessionForm - Conserver la logique actuelle
-
-```typescript
-// src/components/cessions/CessionForm.tsx
-// 
-// AUCUNE MODIFICATION MAJEURE REQUISE
-// 
-// Le formulaire continue d'utiliser repair_order_id et fleet_reservation_id
-// L'accès au dossier se fait via ces entités parentes:
-// - repair_order.dossier_id → pour récupérer les infos du sinistre
-// - fleet_reservation.dossier_id → idem
-//
-// Modifications mineures suggérées:
-// - Afficher la référence du dossier parent dans l'en-tête
-// - Pré-remplir les champs sinistre depuis le dossier si disponibles
 ```
 
 ---
@@ -1247,14 +1078,16 @@ export function DossierCard({ dossier, onClick }: DossierCardProps) {
 -- À EXÉCUTER UNIQUEMENT après validation complète
 
 -- 1. Supprimer les colonnes dupliquées des repair_orders
+-- (claim_number, policy_number, etc. sont maintenant dans dossiers)
 -- ALTER TABLE public.repair_orders DROP COLUMN claim_number;
 -- ALTER TABLE public.repair_orders DROP COLUMN policy_number;
 -- ALTER TABLE public.repair_orders DROP COLUMN incident_date;
 -- ALTER TABLE public.repair_orders DROP COLUMN report_number;
 -- ALTER TABLE public.repair_orders DROP COLUMN expert_name;
 
--- 2. Supprimer les colonnes client_id/vehicle_id des tables (devenues redondantes)
--- Ces colonnes sont conservées pour rétrocompatibilité
+-- 2. Supprimer les colonnes client_id/vehicle_id redondantes
+-- (devenues optionnelles car héritées du dossier)
+-- NOTE: Conserver pour rétrocompatibilité sauf si 100% migré
 
 -- NOTE: Cette phase est OPTIONNELLE et ne doit être exécutée que si:
 -- - Tout le code utilise exclusivement dossier_id
@@ -1271,24 +1104,18 @@ export function DossierCard({ dossier, onClick }: DossierCardProps) {
 ```sql
 -- Si problème après migration, restaurer l'état précédent
 
--- 1. Supprimer les nouvelles colonnes
-ALTER TABLE public.expertise_reports DROP COLUMN IF EXISTS dossier_id;
-ALTER TABLE public.quotes DROP COLUMN IF EXISTS dossier_id;
-ALTER TABLE public.repair_orders DROP COLUMN IF EXISTS dossier_id;
-ALTER TABLE public.fleet_reservations DROP COLUMN IF EXISTS dossier_id;
+-- 1. Supprimer les nouvelles colonnes de dossiers
+ALTER TABLE public.dossiers 
+  DROP COLUMN IF EXISTS expertise_report_id,
+  DROP COLUMN IF EXISTS quote_id,
+  DROP COLUMN IF EXISTS repair_order_id,
+  DROP COLUMN IF EXISTS cession_id,
+  DROP COLUMN IF EXISTS fleet_reservation_id,
+  DROP COLUMN IF EXISTS overall_status;
+
+-- 2. Supprimer dossier_id des tables liées
+ALTER TABLE public.invoices DROP COLUMN IF EXISTS dossier_id;
 ALTER TABLE public.messageries DROP COLUMN IF EXISTS dossier_id;
-
--- 2. Supprimer la table dossiers
-DROP TABLE IF EXISTS public.dossiers CASCADE;
-```
-
-### Rollback Phase 2 (Application)
-
-```bash
-# Revenir à la version précédente du code
-git revert HEAD~N  # N = nombre de commits de migration
-
-# Redéployer l'application
 ```
 
 ### Feature Flag pour basculement progressif
@@ -1302,8 +1129,11 @@ export const FEATURES = {
   // Afficher les dossiers dans l'UI
   SHOW_DOSSIERS_UI: false,
   
-  // Créer automatiquement des dossiers
+  // Créer automatiquement des dossiers à partir des entités
   AUTO_CREATE_DOSSIERS: false,
+  
+  // Exiger un dossier pour créer un OR/devis
+  REQUIRE_DOSSIER_FOR_DOCUMENTS: false,
 };
 ```
 
@@ -1314,15 +1144,14 @@ export const FEATURES = {
 | Jour | Phase | Actions |
 |------|-------|---------|
 | J1 | Préparation | Backup BD, validation scripts SQL |
-| J1 | Phase 1.1 | Création table `dossiers` |
-| J1 | Phase 1.2 | Ajout colonnes `dossier_id` |
+| J1 | Phase 1.1 | Modification table `dossiers` |
+| J1 | Phase 1.2 | Ajout `dossier_id` aux tables |
 | J2 | Phase 1.3 | Migration données existantes |
-| J2 | Phase 1.4 | Validation migration BD |
+| J2 | Phase 1.4-1.5 | Triggers + Validation migration BD |
 | J3 | Phase 2.1-2.2 | Types + Service dossiers |
 | J3 | Phase 2.3 | Hooks dossiers |
-| J4 | Phase 2.4 | Modification services existants |
-| J5 | Phase 3.1-3.2 | Composants UI dossier |
-| J5 | Phase 3.3 | Modifications formulaires |
+| J4 | Phase 3.1-3.2 | Page + Vue détail dossier |
+| J5 | Phase 3.3 | Intégration formulaires |
 | J6 | Tests | Tests de non-régression complets |
 | J7 | Déploiement | Mise en production (feature flag OFF) |
 | J8-J14 | Validation | Activation progressive feature flag |
@@ -1341,63 +1170,64 @@ export const FEATURES = {
 
 ### Post-migration Phase 1
 
-- [ ] Table `dossiers` créée avec données
-- [ ] Colonnes `dossier_id` ajoutées
-- [ ] 100% des repair_orders ont un dossier_id
-- [ ] Contraintes d'intégrité vérifiées
+- [ ] Table `dossiers` mise à jour avec colonnes 1:1
+- [ ] Contraintes UNIQUE en place
+- [ ] Données migrées avec relations 1:1 correctes
+- [ ] Aucune violation de contrainte
 
 ### Post-migration Phase 2
 
 - [ ] Service dossiersService fonctionnel
 - [ ] Hooks React fonctionnels
-- [ ] Services existants en mode hybride
+- [ ] Liaison automatique des entités au dossier
 - [ ] Aucune régression sur les workflows existants
 
 ### Post-migration Phase 3
 
-- [ ] Composants DossierSelector/DossierCard fonctionnels
-- [ ] Navigation vers les dossiers opérationnelle
-- [ ] Formulaires existants non impactés
+- [ ] Page /dossiers fonctionnelle
+- [ ] Vue détail dossier avec toutes les cartes
+- [ ] Navigation bidirectionnelle (dossier ↔ entités)
+- [ ] Formulaires intégrés avec dossier_id
 
 ### Validation Finale
 
-- [ ] Workflow complet expertise → devis → OR → facture → cession
-- [ ] Création de nouveau dossier
-- [ ] Recherche et filtrage par dossier
+- [ ] Workflow complet : Dossier → Expertise → Devis → OR → Facture → Cession
+- [ ] Relations 1:1 respectées (pas de doublons)
+- [ ] Timeline chronologique correcte
 - [ ] Performances acceptables (<500ms pour les requêtes principales)
 
 ---
 
-## Annexes
+## Diagramme des Flux
 
-### A. Mapping des champs sinistre
-
-| Champ | Source actuelle | Source cible |
-|-------|-----------------|--------------|
-| `claim_number` | repair_orders, quotes, expertise_reports | dossiers |
-| `policy_number` | repair_orders, cessions | dossiers |
-| `incident_date` | repair_orders, cessions | dossiers |
-| `incident_number` | cessions | dossiers |
-| `report_number` | repair_orders | dossiers |
-| `expert_name` | repair_orders | dossiers |
-| `insurance_company_id` | cessions | dossiers |
-
-### B. Requêtes de diagnostic
-
-```sql
--- Dossiers sans documents
-SELECT d.* FROM dossiers d
-WHERE NOT EXISTS (SELECT 1 FROM repair_orders WHERE dossier_id = d.id)
-  AND NOT EXISTS (SELECT 1 FROM quotes WHERE dossier_id = d.id)
-  AND NOT EXISTS (SELECT 1 FROM expertise_reports WHERE dossier_id = d.id);
-
--- Documents sans dossier (après migration)
-SELECT 'repair_orders' as type, COUNT(*) FROM repair_orders WHERE dossier_id IS NULL
-UNION ALL
-SELECT 'quotes', COUNT(*) FROM quotes WHERE dossier_id IS NULL
-UNION ALL
-SELECT 'expertise_reports', COUNT(*) FROM expertise_reports WHERE dossier_id IS NULL;
-
--- Statistiques par statut de dossier
-SELECT status, COUNT(*) FROM dossiers GROUP BY status;
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                              CRÉATION D'UN DOSSIER                            │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  1. Client arrive avec un sinistre                                           │
+│     └─> CRÉER DOSSIER (client_id, vehicle_id, infos sinistre)                │
+│                                                                              │
+│  2. Expertise demandée                                                        │
+│     └─> CRÉER EXPERTISE → LIER AU DOSSIER (expertise_report_id)              │
+│                                                                              │
+│  3. Devis généré                                                              │
+│     └─> CRÉER DEVIS (depuis expertise) → LIER AU DOSSIER (quote_id)          │
+│                                                                              │
+│  4. Devis accepté                                                             │
+│     └─> CRÉER OR (depuis devis) → LIER AU DOSSIER (repair_order_id)          │
+│                                                                              │
+│  5. Prêt de véhicule                                                          │
+│     └─> CRÉER RÉSERVATION → LIER AU DOSSIER (fleet_reservation_id)           │
+│                                                                              │
+│  6. Réparation terminée                                                       │
+│     └─> CRÉER FACTURE(S) → LIER AU DOSSIER (via dossier_id dans invoice)     │
+│                                                                              │
+│  7. Cession de créance                                                        │
+│     └─> CRÉER CESSION → LIER AU DOSSIER (cession_id)                         │
+│                                                                              │
+│  8. Paiement reçu                                                             │
+│     └─> CLÔTURER DOSSIER (overall_status = 'cloture')                        │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
 ```
