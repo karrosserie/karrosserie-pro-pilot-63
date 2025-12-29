@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { useTableSorting } from '@/hooks/use-table-sorting';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { 
   Table, 
   TableBody, 
@@ -19,6 +20,7 @@ import { useConfirmation } from '@/hooks/use-confirmation';
 import { useInvoices } from '@/hooks/use-invoices';
 import ReceiptDialog from '@/components/receipts/ReceiptDialog';
 import { getClientDisplayName } from '@/utils/clientDisplayUtils';
+import ClientReceiptMobileCard from './ClientReceiptMobileCard';
 
 interface ClientReceiptsTabProps {
   clientId: string;
@@ -29,6 +31,7 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
   const { invoices } = useInvoices();
   const { toast } = useToast();
   const { confirm } = useConfirmation();
+  const isMobile = useIsMobile();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState<any>(null);
 
@@ -68,11 +71,6 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
       : '0,00';
     
     return `Facture n°${invoice.reference} - ${clientName} - ${amount} €`;
-  };
-
-  const handleView = (receipt: any) => {
-    setSelectedReceipt(receipt);
-    setEditDialogOpen(true);
   };
 
   const handleEdit = (receipt: any) => {
@@ -124,6 +122,41 @@ const ClientReceiptsTab: React.FC<ClientReceiptsTabProps> = ({ clientId }) => {
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  // Rendu mobile avec cartes
+  if (isMobile) {
+    return (
+      <>
+        {sortedData.length > 0 ? (
+          <div className="space-y-0">
+            {sortedData.map((receipt) => (
+              <ClientReceiptMobileCard
+                key={receipt.id}
+                receipt={receipt}
+                invoiceDisplay={getInvoiceDisplay(receipt.invoice_id)}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-8">
+            <Banknote className="h-10 w-10 text-muted-foreground mb-2" />
+            <h3 className="font-medium text-foreground">Aucun encaissement</h3>
+            <p className="text-muted-foreground mt-1 text-sm">Ce client n'a pas encore d'encaissement.</p>
+          </div>
+        )}
+
+        {selectedReceipt && (
+          <ReceiptDialog
+            open={editDialogOpen}
+            onOpenChange={setEditDialogOpen}
+            receipt={selectedReceipt}
+          />
+        )}
+      </>
+    );
+  }
 
   return (
     <>

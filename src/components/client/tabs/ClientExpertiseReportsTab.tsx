@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useExpertiseReports } from '@/hooks/use-expertise-reports';
 import { useReportToQuote } from '@/hooks/use-report-to-quote';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Table, TableBody } from '@/components/ui/table';
 import { FileText, Trash, Download } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +15,7 @@ import { ExpertiseReportTableHeader } from '@/components/expertise/table/Experti
 import { TableCell, TableRow } from '@/components/ui/table';
 import { useTableSorting } from '@/hooks/use-table-sorting';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import ClientExpertiseMobileCard from './ClientExpertiseMobileCard';
 
 interface ClientExpertiseReportsTabProps {
   clientId: string;
@@ -24,6 +26,7 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
   const { checkMultipleReports, isConverted, convertedReports } = useReportToQuote();
   const { toast } = useToast();
   const { confirm } = useConfirmation();
+  const isMobile = useIsMobile();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<ExpertiseReport | null>(null);
 
@@ -76,6 +79,14 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
     }
   };
 
+  const handleDownloadReport = (report: ExpertiseReport) => {
+    if (report.document_url) {
+      import('@/components/shared/document-uploader/utils/documentUtils').then(({ handleDownload }) => {
+        handleDownload(report.document_url, `rapport-expertise-${report.report_number || report.id}.pdf`);
+      });
+    }
+  };
+
   const formatAmount = (amount: number | null | undefined): string => {
     if (amount === null || amount === undefined) return '-';
     return new Intl.NumberFormat('fr-FR', {
@@ -112,10 +123,36 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
   if (sortedData.length === 0) {
     return (
       <div className="text-center py-8">
-        <FileText className="mx-auto h-12 w-12 text-gray-400" />
-        <h3 className="mt-2 text-sm font-semibold text-gray-900">Aucun rapport d'expertise</h3>
-        <p className="mt-1 text-sm text-gray-500">Ce client n'a pas encore de rapport d'expertise.</p>
+        <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
+        <h3 className="mt-2 text-sm font-semibold text-foreground">Aucun rapport d'expertise</h3>
+        <p className="mt-1 text-sm text-muted-foreground">Ce client n'a pas encore de rapport d'expertise.</p>
       </div>
+    );
+  }
+
+  // Rendu mobile avec cartes
+  if (isMobile) {
+    return (
+      <>
+        <div className="space-y-0">
+          {sortedData.map((report) => (
+            <ClientExpertiseMobileCard
+              key={report.id}
+              report={report}
+              isConverted={isConverted(report.id)}
+              onDownload={handleDownloadReport}
+              onDelete={handleDeleteReport}
+            />
+          ))}
+        </div>
+
+        {/* Edit Report Dialog */}
+        <ExpertiseReportDialog
+          report={selectedReport}
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+        />
+      </>
     );
   }
 
@@ -166,13 +203,7 @@ const ClientExpertiseReportsTab: React.FC<ClientExpertiseReportsTabProps> = ({ c
                               <Button 
                                 variant="outline" 
                                 size="sm"
-                                onClick={() => {
-                                  if (report.document_url) {
-                                    import('@/components/shared/document-uploader/utils/documentUtils').then(({ handleDownload }) => {
-                                      handleDownload(report.document_url, `rapport-expertise-${report.report_number || report.id}.pdf`);
-                                    });
-                                  }
-                                }}
+                                onClick={() => handleDownloadReport(report)}
                                 disabled={!report.document_url}
                               >
                                 <Download className="h-4 w-4 mr-1" />
