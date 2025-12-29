@@ -207,7 +207,7 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="8">8 jours</SelectItem>
-                  <SelectItem value="14">14 jours</SelectItem>
+                  <SelectItem value="15">15 jours</SelectItem>
                 </SelectContent>
               </Select>
             </div>
