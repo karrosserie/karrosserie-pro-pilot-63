@@ -52,7 +52,7 @@ Restructurer l'application autour d'une entité **Dossier** (sinistre) qui centr
 |----------|-------------|
 | **Aucune suppression de données** | Les colonnes existantes (`client_id`, `vehicle_id`) sont conservées |
 | **Pas de colonnes redondantes** | On utilise les relations existantes pour les factures |
-| **Références bidirectionnelles** | `dossiers.*_id` est AUTORITATIF, `*.dossier_id` est pour les reverse lookups |
+| **Nettoyage bidirectionnel** | Supprimer les colonnes `dossier_id` redondantes des tables enfants |
 | **Rétrocompatibilité** | Les fonctionnalités existantes continuent de fonctionner |
 | **Feature flag** | Basculement progressif via configuration |
 | **Migration données** | Script automatique pour créer les dossiers existants |
@@ -81,19 +81,24 @@ overall_status TEXT       -- Statut global du dossier
 2. **Index manquants** - Pas d'index sur les colonnes FK
 3. **Triggers manquants** - Pas d'auto-linking lors de la création d'entités
 
-### 🔄 Références Bidirectionnelles Existantes
+### 🔄 Références Bidirectionnelles Existantes (À SUPPRIMER)
 
-La base de données a des références DANS LES DEUX SENS :
+La base de données a des références DANS LES DEUX SENS créant de la redondance :
 
-| Table | Colonne `dossier_id` | Direction |
-|-------|---------------------|-----------|
-| `expertise_reports` | ✅ Existe | Child → Dossier |
-| `quotes` | ✅ Existe | Child → Dossier |
-| `repair_orders` | ✅ Existe | Child → Dossier |
-| `fleet_reservations` | ✅ Existe | Child → Dossier |
-| `messageries` | ✅ Existe | Child → Dossier |
+| Table | Colonne `dossier_id` | Action |
+|-------|---------------------|--------|
+| `expertise_reports` | ✅ Existe | ❌ **À SUPPRIMER** |
+| `quotes` | ✅ Existe | ❌ **À SUPPRIMER** |
+| `repair_orders` | ✅ Existe | ❌ **À SUPPRIMER** |
+| `fleet_reservations` | ✅ Existe | ❌ **À SUPPRIMER** |
+| `messageries` | ✅ Existe | ✅ **À GARDER** (relation 1:N directe) |
 | `cessions` | ❌ N'existe pas | - |
 | `invoices` | ❌ N'existe pas | Relation via `repair_order_id` |
+
+**Pourquoi supprimer ?** Ces colonnes `dossier_id` sont redondantes car :
+- `dossiers.repair_order_id` suffit pour trouver le dossier d'un OR
+- La bidirectionnalité crée un risque de désynchronisation
+- Une seule source de vérité est plus maintenable
 
 ---
 
@@ -131,10 +136,10 @@ La base de données a des références DANS LES DEUX SENS :
                               └──────────┘ └──────────┘ └────────────┘
 ```
 
-### Direction des Relations (IMPORTANT)
+### Direction des Relations (SIMPLIFIÉ)
 
 ```
-AUTORITATIF (Source of Truth):
+AUTORITATIF (Source of Truth) - RELATIONS 1:1 depuis dossiers:
 ┌─────────────────────────────────────────────────────────────────┐
 │  dossiers.expertise_report_id  ──────►  expertise_reports.id   │
 │  dossiers.quote_id             ──────►  quotes.id              │
@@ -143,14 +148,31 @@ AUTORITATIF (Source of Truth):
 │  dossiers.fleet_reservation_id ──────►  fleet_reservations.id  │
 └─────────────────────────────────────────────────────────────────┘
 
-REVERSE LOOKUP (Pour faciliter les requêtes):
+RELATION 1:N DIRECTE (seule exception - À GARDER):
 ┌─────────────────────────────────────────────────────────────────┐
-│  expertise_reports.dossier_id  ◄──────  dossiers.id            │
-│  quotes.dossier_id             ◄──────  dossiers.id            │
-│  repair_orders.dossier_id      ◄──────  dossiers.id            │
-│  fleet_reservations.dossier_id ◄──────  dossiers.id            │
-│  messageries.dossier_id        ◄──────  dossiers.id (1:N)      │
+│  messageries.dossier_id        ──────►  dossiers.id (1:N)      │
 └─────────────────────────────────────────────────────────────────┘
+
+❌ SUPPRIMÉ (plus de reverse lookup redondant):
+┌─────────────────────────────────────────────────────────────────┐
+│  expertise_reports.dossier_id  ← SUPPRIMÉ                      │
+│  quotes.dossier_id             ← SUPPRIMÉ                      │
+│  repair_orders.dossier_id      ← SUPPRIMÉ                      │
+│  fleet_reservations.dossier_id ← SUPPRIMÉ                      │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Comment trouver le dossier d'une entité
+
+```sql
+-- Pour trouver le dossier d'un repair_order :
+SELECT * FROM dossiers WHERE repair_order_id = :repair_order_id;
+
+-- Pour trouver le dossier d'un devis :
+SELECT * FROM dossiers WHERE quote_id = :quote_id;
+
+-- Les messageries ont toujours dossier_id (relation 1:N) :
+SELECT * FROM messageries WHERE dossier_id = :dossier_id;
 ```
 
 ---
@@ -187,13 +209,14 @@ messageries.dossier_id → dossiers.id  (FK existante)
 ### Problème
 
 La présence de références dans les deux sens crée :
-- Risque de désynchronisation
+- Risque de désynchronisation entre `dossiers.repair_order_id` et `repair_orders.dossier_id`
 - Ambiguïté sur la source de vérité
-- Complexité de maintenance
+- Complexité de maintenance avec des triggers de synchro
+- Code applicatif plus complexe
 
-### Solution : Garder les deux mais clarifier les rôles
+### Solution : SUPPRIMER les colonnes redondantes
 
-#### ✅ À GARDER (Autoritatif - dans `dossiers`)
+#### ✅ À GARDER (dans `dossiers` - Source de vérité)
 
 ```sql
 dossiers.expertise_report_id  -- Source de vérité pour le lien 1:1
@@ -203,86 +226,140 @@ dossiers.cession_id           -- Source de vérité pour le lien 1:1
 dossiers.fleet_reservation_id -- Source de vérité pour le lien 1:1
 ```
 
-#### ✅ À GARDER (Reverse lookup - dans les tables enfants)
+#### ✅ À GARDER (messageries - Relation 1:N directe)
 
 ```sql
-expertise_reports.dossier_id  -- Permet SELECT * FROM expertise_reports WHERE dossier_id = :id
-quotes.dossier_id             -- Permet SELECT * FROM quotes WHERE dossier_id = :id
-repair_orders.dossier_id      -- Permet SELECT * FROM repair_orders WHERE dossier_id = :id
-fleet_reservations.dossier_id -- Permet SELECT * FROM fleet_reservations WHERE dossier_id = :id
-messageries.dossier_id        -- Relation 1:N directe
+messageries.dossier_id  -- Relation 1:N directe (un dossier a plusieurs messageries)
 ```
 
-### Trigger de Synchronisation Bidirectionnelle
-
-Pour maintenir la cohérence, créer des triggers qui synchronisent les deux directions :
+#### ❌ À SUPPRIMER (colonnes redondantes dans les tables enfants)
 
 ```sql
--- Quand on met à jour dossiers.repair_order_id, synchroniser repair_orders.dossier_id
-CREATE OR REPLACE FUNCTION sync_dossier_to_child()
-RETURNS TRIGGER AS $$
-BEGIN
-  -- Synchroniser repair_orders
-  IF NEW.repair_order_id IS DISTINCT FROM OLD.repair_order_id THEN
-    -- Désassocier l'ancien
-    IF OLD.repair_order_id IS NOT NULL THEN
-      UPDATE repair_orders SET dossier_id = NULL WHERE id = OLD.repair_order_id;
-    END IF;
-    -- Associer le nouveau
-    IF NEW.repair_order_id IS NOT NULL THEN
-      UPDATE repair_orders SET dossier_id = NEW.id WHERE id = NEW.repair_order_id;
-    END IF;
-  END IF;
-  
-  -- Répéter pour quotes, expertise_reports, etc.
-  -- ... (voir script complet dans Phase 1)
-  
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+expertise_reports.dossier_id  -- ❌ SUPPRIMER - redondant avec dossiers.expertise_report_id
+quotes.dossier_id             -- ❌ SUPPRIMER - redondant avec dossiers.quote_id
+repair_orders.dossier_id      -- ❌ SUPPRIMER - redondant avec dossiers.repair_order_id
+fleet_reservations.dossier_id -- ❌ SUPPRIMER - redondant avec dossiers.fleet_reservation_id
 ```
 
-### Script de Synchronisation Initial
+### Plan de Nettoyage en 3 Étapes
+
+#### Étape 1 : Vérifier que `dossiers.*_id` est peuplé depuis `*.dossier_id`
 
 ```sql
--- Synchroniser les dossier_id manquants dans les tables enfants
--- basé sur les FK dans dossiers
+-- Avant de supprimer, migrer les données de *.dossier_id vers dossiers.*_id
 
--- 1. repair_orders
-UPDATE repair_orders ro
-SET dossier_id = d.id
-FROM dossiers d
-WHERE d.repair_order_id = ro.id
-  AND ro.dossier_id IS NULL;
+-- 1. expertise_reports → dossiers
+UPDATE public.dossiers d
+SET expertise_report_id = er.id
+FROM public.expertise_reports er
+WHERE er.dossier_id = d.id
+  AND d.expertise_report_id IS NULL;
 
--- 2. quotes
-UPDATE quotes q
-SET dossier_id = d.id
-FROM dossiers d
-WHERE d.quote_id = q.id
-  AND q.dossier_id IS NULL;
+-- 2. quotes → dossiers  
+UPDATE public.dossiers d
+SET quote_id = q.id
+FROM public.quotes q
+WHERE q.dossier_id = d.id
+  AND d.quote_id IS NULL;
 
--- 3. expertise_reports
-UPDATE expertise_reports er
-SET dossier_id = d.id
-FROM dossiers d
-WHERE d.expertise_report_id = er.id
-  AND er.dossier_id IS NULL;
+-- 3. repair_orders → dossiers
+UPDATE public.dossiers d
+SET repair_order_id = ro.id
+FROM public.repair_orders ro
+WHERE ro.dossier_id = d.id
+  AND d.repair_order_id IS NULL;
 
--- 4. fleet_reservations
-UPDATE fleet_reservations fr
-SET dossier_id = d.id
-FROM dossiers d
-WHERE d.fleet_reservation_id = fr.id
-  AND fr.dossier_id IS NULL;
+-- 4. fleet_reservations → dossiers
+UPDATE public.dossiers d
+SET fleet_reservation_id = fr.id
+FROM public.fleet_reservations fr
+WHERE fr.dossier_id = d.id
+  AND d.fleet_reservation_id IS NULL;
+```
 
--- 5. messageries (via client_id + vehicle_id matching)
-UPDATE messageries m
-SET dossier_id = d.id
-FROM dossiers d
-WHERE d.client_id = m.client_id
-  AND d.vehicle_id = m.vehicle_id
-  AND m.dossier_id IS NULL;
+#### Étape 2 : Vérifier qu'aucune donnée n'est perdue
+
+```sql
+-- Vérifier les orphelins : entités avec dossier_id mais sans dossier correspondant
+SELECT 'expertise_reports orphelins' as table_name, COUNT(*) 
+FROM expertise_reports er 
+WHERE er.dossier_id IS NOT NULL 
+  AND NOT EXISTS (SELECT 1 FROM dossiers d WHERE d.expertise_report_id = er.id);
+
+SELECT 'quotes orphelins' as table_name, COUNT(*) 
+FROM quotes q 
+WHERE q.dossier_id IS NOT NULL 
+  AND NOT EXISTS (SELECT 1 FROM dossiers d WHERE d.quote_id = q.id);
+
+SELECT 'repair_orders orphelins' as table_name, COUNT(*) 
+FROM repair_orders ro 
+WHERE ro.dossier_id IS NOT NULL 
+  AND NOT EXISTS (SELECT 1 FROM dossiers d WHERE d.repair_order_id = ro.id);
+
+SELECT 'fleet_reservations orphelins' as table_name, COUNT(*) 
+FROM fleet_reservations fr 
+WHERE fr.dossier_id IS NOT NULL 
+  AND NOT EXISTS (SELECT 1 FROM dossiers d WHERE d.fleet_reservation_id = fr.id);
+```
+
+#### Étape 3 : Supprimer les colonnes redondantes
+
+```sql
+-- ============================================
+-- MIGRATION: Suppression des colonnes dossier_id redondantes
+-- ============================================
+
+-- Supprimer les contraintes FK d'abord
+ALTER TABLE public.expertise_reports DROP CONSTRAINT IF EXISTS expertise_reports_dossier_id_fkey;
+ALTER TABLE public.quotes DROP CONSTRAINT IF EXISTS quotes_dossier_id_fkey;
+ALTER TABLE public.repair_orders DROP CONSTRAINT IF EXISTS repair_orders_dossier_id_fkey;
+ALTER TABLE public.fleet_reservations DROP CONSTRAINT IF EXISTS fleet_reservations_dossier_id_fkey;
+
+-- Supprimer les index sur dossier_id
+DROP INDEX IF EXISTS idx_expertise_reports_dossier_id;
+DROP INDEX IF EXISTS idx_quotes_dossier_id;
+DROP INDEX IF EXISTS idx_repair_orders_dossier_id;
+DROP INDEX IF EXISTS idx_fleet_reservations_dossier_id;
+
+-- Supprimer les colonnes dossier_id
+ALTER TABLE public.expertise_reports DROP COLUMN IF EXISTS dossier_id;
+ALTER TABLE public.quotes DROP COLUMN IF EXISTS dossier_id;
+ALTER TABLE public.repair_orders DROP COLUMN IF EXISTS dossier_id;
+ALTER TABLE public.fleet_reservations DROP COLUMN IF EXISTS dossier_id;
+
+-- NE PAS SUPPRIMER messageries.dossier_id (relation 1:N directe)
+```
+
+### Migration du Code Applicatif
+
+Après suppression des colonnes, mettre à jour le code :
+
+```typescript
+// ❌ AVANT (avec dossier_id redondant)
+const repairOrders = await supabase
+  .from('repair_orders')
+  .select('*')
+  .eq('dossier_id', dossierId);
+
+// ✅ APRÈS (via dossiers.repair_order_id)
+const { data: dossier } = await supabase
+  .from('dossiers')
+  .select('repair_order_id')
+  .eq('id', dossierId)
+  .single();
+
+const repairOrder = await supabase
+  .from('repair_orders')
+  .select('*')
+  .eq('id', dossier.repair_order_id)
+  .single();
+
+// OU en une seule requête avec join :
+const dossierWithRO = await supabase
+  .from('dossiers')
+  .select('*, repair_orders(*)')
+  .eq('id', dossierId)
+  .single();
 ```
 
 ---
@@ -324,43 +401,56 @@ const { error: messagingError } = await supabaseClient
 
 ### n8n Webhooks
 
-Les workflows n8n qui créent des entités doivent :
+Les workflows n8n qui créent des entités doivent être mis à jour car les colonnes `dossier_id` seront supprimées des tables enfants (sauf `messageries`).
 
-1. **Recevoir le `dossier_id`** dans le payload si disponible
-2. **OU** le déduire via `client_id` + `vehicle_id`
-3. **OU** créer un nouveau dossier si nécessaire
+**Changements requis :**
 
-#### Exemple de modification workflow n8n
+1. **Ne plus passer `dossier_id`** dans les insertions de `quotes`, `repair_orders`, `expertise_reports`, `fleet_reservations`
+2. **Continuer à passer `dossier_id`** pour `messageries` (relation 1:N directe)
+3. **Les triggers auto-lient** les entités au dossier via `client_id` + `vehicle_id`
+
+#### Exemple de workflow n8n AVANT/APRÈS
 
 ```json
+// ❌ AVANT (avec dossier_id redondant)
 {
-  "name": "Create Quote Workflow",
-  "nodes": [
-    {
-      "name": "Get Dossier",
-      "type": "n8n-nodes-base.supabase",
-      "parameters": {
-        "operation": "select",
-        "table": "dossiers",
-        "filters": {
-          "client_id": "={{ $json.client_id }}",
-          "company_id": "={{ $json.company_id }}"
-        }
-      }
-    },
-    {
-      "name": "Create Quote with Dossier",
-      "type": "n8n-nodes-base.supabase",
-      "parameters": {
-        "operation": "insert",
-        "table": "quotes",
-        "data": {
-          "client_id": "={{ $json.client_id }}",
-          "dossier_id": "={{ $node['Get Dossier'].json.id }}"
-        }
-      }
+  "name": "Create Quote with Dossier",
+  "parameters": {
+    "operation": "insert",
+    "table": "quotes",
+    "data": {
+      "client_id": "={{ $json.client_id }}",
+      "vehicle_id": "={{ $json.vehicle_id }}",
+      "dossier_id": "={{ $node['Get Dossier'].json.id }}"  // ❌ À SUPPRIMER
     }
-  ]
+  }
+}
+
+// ✅ APRÈS (sans dossier_id - auto-lié par trigger)
+{
+  "name": "Create Quote",
+  "parameters": {
+    "operation": "insert",
+    "table": "quotes",
+    "data": {
+      "client_id": "={{ $json.client_id }}",
+      "vehicle_id": "={{ $json.vehicle_id }}"
+      // dossier_id n'est plus nécessaire - le trigger l'auto-lie
+    }
+  }
+}
+
+// ✅ Pour messageries, garder dossier_id (relation 1:N)
+{
+  "name": "Create Messagerie",
+  "parameters": {
+    "operation": "insert",
+    "table": "messageries",
+    "data": {
+      "client_id": "={{ $json.client_id }}",
+      "dossier_id": "={{ $json.dossier_id }}"  // ✅ À GARDER
+    }
+  }
 }
 ```
 
@@ -373,19 +463,21 @@ Les workflows n8n qui créent des entités doivent :
 | Convention | Description |
 |------------|-------------|
 | `dossiers.*_id` | Référence autoritaire (1:1) VERS l'entité |
-| `*.dossier_id` | Référence inverse DEPUIS l'entité |
+| `messageries.dossier_id` | Seule relation 1:N directe autorisée |
 | `overall_status` | Statut calculé du dossier basé sur ses entités |
 
-### Source de Vérité
+### Source de Vérité (SIMPLIFIÉ)
 
 ```
 Pour trouver le repair_order d'un dossier :
 ✅ SELECT * FROM repair_orders WHERE id = dossiers.repair_order_id
-❌ SELECT * FROM repair_orders WHERE dossier_id = dossiers.id  (backup only)
+✅ SELECT ro.* FROM dossiers d JOIN repair_orders ro ON d.repair_order_id = ro.id
 
 Pour trouver le dossier d'un repair_order :
-✅ SELECT * FROM dossiers WHERE repair_order_id = repair_order.id
-✅ SELECT * FROM dossiers WHERE id = repair_order.dossier_id  (équivalent grâce à la synchro)
+✅ SELECT * FROM dossiers WHERE repair_order_id = :repair_order_id
+
+Pour les messageries (1:N direct) :
+✅ SELECT * FROM messageries WHERE dossier_id = :dossier_id
 ```
 
 ---
@@ -416,171 +508,135 @@ CREATE INDEX IF NOT EXISTS idx_dossiers_cession_id ON public.dossiers(cession_id
 CREATE INDEX IF NOT EXISTS idx_dossiers_fleet_reservation_id ON public.dossiers(fleet_reservation_id) WHERE fleet_reservation_id IS NOT NULL;
 ```
 
-### Étape 1.2 - Synchronisation des données bidirectionnelles
+### Étape 1.2 - Migration des données avant nettoyage
 
 ```sql
 -- ============================================
--- MIGRATION 002: Synchronisation bidirectionnelle
+-- MIGRATION 002: Migrer les données *.dossier_id → dossiers.*_id
 -- ============================================
+-- IMPORTANT: Exécuter AVANT de supprimer les colonnes dossier_id
 
--- A. Peupler dossiers.*_id depuis *.dossier_id (si dossiers.*_id est NULL)
-
--- 1. expertise_reports → dossiers
+-- 1. expertise_reports.dossier_id → dossiers.expertise_report_id
 UPDATE public.dossiers d
 SET expertise_report_id = er.id
 FROM public.expertise_reports er
 WHERE er.dossier_id = d.id
   AND d.expertise_report_id IS NULL;
 
--- 2. quotes → dossiers  
+-- 2. quotes.dossier_id → dossiers.quote_id
 UPDATE public.dossiers d
 SET quote_id = q.id
 FROM public.quotes q
 WHERE q.dossier_id = d.id
   AND d.quote_id IS NULL;
 
--- 3. repair_orders → dossiers
+-- 3. repair_orders.dossier_id → dossiers.repair_order_id
 UPDATE public.dossiers d
 SET repair_order_id = ro.id
 FROM public.repair_orders ro
 WHERE ro.dossier_id = d.id
   AND d.repair_order_id IS NULL;
 
--- 4. fleet_reservations → dossiers
+-- 4. fleet_reservations.dossier_id → dossiers.fleet_reservation_id
 UPDATE public.dossiers d
 SET fleet_reservation_id = fr.id
 FROM public.fleet_reservations fr
 WHERE fr.dossier_id = d.id
   AND d.fleet_reservation_id IS NULL;
 
--- B. Peupler *.dossier_id depuis dossiers.*_id (synchronisation inverse)
-
--- 1. dossiers → expertise_reports
-UPDATE public.expertise_reports er
-SET dossier_id = d.id
-FROM public.dossiers d
-WHERE d.expertise_report_id = er.id
-  AND er.dossier_id IS NULL;
-
--- 2. dossiers → quotes
-UPDATE public.quotes q
-SET dossier_id = d.id
-FROM public.dossiers d
-WHERE d.quote_id = q.id
-  AND q.dossier_id IS NULL;
-
--- 3. dossiers → repair_orders
-UPDATE public.repair_orders ro
-SET dossier_id = d.id
-FROM public.dossiers d
-WHERE d.repair_order_id = ro.id
-  AND ro.dossier_id IS NULL;
-
--- 4. dossiers → fleet_reservations
-UPDATE public.fleet_reservations fr
-SET dossier_id = d.id
-FROM public.dossiers d
-WHERE d.fleet_reservation_id = fr.id
-  AND fr.dossier_id IS NULL;
-
--- C. Peupler messageries.dossier_id via client_id matching
+-- 5. Peupler messageries.dossier_id via client_id matching (1:N - À GARDER)
 UPDATE public.messageries m
-SET dossier_id = d.id
-FROM public.dossiers d
-WHERE d.client_id = m.client_id
-  AND m.dossier_id IS NULL
-  AND d.created_at <= m.created_at  -- Le dossier doit exister avant la messagerie
-ORDER BY d.created_at DESC;  -- Prendre le dossier le plus récent
+SET dossier_id = (
+  SELECT d.id FROM dossiers d 
+  WHERE d.client_id = m.client_id 
+    AND d.company_id = m.company_id
+    AND d.created_at <= m.created_at
+  ORDER BY d.created_at DESC
+  LIMIT 1
+)
+WHERE m.dossier_id IS NULL AND m.client_id IS NOT NULL;
 ```
 
-### Étape 1.3 - Triggers de synchronisation bidirectionnelle
+### Étape 1.3 - Vérification avant suppression
 
 ```sql
 -- ============================================
--- MIGRATION 003: Triggers de synchronisation
+-- VÉRIFICATION: S'assurer qu'aucune donnée n'est perdue
 -- ============================================
 
--- A. Trigger sur dossiers pour synchroniser vers les enfants
-CREATE OR REPLACE FUNCTION sync_dossier_to_children()
-RETURNS TRIGGER AS $$
-BEGIN
-  -- Synchroniser repair_orders
-  IF NEW.repair_order_id IS DISTINCT FROM OLD.repair_order_id THEN
-    IF OLD.repair_order_id IS NOT NULL THEN
-      UPDATE repair_orders SET dossier_id = NULL WHERE id = OLD.repair_order_id;
-    END IF;
-    IF NEW.repair_order_id IS NOT NULL THEN
-      UPDATE repair_orders SET dossier_id = NEW.id WHERE id = NEW.repair_order_id;
-    END IF;
-  END IF;
+-- Vérifier les orphelins (entités avec dossier_id non migrées)
+SELECT 'expertise_reports' as table_name, COUNT(*) as orphan_count
+FROM expertise_reports er 
+WHERE er.dossier_id IS NOT NULL 
+  AND NOT EXISTS (SELECT 1 FROM dossiers d WHERE d.expertise_report_id = er.id)
+UNION ALL
+SELECT 'quotes', COUNT(*)
+FROM quotes q 
+WHERE q.dossier_id IS NOT NULL 
+  AND NOT EXISTS (SELECT 1 FROM dossiers d WHERE d.quote_id = q.id)
+UNION ALL
+SELECT 'repair_orders', COUNT(*)
+FROM repair_orders ro 
+WHERE ro.dossier_id IS NOT NULL 
+  AND NOT EXISTS (SELECT 1 FROM dossiers d WHERE d.repair_order_id = ro.id)
+UNION ALL
+SELECT 'fleet_reservations', COUNT(*)
+FROM fleet_reservations fr 
+WHERE fr.dossier_id IS NOT NULL 
+  AND NOT EXISTS (SELECT 1 FROM dossiers d WHERE d.fleet_reservation_id = fr.id);
 
-  -- Synchroniser quotes
-  IF NEW.quote_id IS DISTINCT FROM OLD.quote_id THEN
-    IF OLD.quote_id IS NOT NULL THEN
-      UPDATE quotes SET dossier_id = NULL WHERE id = OLD.quote_id;
-    END IF;
-    IF NEW.quote_id IS NOT NULL THEN
-      UPDATE quotes SET dossier_id = NEW.id WHERE id = NEW.quote_id;
-    END IF;
-  END IF;
+-- Si orphan_count > 0, créer les dossiers manquants AVANT suppression
+```
 
-  -- Synchroniser expertise_reports
-  IF NEW.expertise_report_id IS DISTINCT FROM OLD.expertise_report_id THEN
-    IF OLD.expertise_report_id IS NOT NULL THEN
-      UPDATE expertise_reports SET dossier_id = NULL WHERE id = OLD.expertise_report_id;
-    END IF;
-    IF NEW.expertise_report_id IS NOT NULL THEN
-      UPDATE expertise_reports SET dossier_id = NEW.id WHERE id = NEW.expertise_report_id;
-    END IF;
-  END IF;
+### Étape 1.4 - Suppression des colonnes dossier_id redondantes
 
-  -- Synchroniser fleet_reservations
-  IF NEW.fleet_reservation_id IS DISTINCT FROM OLD.fleet_reservation_id THEN
-    IF OLD.fleet_reservation_id IS NOT NULL THEN
-      UPDATE fleet_reservations SET dossier_id = NULL WHERE id = OLD.fleet_reservation_id;
-    END IF;
-    IF NEW.fleet_reservation_id IS NOT NULL THEN
-      UPDATE fleet_reservations SET dossier_id = NEW.id WHERE id = NEW.fleet_reservation_id;
-    END IF;
-  END IF;
+```sql
+-- ============================================
+-- MIGRATION 003: Supprimer les colonnes dossier_id redondantes
+-- ============================================
+-- ⚠️ ATTENTION: Exécuter uniquement après vérification (Étape 1.3)
 
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+-- Supprimer les contraintes FK
+ALTER TABLE public.expertise_reports DROP CONSTRAINT IF EXISTS expertise_reports_dossier_id_fkey;
+ALTER TABLE public.quotes DROP CONSTRAINT IF EXISTS quotes_dossier_id_fkey;
+ALTER TABLE public.repair_orders DROP CONSTRAINT IF EXISTS repair_orders_dossier_id_fkey;
+ALTER TABLE public.fleet_reservations DROP CONSTRAINT IF EXISTS fleet_reservations_dossier_id_fkey;
 
-CREATE TRIGGER trigger_sync_dossier_to_children
-AFTER UPDATE ON public.dossiers
-FOR EACH ROW EXECUTE FUNCTION sync_dossier_to_children();
+-- Supprimer les index sur dossier_id
+DROP INDEX IF EXISTS idx_expertise_reports_dossier_id;
+DROP INDEX IF EXISTS idx_quotes_dossier_id;
+DROP INDEX IF EXISTS idx_repair_orders_dossier_id;
+DROP INDEX IF EXISTS idx_fleet_reservations_dossier_id;
 
--- B. Triggers sur les enfants pour auto-lier au dossier
+-- Supprimer les colonnes dossier_id
+ALTER TABLE public.expertise_reports DROP COLUMN IF EXISTS dossier_id;
+ALTER TABLE public.quotes DROP COLUMN IF EXISTS dossier_id;
+ALTER TABLE public.repair_orders DROP COLUMN IF EXISTS dossier_id;
+ALTER TABLE public.fleet_reservations DROP COLUMN IF EXISTS dossier_id;
 
--- Trigger pour repair_orders
+-- ✅ NE PAS SUPPRIMER messageries.dossier_id (relation 1:N directe)
+```
+
+### Étape 1.5 - Triggers pour auto-lier les nouvelles entités
+
+```sql
+-- ============================================
+-- MIGRATION 004: Triggers d'auto-liaison (sans bidirectionnel)
+-- ============================================
+
+-- Trigger pour repair_orders : auto-lier au dossier via client_id + vehicle_id
 CREATE OR REPLACE FUNCTION link_repair_order_to_dossier()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- Si dossier_id est fourni, mettre à jour le dossier correspondant
-  IF NEW.dossier_id IS NOT NULL THEN
-    UPDATE dossiers 
-    SET repair_order_id = NEW.id, updated_at = now()
-    WHERE id = NEW.dossier_id
-      AND repair_order_id IS NULL;
-  -- Sinon, chercher un dossier par client_id + vehicle_id
-  ELSIF NEW.client_id IS NOT NULL AND NEW.vehicle_id IS NOT NULL THEN
+  -- Chercher un dossier existant par client_id + vehicle_id
+  IF NEW.client_id IS NOT NULL AND NEW.vehicle_id IS NOT NULL THEN
     UPDATE dossiers 
     SET repair_order_id = NEW.id, updated_at = now()
     WHERE client_id = NEW.client_id 
       AND vehicle_id = NEW.vehicle_id
       AND repair_order_id IS NULL
-      AND company_id = NEW.company_id;
-    
-    -- Mettre à jour le dossier_id du repair_order
-    UPDATE repair_orders
-    SET dossier_id = (
-      SELECT id FROM dossiers 
-      WHERE repair_order_id = NEW.id 
-      LIMIT 1
-    )
-    WHERE id = NEW.id AND dossier_id IS NULL;
+      AND company_id = NEW.company_id
+      AND archived = false;
   END IF;
   RETURN NEW;
 END;
@@ -591,30 +647,18 @@ CREATE TRIGGER after_repair_order_insert
 AFTER INSERT ON repair_orders
 FOR EACH ROW EXECUTE FUNCTION link_repair_order_to_dossier();
 
--- Trigger pour quotes
+-- Trigger pour quotes : auto-lier au dossier via client_id + vehicle_id
 CREATE OR REPLACE FUNCTION link_quote_to_dossier()
 RETURNS TRIGGER AS $$
 BEGIN
-  IF NEW.dossier_id IS NOT NULL THEN
-    UPDATE dossiers 
-    SET quote_id = NEW.id, updated_at = now()
-    WHERE id = NEW.dossier_id
-      AND quote_id IS NULL;
-  ELSIF NEW.client_id IS NOT NULL AND NEW.vehicle_id IS NOT NULL THEN
+  IF NEW.client_id IS NOT NULL AND NEW.vehicle_id IS NOT NULL THEN
     UPDATE dossiers 
     SET quote_id = NEW.id, updated_at = now()
     WHERE client_id = NEW.client_id 
       AND vehicle_id = NEW.vehicle_id
       AND quote_id IS NULL
-      AND company_id = NEW.company_id;
-    
-    UPDATE quotes
-    SET dossier_id = (
-      SELECT id FROM dossiers 
-      WHERE quote_id = NEW.id 
-      LIMIT 1
-    )
-    WHERE id = NEW.id AND dossier_id IS NULL;
+      AND company_id = NEW.company_id
+      AND archived = false;
   END IF;
   RETURN NEW;
 END;
@@ -625,16 +669,16 @@ CREATE TRIGGER after_quote_insert
 AFTER INSERT ON quotes
 FOR EACH ROW EXECUTE FUNCTION link_quote_to_dossier();
 
--- C. Trigger pour messageries
+-- Trigger pour messageries : auto-déduire dossier_id via client_id
 CREATE OR REPLACE FUNCTION link_messagerie_to_dossier()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- Si dossier_id n'est pas fourni, essayer de le déduire
   IF NEW.dossier_id IS NULL AND NEW.client_id IS NOT NULL THEN
     SELECT id INTO NEW.dossier_id
     FROM dossiers
     WHERE client_id = NEW.client_id
       AND company_id = NEW.company_id
+      AND archived = false
     ORDER BY created_at DESC
     LIMIT 1;
   END IF;
@@ -648,11 +692,11 @@ BEFORE INSERT ON messageries
 FOR EACH ROW EXECUTE FUNCTION link_messagerie_to_dossier();
 ```
 
-### Étape 1.4 - Trigger de mise à jour du statut global
+### Étape 1.6 - Trigger de mise à jour du statut global
 
 ```sql
 -- ============================================
--- MIGRATION 004: Calcul automatique de overall_status
+-- MIGRATION 005: Calcul automatique de overall_status
 -- ============================================
 
 CREATE OR REPLACE FUNCTION update_dossier_overall_status()
@@ -660,7 +704,6 @@ RETURNS TRIGGER AS $$
 DECLARE
   v_status TEXT;
 BEGIN
-  -- Calculer le statut basé sur les entités liées
   SELECT 
     CASE
       WHEN NEW.repair_order_id IS NOT NULL THEN
@@ -1044,7 +1087,7 @@ src/
 
 ## Stratégie de Rollback
 
-### Rollback Phase 1 (Contraintes)
+### Rollback Phase 1 (Contraintes et Triggers)
 
 ```sql
 -- Retirer les contraintes UNIQUE si problème
@@ -1055,24 +1098,37 @@ ALTER TABLE dossiers DROP CONSTRAINT IF EXISTS unique_cession_per_dossier;
 ALTER TABLE dossiers DROP CONSTRAINT IF EXISTS unique_fleet_reservation_per_dossier;
 
 -- Supprimer les triggers
-DROP TRIGGER IF EXISTS trigger_sync_dossier_to_children ON dossiers;
 DROP TRIGGER IF EXISTS after_repair_order_insert ON repair_orders;
 DROP TRIGGER IF EXISTS after_quote_insert ON quotes;
 DROP TRIGGER IF EXISTS before_messagerie_insert ON messageries;
 DROP TRIGGER IF EXISTS before_dossier_update_status ON dossiers;
 
 -- Supprimer les fonctions
-DROP FUNCTION IF EXISTS sync_dossier_to_children();
 DROP FUNCTION IF EXISTS link_repair_order_to_dossier();
 DROP FUNCTION IF EXISTS link_quote_to_dossier();
 DROP FUNCTION IF EXISTS link_messagerie_to_dossier();
 DROP FUNCTION IF EXISTS update_dossier_overall_status();
 ```
 
-### Note sur les données
+### Rollback Suppression Colonnes (Si besoin de restaurer)
 
-Les colonnes restent en place (nullable) sans impact sur l'application existante.
-Les références bidirectionnelles existantes continuent de fonctionner.
+⚠️ **ATTENTION**: La suppression des colonnes `dossier_id` est irréversible !
+
+Si vous devez restaurer les colonnes après suppression :
+
+```sql
+-- Recréer les colonnes
+ALTER TABLE public.expertise_reports ADD COLUMN IF NOT EXISTS dossier_id UUID REFERENCES dossiers(id);
+ALTER TABLE public.quotes ADD COLUMN IF NOT EXISTS dossier_id UUID REFERENCES dossiers(id);
+ALTER TABLE public.repair_orders ADD COLUMN IF NOT EXISTS dossier_id UUID REFERENCES dossiers(id);
+ALTER TABLE public.fleet_reservations ADD COLUMN IF NOT EXISTS dossier_id UUID REFERENCES dossiers(id);
+
+-- Repeupler depuis dossiers.*_id
+UPDATE expertise_reports er SET dossier_id = d.id FROM dossiers d WHERE d.expertise_report_id = er.id;
+UPDATE quotes q SET dossier_id = d.id FROM dossiers d WHERE d.quote_id = q.id;
+UPDATE repair_orders ro SET dossier_id = d.id FROM dossiers d WHERE d.repair_order_id = ro.id;
+UPDATE fleet_reservations fr SET dossier_id = d.id FROM dossiers d WHERE d.fleet_reservation_id = fr.id;
+```
 
 ---
 
@@ -1081,9 +1137,11 @@ Les références bidirectionnelles existantes continuent de fonctionner.
 | Étape | Durée estimée | Risque | Dépendances |
 |-------|---------------|--------|-------------|
 | Phase 1.1 - Contraintes UNIQUE | 5 min | Faible | Aucune |
-| Phase 1.2 - Sync données | 10-30 min | Moyen | Phase 1.1 |
-| Phase 1.3 - Triggers sync | 10 min | Moyen | Phase 1.2 |
-| Phase 1.4 - Trigger status | 5 min | Faible | Phase 1.3 |
+| Phase 1.2 - Migration données | 10-30 min | Moyen | Phase 1.1 |
+| Phase 1.3 - Vérification orphelins | 5 min | - | Phase 1.2 |
+| Phase 1.4 - Suppression colonnes | 5 min | **ÉLEVÉ** | Phases 1.2-1.3 |
+| Phase 1.5 - Triggers auto-liaison | 10 min | Moyen | Phase 1.4 |
+| Phase 1.6 - Trigger overall_status | 5 min | Faible | Phase 1.5 |
 | Phase 2 - Types & Services | 2h | Faible | Phase 1 complète |
 | Phase 3 - Edge Functions | 1h | Moyen | Phase 2 |
 | Phase 4 - UI | 4-8h | Moyen | Phase 2 |
@@ -1094,24 +1152,28 @@ Les références bidirectionnelles existantes continuent de fonctionner.
 ## Checklist de Déploiement
 
 ### Pré-déploiement
-- [ ] Backup de la base de données
+- [ ] Backup de la base de données (OBLIGATOIRE avant Phase 1.4)
 - [ ] Vérifier qu'aucun conflit UNIQUE n'existe (doublons)
 - [ ] Identifier les workflows n8n impactés
+- [ ] Identifier le code applicatif qui utilise `*.dossier_id`
 
 ### Phase 1 - Base de données
 - [ ] Exécuter Phase 1.1 (Contraintes UNIQUE)
-- [ ] Exécuter Phase 1.2 (Synchronisation données)
-- [ ] Vérifier les données synchronisées
-- [ ] Créer les triggers Phase 1.3-1.4
+- [ ] Exécuter Phase 1.2 (Migration données)
+- [ ] Exécuter Phase 1.3 (Vérifier orphelins = 0)
+- [ ] **⚠️ Backup final avant suppression**
+- [ ] Exécuter Phase 1.4 (Suppression colonnes dossier_id)
+- [ ] Créer les triggers Phase 1.5-1.6
 - [ ] Tester les triggers manuellement
 
 ### Phase 2 - Application
-- [ ] Déployer les types TypeScript
+- [ ] Mettre à jour les types TypeScript
+- [ ] Supprimer les références à `*.dossier_id` dans le code
 - [ ] Déployer le service dossiers
 - [ ] Déployer les hooks
 
 ### Phase 3 - Edge Functions
-- [ ] Mettre à jour `trigger-document-reminder`
+- [ ] Supprimer `dossier_id` des insertions (sauf messageries)
 - [ ] Déployer les edge functions modifiées
 - [ ] Tester les webhooks
 
@@ -1123,4 +1185,5 @@ Les références bidirectionnelles existantes continuent de fonctionner.
 ### Post-déploiement
 - [ ] Monitoring des erreurs
 - [ ] Vérifier la cohérence des données
+- [ ] Mettre à jour les workflows n8n
 - [ ] Documenter les changements pour l'équipe
