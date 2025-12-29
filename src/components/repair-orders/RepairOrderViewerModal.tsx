@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { toast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
 import { RepairOrder } from '@/services/supabase/repair-orders';
@@ -9,12 +9,19 @@ import { useCompany } from '@/hooks/use-company';
 import { useCompanyPreferences } from '@/hooks/use-company-preferences';
 import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { useQueryClient } from '@tanstack/react-query';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { calculateOrderAmount } from './utils/orderCalculations';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Edit, Trash2, Printer, Download, Mail, FileText, DollarSign, Signature, Pencil, ArrowRight, Trash, FileCheck } from 'lucide-react';
+import { Edit, Trash2, Printer, Download, Mail, FileText, DollarSign, Signature, Pencil, ArrowRight, Trash, FileCheck, MoreVertical, ChevronLeft } from 'lucide-react';
 import { getClientDisplayName } from '@/utils/clientDisplayUtils';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import DefaultRepairOrderPreview from './templates/DefaultRepairOrderPreview';
 import AlternativeRepairOrderPreview from './templates/AlternativeRepairOrderPreview';
 import RepairOrderDialog from './RepairOrderDialog';
@@ -35,6 +42,7 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
   const { deleteOrder } = useRepairOrders();
   const { confirm } = useConfirmation();
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
   const [clientData, setClientData] = useState<any>(null);
   const [vehicleData, setVehicleData] = useState<any>(null);
   const [currentRepairOrder, setCurrentRepairOrder] = useState<RepairOrder | null>(repairOrder);
@@ -393,89 +401,168 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
     setSignatureDialogOpen(true);
   };
 
+  // Preview content
+  const previewContent = (
+    <div className="w-full h-full">
+      {template === 'default' ? (
+        <DefaultRepairOrderPreview 
+          companyData={companyData}
+          orderData={orderData}
+          clientData={clientDataForTemplate}
+          vehicleData={vehicleDataForTemplate}
+          items={items}
+          totals={totalsData}
+          signatureData={signatureData}
+        />
+      ) : (
+        <AlternativeRepairOrderPreview 
+          companyData={companyData}
+          orderData={orderData}
+          clientData={clientDataForTemplate}
+          vehicleData={vehicleDataForTemplate}
+          items={items}
+          totals={totalsData}
+          signatureData={signatureData}
+        />
+      )}
+    </div>
+  );
+
+  // Actions pour mobile (principales dans le footer, secondaires dans le dropdown)
+  const mobileActions = (
+    <div className="flex items-center justify-between gap-2 p-3 border-t bg-background sticky bottom-0">
+      <div className="flex items-center gap-2">
+        <Button variant="outline" size="sm" onClick={handleEdit} className="h-9">
+          <Pencil className="h-4 w-4" />
+        </Button>
+        <Button variant="outline" size="sm" onClick={handleDownload} className="h-9">
+          <Download className="h-4 w-4" />
+        </Button>
+        {!currentRepairOrder.invoices || currentRepairOrder.invoices.length === 0 ? (
+          <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 h-9" onClick={handleConvertToInvoice}>
+            <ArrowRight className="h-4 w-4 mr-1" />
+            Convertir
+          </Button>
+        ) : null}
+      </div>
+      
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" className="h-9">
+            <MoreVertical className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={handlePrint}>
+            <Printer className="h-4 w-4 mr-2" />
+            Imprimer
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleSendEmail}>
+            <Mail className="h-4 w-4 mr-2" />
+            Envoyer par email
+          </DropdownMenuItem>
+          {currentRepairOrder.status !== 'Signé' && (
+            <DropdownMenuItem onClick={handleClientSignature}>
+              <Signature className="h-4 w-4 mr-2" />
+              Signature du client
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuItem onClick={handleDelete} className="text-red-500 focus:text-red-500">
+            <Trash className="h-4 w-4 mr-2" />
+            Supprimer
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+
+  // Actions pour desktop
+  const desktopActions = (
+    <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+      <Button variant="outline" size="sm" onClick={handleEdit} className="text-xs sm:text-sm h-8 sm:h-9">
+        <Pencil className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+        <span className="hidden xs:inline ml-1">Modifier</span>
+      </Button>
+
+      <Button variant="outline" size="sm" onClick={handleDownload} className="text-xs sm:text-sm h-8 sm:h-9">
+        <Download className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+        <span className="hidden xs:inline ml-1">Télécharger</span>
+      </Button>
+
+      <Button variant="outline" size="sm" onClick={handlePrint} className="text-xs sm:text-sm h-8 sm:h-9">
+        <Printer className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+        <span className="hidden xs:inline ml-1">Imprimer</span>
+      </Button>
+
+      <Button variant="outline" size="sm" onClick={handleSendEmail} className="text-xs sm:text-sm h-8 sm:h-9">
+        <Mail className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+        <span className="hidden xs:inline ml-1">Envoyer</span>
+      </Button>
+
+      {currentRepairOrder.status !== 'Signé' && (
+        <Button variant="outline" size="sm" onClick={handleClientSignature} className="text-xs sm:text-sm h-8 sm:h-9">
+          <Signature className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+          <span className="hidden sm:inline ml-1">Signature du client</span>
+        </Button>
+      )}
+
+      <Button variant="outline" size="sm" className="hidden">
+        <FileCheck className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+        <span className="hidden xs:inline ml-1">Demander docs</span>
+      </Button>
+
+      {!currentRepairOrder.invoices || currentRepairOrder.invoices.length === 0 ? (
+        <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-xs sm:text-sm h-8 sm:h-9" onClick={handleConvertToInvoice}>
+          <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+          <span className="hidden xs:inline ml-1">Convertir</span>
+        </Button>
+      ) : null}
+
+      <Button 
+        variant="outline" 
+        size="sm" 
+        className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700 text-xs sm:text-sm h-8 sm:h-9" 
+        onClick={handleDelete}
+      >
+        <Trash className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+        <span className="hidden xs:inline ml-1">Supprimer</span>
+      </Button>
+    </div>
+  );
+
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-5xl w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto p-0">
-          {/* Barre d'actions en haut */}
-          <div className="p-3 sm:p-4 pr-12 sm:pr-16 border-b bg-background">
-            <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3">Aperçu de l'ordre de réparation n°{currentRepairOrder.reference}</h2>
-            <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-              <Button variant="outline" size="sm" onClick={handleEdit} className="text-xs sm:text-sm h-8 sm:h-9">
-                <Pencil className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                <span className="hidden xs:inline ml-1">Modifier</span>
-              </Button>
-
-              <Button variant="outline" size="sm" onClick={handleDownload} className="text-xs sm:text-sm h-8 sm:h-9">
-                <Download className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                <span className="hidden xs:inline ml-1">Télécharger</span>
-              </Button>
-
-              <Button variant="outline" size="sm" onClick={handlePrint} className="text-xs sm:text-sm h-8 sm:h-9">
-                <Printer className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                <span className="hidden xs:inline ml-1">Imprimer</span>
-              </Button>
-
-              <Button variant="outline" size="sm" onClick={handleSendEmail} className="text-xs sm:text-sm h-8 sm:h-9">
-                <Mail className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                <span className="hidden xs:inline ml-1">Envoyer</span>
-              </Button>
-
-              {currentRepairOrder.status !== 'Signé' && (
-                <Button variant="outline" size="sm" onClick={handleClientSignature} className="text-xs sm:text-sm h-8 sm:h-9">
-                  <Signature className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                  <span className="hidden sm:inline ml-1">Signature du client</span>
+      {isMobile ? (
+        <Sheet open={open} onOpenChange={onOpenChange}>
+          <SheetContent side="bottom" className="h-[95vh] p-0 flex flex-col">
+            <SheetHeader className="p-4 border-b flex-shrink-0">
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)} className="h-8 w-8 p-0">
+                  <ChevronLeft className="h-5 w-5" />
                 </Button>
-              )}
-
-              <Button variant="outline" size="sm" className="hidden">
-                <FileCheck className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                <span className="hidden xs:inline ml-1">Demander docs</span>
-              </Button>
-
-              {!currentRepairOrder.invoices || currentRepairOrder.invoices.length === 0 ? (
-                <Button size="sm" className="bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-xs sm:text-sm h-8 sm:h-9" onClick={handleConvertToInvoice}>
-                  <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                  <span className="hidden xs:inline ml-1">Convertir</span>
-                </Button>
-              ) : null}
-
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="text-red-500 hover:text-red-700 border-red-500 hover:border-red-700 text-xs sm:text-sm h-8 sm:h-9" 
-                onClick={handleDelete}
-              >
-                <Trash className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
-                <span className="hidden xs:inline ml-1">Supprimer</span>
-              </Button>
+                <SheetTitle className="text-base truncate">
+                  OR n°{currentRepairOrder.reference}
+                </SheetTitle>
+              </div>
+            </SheetHeader>
+            <div className="flex-1 overflow-y-auto">
+              {previewContent}
             </div>
-          </div>
-          <div className="w-full h-full">
-            {template === 'default' ? (
-              <DefaultRepairOrderPreview 
-                companyData={companyData}
-                orderData={orderData}
-                clientData={clientDataForTemplate}
-                vehicleData={vehicleDataForTemplate}
-                items={items}
-                totals={totalsData}
-                signatureData={signatureData}
-              />
-            ) : (
-              <AlternativeRepairOrderPreview 
-                companyData={companyData}
-                orderData={orderData}
-                clientData={clientDataForTemplate}
-                vehicleData={vehicleDataForTemplate}
-                items={items}
-                totals={totalsData}
-                signatureData={signatureData}
-              />
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+            {mobileActions}
+          </SheetContent>
+        </Sheet>
+      ) : (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+          <DialogContent className="max-w-5xl w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto p-0">
+            {/* Barre d'actions en haut */}
+            <div className="p-3 sm:p-4 pr-12 sm:pr-16 border-b bg-background">
+              <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3">Aperçu de l'ordre de réparation n°{currentRepairOrder.reference}</h2>
+              {desktopActions}
+            </div>
+            {previewContent}
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Dialogues pour les actions */}
       <RepairOrderDialog

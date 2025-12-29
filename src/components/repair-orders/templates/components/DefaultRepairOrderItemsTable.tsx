@@ -1,4 +1,6 @@
 import React from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import RepairOrderMobileItemCard from './RepairOrderMobileItemCard';
 
 interface Item {
   ref?: string;
@@ -16,6 +18,20 @@ interface DefaultRepairOrderItemsTableProps {
 }
 
 const DefaultRepairOrderItemsTable = ({ items }: DefaultRepairOrderItemsTableProps) => {
+  const isMobile = useIsMobile();
+
+  // Affichage mobile avec cartes
+  if (isMobile) {
+    return (
+      <div className="space-y-2">
+        {items.map((item, index) => (
+          <RepairOrderMobileItemCard key={index} item={item} />
+        ))}
+      </div>
+    );
+  }
+
+  // Affichage desktop avec tableau
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-xs sm:text-sm md:text-base bg-white border-collapse min-w-[600px]">
