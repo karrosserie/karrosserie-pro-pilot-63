@@ -255,15 +255,11 @@ export const getCessionById = async (id: string): Promise<Cession> => {
   }
   
   // Map database response to Cession interface with proper defaults
-  const cessionData = basicCession as any;
   return {
     ...basicCession,
     reference: basicCession.reference || '',
     status: basicCession.status || 'en_attente',
     repair_orders: repairOrderData,
     bank_accounts: bankAccountData,
-    expertise_date: cessionData.expertise_date ?? null,
-    expertise_amount: cessionData.expertise_amount ?? null,
-    salvage_value: cessionData.salvage_value ?? null
   } as Cession;
 };
