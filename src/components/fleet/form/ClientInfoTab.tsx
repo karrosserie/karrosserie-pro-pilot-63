@@ -3,9 +3,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { UserPlus } from 'lucide-react';
-import ClientSearchAutocomplete from '@/components/quote/form/client/ClientSearchAutocomplete';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 import { LoanFormData } from '../FleetLoanForm';
-import { DocumentUploader } from '@/components/shared/document-uploader';
+import { DocumentUploader } from '@/components/shared/DocumentUploader';
 import { format, parse } from 'date-fns';
 import { useClient } from '@/hooks/use-clients';
 
@@ -154,10 +154,16 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
 
         {useExistingClient ? (
           <div className="w-full">
-            <ClientSearchAutocomplete
-              onClientSelect={onClientSelect}
-              selectedClientName={getDisplayClientName()}
+            <SearchableSelect
+              options={[]}
+              value={formData.clientId || ''}
+              onValueChange={onClientSelect}
+              placeholder="Rechercher un client..."
               disabled={isViewMode}
+              showNewClientOption={!isViewMode}
+              onNewClientClick={onNewClientClick}
+              allowFreeText
+              onFreeTextChange={onFreeTextClientChange}
             />
           </div>
         ) : (
@@ -213,24 +219,36 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
           <div className="space-y-2">
             <Label className="text-sm">Recto du permis</Label>
             <DocumentUploader
-              label="Recto du permis"
-              value={formData.driverLicenseFrontUrl}
-              onUpload={handleDriverLicenseFrontUpload}
-              storagePath="driver-licenses"
-              acceptedTypes={['image/*']}
-              disabled={isViewMode}
-              analysisType="driving_license"
+              documentType="driver-license"
+              documentId={`${formData.clientId || 'new'}-front`}
+              currentDocumentUrl={formData.driverLicenseFrontUrl}
+              onUploadComplete={onDriverLicenseFrontUpload}
+              onAnalysisComplete={(data) => {
+                if (data) {
+                  const extractedData: any = {};
+                  if (data.first_name) extractedData.first_name = data.first_name;
+                  if (data.last_name) extractedData.last_name = data.last_name;
+                  if (data.date_of_birth) extractedData.date_of_birth = data.date_of_birth;
+                  if (data.license_number) extractedData.license_number = data.license_number;
+                  if (data.issue_date) extractedData.license_issue_date = data.issue_date;
+                  if (data.place_of_birth) extractedData.place_of_birth = data.place_of_birth;
+                  if (data.prefecture) extractedData.prefecture = data.prefecture;
+                  if (Object.keys(extractedData).length > 0) {
+                    onLicenseAnalyzed(extractedData);
+                  }
+                }
+              }}
+              isViewMode={isViewMode}
             />
           </div>
           <div className="space-y-2">
             <Label className="text-sm">Verso du permis</Label>
             <DocumentUploader
-              label="Verso du permis"
-              value={formData.driverLicenseBackUrl}
-              onUpload={onDriverLicenseBackUpload}
-              storagePath="driver-licenses"
-              acceptedTypes={['image/*']}
-              disabled={isViewMode}
+              documentType="driver-license"
+              documentId={`${formData.clientId || 'new'}-back`}
+              currentDocumentUrl={formData.driverLicenseBackUrl}
+              onUploadComplete={onDriverLicenseBackUpload}
+              isViewMode={isViewMode}
             />
           </div>
         </div>
