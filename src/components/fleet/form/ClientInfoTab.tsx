@@ -7,7 +7,7 @@ import { SearchableSelect } from '@/components/ui/searchable-select';
 import { LoanFormData } from '../FleetLoanForm';
 import { DocumentUploader } from '@/components/shared/DocumentUploader';
 import { format, parse } from 'date-fns';
-import { useClient } from '@/hooks/use-clients';
+import { useClient, useClients } from '@/hooks/use-clients';
 
 interface ClientInfoTabProps {
   formData: LoanFormData;
@@ -43,6 +43,13 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
 }) => {
   const [useExistingClient, setUseExistingClient] = useState(!!formData.clientId);
   const { client: clientData, isLoading: isLoadingClient } = useClient(formData.clientId);
+  const { clients } = useClients();
+
+  // Prepare options for SearchableSelect
+  const clientOptions = clients?.map(client => ({
+    value: client.id,
+    label: client.company_name || `${client.first_name || ''} ${client.last_name || ''}`.trim()
+  })) || [];
   
   // Synchronize useExistingClient with formData.clientId
   useEffect(() => {
@@ -155,7 +162,7 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
         {useExistingClient ? (
           <div className="w-full">
             <SearchableSelect
-              options={[]}
+              options={clientOptions}
               value={formData.clientId || ''}
               onValueChange={onClientSelect}
               placeholder="Rechercher un client..."
