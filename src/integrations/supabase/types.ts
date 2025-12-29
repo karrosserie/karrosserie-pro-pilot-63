@@ -2218,18 +2218,24 @@ export type Database = {
       dossiers: {
         Row: {
           archived: boolean | null
+          cession_id: string | null
           claim_number: string | null
           client_id: string | null
           company_id: string
           created_at: string
           expert_name: string | null
+          expertise_report_id: string | null
+          fleet_reservation_id: string | null
           id: string
           incident_date: string | null
           incident_number: string | null
           insurance_company_id: string | null
           notes: string | null
+          overall_status: string | null
           policy_number: string | null
+          quote_id: string | null
           reference: string
+          repair_order_id: string | null
           report_number: string | null
           status: string | null
           updated_at: string
@@ -2237,18 +2243,24 @@ export type Database = {
         }
         Insert: {
           archived?: boolean | null
+          cession_id?: string | null
           claim_number?: string | null
           client_id?: string | null
           company_id: string
           created_at?: string
           expert_name?: string | null
+          expertise_report_id?: string | null
+          fleet_reservation_id?: string | null
           id?: string
           incident_date?: string | null
           incident_number?: string | null
           insurance_company_id?: string | null
           notes?: string | null
+          overall_status?: string | null
           policy_number?: string | null
+          quote_id?: string | null
           reference?: string
+          repair_order_id?: string | null
           report_number?: string | null
           status?: string | null
           updated_at?: string
@@ -2256,24 +2268,37 @@ export type Database = {
         }
         Update: {
           archived?: boolean | null
+          cession_id?: string | null
           claim_number?: string | null
           client_id?: string | null
           company_id?: string
           created_at?: string
           expert_name?: string | null
+          expertise_report_id?: string | null
+          fleet_reservation_id?: string | null
           id?: string
           incident_date?: string | null
           incident_number?: string | null
           insurance_company_id?: string | null
           notes?: string | null
+          overall_status?: string | null
           policy_number?: string | null
+          quote_id?: string | null
           reference?: string
+          repair_order_id?: string | null
           report_number?: string | null
           status?: string | null
           updated_at?: string
           vehicle_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "dossiers_cession_id_fkey"
+            columns: ["cession_id"]
+            isOneToOne: true
+            referencedRelation: "cessions"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "dossiers_client_id_fkey"
             columns: ["client_id"]
@@ -2282,10 +2307,38 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "dossiers_expertise_report_id_fkey"
+            columns: ["expertise_report_id"]
+            isOneToOne: true
+            referencedRelation: "expertise_reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dossiers_fleet_reservation_id_fkey"
+            columns: ["fleet_reservation_id"]
+            isOneToOne: true
+            referencedRelation: "fleet_reservations"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "dossiers_insurance_company_id_fkey"
             columns: ["insurance_company_id"]
             isOneToOne: false
             referencedRelation: "insurance_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dossiers_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: true
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dossiers_repair_order_id_fkey"
+            columns: ["repair_order_id"]
+            isOneToOne: true
+            referencedRelation: "repair_orders"
             referencedColumns: ["id"]
           },
           {
