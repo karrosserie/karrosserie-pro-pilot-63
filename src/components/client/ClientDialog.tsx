@@ -7,6 +7,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useFormDialog } from '@/hooks/use-form-dialog';
 import ClientForm from './ClientForm';
 import ClientVehiclesTab from './tabs/ClientVehiclesTab';
@@ -28,7 +34,19 @@ import { useCredits } from '@/hooks/use-credits';
 import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useMessageries } from '@/hooks/use-messageries';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from '@/lib/utils';
+import { 
+  User, 
+  Car, 
+  FileText, 
+  ClipboardList, 
+  Wrench, 
+  Receipt, 
+  CreditCard, 
+  Wallet, 
+  MessageSquare,
+  ChevronRight
+} from 'lucide-react';
 
 
 interface ClientDialogProps {
@@ -40,6 +58,19 @@ interface ClientDialogProps {
   onSubmit: (data: any) => void;
   mode: 'create' | 'edit' | 'view';
 }
+
+// Mapping des onglets avec leurs icônes et labels
+const TAB_CONFIG = [
+  { id: 'details', label: 'Informations client', icon: User },
+  { id: 'vehicles', label: 'Véhicules', icon: Car },
+  { id: 'expertise', label: 'Rapports d\'expertise', icon: FileText },
+  { id: 'quotes', label: 'Devis', icon: ClipboardList },
+  { id: 'repair-orders', label: 'Ordres de réparation', icon: Wrench },
+  { id: 'invoices', label: 'Factures', icon: Receipt },
+  { id: 'credits', label: 'Avoirs', icon: CreditCard },
+  { id: 'receipts', label: 'Encaissements', icon: Wallet },
+  { id: 'conversations', label: 'Conversations', icon: MessageSquare },
+];
 
 const ClientDialog: React.FC<ClientDialogProps> = ({
   open,
@@ -116,6 +147,21 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
     clientConversations
   );
 
+  // Fonction pour obtenir le compte de chaque onglet
+  const getTabCount = (tabId: string): number => {
+    switch (tabId) {
+      case 'vehicles': return clientVehicles.length;
+      case 'expertise': return clientReports.length;
+      case 'quotes': return clientQuotes.length;
+      case 'repair-orders': return clientOrders.length;
+      case 'invoices': return clientInvoices.length;
+      case 'credits': return clientCredits.length;
+      case 'receipts': return clientReceipts.length;
+      case 'conversations': return clientConversations.length;
+      default: return 0;
+    }
+  };
+
   // Fonction pour rendre le contenu selon l'onglet actif
   const renderActiveContent = () => {
     switch (activeTab) {
@@ -153,64 +199,81 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
   if (mode === 'view') {
     if (isMobile) {
       return (
-        <Dialog open={open} onOpenChange={handleOpenChange}>
-          <DialogContent className="w-[95vw] h-[95vh] overflow-hidden p-0 max-w-none">
-            <DialogHeader className="px-4 pt-4 pb-2">
-              <DialogTitle className="text-lg">{title}</DialogTitle>
-              {description && <DialogDescription className="text-sm">{description}</DialogDescription>}
-            </DialogHeader>
+        <Sheet open={open} onOpenChange={handleOpenChange}>
+          <SheetContent side="bottom" className="h-[95vh] p-0 flex flex-col">
+            <SheetHeader className="px-4 pt-4 pb-2 border-b flex-shrink-0">
+              <SheetTitle className="text-lg">{title}</SheetTitle>
+            </SheetHeader>
             
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col h-[calc(95vh-80px)]">
-              <TabsList className="grid w-full grid-cols-4 mx-4 mb-2">
-                <TabsTrigger value="details" className="text-xs">Détails</TabsTrigger>
-                <TabsTrigger value="vehicles" className="text-xs">
-                  Véhicules {clientVehicles.length > 0 && `(${clientVehicles.length})`}
-                </TabsTrigger>
-                <TabsTrigger value="invoices" className="text-xs">
-                  Factures {clientInvoices.length > 0 && `(${clientInvoices.length})`}
-                </TabsTrigger>
-                <TabsTrigger value="quotes" className="text-xs">
-                  Devis {clientQuotes.length > 0 && `(${clientQuotes.length})`}
-                </TabsTrigger>
-              </TabsList>
-              
-              <div className="flex-1 overflow-y-auto px-4 pb-4">
-                <TabsContent value="details" className="mt-0">
-                  <ClientForm 
-                    onSubmit={handleSubmit}
-                    defaultValues={defaultValues || {}}
-                    isViewMode={true}
-                    onCancel={handleCancel}
-                  />
-                </TabsContent>
-                <TabsContent value="vehicles" className="mt-0">
-                  <ClientVehiclesTab clientId={defaultValues?.id} />
-                </TabsContent>
-                <TabsContent value="expertise" className="mt-0">
-                  <ClientExpertiseReportsTab clientId={defaultValues?.id} />
-                </TabsContent>
-                <TabsContent value="quotes" className="mt-0">
-                  <ClientQuotesTab clientId={defaultValues?.id} />
-                </TabsContent>
-                <TabsContent value="repair-orders" className="mt-0">
-                  <ClientRepairOrdersTab clientId={defaultValues?.id} />
-                </TabsContent>
-                <TabsContent value="invoices" className="mt-0">
-                  <ClientInvoicesTab clientId={defaultValues?.id} />
-                </TabsContent>
-                <TabsContent value="credits" className="mt-0">
-                  <ClientCreditsTab clientId={defaultValues?.id} />
-                </TabsContent>
-                <TabsContent value="receipts" className="mt-0">
-                  <ClientReceiptsTab clientId={defaultValues?.id} />
-                </TabsContent>
-                <TabsContent value="conversations" className="mt-0">
-                  <ClientConversationsTab clientId={defaultValues?.id} />
-                </TabsContent>
+            <div className="flex-1 overflow-y-auto">
+              {/* Navigation des onglets */}
+              <div className="p-3 space-y-1">
+                {TAB_CONFIG.map((tab) => {
+                  const Icon = tab.icon;
+                  const count = getTabCount(tab.id);
+                  const isActive = activeTab === tab.id;
+                  
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={cn(
+                        "w-full flex items-center justify-between p-3 rounded-lg transition-colors",
+                        isActive 
+                          ? "bg-primary text-primary-foreground" 
+                          : "bg-muted/50 hover:bg-muted"
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Icon className="h-5 w-5" />
+                        <span className="font-medium text-sm">{tab.label}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {tab.id !== 'details' && count > 0 && (
+                          <span className={cn(
+                            "px-2 py-0.5 rounded-full text-xs font-medium",
+                            isActive 
+                              ? "bg-primary-foreground/20 text-primary-foreground" 
+                              : "bg-primary/10 text-primary"
+                          )}>
+                            {count}
+                          </span>
+                        )}
+                        <ChevronRight className={cn(
+                          "h-4 w-4",
+                          isActive ? "text-primary-foreground" : "text-muted-foreground"
+                        )} />
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
-            </Tabs>
-          </DialogContent>
-        </Dialog>
+
+              {/* Séparateur */}
+              <div className="border-t my-2" />
+
+              {/* Contenu de l'onglet sélectionné */}
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-4">
+                  {(() => {
+                    const currentTab = TAB_CONFIG.find(t => t.id === activeTab);
+                    if (currentTab) {
+                      const Icon = currentTab.icon;
+                      return (
+                        <>
+                          <Icon className="h-5 w-5 text-primary" />
+                          <h3 className="font-semibold text-foreground">{currentTab.label}</h3>
+                        </>
+                      );
+                    }
+                    return null;
+                  })()}
+                </div>
+                {renderActiveContent()}
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
       );
     }
 
