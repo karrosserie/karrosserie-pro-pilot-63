@@ -1,186 +1,191 @@
-
 import React from 'react';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import SignaturePad from '@/components/shared/SignaturePad';
+import SignaturePad from '@/components/SignaturePad';
 import { LoanFormData } from '../FleetLoanForm';
 import { useCompany } from '@/hooks/use-company';
 import { useClient } from '@/hooks/use-clients';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface AttestationTabProps {
   formData: LoanFormData;
   vehicle: any;
   clientData?: any;
-  onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  onSignatureChange: (field: string, value: any) => void;
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onSignatureChange: (field: string, value: string | boolean) => void;
   isViewMode?: boolean;
 }
 
 const AttestationTab: React.FC<AttestationTabProps> = ({
   formData,
   vehicle,
-  clientData,
+  clientData: propClientData,
   onInputChange,
   onSignatureChange,
   isViewMode = false
 }) => {
-  const { companyData } = useCompany();
-  const { client } = useClient(formData.clientId);
+  const { companyInfo } = useCompany();
+  const { client: fetchedClientData, isLoading: isLoadingClient } = useClient(formData.clientId);
+  
+  // Use prop data if provided, otherwise use fetched data
+  const clientData = propClientData || fetchedClientData;
 
-  // Automatically fill client name when client is selected
+  // Auto-populate client name
   React.useEffect(() => {
-    if (client && (!formData.clientName || formData.clientName.trim() === '')) {
-      onSignatureChange('clientName', `${client.firstName} ${client.lastName}`);
+    if (clientData && !formData.clientName) {
+      const fullName = clientData.company_name || 
+        `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim();
+      if (fullName) {
+        onSignatureChange('clientName', fullName);
+      }
     }
-  }, [client, formData.clientName, onSignatureChange]);
+  }, [clientData, formData.clientName]);
 
-  // Show loading state if client is being fetched
-  if (formData.clientId && !client) {
-    return (
-      <div className="space-y-6">
-        <div className="text-center py-8">
-          <p>Chargement des informations du client...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Format date and time to French format
-  const formatDateTimeToFrench = (dateString: string) => {
+  const formatDateTimeToFrench = (dateString: string | undefined) => {
     if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR') + ' à ' + date.toLocaleTimeString('fr-FR', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
+    try {
+      const date = new Date(dateString);
+      return format(date, "d MMMM yyyy 'à' HH:mm", { locale: fr });
+    } catch {
+      return dateString;
+    }
   };
 
+  if (isLoadingClient && !propClientData) {
+    return <div className="text-center py-8 text-muted-foreground">Chargement des informations client...</div>;
+  }
+
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-center text-lg font-bold">
-            Attestation de prêt de véhicule
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Company and Client Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-            <div className="space-y-4">
-              <div>
-                <Label className="font-semibold">De :</Label>
-                <div className="mt-2 space-y-1">
-                  <div>{companyData?.name}</div>
-                  <div>{companyData?.address}</div>
-                  <div>{companyData?.zipcode} {companyData?.city}</div>
-                  <div>{companyData?.phone}</div>
-                  <div>{companyData?.email}</div>
-                  <div>{companyData?.siren}</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <Label className="font-semibold">Au Client:</Label>
-                <div className="mt-2 space-y-1">
-                  <div>{client?.firstName} {client?.lastName}</div>
-                  <div>{client?.address}</div>
-                  <div>{client?.zipCode} {client?.city}</div>
-                  <div>{client?.phone}</div>
-                  {client?.email && <div>{client.email}</div>}
-                </div>
-              </div>
+    <Card className="border-0 shadow-none" data-tour="attestation">
+      <CardHeader className="px-0 pt-0 pb-3 sm:pb-4">
+        <CardTitle className="text-base sm:text-lg">Attestation de prêt de véhicule</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4 sm:space-y-6 px-0">
+        {/* Company & Client Info */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Company Info */}
+          <div className="p-3 sm:p-4 bg-muted/30 rounded-lg space-y-1.5">
+            <Label className="font-semibold text-xs sm:text-sm text-muted-foreground">De :</Label>
+            <div className="text-sm sm:text-base space-y-0.5">
+              <p className="font-medium">{companyInfo?.name || 'Entreprise'}</p>
+              <p className="text-muted-foreground text-xs sm:text-sm">{companyInfo?.address}</p>
+              <p className="text-muted-foreground text-xs sm:text-sm">{companyInfo?.zipcode} {companyInfo?.city}</p>
             </div>
           </div>
 
-          {/* Vehicle Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-            <div className="space-y-4">
-              <div>
-                <Label className="font-semibold">Désignation du véhicule d'emprunt:</Label>
-                <div className="mt-2 space-y-1">
-                  <div>Marque : {vehicle?.brand}</div>
-                  <div>Model : {vehicle?.model}</div>
-                  <div>N° Immatriculation : {vehicle?.license_plate}</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <Label className="font-semibold">Départ:</Label>
-                <div className="mt-2 space-y-1">
-                  <div>Le : {formatDateTimeToFrench(formData.startDate)}</div>
-                  <div>Kilométrage : {formData.mileage} Km</div>
-                </div>
-              </div>
-              
-              {/* Afficher la section "Retour" seulement si une date de fin est spécifiée */}
-              {formData.expectedReturnDate && (
-                <div>
-                  <Label className="font-semibold">Retour:</Label>
-                  <div className="mt-2 space-y-1">
-                    <div>Le : {formatDateTimeToFrench(formData.expectedReturnDate)}</div>
-                  </div>
-                </div>
-              )}
+          {/* Client Info */}
+          <div className="p-3 sm:p-4 bg-muted/30 rounded-lg space-y-1.5">
+            <Label className="font-semibold text-xs sm:text-sm text-muted-foreground">À :</Label>
+            <div className="text-sm sm:text-base space-y-0.5">
+              <p className="font-medium">
+                {clientData?.company_name || 
+                  `${clientData?.first_name || ''} ${clientData?.last_name || ''}`.trim() ||
+                  formData.clientName || 'Client'}
+              </p>
+              <p className="text-muted-foreground text-xs sm:text-sm">{clientData?.address}</p>
+              <p className="text-muted-foreground text-xs sm:text-sm">
+                {clientData?.postal_code} {clientData?.city}
+              </p>
             </div>
           </div>
+        </div>
 
-          {/* Signature Section */}
-          <div className="border-t pt-6" data-tour="attestation">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="clientName" className="font-semibold">Nom et prénom</Label>
-                  <Input
-                    id="clientName"
-                    name="clientName"
-                    value={formData.clientName || (client ? `${client.firstName} ${client.lastName}` : '')}
-                    onChange={onInputChange}
-                    disabled={isViewMode}
-                    className="mt-2"
-                  />
-                </div>
-                
-                <div className="flex items-start space-x-2">
-                  <Checkbox
-                    id="attestationAccepted"
-                    className="data-[state=checked]:bg-karrosserie-orange data-[state=checked]:border-karrosserie-orange"
-                    checked={formData.attestationAccepted || false}
-                    onCheckedChange={(checked) => onSignatureChange('attestationAccepted', checked)}
-                    disabled={isViewMode}
-                  />
-                  <Label htmlFor="attestationAccepted" className="text-sm leading-relaxed font-normal">
-                    Je certifie avoir pris connaissance de l'intégralité du document présent, et reconnais que ma signature apposée électroniquement sur la présente tablette vaut engagement ferme et personnel. Je confirme que cette signature constitue l'expression de mon consentement libre et éclairé, et engage ma pleine responsabilité juridique.
-                  </Label>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                {/* Electronic Signature */}
-                <SignaturePad
-                  value={formData.clientSignature || ''}
-                  onSignatureChange={(signature) => onSignatureChange('clientSignature', signature)}
-                  disabled={isViewMode}
-                />
-
-                <div className="space-y-2">
-                  <div className="text-sm text-muted-foreground">
-                    La signature électronique a la même valeur légale qu'une signature manuscrite.
-                    Exigence issue du Règlement eIDAS et du Code civil français, art. 1366-1367).
-                    Toute modification du présent document nécessitera une nouvelle signature du client
-                  </div>
-                </div>
-              </div>
+        {/* Vehicle Info */}
+        <div className="p-3 sm:p-4 bg-muted/30 rounded-lg space-y-2">
+          <Label className="font-semibold text-xs sm:text-sm text-muted-foreground">Véhicule :</Label>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
+            <div>
+              <span className="text-muted-foreground text-xs">Marque</span>
+              <p className="font-medium">{vehicle?.car_brands?.name || '-'}</p>
+            </div>
+            <div>
+              <span className="text-muted-foreground text-xs">Modèle</span>
+              <p className="font-medium">{vehicle?.car_models?.name || '-'}</p>
+            </div>
+            <div>
+              <span className="text-muted-foreground text-xs">Immatriculation</span>
+              <p className="font-medium">{vehicle?.license_plate || '-'}</p>
+            </div>
+            <div>
+              <span className="text-muted-foreground text-xs">Kilométrage</span>
+              <p className="font-medium">{formData.mileage?.toLocaleString('fr-FR') || 0} km</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+
+        {/* Dates */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="p-3 bg-muted/20 rounded-lg">
+            <span className="text-muted-foreground text-xs">Départ</span>
+            <p className="font-medium text-sm">{formatDateTimeToFrench(formData.startDate)}</p>
+          </div>
+          <div className="p-3 bg-muted/20 rounded-lg">
+            <span className="text-muted-foreground text-xs">Retour prévu</span>
+            <p className="font-medium text-sm">{formatDateTimeToFrench(formData.expectedReturnDate)}</p>
+          </div>
+        </div>
+
+        {/* Attestation Text */}
+        <div className="p-3 sm:p-4 bg-primary/5 rounded-lg border border-primary/20">
+          <p className="text-xs sm:text-sm leading-relaxed text-foreground">
+            <span className="hidden sm:inline">
+              Je soussigné(e), reconnais avoir pris connaissance de l'état du véhicule décrit ci-dessus et 
+              m'engage à le restituer dans le même état. Je m'engage à respecter le code de la route et 
+              à signaler immédiatement tout incident ou dommage survenu pendant la durée du prêt.
+            </span>
+            <span className="sm:hidden">
+              Je reconnais l'état du véhicule et m'engage à le restituer identique, respecter le code de la route et signaler tout incident.
+            </span>
+          </p>
+        </div>
+
+        {/* Signature Section */}
+        <div className="space-y-4 pt-4 border-t border-border">
+          <div className="space-y-2">
+            <Label htmlFor="signatureName" className="text-sm">
+              Nom et prénom du signataire <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="signatureName"
+              name="clientName"
+              value={formData.clientName || ''}
+              onChange={onInputChange}
+              placeholder="Entrez votre nom complet"
+              disabled={isViewMode}
+              className="max-w-md"
+            />
+          </div>
+
+          <div className="flex items-start gap-3">
+            <Checkbox
+              id="attestationAccepted"
+              checked={formData.attestationAccepted || false}
+              onCheckedChange={(checked) => onSignatureChange('attestationAccepted', checked as boolean)}
+              disabled={isViewMode}
+              className="mt-0.5"
+            />
+            <Label htmlFor="attestationAccepted" className="text-xs sm:text-sm leading-relaxed cursor-pointer">
+              J'atteste avoir lu et accepté les conditions de prêt du véhicule
+            </Label>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-sm">Signature électronique <span className="text-destructive">*</span></Label>
+            <div className="max-w-md">
+              <SignaturePad
+                value={formData.clientSignature || ''}
+                onChange={(value) => onSignatureChange('clientSignature', value)}
+                disabled={isViewMode}
+                height={150}
+              />
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
