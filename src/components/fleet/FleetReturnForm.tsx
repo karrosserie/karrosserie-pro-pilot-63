@@ -9,6 +9,7 @@ import ReturnDamageAssessmentTab from './form/ReturnDamageAssessmentTab';
 import VehicleDetailsTab from './form/VehicleDetailsTab';
 import ReturnAttestationTab from './form/ReturnAttestationTab';
 import { FleetReturnFormData } from './FleetReturnForm.types';
+import { AlertTriangle, Car, FileSignature } from 'lucide-react';
 
 interface FleetReturnFormProps {
   vehicle: FleetVehicle;
@@ -55,9 +56,9 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
   };
 
   const tabs = [
-    { value: 'damages', label: 'Chocs & rayures' },
-    { value: 'vehicle-details', label: 'Détails du véhicule & photos' },
-    { value: 'attestation', label: 'Attestation & Signature' }
+    { value: 'damages', label: 'Chocs & rayures', mobileLabel: 'Dommages', icon: AlertTriangle },
+    { value: 'vehicle-details', label: 'Détails du véhicule & photos', mobileLabel: 'Détails', icon: Car },
+    { value: 'attestation', label: 'Attestation & Signature', mobileLabel: 'Signature', icon: FileSignature }
   ];
 
   const currentTabIndex = tabs.findIndex(tab => tab.value === activeTab);
@@ -118,13 +119,22 @@ const FleetReturnForm: React.FC<FleetReturnFormProps> = ({
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col flex-1 min-h-0">
-        <div className="px-4 shrink-0 border-b">
+        <div className="px-2 sm:px-4 shrink-0 border-b">
           <TabsList className="grid w-full grid-cols-3 h-auto">
-            {tabs.map(tab => (
-              <TabsTrigger key={tab.value} value={tab.value} className="text-[10px] md:text-sm px-1 md:px-3 py-1.5 md:py-2">
-                {tab.label}
-              </TabsTrigger>
-            ))}
+            {tabs.map(tab => {
+              const TabIcon = tab.icon;
+              return (
+                <TabsTrigger 
+                  key={tab.value} 
+                  value={tab.value} 
+                  className="text-xs sm:text-sm px-2 sm:px-3 py-2 flex items-center justify-center gap-1.5"
+                >
+                  <TabIcon className="h-4 w-4 shrink-0" />
+                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="sm:hidden truncate">{tab.mobileLabel}</span>
+                </TabsTrigger>
+              );
+            })}
           </TabsList>
         </div>
 

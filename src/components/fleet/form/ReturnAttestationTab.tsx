@@ -60,120 +60,109 @@ const ReturnAttestationTab: React.FC<ReturnAttestationTabProps> = ({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <Card>
-        <CardHeader>
-          <CardTitle className="text-center text-lg font-bold">
+        <CardHeader className="pb-2 sm:pb-4">
+          <CardTitle className="text-center text-base sm:text-lg font-bold">
             Attestation de retour de véhicule
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4 sm:space-y-6">
           {/* Company and Client Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-4">
-              <div>
-                <Label className="font-semibold">De :</Label>
-                <div className="mt-2 space-y-1">
-                  <div>{companyData?.name}</div>
-                  <div>{companyData?.address}</div>
-                  <div>{companyData?.zipcode} {companyData?.city}</div>
-                  <div>{companyData?.phone}</div>
-                  <div>{companyData?.email}</div>
-                  <div>{companyData?.siren}</div>
-                </div>
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
+            <div className="space-y-2 sm:space-y-4 p-3 bg-muted/30 rounded-lg">
+              <Label className="font-semibold text-sm">De :</Label>
+              <div className="space-y-0.5 text-sm">
+                <div className="font-medium">{companyData?.name}</div>
+                <div className="text-muted-foreground">{companyData?.address}</div>
+                <div className="text-muted-foreground">{companyData?.zipcode} {companyData?.city}</div>
+                <div className="text-muted-foreground">{companyData?.phone}</div>
+                <div className="text-muted-foreground">{companyData?.email}</div>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <Label className="font-semibold">Du Client:</Label>
-                <div className="mt-2 space-y-1">
-                  <div>{client?.firstName} {client?.lastName}</div>
-                  <div>{client?.address}</div>
-                  <div>{client?.zipCode} {client?.city}</div>
-                  <div>{client?.phone}</div>
-                  {client?.email && <div>{client.email}</div>}
-                </div>
+            <div className="space-y-2 sm:space-y-4 p-3 bg-muted/30 rounded-lg">
+              <Label className="font-semibold text-sm">Du Client :</Label>
+              <div className="space-y-0.5 text-sm">
+                <div className="font-medium">{client?.firstName} {client?.lastName}</div>
+                <div className="text-muted-foreground">{client?.address}</div>
+                <div className="text-muted-foreground">{client?.zipCode} {client?.city}</div>
+                <div className="text-muted-foreground">{client?.phone}</div>
+                {client?.email && <div className="text-muted-foreground">{client.email}</div>}
               </div>
             </div>
           </div>
 
           {/* Vehicle Information and Loan Details */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-4">
-              <div>
-                <Label className="font-semibold">Désignation du véhicule retourné:</Label>
-                <div className="mt-2 space-y-1">
-                  <div>Marque : {vehicle?.brand}</div>
-                  <div>Model : {vehicle?.model}</div>
-                  <div>N° Immatriculation : {vehicle?.license_plate}</div>
-                </div>
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
+            <div className="space-y-2 sm:space-y-4 p-3 bg-muted/30 rounded-lg">
+              <Label className="font-semibold text-sm">Véhicule retourné :</Label>
+              <div className="space-y-0.5 text-sm">
+                <div><span className="text-muted-foreground">Marque :</span> {vehicle?.brand}</div>
+                <div><span className="text-muted-foreground">Modèle :</span> {vehicle?.model}</div>
+                <div><span className="text-muted-foreground">Immat. :</span> {vehicle?.license_plate}</div>
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4 p-3 bg-muted/30 rounded-lg">
               <div>
-                <Label className="font-semibold">Départ:</Label>
-                <div className="mt-2 space-y-1">
-                  <div>Le : {reservation?.start_date ? formatDateTimeToFrench(reservation.start_date) : 'N/A'}</div>
-                  <div>Kilométrage : {reservation?.start_mileage || 0} Km</div>
+                <Label className="font-semibold text-sm">Départ :</Label>
+                <div className="space-y-0.5 text-sm mt-1">
+                  <div><span className="text-muted-foreground">Le :</span> {reservation?.start_date ? formatDateTimeToFrench(reservation.start_date) : 'N/A'}</div>
+                  <div><span className="text-muted-foreground">Km :</span> {reservation?.start_mileage || 0}</div>
                 </div>
               </div>
               
               <div>
-                <Label className="font-semibold">Retour:</Label>
-                <div className="mt-2 space-y-1">
-                  <div>Le : {formatDateTimeToFrench(formData.returnDate)}</div>
-                  <div>Kilométrage : {formData.returnMileage} Km</div>
+                <Label className="font-semibold text-sm">Retour :</Label>
+                <div className="space-y-0.5 text-sm mt-1">
+                  <div><span className="text-muted-foreground">Le :</span> {formatDateTimeToFrench(formData.returnDate)}</div>
+                  <div><span className="text-muted-foreground">Km :</span> {formData.returnMileage}</div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Signature Section */}
-          <div className="border-t pt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="clientName" className="font-semibold">Nom et prénom</Label>
-                  <Input
-                    id="clientName"
-                    name="clientName"
-                    value={formData.clientName || (client ? `${client.firstName} ${client.lastName}` : '')}
-                    onChange={onInputChange}
-                    disabled={isViewMode}
-                    className="mt-2"
-                  />
-                </div>
-                
-                <div className="flex items-start space-x-2">
-                  <Checkbox
-                    id="attestationAccepted"
-                    className="data-[state=checked]:bg-karrosserie-orange data-[state=checked]:border-karrosserie-orange"
-                    checked={formData.attestationAccepted || false}
-                    onCheckedChange={(checked) => onSignatureChange('attestationAccepted', checked)}
-                    disabled={isViewMode}
-                  />
-                  <Label htmlFor="attestationAccepted" className="text-sm leading-relaxed font-normal">
-                    Je certifie avoir rendu le véhicule dans l'état décrit dans ce formulaire et reconnais que ma signature apposée électroniquement sur la présente tablette vaut engagement ferme et personnel. Je confirme que cette signature constitue l'expression de mon consentement libre et éclairé, et engage ma pleine responsabilité juridique.
-                  </Label>
-                </div>
+          <div className="border-t pt-4 sm:pt-6">
+            <div className="space-y-4 sm:space-y-6">
+              {/* Client Name Input */}
+              <div>
+                <Label htmlFor="clientName" className="font-semibold text-sm">Nom et prénom</Label>
+                <Input
+                  id="clientName"
+                  name="clientName"
+                  value={formData.clientName || (client ? `${client.firstName} ${client.lastName}` : '')}
+                  onChange={onInputChange}
+                  disabled={isViewMode}
+                  className="mt-2"
+                />
+              </div>
+              
+              {/* Attestation Checkbox */}
+              <div className="flex items-start gap-3 p-3 bg-muted/30 rounded-lg">
+                <Checkbox
+                  id="attestationAccepted"
+                  className="data-[state=checked]:bg-karrosserie-orange data-[state=checked]:border-karrosserie-orange mt-0.5 shrink-0"
+                  checked={formData.attestationAccepted || false}
+                  onCheckedChange={(checked) => onSignatureChange('attestationAccepted', checked)}
+                  disabled={isViewMode}
+                />
+                <Label htmlFor="attestationAccepted" className="text-xs sm:text-sm leading-relaxed font-normal cursor-pointer">
+                  Je certifie avoir rendu le véhicule dans l'état décrit et reconnais que ma signature électronique vaut engagement ferme et personnel.
+                </Label>
               </div>
 
-              <div className="space-y-4">
-                {/* Electronic Signature */}
+              {/* Electronic Signature */}
+              <div className="space-y-3">
                 <SignaturePad
                   value={formData.clientSignature || ''}
                   onSignatureChange={(signature) => onSignatureChange('clientSignature', signature)}
                   disabled={isViewMode}
                 />
 
-                <div className="space-y-2">
-                  <div className="text-sm text-muted-foreground">
-                    La signature électronique a la même valeur légale qu'une signature manuscrite.
-                    Exigence issue du Règlement eIDAS et du Code civil français, art. 1366-1367).
-                    Toute modification du présent document nécessitera une nouvelle signature du client
-                  </div>
+                <div className="text-xs text-muted-foreground leading-relaxed">
+                  La signature électronique a la même valeur légale qu'une signature manuscrite (Règlement eIDAS, Code civil art. 1366-1367).
                 </div>
               </div>
             </div>

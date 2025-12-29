@@ -64,46 +64,56 @@ const ReturnDamageAssessmentTab: React.FC<ReturnDamageAssessmentTabProps> = ({
     onDamageUpdate(updatedDamages);
   };
 
-  const renderDamageSection = (title: string, items: ReturnDamageItem[]) => (
-    <div className="space-y-1 md:space-y-2">
-      <h4 className="font-medium text-gray-700">{title}</h4>
-      <div className="space-y-0.5 md:space-y-1">
-        {items.map((item) => (
-          <div key={item.id} className="grid grid-cols-7 gap-1 md:gap-2 items-center py-1 md:py-1.5 border-b border-gray-100">
-            <div className="col-span-4 text-[10px] md:text-xs text-gray-600 truncate" title={item.name}>{item.name}</div>
-            <div className="flex justify-center">
-              <div 
-                className={`w-full h-6 md:h-8 rounded cursor-pointer border transition-colors ${
-                  item.type === 'rayure'
-                    ? 'bg-karrosserie-orange border-karrosserie-orange' 
-                    : 'bg-gray-100 border-gray-200 hover:bg-gray-200'
-                } ${isViewMode ? 'cursor-default' : 'cursor-pointer'}`}
-                onClick={() => !isViewMode && handleDamageChange(item.id, 'rayure')}
-              />
-            </div>
-            <div className="flex justify-center">
-              <div 
-                className={`w-full h-6 md:h-8 rounded cursor-pointer border transition-colors ${
-                  item.type === 'choc'
-                    ? 'bg-karrosserie-orange border-karrosserie-orange' 
-                    : 'bg-gray-100 border-gray-200 hover:bg-gray-200'
-                } ${isViewMode ? 'cursor-default' : 'cursor-pointer'}`}
-                onClick={() => !isViewMode && handleDamageChange(item.id, 'choc')}
-              />
-            </div>
-            <div className="flex justify-center">
-              <div 
-                className={`w-full h-6 md:h-8 rounded cursor-pointer border transition-colors ${
-                  item.type === 'hs'
-                    ? 'bg-karrosserie-orange border-karrosserie-orange' 
-                    : 'bg-gray-100 border-gray-200 hover:bg-gray-200'
-                } ${isViewMode ? 'cursor-default' : 'cursor-pointer'}`}
-                onClick={() => !isViewMode && handleDamageChange(item.id, 'hs')}
-              />
-            </div>
-          </div>
-        ))}
+  const renderDamageItem = (item: ReturnDamageItem) => (
+    <div 
+      key={item.id} 
+      className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border/50"
+    >
+      <span className="text-sm font-medium text-foreground">{item.name}</span>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${
+            item.type === 'rayure'
+              ? 'bg-karrosserie-orange text-white border-karrosserie-orange'
+              : 'bg-background border-border hover:bg-muted'
+          } ${isViewMode ? 'cursor-default opacity-70' : 'cursor-pointer'}`}
+          onClick={() => !isViewMode && handleDamageChange(item.id, 'rayure')}
+          disabled={isViewMode}
+        >
+          Ray.
+        </button>
+        <button
+          type="button"
+          className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${
+            item.type === 'choc'
+              ? 'bg-karrosserie-orange text-white border-karrosserie-orange'
+              : 'bg-background border-border hover:bg-muted'
+          } ${isViewMode ? 'cursor-default opacity-70' : 'cursor-pointer'}`}
+          onClick={() => !isViewMode && handleDamageChange(item.id, 'choc')}
+          disabled={isViewMode}
+        >
+          Choc
+        </button>
+        <button
+          type="button"
+          className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${
+            item.type === 'hs'
+              ? 'bg-karrosserie-orange text-white border-karrosserie-orange'
+              : 'bg-background border-border hover:bg-muted'
+          } ${isViewMode ? 'cursor-default opacity-70' : 'cursor-pointer'}`}
+          onClick={() => !isViewMode && handleDamageChange(item.id, 'hs')}
+          disabled={isViewMode}
+        >
+          HS
+        </button>
       </div>
+    </div>
+  );
+
+  const renderDamageSection = (title: string, items: ReturnDamageItem[]) => (
+    <div className="space-y-2">
+      {items.map((item) => renderDamageItem(item))}
     </div>
   );
 
@@ -113,45 +123,25 @@ const ReturnDamageAssessmentTab: React.FC<ReturnDamageAssessmentTabProps> = ({
   const partieLatDroite = currentDamages.slice(22);
 
   return (
-    <div className="space-y-3 md:space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
-        <Card className="p-2 md:p-3 overflow-x-auto">
-          <div className="grid grid-cols-7 gap-1 md:gap-2 mb-2 md:mb-3 pb-2 border-b border-gray-200">
-            <div className="col-span-4 font-medium text-gray-700 text-[10px] md:text-xs">Partie Avant</div>
-            <div className="text-center text-[10px] md:text-xs text-gray-600">Ray.</div>
-            <div className="text-center text-[10px] md:text-xs text-gray-600">Choc</div>
-            <div className="text-center text-[10px] md:text-xs text-gray-600">HS</div>
-          </div>
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Card className="p-3 sm:p-4">
+          <h4 className="font-semibold text-foreground mb-3 pb-2 border-b">Partie Avant</h4>
           {renderDamageSection('', partieAvant)}
         </Card>
 
-        <Card className="p-2 md:p-3 overflow-x-auto">
-          <div className="grid grid-cols-7 gap-1 md:gap-2 mb-2 md:mb-3 pb-2 border-b border-gray-200">
-            <div className="col-span-4 font-medium text-gray-700 text-[10px] md:text-xs">Partie Arrière</div>
-            <div className="text-center text-[10px] md:text-xs text-gray-600">Ray.</div>
-            <div className="text-center text-[10px] md:text-xs text-gray-600">Choc</div>
-            <div className="text-center text-[10px] md:text-xs text-gray-600">HS</div>
-          </div>
+        <Card className="p-3 sm:p-4">
+          <h4 className="font-semibold text-foreground mb-3 pb-2 border-b">Partie Arrière</h4>
           {renderDamageSection('', partieArriere)}
         </Card>
 
-        <Card className="p-2 md:p-3 overflow-x-auto">
-          <div className="grid grid-cols-7 gap-1 md:gap-2 mb-2 md:mb-3 pb-2 border-b border-gray-200">
-            <div className="col-span-4 font-medium text-gray-700 text-[10px] md:text-xs">Lat. Gauche</div>
-            <div className="text-center text-[10px] md:text-xs text-gray-600">Ray.</div>
-            <div className="text-center text-[10px] md:text-xs text-gray-600">Choc</div>
-            <div className="text-center text-[10px] md:text-xs text-gray-600">HS</div>
-          </div>
+        <Card className="p-3 sm:p-4">
+          <h4 className="font-semibold text-foreground mb-3 pb-2 border-b">Latéral Gauche</h4>
           {renderDamageSection('', partieLatGauche)}
         </Card>
 
-        <Card className="p-2 md:p-3 overflow-x-auto">
-          <div className="grid grid-cols-7 gap-1 md:gap-2 mb-2 md:mb-3 pb-2 border-b border-gray-200">
-            <div className="col-span-4 font-medium text-gray-700 text-[10px] md:text-xs">Lat. Droite</div>
-            <div className="text-center text-[10px] md:text-xs text-gray-600">Ray.</div>
-            <div className="text-center text-[10px] md:text-xs text-gray-600">Choc</div>
-            <div className="text-center text-[10px] md:text-xs text-gray-600">HS</div>
-          </div>
+        <Card className="p-3 sm:p-4">
+          <h4 className="font-semibold text-foreground mb-3 pb-2 border-b">Latéral Droit</h4>
           {renderDamageSection('', partieLatDroite)}
         </Card>
       </div>

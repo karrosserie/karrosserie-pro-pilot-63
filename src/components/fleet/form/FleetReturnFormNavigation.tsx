@@ -25,31 +25,44 @@ const FleetReturnFormNavigation: React.FC<FleetReturnFormNavigationProps> = ({
   isLastTab
 }) => {
   return (
-    <div className="flex justify-between items-center pt-6 border-t flex-shrink-0">
-      <div>
+    <div className="flex flex-col sm:flex-row gap-2 sm:justify-between items-stretch sm:items-center pt-4 sm:pt-6 flex-shrink-0">
+      {/* Previous button - hidden on first tab */}
+      <div className="order-2 sm:order-1">
         {!isFirstTab && (
-          <Button type="button" variant="outline" onClick={onPrevious}>
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={onPrevious}
+            className="w-full sm:w-auto"
+          >
             Précédent
           </Button>
         )}
       </div>
       
-      <div className="flex space-x-3">
-        <Button type="button" variant="outline" onClick={onCancel}>
+      {/* Cancel and Next/Submit buttons */}
+      <div className="flex flex-col sm:flex-row gap-2 order-1 sm:order-2 w-full sm:w-auto">
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={onCancel}
+          className="w-full sm:w-auto"
+        >
           Annuler
         </Button>
         
         {!isLastTab ? (
           <Button 
             type="button" 
-            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
-            onClick={onNext}>
+            className="w-full sm:w-auto bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+            onClick={onNext}
+          >
             Suivant
           </Button>
         ) : (
           <Button 
             type="submit" 
-            className="bg-karrosserie-orange hover:bg-karrosserie-orange/90"
+            className="w-full sm:w-auto bg-karrosserie-orange hover:bg-karrosserie-orange/90"
             onClick={onSubmit}
             disabled={!isFormValid || isPending}
           >
