@@ -7,6 +7,8 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { MessageriesMobileFilters } from "./MessageriesMobileFilters";
 
 interface Client {
   id: string;
@@ -49,6 +51,32 @@ export function MessageriesFilters({
   onCategoryChange,
   onStatusChange,
 }: MessageriesFiltersProps) {
+  const isMobile = useIsMobile();
+
+  // Afficher la version mobile
+  if (isMobile) {
+    return (
+      <MessageriesMobileFilters
+        searchTerm={searchTerm}
+        selectedType={selectedType}
+        selectedClient={selectedClient}
+        selectedPeriod={selectedPeriod}
+        selectedPriority={selectedPriority}
+        selectedCategory={selectedCategory}
+        selectedStatus={selectedStatus}
+        clients={clients}
+        onSearchChange={onSearchChange}
+        onTypeChange={onTypeChange}
+        onClientChange={onClientChange}
+        onPeriodChange={onPeriodChange}
+        onPriorityChange={onPriorityChange}
+        onCategoryChange={onCategoryChange}
+        onStatusChange={onStatusChange}
+      />
+    );
+  }
+
+  // Version desktop
   return (
     <div className="mb-6 space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

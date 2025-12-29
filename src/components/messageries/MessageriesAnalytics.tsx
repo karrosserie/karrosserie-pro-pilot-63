@@ -10,6 +10,8 @@ import { MessageriesTabs } from "./MessageriesTabs";
 import { Loading } from "@/components/ui/loading";
 import { Messagerie, Client } from "@/hooks/use-messageries";
 import { clientsService } from "@/services/supabase/clients";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 export default function MessageriesAnalytics() {
   const {
@@ -34,6 +36,7 @@ export default function MessageriesAnalytics() {
   const [clientHistoryModalOpen, setClientHistoryModalOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [allClients, setAllClients] = useState<Client[]>([]);
+  const isMobile = useIsMobile();
 
   // Charger tous les clients au montage
   useEffect(() => {
@@ -185,7 +188,10 @@ export default function MessageriesAnalytics() {
   }
 
   return (
-    <div className="p-6 bg-background min-h-screen">
+    <div className={cn(
+      "bg-background min-h-screen",
+      isMobile ? "p-3" : "p-6"
+    )}>
       <div className="max-w-7xl mx-auto">
         <MessageriesHeader 
           onQuickFilterUrgent={() => {
