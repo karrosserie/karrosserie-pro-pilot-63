@@ -69,17 +69,17 @@ const MobileSettingsMenu: React.FC<MobileSettingsMenuProps> = ({
           return (
             <button
               key={category.value}
-              className="w-full flex items-center gap-5 p-5 active:bg-muted/50 transition-colors"
+              className="w-full flex items-center gap-8 p-8 active:bg-muted/50 transition-colors"
               onClick={() => onSelectCategory(category.value)}
             >
-              <div className="p-3 rounded-xl bg-primary/10">
-                <Icon className="h-6 w-6 text-primary" />
+              <div className="p-6 rounded-xl bg-primary/10">
+                <Icon className="h-9 w-9 text-primary" />
               </div>
               <div className="flex-1 text-left">
-                <p className="font-medium text-base text-foreground">{category.label}</p>
+                <p className="font-medium text-xl text-foreground">{category.label}</p>
                 <p className="text-sm text-muted-foreground">{category.description}</p>
               </div>
-              <ChevronRight className="h-6 w-6 text-muted-foreground" />
+              <ChevronRight className="h-9 w-9 text-muted-foreground" />
             </button>
           );
         })}
