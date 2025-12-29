@@ -45,6 +45,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 import { CessionMobileCard } from './CessionMobileCard';
 import { useSubscription } from '@/hooks/use-subscription';
+import { handleDownload } from '@/components/shared/document-uploader/utils/documentUtils';
 import { CessionProgressDialog } from './CessionProgressDialog';
 import {
   Drawer,
@@ -295,45 +296,23 @@ export const CessionsTable = ({
           // Rafraîchir la page pour afficher le nouveau lien
           window.location.reload();
           return;
-        } catch (error) {
+        } catch (error: any) {
           console.error('Erreur lors du téléchargement du document signé:', error);
           toast({
             title: "Erreur",
             description: `Impossible de récupérer le document signé: ${error.message}`,
             variant: "destructive",
           });
-          // Utiliser le document original en cas d'erreur
         }
       }
       
-      // Si on a un document signé, l'utiliser
+      // Si on a un document signé, utiliser la méthode robuste fetch/blob
       if (cession.signed_document_url) {
         try {
-          // Méthode plus robuste pour éviter ERR_BLOCKED_BY_CLIENT
-          const downloadWithFallback = () => {
-            try {
-              // Tentative de téléchargement direct
-              const link = document.createElement('a');
-              link.href = cession.signed_document_url;
-              link.download = `cession-${cession.reference || cession.id}-signee.pdf`;
-              link.target = '_blank';
-              link.rel = 'noopener noreferrer';
-              
-              // Déclencher dans le contexte d'une action utilisateur
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-            } catch (linkError) {
-              console.warn('Téléchargement direct bloqué, utilisation de window.open:', linkError);
-              // Fallback: ouvrir dans un nouvel onglet
-              const newWindow = window.open(cession.signed_document_url, '_blank');
-              if (!newWindow) {
-                throw new Error('Téléchargement bloqué par le navigateur. Veuillez désactiver votre bloqueur de publicités ou autoriser les téléchargements pour ce site.');
-              }
-            }
-          };
-          
-          downloadWithFallback();
+          await handleDownload(
+            cession.signed_document_url, 
+            `cession-${cession.reference || cession.id}-signee.pdf`
+          );
           return;
         } catch (error) {
           console.error('Erreur lors du téléchargement du document signé:', error);
@@ -342,7 +321,6 @@ export const CessionsTable = ({
             description: "Impossible de télécharger le document signé. Utilisation du document original...",
             variant: "destructive",
           });
-          // Continuer avec le document original
         }
       }
     }
@@ -358,41 +336,17 @@ export const CessionsTable = ({
     }
 
     try {
-      // Méthode plus robuste pour éviter ERR_BLOCKED_BY_CLIENT  
-      const downloadWithFallback = (url: string, filename: string) => {
-        try {
-          // Tentative de téléchargement direct
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = filename;
-          link.target = '_blank';
-          link.rel = 'noopener noreferrer';
-          
-          // Déclencher dans le contexte d'une action utilisateur
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        } catch (linkError) {
-          console.warn('Téléchargement direct bloqué, utilisation de window.open:', linkError);
-          // Fallback: ouvrir dans un nouvel onglet
-          const newWindow = window.open(url, '_blank');
-          if (!newWindow) {
-            throw new Error('Téléchargement bloqué par le navigateur. Veuillez désactiver votre bloqueur de publicités ou autoriser les téléchargements pour ce site.');
-          }
-        }
-      };
-      
-      downloadWithFallback(cession.document_url, `cession-${cession.reference || cession.id}.pdf`);
+      await handleDownload(
+        cession.document_url, 
+        `cession-${cession.reference || cession.id}.pdf`
+      );
     } catch (error) {
       console.error('Erreur lors du téléchargement:', error);
       toast({
         title: "Erreur de téléchargement",
-        description: "Impossible de télécharger le fichier. Tentative d'ouverture dans un nouvel onglet...",
+        description: "Impossible de télécharger le fichier.",
         variant: "destructive",
       });
-      
-      // Fallback: ouvrir dans un nouvel onglet
-      window.open(cession.document_url, '_blank');
     }
   };
 
