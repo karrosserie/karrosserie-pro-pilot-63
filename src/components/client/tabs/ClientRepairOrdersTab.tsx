@@ -26,6 +26,8 @@ import { Invoice } from '@/services/supabase/invoices';
 import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
 import { UnsignedRepairOrderWarningDialog } from '@/components/repair-orders/UnsignedRepairOrderWarningDialog';
+import { useIsMobile } from '@/hooks/use-mobile';
+import ClientRepairOrderMobileCard from './ClientRepairOrderMobileCard';
 
 interface ClientRepairOrdersTabProps {
   clientId: string;
@@ -35,6 +37,7 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
   const { orders, isLoading, deleteOrder } = useRepairOrders();
   const { toast } = useToast();
   const { confirm } = useConfirmation();
+  const isMobile = useIsMobile();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [viewerModalOpen, setViewerModalOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
@@ -47,6 +50,8 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
   const [showUnsignedWarning, setShowUnsignedWarning] = useState(false);
   const [orderToConvert, setOrderToConvert] = useState<RepairOrder | null>(null);
 
+  const clientOrders = orders?.filter(order => order.client_id === clientId) || [];
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-32">
@@ -54,8 +59,6 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
       </div>
     );
   }
-
-  const clientOrders = orders?.filter(order => order.client_id === clientId) || [];
   const { sortedData, sortConfig, handleSort } = useTableSorting<RepairOrder>(clientOrders, 'reference');
 
   const handleViewOrder = (order: RepairOrder) => {
@@ -247,6 +250,79 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
       return '-';
     }
   };
+
+  // Affichage mobile avec cartes
+  if (isMobile) {
+    return (
+      <>
+        {clientOrders.length > 0 ? (
+          <div className="space-y-3">
+            {clientOrders.map((order) => (
+              <ClientRepairOrderMobileCard
+                key={order.id}
+                order={order}
+                onViewOrder={handleViewOrder}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-8">
+            <Wrench className="h-10 w-10 text-muted-foreground mb-2" />
+            <h3 className="font-medium text-foreground">Aucun ordre de réparation</h3>
+            <p className="text-muted-foreground mt-1">Ce client n'a pas encore d'ordre de réparation.</p>
+          </div>
+        )}
+
+        <RepairOrderDialog
+          order={selectedOrder}
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+        />
+
+        <RepairOrderViewerModal
+          repairOrder={selectedOrder}
+          open={viewerModalOpen}
+          onOpenChange={setViewerModalOpen}
+        />
+
+        <RepairOrderEmailDialog
+          repairOrder={selectedOrderForEmail}
+          open={emailDialogOpen}
+          onOpenChange={setEmailDialogOpen}
+        />
+
+        <RepairOrderSignatureDialog
+          repairOrder={selectedOrderForSignature}
+          open={signatureDialogOpen}
+          onOpenChange={setSignatureDialogOpen}
+        />
+
+        <InvoiceDialog
+          open={invoiceDialogOpen}
+          onOpenChange={(open) => {
+            setInvoiceDialogOpen(open);
+            if (!open) {
+              setPrefilledInvoice(null);
+            }
+          }}
+          invoice={prefilledInvoice as Invoice}
+        />
+
+        <UnsignedRepairOrderWarningDialog
+          open={showUnsignedWarning}
+          onOpenChange={setShowUnsignedWarning}
+          orderReference={orderToConvert?.reference}
+          onConfirm={() => {
+            if (orderToConvert) {
+              proceedWithConversion(orderToConvert);
+            }
+            setShowUnsignedWarning(false);
+            setOrderToConvert(null);
+          }}
+        />
+      </>
+    );
+  }
 
   return (
     <>
