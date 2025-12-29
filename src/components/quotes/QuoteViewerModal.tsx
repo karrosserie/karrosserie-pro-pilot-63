@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { toast } from '@/hooks/use-toast';
@@ -14,7 +15,7 @@ import { calculateGlobalTotals } from '@/components/quotes/form/utils/calculatio
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Edit, Trash, Printer, Download, Mail, FileText, Wrench, Eye, Pencil, FileCheck, ArrowRight, ShoppingCart } from 'lucide-react';
+import { Edit, Trash, Printer, Download, Mail, FileText, Wrench, Eye, Pencil, FileCheck, ArrowRight, ShoppingCart, MoreHorizontal } from 'lucide-react';
 import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 import DefaultQuotePreview from './templates/DefaultQuotePreview';
 import AlternativeQuotePreview from './templates/AlternativeQuotePreview';
@@ -25,6 +26,13 @@ import BonCommandeModal from './BonCommandeModal';
 import { AttachModificatifDialog } from './AttachModificatifDialog';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { Paperclip, ExternalLink } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface QuoteViewerModalProps {
   quote: Quote | null;
@@ -39,6 +47,7 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
   const { deleteQuote } = useQuotes();
   const { confirm } = useConfirmation();
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
   const [clientData, setClientData] = useState<any>(null);
   const [vehicleData, setVehicleData] = useState<any>(null);
   const [currentQuote, setCurrentQuote] = useState<Quote | null>(quote);
@@ -420,6 +429,163 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
     }
   };
 
+  // Contenu de l'aperçu (partagé entre Dialog et Sheet)
+  const previewContent = (
+    <div className="w-full h-full">
+      {template === 'default' ? (
+        <DefaultQuotePreview 
+          companyData={companyData}
+          quoteData={quoteData}
+          clientData={clientDataForTemplate}
+          items={items}
+          totals={totalsData}
+        />
+      ) : (
+        <AlternativeQuotePreview 
+          companyData={companyData}
+          quoteData={quoteData}
+          clientData={clientDataForTemplate}
+          items={items}
+          totals={totalsData}
+        />
+      )}
+    </div>
+  );
+
+  // Actions principales (pour mobile footer)
+  const primaryActions = (
+    <>
+      <Button variant="outline" size="sm" onClick={handleEdit} className="flex-1 text-xs h-9">
+        <Pencil className="h-3 w-3 mr-1" />
+        Modifier
+      </Button>
+      <Button variant="outline" size="sm" onClick={handleDownload} className="flex-1 text-xs h-9">
+        <Download className="h-3 w-3 mr-1" />
+        PDF
+      </Button>
+      <Button size="sm" className="flex-1 bg-karrosserie-orange hover:bg-karrosserie-orange/90 text-xs h-9" onClick={handleConvertToRepairOrder}>
+        <ArrowRight className="h-3 w-3 mr-1" />
+        Convertir
+      </Button>
+    </>
+  );
+
+  // Actions secondaires (menu déroulant sur mobile)
+  const secondaryActionsMenu = (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm" className="h-9">
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuItem onClick={handlePrint}>
+          <Printer className="h-4 w-4 mr-2" />
+          Imprimer
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleSendEmail}>
+          <Mail className="h-4 w-4 mr-2" />
+          Envoyer par e-mail
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleRequestDocuments}>
+          <FileCheck className="h-4 w-4 mr-2" />
+          Demander justificatifs
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleBonCommande}>
+          <ShoppingCart className="h-4 w-4 mr-2" />
+          Bon de commande
+        </DropdownMenuItem>
+        {currentQuote.is_modified_from_report && !currentQuote.modificatif_received_at && (
+          <DropdownMenuItem onClick={handleAttachModificatif}>
+            <Paperclip className="h-4 w-4 mr-2" />
+            Joindre modificatif
+          </DropdownMenuItem>
+        )}
+        {currentQuote.modificatif_received_at && currentQuote.modificatif_report_id && (
+          <DropdownMenuItem onClick={handleViewModificatif}>
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Voir modificatif
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuItem onClick={handleDelete} className="text-destructive focus:text-destructive">
+          <Trash className="h-4 w-4 mr-2" />
+          Supprimer
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
+  // Version Mobile avec Sheet plein écran
+  if (isMobile) {
+    return (
+      <>
+        <Sheet open={open} onOpenChange={onOpenChange}>
+          <SheetContent side="bottom" className="h-[95vh] p-0 flex flex-col">
+            {/* Header mobile */}
+            <SheetHeader className="p-3 border-b bg-background shrink-0">
+              <SheetTitle className="text-sm font-semibold">
+                Devis n°{currentQuote.reference}
+              </SheetTitle>
+            </SheetHeader>
+            
+            {/* Contenu scrollable */}
+            <div className="flex-1 overflow-y-auto p-3">
+              {previewContent}
+            </div>
+            
+            {/* Footer sticky avec actions */}
+            <div className="p-3 border-t bg-background flex gap-2 shrink-0">
+              {primaryActions}
+              {secondaryActionsMenu}
+            </div>
+          </SheetContent>
+        </Sheet>
+
+        {/* Dialogues pour les actions */}
+        <QuoteDialog
+          quote={currentQuote}
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+        />
+
+        <QuoteEmailDialog
+          quote={currentQuote}
+          open={emailDialogOpen}
+          onOpenChange={setEmailDialogOpen}
+        />
+
+        <RepairOrderDialog
+          order={prefilledRepairOrder as RepairOrder}
+          open={repairOrderDialogOpen}
+          onOpenChange={setRepairOrderDialogOpen}
+          prefillData={prefilledRepairOrder}
+          onSuccess={() => {
+            onOpenChange(false);
+            toast({
+              title: "Conversion réussie",
+              description: `L'ordre de réparation a été créé à partir du devis ${currentQuote.reference}.`
+            });
+          }}
+        />
+
+        <BonCommandeModal
+          open={bonCommandeModalOpen}
+          onOpenChange={setBonCommandeModalOpen}
+          quoteId={currentQuote.id}
+          quoteReference={currentQuote.reference}
+          clientId={currentQuote.client_id || undefined}
+        />
+
+        <AttachModificatifDialog
+          open={attachModificatifDialogOpen}
+          onOpenChange={setAttachModificatifDialogOpen}
+          quote={currentQuote}
+        />
+      </>
+    );
+  }
+
+  // Version Desktop avec Dialog
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -500,25 +666,7 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
               </Button>
             </div>
           </div>
-          <div className="w-full h-full">
-            {template === 'default' ? (
-              <DefaultQuotePreview 
-                companyData={companyData}
-                quoteData={quoteData}
-                clientData={clientDataForTemplate}
-                items={items}
-                totals={totalsData}
-              />
-            ) : (
-              <AlternativeQuotePreview 
-                companyData={companyData}
-                quoteData={quoteData}
-                clientData={clientDataForTemplate}
-                items={items}
-                totals={totalsData}
-              />
-            )}
-          </div>
+          {previewContent}
         </DialogContent>
       </Dialog>
 

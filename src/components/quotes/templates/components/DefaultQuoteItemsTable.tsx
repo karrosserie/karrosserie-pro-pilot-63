@@ -1,4 +1,6 @@
 import React from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import QuoteMobileItemCard from './QuoteMobileItemCard';
 
 interface Item {
   ref?: string;
@@ -16,6 +18,20 @@ interface DefaultQuoteItemsTableProps {
 }
 
 const DefaultQuoteItemsTable = ({ items }: DefaultQuoteItemsTableProps) => {
+  const isMobile = useIsMobile();
+
+  // Affichage mobile en cartes
+  if (isMobile) {
+    return (
+      <div className="space-y-2">
+        {items.map((item, index) => (
+          <QuoteMobileItemCard key={index} item={item} />
+        ))}
+      </div>
+    );
+  }
+
+  // Affichage desktop en tableau
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-xs sm:text-sm md:text-base bg-white border-collapse min-w-[600px]">
