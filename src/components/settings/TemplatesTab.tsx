@@ -136,11 +136,11 @@ export const TemplatesTab = () => {
       </div>
 
       {/* Page Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h3 className="text-xl font-semibold">Bibliothèque de Templates</h3>
-        <div className="flex gap-3">
-          <Button variant="outline">📥 Importer</Button>
-          <Button onClick={handleCreateTemplate}>
+        <div className="flex gap-3 w-full sm:w-auto">
+          <Button variant="outline" className="flex-1 sm:flex-none">📥 Importer</Button>
+          <Button onClick={handleCreateTemplate} className="flex-1 sm:flex-none">
             <Plus className="h-4 w-4 mr-2" />
             Nouveau template
           </Button>
