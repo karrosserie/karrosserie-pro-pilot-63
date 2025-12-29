@@ -117,11 +117,11 @@ const SignaturePad: React.FC<SignaturePadProps> = ({
 
   return (
     <div className="space-y-2">
-      <Label>Signature électronique</Label>
+      <Label className="text-sm font-semibold">Signature électronique</Label>
       <div className="relative">
         <canvas
           ref={canvasRef}
-          className="border-2 border-dashed border-gray-300 w-full h-32 bg-gray-50 cursor-crosshair"
+          className="border-2 border-dashed border-muted-foreground/30 w-full h-40 sm:h-32 bg-muted/20 rounded-lg cursor-crosshair"
           style={{ touchAction: 'none' }}
           onMouseDown={startDrawing}
           onMouseMove={draw}
@@ -134,8 +134,9 @@ const SignaturePad: React.FC<SignaturePadProps> = ({
         
         {!hasSignature && !disabled && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="text-center text-gray-500">
-              <div>Signez ici avec votre doigt ou votre souris</div>
+            <div className="text-center text-muted-foreground text-sm px-4">
+              <div>Signez ici</div>
+              <div className="text-xs mt-1 hidden sm:block">avec votre doigt ou votre souris</div>
             </div>
           </div>
         )}
@@ -147,7 +148,7 @@ const SignaturePad: React.FC<SignaturePadProps> = ({
           variant="outline" 
           size="sm" 
           onClick={clearSignature}
-          className="mt-2"
+          className="w-full sm:w-auto"
         >
           Effacer la signature
         </Button>
