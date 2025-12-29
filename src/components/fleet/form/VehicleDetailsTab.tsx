@@ -76,16 +76,16 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
   const displayImages = vehicleImages.length === 0 ? [{ url: '', timing: 'Avant' as const }] : vehicleImages;
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
-        {/* Left column: Kilométrage et carburant */}
-        <div className="md:col-span-3 lg:col-span-1 space-y-6">
+    <div className="space-y-4 sm:space-y-6">
+      {/* Mobile Layout: Stacked */}
+      <div className="md:hidden space-y-4">
+        <div className="grid grid-cols-2 gap-3">
           <div className="space-y-2" data-tour="vehicle-mileage">
-            <Label htmlFor="mileage">
-              Kilométrage actuel <span className="text-red-500">*</span>
+            <Label htmlFor="mileage-mobile" className="text-sm">
+              Kilométrage <span className="text-destructive">*</span>
             </Label>
             <Input
-              id="mileage"
+              id="mileage-mobile"
               name="mileage"
               type="number"
               value={mileage}
@@ -99,7 +99,7 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
           </div>
 
           <div className="space-y-2" data-tour="fuel-level">
-            <Label>Niveau de carburant</Label>
+            <Label className="text-sm">Carburant</Label>
             <div className="flex justify-center">
               <FuelGauge
                 value={fuelLevel}
@@ -110,8 +110,7 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
           </div>
         </div>
 
-        {/* Right column: Photos du véhicule */}
-        <div className="md:col-span-3 lg:col-span-4 space-y-4" data-tour="vehicle-photos">
+        <div data-tour="vehicle-photos">
           <MultipleVehicleImages
             vehicleId={vehicleId}
             vehicleImages={displayImages}
@@ -122,6 +121,55 @@ const VehicleDetailsTab: React.FC<VehicleDetailsTabProps> = ({
             onImageTimingUpdate={onImageTimingUpdate}
             showTimingSelector={showTimingSelector}
           />
+        </div>
+      </div>
+
+      {/* Desktop Layout: Side by side */}
+      <div className="hidden md:block">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
+          <div className="md:col-span-3 lg:col-span-1 space-y-6">
+            <div className="space-y-2" data-tour="vehicle-mileage">
+              <Label htmlFor="mileage">
+                Kilométrage actuel <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="mileage"
+                name="mileage"
+                type="number"
+                value={mileage}
+                onChange={handleMileageChange}
+                onFocus={handleMileageFocus}
+                onBlur={handleMileageBlur}
+                placeholder="Ex: 45000"
+                disabled={isViewMode}
+                min="0"
+              />
+            </div>
+
+            <div className="space-y-2" data-tour="fuel-level">
+              <Label>Niveau de carburant</Label>
+              <div className="flex justify-center">
+                <FuelGauge
+                  value={fuelLevel}
+                  onChange={onFuelLevelChange}
+                  disabled={isViewMode}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="md:col-span-3 lg:col-span-4 space-y-4" data-tour="vehicle-photos">
+            <MultipleVehicleImages
+              vehicleId={vehicleId}
+              vehicleImages={displayImages}
+              isViewMode={isViewMode}
+              onImageAdd={handleImageAdd}
+              onImageRemove={handleImageRemove}
+              onImageUpdate={handleImageUpdate}
+              onImageTimingUpdate={onImageTimingUpdate}
+              showTimingSelector={showTimingSelector}
+            />
+          </div>
         </div>
       </div>
     </div>

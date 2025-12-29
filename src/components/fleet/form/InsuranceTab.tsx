@@ -27,23 +27,25 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
   isViewMode = false
 }) => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Insurance Switch */}
-      <div className="flex items-center space-x-2" data-tour="insurance-switch">
+      <div className="flex items-center space-x-2 p-3 bg-muted/30 rounded-lg" data-tour="insurance-switch">
         <Switch
           id="clientInsurance"
           checked={formData.clientInsurance || false}
           onCheckedChange={onSwitchChange}
           disabled={isViewMode}
         />
-        <Label htmlFor="clientInsurance">Assurance du client</Label>
+        <Label htmlFor="clientInsurance" className="text-sm sm:text-base cursor-pointer">
+          Assurance du client
+        </Label>
       </div>
 
-      {/* Insurance Details - Always visible */}
-      <div className="space-y-6 md:space-y-8 border-t pt-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Insurance Details */}
+      <div className="space-y-4 sm:space-y-6 border-t pt-4 sm:pt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div className="space-y-2">
-            <Label htmlFor="insuranceCompanyName">
+            <Label htmlFor="insuranceCompanyName" className="text-sm">
               Nom de la compagnie d'assurance <span className="text-destructive">*</span>
             </Label>
             <Input
@@ -57,7 +59,7 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="insurancePhone">
+            <Label htmlFor="insurancePhone" className="text-sm">
               Numéro de téléphone {formData.clientInsurance && <span className="text-destructive">*</span>}
             </Label>
             <PhoneInputField
@@ -69,7 +71,7 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="insuranceEmail">
+            <Label htmlFor="insuranceEmail" className="text-sm">
               Adresse e-mail <span className="text-destructive">*</span>
             </Label>
             <Input
@@ -84,7 +86,7 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="insuranceContractNumber">
+            <Label htmlFor="insuranceContractNumber" className="text-sm">
               Numéro de contrat {formData.clientInsurance && <span className="text-destructive">*</span>}
             </Label>
             <Input
@@ -98,10 +100,10 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
           </div>
         </div>
 
-        {/* Address fields without title */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="md:col-span-2 space-y-2">
-            <Label htmlFor="insuranceAddress">
+        {/* Address fields */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="sm:col-span-2 space-y-2">
+            <Label htmlFor="insuranceAddress" className="text-sm">
               Adresse {formData.clientInsurance && <span className="text-destructive">*</span>}
             </Label>
             <Input
@@ -115,7 +117,7 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="insuranceCity">
+            <Label htmlFor="insuranceCity" className="text-sm">
               Ville {formData.clientInsurance && <span className="text-destructive">*</span>}
             </Label>
             <Input
@@ -129,7 +131,7 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="insurancePostalCode">
+            <Label htmlFor="insurancePostalCode" className="text-sm">
               Code postal {formData.clientInsurance && <span className="text-destructive">*</span>}
             </Label>
             <Input
@@ -145,24 +147,26 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
       </div>
 
       {/* Assistance Section */}
-      <div className="space-y-6 border-t pt-6 mt-6">
-        <h4 className="text-sm font-medium text-foreground">Assistance</h4>
+      <div className="space-y-4 border-t pt-4 sm:pt-6">
+        <h4 className="text-sm sm:text-base font-medium text-foreground">Assistance</h4>
         
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 p-3 bg-muted/30 rounded-lg">
           <Switch
             id="hasAssistance"
             checked={formData.hasAssistance || false}
             onCheckedChange={onAssistanceSwitchChange}
             disabled={isViewMode}
           />
-          <Label htmlFor="hasAssistance">Dossier d'assistance</Label>
+          <Label htmlFor="hasAssistance" className="text-sm sm:text-base cursor-pointer">
+            Dossier d'assistance
+          </Label>
         </div>
 
         {formData.hasAssistance && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             <div className="space-y-2">
-              <Label htmlFor="assistanceCaseNumber">
-                Numéro de dossier d'assistance <span className="text-destructive">*</span>
+              <Label htmlFor="assistanceCaseNumber" className="text-sm">
+                Numéro de dossier <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="assistanceCaseNumber"
@@ -175,8 +179,8 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="assistanceEmail">
-                Email de contact de l'assistance <span className="text-destructive">*</span>
+              <Label htmlFor="assistanceEmail" className="text-sm">
+                Email de contact <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="assistanceEmail"
@@ -190,8 +194,8 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="assistanceFormula">
-                Formule d'assistance <span className="text-destructive">*</span>
+              <Label htmlFor="assistanceFormula" className="text-sm">
+                Formule <span className="text-destructive">*</span>
               </Label>
               <Select
                 value={formData.assistanceFormula || ''}
@@ -199,7 +203,7 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
                 disabled={isViewMode}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Choisir une formule" />
+                  <SelectValue placeholder="Choisir" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="8">8 jours</SelectItem>
