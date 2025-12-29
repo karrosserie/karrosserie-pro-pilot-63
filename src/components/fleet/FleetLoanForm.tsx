@@ -253,13 +253,10 @@ const FleetLoanForm: React.FC<FleetLoanFormProps> = ({
             formData={formData}
             onInputChange={handleInputChange}
             onClientSelect={handleClientSelect}
-            onQuoteSelect={handleQuoteSelect}
-            onFreeTextClientChange={handleFreeTextClientChange}
             onDriverLicenseFrontUpload={handleDriverLicenseFrontUpload}
             onDriverLicenseBackUpload={handleDriverLicenseBackUpload}
             onLicenseAnalyzed={handleLicenseAnalyzed}
             isViewMode={isViewMode}
-            onNewClientClick={handleNewClientClick}
           />
         </TabsContent>
 

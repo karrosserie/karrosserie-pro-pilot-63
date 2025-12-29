@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { UserPlus } from 'lucide-react';
 import { SearchableSelect } from '@/components/ui/searchable-select';
 import { LoanFormData } from '../FleetLoanForm';
 import { DocumentUploader } from '@/components/shared/DocumentUploader';
@@ -13,9 +11,6 @@ interface ClientInfoTabProps {
   formData: LoanFormData;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onClientSelect: (clientId: string) => void;
-  onQuoteSelect: (quoteId: string) => void;
-  onFreeTextClientChange: (name: string) => void;
-  onNewClientClick: () => void;
   onDriverLicenseFrontUpload: (url: string) => void;
   onDriverLicenseBackUpload: (url: string) => void;
   onLicenseAnalyzed: (data: { 
@@ -34,15 +29,12 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
   formData,
   onInputChange,
   onClientSelect,
-  onFreeTextClientChange,
-  onNewClientClick,
   onDriverLicenseFrontUpload,
   onDriverLicenseBackUpload,
   onLicenseAnalyzed,
   isViewMode = false
 }) => {
-  const [useExistingClient, setUseExistingClient] = useState(!!formData.clientId);
-  const { client: clientData, isLoading: isLoadingClient } = useClient(formData.clientId);
+  const { client: clientData } = useClient(formData.clientId);
   const { clients } = useClients();
 
   // Prepare options for SearchableSelect
@@ -50,26 +42,6 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
     value: client.id,
     label: client.company_name || `${client.first_name || ''} ${client.last_name || ''}`.trim()
   })) || [];
-  
-  // Synchronize useExistingClient with formData.clientId
-  useEffect(() => {
-    if (formData.clientId) {
-      setUseExistingClient(true);
-    }
-  }, [formData.clientId]);
-
-  // Extract display name from client data or form data
-  const getDisplayClientName = () => {
-    if (clientData) {
-      return clientData.company_name || 
-        `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim();
-    }
-    return formData.clientName || '';
-  };
-
-  const handleClientNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onFreeTextClientChange(e.target.value);
-  };
 
   const handleDriverLicenseFrontUpload = (url: string, analysisResult?: any) => {
     onDriverLicenseFrontUpload(url);
@@ -121,66 +93,13 @@ const ClientInfoTab: React.FC<ClientInfoTabProps> = ({
           Client <span className="text-destructive">*</span>
         </Label>
         
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 sm:items-center">
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant={useExistingClient ? "default" : "outline"}
-              size="sm"
-              onClick={() => setUseExistingClient(true)}
-              disabled={isViewMode}
-              className="flex-1 sm:flex-none"
-            >
-              Client existant
-            </Button>
-            <Button
-              type="button"
-              variant={!useExistingClient ? "default" : "outline"}
-              size="sm"
-              onClick={() => setUseExistingClient(false)}
-              disabled={isViewMode}
-              className="flex-1 sm:flex-none"
-            >
-              Nouveau conducteur
-            </Button>
-          </div>
-
-          {useExistingClient && !isViewMode && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={onNewClientClick}
-              className="w-full sm:w-auto"
-            >
-              <UserPlus className="h-4 w-4 mr-2" />
-              Créer un client
-            </Button>
-          )}
-        </div>
-
-        {useExistingClient ? (
-          <div className="w-full">
-            <SearchableSelect
-              options={clientOptions}
-              value={formData.clientId || ''}
-              onValueChange={onClientSelect}
-              placeholder="Rechercher un client..."
-              disabled={isViewMode}
-              showNewClientOption={!isViewMode}
-              onNewClientClick={onNewClientClick}
-              allowFreeText
-              onFreeTextChange={onFreeTextClientChange}
-            />
-          </div>
-        ) : (
-          <Input
-            value={formData.clientName || ''}
-            onChange={handleClientNameChange}
-            placeholder="Nom du conducteur"
-            disabled={isViewMode}
-          />
-        )}
+        <SearchableSelect
+          options={clientOptions}
+          value={formData.clientId || ''}
+          onValueChange={onClientSelect}
+          placeholder="Rechercher un client..."
+          disabled={isViewMode}
+        />
       </div>
 
       {/* Client Details */}
