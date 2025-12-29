@@ -7,12 +7,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
 import { useFormDialog } from '@/hooks/use-form-dialog';
 import ClientForm from './ClientForm';
 import ClientVehiclesTab from './tabs/ClientVehiclesTab';
@@ -35,31 +29,6 @@ import { useReceiptsData } from '@/hooks/use-receipts-data';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useMessageries } from '@/hooks/use-messageries';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
-import { 
-  User, 
-  Car, 
-  FileText, 
-  ClipboardList, 
-  Wrench, 
-  Receipt, 
-  CreditCard, 
-  Banknote, 
-  MessageSquare,
-  Pencil,
-  Phone,
-  Mail,
-  MoreHorizontal,
-  ArrowLeft
-} from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 
 
 interface ClientDialogProps {
@@ -180,141 +149,68 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
     }
   };
 
-  const clientDisplayName = getClientDisplayName(defaultValues);
-
-  const handleCallClient = () => {
-    if (defaultValues?.phone) {
-      window.location.href = `tel:${defaultValues.phone}`;
-    }
-  };
-
-  const handleEmailClient = () => {
-    if (defaultValues?.email) {
-      window.location.href = `mailto:${defaultValues.email}`;
-    }
-  };
-
-  const handleEditClient = () => {
-    // Switch to edit mode would require parent component handling
-    // For now, close view and open edit
-    onOpenChange(false);
-  };
-
-  // Mobile tabs configuration with icons
-  const mobileTabs = [
-    { value: 'details', icon: User, label: 'Détails', count: null },
-    { value: 'vehicles', icon: Car, label: 'Véhicules', count: clientVehicles.length },
-    { value: 'expertise', icon: FileText, label: 'Expertises', count: clientReports.length },
-    { value: 'quotes', icon: ClipboardList, label: 'Devis', count: clientQuotes.length },
-    { value: 'repair-orders', icon: Wrench, label: 'OR', count: clientOrders.length },
-    { value: 'invoices', icon: Receipt, label: 'Factures', count: clientInvoices.length },
-    { value: 'credits', icon: CreditCard, label: 'Avoirs', count: clientCredits.length },
-    { value: 'receipts', icon: Banknote, label: 'Encaissements', count: clientReceipts.length },
-    { value: 'conversations', icon: MessageSquare, label: 'Messages', count: clientConversations.length },
-  ];
-
   // Si c'est en mode visualisation, on affiche la sidebar
   if (mode === 'view') {
     if (isMobile) {
       return (
-        <Sheet open={open} onOpenChange={handleOpenChange}>
-          <SheetContent side="bottom" className="h-[100vh] p-0 flex flex-col">
-            {/* Header sticky */}
-            <SheetHeader className="px-4 py-3 border-b border-border flex-shrink-0">
-              <div className="flex items-center gap-3">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => onOpenChange(false)}
-                  className="h-8 w-8"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </Button>
-                <SheetTitle className="text-base font-semibold truncate">
-                  {clientDisplayName || title}
-                </SheetTitle>
-              </div>
-            </SheetHeader>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
+          <DialogContent className="w-[95vw] h-[95vh] overflow-hidden p-0 max-w-none">
+            <DialogHeader className="px-4 pt-4 pb-2">
+              <DialogTitle className="text-lg">{title}</DialogTitle>
+              {description && <DialogDescription className="text-sm">{description}</DialogDescription>}
+            </DialogHeader>
             
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
-              {/* Tabs avec scroll horizontal */}
-              <div className="border-b border-border flex-shrink-0">
-                <ScrollArea className="w-full">
-                  <TabsList className="inline-flex h-10 items-center justify-start gap-1 bg-transparent p-1 w-max">
-                    {mobileTabs.map((tab) => (
-                      <TabsTrigger
-                        key={tab.value}
-                        value={tab.value}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-md"
-                      >
-                        <tab.icon className="h-3.5 w-3.5" />
-                        <span>{tab.label}</span>
-                        {tab.count !== null && tab.count > 0 && (
-                          <span className="ml-1 text-[10px] opacity-70">({tab.count})</span>
-                        )}
-                      </TabsTrigger>
-                    ))}
-                  </TabsList>
-                  <ScrollBar orientation="horizontal" className="h-1.5" />
-                </ScrollArea>
-              </div>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col h-[calc(95vh-80px)]">
+              <TabsList className="grid w-full grid-cols-4 mx-4 mb-2">
+                <TabsTrigger value="details" className="text-xs">Détails</TabsTrigger>
+                <TabsTrigger value="vehicles" className="text-xs">
+                  Véhicules {clientVehicles.length > 0 && `(${clientVehicles.length})`}
+                </TabsTrigger>
+                <TabsTrigger value="invoices" className="text-xs">
+                  Factures {clientInvoices.length > 0 && `(${clientInvoices.length})`}
+                </TabsTrigger>
+                <TabsTrigger value="quotes" className="text-xs">
+                  Devis {clientQuotes.length > 0 && `(${clientQuotes.length})`}
+                </TabsTrigger>
+              </TabsList>
               
-              {/* Contenu scrollable */}
-              <div className="flex-1 overflow-y-auto pb-20">
-                <div className="p-4">
-                  {mobileTabs.map((tab) => (
-                    <TabsContent key={tab.value} value={tab.value} className="mt-0 focus-visible:outline-none">
-                      {activeTab === tab.value && renderActiveContent()}
-                    </TabsContent>
-                  ))}
-                </div>
+              <div className="flex-1 overflow-y-auto px-4 pb-4">
+                <TabsContent value="details" className="mt-0">
+                  <ClientForm 
+                    onSubmit={handleSubmit}
+                    defaultValues={defaultValues || {}}
+                    isViewMode={true}
+                    onCancel={handleCancel}
+                  />
+                </TabsContent>
+                <TabsContent value="vehicles" className="mt-0">
+                  <ClientVehiclesTab clientId={defaultValues?.id} />
+                </TabsContent>
+                <TabsContent value="expertise" className="mt-0">
+                  <ClientExpertiseReportsTab clientId={defaultValues?.id} />
+                </TabsContent>
+                <TabsContent value="quotes" className="mt-0">
+                  <ClientQuotesTab clientId={defaultValues?.id} />
+                </TabsContent>
+                <TabsContent value="repair-orders" className="mt-0">
+                  <ClientRepairOrdersTab clientId={defaultValues?.id} />
+                </TabsContent>
+                <TabsContent value="invoices" className="mt-0">
+                  <ClientInvoicesTab clientId={defaultValues?.id} />
+                </TabsContent>
+                <TabsContent value="credits" className="mt-0">
+                  <ClientCreditsTab clientId={defaultValues?.id} />
+                </TabsContent>
+                <TabsContent value="receipts" className="mt-0">
+                  <ClientReceiptsTab clientId={defaultValues?.id} />
+                </TabsContent>
+                <TabsContent value="conversations" className="mt-0">
+                  <ClientConversationsTab clientId={defaultValues?.id} />
+                </TabsContent>
               </div>
             </Tabs>
-
-            {/* Footer sticky avec actions */}
-            <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-border bg-background flex-shrink-0">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={handleEditClient}
-                    className="flex-1"
-                  >
-                    <Pencil className="h-4 w-4 mr-1" />
-                    Modifier
-                  </Button>
-                  {defaultValues?.phone && (
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={handleCallClient}
-                    >
-                      <Phone className="h-4 w-4 mr-1" />
-                      Appeler
-                    </Button>
-                  )}
-                </div>
-                
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="icon">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    {defaultValues?.email && (
-                      <DropdownMenuItem onClick={handleEmailClient}>
-                        <Mail className="h-4 w-4 mr-2" />
-                        Envoyer un email
-                      </DropdownMenuItem>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
-          </SheetContent>
-        </Sheet>
+          </DialogContent>
+        </Dialog>
       );
     }
 
@@ -343,53 +239,22 @@ const ClientDialog: React.FC<ClientDialogProps> = ({
   }
 
   // Pour les modes create et edit, on garde l'ancien comportement
-  if (isMobile) {
-    return (
-      <Sheet open={open} onOpenChange={handleOpenChange}>
-        <SheetContent side="bottom" className="h-[100vh] p-0 flex flex-col">
-          <SheetHeader className="px-4 py-3 border-b border-border flex-shrink-0">
-            <div className="flex items-center gap-3">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => onOpenChange(false)}
-                className="h-8 w-8"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              <SheetTitle className="text-base font-semibold">
-                {title}
-              </SheetTitle>
-            </div>
-          </SheetHeader>
-          <div className="flex-1 overflow-y-auto p-4">
-            <ClientForm 
-              onSubmit={handleSubmit}
-              defaultValues={defaultValues || {}}
-              isViewMode={false}
-              onCancel={handleCancel}
-              onFormChange={() => setHasUnsavedChanges(true)}
-            />
-          </div>
-        </SheetContent>
-      </Sheet>
-    );
-  }
-
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className={isMobile ? "w-[95vw] h-[95vh] max-w-none" : "max-w-4xl"}>
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          {description && <DialogDescription>{description}</DialogDescription>}
+          <DialogTitle className={isMobile ? "text-lg" : ""}>{title}</DialogTitle>
+          {description && <DialogDescription className={isMobile ? "text-sm" : ""}>{description}</DialogDescription>}
         </DialogHeader>
-        <ClientForm 
-          onSubmit={handleSubmit}
-          defaultValues={defaultValues || {}}
-          isViewMode={false}
-          onCancel={handleCancel}
-          onFormChange={() => setHasUnsavedChanges(true)}
-        />
+        <div className={isMobile ? "overflow-y-auto flex-1" : ""}>
+          <ClientForm 
+            onSubmit={handleSubmit}
+            defaultValues={defaultValues || {}}
+            isViewMode={false}
+            onCancel={handleCancel}
+            onFormChange={() => setHasUnsavedChanges(true)}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );

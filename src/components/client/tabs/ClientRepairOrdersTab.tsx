@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { useRepairOrders } from '@/hooks/use-repair-orders';
 import { useTableSorting } from '@/hooks/use-table-sorting';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { 
   Table, 
   TableBody, 
@@ -27,7 +26,6 @@ import { Invoice } from '@/services/supabase/invoices';
 import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
 import { UnsignedRepairOrderWarningDialog } from '@/components/repair-orders/UnsignedRepairOrderWarningDialog';
-import ClientRepairOrderMobileCard from './ClientRepairOrderMobileCard';
 
 interface ClientRepairOrdersTabProps {
   clientId: string;
@@ -37,7 +35,6 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
   const { orders, isLoading, deleteOrder } = useRepairOrders();
   const { toast } = useToast();
   const { confirm } = useConfirmation();
-  const isMobile = useIsMobile();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [viewerModalOpen, setViewerModalOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
@@ -225,6 +222,15 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
     setInvoiceDialogOpen(true);
   };
 
+  const contextMenuProps = {
+    onDownload: handleDownload,
+    onPrint: handlePrint,
+    onSendEmail: handleSendEmail,
+    onSignOrder: handleSignOrder,
+    onRequestDocuments: handleRequestDocuments,
+    onConvertToInvoice: handleConvertToInvoice
+  };
+
   const formatAmount = (amount: number | null | undefined): string => {
     if (amount === null || amount === undefined) return '-';
     return new Intl.NumberFormat('fr-FR', {
@@ -241,87 +247,6 @@ const ClientRepairOrdersTab: React.FC<ClientRepairOrdersTabProps> = ({ clientId 
       return '-';
     }
   };
-
-  // Rendu mobile avec cartes
-  if (isMobile) {
-    return (
-      <>
-        {sortedData.length > 0 ? (
-          <div className="space-y-0">
-            {sortedData.map((order) => (
-              <ClientRepairOrderMobileCard
-                key={order.id}
-                order={order}
-                onView={handleViewOrder}
-                onEdit={handleEditOrder}
-                onDownload={handleDownload}
-                onPrint={handlePrint}
-                onSendEmail={handleSendEmail}
-                onSign={handleSignOrder}
-                onRequestDocuments={handleRequestDocuments}
-                onConvertToInvoice={handleConvertToInvoice}
-                onDelete={handleDeleteOrder}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-8">
-            <Wrench className="h-10 w-10 text-muted-foreground mb-2" />
-            <h3 className="font-medium text-foreground">Aucun ordre de réparation</h3>
-            <p className="text-muted-foreground mt-1 text-sm">Ce client n'a pas encore d'ordre de réparation.</p>
-          </div>
-        )}
-
-        <RepairOrderDialog
-          order={selectedOrder}
-          open={editDialogOpen}
-          onOpenChange={setEditDialogOpen}
-        />
-
-        <RepairOrderViewerModal
-          repairOrder={selectedOrder}
-          open={viewerModalOpen}
-          onOpenChange={setViewerModalOpen}
-        />
-
-        <RepairOrderEmailDialog
-          repairOrder={selectedOrderForEmail}
-          open={emailDialogOpen}
-          onOpenChange={setEmailDialogOpen}
-        />
-
-        <RepairOrderSignatureDialog
-          repairOrder={selectedOrderForSignature}
-          open={signatureDialogOpen}
-          onOpenChange={setSignatureDialogOpen}
-        />
-
-        <InvoiceDialog
-          open={invoiceDialogOpen}
-          onOpenChange={(open) => {
-            setInvoiceDialogOpen(open);
-            if (!open) {
-              setPrefilledInvoice(null);
-            }
-          }}
-          invoice={prefilledInvoice as Invoice}
-        />
-
-        <UnsignedRepairOrderWarningDialog
-          open={showUnsignedWarning}
-          onOpenChange={setShowUnsignedWarning}
-          orderReference={orderToConvert?.reference}
-          onConfirm={() => {
-            if (orderToConvert) {
-              proceedWithConversion(orderToConvert);
-            }
-            setShowUnsignedWarning(false);
-            setOrderToConvert(null);
-          }}
-        />
-      </>
-    );
-  }
 
   return (
     <>

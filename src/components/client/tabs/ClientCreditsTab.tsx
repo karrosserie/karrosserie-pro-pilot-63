@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useCredits } from '@/hooks/use-credits';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useTableSorting } from '@/hooks/use-table-sorting';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { generateCreditPDFWithTemplate, printCreditPDFWithTemplate } from '@/utils/creditPDFGeneration';
 import { 
   Table, 
@@ -17,11 +16,16 @@ import { CreditCard, Eye, Pencil, Trash, Download, Printer, Mail } from 'lucide-
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import { EditCreditDialog } from '@/components/credits/EditCreditDialog';
 import InvoiceViewerModal from '@/components/invoices/InvoiceViewerModal';
 import { CreditEmailDialog } from '@/components/credits/email/CreditEmailDialog';
-import ClientCreditMobileCard from './ClientCreditMobileCard';
 
 
 interface ClientCreditsTabProps {
@@ -33,7 +37,6 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
   const { invoices } = useInvoices();
   const { toast } = useToast();
   const { confirm } = useConfirmation();
-  const isMobile = useIsMobile();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [invoiceViewerModalOpen, setInvoiceViewerModalOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
@@ -269,67 +272,6 @@ const ClientCreditsTab: React.FC<ClientCreditsTabProps> = ({ clientId }) => {
         return 'bg-gray-100 text-gray-800';
     }
   };
-
-  // Rendu mobile avec cartes
-  if (isMobile) {
-    return (
-      <>
-        {sortedData.length > 0 ? (
-          <div className="space-y-0">
-            {sortedData.map((credit) => (
-              <ClientCreditMobileCard
-                key={credit.id}
-                credit={credit}
-                invoiceDisplay={getInvoiceDisplay(credit.invoice_id)}
-                vehicleDisplay={formatVehicleDisplay(credit)}
-                onView={handleView}
-                onEdit={handleEdit}
-                onDownload={handleDownload}
-                onPrint={handlePrint}
-                onSendEmail={handleSendEmail}
-                onDelete={handleDelete}
-                isDeleting={deleteCredit.isPending}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-8">
-            <CreditCard className="h-10 w-10 text-muted-foreground mb-2" />
-            <h3 className="font-medium text-foreground">Aucun avoir</h3>
-            <p className="text-muted-foreground mt-1 text-sm">Ce client n'a pas encore d'avoir.</p>
-          </div>
-        )}
-
-        {selectedCredit && (
-          <EditCreditDialog
-            open={editDialogOpen}
-            onOpenChange={setEditDialogOpen}
-            creditId={selectedCredit.id}
-            initialData={{
-              reference: selectedCredit.reference,
-              invoice_id: selectedCredit.invoice_id,
-              status: selectedCredit.status,
-              notes: selectedCredit.notes,
-              items: selectedCredit.items,
-              is_franchise_credit: selectedCredit.is_franchise_credit
-            }}
-          />
-        )}
-
-        <InvoiceViewerModal
-          invoice={selectedInvoice}
-          open={invoiceViewerModalOpen}
-          onOpenChange={setInvoiceViewerModalOpen}
-        />
-
-        <CreditEmailDialog
-          credit={selectedCredit}
-          open={emailDialogOpen}
-          onOpenChange={setEmailDialogOpen}
-        />
-      </>
-    );
-  }
 
   return (
     <>
