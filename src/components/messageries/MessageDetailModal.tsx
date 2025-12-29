@@ -5,16 +5,26 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Messagerie, Client, MessagerieReply } from "@/hooks/use-messageries";
-import { Phone, Mail, MessageSquare, Smartphone, Clock, Calendar, Tag, User, History } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Phone, Mail, MessageSquare, Smartphone, Clock, Calendar, Tag, User, History, MoreVertical, CheckCircle, Archive, MessageCircle, Loader2 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { formatDistanceToNow } from "date-fns";
-import { fr } from "date-fns/locale";
-import { useRef } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface MessageDetailModalProps {
   message: Messagerie | null;
@@ -59,6 +69,7 @@ export function MessageDetailModal({
   const [replies, setReplies] = useState<MessagerieReply[]>([]);
   const [loadingReplies, setLoadingReplies] = useState(false);
   const processedMessageIdRef = useRef<string | null>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (message && open && message.id !== processedMessageIdRef.current) {
@@ -67,7 +78,6 @@ export function MessageDetailModal({
       markMessageAsRead();
     }
     
-    // Reset quand le modal se ferme
     if (!open) {
       processedMessageIdRef.current = null;
     }
@@ -107,7 +117,6 @@ export function MessageDetailModal({
     if (!message) return;
     
     try {
-      // 1. Marquer les réponses non lues comme lues
       const { error: repliesError } = await supabase
         .from('messagerie_replies')
         .update({ read_by_company: true })
@@ -118,7 +127,6 @@ export function MessageDetailModal({
         console.error('Erreur lors du marquage des réponses:', repliesError);
       }
 
-      // 2. Si le message est "nouveau", le passer en "en_cours"
       if (message.status === 'nouveau') {
         const { error: statusError } = await supabase
           .from('messageries')
@@ -128,7 +136,6 @@ export function MessageDetailModal({
         if (statusError) {
           console.error('Erreur lors de la mise à jour du statut:', statusError);
         } else if (onStatusChange) {
-          // Notifier le parent pour rafraîchir l'interface
           onStatusChange(message.id, 'en_cours');
         }
       }
@@ -151,6 +158,270 @@ export function MessageDetailModal({
   const isInboundMessage = message.is_inbound !== false;
   const isOutboundMessage = message.is_inbound === false;
 
+  // Contenu partagé entre mobile et desktop
+  const messageContent = (
+    <div className="space-y-4">
+      {/* Badge priorité */}
+      <Badge className={priorityInfo.color}>
+        Priorité {message.priority} - {priorityInfo.label}
+      </Badge>
+
+      {/* Informations Client */}
+      {message.client && (
+        <Card className="p-3 bg-muted/30">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <h4 className="font-semibold text-sm flex items-center gap-2 mb-1">
+                <User className="h-4 w-4 shrink-0" />
+                Client
+              </h4>
+              <p className="text-sm font-medium truncate">
+                {message.client.first_name} {message.client.last_name}
+              </p>
+              <div className="flex flex-col gap-1 mt-1 text-xs text-muted-foreground">
+                {message.client.email && (
+                  <span className="flex items-center gap-1 truncate">
+                    <Mail className="h-3 w-3 shrink-0" />
+                    {message.client.email}
+                  </span>
+                )}
+                {message.client.phone && (
+                  <span className="flex items-center gap-1">
+                    <Phone className="h-3 w-3 shrink-0" />
+                    {message.client.phone}
+                  </span>
+                )}
+              </div>
+            </div>
+            {onViewClientHistory && !isMobile && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  onViewClientHistory(message.client!);
+                  onOpenChange(false);
+                }}
+              >
+                <History className="h-4 w-4 mr-2" />
+                Historique
+              </Button>
+            )}
+          </div>
+        </Card>
+      )}
+
+      {/* Fil de conversation */}
+      {replies.length > 0 && (
+        <div>
+          <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+            <MessageSquare className="h-4 w-4" />
+            Conversation ({replies.length})
+          </h4>
+          <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
+            {replies.map((reply) => {
+              const isClientMessage = reply.sender_type === 'client' || reply.is_inbound;
+              const isInternalNote = reply.sender_type === 'internal';
+
+              return (
+                <Card
+                  key={reply.id}
+                  className={`p-2 text-sm ${
+                    isInternalNote
+                      ? 'bg-yellow-50 border-l-4 border-yellow-400'
+                      : isClientMessage
+                      ? 'bg-blue-50 border-l-4 border-blue-500 ml-2'
+                      : 'bg-green-50 border-l-4 border-green-500 mr-2'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <Badge variant={
+                      isInternalNote ? 'secondary' :
+                      isClientMessage ? 'outline' : 'default'
+                    } className="text-xs">
+                      {isInternalNote 
+                        ? '📝 Note'
+                        : isClientMessage 
+                        ? '📩 Client' 
+                        : '📤 Envoyé'}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      {formatDate(reply.actual_communication_date)}
+                    </span>
+                  </div>
+                  <p className="text-xs whitespace-pre-wrap line-clamp-3">{reply.content}</p>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Résumé */}
+      <div>
+        <h4 className="font-semibold text-sm mb-1">Résumé</h4>
+        <p className="text-sm bg-muted p-2 rounded-lg">{message.summary}</p>
+      </div>
+
+      {/* Message complet */}
+      <div>
+        <h4 className="font-semibold text-sm mb-1">Message complet</h4>
+        <p className="text-sm bg-muted p-2 rounded-lg whitespace-pre-wrap">{message.message}</p>
+      </div>
+
+      {/* Métadonnées */}
+      <div className="grid grid-cols-2 gap-3 text-sm">
+        <div>
+          <h4 className="font-semibold text-xs text-muted-foreground mb-1 flex items-center gap-1">
+            <ChannelIcon className="h-3 w-3" />
+            Canal
+          </h4>
+          <Badge variant="outline" className="text-xs">{message.channel}</Badge>
+        </div>
+
+        <div>
+          <h4 className="font-semibold text-xs text-muted-foreground mb-1 flex items-center gap-1">
+            <Clock className="h-3 w-3" />
+            ETA
+          </h4>
+          <Badge variant="outline" className="text-xs">{message.eta}</Badge>
+        </div>
+
+        <div className="col-span-2">
+          <h4 className="font-semibold text-xs text-muted-foreground mb-1 flex items-center gap-1">
+            <Calendar className="h-3 w-3" />
+            Date
+          </h4>
+          <p className="text-xs">{message.date} à {message.time}</p>
+        </div>
+      </div>
+
+      {/* Tags */}
+      {message.tags.length > 0 && (
+        <div>
+          <h4 className="font-semibold text-xs text-muted-foreground mb-1 flex items-center gap-1">
+            <Tag className="h-3 w-3" />
+            Tags
+          </h4>
+          <div className="flex gap-1 flex-wrap">
+            {message.tags.map((tag, index) => (
+              <Badge key={index} variant="outline" className="text-xs">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  // Rendu mobile avec Sheet
+  if (isMobile) {
+    return (
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent side="bottom" className="h-[95vh] flex flex-col p-0">
+          {/* Header sticky */}
+          <SheetHeader className="px-4 py-3 border-b shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                <ChannelIcon className="h-5 w-5 text-primary" />
+              </div>
+              <SheetTitle className="text-left text-base line-clamp-2 flex-1">
+                {message.title}
+              </SheetTitle>
+            </div>
+          </SheetHeader>
+
+          {/* Contenu scrollable */}
+          <div className="flex-1 overflow-y-auto p-4">
+            {messageContent}
+          </div>
+
+          {/* Footer sticky avec actions */}
+          <div className="shrink-0 border-t bg-background p-3 space-y-2">
+            {/* Actions principales */}
+            <div className="flex gap-2">
+              {isInboundMessage ? (
+                <Button onClick={() => onReply(message.id)} className="flex-1" size="sm">
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  Répondre
+                </Button>
+              ) : (
+                <Button onClick={() => onReply(message.id)} className="flex-1" variant="outline" size="sm">
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  Suivi
+                </Button>
+              )}
+              
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="flex-1"
+                onClick={() => {
+                  onResolve(message.id);
+                  onOpenChange(false);
+                }}
+              >
+                <CheckCircle className="h-4 w-4 mr-2" />
+                {message.resolved ? "Rouvrir" : "Résoudre"}
+              </Button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="px-2">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {isInboundMessage && (
+                    <>
+                      <DropdownMenuItem 
+                        onClick={() => handleStatusChange('en_cours')}
+                        disabled={message.status === 'en_cours'}
+                      >
+                        <Loader2 className="h-4 w-4 mr-2" />
+                        Mettre en cours
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleStatusChange('en_attente_client')}
+                        disabled={message.status === 'en_attente_client'}
+                      >
+                        <Clock className="h-4 w-4 mr-2" />
+                        En attente client
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  <DropdownMenuItem 
+                    onClick={() => handleStatusChange('resolu')}
+                    disabled={message.status === 'resolu'}
+                  >
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Marquer résolu
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => {
+                      onArchive(message.id);
+                      onOpenChange(false);
+                    }}
+                  >
+                    <Archive className="h-4 w-4 mr-2" />
+                    {message.archived ? "Désarchiver" : "Archiver"}
+                  </DropdownMenuItem>
+                  {onViewClientHistory && message.client && (
+                    <DropdownMenuItem onClick={() => onViewClientHistory(message.client!)}>
+                      <History className="h-4 w-4 mr-2" />
+                      Historique client
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  // Rendu desktop avec Dialog (inchangé)
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -362,7 +633,6 @@ export function MessageDetailModal({
           {/* Actions de changement de statut */}
           <div className="space-y-3 pt-4 border-t">
             <div className="flex gap-2 flex-wrap">
-              {/* Boutons uniquement pour messages entrants */}
               {isInboundMessage && (
                 <>
                   <Button 
@@ -383,7 +653,6 @@ export function MessageDetailModal({
                   </Button>
                 </>
               )}
-              {/* Bouton résolu - toujours visible */}
               <Button 
                 variant="outline" 
                 size="sm"
@@ -396,13 +665,11 @@ export function MessageDetailModal({
 
             {/* Actions principales */}
             <div className="flex gap-2">
-              {/* Répondre - uniquement pour messages entrants */}
               {isInboundMessage && (
                 <Button onClick={() => onReply(message.id)} className="flex-1">
                   Répondre
                 </Button>
               )}
-              {/* Ajouter un suivi - uniquement pour messages sortants */}
               {isOutboundMessage && (
                 <Button onClick={() => onReply(message.id)} className="flex-1" variant="outline">
                   Ajouter un suivi
