@@ -11,7 +11,7 @@ import { calculateInvoiceTotals } from '@/utils/invoiceCalculations';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Printer, Download, Mail, CreditCard, FileX, Pencil, Trash, MoreVertical, X } from 'lucide-react';
+import { Printer, Download, Mail, CreditCard, FileX, Pencil, Trash, MoreVertical } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useIsMobile } from '@/hooks/use-mobile';
 import DefaultInvoicePreview from './templates/DefaultInvoicePreview';
@@ -266,14 +266,9 @@ const InvoiceViewerModal = ({
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent side="bottom" className="h-[95vh] p-0 flex flex-col">
           <SheetHeader className="px-4 py-3 border-b flex-shrink-0">
-            <div className="flex items-center justify-between">
-              <SheetTitle className="text-base font-semibold">
-                Facture n°{invoice.reference}
-              </SheetTitle>
-              <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)} className="h-8 w-8">
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
+            <SheetTitle className="text-base font-semibold">
+              Facture n°{invoice.reference}
+            </SheetTitle>
           </SheetHeader>
           
           {/* Contenu scrollable */}
