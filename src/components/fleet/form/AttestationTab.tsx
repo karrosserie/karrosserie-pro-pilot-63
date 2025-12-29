@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import SignaturePad from '@/components/SignaturePad';
+import SignaturePad from '@/components/shared/SignaturePad';
 import { LoanFormData } from '../FleetLoanForm';
 import { useCompany } from '@/hooks/use-company';
 import { useClient } from '@/hooks/use-clients';
@@ -177,9 +177,8 @@ const AttestationTab: React.FC<AttestationTabProps> = ({
             <div className="max-w-md">
               <SignaturePad
                 value={formData.clientSignature || ''}
-                onChange={(value) => onSignatureChange('clientSignature', value)}
+                onSignatureChange={(value) => onSignatureChange('clientSignature', value)}
                 disabled={isViewMode}
-                height={150}
               />
             </div>
           </div>
