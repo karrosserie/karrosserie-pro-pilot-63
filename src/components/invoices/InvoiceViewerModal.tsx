@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo, memo, useRef } from 'react';
 import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
@@ -10,7 +11,9 @@ import { calculateInvoiceTotals } from '@/utils/invoiceCalculations';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Printer, Download, Mail, CreditCard, FileX, Pencil, Trash } from 'lucide-react';
+import { Printer, Download, Mail, CreditCard, FileX, Pencil, Trash, MoreVertical, X } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useIsMobile } from '@/hooks/use-mobile';
 import DefaultInvoicePreview from './templates/DefaultInvoicePreview';
 import AlternativeInvoicePreview from './templates/AlternativeInvoicePreview';
 import { UseMutationResult } from '@tanstack/react-query';
@@ -42,6 +45,7 @@ const InvoiceViewerModal = ({
 }: InvoiceViewerModalProps) => {
   const { confirm } = useConfirmation();
   const isMountedRef = useRef(true);
+  const isMobile = useIsMobile();
   
   const handleDeleteMutation = async (id: string) => {
     if (externalDeleteInvoice) {
@@ -54,13 +58,11 @@ const InvoiceViewerModal = ({
   const [receiptsData, setReceiptsData] = useState<any[]>([]);
   const [creditsData, setCreditsData] = useState<any[]>([]);
   
-  // Reset mounted ref on mount/unmount
   useEffect(() => {
     isMountedRef.current = true;
     return () => { isMountedRef.current = false; };
   }, []);
   
-  // Fetch receipts and credits with abort controller
   useEffect(() => {
     if (!invoice?.id || !open) {
       setReceiptsData([]);
@@ -72,14 +74,12 @@ const InvoiceViewerModal = ({
     
     const fetchData = async () => {
       try {
-        // Fetch receipts
         const { data: receipts } = await supabase
           .from('receipts')
           .select('*')
           .eq('invoice_id', invoice.id)
           .order('date', { ascending: true });
         
-        // Fetch credits (avoirs) linked to this invoice
         const { data: credits } = await supabase
           .from('credits')
           .select('*')
@@ -117,7 +117,6 @@ const InvoiceViewerModal = ({
     try { return format(new Date(dateString), 'dd/MM/yyyy', { locale: fr }); } catch { return dateString; }
   };
 
-  // Mémoriser les données formatées
   const invoiceData = useMemo(() => ({
     number: invoice.reference,
     claimNumber: invoice.claim_number || undefined,
@@ -146,7 +145,6 @@ const InvoiceViewerModal = ({
   const items = useMemo(() => {
     const result: any[] = [];
     
-    // Parser repairs_data (peut être un string JSON ou un array)
     let repairs: any[] = [];
     try {
       if (invoice.repairs_data) {
@@ -160,7 +158,6 @@ const InvoiceViewerModal = ({
       console.error('Error parsing repairs_data:', e);
     }
     
-    // Parser parts_data (peut être un string JSON ou un array)
     let parts: any[] = [];
     try {
       if (invoice.parts_data) {
@@ -174,7 +171,6 @@ const InvoiceViewerModal = ({
       console.error('Error parsing parts_data:', e);
     }
     
-    // Mapper les réparations
     result.push(...repairs.map((r: any) => ({
       ref: r.ref || '',
       description: r.description || r.label || '',
@@ -186,7 +182,6 @@ const InvoiceViewerModal = ({
       totalTTC: (r.unitCost || r.price || 0) * (r.quantity || 1) * (1 - (r.discount || 0) / 100) * (1 + (r.vat || 20) / 100)
     })));
     
-    // Mapper les pièces
     result.push(...parts.map((p: any) => ({
       ref: p.ref || '',
       description: p.description || p.label || '',
@@ -224,7 +219,6 @@ const InvoiceViewerModal = ({
     };
   }, [invoice.repairs_data, invoice.parts_data, invoice.amount, invoice.status, receiptsData, creditsData]);
 
-  // Fusionner encaissements et avoirs pour l'affichage
   const allPayments = useMemo(() => {
     const receiptPayments = receiptsData.map(r => ({
       id: r.id,
@@ -262,6 +256,87 @@ const InvoiceViewerModal = ({
     else toast({ title: "Erreur", description: "Impossible d'imprimer la facture.", variant: "destructive" }); 
   };
 
+  const previewContent = template === 'default' 
+    ? <DefaultInvoicePreview companyData={companyData} invoiceData={invoiceData} clientData={clientDataForTemplate} items={items} totals={totalsData} payments={allPayments} totalPaidAmount={totalPaidAmount} remainingAmount={remainingAmount} isPaid={isPaid} /> 
+    : <AlternativeInvoicePreview companyData={companyData} invoiceData={invoiceData} clientData={clientDataForTemplate} items={items} totals={totalsData} payments={allPayments} totalPaidAmount={totalPaidAmount} remainingAmount={remainingAmount} isPaid={isPaid} />;
+
+  // Mobile: Sheet plein écran
+  if (isMobile) {
+    return (
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent side="bottom" className="h-[95vh] p-0 flex flex-col">
+          <SheetHeader className="px-4 py-3 border-b flex-shrink-0">
+            <div className="flex items-center justify-between">
+              <SheetTitle className="text-base font-semibold">
+                Facture n°{invoice.reference}
+              </SheetTitle>
+              <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)} className="h-8 w-8">
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </SheetHeader>
+          
+          {/* Contenu scrollable */}
+          <div className="flex-1 overflow-y-auto">
+            {previewContent}
+          </div>
+          
+          {/* Footer sticky avec actions */}
+          <div className="flex-shrink-0 border-t bg-background p-3 flex items-center gap-2">
+            {onEditInvoice && (
+              <Button variant="outline" size="sm" onClick={handleEdit} className="flex-1">
+                <Pencil className="h-4 w-4 mr-1" />
+                Modifier
+              </Button>
+            )}
+            <Button variant="outline" size="sm" onClick={handleDownload} className="flex-1">
+              <Download className="h-4 w-4 mr-1" />
+              Télécharger
+            </Button>
+            {onSendEmail && (
+              <Button variant="outline" size="sm" onClick={() => onSendEmail(invoice)} className="flex-1">
+                <Mail className="h-4 w-4 mr-1" />
+                Envoyer
+              </Button>
+            )}
+            
+            {/* Menu déroulant pour les actions secondaires */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="h-9 w-9">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handlePrint}>
+                  <Printer className="h-4 w-4 mr-2" />
+                  Imprimer
+                </DropdownMenuItem>
+                {onCreateReceipt && (
+                  <DropdownMenuItem onClick={() => onCreateReceipt(invoice)}>
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Créer paiement
+                  </DropdownMenuItem>
+                )}
+                {onCreateCredit && (
+                  <DropdownMenuItem onClick={() => onCreateCredit(invoice)}>
+                    <FileX className="h-4 w-4 mr-2" />
+                    Créer avoir
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+                  <Trash className="h-4 w-4 mr-2" />
+                  Supprimer
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  // Desktop: Dialog classique
   return (
     <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
       <DialogContent className="max-w-4xl w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto p-0" onInteractOutside={(e) => e.preventDefault()}>
@@ -279,12 +354,11 @@ const InvoiceViewerModal = ({
           </div>
         </div>
         <div className="w-full h-full">
-          {template === 'default' ? <DefaultInvoicePreview companyData={companyData} invoiceData={invoiceData} clientData={clientDataForTemplate} items={items} totals={totalsData} payments={allPayments} totalPaidAmount={totalPaidAmount} remainingAmount={remainingAmount} isPaid={isPaid} /> : <AlternativeInvoicePreview companyData={companyData} invoiceData={invoiceData} clientData={clientDataForTemplate} items={items} totals={totalsData} payments={allPayments} totalPaidAmount={totalPaidAmount} remainingAmount={remainingAmount} isPaid={isPaid} />}
+          {previewContent}
         </div>
       </DialogContent>
     </Dialog>
   );
 };
 
-// Mémoriser le composant pour éviter les re-renders inutiles
 export default memo(InvoiceViewerModal);
