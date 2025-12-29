@@ -92,13 +92,13 @@ const TeamMobileCard: React.FC<TeamMobileCardProps> = ({
         </div>
 
         {/* Actions */}
-        <div className="flex gap-2 pt-2 border-t">
+        <div className="grid grid-cols-2 gap-2 pt-2 border-t">
           {(member.role === 'carrossier' || member.role === 'carrossier-vehicule de courtoisie') && onViewTimesheet && (
             <Button 
               variant="outline" 
               size="sm" 
               onClick={() => onViewTimesheet(member)}
-              className="flex-1 text-xs"
+              className="col-span-2 text-xs"
               title="Voir les pointages"
             >
               <Clock className="h-3 w-3 mr-1" />
@@ -109,7 +109,7 @@ const TeamMobileCard: React.FC<TeamMobileCardProps> = ({
             variant="outline" 
             size="sm" 
             onClick={() => onEditMember(member)}
-            className="flex-1 text-xs"
+            className="text-xs"
           >
             <Pencil className="h-3 w-3 mr-1" />
             Modifier
@@ -119,7 +119,7 @@ const TeamMobileCard: React.FC<TeamMobileCardProps> = ({
               variant="outline" 
               size="sm" 
               onClick={() => onRemoveMember(member.id)}
-              className="flex-1 text-xs text-red-600 hover:text-red-700"
+              className="text-xs text-red-600 hover:text-red-700"
             >
               <Trash className="h-3 w-3 mr-1" />
               Supprimer
