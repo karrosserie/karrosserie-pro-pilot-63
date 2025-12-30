@@ -64,6 +64,13 @@ export type Database = {
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "abandoned_cycles_config_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       ai_agent_performance: {
@@ -149,6 +156,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_agent_performance_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
           },
         ]
       }
@@ -281,6 +295,13 @@ export type Database = {
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "ai_automatic_actions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       ai_insights: {
@@ -368,6 +389,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_insights_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
           },
         ]
       }
@@ -871,6 +899,13 @@ export type Database = {
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "campaign_logs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       car_brands: {
@@ -1103,6 +1138,13 @@ export type Database = {
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "churn_predictions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       client_activity_trends: {
@@ -1173,6 +1215,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_activity_trends_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
           },
         ]
       }
@@ -1259,6 +1308,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_predictions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
           },
         ]
       }
@@ -1361,6 +1417,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_client_relances_company_id"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
             foreignKeyName: "fk_client_relances_invoice_id"
             columns: ["invoice_id"]
             isOneToOne: false
@@ -1438,6 +1501,105 @@ export type Database = {
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "client_segments_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
+        ]
+      }
+      client_signals: {
+        Row: {
+          company_id: string
+          confidence_score: number | null
+          created_at: string
+          description: string | null
+          detected_at: string
+          expires_at: string | null
+          id: string
+          recommended_action: string | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: number
+          signal_code: string
+          signal_name: string
+          signal_type: string
+          source_data: Json | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          confidence_score?: number | null
+          created_at?: string
+          description?: string | null
+          detected_at?: string
+          expires_at?: string | null
+          id?: string
+          recommended_action?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: number
+          signal_code: string
+          signal_name: string
+          signal_type: string
+          source_data?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          confidence_score?: number | null
+          created_at?: string
+          description?: string | null
+          detected_at?: string
+          expires_at?: string | null
+          id?: string
+          recommended_action?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: number
+          signal_code?: string
+          signal_name?: string
+          signal_type?: string
+          source_data?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_signals_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "client_signals_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "client_signals_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_signals_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       client_validation_sms: {
@@ -1514,6 +1676,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_validation_sms_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
           },
           {
             foreignKeyName: "client_validation_sms_report_id_fkey"
@@ -1691,6 +1860,13 @@ export type Database = {
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "company_business_metrics_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       company_contract_documents: {
@@ -1754,6 +1930,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_contract_documents_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
           },
         ]
       }
@@ -2189,6 +2372,13 @@ export type Database = {
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "detected_patterns_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       document_sav: {
@@ -2490,6 +2680,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "employee_schedule_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
             foreignKeyName: "employee_schedule_interrupted_by_fkey"
             columns: ["interrupted_by"]
             isOneToOne: false
@@ -2622,6 +2819,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_work_time_tracking_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
           },
           {
             foreignKeyName: "employee_work_time_tracking_current_task_id_fkey"
@@ -3363,6 +3567,13 @@ export type Database = {
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "gocardless_customers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       gocardless_mandates: {
@@ -3432,6 +3643,13 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "company_info"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gocardless_mandates_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
           },
           {
             foreignKeyName: "gocardless_mandates_gocardless_customer_id_fkey"
@@ -3521,6 +3739,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gocardless_payments_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
           },
           {
             foreignKeyName: "gocardless_payments_gocardless_mandate_id_fkey"
@@ -3664,6 +3889,13 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "company_info"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_sequences_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
           },
         ]
       }
@@ -4098,6 +4330,13 @@ export type Database = {
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_message_mobile_client_company"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       messagerie_replies: {
@@ -4170,6 +4409,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messagerie_replies_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
           },
           {
             foreignKeyName: "messagerie_replies_messagerie_id_fkey"
@@ -4335,6 +4581,13 @@ export type Database = {
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "migration_errors_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       module_recommendations: {
@@ -4401,6 +4654,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "module_recommendations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
           },
         ]
       }
@@ -4529,6 +4789,13 @@ export type Database = {
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "optimal_send_times_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       otp_codes: {
@@ -4625,6 +4892,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "page_visit_durations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
           },
         ]
       }
@@ -4822,6 +5096,13 @@ export type Database = {
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "personalized_messages_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       planning_patron: {
@@ -4874,6 +5155,125 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      pre_contact_snapshots: {
+        Row: {
+          active_signals: Json
+          activity_data: Json
+          business_data: Json
+          churn_probability: number | null
+          company_created_at: string | null
+          company_email: string | null
+          company_id: string
+          company_name: string
+          company_phone: string | null
+          created_at: string
+          current_segment: string | null
+          detected_patterns: Json | null
+          generated_at: string
+          generated_by: string | null
+          health_score: number | null
+          id: string
+          intervention_urgency: string | null
+          last_contact_channel: string | null
+          last_contact_date: string | null
+          last_contact_outcome: string | null
+          pending_ai_actions: Json | null
+          segment_confidence: number | null
+          total_contacts_30d: number | null
+          trigger_reference: string | null
+          trigger_type: string
+          used_at: string | null
+          used_in_contact_id: string | null
+        }
+        Insert: {
+          active_signals?: Json
+          activity_data?: Json
+          business_data?: Json
+          churn_probability?: number | null
+          company_created_at?: string | null
+          company_email?: string | null
+          company_id: string
+          company_name: string
+          company_phone?: string | null
+          created_at?: string
+          current_segment?: string | null
+          detected_patterns?: Json | null
+          generated_at?: string
+          generated_by?: string | null
+          health_score?: number | null
+          id?: string
+          intervention_urgency?: string | null
+          last_contact_channel?: string | null
+          last_contact_date?: string | null
+          last_contact_outcome?: string | null
+          pending_ai_actions?: Json | null
+          segment_confidence?: number | null
+          total_contacts_30d?: number | null
+          trigger_reference?: string | null
+          trigger_type: string
+          used_at?: string | null
+          used_in_contact_id?: string | null
+        }
+        Update: {
+          active_signals?: Json
+          activity_data?: Json
+          business_data?: Json
+          churn_probability?: number | null
+          company_created_at?: string | null
+          company_email?: string | null
+          company_id?: string
+          company_name?: string
+          company_phone?: string | null
+          created_at?: string
+          current_segment?: string | null
+          detected_patterns?: Json | null
+          generated_at?: string
+          generated_by?: string | null
+          health_score?: number | null
+          id?: string
+          intervention_urgency?: string | null
+          last_contact_channel?: string | null
+          last_contact_date?: string | null
+          last_contact_outcome?: string | null
+          pending_ai_actions?: Json | null
+          segment_confidence?: number | null
+          total_contacts_30d?: number | null
+          trigger_reference?: string | null
+          trigger_type?: string
+          used_at?: string | null
+          used_in_contact_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pre_contact_snapshots_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "pre_contact_snapshots_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "pre_contact_snapshots_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pre_contact_snapshots_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
+        ]
       }
       process_templates: {
         Row: {
@@ -4969,6 +5369,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
           },
         ]
       }
@@ -5559,6 +5966,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "signature_requests_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
             foreignKeyName: "signature_requests_repair_order_id_fkey"
             columns: ["repair_order_id"]
             isOneToOne: false
@@ -5839,6 +6253,13 @@ export type Database = {
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "ticket_erp_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       token_packages: {
@@ -6004,6 +6425,13 @@ export type Database = {
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "user_activity_logs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       user_companies: {
@@ -6058,6 +6486,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_companies_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
           },
         ]
       }
@@ -6135,6 +6570,13 @@ export type Database = {
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "user_errors_abandons_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       user_funnel_progress: {
@@ -6207,6 +6649,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_funnel_progress_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
           },
         ]
       }
@@ -6293,6 +6742,13 @@ export type Database = {
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "user_onboarding_progress_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       user_sessions: {
@@ -6362,6 +6818,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_sessions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
           },
         ]
       }
@@ -6561,6 +7024,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_work_time_tracking_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
           },
           {
             foreignKeyName: "vehicle_work_time_tracking_vehicle_id_fkey"
@@ -6822,6 +7292,13 @@ export type Database = {
             referencedRelation: "company_info"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "webhook_configurations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
         ]
       }
       webhook_executions: {
@@ -7075,6 +7552,22 @@ export type Database = {
         }
         Relationships: []
       }
+      company_signals_summary: {
+        Row: {
+          active_friction_signals: number | null
+          active_opportunity_signals: number | null
+          active_risk_signals: number | null
+          company_created_at: string | null
+          company_id: string | null
+          company_name: string | null
+          email: string | null
+          last_signal_at: string | null
+          max_severity: number | null
+          phone: string | null
+          priority_score: number | null
+        }
+        Relationships: []
+      }
       employee_work_time_summary: {
         Row: {
           company_id: string | null
@@ -7121,6 +7614,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_work_time_tracking_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
           },
           {
             foreignKeyName: "employee_work_time_tracking_current_task_id_fkey"
@@ -7171,6 +7671,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "company_info"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_work_time_tracking_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
           },
           {
             foreignKeyName: "vehicle_work_time_tracking_vehicle_id_fkey"
