@@ -1225,6 +1225,86 @@ export type Database = {
           },
         ]
       }
+      client_lifecycle_state: {
+        Row: {
+          company_id: string
+          created_at: string
+          current_state: Database["public"]["Enums"]["lifecycle_state"]
+          id: string
+          is_manual_override: boolean
+          next_review_at: string
+          override_by: string | null
+          override_expires_at: string | null
+          override_reason: string | null
+          previous_state: Database["public"]["Enums"]["lifecycle_state"] | null
+          state_changed_at: string
+          state_metadata: Json | null
+          state_reason: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          current_state?: Database["public"]["Enums"]["lifecycle_state"]
+          id?: string
+          is_manual_override?: boolean
+          next_review_at?: string
+          override_by?: string | null
+          override_expires_at?: string | null
+          override_reason?: string | null
+          previous_state?: Database["public"]["Enums"]["lifecycle_state"] | null
+          state_changed_at?: string
+          state_metadata?: Json | null
+          state_reason?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          current_state?: Database["public"]["Enums"]["lifecycle_state"]
+          id?: string
+          is_manual_override?: boolean
+          next_review_at?: string
+          override_by?: string | null
+          override_expires_at?: string | null
+          override_reason?: string | null
+          previous_state?: Database["public"]["Enums"]["lifecycle_state"] | null
+          state_changed_at?: string
+          state_metadata?: Json | null
+          state_reason?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_lifecycle_state_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "client_lifecycle_state_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "client_lifecycle_state_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_lifecycle_state_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
+        ]
+      }
       client_predictions: {
         Row: {
           actual_risk_level: string | null
@@ -2233,6 +2313,90 @@ export type Database = {
           },
         ]
       }
+      contact_impact: {
+        Row: {
+          activity_score: number | null
+          business_score: number | null
+          calculated_at: string | null
+          calculation_metadata: Json | null
+          churn_delta: number | null
+          contact_id: string
+          created_at: string | null
+          events_delta: number | null
+          global_impact_score: number | null
+          health_score_delta: number | null
+          id: string
+          new_invoices: number | null
+          new_orders: number | null
+          new_quotes: number | null
+          opportunity_signals_new: number | null
+          risk_signals_resolved: number | null
+          sessions_delta: number | null
+          signal_score: number | null
+          snapshot_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          activity_score?: number | null
+          business_score?: number | null
+          calculated_at?: string | null
+          calculation_metadata?: Json | null
+          churn_delta?: number | null
+          contact_id: string
+          created_at?: string | null
+          events_delta?: number | null
+          global_impact_score?: number | null
+          health_score_delta?: number | null
+          id?: string
+          new_invoices?: number | null
+          new_orders?: number | null
+          new_quotes?: number | null
+          opportunity_signals_new?: number | null
+          risk_signals_resolved?: number | null
+          sessions_delta?: number | null
+          signal_score?: number | null
+          snapshot_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          activity_score?: number | null
+          business_score?: number | null
+          calculated_at?: string | null
+          calculation_metadata?: Json | null
+          churn_delta?: number | null
+          contact_id?: string
+          created_at?: string | null
+          events_delta?: number | null
+          global_impact_score?: number | null
+          health_score_delta?: number | null
+          id?: string
+          new_invoices?: number | null
+          new_orders?: number | null
+          new_quotes?: number | null
+          opportunity_signals_new?: number | null
+          risk_signals_resolved?: number | null
+          sessions_delta?: number | null
+          signal_score?: number | null
+          snapshot_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_impact_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: true
+            referencedRelation: "cs_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contact_impact_snapshot_id_fkey"
+            columns: ["snapshot_id"]
+            isOneToOne: false
+            referencedRelation: "pre_contact_snapshots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       credits: {
         Row: {
           amount: number
@@ -2285,6 +2449,135 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      cs_contacts: {
+        Row: {
+          campaign_batch_id: string | null
+          campaign_id: string | null
+          channel: Database["public"]["Enums"]["contact_channel_enum"]
+          company_id: string
+          contact_type: string
+          contacted_at: string
+          content_summary: string | null
+          created_at: string | null
+          delivery_status: Database["public"]["Enums"]["delivery_status_enum"]
+          direction: Database["public"]["Enums"]["contact_direction_enum"]
+          engagement_status: Database["public"]["Enums"]["engagement_status_enum"]
+          id: string
+          nature: Database["public"]["Enums"]["contact_nature_enum"]
+          objective: string | null
+          observation_ends_at: string | null
+          snapshot_id: string | null
+          source_id: string | null
+          source_table: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          campaign_batch_id?: string | null
+          campaign_id?: string | null
+          channel: Database["public"]["Enums"]["contact_channel_enum"]
+          company_id: string
+          contact_type: string
+          contacted_at?: string
+          content_summary?: string | null
+          created_at?: string | null
+          delivery_status?: Database["public"]["Enums"]["delivery_status_enum"]
+          direction: Database["public"]["Enums"]["contact_direction_enum"]
+          engagement_status?: Database["public"]["Enums"]["engagement_status_enum"]
+          id?: string
+          nature: Database["public"]["Enums"]["contact_nature_enum"]
+          objective?: string | null
+          observation_ends_at?: string | null
+          snapshot_id?: string | null
+          source_id?: string | null
+          source_table?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          campaign_batch_id?: string | null
+          campaign_id?: string | null
+          channel?: Database["public"]["Enums"]["contact_channel_enum"]
+          company_id?: string
+          contact_type?: string
+          contacted_at?: string
+          content_summary?: string | null
+          created_at?: string | null
+          delivery_status?: Database["public"]["Enums"]["delivery_status_enum"]
+          direction?: Database["public"]["Enums"]["contact_direction_enum"]
+          engagement_status?: Database["public"]["Enums"]["engagement_status_enum"]
+          id?: string
+          nature?: Database["public"]["Enums"]["contact_nature_enum"]
+          objective?: string | null
+          observation_ends_at?: string | null
+          snapshot_id?: string | null
+          source_id?: string | null
+          source_table?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cs_contacts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "cs_contacts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "cs_contacts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cs_contacts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "cs_contacts_snapshot_id_fkey"
+            columns: ["snapshot_id"]
+            isOneToOne: false
+            referencedRelation: "pre_contact_snapshots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cs_impact_config: {
+        Row: {
+          config_key: string
+          config_value: Json
+          created_at: string | null
+          description: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          config_key: string
+          config_value: Json
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          config_key?: string
+          config_value?: Json
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       demande_paiment_pret_de_vehicule: {
         Row: {
@@ -4167,6 +4460,122 @@ export type Database = {
           references_legales?: string | null
           relation?: string | null
           status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      lifecycle_state_history: {
+        Row: {
+          change_reason: string | null
+          changed_at: string
+          company_id: string
+          created_at: string
+          from_state: Database["public"]["Enums"]["lifecycle_state"] | null
+          id: string
+          state_metadata: Json | null
+          to_state: Database["public"]["Enums"]["lifecycle_state"]
+          trigger_source: string | null
+          triggered_by: string
+          triggered_by_user_id: string | null
+        }
+        Insert: {
+          change_reason?: string | null
+          changed_at?: string
+          company_id: string
+          created_at?: string
+          from_state?: Database["public"]["Enums"]["lifecycle_state"] | null
+          id?: string
+          state_metadata?: Json | null
+          to_state: Database["public"]["Enums"]["lifecycle_state"]
+          trigger_source?: string | null
+          triggered_by?: string
+          triggered_by_user_id?: string | null
+        }
+        Update: {
+          change_reason?: string | null
+          changed_at?: string
+          company_id?: string
+          created_at?: string
+          from_state?: Database["public"]["Enums"]["lifecycle_state"] | null
+          id?: string
+          state_metadata?: Json | null
+          to_state?: Database["public"]["Enums"]["lifecycle_state"]
+          trigger_source?: string | null
+          triggered_by?: string
+          triggered_by_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lifecycle_state_history_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "lifecycle_state_history_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "lifecycle_state_history_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lifecycle_state_history_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
+        ]
+      }
+      lifecycle_transition_rules: {
+        Row: {
+          auto_apply: boolean
+          created_at: string
+          enabled: boolean
+          from_state: Database["public"]["Enums"]["lifecycle_state"] | null
+          id: string
+          notification_required: boolean
+          priority: number
+          rule_condition: Json
+          rule_description: string | null
+          rule_name: string
+          to_state: Database["public"]["Enums"]["lifecycle_state"]
+          updated_at: string
+        }
+        Insert: {
+          auto_apply?: boolean
+          created_at?: string
+          enabled?: boolean
+          from_state?: Database["public"]["Enums"]["lifecycle_state"] | null
+          id?: string
+          notification_required?: boolean
+          priority?: number
+          rule_condition: Json
+          rule_description?: string | null
+          rule_name: string
+          to_state: Database["public"]["Enums"]["lifecycle_state"]
+          updated_at?: string
+        }
+        Update: {
+          auto_apply?: boolean
+          created_at?: string
+          enabled?: boolean
+          from_state?: Database["public"]["Enums"]["lifecycle_state"] | null
+          id?: string
+          notification_required?: boolean
+          priority?: number
+          rule_condition?: Json
+          rule_description?: string | null
+          rule_name?: string
+          to_state?: Database["public"]["Enums"]["lifecycle_state"]
           updated_at?: string
         }
         Relationships: []
@@ -7638,6 +8047,57 @@ export type Database = {
           },
         ]
       }
+      lifecycle_state_with_company: {
+        Row: {
+          company_email: string | null
+          company_id: string | null
+          company_name: string | null
+          company_phone: string | null
+          created_at: string | null
+          current_state: Database["public"]["Enums"]["lifecycle_state"] | null
+          id: string | null
+          is_manual_override: boolean | null
+          next_review_at: string | null
+          override_by: string | null
+          override_expires_at: string | null
+          override_reason: string | null
+          previous_state: Database["public"]["Enums"]["lifecycle_state"] | null
+          state_changed_at: string | null
+          state_metadata: Json | null
+          state_reason: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_lifecycle_state_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_business_metrics_30d"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "client_lifecycle_state_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_business_summary"
+            referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "client_lifecycle_state_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_lifecycle_state_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_signals_summary"
+            referencedColumns: ["company_id"]
+          },
+        ]
+      }
       vehicle_work_time_summary: {
         Row: {
           company_id: string | null
@@ -8057,8 +8517,36 @@ export type Database = {
         | "whatsapp"
         | "phone"
         | "internal"
+      contact_channel_enum:
+        | "email"
+        | "sms"
+        | "phone"
+        | "whatsapp"
+        | "chat"
+        | "system"
+      contact_direction_enum: "outbound" | "inbound"
+      contact_nature_enum: "human" | "automated" | "ai"
+      delivery_status_enum:
+        | "pending"
+        | "sent"
+        | "delivered"
+        | "bounced"
+        | "failed"
+      engagement_status_enum:
+        | "none"
+        | "opened"
+        | "clicked"
+        | "responded"
+        | "converted"
       insight_impact: "high" | "medium" | "positive"
       insight_type: "trend" | "opportunity" | "alert" | "recommendation"
+      lifecycle_state:
+        | "onboarding"
+        | "engaged"
+        | "champion"
+        | "struggling"
+        | "at_risk"
+        | "churned"
       migration_error_type:
         | "invalid_phone_number"
         | "invalid_email"
@@ -8266,8 +8754,40 @@ export const Constants = {
         "phone",
         "internal",
       ],
+      contact_channel_enum: [
+        "email",
+        "sms",
+        "phone",
+        "whatsapp",
+        "chat",
+        "system",
+      ],
+      contact_direction_enum: ["outbound", "inbound"],
+      contact_nature_enum: ["human", "automated", "ai"],
+      delivery_status_enum: [
+        "pending",
+        "sent",
+        "delivered",
+        "bounced",
+        "failed",
+      ],
+      engagement_status_enum: [
+        "none",
+        "opened",
+        "clicked",
+        "responded",
+        "converted",
+      ],
       insight_impact: ["high", "medium", "positive"],
       insight_type: ["trend", "opportunity", "alert", "recommendation"],
+      lifecycle_state: [
+        "onboarding",
+        "engaged",
+        "champion",
+        "struggling",
+        "at_risk",
+        "churned",
+      ],
       migration_error_type: [
         "invalid_phone_number",
         "invalid_email",
