@@ -57,7 +57,7 @@ const Dossiers = () => {
   const isLoading = activeTab === 'en_cours' ? isLoadingEnCours : isLoadingClotures;
 
   const handleViewDossier = (id: string) => {
-    navigate(`/gestion-atelier?dossierId=${id}`);
+    navigate(`/dossiers/${id}`);
   };
 
   const handleArchiveDossier = async (id: string) => {
