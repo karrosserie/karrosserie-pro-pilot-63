@@ -21,8 +21,19 @@ import TermsAndConditions from "@/pages/TermsAndConditions";
 import Dashboard from "@/pages/Dashboard";
 import GestionTemplates from "@/pages/GestionTemplates";
 import GestionAtelier from "@/pages/GestionAtelier";
+import Dossiers from "@/pages/Dossiers";
 
 export const coreRoutes = [
+  {
+    path: "/dossiers",
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <Dossiers />
+        </AppLayout>
+      </ProtectedRoute>
+    )
+  },
   {
     path: "/gestion-atelier",
     element: (
