@@ -13,19 +13,15 @@ interface DossierStatsRowProps {
 const STATS_CONFIG: Array<{
   status: DossierOverallStatus;
 }> = [
-  { status: 'ouvert' },
   { status: 'en_cours' },
-  { status: 'expertise' },
-  { status: 'devis' },
-  { status: 'reparation' },
-  { status: 'facturation' },
+  { status: 'cloture' },
 ];
 
 export const DossierStatsRow = ({ counts, isLoading, onStatusClick }: DossierStatsRowProps) => {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        {[...Array(6)].map((_, i) => (
+      <div className="grid grid-cols-2 gap-3">
+        {[...Array(2)].map((_, i) => (
           <Card key={i} className="p-4 border-border/60">
             <Skeleton className="h-4 w-16 mb-3" />
             <Skeleton className="h-8 w-8" />
@@ -36,7 +32,7 @@ export const DossierStatsRow = ({ counts, isLoading, onStatusClick }: DossierSta
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+    <div className="grid grid-cols-2 gap-3">
       {STATS_CONFIG.map(({ status }) => {
         const config = DOSSIER_STATUS_CONFIG[status];
         const count = counts[status] || 0;

@@ -9,12 +9,13 @@ import {
   Car,
   FileSignature,
   ExternalLink,
-  Eye
+  Download
 } from 'lucide-react';
 import { DossierWithDetails } from '@/types/dossier';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface DossierDocumentsProps {
   dossier: DossierWithDetails;
@@ -30,6 +31,16 @@ interface DocumentCardProps {
   date?: string;
   amount?: number;
   onClick?: () => void;
+  onDownload?: () => void;
+}
+
+interface PlaceholderCardProps {
+  icon: React.ElementType;
+  iconColor: string;
+  title: string;
+  description: string;
+  onAction: () => void;
+  actionLabel: string;
 }
 
 const DocumentCard = ({ 
@@ -41,7 +52,8 @@ const DocumentCard = ({
   statusColor,
   date,
   amount,
-  onClick 
+  onClick,
+  onDownload
 }: DocumentCardProps) => (
   <Card 
     className="p-4 hover:shadow-md transition-shadow cursor-pointer group"
@@ -54,7 +66,19 @@ const DocumentCard = ({
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2">
           <h4 className="font-medium text-sm text-foreground truncate">{title}</h4>
-          <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+          <div className="flex items-center gap-1">
+            {onDownload && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={(e) => { e.stopPropagation(); onDownload(); }}
+              >
+                <Download className="h-4 w-4 text-muted-foreground" />
+              </Button>
+            )}
+            <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+          </div>
         </div>
         {reference && (
           <p className="text-xs text-muted-foreground font-mono">{reference}</p>
@@ -74,6 +98,34 @@ const DocumentCard = ({
             {amount.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
           </p>
         )}
+      </div>
+    </div>
+  </Card>
+);
+
+const PlaceholderCard = ({
+  icon: Icon,
+  iconColor,
+  title,
+  description,
+  onAction,
+  actionLabel
+}: PlaceholderCardProps) => (
+  <Card className="p-4 border-dashed">
+    <div className="flex items-start gap-3">
+      <div className={`p-2 rounded-lg ${iconColor}`}>
+        <Icon className="h-5 w-5" />
+      </div>
+      <div className="flex-1">
+        <h4 className="font-medium text-sm text-foreground">{title}</h4>
+        <p className="text-xs text-muted-foreground mt-1">{description}</p>
+        <Button 
+          onClick={onAction}
+          className="mt-3 w-full bg-[hsl(var(--karrosserie-orange))] hover:bg-[hsl(var(--karrosserie-orange))]/90"
+          size="sm"
+        >
+          {actionLabel}
+        </Button>
       </div>
     </div>
   </Card>
@@ -100,28 +152,12 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
     ? (Array.isArray(dossier.fleet_reservations) ? dossier.fleet_reservations : [dossier.fleet_reservations])
     : [];
 
-  const hasAnyDocuments = 
-    expertiseReports.length > 0 ||
-    quotes.length > 0 ||
-    repairOrders.length > 0 ||
-    invoices.length > 0 ||
-    cessions.length > 0 ||
-    fleetReservations.length > 0;
-
-  if (!hasAnyDocuments) {
-    return (
-      <Card className="p-8 text-center">
-        <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <h3 className="font-medium text-foreground mb-1">Aucun document</h3>
-        <p className="text-sm text-muted-foreground">
-          Ce dossier n'a pas encore de documents associés.
-        </p>
-      </Card>
-    );
-  }
+  const handleDownload = (type: string, reference?: string) => {
+    toast.info(`Téléchargement du ${type} ${reference || ''} en cours...`);
+  };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6">`
       {/* Expertise Reports */}
       {expertiseReports.length > 0 && (
         <div>
@@ -141,7 +177,7 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
                 statusColor="text-purple-700 dark:text-purple-300"
                 date={report.report_date ? format(new Date(report.report_date), 'dd MMM yyyy', { locale: fr }) : undefined}
                 amount={report.amount}
-                onClick={() => navigate(`/expertise-reports/${report.id}`)}
+                onClick={() => navigate(`/documents/expertise?openReport=${report.id}`)}
               />
             ))}
           </div>
@@ -167,7 +203,7 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
                 statusColor="text-indigo-700 dark:text-indigo-300"
                 date={quote.created_at ? format(new Date(quote.created_at), 'dd MMM yyyy', { locale: fr }) : undefined}
                 amount={quote.amount}
-                onClick={() => navigate(`/quotes/${quote.id}`)}
+                onClick={() => navigate(`/documents/devis?openQuote=${quote.id}`)}
               />
             ))}
           </div>
@@ -192,7 +228,7 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
                 status={ro.status}
                 statusColor="text-green-700 dark:text-green-300"
                 date={ro.arrival_date ? format(new Date(ro.arrival_date), 'dd MMM yyyy', { locale: fr }) : undefined}
-                onClick={() => navigate(`/repair-orders/${ro.id}`)}
+                onClick={() => navigate(`/documents/ordres?openOrder=${ro.id}`)}
               />
             ))}
           </div>
@@ -218,7 +254,7 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
                 statusColor="text-cyan-700 dark:text-cyan-300"
                 date={invoice.issue_date ? format(new Date(invoice.issue_date), 'dd MMM yyyy', { locale: fr }) : undefined}
                 amount={invoice.amount}
-                onClick={() => navigate(`/invoices/${invoice.id}`)}
+                onClick={() => navigate(`/documents/factures?openInvoice=${invoice.id}`)}
               />
             ))}
           </div>
@@ -242,7 +278,7 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
                 reference={cession.reference}
                 status={cession.status}
                 statusColor="text-amber-700 dark:text-amber-300"
-                onClick={() => navigate(`/cessions/${cession.id}`)}
+                onClick={() => navigate(`/cessions?openCession=${cession.id}`)}
               />
             ))}
           </div>
@@ -266,7 +302,7 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
                 status={reservation.status}
                 statusColor="text-blue-700 dark:text-blue-300"
                 date={reservation.start_date ? `${format(new Date(reservation.start_date), 'dd/MM', { locale: fr })} - ${reservation.expected_return_date ? format(new Date(reservation.expected_return_date), 'dd/MM', { locale: fr }) : '...'}` : undefined}
-                onClick={() => navigate(`/fleet/reservations/${reservation.id}`)}
+                onClick={() => navigate(`/fleet/reservations?openReservation=${reservation.id}`)}
               />
             ))}
           </div>

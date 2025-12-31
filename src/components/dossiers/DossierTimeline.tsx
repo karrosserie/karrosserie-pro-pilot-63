@@ -55,7 +55,7 @@ export const DossierTimeline = ({ dossier }: DossierTimelineProps) => {
       description: `${report.report_number || 'EXP'} | Montant: ${report.amount?.toLocaleString('fr-FR') || '0'}€ | ${report.status === 'validated' ? 'Validée' : 'En attente'}`,
       type: 'expertise',
       completed: true,
-      linkTo: `/expertise/${report.id}`,
+      linkTo: `/documents/expertise?openReport=${report.id}`,
     });
   } else {
     events.push({
@@ -78,7 +78,7 @@ export const DossierTimeline = ({ dossier }: DossierTimelineProps) => {
       description: `${quote.reference || 'DEV'} | ${quote.amount?.toLocaleString('fr-FR') || '0'}€ | ${quote.status === 'accepted' ? 'Accepté' : quote.status === 'pending' ? 'En attente' : quote.status || 'En attente'}`,
       type: 'devis',
       completed: true,
-      linkTo: `/devis/${quote.id}`,
+      linkTo: `/documents/devis?openQuote=${quote.id}`,
     });
   } else {
     events.push({
@@ -102,7 +102,7 @@ export const DossierTimeline = ({ dossier }: DossierTimelineProps) => {
       description: `${ro.reference || 'OR'} | ${ro.status === 'completed' ? 'Terminé' : ro.status === 'in_progress' ? 'En cours' : 'En attente'}`,
       type: 'repair_order',
       completed: true,
-      linkTo: `/repair-orders/${ro.id}`,
+      linkTo: `/documents/ordres?openOrder=${ro.id}`,
     });
   } else {
     events.push({
@@ -126,7 +126,7 @@ export const DossierTimeline = ({ dossier }: DossierTimelineProps) => {
       description: `${invoice.reference || 'FAC'} | ${invoice.amount?.toLocaleString('fr-FR') || '0'}€ | ${invoice.status === 'paid' ? 'Payée' : 'En attente'}`,
       type: 'invoice',
       completed: true,
-      linkTo: `/invoices/${invoice.id}`,
+      linkTo: `/documents/factures?openInvoice=${invoice.id}`,
     });
   } else {
     events.push({
@@ -149,7 +149,7 @@ export const DossierTimeline = ({ dossier }: DossierTimelineProps) => {
       description: `${cession.reference || 'CES'} | ${cession.status === 'signed' ? 'Signée' : 'En attente'}`,
       type: 'cession',
       completed: true,
-      linkTo: `/cessions/${cession.id}`,
+      linkTo: `/cessions?openCession=${cession.id}`,
     });
   } else {
     events.push({
