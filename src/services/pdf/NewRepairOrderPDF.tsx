@@ -163,18 +163,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1f2937',
   },
-  amountBox: {
-    backgroundColor: '#2563eb',
-    padding: 10,
-    marginTop: 8,
-    borderRadius: 4,
-  },
-  amountText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
   acceptanceTitle: {
     fontSize: 11,
     fontWeight: 'bold',
@@ -268,10 +256,6 @@ const formatDate = (dateString: string | null | undefined) => {
   }
 };
 
-const formatAmount = (amount: number | null | undefined) => {
-  if (amount == null) return '0,00 €';
-  return `${amount.toFixed(2).replace('.', ',')} €`;
-};
 
 const NewRepairOrderPDF: React.FC<NewRepairOrderPDFProps> = ({
   companyData,
@@ -611,9 +595,6 @@ const NewRepairOrderPDF: React.FC<NewRepairOrderPDFProps> = ({
             </View>
           )}
 
-          <View style={styles.amountBox}>
-            <Text style={styles.amountText}>MONTANT TOTAL TTC : {formatAmount(orderData.amount)}</Text>
-          </View>
         </View>
 
         <Text style={styles.acceptanceTitle}>ACCEPTATION DU CLIENT</Text>
@@ -639,12 +620,6 @@ const NewRepairOrderPDF: React.FC<NewRepairOrderPDFProps> = ({
           </Text>
         </View>
         
-        <View style={styles.checkboxRow}>
-          <View style={styles.checkbox}><Text style={styles.checkmark}>✓</Text></View>
-          <Text style={styles.checkboxText}>
-            J'accepte le montant total TTC mentionné et les modalités de paiement.
-          </Text>
-        </View>
         
         <View style={styles.checkboxRow}>
           <View style={styles.checkbox}><Text style={styles.checkmark}>✓</Text></View>
