@@ -1,51 +1,28 @@
 import React from 'react';
 import { pdf } from '@react-pdf/renderer';
 import { RepairOrder } from '@/services/supabase/repair-orders';
-import InvoicePDF from '@/components/invoices/InvoicePDF';
+import NewRepairOrderPDF from '@/services/pdf/NewRepairOrderPDF';
 import { supabase } from '@/integrations/supabase/client';
-import { parseInvoiceData, calculateInvoiceTotals } from '@/utils/invoiceCalculations';
+import { calculateInvoiceTotals } from '@/utils/invoiceCalculations';
 
 export const generateRepairOrderSignaturePDF = async (
   repairOrder: RepairOrder,
   companyData: any,
   clientData: any,
-  showItemsDetails: boolean = true
+  _showItemsDetails: boolean = true
 ): Promise<string> => {
   try {
     console.log('Generating repair order signature PDF for:', repairOrder.id);
-
-    // Parser les données des réparations et pièces
-    const repairsItems = parseInvoiceData(repairOrder.repairs_data);
-    const partsItems = parseInvoiceData(repairOrder.parts_data);
-
-    // Mapper les propriétés pour InvoicePDF
-    const allItems = [...repairsItems, ...partsItems].map(item => ({
-      ...item,
-      description: item.description || item.label || 'N/A',
-      unitPrice: item.unitCost || 0, // InvoicePDF utilise unitPrice au lieu de unitCost
-      totalHT: (item.quantity || 0) * (item.unitCost || 0) * (1 - (item.discount || 0) / 100)
-    }));
 
     // Calculer les totaux
     const totals = calculateInvoiceTotals(repairOrder.repairs_data, repairOrder.parts_data);
 
     const formattedClientData = {
-      // Format pour InvoicePDF
-      name: clientData ? `${clientData.first_name} ${clientData.last_name}` : '', // InvoicePDF utilise 'name'
-      clientName: clientData ? `${clientData.first_name} ${clientData.last_name}` : '', // Pour la signature
+      name: clientData ? `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim() : '',
       address: clientData?.address,
-      postalCode: clientData?.postal_code || '',
       city: `${clientData?.postal_code || ''} ${clientData?.city || ''}`.trim(),
       phone: clientData?.phone,
       email: clientData?.email,
-      // Ajouter les items pour InvoicePDF
-      items: allItems, // InvoicePDF cherche les items dans clientData.items
-      // Ajouter les totaux pour InvoicePDF
-      totals: {
-        subtotal: totals.subtotalAfterDiscount.toFixed(2).replace('.', ',') + ' €',
-        vat: totals.totalVAT.toFixed(2).replace('.', ',') + ' €',
-        total: totals.finalTotal.toFixed(2).replace('.', ',') + ' €'
-      }
     };
 
     const vehicleData = {
@@ -54,48 +31,45 @@ export const generateRepairOrderSignaturePDF = async (
       brand: repairOrder.vehicles?.car_brands?.name || '',
       model: repairOrder.vehicles?.car_models?.name || '',
       licensePlate: repairOrder.vehicles?.license_plate || '',
-      mileage: '' // TODO: Add mileage field to vehicle type if needed
+      mileage: '',
     };
 
-    const signatureData = {
-      signature: null, // Pas de signature car c'est pour Oodrive
-      clientName: formattedClientData.clientName,
-      signatureDate: null,
-      isForOodrive: true // Indiquer que c'est pour Oodrive
-    };
-
-    // Transformer les données en format compatible avec InvoicePDF
-    const invoiceData = {
-      id: repairOrder.id,
+    const orderData = {
       reference: repairOrder.reference,
       date: repairOrder.created_at,
-      due_date: repairOrder.created_at,
-      status: repairOrder.status,
-      amount: totals.finalTotal, // Utiliser le montant calculé
-      claim_number: repairOrder.claim_number,
-      policy_number: repairOrder.policy_number,
-      report_date: repairOrder.report_date,
-      expert_name: repairOrder.expert_name,
-      report_number: repairOrder.report_number,
-      incident_date: repairOrder.incident_date,
+      amount: totals.finalTotal,
       notes: repairOrder.notes,
-      // Passer les items parsés au lieu des données brutes JSON
-      items: allItems,
-      repairs_data: repairsItems,
-      parts_data: partsItems,
-      discounts_data: repairOrder.discounts_data,
     };
 
-    // Générer le PDF avec le composant InvoicePDF compatible React-PDF
+    // Données optionnelles d'expertise
+    const expertiseData = (repairOrder.report_number || repairOrder.expert_name) ? {
+      reportNumber: repairOrder.report_number,
+      expertName: repairOrder.expert_name,
+      reportDate: repairOrder.report_date,
+    } : undefined;
+
+    // Données optionnelles de sinistre
+    const incidentData = (repairOrder.policy_number || repairOrder.claim_number || repairOrder.incident_date) ? {
+      policyNumber: repairOrder.policy_number,
+      claimNumber: repairOrder.claim_number,
+      incidentDate: repairOrder.incident_date,
+    } : undefined;
+
+    const signatureData = {
+      clientName: formattedClientData.name,
+      isForOodrive: true,
+    };
+
+    // Générer le PDF avec le nouveau composant 4 pages
     const doc = (
-      <InvoicePDF
-        invoice={invoiceData as any}
+      <NewRepairOrderPDF
         companyData={companyData}
         clientData={formattedClientData}
         vehicleData={vehicleData}
+        orderData={orderData}
+        expertiseData={expertiseData}
+        incidentData={incidentData}
         signatureData={signatureData}
-        documentType="repair_order"
-        showItemsDetails={showItemsDetails}
       />
     );
 

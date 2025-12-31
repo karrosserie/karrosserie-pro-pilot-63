@@ -471,6 +471,30 @@ export type Database = {
         }
         Relationships: []
       }
+      assistance_companies: {
+        Row: {
+          address: string | null
+          created_at: string | null
+          id: string
+          name: string
+          phone: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+        }
+        Relationships: []
+      }
       automotive_parts: {
         Row: {
           category: string
@@ -4098,9 +4122,9 @@ export type Database = {
         Row: {
           address: string | null
           address2: string | null
+          assistance_id: string | null
           city: string | null
           created_at: string
-          default_assistance_name: string | null
           email: string | null
           id: string
           name: string
@@ -4111,9 +4135,9 @@ export type Database = {
         Insert: {
           address?: string | null
           address2?: string | null
+          assistance_id?: string | null
           city?: string | null
           created_at?: string
-          default_assistance_name?: string | null
           email?: string | null
           id?: string
           name: string
@@ -4124,9 +4148,9 @@ export type Database = {
         Update: {
           address?: string | null
           address2?: string | null
+          assistance_id?: string | null
           city?: string | null
           created_at?: string
-          default_assistance_name?: string | null
           email?: string | null
           id?: string
           name?: string
@@ -4134,7 +4158,15 @@ export type Database = {
           updated_at?: string
           zipcode?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "insurance_companies_assistance_id_fkey"
+            columns: ["assistance_id"]
+            isOneToOne: false
+            referencedRelation: "assistance_companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       invoice_sequences: {
         Row: {
