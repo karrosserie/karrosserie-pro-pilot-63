@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, FolderOpen } from 'lucide-react';
+import { Plus, FolderOpen, Download, RefreshCw, Settings } from 'lucide-react';
 import { DossierFilters } from '@/components/dossiers/DossierFilters';
 import { DossierList } from '@/components/dossiers/DossierList';
 import { DossierStatsRow } from '@/components/dossiers/DossierStatsRow';
@@ -29,6 +29,7 @@ const Dossiers = () => {
 
   const [activeTab, setActiveTab] = useState<'tous' | 'actifs' | 'archives'>('actifs');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedStatuses, setSelectedStatuses] = useState<DossierOverallStatus[]>([]);
   const [showNewDossier, setShowNewDossier] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
@@ -38,19 +39,20 @@ const Dossiers = () => {
   ];
 
   // Fetch status counts for stats row
-  const { data: statusCounts = {}, isLoading: isLoadingCounts } = useDossiersCountByStatus(companyId);
+  const { data: statusCounts = {}, isLoading: isLoadingCounts, refetch: refetchCounts } = useDossiersCountByStatus(companyId);
 
   // Fetch all dossiers (for "Tous" tab)
   const { data: allDossiers = [], isLoading: isLoadingAll, refetch: refetchAll } = useDossiers({
     company_id: companyId,
     archived: false,
     search: searchQuery || undefined,
+    overall_status: selectedStatuses.length > 0 ? selectedStatuses : undefined,
   });
 
   // Fetch active dossiers (non-cloture, non-archive)
   const { data: activeDossiers = [], isLoading: isLoadingActive, refetch: refetchActive } = useDossiers({
     company_id: companyId,
-    overall_status: activeStatuses,
+    overall_status: selectedStatuses.length > 0 ? selectedStatuses : activeStatuses,
     archived: false,
     search: searchQuery || undefined,
   });
@@ -86,6 +88,18 @@ const Dossiers = () => {
     } catch (error) {
       toast.error('Erreur lors de l\'archivage du dossier');
     }
+  };
+
+  const handleRefresh = () => {
+    refetchAll();
+    refetchActive();
+    refetchArchived();
+    refetchCounts();
+    toast.success('Données actualisées');
+  };
+
+  const handleExport = () => {
+    toast.info('Export en cours de développement');
   };
 
   const generateNextReference = async (): Promise<string> => {
@@ -203,6 +217,7 @@ const Dossiers = () => {
       refetchAll();
       refetchActive();
       refetchArchived();
+      refetchCounts();
 
     } catch (error: any) {
       console.error('Erreur création dossier:', error);
@@ -214,11 +229,11 @@ const Dossiers = () => {
 
   return (
     <div className="container mx-auto py-6 px-4 md:px-6 space-y-6 max-w-[1400px]">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      {/* Header with 3 action buttons */}
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-[hsl(var(--karrosserie-orange))/10] rounded-xl">
+            <div className="p-2 bg-[hsl(var(--karrosserie-orange))]/10 rounded-xl">
               <FolderOpen className="h-6 w-6 text-[hsl(var(--karrosserie-orange))]" />
             </div>
             <h1 className="text-2xl font-bold text-foreground">Dossiers</h1>
@@ -227,20 +242,52 @@ const Dossiers = () => {
             Gérez vos dossiers sinistre de manière centralisée
           </p>
         </div>
-        <Button 
-          onClick={() => setShowNewDossier(true)} 
-          size="lg"
-          className="gap-2 bg-[hsl(var(--karrosserie-orange))] hover:bg-[hsl(var(--karrosserie-orange))]/90 text-white shadow-md"
-        >
-          <Plus className="h-5 w-5" />
-          <span>Nouveau dossier</span>
-        </Button>
+        
+        {/* 3 Action buttons per Figma spec */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleRefresh}
+            className="gap-2"
+          >
+            <RefreshCw className="h-4 w-4" />
+            <span className="hidden sm:inline">Actualiser</span>
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleExport}
+            className="gap-2"
+          >
+            <Download className="h-4 w-4" />
+            <span className="hidden sm:inline">Exporter</span>
+          </Button>
+          <Button 
+            onClick={() => setShowNewDossier(true)} 
+            size="sm"
+            className="gap-2 bg-[hsl(var(--karrosserie-orange))] hover:bg-[hsl(var(--karrosserie-orange))]/90 text-white shadow-md"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Nouveau dossier</span>
+          </Button>
+        </div>
       </div>
 
       {/* Stats Row */}
-      <DossierStatsRow counts={statusCounts} isLoading={isLoadingCounts} />
+      <DossierStatsRow 
+        counts={statusCounts} 
+        isLoading={isLoadingCounts}
+        onStatusClick={(status) => {
+          if (selectedStatuses.includes(status)) {
+            setSelectedStatuses(selectedStatuses.filter(s => s !== status));
+          } else {
+            setSelectedStatuses([...selectedStatuses, status]);
+          }
+        }}
+      />
 
-      {/* Filters */}
+      {/* Filters with status toggles */}
       <DossierFilters
         activeTab={activeTab}
         onTabChange={setActiveTab}
@@ -249,6 +296,8 @@ const Dossiers = () => {
         tousCount={allDossiers.length}
         actifsCount={activeDossiers.length}
         archivesCount={archivedDossiers.length}
+        selectedStatuses={selectedStatuses}
+        onStatusFilterChange={setSelectedStatuses}
       />
 
       {/* Dossier list */}

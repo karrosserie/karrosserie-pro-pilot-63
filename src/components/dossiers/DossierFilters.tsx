@@ -1,8 +1,10 @@
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { Search, X, Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { DossierOverallStatus, DOSSIER_STATUS_CONFIG } from '@/types/dossier';
+import { useState } from 'react';
 
 interface DossierFiltersProps {
   activeTab: 'tous' | 'actifs' | 'archives';
@@ -12,7 +14,13 @@ interface DossierFiltersProps {
   tousCount: number;
   actifsCount: number;
   archivesCount: number;
+  selectedStatuses?: DossierOverallStatus[];
+  onStatusFilterChange?: (statuses: DossierOverallStatus[]) => void;
 }
+
+const STATUS_FILTER_OPTIONS: DossierOverallStatus[] = [
+  'ouvert', 'en_cours', 'expertise', 'devis', 'reparation', 'facturation'
+];
 
 export const DossierFilters = ({
   activeTab,
@@ -22,64 +30,131 @@ export const DossierFilters = ({
   tousCount,
   actifsCount,
   archivesCount,
+  selectedStatuses = [],
+  onStatusFilterChange,
 }: DossierFiltersProps) => {
+  const [showStatusFilters, setShowStatusFilters] = useState(false);
+
   const tabs = [
     { id: 'tous' as const, label: 'Tous', count: tousCount },
     { id: 'actifs' as const, label: 'Actifs', count: actifsCount },
     { id: 'archives' as const, label: 'Archives', count: archivesCount },
   ];
 
+  const toggleStatus = (status: DossierOverallStatus) => {
+    if (!onStatusFilterChange) return;
+    if (selectedStatuses.includes(status)) {
+      onStatusFilterChange(selectedStatuses.filter(s => s !== status));
+    } else {
+      onStatusFilterChange([...selectedStatuses, status]);
+    }
+  };
+
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-      {/* Tab switcher */}
-      <div className="inline-flex bg-muted p-1 rounded-lg">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => onTabChange(tab.id)}
-            className={cn(
-              "px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-2",
-              activeTab === tab.id
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            {tab.label}
-            <Badge 
-              variant="secondary" 
+    <div className="space-y-4">
+      {/* Main filters row */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        {/* Tab switcher */}
+        <div className="inline-flex bg-muted p-1 rounded-lg">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => onTabChange(tab.id)}
               className={cn(
-                "h-5 min-w-[20px] px-1.5 text-xs font-medium",
-                activeTab === tab.id 
-                  ? "bg-primary/10 text-primary" 
-                  : "bg-muted-foreground/10 text-muted-foreground"
+                "px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-2",
+                activeTab === tab.id
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
-              {tab.count}
-            </Badge>
-          </button>
-        ))}
-      </div>
-
-      {/* Search */}
-      <div className="flex items-center gap-2">
-        <div className="relative flex-1 sm:w-80">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher client, immat., sinistre..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-10 pr-10 h-10 bg-background"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => onSearchChange('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-            >
-              <X className="h-4 w-4" />
+              {tab.label}
+              <Badge 
+                variant="secondary" 
+                className={cn(
+                  "h-5 min-w-[20px] px-1.5 text-xs font-medium",
+                  activeTab === tab.id 
+                    ? "bg-[hsl(var(--karrosserie-orange))]/10 text-[hsl(var(--karrosserie-orange))]" 
+                    : "bg-muted-foreground/10 text-muted-foreground"
+                )}
+              >
+                {tab.count}
+              </Badge>
             </button>
+          ))}
+        </div>
+
+        {/* Search and filter toggle */}
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1 sm:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Rechercher client, immat., sinistre..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="pl-10 pr-10 h-10 bg-background"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => onSearchChange('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+          {onStatusFilterChange && (
+            <Button
+              variant={showStatusFilters || selectedStatuses.length > 0 ? "default" : "outline"}
+              size="icon"
+              className={cn(
+                "h-10 w-10 shrink-0",
+                (showStatusFilters || selectedStatuses.length > 0) && "bg-[hsl(var(--karrosserie-orange))] hover:bg-[hsl(var(--karrosserie-orange))]/90"
+              )}
+              onClick={() => setShowStatusFilters(!showStatusFilters)}
+            >
+              <Filter className="h-4 w-4" />
+              {selectedStatuses.length > 0 && (
+                <span className="absolute -top-1 -right-1 h-4 w-4 bg-destructive text-destructive-foreground text-[10px] rounded-full flex items-center justify-center">
+                  {selectedStatuses.length}
+                </span>
+              )}
+            </Button>
           )}
         </div>
       </div>
+
+      {/* Status filter toggles - per Figma spec */}
+      {showStatusFilters && onStatusFilterChange && (
+        <div className="flex flex-wrap gap-2 p-3 bg-muted/50 rounded-lg border">
+          <span className="text-xs font-medium text-muted-foreground mr-2 self-center">Filtrer par statut:</span>
+          {STATUS_FILTER_OPTIONS.map((status) => {
+            const config = DOSSIER_STATUS_CONFIG[status];
+            const isSelected = selectedStatuses.includes(status);
+            return (
+              <button
+                key={status}
+                onClick={() => toggleStatus(status)}
+                className={cn(
+                  "px-3 py-1.5 rounded-full text-xs font-medium transition-all",
+                  isSelected
+                    ? "bg-[hsl(var(--karrosserie-orange))] text-white"
+                    : cn(config.bgColor, config.color, "hover:opacity-80")
+                )}
+              >
+                {config.label}
+              </button>
+            );
+          })}
+          {selectedStatuses.length > 0 && (
+            <button
+              onClick={() => onStatusFilterChange([])}
+              className="px-3 py-1.5 rounded-full text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Effacer
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 };
