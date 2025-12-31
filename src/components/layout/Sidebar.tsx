@@ -24,7 +24,8 @@ import {
   MessageSquare,
   Scale,
   LayoutDashboard,
-  Wrench
+  Wrench,
+  FolderOpen
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useAdmin } from '@/hooks/use-admin';
@@ -186,6 +187,7 @@ const Sidebar = ({ isMobile, isOpen, onClose }: SidebarProps) => {
     { icon: <Bot className="app-icon" />, label: 'Tour de contrôle', path: '/ai-assistant' },
     { icon: <Home className="app-icon" />, label: 'Vue synthétique', path: '/' },
     { icon: <LayoutDashboard className="app-icon" />, label: 'Dashboard', path: '/dashboard' },
+    { icon: <FolderOpen className="app-icon" />, label: 'Dossiers', path: '/dossiers' },
     { icon: <MessageSquare className="app-icon" />, label: 'Messageries', path: '/messageries' },
     { icon: <Users className="app-icon" />, label: 'Clients', path: '/clients' },
     { icon: <Car className="app-icon" />, label: 'Véhicules', path: '/vehicles' },
