@@ -5,7 +5,7 @@ import { useFleetReturns } from '@/hooks/use-fleet-returns';
 import { useFleetPage } from '@/hooks/use-fleet-page';
 import { useCompany } from '@/hooks/use-company';
 import { getCurrentPosition } from '@/utils/geolocation';
-import { generateAttestationPDF, generateReturnAttestationPDF } from '@/utils/pdf-generator';
+import { generateAttestationPDF, generateReturnAttestationPDF, generateLoanContractPDF } from '@/utils/pdf-generator';
 import FleetVehicleDialog from './FleetVehicleDialog';
 import FleetLoanDialog from './FleetLoanDialog';
 import VehicleSelectionDialog from './VehicleSelectionDialog';
@@ -179,7 +179,7 @@ const FleetPageContent = () => {
     ? currentLoans.find(loan => loan.id === selectedLoanForAttestation)
     : null;
 
-  // Fonction pour gérer le téléchargement de l'attestation
+  // Fonction pour gérer le téléchargement de l'attestation (utilise maintenant le contrat complet)
   const handleDownloadAttestation = async (loanId: string) => {
     try {
       const loanData = reservations?.find(r => r.id === loanId);
@@ -197,14 +197,14 @@ const FleetPageContent = () => {
         console.error('Erreur de géolocalisation:', error);
       }
 
-      // Générer le PDF
-      await generateAttestationPDF(loanData, companyData, userPosition);
+      // Générer le contrat PDF complet
+      await generateLoanContractPDF(loanData, companyData, userPosition);
     } catch (error) {
       console.error('Erreur lors de la génération du PDF:', error);
     }
   };
 
-  // Fonction pour télécharger l'attestation de prêt depuis l'historique
+  // Fonction pour télécharger le contrat de prêt depuis l'historique
   const handleDownloadLoanAttestation = async (loanId: string) => {
     try {
       const loanData = reservations?.find(r => r.id === loanId);
@@ -222,10 +222,10 @@ const FleetPageContent = () => {
         console.error('Erreur de géolocalisation:', error);
       }
 
-      // Générer le PDF d'attestation de prêt
-      await generateAttestationPDF(loanData, companyData, userPosition);
+      // Générer le contrat PDF complet
+      await generateLoanContractPDF(loanData, companyData, userPosition);
     } catch (error) {
-      console.error('Erreur lors de la génération du PDF d\'attestation de prêt:', error);
+      console.error('Erreur lors de la génération du PDF du contrat de prêt:', error);
     }
   };
 

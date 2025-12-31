@@ -67,6 +67,40 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* Sinister Info Section */}
+      <div className="space-y-4 sm:space-y-6">
+        <h4 className="text-sm sm:text-base font-medium text-foreground">Informations sur le sinistre</h4>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="sinisterDate" className="text-sm">
+              Date du sinistre
+            </Label>
+            <Input
+              id="sinisterDate"
+              name="sinisterDate"
+              type="date"
+              value={formData.sinisterDate || ''}
+              onChange={onInputChange}
+              disabled={isViewMode}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="expertiseReportNumber" className="text-sm">
+              N° rapport d'expertise
+            </Label>
+            <Input
+              id="expertiseReportNumber"
+              name="expertiseReportNumber"
+              value={formData.expertiseReportNumber || ''}
+              onChange={onInputChange}
+              disabled={isViewMode}
+              placeholder="Ex: RE-2024-001"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Insurance Switch */}
       <div className="flex items-center space-x-2 p-3 bg-muted/30 rounded-lg" data-tour="insurance-switch">
         <Switch

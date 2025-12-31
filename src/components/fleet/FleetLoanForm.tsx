@@ -49,6 +49,9 @@ export interface LoanFormData {
   holderInfo?: string;
   dateOfBirth?: string;
   placeOfBirth?: string;
+  // Sinister fields
+  sinisterDate?: string;
+  expertiseReportNumber?: string;
   // Insurance fields
   clientInsurance?: boolean;
   insuranceCompanyId?: string;

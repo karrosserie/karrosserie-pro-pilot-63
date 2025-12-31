@@ -3383,6 +3383,7 @@ export type Database = {
           damages: Json | null
           end_mileage: number | null
           expected_return_date: string | null
+          expertise_report_number: string | null
           fleet_vehicle_id: string
           fuel_level_end: number | null
           fuel_level_start: number
@@ -3400,6 +3401,7 @@ export type Database = {
           last_reminder_at: string | null
           notes: string | null
           quote_id: string | null
+          sinister_date: string | null
           start_date: string
           start_mileage: number
           status: string
@@ -3422,6 +3424,7 @@ export type Database = {
           damages?: Json | null
           end_mileage?: number | null
           expected_return_date?: string | null
+          expertise_report_number?: string | null
           fleet_vehicle_id: string
           fuel_level_end?: number | null
           fuel_level_start?: number
@@ -3439,6 +3442,7 @@ export type Database = {
           last_reminder_at?: string | null
           notes?: string | null
           quote_id?: string | null
+          sinister_date?: string | null
           start_date: string
           start_mileage?: number
           status?: string
@@ -3461,6 +3465,7 @@ export type Database = {
           damages?: Json | null
           end_mileage?: number | null
           expected_return_date?: string | null
+          expertise_report_number?: string | null
           fleet_vehicle_id?: string
           fuel_level_end?: number | null
           fuel_level_start?: number
@@ -3478,6 +3483,7 @@ export type Database = {
           last_reminder_at?: string | null
           notes?: string | null
           quote_id?: string | null
+          sinister_date?: string | null
           start_date?: string
           start_mileage?: number
           status?: string
