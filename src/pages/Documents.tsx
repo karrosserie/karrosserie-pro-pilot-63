@@ -85,6 +85,8 @@ const Documents = () => {
   const [isRepairOrderDialogOpen, setIsRepairOrderDialogOpen] = useState(false);
   const [isExpertiseDialogOpen, setIsExpertiseDialogOpen] = useState(false);
   const [isCreditDialogOpen, setIsCreditDialogOpen] = useState(false);
+  const [isLinkToDossierOpen, setIsLinkToDossierOpen] = useState(false);
+  const [linkToDossierData, setLinkToDossierData] = useState<{ entityType: 'expertise_report' | 'quote' | 'repair_order'; entityId: string } | null>(null);
 
   // États pour les dialogues de visualisation/édition
   const [selectedQuote, setSelectedQuote] = useState(null);
@@ -727,6 +729,16 @@ const Documents = () => {
                 vehicle={document.vehicle}
                 onView={() => handleViewDocument(document)}
                 onEdit={() => handleEditDocument(document)}
+                onLinkToDossier={() => {
+                  const entityType = document.type === 'expertise' ? 'expertise_report' 
+                    : document.type === 'quote' ? 'quote' 
+                    : document.type === 'order' ? 'repair_order' 
+                    : null;
+                  if (entityType) {
+                    setLinkToDossierData({ entityType, entityId: document.originalId });
+                    setIsLinkToDossierOpen(true);
+                  }
+                }}
               />
             ))}
             
@@ -804,6 +816,15 @@ const Documents = () => {
         onOpenChange={setIsCreditDialogOpen}
         createCredit={createCredit}
       />
+
+      {linkToDossierData && (
+        <LinkToDossierModal
+          open={isLinkToDossierOpen}
+          onOpenChange={setIsLinkToDossierOpen}
+          entityType={linkToDossierData.entityType}
+          entityId={linkToDossierData.entityId}
+        />
+      )}
     </div>
   );
 };
