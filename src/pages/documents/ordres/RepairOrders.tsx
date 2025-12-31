@@ -398,25 +398,39 @@ const RepairOrders = () => {
         });
         return;
       }
+      console.log('=== DÉBUT ENVOI SIGNATURE OR ===');
+      console.log('Order ID:', order.id);
+      console.log('Client ID:', order.client_id);
+
       toast({
         title: "Préparation de la signature",
         description: "Génération du document en cours..."
       });
 
       // Récupérer les données de la société
+      console.log('Étape 1: Récupération données entreprise...');
       const companyData = await companyService.getCompanyInfo();
       if (!companyData) {
+        console.error('ERREUR: Données entreprise non trouvées');
         throw new Error('Données de l\'entreprise non trouvées');
       }
+      console.log('Données entreprise OK:', companyData.name);
 
       // Récupérer les données complètes du client
+      console.log('Étape 2: Récupération données client...');
       const clientData = await clientsService.getById(order.client_id);
       if (!clientData) {
+        console.error('ERREUR: Données client non trouvées');
         throw new Error('Données du client non trouvées');
       }
+      console.log('Données client OK:', clientData.first_name, clientData.last_name, 'Phone:', clientData.phone);
 
       // Récupérer l'ordre de réparation complet avec les données du devis
+      console.log('Étape 3: Récupération OR complet...');
       const fullOrder = await repairOrdersService.getById(order.id);
+      console.log('OR complet récupéré:', fullOrder?.id, 'Reference:', fullOrder?.reference);
+      console.log('Repairs data:', fullOrder?.repairs_data);
+      console.log('Parts data:', fullOrder?.parts_data);
 
       // Déterminer si on doit afficher les détails des items
       let showItemsDetails = true;
@@ -434,18 +448,43 @@ const RepairOrders = () => {
         showItemsDetails = false;
       }
 
-      console.log('Génération du PDF avec showItemsDetails:', showItemsDetails);
+      console.log('Étape 4: Génération du PDF avec showItemsDetails:', showItemsDetails);
 
       // Générer le PDF avec ou sans détails selon le cas
-      const documentUrl = await generateRepairOrderSignaturePDF(
-        fullOrder, 
-        companyData, 
-        clientData,
-        showItemsDetails
-      );
+      let documentUrl: string;
+      try {
+        documentUrl = await generateRepairOrderSignaturePDF(
+          fullOrder, 
+          companyData, 
+          clientData,
+          showItemsDetails
+        );
+        console.log('PDF généré avec succès, URL:', documentUrl);
+      } catch (pdfError) {
+        console.error('ERREUR génération PDF:', pdfError);
+        toast({
+          title: "Erreur génération PDF",
+          description: `Impossible de générer le document: ${pdfError instanceof Error ? pdfError.message : 'Erreur inconnue'}`,
+          variant: "destructive"
+        });
+        throw pdfError;
+      }
 
       // Envoyer pour signature via Oodrive
-      const signatureResponse = await sendRepairOrderForSignature(order.id, documentUrl, clientData);
+      console.log('Étape 5: Envoi pour signature via webhook...');
+      let signatureResponse;
+      try {
+        signatureResponse = await sendRepairOrderForSignature(order.id, documentUrl, clientData);
+        console.log('Réponse signature:', signatureResponse);
+      } catch (sigError) {
+        console.error('ERREUR envoi signature:', sigError);
+        toast({
+          title: "Erreur envoi signature",
+          description: `Impossible d'envoyer pour signature: ${sigError instanceof Error ? sigError.message : 'Erreur inconnue'}`,
+          variant: "destructive"
+        });
+        throw sigError;
+      }
 
       // Mettre à jour l'ordre de réparation avec l'URL du document et le contract_id
       await repairOrdersService.update(order.id, {
