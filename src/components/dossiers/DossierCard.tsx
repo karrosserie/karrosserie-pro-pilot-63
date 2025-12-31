@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Phone, MoreVertical, Eye, Archive, Car, Building2, Calendar, FileText, Trash2 } from 'lucide-react';
+import { Phone, MoreVertical, Eye, Archive, Car, Building2, Calendar, FileText, Trash2, Pencil } from 'lucide-react';
 import { Dossier, DOSSIER_STATUS_CONFIG, DossierOverallStatus } from '@/types/dossier';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -10,10 +10,11 @@ import { cn } from '@/lib/utils';
 interface DossierCardProps {
   dossier: Dossier;
   onView: (id: string) => void;
+  onEdit: (id: string) => void;
   onArchive: (id: string) => void;
 }
 
-export const DossierCard = ({ dossier, onView, onArchive }: DossierCardProps) => {
+export const DossierCard = ({ dossier, onView, onEdit, onArchive }: DossierCardProps) => {
   const client = dossier.clients;
   const vehicle = dossier.vehicles;
   const insurance = dossier.insurance_companies;
@@ -63,6 +64,11 @@ export const DossierCard = ({ dossier, onView, onArchive }: DossierCardProps) =>
                 <Eye className="h-4 w-4 mr-2" />
                 Voir le dossier
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEdit(dossier.id); }}>
+                <Pencil className="h-4 w-4 mr-2" />
+                Modifier
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onArchive(dossier.id); }}>
                 <Archive className="h-4 w-4 mr-2" />
                 Archiver
@@ -189,6 +195,10 @@ export const DossierCard = ({ dossier, onView, onArchive }: DossierCardProps) =>
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onView(dossier.id); }}>
                 <Eye className="h-4 w-4 mr-2" />
                 Voir le dossier
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEdit(dossier.id); }}>
+                <Pencil className="h-4 w-4 mr-2" />
+                Modifier
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onArchive(dossier.id); }}>
