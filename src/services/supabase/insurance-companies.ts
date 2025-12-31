@@ -10,6 +10,7 @@ export type InsuranceCompany = {
   zipcode?: string;
   phone?: string;
   email?: string;
+  default_assistance_name?: string;
   created_at: string;
   updated_at: string;
 };

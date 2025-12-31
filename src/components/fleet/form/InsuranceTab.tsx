@@ -1,10 +1,12 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { PhoneInputField } from '@/components/ui/phone-input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SearchableSelect } from '@/components/ui/searchable-select';
+import { useInsuranceCompanies } from '@/hooks/use-insurance-companies';
 import { LoanFormData } from '../FleetLoanForm';
 
 interface InsuranceTabProps {
@@ -14,6 +16,7 @@ interface InsuranceTabProps {
   onPhoneChange: (value: string | undefined) => void;
   onAssistanceSwitchChange: (checked: boolean) => void;
   onAssistanceFormulaChange: (value: string) => void;
+  onInsuranceCompanySelect: (companyId: string, companyName: string) => void;
   isViewMode?: boolean;
 }
 
@@ -24,8 +27,39 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
   onPhoneChange,
   onAssistanceSwitchChange,
   onAssistanceFormulaChange,
+  onInsuranceCompanySelect,
   isViewMode = false
 }) => {
+  const { insuranceCompanies } = useInsuranceCompanies();
+
+  // Transform insurance companies to options for SearchableSelect
+  const insuranceOptions = insuranceCompanies.map(company => ({
+    value: company.id,
+    label: company.name
+  }));
+
+  // Auto-fill assistance name when insurance company is selected and assistance is enabled
+  useEffect(() => {
+    if (formData.hasAssistance && formData.insuranceCompanyId) {
+      const selectedCompany = insuranceCompanies.find(c => c.id === formData.insuranceCompanyId);
+      
+      if (selectedCompany?.default_assistance_name && !formData.assistanceName) {
+        // Create a synthetic event to update assistanceName
+        const syntheticEvent = {
+          target: { name: 'assistanceName', value: selectedCompany.default_assistance_name }
+        } as React.ChangeEvent<HTMLInputElement>;
+        onInputChange(syntheticEvent);
+      }
+    }
+  }, [formData.hasAssistance, formData.insuranceCompanyId, insuranceCompanies]);
+
+  const handleCompanySelect = (companyId: string) => {
+    const selectedCompany = insuranceCompanies.find(c => c.id === companyId);
+    if (selectedCompany) {
+      onInsuranceCompanySelect(companyId, selectedCompany.name);
+    }
+  };
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Insurance Switch */}
@@ -48,13 +82,16 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
             <Label htmlFor="insuranceCompanyName" className="text-sm">
               Nom de la compagnie d'assurance <span className="text-destructive">*</span>
             </Label>
-            <Input
-              id="insuranceCompanyName"
-              name="insuranceCompanyName"
-              value={formData.insuranceCompanyName || ''}
-              onChange={onInputChange}
+            <SearchableSelect
+              options={insuranceOptions}
+              value={formData.insuranceCompanyId || ''}
+              onValueChange={handleCompanySelect}
+              placeholder="Rechercher une compagnie..."
               disabled={isViewMode}
-              required={true}
+              allowFreeText={true}
+              onFreeTextChange={(text) => {
+                onInsuranceCompanySelect('', text);
+              }}
             />
           </div>
 
@@ -163,7 +200,7 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
         </div>
 
         {formData.hasAssistance && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
               <Label htmlFor="assistanceCaseNumber" className="text-sm">
                 Numéro de dossier <span className="text-destructive">*</span>
@@ -175,6 +212,20 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
                 onChange={onInputChange}
                 disabled={isViewMode}
                 required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="assistanceName" className="text-sm">
+                Nom de l'assistance
+              </Label>
+              <Input
+                id="assistanceName"
+                name="assistanceName"
+                value={formData.assistanceName || ''}
+                onChange={onInputChange}
+                disabled={isViewMode}
+                placeholder="Auto-rempli selon l'assurance"
               />
             </div>
 

@@ -4100,6 +4100,7 @@ export type Database = {
           address2: string | null
           city: string | null
           created_at: string
+          default_assistance_name: string | null
           email: string | null
           id: string
           name: string
@@ -4112,6 +4113,7 @@ export type Database = {
           address2?: string | null
           city?: string | null
           created_at?: string
+          default_assistance_name?: string | null
           email?: string | null
           id?: string
           name: string
@@ -4124,6 +4126,7 @@ export type Database = {
           address2?: string | null
           city?: string | null
           created_at?: string
+          default_assistance_name?: string | null
           email?: string | null
           id?: string
           name?: string
