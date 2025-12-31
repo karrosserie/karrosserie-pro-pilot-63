@@ -309,7 +309,6 @@ const Dossiers = () => {
         dossiers={currentDossiers}
         isLoading={isLoading}
         onView={handleViewDossier}
-        onEdit={handleViewDossier}
         onArchive={handleArchiveDossier}
         onCreateNew={() => setShowNewDossier(true)}
       />

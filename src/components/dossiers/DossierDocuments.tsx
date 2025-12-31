@@ -265,7 +265,7 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
                 title="Réservation véhicule"
                 status={reservation.status}
                 statusColor="text-blue-700 dark:text-blue-300"
-                date={reservation.start_date ? `${format(new Date(reservation.start_date), 'dd/MM', { locale: fr })} - ${reservation.end_date ? format(new Date(reservation.end_date), 'dd/MM', { locale: fr }) : '...'}` : undefined}
+                date={reservation.start_date ? `${format(new Date(reservation.start_date), 'dd/MM', { locale: fr })} - ${reservation.expected_return_date ? format(new Date(reservation.expected_return_date), 'dd/MM', { locale: fr }) : '...'}` : undefined}
                 onClick={() => navigate(`/fleet/reservations/${reservation.id}`)}
               />
             ))}
