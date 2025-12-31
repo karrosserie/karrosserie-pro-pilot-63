@@ -39,6 +39,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useUserOnboardingProgress } from '@/hooks/use-user-onboarding-progress';
 import { usePagination } from '@/hooks/use-pagination';
 import { DocumentPagination } from '@/components/ui/document-pagination';
+import { generateRepairOrderSignaturePDF } from '@/services/pdf/repairOrderSignaturePDFService';
+import { sendRepairOrderForSignature } from '@/services/api/repairOrderSignatureService';
+import { companyService } from '@/services/supabase/company';
+import { clientsService } from '@/services/supabase/clients';
+import { repairOrdersService } from '@/services/supabase/repair-orders';
 
 const RepairOrders = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -397,23 +402,6 @@ const RepairOrders = () => {
         title: "Préparation de la signature",
         description: "Génération du document en cours..."
       });
-
-      // Importer les services nécessaires
-      const {
-        generateRepairOrderSignaturePDF
-      } = await import('@/services/pdf/repairOrderSignaturePDFService');
-      const {
-        sendRepairOrderForSignature
-      } = await import('@/services/api/repairOrderSignatureService');
-      const {
-        companyService
-      } = await import('@/services/supabase/company');
-      const {
-        clientsService
-      } = await import('@/services/supabase/clients');
-      const {
-        repairOrdersService
-      } = await import('@/services/supabase/repair-orders');
 
       // Récupérer les données de la société
       const companyData = await companyService.getCompanyInfo();
