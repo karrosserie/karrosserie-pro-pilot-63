@@ -17,12 +17,20 @@ interface ExpertiseReportDialogProps {
   report?: ExpertiseReport | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  prefillData?: {
+    client_id?: string;
+    vehicle_id?: string;
+    dossier_id?: string;
+  };
+  onSuccess?: () => void;
 }
 
 const ExpertiseReportDialog = ({
   report,
   open,
-  onOpenChange
+  onOpenChange,
+  prefillData,
+  onSuccess
 }: ExpertiseReportDialogProps) => {
   const { toast } = useToast();
   const { updateReport, createReport } = useExpertiseReports();
@@ -33,16 +41,22 @@ const ExpertiseReportDialog = ({
     setIsSubmitting(true);
     
     try {
+      // Merge prefill data with form data for creation
+      const submitData = report?.id 
+        ? formData 
+        : { ...prefillData, ...formData };
+
       if (report && report.id) {
         await updateReport.mutateAsync({ id: report.id, data: formData });
       } else {
-        await createReport.mutateAsync(formData as any);
+        await createReport.mutateAsync(submitData as any);
         toast({
           title: "Rapport créé",
           description: "Le nouveau rapport d'expertise a été créé avec succès."
         });
       }
       onOpenChange(false);
+      onSuccess?.();
     } catch (error: any) {
       toast({
         title: "Erreur",
@@ -54,6 +68,12 @@ const ExpertiseReportDialog = ({
       setIsSubmitting(false);
     }
   };
+
+  // Create a report object with prefill data for initial values
+  const reportWithPrefill = report || (prefillData ? {
+    client_id: prefillData.client_id,
+    vehicle_id: prefillData.vehicle_id,
+  } as ExpertiseReport : null);
 
   return (
     <Dialog open={open} onOpenChange={!isSubmitting ? onOpenChange : undefined}>
@@ -76,7 +96,7 @@ const ExpertiseReportDialog = ({
         
         <div className={`${isMobile ? 'px-2' : ''} flex-1 overflow-hidden`}>
           <ExpertiseReportForm
-            report={report}
+            report={reportWithPrefill}
             onSubmit={handleSubmit}
             onCancel={() => onOpenChange(false)}
             isSubmitting={isSubmitting}
