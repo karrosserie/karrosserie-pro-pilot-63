@@ -5,14 +5,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Loader2, FileText } from 'lucide-react';
 import { DossierWithDetails, DossierOverallStatus, DOSSIER_STATUS_CONFIG } from '@/types/dossier';
+import { useInsuranceCompanies } from '@/hooks/use-insurance-companies';
 
 export interface EditDossierFormData {
   claim_number?: string;
   policy_number?: string;
   notes?: string;
   overall_status?: DossierOverallStatus;
+  insurance_company_id?: string | null;
 }
 
 interface EditDossierModalProps {
@@ -34,11 +37,14 @@ export const EditDossierModal = ({
   onSubmit, 
   isSubmitting = false 
 }: EditDossierModalProps) => {
+  const { insuranceCompanies } = useInsuranceCompanies();
+  
   const [formData, setFormData] = useState<EditDossierFormData>({
     claim_number: '',
     policy_number: '',
     notes: '',
     overall_status: 'ouvert',
+    insurance_company_id: null,
   });
 
   useEffect(() => {
@@ -48,6 +54,7 @@ export const EditDossierModal = ({
         policy_number: dossier.policy_number || '',
         notes: dossier.notes || '',
         overall_status: (dossier.overall_status as DossierOverallStatus) || 'ouvert',
+        insurance_company_id: dossier.insurance_company_id || null,
       });
     }
   }, [dossier, open]);
@@ -59,6 +66,11 @@ export const EditDossierModal = ({
   const handleOpenChange = (newOpen: boolean) => {
     onOpenChange(newOpen);
   };
+
+  const insuranceOptions = insuranceCompanies.map(company => ({
+    value: company.id,
+    label: company.name
+  }));
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -89,6 +101,18 @@ export const EditDossierModal = ({
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div>
+            <Label>Assurance</Label>
+            <SearchableSelect
+              options={insuranceOptions}
+              value={formData.insurance_company_id || ''}
+              onValueChange={(value) => setFormData({ ...formData, insurance_company_id: value || null })}
+              placeholder="Sélectionner une assurance"
+              searchPlaceholder="Rechercher une assurance..."
+              disabled={isSubmitting}
+            />
           </div>
 
           <div>

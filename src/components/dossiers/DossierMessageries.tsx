@@ -10,15 +10,18 @@ import {
   MessageCircle,
   ArrowDownLeft,
   ArrowUpRight,
-  Plus
+  Plus,
+  Eye
 } from 'lucide-react';
 import { useDossierMessageries } from '@/hooks/useDossiers';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { AddCommunicationRecordModal } from '@/components/messageries/AddCommunicationRecordModal';
+import { MessageDetailModal } from '@/components/messageries/MessageDetailModal';
 import { useDossier } from '@/hooks/useDossiers';
 import { useQueryClient } from '@tanstack/react-query';
+import { useMessageries } from '@/hooks/use-messageries';
 
 interface DossierMessageriesProps {
   dossierId: string;
@@ -58,13 +61,11 @@ const getChannelColor = (channel: string) => {
 };
 
 const getPriorityColor = (priority: number | string | null | undefined) => {
-  // Handle numeric priority (1 = low, 2 = medium, 3 = high)
   if (typeof priority === 'number') {
     if (priority >= 3) return 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300';
     if (priority === 2) return 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300';
     return 'bg-muted text-muted-foreground';
   }
-  // Handle string priority
   const priorityStr = String(priority || '').toLowerCase();
   switch (priorityStr) {
     case 'high':
@@ -82,14 +83,22 @@ export const DossierMessageries = ({ dossierId }: DossierMessageriesProps) => {
   const { data: messageries, isLoading } = useDossierMessageries(dossierId);
   const { data: dossier } = useDossier(dossierId);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState<any>(null);
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  
+  // Get messageries hook for actions
+  const { updateStatus, toggleResolved, toggleArchived } = useMessageries();
 
-  // Get client ID from dossier for preselection
   const clientId = dossier?.client_id;
 
   const handleAddSuccess = () => {
-    // Refresh messageries data
     queryClient.invalidateQueries({ queryKey: ['dossierMessageries', dossierId] });
     queryClient.invalidateQueries({ queryKey: ['dossier', dossierId] });
+  };
+
+  const handleViewMessage = (message: any) => {
+    setSelectedMessage(message);
+    setDetailModalOpen(true);
   };
 
   if (isLoading) {
@@ -200,6 +209,17 @@ export const DossierMessageries = ({ dossierId }: DossierMessageriesProps) => {
                     </span>
                   </div>
                 </div>
+
+                {/* View button */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1 shrink-0"
+                  onClick={() => handleViewMessage(message)}
+                >
+                  <Eye className="h-3 w-3" />
+                  Voir
+                </Button>
               </div>
             </Card>
           );
@@ -212,6 +232,18 @@ export const DossierMessageries = ({ dossierId }: DossierMessageriesProps) => {
         onClose={() => setIsAddModalOpen(false)}
         onSuccess={handleAddSuccess}
         preselectedClientId={clientId}
+      />
+
+      {/* Message Detail Modal */}
+      <MessageDetailModal
+        message={selectedMessage}
+        open={detailModalOpen}
+        onOpenChange={setDetailModalOpen}
+        onReply={() => {}}
+        onResolve={toggleResolved}
+        onArchive={toggleArchived}
+        onViewClientHistory={() => {}}
+        onStatusChange={updateStatus}
       />
     </div>
   );

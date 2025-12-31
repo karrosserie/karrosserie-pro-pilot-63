@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { FileText, Search, Filter, Eye, Pencil } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { FileText, Search, Filter, Eye, Pencil, Link } from 'lucide-react';
+import { Link as RouterLink } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +20,7 @@ import InvoiceDialog from '@/components/invoices/InvoiceDialog';
 import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
 import ExpertiseReportDialog from '@/components/expertise/ExpertiseReportDialog';
 import { CreditDialog } from '@/components/credits/CreditDialog';
+import { LinkToDossierModal } from '@/components/dossiers/LinkToDossierModal';
 
 const DocumentItem = ({ 
   icon, 
@@ -28,7 +29,8 @@ const DocumentItem = ({
   customer, 
   vehicle, 
   onView,
-  onEdit
+  onEdit,
+  onLinkToDossier
 }: { 
   icon: React.ReactNode; 
   title: string; 
@@ -37,6 +39,7 @@ const DocumentItem = ({
   vehicle: string; 
   onView: () => void;
   onEdit: () => void;
+  onLinkToDossier: () => void;
 }) => {
   return (
     <div className="flex items-start p-3 sm:p-4 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow bg-white">
@@ -61,11 +64,14 @@ const DocumentItem = ({
       </div>
       
       <div className="ml-2 sm:ml-4 flex gap-1 sm:gap-2 flex-shrink-0">
-        <Button variant="view" size="icon" onClick={onView} className="h-8 w-8 sm:h-10 sm:w-10">
+        <Button variant="view" size="icon" onClick={onView} className="h-8 w-8 sm:h-10 sm:w-10" title="Voir">
           <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
         </Button>
-        <Button variant="edit" size="icon" onClick={onEdit} className="h-8 w-8 sm:h-10 sm:w-10">
+        <Button variant="edit" size="icon" onClick={onEdit} className="h-8 w-8 sm:h-10 sm:w-10" title="Modifier">
           <Pencil className="h-3 w-3 sm:h-4 sm:w-4" />
+        </Button>
+        <Button variant="outline" size="icon" onClick={onLinkToDossier} className="h-8 w-8 sm:h-10 sm:w-10" title="Lier à un dossier">
+          <Link className="h-3 w-3 sm:h-4 sm:w-4" />
         </Button>
       </div>
     </div>
