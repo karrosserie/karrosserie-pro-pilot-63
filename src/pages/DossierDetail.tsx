@@ -96,211 +96,180 @@ const DossierDetail = () => {
   const dossierReference = dossier.reference || `DOS-${dossier.id.slice(0, 8).toUpperCase()}`;
 
   return (
-    <div className="container mx-auto py-6 px-4 md:px-6 space-y-6 max-w-[1400px]">
+    <div className="min-h-screen bg-muted/30">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1 text-sm text-muted-foreground">
-        <Link 
-          to="/dossiers" 
-          className="hover:text-foreground transition-colors"
-        >
-          Dossiers
-        </Link>
-        <ChevronRight className="h-4 w-4" />
-        <span className="text-foreground font-medium">{dossierReference}</span>
-      </nav>
-
-      {/* Summary Card */}
-      <Card className="p-6 shadow-[var(--shadow-card)]">
-        {/* Header Row */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl font-semibold text-foreground">{dossierReference}</h1>
-            {statusConfig && (
-              <Badge className={cn(statusConfig.bgColor, statusConfig.color, 'border-0')}>
-                {statusConfig.label}
-              </Badge>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="gap-2">
-              <Edit className="h-4 w-4" />
-              <span className="hidden sm:inline">Modifier</span>
-            </Button>
+      <div className="bg-background border-b">
+        <div className="container mx-auto px-4 md:px-6 py-4 max-w-[1400px]">
+          <nav className="flex items-center gap-2 text-sm">
             <Button 
-              variant="outline" 
-              size="sm" 
-              className="gap-2"
-              onClick={handleArchive}
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8"
+              onClick={() => navigate('/dossiers')}
             >
-              <Archive className="h-4 w-4" />
-              <span className="hidden sm:inline">Archiver</span>
+              <ChevronRight className="h-4 w-4 rotate-180" />
             </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" className="h-9 w-9">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>Générer PDF</DropdownMenuItem>
-                <DropdownMenuItem>Envoyer par email</DropdownMenuItem>
-                <DropdownMenuItem className="text-destructive">Supprimer</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+            <Link 
+              to="/dossiers" 
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Dossiers
+            </Link>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            <span className="text-foreground font-medium">{dossierReference}</span>
+          </nav>
         </div>
+      </div>
 
-        {/* 3-Column Info Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Client Info */}
-          <div className="space-y-3 p-4 bg-muted/30 rounded-lg">
-            <h3 className="font-medium flex items-center gap-2 text-foreground text-sm">
-              <User className="h-4 w-4 text-[hsl(var(--karrosserie-orange))]" />
-              Client
-            </h3>
-            <div className="space-y-2 text-sm">
-              <p className="font-medium text-foreground">{clientName}</p>
-              {client?.phone && (
-                <a 
-                  href={`tel:${client.phone}`}
-                  className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <Phone className="h-3.5 w-3.5" />
-                  {client.phone}
-                </a>
-              )}
-              {client?.email && (
-                <a 
-                  href={`mailto:${client.email}`}
-                  className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors truncate"
-                >
-                  <Mail className="h-3.5 w-3.5 shrink-0" />
-                  <span className="truncate">{client.email}</span>
-                </a>
-              )}
-              {(client?.address || client?.city) && (
-                <p className="flex items-start gap-2 text-muted-foreground">
-                  <MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5" />
-                  <span>{[client.address, client.postal_code, client.city].filter(Boolean).join(', ')}</span>
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Vehicle Info */}
-          <div className="space-y-3 p-4 bg-muted/30 rounded-lg">
-            <h3 className="font-medium flex items-center gap-2 text-foreground text-sm">
-              <Car className="h-4 w-4 text-[hsl(var(--karrosserie-orange))]" />
-              Véhicule
-            </h3>
-            <div className="space-y-2 text-sm">
-              {vehicle?.license_plate && (
-                <Badge variant="outline" className="font-mono text-sm">
-                  {vehicle.license_plate}
+      <div className="container mx-auto py-6 px-4 md:px-6 space-y-6 max-w-[1400px]">
+        {/* Summary Card */}
+        <Card className="p-6">
+          {/* Header Row */}
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-xl font-semibold text-foreground mb-2">{dossierReference}</h1>
+              {statusConfig && (
+                <Badge className={cn(statusConfig.bgColor, statusConfig.color, 'border-0')}>
+                  {statusConfig.label}
                 </Badge>
               )}
-              {vehicleInfo && (
-                <p className="font-medium text-foreground">{vehicleInfo}</p>
-              )}
-              {vehicle?.vin && (
-                <p className="text-muted-foreground">
-                  VIN: <span className="font-mono text-xs">{vehicle.vin}</span>
-                </p>
-              )}
-              {vehicle?.mileage && (
-                <p className="text-muted-foreground">
-                  Kilométrage: {vehicle.mileage.toLocaleString()} km
-                </p>
-              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" className="gap-2">
+                <Edit className="h-4 w-4" />
+                Modifier
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-2"
+                onClick={handleArchive}
+              >
+                <Archive className="h-4 w-4" />
+                Archiver
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-9 w-9">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>Générer PDF</DropdownMenuItem>
+                  <DropdownMenuItem>Envoyer par email</DropdownMenuItem>
+                  <DropdownMenuItem className="text-destructive">Supprimer</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
-          {/* Insurance Info */}
-          <div className="space-y-3 p-4 bg-muted/30 rounded-lg">
-            <h3 className="font-medium flex items-center gap-2 text-foreground text-sm">
-              <Building2 className="h-4 w-4 text-[hsl(var(--karrosserie-orange))]" />
-              Assurance
-            </h3>
-            <div className="space-y-2 text-sm">
+          {/* 3-Column Info Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Client Info */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                <User className="h-4 w-4 text-[hsl(var(--karrosserie-orange))]" />
+                Client
+              </div>
+              <p className="font-medium text-foreground">{clientName}</p>
+              {client?.phone && (
+                <p className="text-sm text-muted-foreground">{client.phone}</p>
+              )}
+              {client?.email && (
+                <p className="text-sm text-muted-foreground">{client.email}</p>
+              )}
+            </div>
+
+            {/* Vehicle Info */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                <Car className="h-4 w-4 text-[hsl(var(--karrosserie-orange))]" />
+                Véhicule
+              </div>
+              {vehicle?.license_plate && (
+                <p className="font-medium text-foreground">{vehicle.license_plate}</p>
+              )}
+              {vehicleInfo && (
+                <p className="text-sm text-muted-foreground">{vehicleInfo}</p>
+              )}
+              {vehicle?.vin && (
+                <p className="text-sm text-muted-foreground">
+                  VIN: {vehicle.vin.length > 10 ? `${vehicle.vin.slice(0, 10)}...` : vehicle.vin}
+                </p>
+              )}
+            </div>
+
+            {/* Insurance Info */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                <Building2 className="h-4 w-4 text-[hsl(var(--karrosserie-orange))]" />
+                Assurance
+              </div>
               {insurance?.name ? (
                 <p className="font-medium text-foreground">{insurance.name}</p>
               ) : (
-                <p className="text-muted-foreground italic">Non renseignée</p>
+                <p className="text-muted-foreground italic text-sm">Non renseignée</p>
               )}
               {dossier.policy_number && (
-                <p className="text-muted-foreground">
-                  Police: <span className="font-mono">{dossier.policy_number}</span>
+                <p className="text-sm text-muted-foreground">
+                  Police: {dossier.policy_number}
                 </p>
               )}
               {dossier.claim_number && (
-                <p className="text-muted-foreground">
-                  Sinistre: <span className="font-mono">{dossier.claim_number}</span>
-                </p>
-              )}
-              {dossier.incident_date && (
-                <p className="text-muted-foreground">
-                  Date sinistre: {new Date(dossier.incident_date).toLocaleDateString('fr-FR')}
-                </p>
-              )}
-              {dossier.expert_name && (
-                <p className="text-muted-foreground">
-                  Expert: {dossier.expert_name}
+                <p className="text-sm text-muted-foreground">
+                  Sinistre: {dossier.claim_number}
                 </p>
               )}
             </div>
           </div>
-        </div>
-      </Card>
+        </Card>
 
-      {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="inline-flex bg-muted p-1 rounded-lg h-auto">
-          <TabsTrigger 
-            value="chronologie" 
-            className="gap-2 px-4 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md"
-          >
-            <Clock className="h-4 w-4" />
-            <span className="hidden sm:inline">Chronologie</span>
-          </TabsTrigger>
-          <TabsTrigger 
-            value="documents" 
-            className="gap-2 px-4 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md"
-          >
-            <FileText className="h-4 w-4" />
-            <span className="hidden sm:inline">Documents</span>
-          </TabsTrigger>
-          <TabsTrigger 
-            value="messageries" 
-            className="gap-2 px-4 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md"
-          >
-            <MessageSquare className="h-4 w-4" />
-            <span className="hidden sm:inline">Messages</span>
-          </TabsTrigger>
-          <TabsTrigger 
-            value="historique" 
-            className="gap-2 px-4 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md"
-          >
-            <History className="h-4 w-4" />
-            <span className="hidden sm:inline">Historique</span>
-          </TabsTrigger>
-        </TabsList>
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="inline-flex bg-muted p-1 rounded-lg h-auto">
+            <TabsTrigger 
+              value="chronologie" 
+              className="px-4 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md text-sm"
+            >
+              Chronologie
+            </TabsTrigger>
+            <TabsTrigger 
+              value="documents" 
+              className="px-4 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md text-sm"
+            >
+              Documents
+            </TabsTrigger>
+            <TabsTrigger 
+              value="messageries" 
+              className="px-4 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md text-sm"
+            >
+              Messages
+            </TabsTrigger>
+            <TabsTrigger 
+              value="historique" 
+              className="px-4 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md text-sm"
+            >
+              Historique
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="chronologie" className="mt-6">
-          <DossierTimeline dossier={dossier} />
-        </TabsContent>
+          <TabsContent value="chronologie" className="mt-6">
+            <DossierTimeline dossier={dossier} />
+          </TabsContent>
 
-        <TabsContent value="documents" className="mt-6">
-          <DossierDocuments dossier={dossier} />
-        </TabsContent>
+          <TabsContent value="documents" className="mt-6">
+            <DossierDocuments dossier={dossier} />
+          </TabsContent>
 
-        <TabsContent value="messageries" className="mt-6">
-          <DossierMessageries dossierId={dossier.id} />
-        </TabsContent>
+          <TabsContent value="messageries" className="mt-6">
+            <DossierMessageries dossierId={dossier.id} />
+          </TabsContent>
 
-        <TabsContent value="historique" className="mt-6">
-          <DossierHistory dossier={dossier} />
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="historique" className="mt-6">
+            <DossierHistory dossier={dossier} />
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 };
