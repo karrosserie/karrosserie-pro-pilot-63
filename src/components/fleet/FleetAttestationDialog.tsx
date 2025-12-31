@@ -114,6 +114,8 @@ const FleetAttestationDialog: React.FC<FleetAttestationDialogProps> = ({
                 <p>{loanData?.clients?.postal_code || ''} {loanData?.clients?.city || ''}</p>
                 <p>Tél : {loanData?.clients?.phone || ''}</p>
                 <p>Email : {loanData?.clients?.email || ''}</p>
+                <p>N° Permis : {loanData?.clients?.license_number || '[Non renseigné]'}</p>
+                <p>Délivré le : {loanData?.clients?.license_issue_date ? formatDate(loanData.clients.license_issue_date) : '[Non renseigné]'}</p>
               </div>
             </div>
           </div>

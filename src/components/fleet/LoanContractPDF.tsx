@@ -355,6 +355,8 @@ const LoanContractPDF = ({ loanData, companyData, userPosition }: LoanContractPD
             <Text style={styles.partyInfo}>{loanData?.clients?.postal_code || ''} {loanData?.clients?.city || ''}</Text>
             <Text style={styles.partyInfo}>Tél : {loanData?.clients?.phone || ''}</Text>
             <Text style={styles.partyInfo}>Email : {loanData?.clients?.email || ''}</Text>
+            <Text style={styles.partyInfo}>N° Permis : {loanData?.clients?.license_number || '[Non renseigné]'}</Text>
+            <Text style={styles.partyInfo}>Délivré le : {loanData?.clients?.license_issue_date ? formatDate(loanData.clients.license_issue_date) : '[Non renseigné]'}</Text>
           </View>
         </View>
 
