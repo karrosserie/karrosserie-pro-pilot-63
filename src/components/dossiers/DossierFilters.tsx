@@ -1,6 +1,7 @@
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface DossierFiltersProps {
@@ -29,28 +30,28 @@ export const DossierFilters = ({
   ];
 
   return (
-    <div className="space-y-4">
-      {/* Tab switcher - Figma style with bg-muted container */}
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      {/* Tab switcher */}
       <div className="inline-flex bg-muted p-1 rounded-lg">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
             className={cn(
-              "px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2",
+              "px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-2",
               activeTab === tab.id
                 ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/80"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
             {tab.label}
             <Badge 
               variant="secondary" 
               className={cn(
-                "h-5 min-w-5 px-1.5 text-xs",
+                "h-5 min-w-[20px] px-1.5 text-xs font-medium",
                 activeTab === tab.id 
-                  ? "bg-muted text-muted-foreground" 
-                  : "bg-muted-foreground/20"
+                  ? "bg-primary/10 text-primary" 
+                  : "bg-muted-foreground/10 text-muted-foreground"
               )}
             >
               {tab.count}
@@ -59,16 +60,24 @@ export const DossierFilters = ({
         ))}
       </div>
 
-      {/* Search and filters row */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1 max-w-md">
+      {/* Search */}
+      <div className="flex items-center gap-2">
+        <div className="relative flex-1 sm:w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Rechercher par client, immatriculation, n° sinistre..."
+            placeholder="Rechercher client, immat., sinistre..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-10 h-10"
+            className="pl-10 pr-10 h-10 bg-background"
           />
+          {searchQuery && (
+            <button
+              onClick={() => onSearchChange('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
       </div>
     </div>

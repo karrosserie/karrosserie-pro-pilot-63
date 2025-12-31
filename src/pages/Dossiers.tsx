@@ -215,22 +215,25 @@ const Dossiers = () => {
   return (
     <div className="container mx-auto py-6 px-4 md:px-6 space-y-6 max-w-[1400px]">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-3 mb-1">
-            <FolderOpen className="h-7 w-7 text-[hsl(var(--karrosserie-orange))]" />
-            <h1 className="text-2xl font-semibold text-foreground">Dossiers</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-[hsl(var(--karrosserie-orange))/10] rounded-xl">
+              <FolderOpen className="h-6 w-6 text-[hsl(var(--karrosserie-orange))]" />
+            </div>
+            <h1 className="text-2xl font-bold text-foreground">Dossiers</h1>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Gestion centralisée des dossiers sinistre
+          <p className="text-sm text-muted-foreground pl-[52px]">
+            Gérez vos dossiers sinistre de manière centralisée
           </p>
         </div>
         <Button 
           onClick={() => setShowNewDossier(true)} 
-          className="gap-2 bg-primary hover:bg-primary/90"
+          size="lg"
+          className="gap-2 bg-[hsl(var(--karrosserie-orange))] hover:bg-[hsl(var(--karrosserie-orange))]/90 text-white shadow-md"
         >
-          <Plus className="h-4 w-4" />
-          <span className="hidden sm:inline">Nouveau dossier</span>
+          <Plus className="h-5 w-5" />
+          <span>Nouveau dossier</span>
         </Button>
       </div>
 
