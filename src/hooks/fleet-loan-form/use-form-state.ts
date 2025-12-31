@@ -34,6 +34,7 @@ export const useFleetLoanFormState = (vehicle: FleetVehicle, defaultValues?: any
     dateOfBirth: defaultValues?.clients?.date_of_birth || '',
     placeOfBirth: defaultValues?.clients?.place_of_birth || '',
     clientInsurance: defaultValues?.client_insurance || false,
+    insuranceCompanyId: defaultValues?.insurance_company_id || '',
     insuranceCompanyName: defaultValues?.insurance_company_name || '',
     insurancePhone: defaultValues?.insurance_phone || '',
     insuranceEmail: defaultValues?.insurance_email || '',
@@ -46,6 +47,7 @@ export const useFleetLoanFormState = (vehicle: FleetVehicle, defaultValues?: any
     assistanceCaseNumber: defaultValues?.assistance_case_number || '',
     assistanceEmail: defaultValues?.assistance_email || '',
     assistanceFormula: defaultValues?.coverage_duration || '',
+    assistanceName: defaultValues?.assistance_name || '',
     attestationAccepted: defaultValues?.attestation_accepted || false,
     clientSignature: defaultValues?.client_signature || ''
   });
