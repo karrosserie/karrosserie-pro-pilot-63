@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, FolderOpen, Download, RefreshCw, Settings } from 'lucide-react';
+import { Plus, FolderOpen } from 'lucide-react';
 import { DossierFilters } from '@/components/dossiers/DossierFilters';
 import { DossierList } from '@/components/dossiers/DossierList';
 import { DossierStatsRow } from '@/components/dossiers/DossierStatsRow';
@@ -231,49 +231,27 @@ const Dossiers = () => {
 
   return (
     <div className="container mx-auto py-6 px-4 md:px-6 space-y-6 max-w-[1400px]">
-      {/* Header with 3 action buttons */}
+      {/* Header matching design */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-[hsl(var(--karrosserie-orange))]/10 rounded-xl">
-              <FolderOpen className="h-6 w-6 text-[hsl(var(--karrosserie-orange))]" />
-            </div>
-            <h1 className="text-2xl font-bold text-foreground">Dossiers</h1>
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-[hsl(var(--karrosserie-orange))]/10 rounded-xl">
+            <FolderOpen className="h-6 w-6 text-[hsl(var(--karrosserie-orange))]" />
           </div>
-          <p className="text-sm text-muted-foreground pl-[52px]">
-            Gérez vos dossiers sinistre de manière centralisée
-          </p>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Dossiers</h1>
+            <p className="text-sm text-muted-foreground">
+              Gestion centralisée des dossiers sinistre
+            </p>
+          </div>
         </div>
         
-        {/* 3 Action buttons per Figma spec */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={handleRefresh}
-            className="gap-2"
-          >
-            <RefreshCw className="h-4 w-4" />
-            <span className="hidden sm:inline">Actualiser</span>
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={handleExport}
-            className="gap-2"
-          >
-            <Download className="h-4 w-4" />
-            <span className="hidden sm:inline">Exporter</span>
-          </Button>
-          <Button 
-            onClick={() => setShowNewDossier(true)} 
-            size="sm"
-            className="gap-2 bg-[hsl(var(--karrosserie-orange))] hover:bg-[hsl(var(--karrosserie-orange))]/90 text-white shadow-md"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Nouveau dossier</span>
-          </Button>
-        </div>
+        <Button 
+          onClick={() => setShowNewDossier(true)} 
+          className="gap-2 bg-[hsl(var(--karrosserie-orange))] hover:bg-[hsl(var(--karrosserie-orange))]/90 text-white"
+        >
+          <Plus className="h-4 w-4" />
+          Nouveau dossier
+        </Button>
       </div>
 
       {/* Stats Row */}

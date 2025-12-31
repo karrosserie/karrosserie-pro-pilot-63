@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Phone, MoreVertical, Eye, Archive, Car, Building2, Calendar, FileText, Trash2 } from 'lucide-react';
+import { Phone, MoreVertical, Eye, Archive, Car, Calendar } from 'lucide-react';
 import { Dossier, DOSSIER_STATUS_CONFIG, DossierOverallStatus } from '@/types/dossier';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -107,16 +107,13 @@ export const DossierCard = ({ dossier, onView, onArchive }: DossierCardProps) =>
         </div>
       </div>
 
-      {/* Desktop Layout - Table row matching header columns */}
-      <div className="hidden md:grid md:grid-cols-[180px_1.2fr_1fr_1fr_100px_48px] md:items-center md:gap-4 md:px-5 md:py-3">
+      {/* Desktop Layout - Table row matching new design columns */}
+      <div className="hidden md:grid md:grid-cols-[140px_1fr_1fr_120px_1fr_120px_48px] md:items-center md:gap-4 md:px-5 md:py-4">
         {/* Reference */}
         <div className="min-w-0">
-          <p className="font-mono text-sm font-semibold text-[hsl(var(--karrosserie-orange))] truncate">
+          <p className="font-mono text-sm font-semibold text-[hsl(var(--karrosserie-orange))]">
             {dossierReference}
           </p>
-          <span className="text-[11px] text-muted-foreground flex items-center gap-1 mt-0.5">
-            {format(new Date(dossier.created_at), 'dd/MM/yyyy', { locale: fr })}
-          </span>
         </div>
 
         {/* Client */}
@@ -128,7 +125,6 @@ export const DossierCard = ({ dossier, onView, onArchive }: DossierCardProps) =>
               className="text-xs text-muted-foreground hover:text-[hsl(var(--karrosserie-orange))] flex items-center gap-1 mt-0.5"
               onClick={(e) => e.stopPropagation()}
             >
-              <Phone className="h-3 w-3" />
               {client.phone}
             </a>
           )}
@@ -137,9 +133,9 @@ export const DossierCard = ({ dossier, onView, onArchive }: DossierCardProps) =>
         {/* Vehicle */}
         <div className="min-w-0">
           {vehicle?.license_plate && (
-            <Badge variant="outline" className="font-mono text-xs bg-muted/30 mb-0.5">
+            <p className="font-mono text-sm font-medium text-foreground">
               {vehicle.license_plate}
-            </Badge>
+            </p>
           )}
           {vehicleInfo && (
             <p className="text-xs text-muted-foreground truncate">{vehicleInfo}</p>
@@ -149,29 +145,29 @@ export const DossierCard = ({ dossier, onView, onArchive }: DossierCardProps) =>
           )}
         </div>
 
+        {/* Status */}
+        <div>
+          {statusConfig && (
+            <Badge className={cn(statusConfig.bgColor, statusConfig.color, 'border-0 text-xs font-medium whitespace-nowrap')}>
+              {statusConfig.label}
+            </Badge>
+          )}
+        </div>
+
         {/* Insurance */}
         <div className="min-w-0">
           {insurance?.name ? (
-            <>
-              <span className="text-sm text-foreground truncate block">{insurance.name}</span>
-              {dossier.claim_number && (
-                <p className="text-[11px] text-muted-foreground mt-0.5 font-mono">
-                  N° {dossier.claim_number}
-                </p>
-              )}
-            </>
+            <span className="text-sm text-foreground truncate block">{insurance.name}</span>
           ) : (
             <span className="text-sm text-muted-foreground">—</span>
           )}
         </div>
 
-        {/* Status */}
-        <div>
-          {statusConfig && (
-            <Badge className={cn(statusConfig.bgColor, statusConfig.color, 'border-0 text-[11px] font-medium whitespace-nowrap')}>
-              {statusConfig.label}
-            </Badge>
-          )}
+        {/* Date sinistre */}
+        <div className="min-w-0">
+          <span className="text-sm text-foreground">
+            {format(new Date(dossier.created_at), 'dd/MM/yyyy', { locale: fr })}
+          </span>
         </div>
 
         {/* Actions */}
