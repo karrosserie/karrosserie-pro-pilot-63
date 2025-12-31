@@ -9,14 +9,7 @@ import {
   ChevronRight,
   User, 
   Car, 
-  Phone, 
-  Mail, 
-  MapPin,
   Building2,
-  FileText,
-  MessageSquare,
-  Clock,
-  History,
   Edit,
   Archive,
   MoreHorizontal
@@ -27,22 +20,25 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useDossier, useArchiveDossier } from '@/hooks/useDossiers';
+import { useDossier, useArchiveDossier, useUpdateDossier } from '@/hooks/useDossiers';
 import { DOSSIER_STATUS_CONFIG, DossierOverallStatus } from '@/types/dossier';
 import { cn } from '@/lib/utils';
 import { DossierTimeline } from '@/components/dossiers/DossierTimeline';
 import { DossierDocuments } from '@/components/dossiers/DossierDocuments';
 import { DossierMessageries } from '@/components/dossiers/DossierMessageries';
 import { DossierHistory } from '@/components/dossiers/DossierHistory';
+import { EditDossierModal, EditDossierFormData } from '@/components/dossiers/EditDossierModal';
 import { toast } from 'sonner';
 
 const DossierDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('chronologie');
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const { data: dossier, isLoading, error } = useDossier(id);
   const archiveDossier = useArchiveDossier();
+  const updateDossier = useUpdateDossier();
 
   const handleArchive = async () => {
     if (!dossier?.id) return;
@@ -53,6 +49,27 @@ const DossierDetail = () => {
     } catch (error) {
       toast.error('Erreur lors de l\'archivage');
     }
+  };
+
+  const handleEdit = async (formData: EditDossierFormData) => {
+    if (!dossier?.id) return;
+    try {
+      await updateDossier.mutateAsync({ 
+        id: dossier.id, 
+        params: formData 
+      });
+      setShowEditModal(false);
+    } catch (error) {
+      // Toast is handled by the hook
+    }
+  };
+
+  const handleGeneratePDF = () => {
+    toast.info('Génération du PDF en cours de développement');
+  };
+
+  const handleSendEmail = () => {
+    toast.info('Envoi par email en cours de développement');
   };
 
   if (isLoading) {
@@ -135,7 +152,12 @@ const DossierDetail = () => {
               )}
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-2"
+                onClick={() => setShowEditModal(true)}
+              >
                 <Edit className="h-4 w-4" />
                 Modifier
               </Button>
@@ -155,8 +177,8 @@ const DossierDetail = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem>Générer PDF</DropdownMenuItem>
-                  <DropdownMenuItem>Envoyer par email</DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleGeneratePDF}>Générer PDF</DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSendEmail}>Envoyer par email</DropdownMenuItem>
                   <DropdownMenuItem className="text-destructive">Supprimer</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -270,6 +292,15 @@ const DossierDetail = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Edit Modal */}
+      <EditDossierModal
+        open={showEditModal}
+        onOpenChange={setShowEditModal}
+        dossier={dossier}
+        onSubmit={handleEdit}
+        isSubmitting={updateDossier.isPending}
+      />
     </div>
   );
 };
