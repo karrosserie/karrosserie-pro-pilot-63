@@ -474,24 +474,30 @@ export type Database = {
       assistance_companies: {
         Row: {
           address: string | null
+          city: string | null
           created_at: string | null
           id: string
           name: string
           phone: string | null
+          zipcode: string | null
         }
         Insert: {
           address?: string | null
+          city?: string | null
           created_at?: string | null
           id?: string
           name: string
           phone?: string | null
+          zipcode?: string | null
         }
         Update: {
           address?: string | null
+          city?: string | null
           created_at?: string | null
           id?: string
           name?: string
           phone?: string | null
+          zipcode?: string | null
         }
         Relationships: []
       }
@@ -2491,6 +2497,7 @@ export type Database = {
           nature: Database["public"]["Enums"]["contact_nature_enum"]
           objective: string | null
           observation_ends_at: string | null
+          signal_id: string | null
           snapshot_id: string | null
           source_id: string | null
           source_table: string | null
@@ -2512,6 +2519,7 @@ export type Database = {
           nature: Database["public"]["Enums"]["contact_nature_enum"]
           objective?: string | null
           observation_ends_at?: string | null
+          signal_id?: string | null
           snapshot_id?: string | null
           source_id?: string | null
           source_table?: string | null
@@ -2533,6 +2541,7 @@ export type Database = {
           nature?: Database["public"]["Enums"]["contact_nature_enum"]
           objective?: string | null
           observation_ends_at?: string | null
+          signal_id?: string | null
           snapshot_id?: string | null
           source_id?: string | null
           source_table?: string | null
@@ -2566,6 +2575,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "company_signals_summary"
             referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "cs_contacts_signal_id_fkey"
+            columns: ["signal_id"]
+            isOneToOne: false
+            referencedRelation: "client_signals"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "cs_contacts_snapshot_id_fkey"

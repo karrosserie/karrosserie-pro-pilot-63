@@ -138,29 +138,29 @@ export const DossierTimeline = ({ dossier }: DossierTimelineProps) => {
         <h4 className="font-medium text-sm text-muted-foreground mb-4">Documents liés</h4>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {dossier.expertise_reports && (
-            <div className="text-center p-3 bg-muted/50 rounded-lg">
-              <ClipboardCheck className="h-5 w-5 mx-auto mb-1 text-purple-600" />
+            <div className="text-center p-3 bg-[hsl(var(--status-expertise-bg))] rounded-lg">
+              <ClipboardCheck className="h-5 w-5 mx-auto mb-1 text-[hsl(var(--status-expertise-text))]" />
               <p className="text-sm font-medium">{Array.isArray(dossier.expertise_reports) ? dossier.expertise_reports.length : 1}</p>
               <p className="text-xs text-muted-foreground">Expertise(s)</p>
             </div>
           )}
           {dossier.quotes && (
-            <div className="text-center p-3 bg-muted/50 rounded-lg">
-              <FileText className="h-5 w-5 mx-auto mb-1 text-indigo-600" />
+            <div className="text-center p-3 bg-[hsl(var(--status-devis-bg))] rounded-lg">
+              <FileText className="h-5 w-5 mx-auto mb-1 text-[hsl(var(--status-devis-text))]" />
               <p className="text-sm font-medium">{Array.isArray(dossier.quotes) ? dossier.quotes.length : 1}</p>
               <p className="text-xs text-muted-foreground">Devis</p>
             </div>
           )}
           {dossier.repair_orders && (
-            <div className="text-center p-3 bg-muted/50 rounded-lg">
-              <Wrench className="h-5 w-5 mx-auto mb-1 text-green-600" />
+            <div className="text-center p-3 bg-[hsl(var(--status-reparation-bg))] rounded-lg">
+              <Wrench className="h-5 w-5 mx-auto mb-1 text-[hsl(var(--status-reparation-text))]" />
               <p className="text-sm font-medium">{Array.isArray(dossier.repair_orders) ? dossier.repair_orders.length : 1}</p>
               <p className="text-xs text-muted-foreground">OR</p>
             </div>
           )}
           {dossier.invoices && dossier.invoices.length > 0 && (
-            <div className="text-center p-3 bg-muted/50 rounded-lg">
-              <Receipt className="h-5 w-5 mx-auto mb-1 text-cyan-600" />
+            <div className="text-center p-3 bg-[hsl(var(--status-facturation-bg))] rounded-lg">
+              <Receipt className="h-5 w-5 mx-auto mb-1 text-[hsl(var(--status-facturation-text))]" />
               <p className="text-sm font-medium">{dossier.invoices.length}</p>
               <p className="text-xs text-muted-foreground">Facture(s)</p>
             </div>
