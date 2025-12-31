@@ -209,6 +209,10 @@ export type Database = {
         Row: {
           action_type: Database["public"]["Enums"]["action_type"]
           agent_name: string
+          approval_status: string | null
+          approved_at: string | null
+          approved_by: string | null
+          channel: string | null
           client_id: string | null
           company_id: string
           completed_at: string | null
@@ -216,9 +220,12 @@ export type Database = {
           execution_time_ms: number | null
           expected_impact: string | null
           id: string
+          message_body: string | null
+          message_subject: string | null
           priority: string
           result_data: Json | null
           scheduled_at: string
+          signal_id: string | null
           started_at: string | null
           status: Database["public"]["Enums"]["action_status"]
           success: boolean | null
@@ -229,6 +236,10 @@ export type Database = {
         Insert: {
           action_type: Database["public"]["Enums"]["action_type"]
           agent_name: string
+          approval_status?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          channel?: string | null
           client_id?: string | null
           company_id: string
           completed_at?: string | null
@@ -236,9 +247,12 @@ export type Database = {
           execution_time_ms?: number | null
           expected_impact?: string | null
           id?: string
+          message_body?: string | null
+          message_subject?: string | null
           priority: string
           result_data?: Json | null
           scheduled_at?: string
+          signal_id?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["action_status"]
           success?: boolean | null
@@ -249,6 +263,10 @@ export type Database = {
         Update: {
           action_type?: Database["public"]["Enums"]["action_type"]
           agent_name?: string
+          approval_status?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          channel?: string | null
           client_id?: string | null
           company_id?: string
           completed_at?: string | null
@@ -256,9 +274,12 @@ export type Database = {
           execution_time_ms?: number | null
           expected_impact?: string | null
           id?: string
+          message_body?: string | null
+          message_subject?: string | null
           priority?: string
           result_data?: Json | null
           scheduled_at?: string
+          signal_id?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["action_status"]
           success?: boolean | null
@@ -301,6 +322,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "company_signals_summary"
             referencedColumns: ["company_id"]
+          },
+          {
+            foreignKeyName: "ai_automatic_actions_signal_id_fkey"
+            columns: ["signal_id"]
+            isOneToOne: false
+            referencedRelation: "client_signals"
+            referencedColumns: ["id"]
           },
         ]
       }

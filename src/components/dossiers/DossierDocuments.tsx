@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,13 +10,15 @@ import {
   Car,
   FileSignature,
   ExternalLink,
-  Download
+  Download,
+  Plus
 } from 'lucide-react';
 import { DossierWithDetails } from '@/types/dossier';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { DocumentPreviewModal } from './DocumentPreviewModal';
 
 interface DossierDocumentsProps {
   dossier: DossierWithDetails;
@@ -111,19 +114,20 @@ const PlaceholderCard = ({
   onAction,
   actionLabel
 }: PlaceholderCardProps) => (
-  <Card className="p-4 border-dashed">
+  <Card className="p-4 border-dashed border-2 bg-muted/20">
     <div className="flex items-start gap-3">
-      <div className={`p-2 rounded-lg ${iconColor}`}>
+      <div className={`p-2 rounded-lg ${iconColor} opacity-50`}>
         <Icon className="h-5 w-5" />
       </div>
       <div className="flex-1">
-        <h4 className="font-medium text-sm text-foreground">{title}</h4>
-        <p className="text-xs text-muted-foreground mt-1">{description}</p>
+        <h4 className="font-medium text-sm text-muted-foreground">{title}</h4>
+        <p className="text-xs text-muted-foreground/70 mt-1">{description}</p>
         <Button 
           onClick={onAction}
-          className="mt-3 w-full bg-[hsl(var(--karrosserie-orange))] hover:bg-[hsl(var(--karrosserie-orange))]/90"
+          className="mt-3 gap-2 bg-[hsl(var(--karrosserie-orange))] hover:bg-[hsl(var(--karrosserie-orange))]/90"
           size="sm"
         >
+          <Plus className="h-3 w-3" />
           {actionLabel}
         </Button>
       </div>
@@ -131,8 +135,12 @@ const PlaceholderCard = ({
   </Card>
 );
 
+type ModalType = 'expertise' | 'quote' | 'repair_order' | 'invoice' | 'cession' | 'fleet' | null;
+
 export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
   const navigate = useNavigate();
+  const [modalType, setModalType] = useState<ModalType>(null);
+  const [modalData, setModalData] = useState<any>(null);
 
   // Normalize to arrays (handle single object or array from API)
   const expertiseReports = dossier.expertise_reports 
@@ -156,10 +164,40 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
     toast.info(`Téléchargement du ${type} ${reference || ''} en cours...`);
   };
 
+  const openModal = (type: ModalType, data: any) => {
+    setModalType(type);
+    setModalData(data);
+  };
+
+  const closeModal = () => {
+    setModalType(null);
+    setModalData(null);
+  };
+
+  // Placeholder actions
+  const handleCreateExpertise = () => {
+    navigate(`/documents/expertise?create=true&dossierId=${dossier.id}`);
+  };
+  const handleCreateQuote = () => {
+    navigate(`/documents/devis?create=true&dossierId=${dossier.id}`);
+  };
+  const handleCreateRepairOrder = () => {
+    navigate(`/documents/ordres?create=true&dossierId=${dossier.id}`);
+  };
+  const handleCreateInvoice = () => {
+    navigate(`/documents/factures?create=true&dossierId=${dossier.id}`);
+  };
+  const handleCreateCession = () => {
+    navigate(`/cessions?create=true&dossierId=${dossier.id}`);
+  };
+  const handleCreateFleetReservation = () => {
+    navigate(`/fleet/reservations?create=true&dossierId=${dossier.id}`);
+  };
+
   return (
-    <div className="space-y-6">`
-      {/* Expertise Reports */}
-      {expertiseReports.length > 0 && (
+    <>
+      <div className="space-y-6">
+        {/* Expertise Reports Section */}
         <div>
           <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
             <ClipboardCheck className="h-4 w-4 text-purple-600" />
@@ -177,15 +215,24 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
                 statusColor="text-purple-700 dark:text-purple-300"
                 date={report.report_date ? format(new Date(report.report_date), 'dd MMM yyyy', { locale: fr }) : undefined}
                 amount={report.amount}
-                onClick={() => navigate(`/documents/expertise?openReport=${report.id}`)}
+                onClick={() => openModal('expertise', report)}
+                onDownload={() => handleDownload('rapport', report.report_number)}
               />
             ))}
+            {expertiseReports.length === 0 && (
+              <PlaceholderCard
+                icon={ClipboardCheck}
+                iconColor="bg-purple-100 text-purple-600 dark:bg-purple-900/50 dark:text-purple-400"
+                title="Aucun rapport d'expertise"
+                description="Créez un rapport d'expertise pour ce dossier"
+                onAction={handleCreateExpertise}
+                actionLabel="Créer"
+              />
+            )}
           </div>
         </div>
-      )}
 
-      {/* Quotes */}
-      {quotes.length > 0 && (
+        {/* Quotes Section */}
         <div>
           <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
             <FileText className="h-4 w-4 text-indigo-600" />
@@ -203,15 +250,24 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
                 statusColor="text-indigo-700 dark:text-indigo-300"
                 date={quote.created_at ? format(new Date(quote.created_at), 'dd MMM yyyy', { locale: fr }) : undefined}
                 amount={quote.amount}
-                onClick={() => navigate(`/documents/devis?openQuote=${quote.id}`)}
+                onClick={() => openModal('quote', quote)}
+                onDownload={() => handleDownload('devis', quote.reference)}
               />
             ))}
+            {quotes.length === 0 && (
+              <PlaceholderCard
+                icon={FileText}
+                iconColor="bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-400"
+                title="Aucun devis"
+                description="Créez un devis pour ce dossier"
+                onAction={handleCreateQuote}
+                actionLabel="Créer"
+              />
+            )}
           </div>
         </div>
-      )}
 
-      {/* Repair Orders */}
-      {repairOrders.length > 0 && (
+        {/* Repair Orders Section */}
         <div>
           <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
             <Wrench className="h-4 w-4 text-green-600" />
@@ -228,15 +284,24 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
                 status={ro.status}
                 statusColor="text-green-700 dark:text-green-300"
                 date={ro.arrival_date ? format(new Date(ro.arrival_date), 'dd MMM yyyy', { locale: fr }) : undefined}
-                onClick={() => navigate(`/documents/ordres?openOrder=${ro.id}`)}
+                onClick={() => openModal('repair_order', ro)}
+                onDownload={() => handleDownload('ordre de réparation', ro.reference)}
               />
             ))}
+            {repairOrders.length === 0 && (
+              <PlaceholderCard
+                icon={Wrench}
+                iconColor="bg-green-100 text-green-600 dark:bg-green-900/50 dark:text-green-400"
+                title="Aucun ordre de réparation"
+                description="Créez un OR pour ce dossier"
+                onAction={handleCreateRepairOrder}
+                actionLabel="Créer"
+              />
+            )}
           </div>
         </div>
-      )}
 
-      {/* Invoices */}
-      {invoices.length > 0 && (
+        {/* Invoices Section */}
         <div>
           <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
             <Receipt className="h-4 w-4 text-cyan-600" />
@@ -254,15 +319,24 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
                 statusColor="text-cyan-700 dark:text-cyan-300"
                 date={invoice.issue_date ? format(new Date(invoice.issue_date), 'dd MMM yyyy', { locale: fr }) : undefined}
                 amount={invoice.amount}
-                onClick={() => navigate(`/documents/factures?openInvoice=${invoice.id}`)}
+                onClick={() => openModal('invoice', invoice)}
+                onDownload={() => handleDownload('facture', invoice.reference)}
               />
             ))}
+            {invoices.length === 0 && (
+              <PlaceholderCard
+                icon={Receipt}
+                iconColor="bg-cyan-100 text-cyan-600 dark:bg-cyan-900/50 dark:text-cyan-400"
+                title="Aucune facture"
+                description="Créez une facture pour ce dossier"
+                onAction={handleCreateInvoice}
+                actionLabel="Créer"
+              />
+            )}
           </div>
         </div>
-      )}
 
-      {/* Cessions */}
-      {cessions.length > 0 && (
+        {/* Cessions Section */}
         <div>
           <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
             <FileSignature className="h-4 w-4 text-amber-600" />
@@ -278,15 +352,24 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
                 reference={cession.reference}
                 status={cession.status}
                 statusColor="text-amber-700 dark:text-amber-300"
-                onClick={() => navigate(`/cessions?openCession=${cession.id}`)}
+                onClick={() => openModal('cession', cession)}
+                onDownload={() => handleDownload('cession', cession.reference)}
               />
             ))}
+            {cessions.length === 0 && (
+              <PlaceholderCard
+                icon={FileSignature}
+                iconColor="bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400"
+                title="Aucune cession"
+                description="Créez une cession pour ce dossier"
+                onAction={handleCreateCession}
+                actionLabel="Créer"
+              />
+            )}
           </div>
         </div>
-      )}
 
-      {/* Fleet Reservations */}
-      {fleetReservations.length > 0 && (
+        {/* Fleet Reservations Section */}
         <div>
           <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
             <Car className="h-4 w-4 text-blue-600" />
@@ -302,12 +385,32 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
                 status={reservation.status}
                 statusColor="text-blue-700 dark:text-blue-300"
                 date={reservation.start_date ? `${format(new Date(reservation.start_date), 'dd/MM', { locale: fr })} - ${reservation.expected_return_date ? format(new Date(reservation.expected_return_date), 'dd/MM', { locale: fr }) : '...'}` : undefined}
-                onClick={() => navigate(`/fleet/reservations?openReservation=${reservation.id}`)}
+                onClick={() => openModal('fleet', reservation)}
               />
             ))}
+            {fleetReservations.length === 0 && (
+              <PlaceholderCard
+                icon={Car}
+                iconColor="bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                title="Aucune réservation"
+                description="Réservez un véhicule de remplacement"
+                onAction={handleCreateFleetReservation}
+                actionLabel="Réserver"
+              />
+            )}
           </div>
         </div>
+      </div>
+
+      {/* Preview Modal */}
+      {modalType && (
+        <DocumentPreviewModal
+          open={!!modalType}
+          onOpenChange={(open) => !open && closeModal()}
+          type={modalType}
+          data={modalData}
+        />
       )}
-    </div>
+    </>
   );
 };
