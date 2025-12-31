@@ -22,6 +22,7 @@ import Dashboard from "@/pages/Dashboard";
 import GestionTemplates from "@/pages/GestionTemplates";
 import GestionAtelier from "@/pages/GestionAtelier";
 import Dossiers from "@/pages/Dossiers";
+import DossierDetail from "@/pages/DossierDetail";
 
 export const coreRoutes = [
   {
@@ -30,6 +31,16 @@ export const coreRoutes = [
       <ProtectedRoute>
         <AppLayout>
           <Dossiers />
+        </AppLayout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/dossiers/:id",
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <DossierDetail />
         </AppLayout>
       </ProtectedRoute>
     )
