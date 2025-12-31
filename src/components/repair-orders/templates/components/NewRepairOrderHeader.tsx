@@ -239,12 +239,6 @@ const NewRepairOrderHeader: React.FC<NewRepairOrderHeaderProps> = ({
         </>
       )}
 
-      {/* Montant total */}
-      <div className="bg-blue-600 text-white p-3 text-center mt-4">
-        <p className="text-sm mb-1">Montant total TTC</p>
-        <p className="text-xl font-bold">{orderData.amountDue}</p>
-      </div>
-
       <div className="mt-4 text-xs text-gray-500 text-center">
         Page 1/4
       </div>
