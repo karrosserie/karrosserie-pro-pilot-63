@@ -47,8 +47,16 @@ const getChannelColor = (channel: string) => {
   }
 };
 
-const getPriorityColor = (priority: string) => {
-  switch (priority?.toLowerCase()) {
+const getPriorityColor = (priority: number | string | null | undefined) => {
+  // Handle numeric priority (1 = low, 2 = medium, 3 = high)
+  if (typeof priority === 'number') {
+    if (priority >= 3) return 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300';
+    if (priority === 2) return 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300';
+    return 'bg-muted text-muted-foreground';
+  }
+  // Handle string priority
+  const priorityStr = String(priority || '').toLowerCase();
+  switch (priorityStr) {
     case 'high':
     case 'urgent':
       return 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300';
