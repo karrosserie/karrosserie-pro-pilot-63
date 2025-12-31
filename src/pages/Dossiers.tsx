@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, FolderKanban } from 'lucide-react';
-import { DossierFilters, DossierList } from '@/components/dossiers';
+import { Plus, FolderOpen } from 'lucide-react';
+import { DossierFilters } from '@/components/dossiers/DossierFilters';
+import { DossierList } from '@/components/dossiers/DossierList';
+import { DossierStatsRow } from '@/components/dossiers/DossierStatsRow';
 import { NewDossierModal, NewDossierFormData } from '@/components/atelier/modals/NewDossierModal';
-import { useDossiers, useArchiveDossier } from '@/hooks/useDossiers';
+import { useDossiers, useArchiveDossier, useDossiersCountByStatus } from '@/hooks/useDossiers';
 import { useCompanyId } from '@/hooks/use-company-id';
 import { useAuth } from '@/contexts/AuthContext';
 import { DossierOverallStatus } from '@/types/dossier';
@@ -25,36 +27,53 @@ const Dossiers = () => {
   const { profile } = useAuth();
   const { companyId } = useCompanyId();
 
-  const [activeTab, setActiveTab] = useState<'en_cours' | 'clotures'>('en_cours');
+  const [activeTab, setActiveTab] = useState<'tous' | 'actifs' | 'archives'>('actifs');
   const [searchQuery, setSearchQuery] = useState('');
   const [showNewDossier, setShowNewDossier] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
-  // Statuses for "En cours" tab (all active statuses except cloture and archive)
-  const enCoursStatuses: DossierOverallStatus[] = [
+  // Statuses for active dossiers
+  const activeStatuses: DossierOverallStatus[] = [
     'ouvert', 'en_cours', 'expertise', 'devis', 'reparation', 'facturation'
   ];
 
-  // Fetch dossiers for "En cours" tab
-  const { data: enCoursDossiers = [], isLoading: isLoadingEnCours, refetch: refetchEnCours } = useDossiers({
+  // Fetch status counts for stats row
+  const { data: statusCounts = {}, isLoading: isLoadingCounts } = useDossiersCountByStatus(companyId);
+
+  // Fetch all dossiers (for "Tous" tab)
+  const { data: allDossiers = [], isLoading: isLoadingAll, refetch: refetchAll } = useDossiers({
     company_id: companyId,
-    overall_status: enCoursStatuses,
     archived: false,
     search: searchQuery || undefined,
   });
 
-  // Fetch dossiers for "Clôturées" tab
-  const { data: cloturesDossiers = [], isLoading: isLoadingClotures, refetch: refetchClotures } = useDossiers({
+  // Fetch active dossiers (non-cloture, non-archive)
+  const { data: activeDossiers = [], isLoading: isLoadingActive, refetch: refetchActive } = useDossiers({
     company_id: companyId,
-    overall_status: 'cloture',
+    overall_status: activeStatuses,
     archived: false,
+    search: searchQuery || undefined,
+  });
+
+  // Fetch archived dossiers
+  const { data: archivedDossiers = [], isLoading: isLoadingArchived, refetch: refetchArchived } = useDossiers({
+    company_id: companyId,
+    archived: true,
     search: searchQuery || undefined,
   });
 
   const archiveDossier = useArchiveDossier();
 
-  const currentDossiers = activeTab === 'en_cours' ? enCoursDossiers : cloturesDossiers;
-  const isLoading = activeTab === 'en_cours' ? isLoadingEnCours : isLoadingClotures;
+  // Determine current dossiers based on tab
+  const currentDossiers = 
+    activeTab === 'tous' ? allDossiers :
+    activeTab === 'actifs' ? activeDossiers :
+    archivedDossiers;
+
+  const isLoading = 
+    activeTab === 'tous' ? isLoadingAll :
+    activeTab === 'actifs' ? isLoadingActive :
+    isLoadingArchived;
 
   const handleViewDossier = (id: string) => {
     navigate(`/dossiers/${id}`);
@@ -181,8 +200,9 @@ const Dossiers = () => {
 
       toast.success('Dossier créé avec succès !', { id: toastId });
       setShowNewDossier(false);
-      refetchEnCours();
-      refetchClotures();
+      refetchAll();
+      refetchActive();
+      refetchArchived();
 
     } catch (error: any) {
       console.error('Erreur création dossier:', error);
@@ -193,18 +213,29 @@ const Dossiers = () => {
   };
 
   return (
-    <div className="container mx-auto py-6 px-4 space-y-6">
+    <div className="container mx-auto py-6 px-4 md:px-6 space-y-6 max-w-[1400px]">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <FolderKanban className="h-7 w-7 text-primary" />
-          <h1 className="text-2xl font-bold text-foreground">Gestion des Dossiers</h1>
+        <div>
+          <div className="flex items-center gap-3 mb-1">
+            <FolderOpen className="h-7 w-7 text-[hsl(var(--karrosserie-orange))]" />
+            <h1 className="text-2xl font-semibold text-foreground">Dossiers</h1>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Gestion centralisée des dossiers sinistre
+          </p>
         </div>
-        <Button onClick={() => setShowNewDossier(true)} className="gap-2">
+        <Button 
+          onClick={() => setShowNewDossier(true)} 
+          className="gap-2 bg-primary hover:bg-primary/90"
+        >
           <Plus className="h-4 w-4" />
-          Nouveau dossier
+          <span className="hidden sm:inline">Nouveau dossier</span>
         </Button>
       </div>
+
+      {/* Stats Row */}
+      <DossierStatsRow counts={statusCounts} isLoading={isLoadingCounts} />
 
       {/* Filters */}
       <DossierFilters
@@ -212,8 +243,9 @@ const Dossiers = () => {
         onTabChange={setActiveTab}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        enCoursCount={enCoursDossiers.length}
-        cloturesCount={cloturesDossiers.length}
+        tousCount={allDossiers.length}
+        actifsCount={activeDossiers.length}
+        archivesCount={archivedDossiers.length}
       />
 
       {/* Dossier list */}
@@ -225,7 +257,7 @@ const Dossiers = () => {
         onCreateNew={() => setShowNewDossier(true)}
       />
 
-      {/* New Dossier Modal - Reused from Atelier */}
+      {/* New Dossier Modal */}
       <NewDossierModal
         open={showNewDossier}
         onOpenChange={setShowNewDossier}
