@@ -25,10 +25,15 @@ export const useFleetLoanFormValidation = (formData: LoanFormData) => {
                       formData.clientSignature && 
                       formData.clientSignature.trim() !== '';
 
-    // Champs toujours obligatoires
-    const mandatoryInsuranceValid = 
-      formData.insuranceCompanyName && 
-      formData.insuranceEmail;
+    // Nom de la compagnie toujours obligatoire
+    const companyNameValid = !!formData.insuranceCompanyName;
+
+    // Email conditionnel selon le switch assistance
+    const emailValid = formData.hasAssistance 
+      ? !!formData.assistanceEmail        // Si assistance → email assistance requis
+      : !!formData.insuranceEmail;        // Sinon → email assurance requis
+
+    const mandatoryInsuranceValid = companyNameValid && emailValid;
 
     // Champs obligatoires uniquement si clientInsurance = true
     const conditionalInsuranceValid = !formData.clientInsurance || (
