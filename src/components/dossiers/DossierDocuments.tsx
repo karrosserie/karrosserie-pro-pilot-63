@@ -16,9 +16,15 @@ import {
 import { DossierWithDetails } from '@/types/dossier';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { DocumentPreviewModal } from './DocumentPreviewModal';
+import ExpertiseReportDialog from '@/components/expertise/ExpertiseReportDialog';
+import QuoteDialog from '@/components/quotes/QuoteDialog';
+import RepairOrderDialog from '@/components/repair-orders/RepairOrderDialog';
+import InvoiceDialog from '@/components/invoices/InvoiceDialog';
+import { CessionDialog } from '@/components/cessions/CessionDialog';
+import { useCessions } from '@/hooks/use-cessions';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface DossierDocumentsProps {
   dossier: DossierWithDetails;
@@ -135,12 +141,20 @@ const PlaceholderCard = ({
   </Card>
 );
 
-type ModalType = 'expertise' | 'quote' | 'repair_order' | 'invoice' | 'cession' | 'fleet' | null;
+type PreviewModalType = 'expertise' | 'quote' | 'repair_order' | 'invoice' | 'cession' | 'fleet' | null;
+type CreateModalType = 'expertise' | 'quote' | 'repair_order' | 'invoice' | 'cession' | null;
 
 export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
-  const navigate = useNavigate();
-  const [modalType, setModalType] = useState<ModalType>(null);
-  const [modalData, setModalData] = useState<any>(null);
+  const queryClient = useQueryClient();
+  const { createCession } = useCessions();
+  
+  // Preview modal state
+  const [previewModalType, setPreviewModalType] = useState<PreviewModalType>(null);
+  const [previewModalData, setPreviewModalData] = useState<any>(null);
+  
+  // Create modal state
+  const [createModalType, setCreateModalType] = useState<CreateModalType>(null);
+  const [isSubmittingCession, setIsSubmittingCession] = useState(false);
 
   // Normalize to arrays (handle single object or array from API)
   const expertiseReports = dossier.expertise_reports 
@@ -164,34 +178,84 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
     toast.info(`Téléchargement du ${type} ${reference || ''} en cours...`);
   };
 
-  const openModal = (type: ModalType, data: any) => {
-    setModalType(type);
-    setModalData(data);
+  const openPreviewModal = (type: PreviewModalType, data: any) => {
+    setPreviewModalType(type);
+    setPreviewModalData(data);
   };
 
-  const closeModal = () => {
-    setModalType(null);
-    setModalData(null);
+  const closePreviewModal = () => {
+    setPreviewModalType(null);
+    setPreviewModalData(null);
   };
 
-  // Placeholder actions
-  const handleCreateExpertise = () => {
-    navigate(`/documents/expertise?create=true&dossierId=${dossier.id}`);
+  const openCreateModal = (type: CreateModalType) => {
+    setCreateModalType(type);
   };
-  const handleCreateQuote = () => {
-    navigate(`/documents/devis?create=true&dossierId=${dossier.id}`);
+
+  const closeCreateModal = () => {
+    setCreateModalType(null);
   };
-  const handleCreateRepairOrder = () => {
-    navigate(`/documents/ordres?create=true&dossierId=${dossier.id}`);
+
+  const handleCreateSuccess = () => {
+    closeCreateModal();
+    // Invalidate dossier query to refresh documents
+    queryClient.invalidateQueries({ queryKey: ['dossier', dossier.id] });
   };
-  const handleCreateInvoice = () => {
-    navigate(`/documents/factures?create=true&dossierId=${dossier.id}`);
+
+  // Get client and vehicle data for prefilling forms
+  const clientData = dossier.clients;
+  const vehicleData = dossier.vehicles;
+
+  // Prefill data for new documents
+  const getExpertisePrefillData = () => ({
+    client_id: clientData?.id,
+    vehicle_id: vehicleData?.id,
+    dossier_id: dossier.id,
+  });
+
+  const getQuotePrefillData = () => ({
+    client_id: clientData?.id,
+    vehicle_id: vehicleData?.id,
+    dossier_id: dossier.id,
+  });
+
+  const getRepairOrderPrefillData = () => ({
+    client_id: clientData?.id,
+    vehicle_id: vehicleData?.id,
+    dossier_id: dossier.id,
+  });
+
+  const getInvoicePrefillData = () => ({
+    client_id: clientData?.id,
+    vehicle_id: vehicleData?.id,
+    dossier_id: dossier.id,
+  });
+
+  const handleCessionSubmit = async (formData: any) => {
+    setIsSubmittingCession(true);
+    try {
+      await createCession.mutateAsync({
+        ...formData,
+        dossier_id: dossier.id,
+      });
+      toast.success('Cession créée avec succès');
+      handleCreateSuccess();
+    } catch (error: any) {
+      toast.error(`Erreur: ${error.message}`);
+    } finally {
+      setIsSubmittingCession(false);
+    }
   };
-  const handleCreateCession = () => {
-    navigate(`/cessions?create=true&dossierId=${dossier.id}`);
-  };
+
+  // Placeholder actions using modals
+  const handleCreateExpertise = () => openCreateModal('expertise');
+  const handleCreateQuote = () => openCreateModal('quote');
+  const handleCreateRepairOrder = () => openCreateModal('repair_order');
+  const handleCreateInvoice = () => openCreateModal('invoice');
+  const handleCreateCession = () => openCreateModal('cession');
   const handleCreateFleetReservation = () => {
-    navigate(`/fleet/reservations?create=true&dossierId=${dossier.id}`);
+    // Fleet reservation might need navigation since it's a complex module
+    toast.info('Réservation de véhicule - fonctionnalité en cours de développement');
   };
 
   return (
@@ -215,7 +279,7 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
                 statusColor="text-purple-700 dark:text-purple-300"
                 date={report.report_date ? format(new Date(report.report_date), 'dd MMM yyyy', { locale: fr }) : undefined}
                 amount={report.amount}
-                onClick={() => openModal('expertise', report)}
+                onClick={() => openPreviewModal('expertise', report)}
                 onDownload={() => handleDownload('rapport', report.report_number)}
               />
             ))}
@@ -250,7 +314,7 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
                 statusColor="text-indigo-700 dark:text-indigo-300"
                 date={quote.created_at ? format(new Date(quote.created_at), 'dd MMM yyyy', { locale: fr }) : undefined}
                 amount={quote.amount}
-                onClick={() => openModal('quote', quote)}
+                onClick={() => openPreviewModal('quote', quote)}
                 onDownload={() => handleDownload('devis', quote.reference)}
               />
             ))}
@@ -284,7 +348,7 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
                 status={ro.status}
                 statusColor="text-green-700 dark:text-green-300"
                 date={ro.arrival_date ? format(new Date(ro.arrival_date), 'dd MMM yyyy', { locale: fr }) : undefined}
-                onClick={() => openModal('repair_order', ro)}
+                onClick={() => openPreviewModal('repair_order', ro)}
                 onDownload={() => handleDownload('ordre de réparation', ro.reference)}
               />
             ))}
@@ -319,7 +383,7 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
                 statusColor="text-cyan-700 dark:text-cyan-300"
                 date={invoice.issue_date ? format(new Date(invoice.issue_date), 'dd MMM yyyy', { locale: fr }) : undefined}
                 amount={invoice.amount}
-                onClick={() => openModal('invoice', invoice)}
+                onClick={() => openPreviewModal('invoice', invoice)}
                 onDownload={() => handleDownload('facture', invoice.reference)}
               />
             ))}
@@ -352,7 +416,7 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
                 reference={cession.reference}
                 status={cession.status}
                 statusColor="text-amber-700 dark:text-amber-300"
-                onClick={() => openModal('cession', cession)}
+                onClick={() => openPreviewModal('cession', cession)}
                 onDownload={() => handleDownload('cession', cession.reference)}
               />
             ))}
@@ -385,7 +449,7 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
                 status={reservation.status}
                 statusColor="text-blue-700 dark:text-blue-300"
                 date={reservation.start_date ? `${format(new Date(reservation.start_date), 'dd/MM', { locale: fr })} - ${reservation.expected_return_date ? format(new Date(reservation.expected_return_date), 'dd/MM', { locale: fr }) : '...'}` : undefined}
-                onClick={() => openModal('fleet', reservation)}
+                onClick={() => openPreviewModal('fleet', reservation)}
               />
             ))}
             {fleetReservations.length === 0 && (
@@ -403,14 +467,54 @@ export const DossierDocuments = ({ dossier }: DossierDocumentsProps) => {
       </div>
 
       {/* Preview Modal */}
-      {modalType && (
+      {previewModalType && (
         <DocumentPreviewModal
-          open={!!modalType}
-          onOpenChange={(open) => !open && closeModal()}
-          type={modalType}
-          data={modalData}
+          open={!!previewModalType}
+          onOpenChange={(open) => !open && closePreviewModal()}
+          type={previewModalType}
+          data={previewModalData}
         />
       )}
+
+      {/* Create Modals */}
+      <ExpertiseReportDialog
+        open={createModalType === 'expertise'}
+        onOpenChange={(open) => !open && closeCreateModal()}
+        report={null}
+        prefillData={getExpertisePrefillData()}
+        onSuccess={handleCreateSuccess}
+      />
+
+      <QuoteDialog
+        open={createModalType === 'quote'}
+        onOpenChange={(open) => !open && closeCreateModal()}
+        quote={null}
+        prefillData={getQuotePrefillData()}
+      />
+
+      <RepairOrderDialog
+        open={createModalType === 'repair_order'}
+        onOpenChange={(open) => !open && closeCreateModal()}
+        order={null}
+        onSuccess={handleCreateSuccess}
+        prefillData={getRepairOrderPrefillData()}
+      />
+
+      <InvoiceDialog
+        open={createModalType === 'invoice'}
+        onOpenChange={(open) => !open && closeCreateModal()}
+        invoice={null}
+        onSuccess={handleCreateSuccess}
+        prefillData={getInvoicePrefillData()}
+      />
+
+      <CessionDialog
+        open={createModalType === 'cession'}
+        onOpenChange={(open) => !open && closeCreateModal()}
+        cession={null}
+        onSubmit={handleCessionSubmit}
+        isSubmitting={isSubmittingCession}
+      />
     </>
   );
 };
