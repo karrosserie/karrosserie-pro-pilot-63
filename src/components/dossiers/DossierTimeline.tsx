@@ -1,172 +1,256 @@
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { 
-  FolderOpen, 
-  ClipboardCheck, 
-  FileText, 
-  Wrench, 
-  Receipt, 
-  CheckCircle,
-  Circle
-} from 'lucide-react';
-import { DossierWithDetails, DOSSIER_STATUS_CONFIG, DossierOverallStatus } from '@/types/dossier';
+import { Button } from '@/components/ui/button';
+import { DossierWithDetails } from '@/types/dossier';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useNavigate } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 
 interface DossierTimelineProps {
   dossier: DossierWithDetails;
 }
 
-// Timeline steps configuration
-const TIMELINE_STEPS = [
-  { status: 'ouvert', label: 'Ouvert', icon: FolderOpen },
-  { status: 'expertise', label: 'Expertise', icon: ClipboardCheck },
-  { status: 'devis', label: 'Devis', icon: FileText },
-  { status: 'reparation', label: 'Réparation', icon: Wrench },
-  { status: 'facturation', label: 'Facturation', icon: Receipt },
-  { status: 'cloture', label: 'Clôturé', icon: CheckCircle },
-] as const;
-
-const getStepIndex = (status: DossierOverallStatus | null): number => {
-  if (!status) return 0;
-  const statusMap: Record<string, number> = {
-    'ouvert': 0,
-    'en_cours': 1,
-    'expertise': 1,
-    'devis': 2,
-    'reparation': 3,
-    'facturation': 4,
-    'cloture': 5,
-    'archive': 5,
-  };
-  return statusMap[status] ?? 0;
-};
+interface TimelineEvent {
+  id: string;
+  date: Date | null;
+  title: string;
+  description: string;
+  type: 'creation' | 'expertise' | 'devis' | 'repair_order' | 'invoice' | 'cession';
+  completed: boolean;
+  linkTo?: string;
+}
 
 export const DossierTimeline = ({ dossier }: DossierTimelineProps) => {
-  const currentStepIndex = getStepIndex(dossier.overall_status as DossierOverallStatus | null);
+  const navigate = useNavigate();
+
+  // Build timeline events from dossier data
+  const events: TimelineEvent[] = [];
+
+  // Get client and vehicle info for creation event
+  const client = dossier.clients;
+  const vehicle = dossier.vehicles;
+  const clientName = client 
+    ? client.company_name || `${client.first_name || ''} ${client.last_name || ''}`.trim() 
+    : 'Client';
+  const licensePlate = vehicle?.license_plate || 'Véhicule';
+
+  // 1. Dossier creation
+  events.push({
+    id: 'creation',
+    date: dossier.created_at ? new Date(dossier.created_at) : null,
+    title: 'Dossier créé',
+    description: `Client: ${clientName} | Véhicule: ${licensePlate}`,
+    type: 'creation',
+    completed: true,
+  });
+
+  // 2. Expertise report
+  if (dossier.expertise_reports) {
+    const report = dossier.expertise_reports;
+    const reportDate = report.report_date ? new Date(report.report_date) : null;
+    events.push({
+      id: 'expertise',
+      date: reportDate,
+      title: 'Expertise liée',
+      description: `${report.report_number || 'EXP'} | Montant: ${report.amount?.toLocaleString('fr-FR') || '0'}€ | ${report.status === 'validated' ? 'Validée' : 'En attente'}`,
+      type: 'expertise',
+      completed: true,
+      linkTo: `/expertise/${report.id}`,
+    });
+  } else {
+    events.push({
+      id: 'expertise',
+      date: null,
+      title: 'Expertise',
+      description: '(à venir)',
+      type: 'expertise',
+      completed: false,
+    });
+  }
+
+  // 3. Devis (Quote)
+  if (dossier.quotes) {
+    const quote = dossier.quotes;
+    events.push({
+      id: 'devis',
+      date: quote.created_at ? new Date(quote.created_at) : null,
+      title: 'Devis créé',
+      description: `${quote.reference || 'DEV'} | ${quote.amount?.toLocaleString('fr-FR') || '0'}€ | ${quote.status === 'accepted' ? 'Accepté' : quote.status === 'pending' ? 'En attente' : quote.status || 'En attente'}`,
+      type: 'devis',
+      completed: true,
+      linkTo: `/devis/${quote.id}`,
+    });
+  } else {
+    events.push({
+      id: 'devis',
+      date: null,
+      title: 'Devis',
+      description: '(à venir)',
+      type: 'devis',
+      completed: false,
+    });
+  }
+
+  // 4. Repair Order
+  if (dossier.repair_orders) {
+    const ro = dossier.repair_orders;
+    const roDate = ro.arrival_date ? new Date(ro.arrival_date) : null;
+    events.push({
+      id: 'repair_order',
+      date: roDate,
+      title: 'Ordre de réparation',
+      description: `${ro.reference || 'OR'} | ${ro.status === 'completed' ? 'Terminé' : ro.status === 'in_progress' ? 'En cours' : 'En attente'}`,
+      type: 'repair_order',
+      completed: true,
+      linkTo: `/repair-orders/${ro.id}`,
+    });
+  } else {
+    events.push({
+      id: 'repair_order',
+      date: null,
+      title: 'Ordre de réparation',
+      description: '(à venir)',
+      type: 'repair_order',
+      completed: false,
+    });
+  }
+
+  // 5. Invoice
+  if (dossier.invoices && dossier.invoices.length > 0) {
+    const invoice = dossier.invoices[0];
+    const invoiceDate = invoice.issue_date ? new Date(invoice.issue_date) : null;
+    events.push({
+      id: 'invoice',
+      date: invoiceDate,
+      title: 'Facture',
+      description: `${invoice.reference || 'FAC'} | ${invoice.amount?.toLocaleString('fr-FR') || '0'}€ | ${invoice.status === 'paid' ? 'Payée' : 'En attente'}`,
+      type: 'invoice',
+      completed: true,
+      linkTo: `/invoices/${invoice.id}`,
+    });
+  } else {
+    events.push({
+      id: 'invoice',
+      date: null,
+      title: 'Facture',
+      description: '(à venir)',
+      type: 'invoice',
+      completed: false,
+    });
+  }
+
+  // 6. Cession
+  if (dossier.cessions) {
+    const cession = dossier.cessions;
+    events.push({
+      id: 'cession',
+      date: null,
+      title: 'Cession',
+      description: `${cession.reference || 'CES'} | ${cession.status === 'signed' ? 'Signée' : 'En attente'}`,
+      type: 'cession',
+      completed: true,
+      linkTo: `/cessions/${cession.id}`,
+    });
+  } else {
+    events.push({
+      id: 'cession',
+      date: null,
+      title: 'Cession',
+      description: '(à venir)',
+      type: 'cession',
+      completed: false,
+    });
+  }
 
   return (
-    <Card className="p-6">
-      <h3 className="font-semibold text-lg mb-6 text-foreground">Progression du dossier</h3>
-      
-      {/* Desktop Timeline */}
-      <div className="hidden md:block">
-        <div className="relative">
-          {/* Progress Line */}
-          <div className="absolute top-5 left-0 right-0 h-0.5 bg-muted" />
-          <div 
-            className="absolute top-5 left-0 h-0.5 bg-primary transition-all duration-500"
-            style={{ width: `${(currentStepIndex / (TIMELINE_STEPS.length - 1)) * 100}%` }}
-          />
-          
-          {/* Steps */}
-          <div className="relative flex justify-between">
-            {TIMELINE_STEPS.map((step, index) => {
-              const isCompleted = index <= currentStepIndex;
-              const isCurrent = index === currentStepIndex;
-              const Icon = step.icon;
-              
-              return (
-                <div key={step.status} className="flex flex-col items-center">
-                  <div 
-                    className={cn(
-                      "w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all",
-                      isCompleted 
-                        ? "bg-primary border-primary text-primary-foreground" 
-                        : "bg-background border-muted text-muted-foreground",
-                      isCurrent && "ring-4 ring-primary/20"
-                    )}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <span 
-                    className={cn(
-                      "mt-2 text-sm font-medium",
-                      isCompleted ? "text-foreground" : "text-muted-foreground"
-                    )}
-                  >
-                    {step.label}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-      
-      {/* Mobile Timeline */}
-      <div className="md:hidden space-y-4">
-        {TIMELINE_STEPS.map((step, index) => {
-          const isCompleted = index <= currentStepIndex;
-          const isCurrent = index === currentStepIndex;
-          const Icon = step.icon;
-          
-          return (
-            <div key={step.status} className="flex items-center gap-3">
+    <div className="space-y-0">
+      {events.map((event, index) => (
+        <div key={event.id} className="relative flex gap-4">
+          {/* Timeline Line */}
+          <div className="flex flex-col items-center">
+            {/* Dot */}
+            <div 
+              className={cn(
+                "w-3 h-3 rounded-full shrink-0 z-10",
+                event.completed 
+                  ? "bg-[hsl(var(--karrosserie-orange))]" 
+                  : "bg-background border-2 border-muted-foreground/30"
+              )}
+            />
+            {/* Vertical Line */}
+            {index < events.length - 1 && (
               <div 
                 className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center border-2 shrink-0",
-                  isCompleted 
-                    ? "bg-primary border-primary text-primary-foreground" 
-                    : "bg-background border-muted text-muted-foreground",
-                  isCurrent && "ring-2 ring-primary/20"
+                  "w-0.5 flex-1 min-h-[60px]",
+                  event.completed && events[index + 1]?.completed 
+                    ? "bg-primary" 
+                    : "bg-muted-foreground/20"
                 )}
-              >
-                <Icon className="h-4 w-4" />
+              />
+            )}
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 pb-6">
+            {/* Date */}
+            {event.date && (
+              <p className="text-sm text-muted-foreground mb-2">
+                {format(event.date, "dd/MM/yyyy HH:mm", { locale: fr })}
+              </p>
+            )}
+
+            {/* Event Card */}
+            <div 
+              className={cn(
+                "rounded-lg p-4 flex items-center justify-between",
+                event.completed 
+                  ? "bg-background border border-border shadow-sm" 
+                  : "bg-muted/30 border border-dashed border-muted-foreground/30"
+              )}
+            >
+              <div className="flex-1">
+                <div className="flex items-start gap-3">
+                  <div 
+                    className={cn(
+                      "w-1 h-12 rounded-full shrink-0",
+                      event.completed ? "bg-primary" : "bg-transparent"
+                    )}
+                  />
+                  <div>
+                    <h4 
+                      className={cn(
+                        "font-medium",
+                        event.completed ? "text-foreground" : "text-muted-foreground"
+                      )}
+                    >
+                      {event.title}
+                    </h4>
+                    <p 
+                      className={cn(
+                        "text-sm",
+                        event.completed ? "text-muted-foreground" : "text-muted-foreground/70"
+                      )}
+                    >
+                      {event.description}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <span 
-                className={cn(
-                  "text-sm font-medium",
-                  isCompleted ? "text-foreground" : "text-muted-foreground"
-                )}
-              >
-                {step.label}
-              </span>
-              {isCurrent && (
-                <Badge variant="outline" className="ml-auto text-xs">
-                  Actuel
-                </Badge>
+
+              {event.completed && event.linkTo && (
+                <Button
+                  size="sm"
+                  className="ml-4 gap-1"
+                  onClick={() => navigate(event.linkTo!)}
+                >
+                  Voir
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
               )}
             </div>
-          );
-        })}
-      </div>
-
-      {/* Linked Documents Summary */}
-      <div className="mt-8 pt-6 border-t">
-        <h4 className="font-medium text-sm text-muted-foreground mb-4">Documents liés</h4>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {dossier.expertise_reports && (
-            <div className="text-center p-3 bg-[hsl(var(--status-expertise-bg))] rounded-lg">
-              <ClipboardCheck className="h-5 w-5 mx-auto mb-1 text-[hsl(var(--status-expertise-text))]" />
-              <p className="text-sm font-medium">{Array.isArray(dossier.expertise_reports) ? dossier.expertise_reports.length : 1}</p>
-              <p className="text-xs text-muted-foreground">Expertise(s)</p>
-            </div>
-          )}
-          {dossier.quotes && (
-            <div className="text-center p-3 bg-[hsl(var(--status-devis-bg))] rounded-lg">
-              <FileText className="h-5 w-5 mx-auto mb-1 text-[hsl(var(--status-devis-text))]" />
-              <p className="text-sm font-medium">{Array.isArray(dossier.quotes) ? dossier.quotes.length : 1}</p>
-              <p className="text-xs text-muted-foreground">Devis</p>
-            </div>
-          )}
-          {dossier.repair_orders && (
-            <div className="text-center p-3 bg-[hsl(var(--status-reparation-bg))] rounded-lg">
-              <Wrench className="h-5 w-5 mx-auto mb-1 text-[hsl(var(--status-reparation-text))]" />
-              <p className="text-sm font-medium">{Array.isArray(dossier.repair_orders) ? dossier.repair_orders.length : 1}</p>
-              <p className="text-xs text-muted-foreground">OR</p>
-            </div>
-          )}
-          {dossier.invoices && dossier.invoices.length > 0 && (
-            <div className="text-center p-3 bg-[hsl(var(--status-facturation-bg))] rounded-lg">
-              <Receipt className="h-5 w-5 mx-auto mb-1 text-[hsl(var(--status-facturation-text))]" />
-              <p className="text-sm font-medium">{dossier.invoices.length}</p>
-              <p className="text-xs text-muted-foreground">Facture(s)</p>
-            </div>
-          )}
+          </div>
         </div>
-      </div>
-    </Card>
+      ))}
+    </div>
   );
 };
