@@ -22,7 +22,7 @@ const DOSSIER_DETAIL_SELECT = `
   quotes (id, reference, status, amount, created_at),
   repair_orders (id, reference, status, arrival_date, end_date),
   cessions (id, reference, status, cession_type),
-  fleet_reservations (id, status, start_date, end_date),
+  fleet_reservations (id, status, start_date, expected_return_date),
   insurance_companies (id, name)
 `;
 
