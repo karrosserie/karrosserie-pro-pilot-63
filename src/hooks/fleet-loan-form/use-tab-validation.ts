@@ -52,15 +52,25 @@ export const useTabValidation = () => {
   const validateInsuranceTab = (formData: LoanFormData): boolean => {
     const errors: string[] = [];
     
-    // Champs TOUJOURS obligatoires
+    // Nom de la compagnie toujours obligatoire
     if (!formData.insuranceCompanyName) {
       errors.push('Nom de la compagnie d\'assurance');
     }
-    if (!formData.insuranceEmail) {
-      errors.push('Email de l\'assurance');
+    
+    // Email conditionnel selon le switch assistance
+    if (formData.hasAssistance) {
+      // Si assistance activée → email assistance obligatoire
+      if (!formData.assistanceEmail) {
+        errors.push('Email de l\'assistance');
+      }
+    } else {
+      // Sinon → email assurance obligatoire
+      if (!formData.insuranceEmail) {
+        errors.push('Email de l\'assurance');
+      }
     }
     
-    // Champs obligatoires UNIQUEMENT si le switch est activé
+    // Champs obligatoires UNIQUEMENT si le switch clientInsurance est activé
     if (formData.clientInsurance) {
       if (!formData.insurancePhone) {
         errors.push('Téléphone de l\'assurance');
