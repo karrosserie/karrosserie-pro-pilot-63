@@ -242,10 +242,21 @@ export const dossiersQueries = {
       throw error;
     }
     
-    const counts: Record<string, number> = {};
+    // Statuses that count as "en_cours": ouvert, expertise, devis, reparation
+    const EN_COURS_STATUSES = ['ouvert', 'en_cours', 'expertise', 'devis', 'reparation', 'facturation'];
+    
+    const counts: Record<string, number> = {
+      en_cours: 0,
+      cloture: 0,
+    };
+    
     (data || []).forEach(d => {
       const status = d.overall_status || 'ouvert';
-      counts[status] = (counts[status] || 0) + 1;
+      if (status === 'cloture') {
+        counts.cloture = (counts.cloture || 0) + 1;
+      } else if (EN_COURS_STATUSES.includes(status)) {
+        counts.en_cours = (counts.en_cours || 0) + 1;
+      }
     });
     
     return counts;
