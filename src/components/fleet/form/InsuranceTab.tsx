@@ -43,10 +43,10 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
     if (formData.hasAssistance && formData.insuranceCompanyId) {
       const selectedCompany = insuranceCompanies.find(c => c.id === formData.insuranceCompanyId);
       
-      if (selectedCompany?.default_assistance_name && !formData.assistanceName) {
-        // Create a synthetic event to update assistanceName
+      // Use the nested assistance object instead of default_assistance_name
+      if (selectedCompany?.assistance?.name && !formData.assistanceName) {
         const syntheticEvent = {
-          target: { name: 'assistanceName', value: selectedCompany.default_assistance_name }
+          target: { name: 'assistanceName', value: selectedCompany.assistance.name }
         } as React.ChangeEvent<HTMLInputElement>;
         onInputChange(syntheticEvent);
       }
