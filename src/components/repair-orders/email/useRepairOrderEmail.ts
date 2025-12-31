@@ -7,10 +7,11 @@ import { RepairOrder as SimpleRepairOrder } from './types';
 import { RepairOrder } from '@/services/supabase/repair-orders';
 import { supabase } from '@/integrations/supabase/client';
 import { pdf } from '@react-pdf/renderer';
-import InvoicePDF from '@/components/invoices/InvoicePDF';
+import NewRepairOrderPDF from '@/services/pdf/NewRepairOrderPDF';
 import { prepareRepairOrderDataForPDF } from '@/utils/repairOrderPDFGeneration';
 import { getClientDisplayName } from '@/utils/clientDisplayUtils';
 import { registerEmailInMessagerie } from '@/services/messagerie/emailMessagerie';
+import React from 'react';
 
 export const useRepairOrderEmail = (repairOrder: SimpleRepairOrder | null, open: boolean) => {
   const { toast } = useToast();
@@ -95,28 +96,18 @@ ${companyName}`
       // Utiliser la même fonction que pour le téléchargement/impression
       const data = await prepareRepairOrderDataForPDF(fullRepairOrder as RepairOrder, companyData || {});
       
-      // Adapter l'ordre de réparation au format Invoice pour le PDF (même logique que generateRepairOrderPDFWithTemplate)
-      const invoiceData = {
-        ...data.repairOrder,
-        amount: data.totals.total,
-        date: data.repairOrder.created_at,
-        due_date: data.repairOrder.created_at,
-        repairs_data: Array.isArray(data.repairOrder.repairs_data) ? data.repairOrder.repairs_data : [],
-        parts_data: Array.isArray(data.repairOrder.parts_data) ? data.repairOrder.parts_data : []
-      } as any;
-
-      // Générer le PDF de l'ordre de réparation avec exactement les mêmes données que téléchargement/impression
-      const doc = InvoicePDF({ 
-        invoice: invoiceData,
-        companyData: data.companyData, 
-        payments: [],
-        clientData: data.clientData,
-        vehicleData: data.vehicleData,
-        template: data.template,
-        documentType: 'repair_order'
+      // Générer le PDF avec le nouveau format
+      const doc = NewRepairOrderPDF({
+        companyData: data.companyData,
+        clientData: data.clientData || { name: '', address: '', city: '', phone: '', email: '' },
+        vehicleData: data.vehicleData || { brand: '', model: '', licensePlate: '', mileage: '' },
+        orderData: data.orderData,
+        expertiseData: data.expertiseData,
+        incidentData: data.incidentData,
+        signatureData: data.signatureData,
       });
 
-      const asPdf = pdf(doc);
+      const asPdf = pdf(doc as React.ReactElement);
       const blob = await asPdf.toBlob();
       
       // Convertir le blob en base64

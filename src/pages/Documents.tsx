@@ -394,15 +394,15 @@ const Documents = () => {
         case 'order': {
           const { prepareRepairOrderDataForPDF } = await import('@/utils/repairOrderPDFGeneration');
           const preparedData = await prepareRepairOrderDataForPDF(data, {});
-          const { default: InvoicePDF } = await import('@/components/invoices/InvoicePDF');
-          doc = InvoicePDF({ 
-            invoice: preparedData.repairOrder as any,
-            companyData: preparedData.companyData, 
-            payments: [],
-            clientData: preparedData.clientData,
-            vehicleData: preparedData.vehicleData,
-            template: preparedData.template || 'default',
-            documentType: 'repair_order'
+          const { default: NewRepairOrderPDF } = await import('@/services/pdf/NewRepairOrderPDF');
+          doc = NewRepairOrderPDF({ 
+            companyData: preparedData.companyData,
+            clientData: preparedData.clientData || { name: '', address: '', city: '', phone: '', email: '' },
+            vehicleData: preparedData.vehicleData || { brand: '', model: '', licensePlate: '', mileage: '' },
+            orderData: preparedData.orderData,
+            expertiseData: preparedData.expertiseData,
+            incidentData: preparedData.incidentData,
+            signatureData: preparedData.signatureData,
           });
           break;
         }
