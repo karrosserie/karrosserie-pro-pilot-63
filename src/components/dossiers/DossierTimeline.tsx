@@ -1,10 +1,11 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { DossierWithDetails } from '@/types/dossier';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import { DocumentPreviewModal } from './DocumentPreviewModal';
 
 interface DossierTimelineProps {
   dossier: DossierWithDetails;
@@ -17,11 +18,25 @@ interface TimelineEvent {
   description: string;
   type: 'creation' | 'expertise' | 'devis' | 'repair_order' | 'invoice' | 'cession';
   completed: boolean;
-  linkTo?: string;
+  data?: any;
 }
 
+type DocumentType = 'expertise' | 'quote' | 'repair_order' | 'invoice' | 'cession' | 'fleet';
+
 export const DossierTimeline = ({ dossier }: DossierTimelineProps) => {
-  const navigate = useNavigate();
+  const [previewModal, setPreviewModal] = useState<{
+    open: boolean;
+    type: DocumentType;
+    data: any;
+  }>({
+    open: false,
+    type: 'expertise',
+    data: null,
+  });
+
+  const handleOpenPreview = (type: DocumentType, data: any) => {
+    setPreviewModal({ open: true, type, data });
+  };
 
   // Build timeline events from dossier data
   const events: TimelineEvent[] = [];
@@ -55,7 +70,7 @@ export const DossierTimeline = ({ dossier }: DossierTimelineProps) => {
       description: `${report.report_number || 'EXP'} | Montant: ${report.amount?.toLocaleString('fr-FR') || '0'}€ | ${report.status === 'validated' ? 'Validée' : 'En attente'}`,
       type: 'expertise',
       completed: true,
-      linkTo: `/documents/expertise?openReport=${report.id}`,
+      data: report,
     });
   } else {
     events.push({
@@ -78,7 +93,7 @@ export const DossierTimeline = ({ dossier }: DossierTimelineProps) => {
       description: `${quote.reference || 'DEV'} | ${quote.amount?.toLocaleString('fr-FR') || '0'}€ | ${quote.status === 'accepted' ? 'Accepté' : quote.status === 'pending' ? 'En attente' : quote.status || 'En attente'}`,
       type: 'devis',
       completed: true,
-      linkTo: `/documents/devis?openQuote=${quote.id}`,
+      data: quote,
     });
   } else {
     events.push({
@@ -102,7 +117,7 @@ export const DossierTimeline = ({ dossier }: DossierTimelineProps) => {
       description: `${ro.reference || 'OR'} | ${ro.status === 'completed' ? 'Terminé' : ro.status === 'in_progress' ? 'En cours' : 'En attente'}`,
       type: 'repair_order',
       completed: true,
-      linkTo: `/documents/ordres?openOrder=${ro.id}`,
+      data: ro,
     });
   } else {
     events.push({
@@ -126,7 +141,7 @@ export const DossierTimeline = ({ dossier }: DossierTimelineProps) => {
       description: `${invoice.reference || 'FAC'} | ${invoice.amount?.toLocaleString('fr-FR') || '0'}€ | ${invoice.status === 'paid' ? 'Payée' : 'En attente'}`,
       type: 'invoice',
       completed: true,
-      linkTo: `/documents/factures?openInvoice=${invoice.id}`,
+      data: invoice,
     });
   } else {
     events.push({
@@ -149,7 +164,7 @@ export const DossierTimeline = ({ dossier }: DossierTimelineProps) => {
       description: `${cession.reference || 'CES'} | ${cession.status === 'signed' ? 'Signée' : 'En attente'}`,
       type: 'cession',
       completed: true,
-      linkTo: `/cessions?openCession=${cession.id}`,
+      data: cession,
     });
   } else {
     events.push({
@@ -162,95 +177,115 @@ export const DossierTimeline = ({ dossier }: DossierTimelineProps) => {
     });
   }
 
+  const getDocumentType = (eventType: string): DocumentType => {
+    switch (eventType) {
+      case 'devis': return 'quote';
+      case 'expertise': return 'expertise';
+      case 'repair_order': return 'repair_order';
+      case 'invoice': return 'invoice';
+      case 'cession': return 'cession';
+      default: return 'expertise';
+    }
+  };
+
   return (
-    <div className="space-y-0">
-      {events.map((event, index) => (
-        <div key={event.id} className="relative flex gap-4">
-          {/* Timeline Line */}
-          <div className="flex flex-col items-center">
-            {/* Dot */}
-            <div 
-              className={cn(
-                "w-3 h-3 rounded-full shrink-0 z-10",
-                event.completed 
-                  ? "bg-[hsl(var(--karrosserie-orange))]" 
-                  : "bg-background border-2 border-muted-foreground/30"
-              )}
-            />
-            {/* Vertical Line */}
-            {index < events.length - 1 && (
+    <>
+      <div className="space-y-0">
+        {events.map((event, index) => (
+          <div key={event.id} className="relative flex gap-4">
+            {/* Timeline Line */}
+            <div className="flex flex-col items-center">
+              {/* Dot */}
               <div 
                 className={cn(
-                  "w-0.5 flex-1 min-h-[60px]",
-                  event.completed && events[index + 1]?.completed 
-                    ? "bg-primary" 
-                    : "bg-muted-foreground/20"
+                  "w-3 h-3 rounded-full shrink-0 z-10",
+                  event.completed 
+                    ? "bg-[hsl(var(--karrosserie-orange))]" 
+                    : "bg-background border-2 border-muted-foreground/30"
                 )}
               />
-            )}
-          </div>
-
-          {/* Content */}
-          <div className="flex-1 pb-6">
-            {/* Date */}
-            {event.date && (
-              <p className="text-sm text-muted-foreground mb-2">
-                {format(event.date, "dd/MM/yyyy HH:mm", { locale: fr })}
-              </p>
-            )}
-
-            {/* Event Card */}
-            <div 
-              className={cn(
-                "rounded-lg p-4 flex items-center justify-between",
-                event.completed 
-                  ? "bg-background border border-border shadow-sm" 
-                  : "bg-muted/30 border border-dashed border-muted-foreground/30"
-              )}
-            >
-              <div className="flex-1">
-                <div className="flex items-start gap-3">
-                  <div 
-                    className={cn(
-                      "w-1 h-12 rounded-full shrink-0",
-                      event.completed ? "bg-primary" : "bg-transparent"
-                    )}
-                  />
-                  <div>
-                    <h4 
-                      className={cn(
-                        "font-medium",
-                        event.completed ? "text-foreground" : "text-muted-foreground"
-                      )}
-                    >
-                      {event.title}
-                    </h4>
-                    <p 
-                      className={cn(
-                        "text-sm",
-                        event.completed ? "text-muted-foreground" : "text-muted-foreground/70"
-                      )}
-                    >
-                      {event.description}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {event.completed && event.linkTo && (
-                <Button
-                  size="sm"
-                  className="ml-4 gap-1"
-                  onClick={() => navigate(event.linkTo!)}
-                >
-                  Voir
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
+              {/* Vertical Line */}
+              {index < events.length - 1 && (
+                <div 
+                  className={cn(
+                    "w-0.5 flex-1 min-h-[60px]",
+                    event.completed && events[index + 1]?.completed 
+                      ? "bg-primary" 
+                      : "bg-muted-foreground/20"
+                  )}
+                />
               )}
             </div>
+
+            {/* Content */}
+            <div className="flex-1 pb-6">
+              {/* Date */}
+              {event.date && (
+                <p className="text-sm text-muted-foreground mb-2">
+                  {format(event.date, "dd/MM/yyyy HH:mm", { locale: fr })}
+                </p>
+              )}
+
+              {/* Event Card */}
+              <div 
+                className={cn(
+                  "rounded-lg p-4 flex items-center justify-between",
+                  event.completed 
+                    ? "bg-background border border-border shadow-sm" 
+                    : "bg-muted/30 border border-dashed border-muted-foreground/30"
+                )}
+              >
+                <div className="flex-1">
+                  <div className="flex items-start gap-3">
+                    <div 
+                      className={cn(
+                        "w-1 h-12 rounded-full shrink-0",
+                        event.completed ? "bg-primary" : "bg-transparent"
+                      )}
+                    />
+                    <div>
+                      <h4 
+                        className={cn(
+                          "font-medium",
+                          event.completed ? "text-foreground" : "text-muted-foreground"
+                        )}
+                      >
+                        {event.title}
+                      </h4>
+                      <p 
+                        className={cn(
+                          "text-sm",
+                          event.completed ? "text-muted-foreground" : "text-muted-foreground/70"
+                        )}
+                      >
+                        {event.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {event.completed && event.data && event.type !== 'creation' && (
+                  <Button
+                    size="sm"
+                    className="ml-4 gap-1"
+                    onClick={() => handleOpenPreview(getDocumentType(event.type), event.data)}
+                  >
+                    Voir
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+
+      <DocumentPreviewModal
+        open={previewModal.open}
+        onOpenChange={(open) => setPreviewModal(prev => ({ ...prev, open }))}
+        type={previewModal.type}
+        data={previewModal.data}
+      />
+    </>
   );
 };

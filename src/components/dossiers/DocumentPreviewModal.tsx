@@ -9,16 +9,13 @@ import {
   Receipt,
   Car,
   FileSignature,
-  ExternalLink,
   Download,
   Calendar,
-  User,
-  Car as CarIcon,
-  Euro
+  Euro,
+  Eye
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 type DocumentType = 'expertise' | 'quote' | 'repair_order' | 'invoice' | 'cession' | 'fleet';
@@ -34,43 +31,36 @@ const DOCUMENT_CONFIG: Record<DocumentType, {
   title: string;
   icon: React.ElementType;
   iconColor: string;
-  route: string;
 }> = {
   expertise: {
     title: "Rapport d'expertise",
     icon: ClipboardCheck,
     iconColor: 'text-purple-500',
-    route: '/documents/expertise',
   },
   quote: {
     title: 'Devis',
     icon: FileText,
     iconColor: 'text-indigo-500',
-    route: '/documents/devis',
   },
   repair_order: {
     title: 'Ordre de réparation',
     icon: Wrench,
     iconColor: 'text-green-500',
-    route: '/documents/ordres',
   },
   invoice: {
     title: 'Facture',
     icon: Receipt,
     iconColor: 'text-cyan-500',
-    route: '/documents/factures',
   },
   cession: {
     title: 'Cession',
     icon: FileSignature,
     iconColor: 'text-amber-500',
-    route: '/cessions',
   },
   fleet: {
     title: 'Réservation véhicule',
     icon: Car,
     iconColor: 'text-blue-500',
-    route: '/fleet/reservations',
   },
 };
 
@@ -80,26 +70,20 @@ export const DocumentPreviewModal = ({
   type, 
   data 
 }: DocumentPreviewModalProps) => {
-  const navigate = useNavigate();
   const config = DOCUMENT_CONFIG[type];
   const Icon = config.icon;
 
-  const handleOpenFullPage = () => {
-    const queryParam = {
-      expertise: 'openReport',
-      quote: 'openQuote',
-      repair_order: 'openOrder',
-      invoice: 'openInvoice',
-      cession: 'openCession',
-      fleet: 'openReservation',
-    }[type];
-    
-    navigate(`${config.route}?${queryParam}=${data?.id}`);
-    onOpenChange(false);
-  };
-
   const handleDownload = () => {
     toast.info(`Téléchargement du ${config.title} en cours...`);
+  };
+
+  const handlePreview = () => {
+    // For expertise, just show the file if available
+    if (type === 'expertise' && data?.file_url) {
+      window.open(data.file_url, '_blank');
+    } else {
+      toast.info(`Aperçu du ${config.title}`);
+    }
   };
 
   const renderContent = () => {
@@ -133,6 +117,12 @@ export const DocumentPreviewModal = ({
                 </p>
               </div>
             </div>
+            {data.expert_name && (
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Expert</p>
+                <p className="font-medium">{data.expert_name}</p>
+              </div>
+            )}
           </div>
         );
 
@@ -156,13 +146,19 @@ export const DocumentPreviewModal = ({
                 </p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground mb-1">Montant</p>
+                <p className="text-xs text-muted-foreground mb-1">Montant TTC</p>
                 <p className="font-medium text-[hsl(var(--karrosserie-orange))] flex items-center gap-1">
                   <Euro className="h-3 w-3" />
                   {data.amount?.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' }) || 'N/A'}
                 </p>
               </div>
             </div>
+            {data.notes && (
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Notes</p>
+                <p className="text-sm">{data.notes}</p>
+              </div>
+            )}
           </div>
         );
 
@@ -186,13 +182,19 @@ export const DocumentPreviewModal = ({
                 </p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground mb-1">Date de fin</p>
+                <p className="text-xs text-muted-foreground mb-1">Date de fin prévue</p>
                 <p className="font-medium flex items-center gap-1">
                   <Calendar className="h-3 w-3" />
                   {data.end_date ? format(new Date(data.end_date), 'dd/MM/yyyy', { locale: fr }) : 'En cours'}
                 </p>
               </div>
             </div>
+            {data.notes && (
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Notes</p>
+                <p className="text-sm">{data.notes}</p>
+              </div>
+            )}
           </div>
         );
 
@@ -216,13 +218,22 @@ export const DocumentPreviewModal = ({
                 </p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground mb-1">Montant</p>
+                <p className="text-xs text-muted-foreground mb-1">Montant TTC</p>
                 <p className="font-medium text-[hsl(var(--karrosserie-orange))] flex items-center gap-1">
                   <Euro className="h-3 w-3" />
                   {data.amount?.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' }) || 'N/A'}
                 </p>
               </div>
             </div>
+            {data.due_date && (
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Date d'échéance</p>
+                <p className="font-medium flex items-center gap-1">
+                  <Calendar className="h-3 w-3" />
+                  {format(new Date(data.due_date), 'dd/MM/yyyy', { locale: fr })}
+                </p>
+              </div>
+            )}
           </div>
         );
 
@@ -240,10 +251,19 @@ export const DocumentPreviewModal = ({
                   {data.cession_type === 'creance' ? 'Cession de créance' : 'Cession'}
                 </Badge>
               </div>
-              <div className="col-span-2">
+              <div>
                 <p className="text-xs text-muted-foreground mb-1">Statut</p>
                 <Badge variant="outline">{data.status || 'En attente'}</Badge>
               </div>
+              {data.loan_amount && (
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Montant</p>
+                  <p className="font-medium text-[hsl(var(--karrosserie-orange))] flex items-center gap-1">
+                    <Euro className="h-3 w-3" />
+                    {data.loan_amount?.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         );
@@ -272,6 +292,9 @@ export const DocumentPreviewModal = ({
     }
   };
 
+  // For expertise type, only show download and preview (no "voir détails" navigation)
+  const isFileBasedDocument = type === 'expertise';
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
@@ -299,13 +322,23 @@ export const DocumentPreviewModal = ({
             <Download className="h-4 w-4" />
             Télécharger PDF
           </Button>
-          <Button 
-            className="flex-1 gap-2 bg-[hsl(var(--karrosserie-orange))] hover:bg-[hsl(var(--karrosserie-orange))]/90"
-            onClick={handleOpenFullPage}
-          >
-            <ExternalLink className="h-4 w-4" />
-            Voir détails
-          </Button>
+          {isFileBasedDocument ? (
+            <Button 
+              className="flex-1 gap-2 bg-[hsl(var(--karrosserie-orange))] hover:bg-[hsl(var(--karrosserie-orange))]/90"
+              onClick={handlePreview}
+            >
+              <Eye className="h-4 w-4" />
+              Aperçu
+            </Button>
+          ) : (
+            <Button 
+              variant="secondary"
+              className="flex-1 gap-2"
+              onClick={() => onOpenChange(false)}
+            >
+              Fermer
+            </Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>
