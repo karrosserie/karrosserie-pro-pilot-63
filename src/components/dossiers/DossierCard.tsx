@@ -33,9 +33,8 @@ export const DossierCard = ({ dossier, onView, onArchive }: DossierCardProps) =>
   return (
     <div 
       className={cn(
-        "group bg-card rounded-xl border transition-all duration-200",
-        "shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)]",
-        "hover:border-[hsl(var(--karrosserie-orange))/20] cursor-pointer"
+        "group bg-card transition-colors duration-150 cursor-pointer",
+        "hover:bg-muted/40"
       )}
       onClick={() => onView(dossier.id)}
     >
@@ -44,7 +43,7 @@ export const DossierCard = ({ dossier, onView, onArchive }: DossierCardProps) =>
         {/* Header: Reference + Status */}
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="font-mono text-sm font-semibold text-primary">
+            <span className="font-mono text-sm font-semibold text-[hsl(var(--karrosserie-orange))]">
               {dossierReference}
             </span>
             {statusConfig && (
@@ -78,7 +77,7 @@ export const DossierCard = ({ dossier, onView, onArchive }: DossierCardProps) =>
           {client?.phone && (
             <a 
               href={`tel:${client.phone}`}
-              className="text-sm text-muted-foreground hover:text-primary flex items-center gap-1.5"
+              className="text-sm text-muted-foreground hover:text-[hsl(var(--karrosserie-orange))] flex items-center gap-1.5"
               onClick={(e) => e.stopPropagation()}
             >
               <Phone className="h-3.5 w-3.5" />
@@ -107,15 +106,14 @@ export const DossierCard = ({ dossier, onView, onArchive }: DossierCardProps) =>
         </div>
       </div>
 
-      {/* Desktop Layout - Enhanced table row */}
-      <div className="hidden md:grid md:grid-cols-[180px_1.2fr_1fr_1fr_100px_100px_48px] md:items-center md:gap-4 md:px-5 md:py-4">
+      {/* Desktop Layout - Table row matching header columns */}
+      <div className="hidden md:grid md:grid-cols-[180px_1.2fr_1fr_1fr_100px_48px] md:items-center md:gap-4 md:px-5 md:py-3">
         {/* Reference */}
         <div className="min-w-0">
-          <p className="font-mono text-sm font-semibold text-primary truncate">
+          <p className="font-mono text-sm font-semibold text-[hsl(var(--karrosserie-orange))] truncate">
             {dossierReference}
           </p>
-          <span className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-            <Calendar className="h-3 w-3" />
+          <span className="text-[11px] text-muted-foreground flex items-center gap-1 mt-0.5">
             {format(new Date(dossier.created_at), 'dd/MM/yyyy', { locale: fr })}
           </span>
         </div>
@@ -126,7 +124,7 @@ export const DossierCard = ({ dossier, onView, onArchive }: DossierCardProps) =>
           {client?.phone && (
             <a 
               href={`tel:${client.phone}`}
-              className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1 mt-0.5"
+              className="text-xs text-muted-foreground hover:text-[hsl(var(--karrosserie-orange))] flex items-center gap-1 mt-0.5"
               onClick={(e) => e.stopPropagation()}
             >
               <Phone className="h-3 w-3" />
@@ -136,60 +134,54 @@ export const DossierCard = ({ dossier, onView, onArchive }: DossierCardProps) =>
         </div>
 
         {/* Vehicle */}
-        <div className="min-w-0 space-y-1">
+        <div className="min-w-0">
           {vehicle?.license_plate && (
-            <Badge variant="outline" className="font-mono text-xs bg-muted/50">
+            <Badge variant="outline" className="font-mono text-xs bg-muted/30 mb-0.5">
               {vehicle.license_plate}
             </Badge>
           )}
           {vehicleInfo && (
             <p className="text-xs text-muted-foreground truncate">{vehicleInfo}</p>
           )}
+          {!vehicle?.license_plate && !vehicleInfo && (
+            <span className="text-sm text-muted-foreground">—</span>
+          )}
         </div>
 
         {/* Insurance */}
         <div className="min-w-0">
           {insurance?.name ? (
-            <div className="flex items-center gap-1.5">
-              <Building2 className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-              <span className="text-sm text-foreground truncate">{insurance.name}</span>
-            </div>
+            <>
+              <span className="text-sm text-foreground truncate block">{insurance.name}</span>
+              {dossier.claim_number && (
+                <p className="text-[11px] text-muted-foreground mt-0.5 font-mono">
+                  N° {dossier.claim_number}
+                </p>
+              )}
+            </>
           ) : (
             <span className="text-sm text-muted-foreground">—</span>
-          )}
-          {dossier.claim_number && (
-            <p className="text-xs text-muted-foreground mt-0.5">
-              N° {dossier.claim_number}
-            </p>
           )}
         </div>
 
         {/* Status */}
         <div>
           {statusConfig && (
-            <Badge className={cn(statusConfig.bgColor, statusConfig.color, 'border-0 text-xs whitespace-nowrap')}>
+            <Badge className={cn(statusConfig.bgColor, statusConfig.color, 'border-0 text-[11px] font-medium whitespace-nowrap')}>
               {statusConfig.label}
             </Badge>
           )}
         </div>
 
-        {/* Quick Actions */}
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-            onClick={(e) => { e.stopPropagation(); onView(dossier.id); }}
-          >
-            <FileText className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {/* Menu */}
+        {/* Actions */}
         <div className="flex justify-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-8 w-8 opacity-60 hover:opacity-100 transition-opacity"
+              >
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>

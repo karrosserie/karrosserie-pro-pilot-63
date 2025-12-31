@@ -55,24 +55,26 @@ export const DossierStatsRow = ({ counts, isLoading, onStatusClick }: DossierSta
             onClick={() => onStatusClick?.(status)}
             className={cn(
               "p-4 flex items-center justify-between transition-all duration-200",
-              "border hover:border-[hsl(var(--karrosserie-orange))/30]",
+              "border hover:border-[hsl(var(--karrosserie-orange))/40]",
               "shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)]",
-              onStatusClick && "cursor-pointer"
+              onStatusClick && "cursor-pointer active:scale-[0.98]"
             )}
           >
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+            <div className="space-y-0.5">
+              <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">
                 {config.label}
               </p>
-              <p className="text-2xl font-bold text-foreground tabular-nums">
+              {/* 32px numeric display per spec */}
+              <p className="text-[32px] leading-tight font-bold text-foreground tabular-nums">
                 {count}
               </p>
             </div>
             <div className={cn(
-              "p-2.5 rounded-xl",
-              config.bgColor
+              "p-2.5 rounded-xl transition-transform",
+              config.bgColor,
+              onStatusClick && "group-hover:scale-110"
             )}>
-              <Icon className={cn("h-5 w-5", config.color)} />
+              <Icon className={cn("h-6 w-6", config.color)} />
             </div>
           </Card>
         );
