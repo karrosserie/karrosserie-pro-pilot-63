@@ -237,6 +237,11 @@ const DossierDetail = () => {
                   Sinistre: <span className="font-mono">{dossier.claim_number}</span>
                 </p>
               )}
+              {dossier.incident_date && (
+                <p className="text-muted-foreground">
+                  Date sinistre: {new Date(dossier.incident_date).toLocaleDateString('fr-FR')}
+                </p>
+              )}
               {dossier.expert_name && (
                 <p className="text-muted-foreground">
                   Expert: {dossier.expert_name}
