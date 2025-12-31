@@ -22,6 +22,7 @@ interface DossierListProps {
   dossiers: Dossier[];
   isLoading: boolean;
   onView: (id: string) => void;
+  onEdit: (id: string) => void;
   onArchive: (id: string) => void;
   onCreateNew?: () => void;
 }
@@ -31,7 +32,7 @@ type SortDirection = 'asc' | 'desc';
 
 const ITEMS_PER_PAGE = 10;
 
-export const DossierList = ({ dossiers, isLoading, onView, onArchive, onCreateNew }: DossierListProps) => {
+export const DossierList = ({ dossiers, isLoading, onView, onEdit, onArchive, onCreateNew }: DossierListProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
@@ -196,6 +197,7 @@ export const DossierList = ({ dossiers, isLoading, onView, onArchive, onCreateNe
             key={dossier.id}
             dossier={dossier}
             onView={onView}
+            onEdit={onEdit}
             onArchive={onArchive}
           />
         ))}
