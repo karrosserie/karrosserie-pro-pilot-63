@@ -12,12 +12,18 @@ export type FleetReservation = Database['public']['Tables']['fleet_reservations'
     address?: string;
     postal_code?: string;
     city?: string;
+    license_number?: string;
+    license_issue_date?: string;
+    prefecture?: string;
+    date_of_birth?: string;
+    place_of_birth?: string;
   } | null;
   fleet_vehicles?: {
     id: string;
     brand_id: string;
     model_id: string;
     license_plate: string;
+    vin?: string;
     color?: string;
     year: number;
     registration_front_url?: string;
@@ -37,6 +43,20 @@ export type FleetReservation = Database['public']['Tables']['fleet_reservations'
     reference: string;
     status?: string;
     amount?: number;
+    claim_number?: string;
+    vehicles?: {
+      id: string;
+      license_plate?: string;
+      vin?: string;
+      car_brands?: {
+        id: string;
+        name: string;
+      } | null;
+      car_models?: {
+        id: string;
+        name: string;
+      } | null;
+    } | null;
   } | null;
 };
 
@@ -51,12 +71,13 @@ export const fleetReservationsService = {
       .from('fleet_reservations')
       .select(`
         *,
-        clients(id, first_name, last_name, email, phone, address, postal_code, city),
+        clients(id, first_name, last_name, email, phone, address, postal_code, city, license_number, license_issue_date, prefecture, date_of_birth, place_of_birth),
         fleet_vehicles(
           id,
           brand_id,
           model_id,
           license_plate,
+          vin,
           color,
           year,
           registration_front_url,
@@ -65,7 +86,7 @@ export const fleetReservationsService = {
           car_brands(id, name),
           car_models(id, name)
         ),
-        quotes(id, reference, status, amount)
+        quotes(id, reference, status, amount, claim_number, vehicles(id, license_plate, vin, car_brands(id, name), car_models(id, name)))
       `)
       .order('created_at', { ascending: false });
     
@@ -91,12 +112,13 @@ export const fleetReservationsService = {
       .from('fleet_reservations')
       .select(`
         *,
-        clients(id, first_name, last_name, email, phone, address, postal_code, city),
+        clients(id, first_name, last_name, email, phone, address, postal_code, city, license_number, license_issue_date, prefecture, date_of_birth, place_of_birth),
         fleet_vehicles(
           id,
           brand_id,
           model_id,
           license_plate,
+          vin,
           color,
           year,
           registration_front_url,
@@ -105,7 +127,7 @@ export const fleetReservationsService = {
           car_brands(id, name),
           car_models(id, name)
         ),
-        quotes(id, reference, status, amount)
+        quotes(id, reference, status, amount, claim_number, vehicles(id, license_plate, vin, car_brands(id, name), car_models(id, name)))
       `)
       .eq('id', id)
       .single();
@@ -126,12 +148,13 @@ export const fleetReservationsService = {
       .from('fleet_reservations')
       .select(`
         *,
-        clients(id, first_name, last_name, email, phone, address, postal_code, city),
+        clients(id, first_name, last_name, email, phone, address, postal_code, city, license_number, license_issue_date, prefecture, date_of_birth, place_of_birth),
         fleet_vehicles(
           id,
           brand_id,
           model_id,
           license_plate,
+          vin,
           color,
           year,
           registration_front_url,
@@ -140,7 +163,7 @@ export const fleetReservationsService = {
           car_brands(id, name),
           car_models(id, name)
         ),
-        quotes(id, reference, status, amount)
+        quotes(id, reference, status, amount, claim_number, vehicles(id, license_plate, vin, car_brands(id, name), car_models(id, name)))
       `)
       .eq('fleet_vehicle_id', vehicleId)
       .order('created_at', { ascending: false });
@@ -162,12 +185,13 @@ export const fleetReservationsService = {
       .insert([reservation])
       .select(`
         *,
-        clients(id, first_name, last_name, email, phone, address, postal_code, city),
+        clients(id, first_name, last_name, email, phone, address, postal_code, city, license_number, license_issue_date, prefecture, date_of_birth, place_of_birth),
         fleet_vehicles(
           id,
           brand_id,
           model_id,
           license_plate,
+          vin,
           color,
           year,
           registration_front_url,
@@ -176,7 +200,7 @@ export const fleetReservationsService = {
           car_brands(id, name),
           car_models(id, name)
         ),
-        quotes(id, reference, status, amount)
+        quotes(id, reference, status, amount, claim_number, vehicles(id, license_plate, vin, car_brands(id, name), car_models(id, name)))
       `)
       .single();
     
@@ -198,12 +222,13 @@ export const fleetReservationsService = {
       .eq('id', id)
       .select(`
         *,
-        clients(id, first_name, last_name, email, phone, address, postal_code, city),
+        clients(id, first_name, last_name, email, phone, address, postal_code, city, license_number, license_issue_date, prefecture, date_of_birth, place_of_birth),
         fleet_vehicles(
           id,
           brand_id,
           model_id,
           license_plate,
+          vin,
           color,
           year,
           registration_front_url,
@@ -212,7 +237,7 @@ export const fleetReservationsService = {
           car_brands(id, name),
           car_models(id, name)
         ),
-        quotes(id, reference, status, amount)
+        quotes(id, reference, status, amount, claim_number, vehicles(id, license_plate, vin, car_brands(id, name), car_models(id, name)))
       `)
       .single();
     
