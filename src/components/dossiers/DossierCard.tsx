@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Phone, MoreVertical, Eye, Archive, Car, Building2, Calendar } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Phone, MoreVertical, Eye, Archive, Car, Building2, Calendar, FileText, Trash2 } from 'lucide-react';
 import { Dossier, DOSSIER_STATUS_CONFIG, DossierOverallStatus } from '@/types/dossier';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -28,62 +28,38 @@ export const DossierCard = ({ dossier, onView, onArchive }: DossierCardProps) =>
     ? `${vehicle.car_brands?.name || ''} ${vehicle.car_models?.name || ''}`.trim() 
     : null;
 
+  const dossierReference = dossier.reference || `DOS-${dossier.id.slice(0, 8).toUpperCase()}`;
+
   return (
     <div 
       className={cn(
-        "bg-card rounded-lg p-4 cursor-pointer border transition-all",
+        "group bg-card rounded-xl border transition-all duration-200",
         "shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)]",
-        "hover:bg-muted/30"
+        "hover:border-[hsl(var(--karrosserie-orange))/20] cursor-pointer"
       )}
       onClick={() => onView(dossier.id)}
     >
       {/* Mobile Layout */}
-      <div className="md:hidden space-y-3">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0 flex-1">
-            <p className="font-semibold text-foreground truncate">{clientName}</p>
-            {client?.phone && (
-              <a 
-                href={`tel:${client.phone}`}
-                className="text-sm text-muted-foreground hover:text-primary flex items-center gap-1 mt-0.5"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Phone className="h-3 w-3" />
-                {client.phone}
-              </a>
+      <div className="md:hidden p-4 space-y-3">
+        {/* Header: Reference + Status */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="font-mono text-sm font-semibold text-primary">
+              {dossierReference}
+            </span>
+            {statusConfig && (
+              <Badge className={cn(statusConfig.bgColor, statusConfig.color, 'border-0 text-[10px] px-2 py-0.5 shrink-0')}>
+                {statusConfig.label}
+              </Badge>
             )}
           </div>
-          {statusConfig && (
-            <Badge className={cn(statusConfig.bgColor, statusConfig.color, 'border-0 text-xs shrink-0')}>
-              {statusConfig.label}
-            </Badge>
-          )}
-        </div>
-        
-        <div className="flex items-center gap-2 flex-wrap">
-          {vehicle?.license_plate && (
-            <Badge variant="outline" className="font-mono text-xs">
-              <Car className="h-3 w-3 mr-1" />
-              {vehicle.license_plate}
-            </Badge>
-          )}
-          {vehicleInfo && (
-            <span className="text-xs text-muted-foreground">{vehicleInfo}</span>
-          )}
-        </div>
-
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-muted-foreground flex items-center gap-1">
-            <Calendar className="h-3 w-3" />
-            {format(new Date(dossier.created_at), 'dd/MM/yyyy', { locale: fr })}
-          </span>
           <DropdownMenu>
             <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onView(dossier.id); }}>
                 <Eye className="h-4 w-4 mr-2" />
                 Voir le dossier
@@ -95,25 +71,74 @@ export const DossierCard = ({ dossier, onView, onArchive }: DossierCardProps) =>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+        
+        {/* Client Info */}
+        <div className="space-y-1">
+          <p className="font-medium text-foreground truncate">{clientName}</p>
+          {client?.phone && (
+            <a 
+              href={`tel:${client.phone}`}
+              className="text-sm text-muted-foreground hover:text-primary flex items-center gap-1.5"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Phone className="h-3.5 w-3.5" />
+              {client.phone}
+            </a>
+          )}
+        </div>
+
+        {/* Vehicle & Date Row */}
+        <div className="flex items-center justify-between pt-2 border-t border-border/50">
+          <div className="flex items-center gap-2">
+            {vehicle?.license_plate && (
+              <Badge variant="outline" className="font-mono text-xs bg-muted/50">
+                <Car className="h-3 w-3 mr-1.5" />
+                {vehicle.license_plate}
+              </Badge>
+            )}
+            {vehicleInfo && (
+              <span className="text-xs text-muted-foreground truncate max-w-[120px]">{vehicleInfo}</span>
+            )}
+          </div>
+          <span className="text-xs text-muted-foreground flex items-center gap-1">
+            <Calendar className="h-3 w-3" />
+            {format(new Date(dossier.created_at), 'dd MMM', { locale: fr })}
+          </span>
+        </div>
       </div>
 
-      {/* Desktop Layout - Table-like row */}
-      <div className="hidden md:grid md:grid-cols-[1fr_1fr_1fr_120px_100px_auto] md:items-center md:gap-4">
-        {/* Reference / Client */}
+      {/* Desktop Layout - Enhanced table row */}
+      <div className="hidden md:grid md:grid-cols-[180px_1.2fr_1fr_1fr_100px_100px_48px] md:items-center md:gap-4 md:px-5 md:py-4">
+        {/* Reference */}
         <div className="min-w-0">
-          <p className="font-mono text-sm text-primary font-medium truncate">
-            {dossier.reference || `DOS-${dossier.id.slice(0, 8).toUpperCase()}`}
+          <p className="font-mono text-sm font-semibold text-primary truncate">
+            {dossierReference}
           </p>
-          <p className="text-sm text-foreground truncate">{clientName}</p>
+          <span className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+            <Calendar className="h-3 w-3" />
+            {format(new Date(dossier.created_at), 'dd/MM/yyyy', { locale: fr })}
+          </span>
+        </div>
+
+        {/* Client */}
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-foreground truncate">{clientName}</p>
           {client?.phone && (
-            <p className="text-xs text-muted-foreground">{client.phone}</p>
+            <a 
+              href={`tel:${client.phone}`}
+              className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1 mt-0.5"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Phone className="h-3 w-3" />
+              {client.phone}
+            </a>
           )}
         </div>
 
         {/* Vehicle */}
-        <div className="min-w-0">
+        <div className="min-w-0 space-y-1">
           {vehicle?.license_plate && (
-            <Badge variant="outline" className="font-mono text-xs mb-1">
+            <Badge variant="outline" className="font-mono text-xs bg-muted/50">
               {vehicle.license_plate}
             </Badge>
           )}
@@ -132,23 +157,35 @@ export const DossierCard = ({ dossier, onView, onArchive }: DossierCardProps) =>
           ) : (
             <span className="text-sm text-muted-foreground">—</span>
           )}
+          {dossier.claim_number && (
+            <p className="text-xs text-muted-foreground mt-0.5">
+              N° {dossier.claim_number}
+            </p>
+          )}
         </div>
 
         {/* Status */}
         <div>
           {statusConfig && (
-            <Badge className={cn(statusConfig.bgColor, statusConfig.color, 'border-0 text-xs')}>
+            <Badge className={cn(statusConfig.bgColor, statusConfig.color, 'border-0 text-xs whitespace-nowrap')}>
               {statusConfig.label}
             </Badge>
           )}
         </div>
 
-        {/* Date */}
-        <div className="text-sm text-muted-foreground">
-          {format(new Date(dossier.created_at), 'dd/MM/yyyy', { locale: fr })}
+        {/* Quick Actions */}
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={(e) => { e.stopPropagation(); onView(dossier.id); }}
+          >
+            <FileText className="h-4 w-4" />
+          </Button>
         </div>
 
-        {/* Actions */}
+        {/* Menu */}
         <div className="flex justify-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
@@ -156,11 +193,12 @@ export const DossierCard = ({ dossier, onView, onArchive }: DossierCardProps) =>
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onView(dossier.id); }}>
                 <Eye className="h-4 w-4 mr-2" />
                 Voir le dossier
               </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onArchive(dossier.id); }}>
                 <Archive className="h-4 w-4 mr-2" />
                 Archiver

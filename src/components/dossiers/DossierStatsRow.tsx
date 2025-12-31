@@ -9,10 +9,12 @@ import {
 } from 'lucide-react';
 import { DOSSIER_STATUS_CONFIG, DossierOverallStatus } from '@/types/dossier';
 import { cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface DossierStatsRowProps {
   counts: Record<string, number>;
   isLoading?: boolean;
+  onStatusClick?: (status: DossierOverallStatus) => void;
 }
 
 const STATS_CONFIG: Array<{
@@ -27,7 +29,20 @@ const STATS_CONFIG: Array<{
   { status: 'facturation', icon: Receipt },
 ];
 
-export const DossierStatsRow = ({ counts, isLoading }: DossierStatsRowProps) => {
+export const DossierStatsRow = ({ counts, isLoading, onStatusClick }: DossierStatsRowProps) => {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        {[...Array(6)].map((_, i) => (
+          <Card key={i} className="p-4">
+            <Skeleton className="h-4 w-16 mb-2" />
+            <Skeleton className="h-8 w-12" />
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
       {STATS_CONFIG.map(({ status, icon: Icon }) => {
@@ -37,21 +52,24 @@ export const DossierStatsRow = ({ counts, isLoading }: DossierStatsRowProps) => 
         return (
           <Card 
             key={status}
+            onClick={() => onStatusClick?.(status)}
             className={cn(
-              "p-4 flex items-center justify-between transition-shadow hover:shadow-md",
-              "border shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)]"
+              "p-4 flex items-center justify-between transition-all duration-200",
+              "border hover:border-[hsl(var(--karrosserie-orange))/30]",
+              "shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)]",
+              onStatusClick && "cursor-pointer"
             )}
           >
             <div className="space-y-1">
-              <p className="text-xs text-muted-foreground font-medium">
+              <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
                 {config.label}
               </p>
-              <p className="text-2xl font-bold text-foreground">
-                {isLoading ? '—' : count}
+              <p className="text-2xl font-bold text-foreground tabular-nums">
+                {count}
               </p>
             </div>
             <div className={cn(
-              "p-2 rounded-lg",
+              "p-2.5 rounded-xl",
               config.bgColor
             )}>
               <Icon className={cn("h-5 w-5", config.color)} />
