@@ -11,159 +11,150 @@ interface LoanContractPDFProps {
 const styles = StyleSheet.create({
   page: {
     fontFamily: 'Helvetica',
-    fontSize: 9,
-    paddingTop: 30,
-    paddingBottom: 40,
-    paddingHorizontal: 35,
+    fontSize: 8,
+    paddingTop: 25,
+    paddingBottom: 35,
+    paddingHorizontal: 30,
     position: 'relative',
   },
   mainTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   subtitle: {
-    fontSize: 10,
+    fontSize: 9,
     textAlign: 'center',
-    marginBottom: 15,
+    marginBottom: 2,
+    fontStyle: 'italic',
+  },
+  subtitleSmall: {
+    fontSize: 8,
+    textAlign: 'center',
+    marginBottom: 10,
     fontStyle: 'italic',
   },
   contractInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 15,
-    fontSize: 9,
-  },
-  preambuleSection: {
-    marginBottom: 15,
-  },
-  preambuleTitle: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    marginBottom: 6,
-  },
-  preambuleText: {
-    fontSize: 8,
-    lineHeight: 1.4,
-    textAlign: 'justify',
-    marginBottom: 6,
-  },
-  referenceSection: {
-    marginBottom: 12,
-    padding: 8,
-    backgroundColor: '#f5f5f5',
-  },
-  referenceTitle: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    marginBottom: 6,
-  },
-  referenceRow: {
-    flexDirection: 'row',
-    marginBottom: 2,
-  },
-  referenceLabel: {
-    width: 120,
-    fontSize: 8,
-  },
-  referenceValue: {
-    flex: 1,
+    marginBottom: 10,
     fontSize: 8,
   },
   articleTitle: {
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: 'bold',
-    marginTop: 12,
-    marginBottom: 6,
-    backgroundColor: '#e8e8e8',
-    padding: 4,
+    marginTop: 8,
+    marginBottom: 4,
+    backgroundColor: '#e0e0e0',
+    padding: 3,
+  },
+  subArticleTitle: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    marginTop: 4,
+    marginBottom: 2,
   },
   articleText: {
-    fontSize: 8,
-    lineHeight: 1.4,
-    marginBottom: 4,
+    fontSize: 7,
+    lineHeight: 1.35,
+    marginBottom: 2,
     textAlign: 'justify',
   },
   twoColumnGrid: {
     flexDirection: 'row',
-    gap: 20,
-    marginBottom: 10,
+    gap: 15,
+    marginBottom: 6,
   },
   column: {
     flex: 1,
   },
   partyTitle: {
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: 'bold',
-    marginBottom: 4,
+    marginBottom: 2,
     textDecoration: 'underline',
   },
   partyInfo: {
-    fontSize: 8,
-    marginBottom: 2,
+    fontSize: 7,
+    marginBottom: 1,
   },
   vehicleGrid: {
     flexDirection: 'row',
-    gap: 15,
-    marginTop: 6,
+    gap: 10,
+    marginTop: 4,
   },
   vehicleColumn: {
     flex: 1,
-    padding: 8,
-    border: '1px solid #ccc',
+    padding: 5,
+    border: '1px solid #999',
   },
   vehicleTitle: {
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: 'bold',
-    marginBottom: 6,
+    marginBottom: 4,
     textAlign: 'center',
   },
   vehicleRow: {
     flexDirection: 'row',
-    marginBottom: 2,
+    marginBottom: 1,
   },
   vehicleLabel: {
-    width: 80,
-    fontSize: 8,
+    width: 70,
+    fontSize: 7,
   },
   vehicleValue: {
     flex: 1,
-    fontSize: 8,
+    fontSize: 7,
   },
   bulletPoint: {
-    fontSize: 8,
-    marginLeft: 10,
-    marginBottom: 2,
+    fontSize: 7,
+    marginLeft: 8,
+    marginBottom: 1,
   },
-  subSectionTitle: {
-    fontSize: 9,
-    fontWeight: 'bold',
-    marginTop: 6,
+  numberedPoint: {
+    fontSize: 7,
+    marginLeft: 8,
+    marginBottom: 1,
+  },
+  infoTable: {
+    marginTop: 4,
     marginBottom: 4,
   },
-  damageTable: {
-    marginTop: 8,
+  infoRow: {
+    flexDirection: 'row',
+    marginBottom: 1,
+  },
+  infoLabel: {
+    width: 100,
+    fontSize: 7,
+  },
+  infoValue: {
+    flex: 1,
+    fontSize: 7,
+  },
+  simpleTable: {
+    marginTop: 4,
     border: '1px solid #000',
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#e8e8e8',
+    backgroundColor: '#e0e0e0',
     borderBottom: '1px solid #000',
   },
   tableHeaderCell: {
     flex: 1,
-    fontSize: 8,
+    fontSize: 7,
     fontWeight: 'bold',
-    padding: 4,
+    padding: 2,
     textAlign: 'center',
     borderRight: '1px solid #000',
   },
   tableHeaderCellLast: {
     flex: 1,
-    fontSize: 8,
+    fontSize: 7,
     fontWeight: 'bold',
-    padding: 4,
+    padding: 2,
     textAlign: 'center',
   },
   tableRow: {
@@ -172,90 +163,163 @@ const styles = StyleSheet.create({
   },
   tableCell: {
     flex: 1,
-    fontSize: 7,
-    padding: 3,
+    fontSize: 6,
+    padding: 2,
     borderRight: '1px solid #ccc',
   },
   tableCellLast: {
     flex: 1,
+    fontSize: 6,
+    padding: 2,
+  },
+  tariffRow: {
+    flexDirection: 'row',
+    marginBottom: 1,
+  },
+  tariffLabel: {
+    flex: 3,
     fontSize: 7,
-    padding: 3,
+  },
+  tariffValue: {
+    flex: 1,
+    fontSize: 7,
+    textAlign: 'right',
+  },
+  delegationBox: {
+    marginTop: 4,
+    padding: 6,
+    border: '1px solid #000',
+    backgroundColor: '#f8f8f8',
+  },
+  delegationText: {
+    fontSize: 7,
+    lineHeight: 1.4,
+    marginBottom: 3,
+    textAlign: 'justify',
+  },
+  delegationBold: {
+    fontSize: 7,
+    fontWeight: 'bold',
+    marginTop: 4,
+    marginBottom: 2,
   },
   signatureSection: {
-    marginTop: 20,
+    marginTop: 12,
   },
   signatureGrid: {
     flexDirection: 'row',
-    gap: 30,
+    gap: 20,
   },
   signatureColumn: {
     flex: 1,
-    border: '1px solid #ccc',
-    padding: 10,
-    minHeight: 80,
+    border: '1px solid #999',
+    padding: 8,
+    minHeight: 70,
   },
   signatureTitle: {
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: 4,
     textAlign: 'center',
   },
   signatureImage: {
-    width: 120,
-    height: 50,
+    width: 100,
+    height: 40,
     objectFit: 'contain',
     alignSelf: 'center',
   },
-  signatureDate: {
-    fontSize: 8,
-    marginTop: 8,
+  signatureMention: {
+    fontSize: 6,
     textAlign: 'center',
+    marginTop: 4,
+    fontStyle: 'italic',
   },
   pageNumber: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 15,
     left: 0,
     right: 0,
     textAlign: 'center',
-    fontSize: 8,
+    fontSize: 7,
     color: '#666',
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 25,
+    left: 30,
+    right: 30,
+    fontSize: 6,
+    textAlign: 'center',
+    color: '#666',
+  },
+  legalReferences: {
+    marginTop: 4,
+  },
+  legalRef: {
+    fontSize: 6,
+    marginBottom: 1,
+  },
+  checkbox: {
+    width: 8,
+    height: 8,
+    border: '1px solid #000',
+    marginRight: 4,
+  },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 2,
+  },
+  etatLieuxTable: {
+    marginTop: 4,
+    border: '1px solid #000',
+  },
+  etatLieuxRow: {
+    flexDirection: 'row',
+    borderBottom: '1px solid #ccc',
+  },
+  etatLieuxLabel: {
+    flex: 2,
+    fontSize: 7,
+    padding: 2,
+    borderRight: '1px solid #ccc',
+  },
+  etatLieuxCell: {
+    flex: 1,
+    fontSize: 7,
+    padding: 2,
+    textAlign: 'center',
+    borderRight: '1px solid #ccc',
+  },
+  etatLieuxCellLast: {
+    flex: 1,
+    fontSize: 7,
+    padding: 2,
+    textAlign: 'center',
   },
 });
 
-// Liste des pièces pour l'état des lieux
-const BODY_PARTS = [
-  'Pare-choc avant', 'Capot', 'Aile avant droite', 'Aile avant gauche',
-  'Porte avant droite', 'Porte avant gauche', 'Porte arrière droite', 'Porte arrière gauche',
-  'Aile arrière droite', 'Aile arrière gauche', 'Pare-choc arrière', 'Hayon/Coffre',
-  'Toit', 'Rétroviseur droit', 'Rétroviseur gauche', 'Pare-brise',
-  'Lunette arrière', 'Vitres latérales', 'Jantes/Pneus'
+const BODY_PARTS_SIMPLIFIED = [
+  'Extérieur (carrosserie)',
+  'Intérieur (habitacle)',
+  'Jantes / Pneus',
+  'Vitrage',
+  'Accessoires (clés, docs)',
 ];
 
 const LoanContractPDF = ({ loanData, companyData, userPosition }: LoanContractPDFProps) => {
   const contractDate = formatDate(new Date().toISOString());
   const contractNumber = `CPV-${new Date().getFullYear()}-${loanData?.id?.substring(0, 6) || '000000'}`;
   
-  // Parse damages from JSON
-  const damages = loanData?.damages 
-    ? (typeof loanData.damages === 'string' ? JSON.parse(loanData.damages) : loanData.damages)
-    : [];
-  
-  // Get damage status for a part
-  const getDamageStatus = (partName: string): string => {
-    const damage = damages.find((d: any) => d.name === partName);
-    if (!damage || damage.type === 'none') return '-';
-    if (damage.type === 'rayure') return 'R';
-    if (damage.type === 'choc') return 'C';
-    if (damage.type === 'hs') return 'HS';
-    return '-';
-  };
-
-  // Véhicule sinistré depuis le devis
   const damagedVehicle = loanData?.quotes?.vehicles;
+  const clientName = `${loanData?.clients?.first_name || ''} ${loanData?.clients?.last_name || ''}`.trim();
+  const insurerName = loanData?.insurance_company_name || '[Assureur]';
+  const assisteurName = loanData?.assistance_name || '[Assisteur]';
+  const companyName = companyData?.name || '[Carrossier]';
 
   return (
     <Document>
-      {/* Page 1 - Titre, Préambule, Articles 1-4 */}
+      {/* Page 1 - En-tête, Articles 1-4 */}
       <Page size="A4" style={styles.page}>
         <Text style={styles.mainTitle}>
           CONTRAT DE MISE À DISPOSITION DE VÉHICULE DE PRÊT
@@ -263,50 +327,20 @@ const LoanContractPDF = ({ loanData, companyData, userPosition }: LoanContractPD
         <Text style={styles.subtitle}>
           (Articles 1875 à 1891 du Code civil - Prêt à usage)
         </Text>
+        <Text style={styles.subtitleSmall}>
+          Avec autorisation de paiement direct à l'assisteur
+        </Text>
 
         <View style={styles.contractInfo}>
           <Text>N° Contrat : {contractNumber}</Text>
           <Text>Date : {contractDate}</Text>
         </View>
 
-        {/* Préambule */}
-        <View style={styles.preambuleSection}>
-          <Text style={styles.preambuleTitle}>PRÉAMBULE</Text>
-          <Text style={styles.preambuleText}>
-            Le présent contrat est établi dans le cadre d'une mise à disposition gratuite d'un véhicule de remplacement 
-            pendant la durée des réparations du véhicule sinistré de l'Emprunteur. Cette mise à disposition constitue 
-            un prêt à usage (commodat) au sens des articles 1875 et suivants du Code civil, et ne saurait être assimilée 
-            à une location de véhicule.
-          </Text>
-          <Text style={styles.preambuleText}>
-            L'Emprunteur reconnaît avoir pris connaissance des conditions générales du présent contrat et les accepte 
-            sans réserve. Il s'engage à utiliser le véhicule en bon père de famille et à le restituer dans l'état où 
-            il l'a reçu.
-          </Text>
-        </View>
-
-        {/* Références sinistre */}
-        <View style={styles.referenceSection}>
-          <Text style={styles.referenceTitle}>RÉFÉRENCES DU SINISTRE</Text>
-          <View style={styles.referenceRow}>
-            <Text style={styles.referenceLabel}>N° de sinistre :</Text>
-            <Text style={styles.referenceValue}>{loanData?.quotes?.claim_number || ''}</Text>
-          </View>
-          <View style={styles.referenceRow}>
-            <Text style={styles.referenceLabel}>Date du sinistre :</Text>
-            <Text style={styles.referenceValue}>{loanData?.sinister_date ? formatDate(loanData.sinister_date) : ''}</Text>
-          </View>
-          <View style={styles.referenceRow}>
-            <Text style={styles.referenceLabel}>N° rapport d'expertise :</Text>
-            <Text style={styles.referenceValue}>{loanData?.expertise_report_number || ''}</Text>
-          </View>
-        </View>
-
         {/* Article 1 - Identification des parties */}
         <Text style={styles.articleTitle}>ARTICLE 1 - IDENTIFICATION DES PARTIES</Text>
         <View style={styles.twoColumnGrid}>
           <View style={styles.column}>
-            <Text style={styles.partyTitle}>LE PRÊTEUR</Text>
+            <Text style={styles.partyTitle}>LE PRÊTEUR (ci-après "le Prêteur")</Text>
             <Text style={styles.partyInfo}>{companyData?.name || ''}</Text>
             <Text style={styles.partyInfo}>{companyData?.address || ''}</Text>
             <Text style={styles.partyInfo}>{companyData?.zipcode || ''} {companyData?.city || ''}</Text>
@@ -315,8 +349,8 @@ const LoanContractPDF = ({ loanData, companyData, userPosition }: LoanContractPD
             <Text style={styles.partyInfo}>SIRET : {companyData?.siret || ''}</Text>
           </View>
           <View style={styles.column}>
-            <Text style={styles.partyTitle}>L'EMPRUNTEUR</Text>
-            <Text style={styles.partyInfo}>{loanData?.clients?.first_name || ''} {loanData?.clients?.last_name || ''}</Text>
+            <Text style={styles.partyTitle}>L'EMPRUNTEUR (ci-après "l'Emprunteur")</Text>
+            <Text style={styles.partyInfo}>{clientName}</Text>
             <Text style={styles.partyInfo}>{loanData?.clients?.address || ''}</Text>
             <Text style={styles.partyInfo}>{loanData?.clients?.postal_code || ''} {loanData?.clients?.city || ''}</Text>
             <Text style={styles.partyInfo}>Tél : {loanData?.clients?.phone || ''}</Text>
@@ -328,20 +362,19 @@ const LoanContractPDF = ({ loanData, companyData, userPosition }: LoanContractPD
         <Text style={styles.articleTitle}>ARTICLE 2 - ASSURANCE ET ASSISTANCE</Text>
         <View style={styles.twoColumnGrid}>
           <View style={styles.column}>
-            <Text style={styles.subSectionTitle}>ASSUREUR</Text>
-            <Text style={styles.partyInfo}>Compagnie : {loanData?.insurance_company_name || ''}</Text>
+            <Text style={styles.subArticleTitle}>ASSUREUR</Text>
+            <Text style={styles.partyInfo}>Compagnie : {insurerName}</Text>
             <Text style={styles.partyInfo}>N° contrat : {loanData?.insurance_contract_number || ''}</Text>
-            <Text style={styles.partyInfo}>Tél : {loanData?.insurance_phone || ''}</Text>
+            <Text style={styles.partyInfo}>N° sinistre : {loanData?.quotes?.claim_number || ''}</Text>
             <Text style={styles.partyInfo}>Email : {loanData?.insurance_email || ''}</Text>
           </View>
-          {loanData?.has_assistance && (
-            <View style={styles.column}>
-              <Text style={styles.subSectionTitle}>ASSISTEUR</Text>
-              <Text style={styles.partyInfo}>Société : {loanData?.assistance_name || ''}</Text>
-              <Text style={styles.partyInfo}>N° dossier : {loanData?.assistance_case_number || ''}</Text>
-              <Text style={styles.partyInfo}>Email : {loanData?.assistance_email || ''}</Text>
-            </View>
-          )}
+          <View style={styles.column}>
+            <Text style={styles.subArticleTitle}>ASSISTEUR</Text>
+            <Text style={styles.partyInfo}>Société : {assisteurName}</Text>
+            <Text style={styles.partyInfo}>N° dossier : {loanData?.assistance_case_number || ''}</Text>
+            <Text style={styles.partyInfo}>Email : {loanData?.assistance_email || ''}</Text>
+            <Text style={styles.partyInfo}>Formule : {loanData?.assistance_formula || ''}</Text>
+          </View>
         </View>
 
         {/* Article 3 - Véhicules */}
@@ -389,204 +422,348 @@ const LoanContractPDF = ({ loanData, companyData, userPosition }: LoanContractPD
 
         {/* Article 4 - Durée du prêt */}
         <Text style={styles.articleTitle}>ARTICLE 4 - DURÉE DU PRÊT</Text>
-        <Text style={styles.articleText}>
-          Le véhicule est mis à disposition à compter du {loanData?.start_date ? formatDate(loanData.start_date) : ''} 
-          {loanData?.expected_return_date ? ` jusqu'au ${formatDate(loanData.expected_return_date)}` : ''}.
-        </Text>
-        <Text style={styles.articleText}>
-          Formule de couverture : {loanData?.coverage_duration ? `${loanData.coverage_duration} jours` : 'Non spécifiée'}
-        </Text>
+        
+        <Text style={styles.subArticleTitle}>4.1 Période de mise à disposition</Text>
+        <View style={styles.simpleTable}>
+          <View style={styles.tableRow}>
+            <Text style={{...styles.tableCell, fontWeight: 'bold'}}>Mise à disposition</Text>
+            <Text style={styles.tableCellLast}>{loanData?.start_date ? formatDate(loanData.start_date) : ''}</Text>
+          </View>
+          <View style={styles.tableRow}>
+            <Text style={{...styles.tableCell, fontWeight: 'bold'}}>Restitution prévue</Text>
+            <Text style={styles.tableCellLast}>{loanData?.expected_return_date ? formatDate(loanData.expected_return_date) : ''}</Text>
+          </View>
+          <View style={styles.tableRow}>
+            <Text style={{...styles.tableCell, fontWeight: 'bold'}}>Durée garantie</Text>
+            <Text style={styles.tableCellLast}>{loanData?.assistance_formula || loanData?.coverage_duration ? `${loanData.coverage_duration || ''} jours` : ''}</Text>
+          </View>
+        </View>
+
+        <Text style={styles.subArticleTitle}>4.2 Restitution anticipée</Text>
         <Text style={styles.articleText}>
           L'Emprunteur s'engage à restituer le véhicule dès que son véhicule personnel sera disponible, 
           même si cette date intervient avant la fin de la période prévue.
         </Text>
 
+        <Text style={styles.subArticleTitle}>4.3 Prolongation</Text>
+        <Text style={styles.articleText}>
+          Toute prolongation doit faire l'objet d'une demande écrite au moins 24 heures avant la fin de la période initiale, 
+          et nécessite l'accord préalable du Prêteur et de l'assisteur.
+        </Text>
+
+        <Text style={styles.subArticleTitle}>4.4 Pénalités de retard</Text>
+        <Text style={styles.articleText}>
+          Tout retard non autorisé dans la restitution entraînera une facturation de 45 € HT par jour de retard, 
+          sans préjudice des éventuelles poursuites pour abus de confiance.
+        </Text>
+
         <Text style={styles.pageNumber}>Page 1/4</Text>
       </Page>
 
-      {/* Page 2 - Articles 5-9 */}
+      {/* Page 2 - Articles 5-6 */}
       <Page size="A4" style={styles.page}>
         {/* Article 5 - Conducteur autorisé */}
         <Text style={styles.articleTitle}>ARTICLE 5 - CONDUCTEUR AUTORISÉ</Text>
+        
+        <Text style={styles.subArticleTitle}>5.1 Conducteur unique</Text>
         <Text style={styles.articleText}>
-          Seul l'Emprunteur désigné ci-dessus est autorisé à conduire le véhicule de prêt. Tout autre conducteur 
-          doit faire l'objet d'une autorisation écrite préalable du Prêteur.
+          Seul l'Emprunteur désigné ci-dessus est autorisé à conduire le véhicule de prêt. 
+          Le conducteur doit être titulaire d'un permis de conduire valide depuis plus de 2 ans.
         </Text>
-        <View style={{ marginTop: 6 }}>
-          <View style={styles.referenceRow}>
-            <Text style={styles.referenceLabel}>N° permis de conduire :</Text>
-            <Text style={styles.referenceValue}>{loanData?.clients?.license_number || ''}</Text>
+        <View style={styles.infoTable}>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>N° permis de conduire :</Text>
+            <Text style={styles.infoValue}>{loanData?.clients?.license_number || ''}</Text>
           </View>
-          <View style={styles.referenceRow}>
-            <Text style={styles.referenceLabel}>Date de délivrance :</Text>
-            <Text style={styles.referenceValue}>{loanData?.clients?.license_issue_date ? formatDate(loanData.clients.license_issue_date) : ''}</Text>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Date de délivrance :</Text>
+            <Text style={styles.infoValue}>{loanData?.clients?.license_issue_date ? formatDate(loanData.clients.license_issue_date) : ''}</Text>
           </View>
-          <View style={styles.referenceRow}>
-            <Text style={styles.referenceLabel}>Préfecture :</Text>
-            <Text style={styles.referenceValue}>{loanData?.clients?.prefecture || ''}</Text>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Préfecture :</Text>
+            <Text style={styles.infoValue}>{loanData?.clients?.prefecture || ''}</Text>
+          </View>
+        </View>
+
+        <Text style={styles.subArticleTitle}>5.2 Interdiction de prêt à tiers</Text>
+        <Text style={styles.articleText}>
+          Il est formellement interdit à l'Emprunteur de prêter le véhicule à un tiers. 
+          Toute infraction à cette règle entraînera une pénalité de 500 € et la résiliation immédiate du contrat.
+        </Text>
+
+        <Text style={styles.subArticleTitle}>5.3 Conducteur secondaire (optionnel)</Text>
+        <View style={styles.infoTable}>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Nom :</Text>
+            <Text style={styles.infoValue}>________________________________________</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>N° permis :</Text>
+            <Text style={styles.infoValue}>________________________________________</Text>
           </View>
         </View>
 
         {/* Article 6 - Conditions d'utilisation */}
         <Text style={styles.articleTitle}>ARTICLE 6 - CONDITIONS D'UTILISATION</Text>
-        <Text style={styles.articleText}>L'Emprunteur s'engage à :</Text>
-        <Text style={styles.bulletPoint}>• Utiliser le véhicule en bon père de famille conformément à sa destination normale</Text>
-        <Text style={styles.bulletPoint}>• Ne pas sous-louer le véhicule ni le prêter à un tiers</Text>
-        <Text style={styles.bulletPoint}>• Ne pas utiliser le véhicule pour des compétitions sportives ou des essais</Text>
-        <Text style={styles.bulletPoint}>• Ne pas transporter de marchandises dangereuses ou illicites</Text>
-        <Text style={styles.bulletPoint}>• Respecter le Code de la route et les limitations de vitesse</Text>
-        <Text style={styles.bulletPoint}>• Ne pas fumer dans le véhicule</Text>
-        <Text style={styles.bulletPoint}>• Ne pas quitter le territoire français sans autorisation préalable</Text>
+        
+        <Text style={styles.subArticleTitle}>6.1 Cadre autorisé</Text>
+        <Text style={styles.articleText}>
+          Le véhicule est destiné à un usage personnel en France métropolitaine uniquement. 
+          Le kilométrage est limité à 150 km par jour. Tout dépassement sera facturé 0,30 € HT/km.
+        </Text>
+
+        <Text style={styles.subArticleTitle}>6.2 Usages interdits</Text>
+        <Text style={styles.bulletPoint}>• Transport de personnes à titre onéreux (VTC, taxi)</Text>
+        <Text style={styles.bulletPoint}>• Remorquage ou poussée d'un autre véhicule</Text>
+        <Text style={styles.bulletPoint}>• Apprentissage de la conduite</Text>
+        <Text style={styles.bulletPoint}>• Compétitions sportives ou essais de vitesse</Text>
+        <Text style={styles.bulletPoint}>• Transport de marchandises dangereuses, illicites ou malodorantes</Text>
+        <Text style={styles.bulletPoint}>• Usage en dehors du territoire français sans autorisation écrite</Text>
+
+        <Text style={styles.subArticleTitle}>6.3 Obligations de sécurité</Text>
+        <Text style={styles.bulletPoint}>• Taux d'alcoolémie : 0,0 g/l (tolérance zéro)</Text>
+        <Text style={styles.bulletPoint}>• Interdiction d'usage du téléphone au volant</Text>
+        <Text style={styles.bulletPoint}>• Port de la ceinture obligatoire pour tous les passagers</Text>
+        <Text style={styles.bulletPoint}>• Respect strict du Code de la route</Text>
+        <Text style={styles.bulletPoint}>• Interdiction de fumer dans le véhicule</Text>
+
+        <Text style={styles.subArticleTitle}>6.4 Entretien courant</Text>
+        <Text style={styles.articleText}>
+          L'Emprunteur prend à sa charge pendant la durée du prêt :
+        </Text>
+        <Text style={styles.bulletPoint}>• Le carburant</Text>
+        <Text style={styles.bulletPoint}>• Les frais de péage et de stationnement</Text>
+        <Text style={styles.bulletPoint}>• La vérification régulière des niveaux (huile, liquide de refroidissement, lave-glace)</Text>
+        <Text style={styles.bulletPoint}>• Le gonflage des pneumatiques</Text>
 
         {/* Article 7 - Assurance du véhicule de prêt */}
         <Text style={styles.articleTitle}>ARTICLE 7 - ASSURANCE DU VÉHICULE DE PRÊT</Text>
+        
+        <Text style={styles.subArticleTitle}>7.1 Couverture</Text>
         <Text style={styles.articleText}>
-          Le véhicule de prêt est couvert par l'assurance du Prêteur. L'Emprunteur reste responsable de la franchise 
-          en cas de sinistre responsable ou sans tiers identifié.
+          Le véhicule de prêt est assuré par le Prêteur. Les garanties applicables sont :
         </Text>
+        <View style={styles.infoTable}>
+          <View style={styles.checkboxRow}>
+            <View style={styles.checkbox} />
+            <Text style={styles.articleText}>Responsabilité civile</Text>
+          </View>
+          <View style={styles.checkboxRow}>
+            <View style={styles.checkbox} />
+            <Text style={styles.articleText}>Dommages tous accidents</Text>
+          </View>
+          <View style={styles.checkboxRow}>
+            <View style={styles.checkbox} />
+            <Text style={styles.articleText}>Vol / Incendie</Text>
+          </View>
+          <View style={styles.checkboxRow}>
+            <View style={styles.checkbox} />
+            <Text style={styles.articleText}>Bris de glace</Text>
+          </View>
+        </View>
+
+        <Text style={styles.subArticleTitle}>7.2 Franchise</Text>
         <Text style={styles.articleText}>
-          La franchise applicable est de : ____________ € (montant à compléter par le Prêteur).
-        </Text>
-        <Text style={styles.articleText}>
-          L'Emprunteur peut souscrire une assurance complémentaire couvrant cette franchise auprès de son propre assureur.
+          En cas de sinistre responsable ou sans tiers identifié, la franchise reste à la charge de l'Emprunteur.
+          Montant de la franchise : ____________ €
         </Text>
 
-        {/* Article 8 - Procédure en cas de sinistre */}
-        <Text style={styles.articleTitle}>ARTICLE 8 - PROCÉDURE EN CAS DE SINISTRE</Text>
-        <Text style={styles.articleText}>En cas d'accident ou de sinistre, l'Emprunteur doit impérativement :</Text>
-        <Text style={styles.bulletPoint}>• Prévenir immédiatement le Prêteur par téléphone</Text>
-        <Text style={styles.bulletPoint}>• Remplir un constat amiable avec le tiers (le cas échéant)</Text>
-        <Text style={styles.bulletPoint}>• Ne pas reconnaître sa responsabilité</Text>
-        <Text style={styles.bulletPoint}>• Relever l'identité des témoins éventuels</Text>
-        <Text style={styles.bulletPoint}>• Déposer plainte en cas de vol ou de vandalisme</Text>
-        <Text style={styles.bulletPoint}>• Transmettre tous les documents au Prêteur dans les 48 heures</Text>
-
-        {/* Article 9 - Infractions au code de la route */}
-        <Text style={styles.articleTitle}>ARTICLE 9 - INFRACTIONS AU CODE DE LA ROUTE</Text>
+        <Text style={styles.subArticleTitle}>7.3 Exclusions de garantie</Text>
         <Text style={styles.articleText}>
-          L'Emprunteur est seul responsable des infractions au Code de la route commises pendant la durée du prêt. 
-          Il s'engage à régler directement les amendes et contraventions dont il sera l'auteur.
+          L'assurance ne couvre pas les sinistres survenus dans les cas suivants :
         </Text>
-        <Text style={styles.articleText}>
-          En cas de réception d'un avis de contravention par le Prêteur, celui-ci transmettra les coordonnées de 
-          l'Emprunteur à l'autorité compétente conformément à la réglementation en vigueur.
-        </Text>
-        <Text style={styles.articleText}>
-          L'Emprunteur s'engage à indemniser le Prêteur de tous frais administratifs liés au traitement des infractions 
-          (forfait de 30 € par infraction).
-        </Text>
+        <Text style={styles.bulletPoint}>• Conduite sous l'emprise de l'alcool ou de stupéfiants</Text>
+        <Text style={styles.bulletPoint}>• Conducteur non autorisé au présent contrat</Text>
+        <Text style={styles.bulletPoint}>• Usage non conforme aux conditions du contrat</Text>
+        <Text style={styles.bulletPoint}>• Vol avec les clés laissées dans le véhicule</Text>
 
         <Text style={styles.pageNumber}>Page 2/4</Text>
       </Page>
 
-      {/* Page 3 - Articles 10-13 */}
+      {/* Page 3 - Articles 8-11 */}
       <Page size="A4" style={styles.page}>
+        {/* Article 8 - Procédure en cas de sinistre */}
+        <Text style={styles.articleTitle}>ARTICLE 8 - PROCÉDURE EN CAS DE SINISTRE</Text>
+        
+        <Text style={styles.subArticleTitle}>8.1 Obligations immédiates</Text>
+        <Text style={styles.articleText}>En cas d'accident ou de sinistre, l'Emprunteur doit impérativement :</Text>
+        <Text style={styles.numberedPoint}>1. Prévenir immédiatement le Prêteur par téléphone au {companyData?.phone || ''}</Text>
+        <Text style={styles.numberedPoint}>2. Remplir un constat amiable avec le tiers (le cas échéant)</Text>
+        <Text style={styles.numberedPoint}>3. Relever l'identité et les coordonnées des témoins éventuels</Text>
+        <Text style={styles.numberedPoint}>4. Prendre des photos des dégâts et de la scène</Text>
+        <Text style={styles.numberedPoint}>5. Déposer plainte en cas de vol, vandalisme ou délit de fuite</Text>
+        <Text style={styles.numberedPoint}>6. Transmettre tous les documents au Prêteur dans les 48 heures</Text>
+
+        <Text style={styles.subArticleTitle}>8.2 Informations à recueillir</Text>
+        <Text style={styles.articleText}>
+          En cas d'accident avec un tiers, relever : nom, adresse, téléphone, assurance, n° de police, 
+          immatriculation du véhicule adverse.
+        </Text>
+
+        <Text style={styles.subArticleTitle}>8.3 Interdictions</Text>
+        <Text style={styles.bulletPoint}>• Ne jamais reconnaître sa responsabilité sur place</Text>
+        <Text style={styles.bulletPoint}>• Ne pas faire réparer le véhicule sans accord du Prêteur</Text>
+        <Text style={styles.bulletPoint}>• Ne signer aucun document engageant la responsabilité du Prêteur</Text>
+
+        {/* Article 9 - Infractions */}
+        <Text style={styles.articleTitle}>ARTICLE 9 - INFRACTIONS AU CODE DE LA ROUTE</Text>
+        <Text style={styles.articleText}>
+          L'Emprunteur est seul responsable des infractions commises pendant la durée du prêt. 
+          Il s'engage à régler directement les amendes et contraventions.
+        </Text>
+        <Text style={styles.articleText}>
+          En cas de réception d'un avis de contravention par le Prêteur, les coordonnées de l'Emprunteur 
+          seront transmises à l'autorité compétente.
+        </Text>
+        <Text style={styles.articleText}>
+          Frais administratifs : 30 € par infraction + frais de fourrière éventuels.
+        </Text>
+
         {/* Article 10 - Restitution */}
         <Text style={styles.articleTitle}>ARTICLE 10 - RESTITUTION DU VÉHICULE</Text>
-        <Text style={styles.articleText}>
-          L'Emprunteur s'engage à restituer le véhicule dans l'état où il l'a reçu, à la date et au lieu convenus.
-        </Text>
+        
+        <Text style={styles.subArticleTitle}>10.1 État de restitution</Text>
         <Text style={styles.articleText}>Le véhicule doit être restitué :</Text>
         <Text style={styles.bulletPoint}>• Propre intérieurement et extérieurement</Text>
         <Text style={styles.bulletPoint}>• Avec le même niveau de carburant qu'au départ</Text>
-        <Text style={styles.bulletPoint}>• Avec tous les documents et accessoires fournis (clés, carte grise, carte verte, etc.)</Text>
-        <Text style={styles.articleText}>
-          Tout retard non autorisé dans la restitution entraînera une facturation de 50 € par jour de retard, 
-          sans préjudice des éventuelles poursuites pour abus de confiance.
-        </Text>
+        <Text style={styles.bulletPoint}>• Avec tous les documents et accessoires (clés, carte grise, carte verte)</Text>
+        <Text style={styles.bulletPoint}>• Sans nouveaux dommages non signalés</Text>
+
+        <Text style={styles.subArticleTitle}>10.2 Frais de remise en état</Text>
+        <View style={styles.simpleTable}>
+          <View style={styles.tableHeader}>
+            <Text style={styles.tableHeaderCell}>Prestation</Text>
+            <Text style={styles.tableHeaderCellLast}>Tarif HT</Text>
+          </View>
+          <View style={styles.tableRow}>
+            <Text style={styles.tableCell}>Nettoyage extérieur</Text>
+            <Text style={styles.tableCellLast}>30 €</Text>
+          </View>
+          <View style={styles.tableRow}>
+            <Text style={styles.tableCell}>Nettoyage intérieur</Text>
+            <Text style={styles.tableCellLast}>80 €</Text>
+          </View>
+          <View style={styles.tableRow}>
+            <Text style={styles.tableCell}>Désodorisation (tabac, animaux)</Text>
+            <Text style={styles.tableCellLast}>150 €</Text>
+          </View>
+          <View style={styles.tableRow}>
+            <Text style={styles.tableCell}>Complément carburant</Text>
+            <Text style={styles.tableCellLast}>Prix station + 20%</Text>
+          </View>
+        </View>
 
         {/* Article 11 - Tarification */}
-        <Text style={styles.articleTitle}>ARTICLE 11 - TARIFICATION ET FACTURATION</Text>
+        <Text style={styles.articleTitle}>ARTICLE 11 - TARIFICATION</Text>
         <Text style={styles.articleText}>
-          Le prêt du véhicule est consenti à titre gratuit dans le cadre de la réparation du véhicule sinistré.
+          Le prêt du véhicule est consenti dans le cadre de la prise en charge par l'assisteur.
         </Text>
-        <Text style={styles.articleText}>
-          Toutefois, les prestations suivantes pourront faire l'objet d'une facturation :
-        </Text>
-        <Text style={styles.bulletPoint}>• Nettoyage du véhicule si restitué sale : 80 € TTC</Text>
-        <Text style={styles.bulletPoint}>• Complément de carburant au tarif en vigueur + 20 € de frais de service</Text>
-        <Text style={styles.bulletPoint}>• Réparation des dommages non signalés au départ : selon devis</Text>
-        <Text style={styles.bulletPoint}>• Frais de gestion des contraventions : 30 € par infraction</Text>
-
-        {/* Article 12 - Autorisation paiement direct */}
-        <Text style={styles.articleTitle}>ARTICLE 12 - AUTORISATION DE PAIEMENT DIRECT</Text>
-        <Text style={styles.articleText}>
-          L'Emprunteur autorise expressément le Prêteur à facturer directement à la compagnie d'assurance 
-          ou à l'assisteur les frais de mise à disposition du véhicule de prêt, dans la limite des garanties 
-          prévues au contrat d'assurance.
-        </Text>
-
-        {/* Article 13 - État des lieux */}
-        <Text style={styles.articleTitle}>ARTICLE 13 - ÉTAT DES LIEUX CONTRADICTOIRE</Text>
-        <Text style={styles.articleText}>
-          L'état du véhicule est constaté contradictoirement au départ et au retour. Les dommages non mentionnés 
-          à l'état des lieux de départ seront présumés avoir été causés pendant le prêt.
-        </Text>
-        <Text style={styles.articleText}>
-          Légende : R = Rayure | C = Choc | HS = Hors Service
-        </Text>
-
-        <View style={styles.damageTable}>
+        <View style={styles.simpleTable}>
           <View style={styles.tableHeader}>
-            <Text style={styles.tableHeaderCell}>ÉLÉMENT</Text>
-            <Text style={styles.tableHeaderCell}>DÉPART</Text>
-            <Text style={styles.tableHeaderCellLast}>RETOUR</Text>
+            <Text style={styles.tableHeaderCell}>Formule</Text>
+            <Text style={styles.tableHeaderCellLast}>Tarif HT / jour</Text>
           </View>
-          {BODY_PARTS.map((part, index) => (
-            <View key={index} style={styles.tableRow}>
-              <Text style={styles.tableCell}>{part}</Text>
-              <Text style={styles.tableCell}>{getDamageStatus(part)}</Text>
-              <Text style={styles.tableCellLast}></Text>
-            </View>
-          ))}
-        </View>
-
-        <View style={{ marginTop: 10 }}>
-          <View style={styles.referenceRow}>
-            <Text style={styles.referenceLabel}>Kilométrage départ :</Text>
-            <Text style={styles.referenceValue}>{loanData?.start_mileage || ''} km</Text>
+          <View style={styles.tableRow}>
+            <Text style={styles.tableCell}>Tarif journalier standard</Text>
+            <Text style={styles.tableCellLast}>45 €</Text>
           </View>
-          <View style={styles.referenceRow}>
-            <Text style={styles.referenceLabel}>Carburant départ :</Text>
-            <Text style={styles.referenceValue}>{loanData?.fuel_level_start || ''}%</Text>
+          <View style={styles.tableRow}>
+            <Text style={styles.tableCell}>Forfait 7 jours</Text>
+            <Text style={styles.tableCellLast}>280 €</Text>
+          </View>
+          <View style={styles.tableRow}>
+            <Text style={styles.tableCell}>Forfait 14 jours</Text>
+            <Text style={styles.tableCellLast}>490 €</Text>
+          </View>
+          <View style={styles.tableRow}>
+            <Text style={styles.tableCell}>Forfait 21 jours</Text>
+            <Text style={styles.tableCellLast}>650 €</Text>
           </View>
         </View>
+        <Text style={styles.articleText}>
+          Au-delà de la durée couverte par l'assisteur, le tarif journalier sera facturé à l'Emprunteur.
+        </Text>
 
         <Text style={styles.pageNumber}>Page 3/4</Text>
       </Page>
 
-      {/* Page 4 - Articles 14-15 et Signatures */}
+      {/* Page 4 - Articles 12-15 et Signatures */}
       <Page size="A4" style={styles.page}>
+        {/* Article 12 - Délégation de paiement */}
+        <Text style={styles.articleTitle}>ARTICLE 12 - DÉLÉGATION DE PAIEMENT</Text>
+        <View style={styles.delegationBox}>
+          <Text style={styles.delegationText}>
+            Conformément aux dispositions de l'article 1336 du Code civil, l'Emprunteur, en sa qualité de délégant, 
+            délègue par les présentes au Prêteur, en sa qualité de délégataire, le paiement des frais de mise à 
+            disposition du véhicule de prêt par :
+          </Text>
+          <Text style={styles.delegationText}>
+            • L'assureur : {insurerName}
+          </Text>
+          <Text style={styles.delegationText}>
+            • Et/ou l'assisteur : {assisteurName}
+          </Text>
+          <Text style={styles.delegationText}>
+            Cette délégation est consentie dans la limite du montant des garanties prévues au contrat d'assurance 
+            et/ou d'assistance de l'Emprunteur.
+          </Text>
+          <Text style={styles.delegationBold}>
+            L'Emprunteur, {clientName}, AUTORISE EXPRESSÉMENT ET IRRÉVOCABLEMENT le carrossier {companyName} 
+            à percevoir directement les indemnités dues au titre du véhicule de remplacement.
+          </Text>
+          <Text style={styles.delegationText}>
+            En cas de refus de prise en charge ou de prise en charge partielle par l'assureur ou l'assisteur, 
+            l'Emprunteur s'engage à régler personnellement le solde restant dû.
+          </Text>
+        </View>
+
+        {/* Article 13 - État des lieux */}
+        <Text style={styles.articleTitle}>ARTICLE 13 - ÉTAT DES LIEUX</Text>
+        <View style={styles.etatLieuxTable}>
+          <View style={{...styles.etatLieuxRow, backgroundColor: '#e0e0e0'}}>
+            <Text style={{...styles.etatLieuxLabel, fontWeight: 'bold'}}>Élément</Text>
+            <Text style={{...styles.etatLieuxCell, fontWeight: 'bold'}}>RAS</Text>
+            <Text style={{...styles.etatLieuxCellLast, fontWeight: 'bold'}}>Dégâts</Text>
+          </View>
+          {BODY_PARTS_SIMPLIFIED.map((part, index) => (
+            <View key={index} style={styles.etatLieuxRow}>
+              <Text style={styles.etatLieuxLabel}>{part}</Text>
+              <Text style={styles.etatLieuxCell}>☐</Text>
+              <Text style={styles.etatLieuxCellLast}>☐</Text>
+            </View>
+          ))}
+        </View>
+        <View style={styles.infoTable}>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Kilométrage départ :</Text>
+            <Text style={styles.infoValue}>{loanData?.start_mileage || '________'} km</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Carburant départ :</Text>
+            <Text style={styles.infoValue}>{loanData?.fuel_level_start || '____'}%</Text>
+          </View>
+        </View>
+
         {/* Article 14 - Fondements juridiques */}
         <Text style={styles.articleTitle}>ARTICLE 14 - FONDEMENTS JURIDIQUES</Text>
-        <Text style={styles.articleText}>
-          Le présent contrat est régi par les dispositions du Code civil français, notamment :
-        </Text>
-        <Text style={styles.bulletPoint}>• Articles 1875 à 1891 relatifs au prêt à usage (commodat)</Text>
-        <Text style={styles.bulletPoint}>• Articles 1101 et suivants relatifs aux contrats</Text>
-        <Text style={styles.bulletPoint}>• Articles 1240 et suivants relatifs à la responsabilité civile</Text>
-        <Text style={styles.articleText}>
-          Tout litige relatif à l'exécution du présent contrat sera soumis à la juridiction compétente du lieu 
-          du siège social du Prêteur.
-        </Text>
+        <View style={styles.legalReferences}>
+          <Text style={styles.legalRef}>• Art. 1875-1891 Code civil : prêt à usage (commodat)</Text>
+          <Text style={styles.legalRef}>• Art. 1336-1340 Code civil : délégation de paiement</Text>
+          <Text style={styles.legalRef}>• Art. 1231-1 Code civil : responsabilité contractuelle</Text>
+          <Text style={styles.legalRef}>• Art. L.211-1 et suivants Code des assurances : assurance automobile</Text>
+          <Text style={styles.legalRef}>• Art. L.211-10 Code des assurances : garantie assistance</Text>
+          <Text style={styles.legalRef}>• Art. L.211-5-1 Code des assurances : libre choix du réparateur</Text>
+        </View>
 
-        {/* Article 15 - Acceptation et signatures */}
+        {/* Article 15 - Signatures */}
         <Text style={styles.articleTitle}>ARTICLE 15 - ACCEPTATION ET SIGNATURES</Text>
         <Text style={styles.articleText}>
-          L'Emprunteur déclare avoir pris connaissance de l'ensemble des conditions du présent contrat et les 
-          accepter sans réserve. Il reconnaît avoir reçu un exemplaire du présent contrat.
-        </Text>
-        <Text style={styles.articleText}>
-          L'Emprunteur atteste sur l'honneur être titulaire d'un permis de conduire en cours de validité 
-          l'autorisant à conduire le véhicule mis à disposition.
+          L'Emprunteur déclare avoir pris connaissance de l'ensemble des conditions du présent contrat et les accepter sans réserve.
         </Text>
 
-        <View style={{ marginTop: 15 }}>
-          <Text style={{ fontSize: 9, fontWeight: 'bold' }}>
-            Fait à {companyData?.city || '________________'}, le {contractDate}
-          </Text>
-          <Text style={{ fontSize: 8, marginTop: 4, fontStyle: 'italic' }}>
-            En deux exemplaires originaux
+        <View style={{ marginTop: 8 }}>
+          <Text style={{ fontSize: 8 }}>
+            Fait à {companyData?.city || '________________'}, le {contractDate}, en deux exemplaires.
           </Text>
         </View>
 
@@ -594,30 +771,25 @@ const LoanContractPDF = ({ loanData, companyData, userPosition }: LoanContractPD
           <View style={styles.signatureGrid}>
             <View style={styles.signatureColumn}>
               <Text style={styles.signatureTitle}>LE PRÊTEUR</Text>
-              <Text style={{ fontSize: 8, textAlign: 'center' }}>{companyData?.name || ''}</Text>
-              <Text style={{ fontSize: 7, textAlign: 'center', marginTop: 4 }}>Cachet et signature</Text>
+              <Text style={{ fontSize: 7, textAlign: 'center' }}>{companyData?.name || ''}</Text>
+              <Text style={{ fontSize: 6, textAlign: 'center', marginTop: 2 }}>Cachet et signature</Text>
             </View>
             <View style={styles.signatureColumn}>
               <Text style={styles.signatureTitle}>L'EMPRUNTEUR</Text>
-              <Text style={{ fontSize: 8, textAlign: 'center' }}>
-                {loanData?.clients?.first_name || ''} {loanData?.clients?.last_name || ''}
-              </Text>
+              <Text style={{ fontSize: 7, textAlign: 'center' }}>{clientName}</Text>
               {loanData?.client_signature && (
                 <Image src={loanData.client_signature} style={styles.signatureImage} />
               )}
-              <Text style={{ fontSize: 7, textAlign: 'center', marginTop: 4 }}>
-                Lu et approuvé, signature précédée de la mention "Bon pour accord"
+              <Text style={styles.signatureMention}>
+                "Lu et approuvé, bon pour prêt et autorisation de paiement direct"
               </Text>
             </View>
           </View>
         </View>
 
-        <View style={{ marginTop: 20, padding: 10, backgroundColor: '#f5f5f5' }}>
-          <Text style={{ fontSize: 7, textAlign: 'center', fontStyle: 'italic' }}>
-            Document généré électroniquement le {contractDate} - Position GPS : {userPosition}
-          </Text>
-          <Text style={{ fontSize: 7, textAlign: 'center', marginTop: 2 }}>
-            Ce document a valeur de contrat entre les parties et engage leur responsabilité respective.
+        <View style={styles.footer}>
+          <Text>
+            Contrat généré le {contractDate} - Document ayant valeur contractuelle entre les parties
           </Text>
         </View>
 
