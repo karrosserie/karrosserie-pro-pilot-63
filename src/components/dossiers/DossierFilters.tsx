@@ -1,9 +1,9 @@
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Search, X, Filter, CalendarIcon } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Filter, CalendarIcon, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DossierOverallStatus, DOSSIER_STATUS_CONFIG } from '@/types/dossier';
 import { useState } from 'react';
@@ -42,7 +42,6 @@ export const DossierFilters = ({
   dateRange,
   onDateRangeChange,
 }: DossierFiltersProps) => {
-  const [showStatusFilters, setShowStatusFilters] = useState(false);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
 
   const tabs = [
@@ -51,60 +50,49 @@ export const DossierFilters = ({
     { id: 'archives' as const, label: 'Archives', count: archivesCount },
   ];
 
-  const toggleStatus = (status: DossierOverallStatus) => {
+  const handleStatusChange = (value: string) => {
     if (!onStatusFilterChange) return;
-    if (selectedStatuses.includes(status)) {
-      onStatusFilterChange(selectedStatuses.filter(s => s !== status));
+    if (value === 'all') {
+      onStatusFilterChange([]);
     } else {
-      onStatusFilterChange([...selectedStatuses, status]);
+      onStatusFilterChange([value as DossierOverallStatus]);
     }
   };
 
   const hasDateRange = dateRange?.from || dateRange?.to;
+  const currentStatusValue = selectedStatuses.length === 1 ? selectedStatuses[0] : 'all';
 
   return (
     <div className="space-y-4">
-      {/* Main filters row */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        {/* Tab switcher */}
-        <div className="inline-flex bg-muted p-1 rounded-lg">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => onTabChange(tab.id)}
-              className={cn(
-                "px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-2",
-                activeTab === tab.id
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {tab.label}
-              <Badge 
-                variant="secondary" 
-                className={cn(
-                  "h-5 min-w-[20px] px-1.5 text-xs font-medium",
-                  activeTab === tab.id 
-                    ? "bg-[hsl(var(--karrosserie-orange))]/10 text-[hsl(var(--karrosserie-orange))]" 
-                    : "bg-muted-foreground/10 text-muted-foreground"
-                )}
-              >
-                {tab.count}
-              </Badge>
-            </button>
-          ))}
-        </div>
+      {/* Tabs - standalone, matching design */}
+      <div className="inline-flex bg-muted rounded-lg p-1">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => onTabChange(tab.id)}
+            className={cn(
+              "px-5 py-2 rounded-md text-sm font-medium transition-all duration-200",
+              activeTab === tab.id
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
-        {/* Search, date range, and filter toggle */}
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* Search input */}
-          <div className="relative flex-1 sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      {/* Filters card - matching design */}
+      <div className="bg-card border border-border/60 rounded-xl p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+          {/* Search input with filter icon */}
+          <div className="relative flex-1">
+            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Rechercher client, immat., sinistre..."
+              placeholder="Rechercher un dossier..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-10 pr-10 h-10 bg-background"
+              className="pl-10 h-10 bg-background border-border/60"
             />
             {searchQuery && (
               <button
@@ -116,29 +104,45 @@ export const DossierFilters = ({
             )}
           </div>
 
-          {/* Date range picker - per Figma spec */}
+          {/* Status dropdown */}
+          {onStatusFilterChange && (
+            <Select value={currentStatusValue} onValueChange={handleStatusChange}>
+              <SelectTrigger className="w-full sm:w-[180px] h-10 bg-background border-border/60">
+                <SelectValue placeholder="Tous les statuts" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous les statuts</SelectItem>
+                {STATUS_FILTER_OPTIONS.map((status) => (
+                  <SelectItem key={status} value={status}>
+                    {DOSSIER_STATUS_CONFIG[status].label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
+          {/* Date picker */}
           {onDateRangeChange && (
             <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
               <PopoverTrigger asChild>
                 <Button
-                  variant={hasDateRange ? "default" : "outline"}
-                  size="sm"
+                  variant="outline"
                   className={cn(
-                    "h-10 gap-2 min-w-[180px] justify-start font-normal",
-                    hasDateRange && "bg-[hsl(var(--karrosserie-orange))] hover:bg-[hsl(var(--karrosserie-orange))]/90"
+                    "w-full sm:w-[160px] h-10 justify-start font-normal bg-background border-border/60",
+                    hasDateRange && "text-foreground"
                   )}
                 >
-                  <CalendarIcon className="h-4 w-4" />
+                  <CalendarIcon className="h-4 w-4 mr-2 text-muted-foreground" />
                   {dateRange?.from ? (
                     dateRange.to ? (
                       <span className="truncate">
                         {format(dateRange.from, 'dd/MM/yy', { locale: fr })} - {format(dateRange.to, 'dd/MM/yy', { locale: fr })}
                       </span>
                     ) : (
-                      format(dateRange.from, 'dd MMM yyyy', { locale: fr })
+                      format(dateRange.from, 'dd/MM/yyyy', { locale: fr })
                     )
                   ) : (
-                    <span className="text-muted-foreground">Période</span>
+                    <span className="text-muted-foreground">mm/dd/yyyy</span>
                   )}
                 </Button>
               </PopoverTrigger>
@@ -175,61 +179,8 @@ export const DossierFilters = ({
               </PopoverContent>
             </Popover>
           )}
-
-          {/* Filter toggle button */}
-          {onStatusFilterChange && (
-            <Button
-              variant={showStatusFilters || selectedStatuses.length > 0 ? "default" : "outline"}
-              size="icon"
-              className={cn(
-                "h-10 w-10 shrink-0 relative",
-                (showStatusFilters || selectedStatuses.length > 0) && "bg-[hsl(var(--karrosserie-orange))] hover:bg-[hsl(var(--karrosserie-orange))]/90"
-              )}
-              onClick={() => setShowStatusFilters(!showStatusFilters)}
-            >
-              <Filter className="h-4 w-4" />
-              {selectedStatuses.length > 0 && (
-                <span className="absolute -top-1 -right-1 h-4 w-4 bg-destructive text-destructive-foreground text-[10px] rounded-full flex items-center justify-center">
-                  {selectedStatuses.length}
-                </span>
-              )}
-            </Button>
-          )}
         </div>
       </div>
-
-      {/* Status filter toggles - per Figma spec */}
-      {showStatusFilters && onStatusFilterChange && (
-        <div className="flex flex-wrap gap-2 p-3 bg-muted/50 rounded-lg border">
-          <span className="text-xs font-medium text-muted-foreground mr-2 self-center">Filtrer par statut:</span>
-          {STATUS_FILTER_OPTIONS.map((status) => {
-            const config = DOSSIER_STATUS_CONFIG[status];
-            const isSelected = selectedStatuses.includes(status);
-            return (
-              <button
-                key={status}
-                onClick={() => toggleStatus(status)}
-                className={cn(
-                  "px-3 py-1.5 rounded-full text-xs font-medium transition-all",
-                  isSelected
-                    ? "bg-[hsl(var(--karrosserie-orange))] text-white"
-                    : cn(config.bgColor, config.color, "hover:opacity-80")
-                )}
-              >
-                {config.label}
-              </button>
-            );
-          })}
-          {selectedStatuses.length > 0 && (
-            <button
-              onClick={() => onStatusFilterChange([])}
-              className="px-3 py-1.5 rounded-full text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Effacer
-            </button>
-          )}
-        </div>
-      )}
     </div>
   );
 };

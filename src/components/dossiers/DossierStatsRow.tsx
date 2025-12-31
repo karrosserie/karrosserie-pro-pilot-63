@@ -1,12 +1,5 @@
 import { Card } from '@/components/ui/card';
-import { 
-  FolderOpen, 
-  Clock, 
-  ClipboardCheck, 
-  FileText, 
-  Wrench, 
-  Receipt 
-} from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { DOSSIER_STATUS_CONFIG, DossierOverallStatus } from '@/types/dossier';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -19,14 +12,13 @@ interface DossierStatsRowProps {
 
 const STATS_CONFIG: Array<{
   status: DossierOverallStatus;
-  icon: React.ElementType;
 }> = [
-  { status: 'ouvert', icon: FolderOpen },
-  { status: 'en_cours', icon: Clock },
-  { status: 'expertise', icon: ClipboardCheck },
-  { status: 'devis', icon: FileText },
-  { status: 'reparation', icon: Wrench },
-  { status: 'facturation', icon: Receipt },
+  { status: 'ouvert' },
+  { status: 'en_cours' },
+  { status: 'expertise' },
+  { status: 'devis' },
+  { status: 'reparation' },
+  { status: 'facturation' },
 ];
 
 export const DossierStatsRow = ({ counts, isLoading, onStatusClick }: DossierStatsRowProps) => {
@@ -34,9 +26,9 @@ export const DossierStatsRow = ({ counts, isLoading, onStatusClick }: DossierSta
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {[...Array(6)].map((_, i) => (
-          <Card key={i} className="p-4">
-            <Skeleton className="h-4 w-16 mb-2" />
-            <Skeleton className="h-8 w-12" />
+          <Card key={i} className="p-4 border-border/60">
+            <Skeleton className="h-4 w-16 mb-3" />
+            <Skeleton className="h-8 w-8" />
           </Card>
         ))}
       </div>
@@ -45,7 +37,7 @@ export const DossierStatsRow = ({ counts, isLoading, onStatusClick }: DossierSta
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-      {STATS_CONFIG.map(({ status, icon: Icon }) => {
+      {STATS_CONFIG.map(({ status }) => {
         const config = DOSSIER_STATUS_CONFIG[status];
         const count = counts[status] || 0;
         
@@ -55,26 +47,21 @@ export const DossierStatsRow = ({ counts, isLoading, onStatusClick }: DossierSta
             onClick={() => onStatusClick?.(status)}
             className={cn(
               "p-4 flex items-center justify-between transition-all duration-200",
-              "border hover:border-[hsl(var(--karrosserie-orange))/40]",
-              "shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)]",
+              "border-border/60 bg-card",
+              "hover:border-[hsl(var(--karrosserie-orange))]/40 hover:shadow-md",
               onStatusClick && "cursor-pointer active:scale-[0.98]"
             )}
           >
-            <div className="space-y-0.5">
-              <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground font-medium">
                 {config.label}
               </p>
-              {/* 32px numeric display per spec */}
-              <p className="text-[32px] leading-tight font-bold text-foreground tabular-nums">
+              <p className="text-3xl font-bold text-foreground tabular-nums">
                 {count}
               </p>
             </div>
-            <div className={cn(
-              "p-2.5 rounded-xl transition-transform",
-              config.bgColor,
-              onStatusClick && "group-hover:scale-110"
-            )}>
-              <Icon className={cn("h-6 w-6", config.color)} />
+            <div className="text-muted-foreground/40">
+              <FileText className="h-8 w-8" />
             </div>
           </Card>
         );

@@ -2,16 +2,11 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { 
   FolderOpen, 
-  User, 
-  Car, 
-  Building2, 
-  Hash, 
   ChevronLeft, 
   ChevronRight,
   ArrowUpDown,
   ArrowUp,
-  ArrowDown,
-  Calendar
+  ArrowDown
 } from 'lucide-react';
 import { Dossier } from '@/types/dossier';
 import { DossierCard } from './DossierCard';
@@ -26,7 +21,7 @@ interface DossierListProps {
   onCreateNew?: () => void;
 }
 
-type SortField = 'reference' | 'client' | 'vehicle' | 'insurance' | 'created_at' | null;
+type SortField = 'reference' | 'client' | 'vehicle' | 'status' | 'insurance' | 'created_at' | null;
 type SortDirection = 'asc' | 'desc';
 
 const ITEMS_PER_PAGE = 10;
@@ -58,6 +53,10 @@ export const DossierList = ({ dossiers, isLoading, onView, onArchive, onCreateNe
         case 'vehicle':
           aValue = a.vehicles?.license_plate || '';
           bValue = b.vehicles?.license_plate || '';
+          break;
+        case 'status':
+          aValue = a.overall_status || '';
+          bValue = b.overall_status || '';
           break;
         case 'insurance':
           aValue = a.insurance_companies?.name || '';
@@ -101,24 +100,22 @@ export const DossierList = ({ dossiers, isLoading, onView, onArchive, onCreateNe
 
   if (isLoading) {
     return (
-      <div className="bg-card rounded-xl border overflow-hidden">
+      <div className="bg-card rounded-xl border border-border/60 overflow-hidden">
         {/* Header skeleton */}
-        <div className="hidden md:grid md:grid-cols-[180px_1.2fr_1fr_1fr_100px_48px] md:items-center md:gap-4 md:px-5 md:py-3 bg-[#F1F5F9] dark:bg-muted/50">
-          <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-4 w-16" />
-          <Skeleton className="h-4 w-16" />
-          <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-4 w-14" />
-          <div />
+        <div className="hidden md:grid md:grid-cols-[140px_1fr_1fr_120px_1fr_120px_48px] md:items-center md:gap-4 md:px-5 md:py-3 border-b border-border/60">
+          {['Référence', 'Client', 'Véhicule', 'Statut', 'Assurance', 'Date sinistre', ''].map((_, i) => (
+            <Skeleton key={i} className="h-4 w-16" />
+          ))}
         </div>
-        <div className="divide-y divide-border">
+        <div className="divide-y divide-border/60">
           {[...Array(5)].map((_, i) => (
             <div key={i} className="p-4">
               <div className="flex items-center gap-4">
-                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-28" />
                 <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-6 w-20 rounded-full" />
                 <Skeleton className="h-4 w-20" />
-                <Skeleton className="h-5 w-16 rounded-full" />
               </div>
             </div>
           ))}
@@ -148,49 +145,58 @@ export const DossierList = ({ dossiers, isLoading, onView, onArchive, onCreateNe
   }
 
   return (
-    <div className="bg-card rounded-xl border overflow-hidden shadow-[var(--shadow-card)]">
-      {/* Desktop Table Header - Sortable columns per Figma spec */}
-      <div className="hidden md:grid md:grid-cols-[180px_1.2fr_1fr_1fr_100px_48px] md:items-center md:gap-4 md:px-5 md:py-3 bg-[#F1F5F9] dark:bg-muted/50 border-b">
+    <div className="bg-card rounded-xl border border-border/60 overflow-hidden">
+      {/* Desktop Table Header - Matching design columns */}
+      <div className="hidden md:grid md:grid-cols-[140px_1fr_1fr_120px_1fr_120px_48px] md:items-center md:gap-4 md:px-5 md:py-3 border-b border-border/60">
         <button 
           onClick={() => handleSort('reference')}
-          className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors group"
+          className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
-          <Hash className="h-3.5 w-3.5" />
           Référence
           <SortIcon field="reference" />
         </button>
         <button 
           onClick={() => handleSort('client')}
-          className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors group"
+          className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
-          <User className="h-3.5 w-3.5" />
           Client
           <SortIcon field="client" />
         </button>
         <button 
           onClick={() => handleSort('vehicle')}
-          className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors group"
+          className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
-          <Car className="h-3.5 w-3.5" />
           Véhicule
           <SortIcon field="vehicle" />
         </button>
         <button 
-          onClick={() => handleSort('insurance')}
-          className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors group"
+          onClick={() => handleSort('status')}
+          className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
-          <Building2 className="h-3.5 w-3.5" />
+          Statut
+          <SortIcon field="status" />
+        </button>
+        <button 
+          onClick={() => handleSort('insurance')}
+          className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
           Assurance
           <SortIcon field="insurance" />
         </button>
-        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-          Statut
+        <button 
+          onClick={() => handleSort('created_at')}
+          className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Date sinistre
+          <SortIcon field="created_at" />
+        </button>
+        <div className="text-xs font-medium text-muted-foreground text-right">
+          Actions
         </div>
-        <div />
       </div>
 
       {/* Dossier Rows */}
-      <div className="divide-y divide-border">
+      <div className="divide-y divide-border/60">
         {paginatedDossiers.map((dossier) => (
           <DossierCard
             key={dossier.id}
@@ -203,7 +209,7 @@ export const DossierList = ({ dossiers, isLoading, onView, onArchive, onCreateNe
 
       {/* Pagination Footer */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-5 py-3 border-t bg-[#F8FAFC] dark:bg-muted/30">
+        <div className="flex items-center justify-between px-5 py-3 border-t border-border/60 bg-muted/30">
           <p className="text-sm text-muted-foreground">
             Affichage {startIndex + 1}-{Math.min(startIndex + ITEMS_PER_PAGE, sortedDossiers.length)} sur {sortedDossiers.length}
           </p>
@@ -218,7 +224,6 @@ export const DossierList = ({ dossiers, isLoading, onView, onArchive, onCreateNe
               <ChevronLeft className="h-4 w-4" />
             </Button>
             {[...Array(Math.min(totalPages, 5))].map((_, i) => {
-              // Show limited page numbers with ellipsis for large page counts
               let pageNum = i + 1;
               if (totalPages > 5) {
                 if (currentPage <= 3) {
