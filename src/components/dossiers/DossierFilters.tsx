@@ -1,10 +1,15 @@
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Search, X, Filter } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Search, X, Filter, CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DossierOverallStatus, DOSSIER_STATUS_CONFIG } from '@/types/dossier';
 import { useState } from 'react';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { DateRange } from 'react-day-picker';
 
 interface DossierFiltersProps {
   activeTab: 'tous' | 'actifs' | 'archives';
@@ -16,6 +21,8 @@ interface DossierFiltersProps {
   archivesCount: number;
   selectedStatuses?: DossierOverallStatus[];
   onStatusFilterChange?: (statuses: DossierOverallStatus[]) => void;
+  dateRange?: DateRange;
+  onDateRangeChange?: (range: DateRange | undefined) => void;
 }
 
 const STATUS_FILTER_OPTIONS: DossierOverallStatus[] = [
@@ -32,8 +39,11 @@ export const DossierFilters = ({
   archivesCount,
   selectedStatuses = [],
   onStatusFilterChange,
+  dateRange,
+  onDateRangeChange,
 }: DossierFiltersProps) => {
   const [showStatusFilters, setShowStatusFilters] = useState(false);
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
 
   const tabs = [
     { id: 'tous' as const, label: 'Tous', count: tousCount },
@@ -49,6 +59,8 @@ export const DossierFilters = ({
       onStatusFilterChange([...selectedStatuses, status]);
     }
   };
+
+  const hasDateRange = dateRange?.from || dateRange?.to;
 
   return (
     <div className="space-y-4">
@@ -83,9 +95,10 @@ export const DossierFilters = ({
           ))}
         </div>
 
-        {/* Search and filter toggle */}
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1 sm:w-72">
+        {/* Search, date range, and filter toggle */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Search input */}
+          <div className="relative flex-1 sm:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Rechercher client, immat., sinistre..."
@@ -102,12 +115,74 @@ export const DossierFilters = ({
               </button>
             )}
           </div>
+
+          {/* Date range picker - per Figma spec */}
+          {onDateRangeChange && (
+            <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={hasDateRange ? "default" : "outline"}
+                  size="sm"
+                  className={cn(
+                    "h-10 gap-2 min-w-[180px] justify-start font-normal",
+                    hasDateRange && "bg-[hsl(var(--karrosserie-orange))] hover:bg-[hsl(var(--karrosserie-orange))]/90"
+                  )}
+                >
+                  <CalendarIcon className="h-4 w-4" />
+                  {dateRange?.from ? (
+                    dateRange.to ? (
+                      <span className="truncate">
+                        {format(dateRange.from, 'dd/MM/yy', { locale: fr })} - {format(dateRange.to, 'dd/MM/yy', { locale: fr })}
+                      </span>
+                    ) : (
+                      format(dateRange.from, 'dd MMM yyyy', { locale: fr })
+                    )
+                  ) : (
+                    <span className="text-muted-foreground">Période</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Calendar
+                  mode="range"
+                  selected={dateRange}
+                  onSelect={(range) => {
+                    onDateRangeChange(range);
+                    if (range?.from && range?.to) {
+                      setDatePickerOpen(false);
+                    }
+                  }}
+                  numberOfMonths={2}
+                  locale={fr}
+                  className="pointer-events-auto"
+                />
+                {hasDateRange && (
+                  <div className="p-3 border-t">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => {
+                        onDateRangeChange(undefined);
+                        setDatePickerOpen(false);
+                      }}
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      Effacer les dates
+                    </Button>
+                  </div>
+                )}
+              </PopoverContent>
+            </Popover>
+          )}
+
+          {/* Filter toggle button */}
           {onStatusFilterChange && (
             <Button
               variant={showStatusFilters || selectedStatuses.length > 0 ? "default" : "outline"}
               size="icon"
               className={cn(
-                "h-10 w-10 shrink-0",
+                "h-10 w-10 shrink-0 relative",
                 (showStatusFilters || selectedStatuses.length > 0) && "bg-[hsl(var(--karrosserie-orange))] hover:bg-[hsl(var(--karrosserie-orange))]/90"
               )}
               onClick={() => setShowStatusFilters(!showStatusFilters)}
