@@ -109,7 +109,7 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
 
           <div className="space-y-2">
             <Label htmlFor="insuranceEmail" className="text-sm">
-              Adresse e-mail <span className="text-destructive">*</span>
+              Adresse e-mail {!formData.hasAssistance && <span className="text-destructive">*</span>}
             </Label>
             <Input
               id="insuranceEmail"
