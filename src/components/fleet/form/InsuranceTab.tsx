@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { SearchableSelect } from '@/components/ui/searchable-select';
 import { useInsuranceCompanies } from '@/hooks/use-insurance-companies';
 import { LoanFormData } from '../FleetLoanForm';
+import { AlertCircle } from 'lucide-react';
 
 interface InsuranceTabProps {
   formData: LoanFormData;
@@ -37,6 +38,10 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
     value: company.id,
     label: company.name
   }));
+
+  // Check if selected company has linked assistance
+  const selectedCompany = insuranceCompanies.find(c => c.id === formData.insuranceCompanyId);
+  const hasLinkedAssistance = selectedCompany?.assistance != null;
 
   // Auto-fill assistance name when insurance company is selected and assistance is enabled
   useEffect(() => {
@@ -198,6 +203,15 @@ const InsuranceTab: React.FC<InsuranceTabProps> = ({
             Dossier d'assistance
           </Label>
         </div>
+
+        {formData.hasAssistance && formData.insuranceCompanyId && !hasLinkedAssistance && (
+          <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800">
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            <span className="text-sm">
+              Cette compagnie d'assurance n'a pas d'assistance prédéfinie. Veuillez saisir les informations manuellement.
+            </span>
+          </div>
+        )}
 
         {formData.hasAssistance && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
