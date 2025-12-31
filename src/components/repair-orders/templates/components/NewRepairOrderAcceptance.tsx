@@ -37,10 +37,6 @@ const formatDate = (dateString: string | null | undefined) => {
   }
 };
 
-const formatAmount = (amount: number | null | undefined) => {
-  if (amount == null) return '0,00 €';
-  return `${amount.toFixed(2).replace('.', ',')} €`;
-};
 
 const NewRepairOrderAcceptance: React.FC<NewRepairOrderAcceptanceProps> = ({
   orderData,
@@ -54,7 +50,6 @@ const NewRepairOrderAcceptance: React.FC<NewRepairOrderAcceptanceProps> = ({
     "Je reconnais avoir reçu un exemplaire des conditions générales et en accepte les termes.",
     "Je reconnais avoir été informé de mon droit de rétractation conformément au Code de la consommation.",
     "J'accepte les travaux décrits dans le rapport d'expertise référencé ci-dessus.",
-    "J'accepte le montant total TTC mentionné et les modalités de paiement.",
     "J'accepte les délais prévisionnels de réparation indiqués.",
     "Je confirme avoir retiré tous mes effets personnels du véhicule ou les avoir déclarés au prestataire.",
   ];
@@ -101,9 +96,6 @@ const NewRepairOrderAcceptance: React.FC<NewRepairOrderAcceptanceProps> = ({
             </div>
           )}
 
-          <div className="bg-blue-600 text-white p-3 mt-4 rounded text-center">
-            <span className="text-lg font-bold">MONTANT TOTAL TTC : {formatAmount(orderData.amount)}</span>
-          </div>
         </div>
       </div>
 
