@@ -22,8 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import DefaultRepairOrderPreview from './templates/DefaultRepairOrderPreview';
-import AlternativeRepairOrderPreview from './templates/AlternativeRepairOrderPreview';
+import NewRepairOrderPreview from './templates/NewRepairOrderPreview';
 import RepairOrderDialog from './RepairOrderDialog';
 import RepairOrderEmailDialog from './RepairOrderEmailDialog';
 import RepairOrderSignatureDialog from './RepairOrderSignatureDialog';
@@ -401,30 +400,39 @@ const RepairOrderViewerModal = ({ repairOrder, open, onOpenChange }: RepairOrder
     setSignatureDialogOpen(true);
   };
 
-  // Preview content
+  // Preview content - Nouveau format unique pour tous les ordres de réparation
+  const expertiseDataForTemplate = {
+    reportNumber: orderData.reportNumber,
+    expertName: orderData.expertName,
+    reportDate: orderData.reportDate,
+  };
+
+  const incidentDataForTemplate = {
+    policyNumber: orderData.policyNumber,
+    claimNumber: orderData.claimNumber,
+    incidentDate: orderData.incidentDate,
+  };
+
   const previewContent = (
     <div className="w-full h-full">
-      {template === 'default' ? (
-        <DefaultRepairOrderPreview 
-          companyData={companyData}
-          orderData={orderData}
-          clientData={clientDataForTemplate}
-          vehicleData={vehicleDataForTemplate}
-          items={items}
-          totals={totalsData}
-          signatureData={signatureData}
-        />
-      ) : (
-        <AlternativeRepairOrderPreview 
-          companyData={companyData}
-          orderData={orderData}
-          clientData={clientDataForTemplate}
-          vehicleData={vehicleDataForTemplate}
-          items={items}
-          totals={totalsData}
-          signatureData={signatureData}
-        />
-      )}
+      <NewRepairOrderPreview 
+        companyData={companyData}
+        orderData={{
+          ...orderData,
+          amount: totalAmount,
+          reference: orderData.number,
+          date: orderData.orderDate,
+        }}
+        clientData={clientDataForTemplate}
+        vehicleData={{
+          ...vehicleDataForTemplate,
+          brand: vehicleData?.car_brands?.name,
+          model: vehicleData?.car_models?.name,
+        }}
+        expertiseData={expertiseDataForTemplate}
+        incidentData={incidentDataForTemplate}
+        signatureData={signatureData}
+      />
     </div>
   );
 
