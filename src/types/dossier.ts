@@ -16,7 +16,7 @@ export type DossierOverallStatus =
   | 'cloture' 
   | 'archive';
 
-// Status configuration for UI display
+// Status configuration for UI display using CSS variables
 export const DOSSIER_STATUS_CONFIG: Record<DossierOverallStatus, {
   label: string;
   color: string;
@@ -24,43 +24,43 @@ export const DOSSIER_STATUS_CONFIG: Record<DossierOverallStatus, {
 }> = {
   ouvert: { 
     label: 'Ouvert', 
-    color: 'text-blue-700 dark:text-blue-300',
-    bgColor: 'bg-blue-100 dark:bg-blue-900/50'
+    color: 'text-[hsl(var(--status-ouvert-text))]',
+    bgColor: 'bg-[hsl(var(--status-ouvert-bg))]'
   },
   en_cours: { 
     label: 'En cours', 
-    color: 'text-amber-700 dark:text-amber-300',
-    bgColor: 'bg-amber-100 dark:bg-amber-900/50'
+    color: 'text-[hsl(var(--status-en-cours-text))]',
+    bgColor: 'bg-[hsl(var(--status-en-cours-bg))]'
   },
   expertise: { 
     label: 'Expertise', 
-    color: 'text-purple-700 dark:text-purple-300',
-    bgColor: 'bg-purple-100 dark:bg-purple-900/50'
+    color: 'text-[hsl(var(--status-expertise-text))]',
+    bgColor: 'bg-[hsl(var(--status-expertise-bg))]'
   },
   devis: { 
     label: 'Devis', 
-    color: 'text-indigo-700 dark:text-indigo-300',
-    bgColor: 'bg-indigo-100 dark:bg-indigo-900/50'
+    color: 'text-[hsl(var(--status-devis-text))]',
+    bgColor: 'bg-[hsl(var(--status-devis-bg))]'
   },
   reparation: { 
     label: 'Réparation', 
-    color: 'text-green-700 dark:text-green-300',
-    bgColor: 'bg-green-100 dark:bg-green-900/50'
+    color: 'text-[hsl(var(--status-reparation-text))]',
+    bgColor: 'bg-[hsl(var(--status-reparation-bg))]'
   },
   facturation: { 
     label: 'Facturation', 
-    color: 'text-cyan-700 dark:text-cyan-300',
-    bgColor: 'bg-cyan-100 dark:bg-cyan-900/50'
+    color: 'text-[hsl(var(--status-facturation-text))]',
+    bgColor: 'bg-[hsl(var(--status-facturation-bg))]'
   },
   cloture: { 
     label: 'Clôturé', 
-    color: 'text-gray-600 dark:text-gray-400',
-    bgColor: 'bg-gray-200 dark:bg-gray-800'
+    color: 'text-[hsl(var(--status-cloture-text))]',
+    bgColor: 'bg-[hsl(var(--status-cloture-bg))]'
   },
   archive: { 
     label: 'Archivé', 
-    color: 'text-gray-500 dark:text-gray-500',
-    bgColor: 'bg-gray-100 dark:bg-gray-900'
+    color: 'text-[hsl(var(--status-archive-text))]',
+    bgColor: 'bg-[hsl(var(--status-archive-bg))]'
   },
 };
 

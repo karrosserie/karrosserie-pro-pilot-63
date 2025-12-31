@@ -35,6 +35,28 @@
     --karrosserie-gray: 0 0% 33.3%;
     --karrosserie-gray-light: 220 4% 58%;
     --karrosserie-gray-lighter: 0 0% 94.5%;
+    
+    /* Dossier Status Colors */
+    --status-ouvert-bg: 214 93% 93%;
+    --status-ouvert-text: 226 71% 40%;
+    --status-en-cours-bg: 48 96% 89%;
+    --status-en-cours-text: 26 90% 37%;
+    --status-expertise-bg: 270 100% 97%;
+    --status-expertise-text: 274 72% 47%;
+    --status-devis-bg: 226 100% 94%;
+    --status-devis-text: 243 75% 41%;
+    --status-reparation-bg: 142 76% 93%;
+    --status-reparation-text: 142 72% 29%;
+    --status-facturation-bg: 188 96% 91%;
+    --status-facturation-text: 189 94% 31%;
+    --status-cloture-bg: 220 13% 91%;
+    --status-cloture-text: 217 19% 35%;
+    --status-archive-bg: 220 14% 96%;
+    --status-archive-text: 220 9% 46%;
+    
+    /* Card shadows */
+    --shadow-card: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-card-hover: 0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
   }
 
   .dark {
@@ -66,6 +88,28 @@
     --karrosserie-gray: 0 0% 33.3%;
     --karrosserie-gray-light: 220 4% 58%;
     --karrosserie-gray-lighter: 0 0% 94.5%;
+    
+    /* Dossier Status Colors (dark mode - keep same for now) */
+    --status-ouvert-bg: 214 93% 20%;
+    --status-ouvert-text: 214 93% 80%;
+    --status-en-cours-bg: 48 70% 20%;
+    --status-en-cours-text: 48 96% 80%;
+    --status-expertise-bg: 270 50% 20%;
+    --status-expertise-text: 270 100% 80%;
+    --status-devis-bg: 226 50% 20%;
+    --status-devis-text: 226 100% 80%;
+    --status-reparation-bg: 142 50% 20%;
+    --status-reparation-text: 142 76% 80%;
+    --status-facturation-bg: 188 50% 20%;
+    --status-facturation-text: 188 96% 80%;
+    --status-cloture-bg: 220 13% 25%;
+    --status-cloture-text: 220 13% 70%;
+    --status-archive-bg: 220 14% 20%;
+    --status-archive-text: 220 9% 60%;
+    
+    /* Card shadows */
+    --shadow-card: 0 1px 3px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.12);
+    --shadow-card-hover: 0 4px 6px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.12);
   }
 }
 
