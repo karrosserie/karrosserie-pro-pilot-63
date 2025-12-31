@@ -16,6 +16,7 @@ import { vehiclesService } from '@/services/supabase/vehicles';
 import { createRepairOrder } from '@/services/supabase/repair-orders/mutations';
 import { repairOrdersService } from '@/services/supabase/repair-orders';
 import { uploadVehiclePhoto } from '@/utils/vehiclePhotoService';
+import { DateRange } from 'react-day-picker';
 
 interface CapturedPhoto {
   blob: Blob;
@@ -30,6 +31,7 @@ const Dossiers = () => {
   const [activeTab, setActiveTab] = useState<'tous' | 'actifs' | 'archives'>('actifs');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatuses, setSelectedStatuses] = useState<DossierOverallStatus[]>([]);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [showNewDossier, setShowNewDossier] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
@@ -287,7 +289,7 @@ const Dossiers = () => {
         }}
       />
 
-      {/* Filters with status toggles */}
+      {/* Filters with status toggles and date range */}
       <DossierFilters
         activeTab={activeTab}
         onTabChange={setActiveTab}
@@ -298,6 +300,8 @@ const Dossiers = () => {
         archivesCount={archivedDossiers.length}
         selectedStatuses={selectedStatuses}
         onStatusFilterChange={setSelectedStatuses}
+        dateRange={dateRange}
+        onDateRangeChange={setDateRange}
       />
 
       {/* Dossier list */}
