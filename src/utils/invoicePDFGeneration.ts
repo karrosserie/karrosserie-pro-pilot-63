@@ -110,6 +110,11 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
       }
     };
 
+    // Fonction pour formater le kilométrage sans espaces insécables (non supportés par react-pdf)
+    const formatMileage = (mileage: number) => {
+      return mileage.toLocaleString('fr-FR').replace(/[\u00A0\u202F]/g, ' ') + ' km';
+    };
+
     // Préparer les données pour les composants de template - exactement comme dans InvoiceViewerModal
     const invoiceData = {
       number: invoice.reference,
@@ -118,7 +123,7 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
       dueDate: formatDateFr(invoice.due_date),
       vehicle: vehicleData ? `${vehicleData.car_brands?.name || ''} ${vehicleData.car_models?.name || ''}`.trim() : undefined,
       licensePlate: vehicleData?.license_plate || undefined,
-      mileage: vehicleData?.mileage ? `${vehicleData.mileage.toLocaleString('fr-FR')} km` : undefined,
+      mileage: vehicleData?.mileage ? formatMileage(vehicleData.mileage) : undefined,
       amountDue: `${invoice.amount.toFixed(2).replace('.', ',')} €`,
       date: formatDateFr(invoice.date)
     };
@@ -131,7 +136,7 @@ export const prepareInvoiceDataForPDF = async (invoice: Invoice, companyData: an
       phone: clientData?.phone || undefined,
       email: clientData?.email || undefined,
       licensePlate: vehicleData?.license_plate || undefined,
-      mileage: vehicleData?.mileage ? `${vehicleData.mileage.toLocaleString('fr-FR')} km` : undefined,
+      mileage: vehicleData?.mileage ? formatMileage(vehicleData.mileage) : undefined,
       vehicle: vehicleData ? `${vehicleData.car_brands?.name || ''} ${vehicleData.car_models?.name || ''}`.trim() : undefined,
       notes: invoice.notes || ''
     };
