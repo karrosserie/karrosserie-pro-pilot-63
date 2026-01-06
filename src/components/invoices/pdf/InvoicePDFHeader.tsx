@@ -24,6 +24,23 @@ const InvoicePDFHeader = ({ invoice, companyData, totalPaidAmount, finalTotal }:
     }
   };
 
+  // react-pdf (Helvetica) peut afficher certains espaces insécables comme "/".
+  // On force donc des espaces standards avant rendu.
+  const formatMileage = (mileage: unknown) => {
+    if (mileage == null || mileage === '') return '';
+
+    const formatted =
+      typeof mileage === 'number'
+        ? mileage.toLocaleString('fr-FR')
+        : String(mileage);
+
+    return formatted
+      .toString()
+      .replace(/[\u00A0\u202F]/g, ' ')
+      .replace(/\//g, ' ')
+      .trim();
+  };
+
   return (
     <View style={pdfStyles.header}>
       {/* Colonne 1 - Informations entreprise */}
@@ -80,7 +97,7 @@ const InvoicePDFHeader = ({ invoice, companyData, totalPaidAmount, finalTotal }:
         {invoice.vehicles?.mileage != null && (
           <View style={pdfStyles.detailRow}>
             <Text style={pdfStyles.detailLabel}>Kilométrage</Text>
-            <Text style={pdfStyles.detailValue}>{invoice.vehicles.mileage} km</Text>
+            <Text style={pdfStyles.detailValue}>{formatMileage(invoice.vehicles.mileage)} km</Text>
           </View>
         )}
         {totalPaidAmount > 0 && (
