@@ -31,8 +31,8 @@ const InvoicePDFHeader = ({ invoice, companyData, totalPaidAmount, finalTotal }:
 
   return (
     <View style={pdfStyles.header}>
-      {/* Colonne 1 - Informations entreprise */}
-      <View style={pdfStyles.headerColumn} wrap={false}>
+      {/* Colonne gauche - Informations entreprise */}
+      <View style={pdfStyles.headerCompanyColumn} wrap={false}>
         <View style={pdfStyles.title}>
           <Text>FACTURE</Text>
         </View>
@@ -42,7 +42,9 @@ const InvoicePDFHeader = ({ invoice, companyData, totalPaidAmount, finalTotal }:
         <Text style={pdfStyles.companyName}>{companyData?.name || 'KARROSSERIE'}</Text>
         <View style={pdfStyles.companyInfo}>
           <Text>{companyData?.address || 'Votre adresse'}</Text>
-          <Text>{companyData?.zipcode || ''} {companyData?.city || ''}</Text>
+          <Text>
+            {companyData?.zipcode || ''} {companyData?.city || ''}
+          </Text>
           <Text>Téléphone : {companyData?.phone || '+33 1 23 45 67 89'}</Text>
           <Text>E-mail : {companyData?.email || 'contact@karrosserie.fr'}</Text>
           <Text>SIRET : {companyData?.siret || '123 456 789 00123'}</Text>
@@ -50,8 +52,8 @@ const InvoicePDFHeader = ({ invoice, companyData, totalPaidAmount, finalTotal }:
         </View>
       </View>
 
-      {/* Colonne 2 - Détails de la facture */}
-      <View style={pdfStyles.headerColumn}>
+      {/* Colonne centrale - Détails de la facture */}
+      <View style={pdfStyles.headerDetailsColumn}>
         <Text style={pdfStyles.sectionTitle}>Détails de la facture</Text>
         <View style={pdfStyles.detailRow}>
           <Text style={pdfStyles.detailLabel}>Facture</Text>
@@ -72,10 +74,9 @@ const InvoicePDFHeader = ({ invoice, companyData, totalPaidAmount, finalTotal }:
         <View style={pdfStyles.detailRow}>
           <Text style={pdfStyles.detailLabel}>Véhicule</Text>
           <Text style={pdfStyles.detailValue}>
-            {invoice.vehicles ? 
-              `${invoice.vehicles.car_brands?.name || 'N/A'} ${invoice.vehicles.car_models?.name || 'N/A'}` : 
-              'N/A'
-            }
+            {invoice.vehicles
+              ? `${invoice.vehicles.car_brands?.name || 'N/A'} ${invoice.vehicles.car_models?.name || 'N/A'}`
+              : 'N/A'}
           </Text>
         </View>
         <View style={pdfStyles.detailRow}>
@@ -94,7 +95,7 @@ const InvoicePDFHeader = ({ invoice, companyData, totalPaidAmount, finalTotal }:
             <Text style={pdfStyles.detailValue}>{formatAmount(totalPaidAmount)}</Text>
           </View>
         )}
-        
+
         {/* Encadré Montant dû */}
         <View style={pdfStyles.amountDue}>
           <Text style={pdfStyles.amountDueText}>Montant dû</Text>
@@ -102,21 +103,25 @@ const InvoicePDFHeader = ({ invoice, companyData, totalPaidAmount, finalTotal }:
         </View>
       </View>
 
-      {/* Colonne 3 - Espace réservé (l'adresse est positionnée en absolu) */}
-      <View style={pdfStyles.headerColumn}>
+      {/* Colonne droite - Client (dans le flux, sans absolute) */}
+      <View style={pdfStyles.headerClientColumn}>
         <Text style={pdfStyles.sectionTitle}>Facture pour</Text>
-        <Text style={{ fontSize: 7, color: '#666' }}>(Voir adresse destinataire ci-contre)</Text>
-      </View>
-
-      {/* Zone d'adresse destinataire positionnée pour fenêtre d'enveloppe */}
-      <View style={pdfStyles.clientAddressWindow}>
-        <Text style={pdfStyles.clientAddressName}>
-          {invoice.clients ? getClientDisplayName(invoice.clients) : 'Client non spécifié'}
-        </Text>
-        <Text style={pdfStyles.clientAddressText}>{invoice.clients?.address || ''}</Text>
-        <Text style={pdfStyles.clientAddressText}>
-          {invoice.clients?.postal_code || ''} {invoice.clients?.city || ''}
-        </Text>
+        <View style={pdfStyles.clientAddressBox}>
+          <Text style={pdfStyles.clientAddressName}>
+            {invoice.clients ? getClientDisplayName(invoice.clients) : 'Client non spécifié'}
+          </Text>
+          {invoice.clients?.phone ? (
+            <Text style={pdfStyles.clientAddressText}>Téléphone : {invoice.clients.phone}</Text>
+          ) : null}
+          {invoice.clients?.address ? (
+            <Text style={pdfStyles.clientAddressText}>{invoice.clients.address}</Text>
+          ) : null}
+          {(invoice.clients?.postal_code || invoice.clients?.city) && (
+            <Text style={pdfStyles.clientAddressText}>
+              {invoice.clients?.postal_code || ''} {invoice.clients?.city || ''}
+            </Text>
+          )}
+        </View>
       </View>
     </View>
   );
