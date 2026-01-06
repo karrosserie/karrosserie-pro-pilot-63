@@ -24,6 +24,11 @@ const InvoicePDFHeader = ({ invoice, companyData, totalPaidAmount, finalTotal }:
     }
   };
 
+  // Formater le kilométrage avec remplacement des espaces insécables pour react-pdf
+  const formatMileage = (mileage: number) => {
+    return mileage.toLocaleString('fr-FR').replace(/[\u00A0\u202F]/g, ' ') + ' km';
+  };
+
   return (
     <View style={pdfStyles.header}>
       {/* Colonne 1 - Informations entreprise */}
@@ -80,7 +85,7 @@ const InvoicePDFHeader = ({ invoice, companyData, totalPaidAmount, finalTotal }:
         {invoice.vehicles?.mileage != null && (
           <View style={pdfStyles.detailRow}>
             <Text style={pdfStyles.detailLabel}>Kilométrage</Text>
-            <Text style={pdfStyles.detailValue}>{invoice.vehicles.mileage} km</Text>
+            <Text style={pdfStyles.detailValue}>{formatMileage(invoice.vehicles.mileage)}</Text>
           </View>
         )}
         {totalPaidAmount > 0 && (
