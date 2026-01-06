@@ -420,6 +420,13 @@ const InvoicePDF = ({ invoice, companyData, payments = [], clientData, vehicleDa
     return formatted.replace(/[\u00A0\u202F]/g, ' ') + ' €';
   };
 
+  // Fonction pour nettoyer les espaces insécables des chaînes (pour le kilométrage, etc.)
+  const sanitizeText = (text: string | null | undefined) => {
+    if (!text) return '';
+    // Remplacer tous les types d'espaces insécables et les slashs parasites par des espaces normaux
+    return text.toString().replace(/[\u00A0\u202F]/g, ' ').replace(/\//g, ' ');
+  };
+
   // Calculer les montants de paiement
   const totalPaidAmount = payments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
   const invoiceAmount = typeof invoice.amount === 'number' ? invoice.amount : 0;
@@ -482,7 +489,7 @@ const InvoicePDF = ({ invoice, companyData, payments = [], clientData, vehicleDa
                 {clientData?.address && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>ADRESSE :</Text> {clientData.address}</Text>}
                 {clientData?.city && <Text style={alternativeStyles.clientInfo}>{clientData.city}</Text>}
                 {clientData?.licensePlate && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>Immatriculation :</Text> {clientData.licensePlate}</Text>}
-                {clientData?.mileage && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>Kilométrage :</Text> {clientData.mileage}</Text>}
+                {clientData?.mileage && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>Kilométrage :</Text> {sanitizeText(clientData.mileage)}</Text>}
                 {clientData?.vehicle && <Text style={alternativeStyles.clientInfo}><Text style={{ fontWeight: 'bold' }}>Véhicule :</Text> {clientData.vehicle}</Text>}
                 
                 {/* Section Délai prévisionnel pour les ordres de réparation */}
@@ -912,7 +919,7 @@ const InvoicePDF = ({ invoice, companyData, payments = [], clientData, vehicleDa
             {clientData?.mileage && (
               <View style={defaultStyles.detailRow}>
                 <Text style={defaultStyles.detailLabel}>Kilométrage</Text>
-                <Text style={defaultStyles.detailValue}>{clientData.mileage}</Text>
+                <Text style={defaultStyles.detailValue}>{sanitizeText(clientData.mileage)}</Text>
               </View>
             )}
             
@@ -966,18 +973,20 @@ const InvoicePDF = ({ invoice, companyData, payments = [], clientData, vehicleDa
           </View>
         </View>
 
-        {/* Zone d'adresse positionnée pour fenêtre d'enveloppe DL */}
-        <View style={defaultStyles.clientAddressEnvelope}>
-          <Text style={defaultStyles.clientAddressName}>
-            {clientData?.name || 'Client non spécifié'}
-          </Text>
-          <Text style={defaultStyles.clientAddressText}>
-            {clientData?.address || ''}
-          </Text>
-          <Text style={defaultStyles.clientAddressText}>
-            {clientData?.city || ''}
-          </Text>
-        </View>
+        {/* Zone d'adresse positionnée pour fenêtre d'enveloppe DL - seulement si adresse disponible */}
+        {clientData?.address && (
+          <View style={defaultStyles.clientAddressEnvelope}>
+            <Text style={defaultStyles.clientAddressName}>
+              {clientData?.name || 'Client non spécifié'}
+            </Text>
+            <Text style={defaultStyles.clientAddressText}>
+              {clientData?.address || ''}
+            </Text>
+            <Text style={defaultStyles.clientAddressText}>
+              {clientData?.city || ''}
+            </Text>
+          </View>
+        )}
 
         {/* Tableau des articles par défaut */}
         {showItemsDetails && (
