@@ -410,7 +410,14 @@ const InvoicePDF = ({ invoice, companyData, payments = [], clientData, vehicleDa
     if (isNaN(numAmount)) {
       return '0,00 €';
     }
-    return `${numAmount.toFixed(2).replace('.', ',')} €`;
+    // Utiliser toLocaleString pour le formatage français, puis remplacer l'espace insécable (U+202F) 
+    // par un espace normal car react-pdf ne supporte pas bien les espaces insécables
+    const formatted = numAmount.toLocaleString('fr-FR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+    // Remplacer tous les types d'espaces insécables par des espaces normaux
+    return formatted.replace(/[\u00A0\u202F]/g, ' ') + ' €';
   };
 
   // Calculer les montants de paiement
