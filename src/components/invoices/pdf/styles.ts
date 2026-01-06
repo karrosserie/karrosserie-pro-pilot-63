@@ -153,8 +153,8 @@ export const pdfStyles = StyleSheet.create({
   clientAddressWindow: {
     position: 'absolute',
     top: 140,        // ~50mm du haut (en points: 1mm ≈ 2.83 points)
-    right: 57,       // ~20mm du bord droit
-    width: 255,      // ~90mm de large
+    right: 30,       // Aligné avec la marge droite de la page
+    width: 160,      // Largeur réduite pour éviter le chevauchement
     height: 85,      // ~30mm de haut
     padding: 8,
     fontSize: 9,
