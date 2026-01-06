@@ -14,37 +14,12 @@ export const pdfStyles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
     marginBottom: 15,
     paddingBottom: 15,
   },
-  // Colonne générique (conservée pour compatibilité)
   headerColumn: {
     flex: 1,
     paddingHorizontal: 8,
-  },
-  // Colonnes spécifiques à l'en-tête facture (évite tout chevauchement)
-  headerCompanyColumn: {
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 0,
-    maxWidth: 170,
-    paddingRight: 10,
-  },
-  headerDetailsColumn: {
-    flexGrow: 1.35,
-    flexShrink: 1,
-    flexBasis: 0,
-    maxWidth: 240,
-    paddingHorizontal: 10,
-  },
-  headerClientColumn: {
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 0,
-    maxWidth: 170,
-    paddingLeft: 10,
   },
   title: {
     fontSize: 12,
@@ -174,9 +149,16 @@ export const pdfStyles = StyleSheet.create({
     marginTop: 15,
     marginBottom: 15,
   },
-  // Bloc client dans le flux (PAS d'absolute) pour éviter les superpositions
-  clientAddressBox: {
-    marginTop: 2,
+  // Zone d'adresse destinataire positionnée pour fenêtre d'enveloppe DL
+  clientAddressWindow: {
+    position: 'absolute',
+    top: 140,        // ~50mm du haut (en points: 1mm ≈ 2.83 points)
+    right: 57,       // ~20mm du bord droit
+    width: 255,      // ~90mm de large
+    height: 85,      // ~30mm de haut
+    padding: 8,
+    fontSize: 9,
+    lineHeight: 1.4,
   },
   clientAddressName: {
     fontSize: 10,
