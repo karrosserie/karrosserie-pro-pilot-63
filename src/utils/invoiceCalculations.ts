@@ -58,8 +58,10 @@ export const calculateInvoiceTotals = (repairsData: any, partsData: any) => {
 };
 
 export const formatAmount = (amount: number): string => {
-  return new Intl.NumberFormat('fr-FR', {
+  const formatted = new Intl.NumberFormat('fr-FR', {
     style: 'currency',
     currency: 'EUR'
   }).format(amount);
+  // Replace non-breaking spaces with regular spaces for proper PDF rendering
+  return formatted.replace(/[\u00A0\u202F]/g, ' ');
 };

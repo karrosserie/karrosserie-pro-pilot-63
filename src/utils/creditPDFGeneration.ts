@@ -147,7 +147,7 @@ export const prepareCreditDataForPDF = async (credit: any, companyData: any) => 
         address: clientData?.address || '',
         city: clientData ? `${clientData.postal_code || ''} ${clientData.city || ''}`.trim() : '',
         licensePlate: vehicleData?.license_plate || '',
-        mileage: vehicleData?.mileage ? `${vehicleData.mileage.toLocaleString('fr-FR')} km` : '',
+        mileage: vehicleData?.mileage ? `${vehicleData.mileage.toLocaleString('fr-FR').replace(/[\u00A0\u202F]/g, ' ')} km` : '',
         vehicle: vehicleData ? `${vehicleData.car_brands?.name || ''} ${vehicleData.car_models?.name || ''}`.trim() : '',
         billingDate: credit.created_at ? new Date(credit.created_at).toLocaleDateString('fr-FR') : '',
         invoiceReference: invoiceData?.reference || 'N/A',
@@ -184,7 +184,7 @@ export const prepareCreditDataForPDF = async (credit: any, companyData: any) => 
       vehicleData: vehicleData ? {
         vehicle: `${vehicleData.car_brands?.name || ''} ${vehicleData.car_models?.name || ''}`.trim(),
         licensePlate: vehicleData.license_plate || '',
-        mileage: vehicleData.mileage ? vehicleData.mileage.toLocaleString() + ' km' : ''
+        mileage: vehicleData.mileage ? vehicleData.mileage.toLocaleString('fr-FR').replace(/[\u00A0\u202F]/g, ' ') + ' km' : ''
       } : null,
       items,
       totals
