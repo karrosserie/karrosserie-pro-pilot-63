@@ -4,6 +4,8 @@ import InvoicePDF from '@/components/invoices/InvoicePDF';
 import { supabase } from '@/integrations/supabase/client';
 import { clientsService } from '@/services/supabase/clients';
 import { getClientDisplayName } from '@/utils/clientDisplayUtils';
+import { calculateGlobalTotals } from '@/components/quotes/form/utils/calculations';
+import { QuoteRepairItem, QuotePartItem, QuoteDiscountItem } from '@/components/quotes/form/types';
 
 export const prepareQuoteDataForPDF = async (quote: Quote, companyData: any) => {
   try {
@@ -112,60 +114,68 @@ export const prepareQuoteDataForPDF = async (quote: Quote, companyData: any) => 
       validUntil: quote.valid_until ? new Date(quote.valid_until).toLocaleDateString('fr-FR') : ''
     };
 
+    // Helper function to clean numeric values and replace NaN with 0
+    const cleanNumericValue = (value: any): number => {
+      const num = Number(value);
+      return isNaN(num) ? 0 : num;
+    };
+
+    // Helper function to clean data arrays - identique à QuoteViewerModal
+    const cleanDataArray = (data: any[]): QuoteRepairItem[] | QuotePartItem[] => {
+      return data.map(item => ({
+        ...item,
+        quantity: cleanNumericValue(item.quantity),
+        unitCost: cleanNumericValue(item.unitCost),
+        discount: cleanNumericValue(item.discount),
+        vat: cleanNumericValue(item.vat),
+        total: cleanNumericValue(item.total)
+      }));
+    };
+
     // Parser les données des items
-    let items: any[] = [];
+    let repairs: QuoteRepairItem[] = [];
+    let parts: QuotePartItem[] = [];
+    let discounts: QuoteDiscountItem[] = [];
+
     try {
-      const repairs = quote.repairs_data ? JSON.parse(quote.repairs_data as string) : [];
-      const parts = quote.parts_data ? JSON.parse(quote.parts_data as string) : [];
-      items = [...repairs, ...parts];
-      console.log('Quote items parsed:', items);
+      const parsedRepairs = quote.repairs_data ? JSON.parse(quote.repairs_data as string) : [];
+      repairs = Array.isArray(parsedRepairs) ? cleanDataArray(parsedRepairs) as QuoteRepairItem[] : [];
     } catch (error) {
-      console.error('Error parsing quote items:', error);
+      console.error('Error parsing repairs data:', error);
+      repairs = [];
     }
 
-    // Parser les remises globales - support string et array
-    let discounts: any[] = [];
     try {
+      const parsedParts = quote.parts_data ? JSON.parse(quote.parts_data as string) : [];
+      parts = Array.isArray(parsedParts) ? cleanDataArray(parsedParts) as QuotePartItem[] : [];
+    } catch (error) {
+      console.error('Error parsing parts data:', error);
+      parts = [];
+    }
+
+    try {
+      let parsedDiscounts;
       if (typeof quote.discounts_data === 'string') {
-        discounts = JSON.parse(quote.discounts_data);
+        parsedDiscounts = JSON.parse(quote.discounts_data);
       } else if (Array.isArray(quote.discounts_data)) {
-        discounts = quote.discounts_data;
+        parsedDiscounts = quote.discounts_data;
+      } else {
+        parsedDiscounts = [];
       }
+      discounts = Array.isArray(parsedDiscounts) ? parsedDiscounts.map(item => ({
+        ...item,
+        amount: cleanNumericValue(item.amount ?? item.finalAmount)
+      })) : [];
     } catch (error) {
-      console.error('Error parsing quote discounts:', error);
+      console.error('Error parsing discounts data:', error);
+      discounts = [];
     }
 
-    // Calculer le total des remises globales (supporte amount OU finalAmount)
-    const globalDiscountTotal = discounts.reduce((sum, d) => {
-      const discountAmount = parseFloat(d.amount ?? d.finalAmount ?? 0);
-      return sum + discountAmount;
-    }, 0);
-
-    // Calculer les totaux - utiliser directement le total calculé de chaque item
-    const totals = items.reduce((acc, item) => {
-      const itemTotal = parseFloat(item.total) || 0;
-      const quantity = parseFloat(item.quantity) || 1;
-      const unitCost = parseFloat(item.unitCost) || 0;
-      const vat = parseFloat(item.vat) || 20;
-      
-      console.log('Processing item:', item, { itemTotal, quantity, unitCost, vat });
-      
-      // Utiliser le total déjà calculé
-      const totalTTC = itemTotal;
-      const totalHT = totalTTC / (1 + vat / 100);
-      const vatAmount = totalTTC - totalHT;
-
-      acc.subtotalHT += totalHT;
-      acc.totalVAT += vatAmount;
-      acc.total += totalTTC;
-
-      return acc;
-    }, { subtotalHT: 0, totalVAT: 0, total: 0 });
-
-    // Appliquer les remises globales au total
-    totals.total = totals.total - globalDiscountTotal;
+    // Utiliser calculateGlobalTotals pour cohérence avec QuoteViewerModal
+    const totals = calculateGlobalTotals(repairs, parts, discounts);
+    const items = [...repairs, ...parts];
     
-    console.log('Quote totals calculated:', totals, 'Global discounts:', globalDiscountTotal);
+    console.log('Quote totals calculated with calculateGlobalTotals:', totals);
 
     return {
       quote: {
@@ -198,16 +208,20 @@ export const prepareQuoteDataForPDF = async (quote: Quote, companyData: any) => 
         vehicle: vehicleData?.vehicle || '',
         billingDate: quote.created_at ? new Date(quote.created_at).toLocaleDateString('fr-FR') : '',
         notes: quote.notes || '',
-        items: items.map(item => {
-          const unitPrice = parseFloat(item.unitCost) || 0;
-          const quantity = parseFloat(item.quantity) || 1;
-          const discount = parseFloat(item.discount) || 0;
-          const vat = parseFloat(item.vat) || 20;
-          const totalTTC = parseFloat(item.total) || 0;
-          const totalHT = totalTTC / (1 + vat / 100);
+        items: items.map((item: any) => {
+          const unitPrice = item.unitCost || 0;
+          const quantity = item.quantity || 1;
+          const discount = item.discount || 0;
+          const vat = item.vat || 20;
+          const subtotal = quantity * unitPrice;
+          const discountAmount = subtotal * (discount / 100);
+          const afterDiscount = subtotal - discountAmount;
+          const vatAmount = afterDiscount * (vat / 100);
+          const totalTTC = afterDiscount + vatAmount;
+          const totalHT = afterDiscount;
           
           return {
-            ref: item.ref || '',
+            ref: (item as any).ref || '',
             description: item.description || '',
             quantity: quantity,
             discount: discount,
@@ -218,17 +232,13 @@ export const prepareQuoteDataForPDF = async (quote: Quote, companyData: any) => 
           };
         }),
         totals: {
-          totalHT: `${totals.subtotalHT.toFixed(2).replace('.', ',')} €`,
-          totalVAT: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`,
-          totalDiscount: `${items.reduce((sum, item) => {
-            const subtotal = (parseFloat(item.quantity) || 1) * (parseFloat(item.unitCost) || 0);
-            const discountPercent = parseFloat(item.discount) || 0;
-            return sum + (subtotal * discountPercent / 100);
-          }, 0).toFixed(2).replace('.', ',')} €`,
-          globalDiscount: globalDiscountTotal > 0 ? `${globalDiscountTotal.toFixed(2).replace('.', ',')} €` : undefined,
+          totalHT: `${totals.subTotal.toFixed(2).replace('.', ',')} €`,
+          totalVAT: `${totals.totalVat.toFixed(2).replace('.', ',')} €`,
+          totalDiscount: `${totals.totalDiscount.toFixed(2).replace('.', ',')} €`,
+          globalDiscount: discounts.length > 0 ? `${discounts.reduce((sum, d) => sum + (d.amount || 0), 0).toFixed(2).replace('.', ',')} €` : undefined,
           totalTTC: `${totals.total.toFixed(2).replace('.', ',')} €`,
-          subtotal: `${totals.subtotalHT.toFixed(2).replace('.', ',')} €`,
-          vat: `${totals.totalVAT.toFixed(2).replace('.', ',')} €`,
+          subtotal: `${totals.subTotal.toFixed(2).replace('.', ',')} €`,
+          vat: `${totals.totalVat.toFixed(2).replace('.', ',')} €`,
           total: `${totals.total.toFixed(2).replace('.', ',')} €`
         }
       },
