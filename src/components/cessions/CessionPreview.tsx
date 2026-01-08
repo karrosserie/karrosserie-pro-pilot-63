@@ -33,10 +33,12 @@ export const CessionPreview = ({ cession, open, onOpenChange }: CessionPreviewPr
   };
 
   const formatEuro = (amount: number) => {
-    return new Intl.NumberFormat('fr-FR', {
+    const formatted = new Intl.NumberFormat('fr-FR', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(amount);
+    // Replace non-breaking spaces with regular spaces for proper PDF rendering
+    return formatted.replace(/[\u00A0\u202F]/g, ' ');
   };
 
   // Calculate specific amounts from repair order data
