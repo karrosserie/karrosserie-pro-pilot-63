@@ -120,13 +120,13 @@ export const useGeneratedReports = () => {
     yPos += 10;
     
     doc.setFontSize(10);
-    doc.text(`Encaissements: ${totalReceipts.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}`, 20, yPos);
+    doc.text(`Encaissements: ${totalReceipts.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' }).replace(/[\u00A0\u202F]/g, ' ')}`, 20, yPos);
     yPos += 7;
-    doc.text(`Dépenses: ${totalExpenses.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}`, 20, yPos);
+    doc.text(`Dépenses: ${totalExpenses.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' }).replace(/[\u00A0\u202F]/g, ' ')}`, 20, yPos);
     yPos += 7;
-    doc.text(`En attente: ${totalPending.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}`, 20, yPos);
+    doc.text(`En attente: ${totalPending.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' }).replace(/[\u00A0\u202F]/g, ' ')}`, 20, yPos);
     yPos += 7;
-    doc.text(`Solde: ${(totalReceipts - totalExpenses).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}`, 20, yPos);
+    doc.text(`Solde: ${(totalReceipts - totalExpenses).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' }).replace(/[\u00A0\u202F]/g, ' ')}`, 20, yPos);
     
     // Détail des transactions
     yPos += 20;
