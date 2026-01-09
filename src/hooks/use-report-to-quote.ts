@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { quotesService } from '@/services/supabase/quotes';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
@@ -12,6 +12,21 @@ export const useReportToQuote = () => {
   const [convertingReportId, setConvertingReportId] = useState<string | null>(null);
   const [convertedReports, setConvertedReports] = useState<Record<string, any>>({});
 
+  // Vérifier si un rapport a déjà été converti en devis
+  const checkConvertedStatus = async (reportId: string) => {
+    try {
+      const existingQuote = await quotesService.getByReportId(reportId);
+      if (existingQuote) {
+        setConvertedReports(prev => ({ ...prev, [reportId]: existingQuote }));
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error checking converted status:', error);
+      return false;
+    }
+  };
+
   // Vérifier le statut de conversion pour plusieurs rapports en UNE SEULE requête
   const checkMultipleReports = async (reports: ExpertiseReport[]) => {
     if (!reports || reports.length === 0) {
@@ -21,40 +36,10 @@ export const useReportToQuote = () => {
     
     // Utiliser une requête batch au lieu de N requêtes individuelles
     const reportIds = reports.map(r => r.id);
-    const quotesMap = await quotesService.getByReportIds(reportIds);
+    const results = await quotesService.getByReportIds(reportIds);
     
-    // Filtrer: ne marquer comme "converti" que si le rapport n'a pas été modifié après le devis
-    const filteredResults: Record<string, any> = {};
-    for (const report of reports) {
-      const quote = quotesMap[report.id];
-      if (quote) {
-        // Vérifier si le rapport a été modifié après la création du devis
-        const reportDate = new Date(report.updated_at);
-        const quoteDate = new Date(quote.created_at);
-        if (reportDate <= quoteDate) {
-          // Le rapport n'a pas été modifié après le devis, le marquer comme converti
-          filteredResults[report.id] = quote;
-        }
-        // Sinon, ne pas l'inclure = le bouton Convertir sera actif
-      }
-    }
-    
-    setConvertedReports(filteredResults);
-    return filteredResults;
-  };
-
-  // Marquer un rapport comme converti immédiatement après conversion
-  const markAsConverted = (reportId: string, quote: any) => {
-    setConvertedReports(prev => ({ ...prev, [reportId]: quote }));
-  };
-
-  // Réactiver le bouton Convertir pour un rapport (après modification)
-  const enableConversion = (reportId: string) => {
-    setConvertedReports(prev => {
-      const newState = { ...prev };
-      delete newState[reportId];
-      return newState;
-    });
+    setConvertedReports(results);
+    return results;
   };
 
   // Convertir un rapport d'expertise en devis
@@ -68,8 +53,9 @@ export const useReportToQuote = () => {
       return null;
     }
 
-    // Vérifier si déjà converti (état local uniquement - plus fiable)
-    if (convertedReports[report.id]) {
+    // Vérifier si déjà converti
+    const isAlreadyConverted = await checkConvertedStatus(report.id);
+    if (isAlreadyConverted) {
       toast({
         title: "Information",
         description: "Ce rapport a déjà été converti en devis.",
@@ -83,8 +69,8 @@ export const useReportToQuote = () => {
     try {
       const newQuote = await quotesService.createFromReport(report);
       
-      // Marquer immédiatement comme converti pour désactiver le bouton
-      markAsConverted(report.id, newQuote);
+      // Mettre à jour l'état local
+      setConvertedReports(prev => ({ ...prev, [report.id]: newQuote }));
       
       // Invalider le cache des devis pour rafraîchir l'affichage
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
@@ -122,12 +108,11 @@ export const useReportToQuote = () => {
 
   return {
     convertToQuote,
+    checkConvertedStatus,
     checkMultipleReports,
     isConverting,
     isConverted,
     getQuoteForReport,
-    convertedReports,
-    enableConversion,
-    markAsConverted
+    convertedReports
   };
 };

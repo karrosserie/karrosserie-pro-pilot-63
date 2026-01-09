@@ -215,7 +215,7 @@ export const quotesService = {
   getByReportId: async (reportId: string) => {
     const { data, error } = await supabase
       .from('quotes')
-      .select('id, reference, created_at')
+      .select('id, reference')
       .filter('report_id', 'eq', reportId);
       
     if (error) {
@@ -227,14 +227,14 @@ export const quotesService = {
   },
 
   // Récupérer les devis pour plusieurs rapports en UNE SEULE requête (évite N+1)
-  getByReportIds: async (reportIds: string[]): Promise<Record<string, { id: string; reference: string; created_at: string }>> => {
+  getByReportIds: async (reportIds: string[]): Promise<Record<string, { id: string; reference: string }>> => {
     if (!reportIds || reportIds.length === 0) {
       return {};
     }
     
     const { data, error } = await supabase
       .from('quotes')
-      .select('id, reference, report_id, created_at')
+      .select('id, reference, report_id')
       .in('report_id', reportIds);
       
     if (error) {
@@ -243,11 +243,11 @@ export const quotesService = {
     }
     
     // Transformer en map reportId -> quote
-    const result: Record<string, { id: string; reference: string; created_at: string }> = {};
+    const result: Record<string, { id: string; reference: string }> = {};
     if (data) {
       for (const quote of data) {
         if (quote.report_id) {
-          result[quote.report_id] = { id: quote.id, reference: quote.reference, created_at: quote.created_at };
+          result[quote.report_id] = { id: quote.id, reference: quote.reference };
         }
       }
     }

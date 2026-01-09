@@ -27,7 +27,7 @@ import { DocumentPagination } from '@/components/ui/document-pagination';
 
 const ExpertiseReports = () => {
   const { reports, isLoading, error, deleteReport } = useExpertiseReports();
-  const { convertToQuote, checkMultipleReports, isConverting, isConverted, convertedReports, enableConversion } = useReportToQuote();
+  const { convertToQuote, checkMultipleReports, isConverting, isConverted, convertedReports } = useReportToQuote();
   const { settings: environmentSettings } = useEnvironment();
   const [initialCheckComplete, setInitialCheckComplete] = useState(false);
   const { pendingImports, isLoading: importsLoading, deleteImport } = useImports();
@@ -276,7 +276,6 @@ const ExpertiseReports = () => {
         onConvertToQuote={handleConvertToQuote}
         getConvertingReportId={getConvertingReportId}
         convertedReports={convertedReports}
-        onEnableConversion={enableConversion}
       />
 
       {/* Import Rapport Dialog */}
@@ -347,7 +346,6 @@ interface PaginatedReportsSectionProps {
   onConvertToQuote: (report: ExpertiseReport) => void;
   getConvertingReportId: () => string | null;
   convertedReports: Record<string, boolean>;
-  onEnableConversion: (reportId: string) => void;
 }
 
 function PaginatedReportsSection({
@@ -359,8 +357,7 @@ function PaginatedReportsSection({
   onDeleteReport,
   onConvertToQuote,
   getConvertingReportId,
-  convertedReports,
-  onEnableConversion
+  convertedReports
 }: PaginatedReportsSectionProps) {
   const {
     currentPage,
@@ -385,7 +382,6 @@ function PaginatedReportsSection({
         onConvertToQuote={onConvertToQuote}
         convertingReportId={getConvertingReportId()}
         convertedReports={convertedReports}
-        onEnableConversion={onEnableConversion}
       />
       <DocumentPagination
         currentPage={currentPage}

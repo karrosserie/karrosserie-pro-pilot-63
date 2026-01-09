@@ -19,7 +19,6 @@ interface ExpertiseReportTableProps {
   onConvertToQuote?: (report: ExpertiseReport) => void;
   convertingReportId?: string | null;
   convertedReports?: Record<string, any>;
-  onEnableConversion?: (reportId: string) => void;
 }
 
 const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
@@ -30,8 +29,7 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
   onDeleteReport,
   onConvertToQuote,
   convertingReportId,
-  convertedReports = {},
-  onEnableConversion
+  convertedReports = {}
 }) => {
   const isMobile = useIsMobile();
 
@@ -45,7 +43,6 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
             report={report}
             onEditReport={onEditReport}
             onDeleteReport={onDeleteReport}
-            onEnableConversion={onEnableConversion}
           />
         ))}
       </div>
@@ -81,7 +78,6 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
                   onConvertToQuote={onConvertToQuote}
                   isConverting={convertingReportId === report.id}
                   isConverted={!!convertedReports[report.id]}
-                  onEnableConversion={onEnableConversion}
                 />
               ))
             ) : (
