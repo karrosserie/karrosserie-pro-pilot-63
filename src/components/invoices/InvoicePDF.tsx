@@ -82,10 +82,14 @@ const defaultStyles = StyleSheet.create({
   detailLabel: {
     fontWeight: 'bold',
     fontSize: 9,
+    flex: 1,
+    minWidth: 80,
   },
   detailValue: {
     fontSize: 9,
     textAlign: 'right',
+    flex: 1.5,
+    flexWrap: 'wrap',
   },
   table: {
     marginTop: 15,
