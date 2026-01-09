@@ -216,5 +216,73 @@ export const expertiseReportsService = {
     }
     
     return true;
+  },
+
+  // Modifier le document d'un rapport existant
+  modifyDocument: async (id: string, newDocumentUrl: string) => {
+    const { data, error } = await supabase
+      .from('expertise_reports')
+      .update({
+        document_url: newDocumentUrl,
+        status: 'Modifié',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error(`Error modifying document for report ${id}:`, error);
+      throw new Error(error.message);
+    }
+
+    return data;
+  },
+
+  // Vérifier les dépendances d'un rapport (quotes et repair_orders)
+  checkDependencies: async (reportId: string): Promise<{
+    hasSignedRepairOrder: boolean;
+    quotes: { id: string; reference: string }[];
+    repairOrders: { id: string; reference: string; status: string }[];
+  }> => {
+    // Vérifier les devis liés
+    const { data: quotes, error: quotesError } = await supabase
+      .from('quotes')
+      .select('id, reference')
+      .eq('report_id', reportId);
+
+    if (quotesError) {
+      console.error(`Error fetching quotes for report ${reportId}:`, quotesError);
+      throw new Error(quotesError.message);
+    }
+
+    // Vérifier les ordres de réparation liés via les devis
+    let repairOrders: { id: string; reference: string; status: string }[] = [];
+    let hasSignedRepairOrder = false;
+
+    if (quotes && quotes.length > 0) {
+      const quoteIds = quotes.map(q => q.id);
+      
+      const { data: ros, error: rosError } = await supabase
+        .from('repair_orders')
+        .select('id, reference, status')
+        .in('quote_id', quoteIds);
+
+      if (rosError) {
+        console.error(`Error fetching repair orders for report ${reportId}:`, rosError);
+        throw new Error(rosError.message);
+      }
+
+      if (ros) {
+        repairOrders = ros;
+        hasSignedRepairOrder = ros.some(ro => ro.status === 'Signé' || ro.status === 'signed');
+      }
+    }
+
+    return {
+      hasSignedRepairOrder,
+      quotes: quotes || [],
+      repairOrders
+    };
   }
 };
