@@ -13,6 +13,7 @@ export type ExpertiseReport = Database['public']['Tables']['expertise_reports'][
   global_discount_data?: string | null;
   // Add joined relations
   clients?: {
+    id?: string;
     first_name: string;
     last_name: string;
   } | null;
@@ -56,7 +57,7 @@ export const expertiseReportsService = {
       .from('expertise_reports')
       .select(`
         *,
-        clients(first_name, last_name),
+        clients(id, first_name, last_name),
         vehicles(
           id,
           license_plate,
@@ -152,46 +153,52 @@ export const expertiseReportsService = {
   },
   
   update: async (id: string, report: UpdateExpertiseReport) => {
-    // Calculer le montant total à partir des données de réparations et pièces
-    let totalAmount = 0;
+    // Only recompute amount if repairs_data, parts_data, or global_discount_data are provided
+    const shouldRecomputeAmount = 
+      'repairs_data' in report || 
+      'parts_data' in report || 
+      'global_discount_data' in report;
     
-    if (report.repairs_data) {
-      try {
-        const repairs = JSON.parse(report.repairs_data);
-        totalAmount += repairs.reduce((sum: number, repair: any) => sum + (repair.total || 0), 0);
-      } catch (e) {
-        console.error('Error parsing repairs data:', e);
-      }
-    }
+    let reportToUpdate: UpdateExpertiseReport = { ...report };
     
-    if (report.parts_data) {
-      try {
-        const parts = JSON.parse(report.parts_data);
-        totalAmount += parts.reduce((sum: number, part: any) => sum + (part.total || 0), 0);
-      } catch (e) {
-        console.error('Error parsing parts data:', e);
+    if (shouldRecomputeAmount) {
+      let totalAmount = 0;
+      
+      if (report.repairs_data) {
+        try {
+          const repairs = JSON.parse(report.repairs_data);
+          totalAmount += repairs.reduce((sum: number, repair: any) => sum + (repair.total || 0), 0);
+        } catch (e) {
+          console.error('Error parsing repairs data:', e);
+        }
       }
-    }
-
-    // Soustraire les remises globales du total
-    let globalDiscounts = 0;
-    if (report.global_discount_data) {
-      try {
-        const discounts = JSON.parse(report.global_discount_data);
-        globalDiscounts = discounts.reduce((sum: number, d: any) => sum + (d.amount || 0), 0);
-      } catch (e) {
-        console.error('Error parsing global_discount_data:', e);
+      
+      if (report.parts_data) {
+        try {
+          const parts = JSON.parse(report.parts_data);
+          totalAmount += parts.reduce((sum: number, part: any) => sum + (part.total || 0), 0);
+        } catch (e) {
+          console.error('Error parsing parts data:', e);
+        }
       }
-    }
 
-    const reportWithAmount = {
-      ...report,
-      amount: totalAmount - globalDiscounts
-    };
+      // Soustraire les remises globales du total
+      let globalDiscounts = 0;
+      if (report.global_discount_data) {
+        try {
+          const discounts = JSON.parse(report.global_discount_data);
+          globalDiscounts = discounts.reduce((sum: number, d: any) => sum + (d.amount || 0), 0);
+        } catch (e) {
+          console.error('Error parsing global_discount_data:', e);
+        }
+      }
+
+      reportToUpdate.amount = totalAmount - globalDiscounts;
+    }
 
     const { data, error } = await supabase
       .from('expertise_reports')
-      .update(reportWithAmount)
+      .update(reportToUpdate)
       .eq('id', id)
       .select()
       .single();

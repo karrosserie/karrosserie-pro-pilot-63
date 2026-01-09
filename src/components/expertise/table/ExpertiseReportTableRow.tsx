@@ -38,7 +38,7 @@ const getStatusColor = (status: string) => {
 };
 
 const formatAmount = (amount: number | null) => {
-  if (!amount) return 'Non spécifié';
+  if (amount == null) return 'Non spécifié';
   return new Intl.NumberFormat('fr-FR', { 
     style: 'currency', 
     currency: 'EUR' 
