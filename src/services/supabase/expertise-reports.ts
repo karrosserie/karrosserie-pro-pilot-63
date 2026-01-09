@@ -216,5 +216,65 @@ export const expertiseReportsService = {
     }
     
     return true;
+  },
+
+  /**
+   * Remplace le document PDF d'un rapport d'expertise existant
+   * et remet le status à "En cours d'analyse"
+   */
+  replaceDocument: async (
+    reportId: string, 
+    newDocumentUrl: string,
+    oldDocumentUrl: string | null
+  ) => {
+    // Mettre à jour le rapport avec le nouveau document
+    const { data: updatedReport, error: updateError } = await supabase
+      .from('expertise_reports')
+      .update({
+        document_url: newDocumentUrl,
+        status: 'En cours d\'analyse',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', reportId)
+      .select()
+      .single();
+    
+    if (updateError) {
+      console.error('Error updating report:', updateError);
+      throw new Error(updateError.message);
+    }
+    
+    return updatedReport;
+  },
+
+  /**
+   * Vérifie les dépendances d'un rapport (quotes, repair_orders)
+   */
+  checkDependencies: async (reportId: string) => {
+    // Vérifier les devis liés
+    const { data: quotes, error: quotesError } = await supabase
+      .from('quotes')
+      .select('id, reference, status')
+      .or(`report_id.eq.${reportId},source_report_id.eq.${reportId},modificatif_report_id.eq.${reportId}`);
+    
+    if (quotesError) {
+      console.error('Error checking quotes dependencies:', quotesError);
+    }
+
+    // Vérifier les ordres de réparation liés
+    const { data: repairOrders, error: roError } = await supabase
+      .from('repair_orders')
+      .select('id, reference, status')
+      .or(`source_report_id.eq.${reportId},modificatif_report_id.eq.${reportId}`);
+    
+    if (roError) {
+      console.error('Error checking repair orders dependencies:', roError);
+    }
+
+    return {
+      quotes: quotes || [],
+      repairOrders: repairOrders || [],
+      hasLinkedDocuments: (quotes?.length || 0) > 0 || (repairOrders?.length || 0) > 0
+    };
   }
 };
