@@ -276,6 +276,7 @@ const ExpertiseReports = () => {
         onConvertToQuote={handleConvertToQuote}
         getConvertingReportId={getConvertingReportId}
         convertedReports={convertedReports}
+        onEnableConversion={enableConversion}
       />
 
       {/* Import Rapport Dialog */}
@@ -346,6 +347,7 @@ interface PaginatedReportsSectionProps {
   onConvertToQuote: (report: ExpertiseReport) => void;
   getConvertingReportId: () => string | null;
   convertedReports: Record<string, boolean>;
+  onEnableConversion: (reportId: string) => void;
 }
 
 function PaginatedReportsSection({
@@ -357,7 +359,8 @@ function PaginatedReportsSection({
   onDeleteReport,
   onConvertToQuote,
   getConvertingReportId,
-  convertedReports
+  convertedReports,
+  onEnableConversion
 }: PaginatedReportsSectionProps) {
   const {
     currentPage,
@@ -382,7 +385,7 @@ function PaginatedReportsSection({
         onConvertToQuote={onConvertToQuote}
         convertingReportId={getConvertingReportId()}
         convertedReports={convertedReports}
-        onEnableConversion={enableConversion}
+        onEnableConversion={onEnableConversion}
       />
       <DocumentPagination
         currentPage={currentPage}
