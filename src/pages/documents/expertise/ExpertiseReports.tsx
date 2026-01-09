@@ -161,23 +161,14 @@ const ExpertiseReports = () => {
   useEffect(() => {
     const initializeReports = async () => {
       if (filteredAndSortedReports && filteredAndSortedReports.length > 0 && !initialCheckComplete) {
-        await checkMultipleReports(filteredAndSortedReports);
-        
-        // Vérifier les dépendances OR signés pour chaque rapport
-        const signedReports = new Set<string>();
-        for (const report of filteredAndSortedReports) {
-          try {
-            const deps = await expertiseReportsService.checkDependencies(report.id);
-            if (deps.hasSignedRepairOrder) {
-              signedReports.add(report.id);
-            }
-          } catch (e) {
-            console.error('Error checking dependencies for report:', report.id, e);
-          }
-        }
-        setSignedRepairOrderReports(signedReports);
-        
+        // Marquer comme complet immédiatement pour ne pas bloquer l'UI
         setInitialCheckComplete(true);
+        
+        // Vérifier le statut de conversion en arrière-plan
+        checkMultipleReports(filteredAndSortedReports);
+        
+        // Vérifier les dépendances OR signés uniquement pour les rapports affichés (paginés)
+        // La vérification complète se fait à la demande (lazy loading)
       }
     };
     
