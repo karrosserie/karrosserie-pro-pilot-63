@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { quotesService } from '@/services/supabase/quotes';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
@@ -11,30 +11,6 @@ export const useReportToQuote = () => {
   const navigate = useNavigate();
   const [convertingReportId, setConvertingReportId] = useState<string | null>(null);
   const [convertedReports, setConvertedReports] = useState<Record<string, any>>({});
-
-  // Vérifier si un rapport a déjà été converti en devis
-  const checkConvertedStatus = async (reportId: string, reportUpdatedAt?: string) => {
-    try {
-      const existingQuote = await quotesService.getByReportId(reportId);
-      if (existingQuote) {
-        // Si le rapport a été mis à jour après la création du devis, autoriser la reconversion
-        if (reportUpdatedAt && existingQuote.created_at) {
-          const reportDate = new Date(reportUpdatedAt);
-          const quoteDate = new Date(existingQuote.created_at);
-          if (reportDate > quoteDate) {
-            // Le rapport a été modifié après le devis, permettre la reconversion
-            return false;
-          }
-        }
-        setConvertedReports(prev => ({ ...prev, [reportId]: existingQuote }));
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Error checking converted status:', error);
-      return false;
-    }
-  };
 
   // Vérifier le statut de conversion pour plusieurs rapports en UNE SEULE requête
   const checkMultipleReports = async (reports: ExpertiseReport[]) => {
@@ -67,6 +43,20 @@ export const useReportToQuote = () => {
     return filteredResults;
   };
 
+  // Marquer un rapport comme converti immédiatement après conversion
+  const markAsConverted = (reportId: string, quote: any) => {
+    setConvertedReports(prev => ({ ...prev, [reportId]: quote }));
+  };
+
+  // Réactiver le bouton Convertir pour un rapport (après modification)
+  const enableConversion = (reportId: string) => {
+    setConvertedReports(prev => {
+      const newState = { ...prev };
+      delete newState[reportId];
+      return newState;
+    });
+  };
+
   // Convertir un rapport d'expertise en devis
   const convertToQuote = async (report: ExpertiseReport) => {
     if (!report.client_id || !report.vehicle_id) {
@@ -78,9 +68,8 @@ export const useReportToQuote = () => {
       return null;
     }
 
-    // Vérifier si déjà converti (en tenant compte de la date de mise à jour)
-    const isAlreadyConverted = await checkConvertedStatus(report.id, report.updated_at);
-    if (isAlreadyConverted) {
+    // Vérifier si déjà converti (état local uniquement - plus fiable)
+    if (convertedReports[report.id]) {
       toast({
         title: "Information",
         description: "Ce rapport a déjà été converti en devis.",
@@ -94,8 +83,8 @@ export const useReportToQuote = () => {
     try {
       const newQuote = await quotesService.createFromReport(report);
       
-      // Mettre à jour l'état local
-      setConvertedReports(prev => ({ ...prev, [report.id]: newQuote }));
+      // Marquer immédiatement comme converti pour désactiver le bouton
+      markAsConverted(report.id, newQuote);
       
       // Invalider le cache des devis pour rafraîchir l'affichage
       queryClient.invalidateQueries({ queryKey: ['quotes'] });
@@ -133,11 +122,12 @@ export const useReportToQuote = () => {
 
   return {
     convertToQuote,
-    checkConvertedStatus,
     checkMultipleReports,
     isConverting,
     isConverted,
     getQuoteForReport,
-    convertedReports
+    convertedReports,
+    enableConversion,
+    markAsConverted
   };
 };

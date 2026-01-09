@@ -14,6 +14,7 @@ interface ExpertiseReportTableRowProps {
   onConvertToQuote?: (report: ExpertiseReport) => void;
   isConverting?: boolean;
   isConverted?: boolean;
+  onEnableConversion?: (reportId: string) => void;
 }
 
 const getStatusColor = (status: string) => {
@@ -49,7 +50,8 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
   onDeleteReport,
   onConvertToQuote,
   isConverting = false,
-  isConverted = false
+  isConverted = false,
+  onEnableConversion
 }) => {
   const [showReplacer, setShowReplacer] = useState(false);
 
@@ -200,7 +202,8 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
         open={showReplacer}
         onOpenChange={setShowReplacer}
         onSuccess={() => {
-          // Le hook invalide déjà le cache
+          // Réactiver le bouton Convertir après modification
+          onEnableConversion?.(report.id);
         }}
       />
     </>

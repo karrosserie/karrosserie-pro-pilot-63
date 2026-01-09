@@ -27,7 +27,7 @@ import { DocumentPagination } from '@/components/ui/document-pagination';
 
 const ExpertiseReports = () => {
   const { reports, isLoading, error, deleteReport } = useExpertiseReports();
-  const { convertToQuote, checkMultipleReports, isConverting, isConverted, convertedReports } = useReportToQuote();
+  const { convertToQuote, checkMultipleReports, isConverting, isConverted, convertedReports, enableConversion } = useReportToQuote();
   const { settings: environmentSettings } = useEnvironment();
   const [initialCheckComplete, setInitialCheckComplete] = useState(false);
   const { pendingImports, isLoading: importsLoading, deleteImport } = useImports();
@@ -382,6 +382,7 @@ function PaginatedReportsSection({
         onConvertToQuote={onConvertToQuote}
         convertingReportId={getConvertingReportId()}
         convertedReports={convertedReports}
+        onEnableConversion={enableConversion}
       />
       <DocumentPagination
         currentPage={currentPage}

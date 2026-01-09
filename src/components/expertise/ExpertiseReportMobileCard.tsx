@@ -9,12 +9,14 @@ interface ExpertiseReportMobileCardProps {
   report: ExpertiseReport;
   onEditReport: (report: ExpertiseReport) => void;
   onDeleteReport: (id: string) => void;
+  onEnableConversion?: (reportId: string) => void;
 }
 
 const ExpertiseReportMobileCard: React.FC<ExpertiseReportMobileCardProps> = ({
   report,
   onEditReport,
-  onDeleteReport
+  onDeleteReport,
+  onEnableConversion
 }) => {
   const [showReplacer, setShowReplacer] = useState(false);
 
@@ -139,7 +141,8 @@ const ExpertiseReportMobileCard: React.FC<ExpertiseReportMobileCardProps> = ({
         open={showReplacer}
         onOpenChange={setShowReplacer}
         onSuccess={() => {
-          // Le hook invalide déjà le cache
+          // Réactiver le bouton Convertir après modification
+          onEnableConversion?.(report.id);
         }}
       />
     </>
