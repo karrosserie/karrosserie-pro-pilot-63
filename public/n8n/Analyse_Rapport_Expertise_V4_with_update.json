@@ -1,0 +1,1792 @@
+{
+  "name": "Analyse Rapport Expertise V4 (with Update)",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    URL: $input.first().json.body.URL,\n    companyId: $input.first().json.body.companyId,\n    isUpdate: $input.first().json.body.isUpdate || false,\n    reportId: $input.first().json.body.reportId || null,\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2384,
+        288
+      ],
+      "id": "376a7f12-e261-4b46-8e24-b9e5da64918c",
+      "name": "Extract origin"
+    },
+    {
+      "parameters": {
+        "jsCode": "var sinister_date = $input.first().json.output.sinister.date;\nvar report_date = $input.first().json.output.date;\n\n$input.first().json = $input.first().json.output;\n\n\n$input.first().json.src = $('Extract origin').first().json.URL;\n$input.first().json.companyId = $('Extract origin').first().json.companyId;\n$input.first().json.isUpdate = $('Extract origin').first().json.isUpdate;\n$input.first().json.reportId = $('Extract origin').first().json.reportId;\n\n$input.first().json.date = report_date;\n$input.first().json.sinister.date = sinister_date;\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1104,
+        288
+      ],
+      "id": "c8619853-2e48-4b8a-945c-d27786979ade",
+      "name": "Merge with origin"
+    },
+    {
+      "parameters": {
+        "tableId": "clients",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "company_id",
+              "fieldValue": "={{ $json.companyId }}"
+            },
+            {
+              "fieldId": "first_name",
+              "fieldValue": "={{ $json.firstName }}"
+            },
+            {
+              "fieldId": "last_name",
+              "fieldValue": "={{ $json.lastName }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $json.email }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $json.phone }}"
+            },
+            {
+              "fieldId": "address",
+              "fieldValue": "={{ $json.address }}"
+            },
+            {
+              "fieldId": "postal_code",
+              "fieldValue": "={{ $json.zipCode }}"
+            },
+            {
+              "fieldId": "city",
+              "fieldValue": "={{ $json.city }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1216,
+        272
+      ],
+      "id": "b2ddca9c-a0bb-4df3-9b3e-ac3daea566bf",
+      "name": "Add client",
+      "credentials": {
+        "supabaseApi": {
+          "id": "85icT7Vwmd73XwZv",
+          "name": "Supabase Lovable"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "clients",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "company_id",
+              "keyValue": "={{ $json.companyId }}"
+            },
+            {
+              "keyName": "phone",
+              "keyValue": "={{ $json.customer.phone }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        208
+      ],
+      "id": "b3f92b9b-a01e-4ebd-a602-7025b1cb0862",
+      "name": "Get client by phone",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "85icT7Vwmd73XwZv",
+          "name": "Supabase Lovable"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f5a5033c-944e-4b16-9517-b1054a192d41",
+              "leftValue": "={{ $json.customer.phone }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -832,
+        288
+      ],
+      "id": "a8c8168b-abd4-48e0-a3ea-7a95b346fd4f",
+      "name": "If phone is not empty",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "24802e43-4158-4677-b9fd-0c9a37ea6638",
+              "leftValue": "={{ $json.customer.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -448,
+        432
+      ],
+      "id": "aa2ffea4-af58-445b-84b2-ae500609386a",
+      "name": "If e-mail is not empty"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "clients",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "keyValue": "={{ $json.customer.email }}"
+            },
+            {
+              "keyName": "company_id",
+              "keyValue": "={{ $json.companyId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        336
+      ],
+      "id": "81b0fd40-0134-49d3-a396-cfda1e000c68",
+      "name": "Get client by e-mail",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "85icT7Vwmd73XwZv",
+          "name": "Supabase Lovable"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9971153c-36c3-4a08-adbe-27142be3d4d6",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        592,
+        192
+      ],
+      "id": "f8aca677-ce9e-4cc3-8c2e-0c87f24d3d1c",
+      "name": "If client exists",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "update-check-condition",
+              "leftValue": "={{ $('Extract origin').first().json.isUpdate }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3264,
+        224
+      ],
+      "id": "check-if-update",
+      "name": "If is Update"
+    },
+    {
+      "parameters": {
+        "tableId": "expertise_reports",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "company_id",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.companyId }}"
+            },
+            {
+              "fieldId": "client_id",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.clientId }}"
+            },
+            {
+              "fieldId": "vehicle_id",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.vehicleId }}"
+            },
+            {
+              "fieldId": "expert_name",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.expert }}"
+            },
+            {
+              "fieldId": "amount",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.finalAmount }}"
+            },
+            {
+              "fieldId": "document_url",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.src }}"
+            },
+            {
+              "fieldId": "report_number",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.number }}"
+            },
+            {
+              "fieldId": "report_date",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.date; }}"
+            },
+            {
+              "fieldId": "claim_number",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.sinister.number }}"
+            },
+            {
+              "fieldId": "incident_date",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.sinister.date != '' ? $('Format Parts & Repairs').item.json.sinister.date : null }}"
+            },
+            {
+              "fieldId": "policy_number",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.insurance.contract }}"
+            },
+            {
+              "fieldId": "repairs_data",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.repairsForDB }}"
+            },
+            {
+              "fieldId": "parts_data",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.partsForDB }}"
+            },
+            {
+              "fieldId": "global_discount_data",
+              "fieldValue": "={{ $json.globalDiscountsForDB }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3472,
+        320
+      ],
+      "id": "869dcde6-86ab-49ae-98d1-3031896a5354",
+      "name": "Add report",
+      "credentials": {
+        "supabaseApi": {
+          "id": "85icT7Vwmd73XwZv",
+          "name": "Supabase Lovable"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "expertise_reports",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Extract origin').first().json.reportId }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "client_id",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.clientId }}"
+            },
+            {
+              "fieldId": "vehicle_id",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.vehicleId }}"
+            },
+            {
+              "fieldId": "expert_name",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.expert }}"
+            },
+            {
+              "fieldId": "amount",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.finalAmount }}"
+            },
+            {
+              "fieldId": "document_url",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.src }}"
+            },
+            {
+              "fieldId": "report_number",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.number }}"
+            },
+            {
+              "fieldId": "report_date",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.date; }}"
+            },
+            {
+              "fieldId": "claim_number",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.sinister.number }}"
+            },
+            {
+              "fieldId": "incident_date",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.sinister.date != '' ? $('Format Parts & Repairs').item.json.sinister.date : null }}"
+            },
+            {
+              "fieldId": "policy_number",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.insurance.contract }}"
+            },
+            {
+              "fieldId": "repairs_data",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.repairsForDB }}"
+            },
+            {
+              "fieldId": "parts_data",
+              "fieldValue": "={{ $('Format Parts & Repairs').item.json.partsForDB }}"
+            },
+            {
+              "fieldId": "global_discount_data",
+              "fieldValue": "={{ $json.globalDiscountsForDB }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3472,
+        128
+      ],
+      "id": "update-report-node",
+      "name": "Update report",
+      "credentials": {
+        "supabaseApi": {
+          "id": "85icT7Vwmd73XwZv",
+          "name": "Supabase Lovable"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "vehicles",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "company_id",
+              "keyValue": "={{ $json.companyId }}"
+            },
+            {
+              "keyName": "license_plate",
+              "keyValue": "={{ $json.vehicle.registration }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        240
+      ],
+      "id": "50c3126a-63ad-46f1-8c9c-d3c4438ad690",
+      "name": "Get vehicle by registration",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "85icT7Vwmd73XwZv",
+          "name": "Supabase Lovable"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9971153c-36c3-4a08-adbe-27142be3d4d6",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1792,
+        240
+      ],
+      "id": "f3a415d6-c20c-461a-8ba9-2dc41b74f3a3",
+      "name": "If vehicle exists",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "jsCode": "function extractAddress(address) {\n    const match = address.match(/^(.*?)\\s(\\d{5})\\s([\\w\\s-]+)$/);\n    if (match) {\n        return {\n            address: match[1].trim(),\n            zipCode: match[2],\n            city: match[3].trim()\n        };\n    } else {\n        //throw new Error(\"Format d'adresse non reconnu.\");\n    }\n}\n\nlet client = {};\n// C'est une bonne pratique de ne récupérer la source qu'une seule fois\nconst sourceData = $('Merge with origin').first().json; \n\nclient.companyId = sourceData.companyId;\nlet names = sourceData.customer.name.split(' ');\nclient.lastName = names[0];\nclient.firstName = names[1];\n\nlet extractedAddress = extractAddress(sourceData.customer.address);\nif (extractedAddress) {\n  client.address = extractedAddress.address;\n  client.zipCode = extractedAddress.zipCode;\n  client.city = extractedAddress.city;  \n}\n\nclient.email = sourceData.customer.email;\n\n// --- Logique de normalisation du téléphone ---\nlet rawPhone = sourceData.customer.phone;\nlet formattedPhone = null; // Mettre null (ou \"\") si le numéro est invalide\n\nif (rawPhone) {\n    // 1. Supprime tous les caractères non numériques (espaces, +, °, ., -)\n    const digits = rawPhone.replace(/\\D/g, ''); \n\n    // 2. Vérifie qu'on a au moins 9 chiffres.\n    // (ex: 0612345678 -> 10 chiffres, 33612345678 -> 11 chiffres)\n    if (digits.length >= 9) {\n        // 3. Prend les 9 derniers chiffres\n        const last9Digits = digits.slice(-9); \n        \n        // 4. Ajoute le préfixe +33\n        formattedPhone = '+33' + last9Digits;\n    }\n}\n\nclient.phone = formattedPhone;\n// --- Fin de la logique téléphone ---\n\nreturn client;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        496
+      ],
+      "id": "42ddd7a3-e7d8-4b4f-bfff-f6d7074ef10b",
+      "name": "Prepare client"
+    },
+    {
+      "parameters": {
+        "tableId": "vehicles",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "company_id",
+              "fieldValue": "={{ $('Merge with client id').item.json.companyId }}"
+            },
+            {
+              "fieldId": "client_id",
+              "fieldValue": "={{ $('Merge with client id').item.json.clientId }}"
+            },
+            {
+              "fieldId": "license_plate",
+              "fieldValue": "={{ $('Merge with origin').item.json.vehicle.registration }}"
+            },
+            {
+              "fieldId": "vin",
+              "fieldValue": "={{ $('Merge with origin').item.json.vehicle.vin }}"
+            },
+            {
+              "fieldId": "color",
+              "fieldValue": "={{ $('Merge with origin').item.json.vehicle.color }}"
+            },
+            {
+              "fieldId": "mileage",
+              "fieldValue": "={{ $('Merge with origin').item.json.vehicle.mileage }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2576,
+        720
+      ],
+      "id": "d24969dd-786f-4e28-afa8-1e5f42e862bf",
+      "name": "Add vehicle",
+      "credentials": {
+        "supabaseApi": {
+          "id": "85icT7Vwmd73XwZv",
+          "name": "Supabase Lovable"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "car_models",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "name",
+              "keyValue": "={{ $('Merge with client id').item.json.vehicle.model }}"
+            },
+            {
+              "keyName": "brand_id",
+              "keyValue": "={{ $json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1712,
+        528
+      ],
+      "id": "83fc6b74-a968-4c9c-91f6-8600ed8eda25",
+      "name": "Get model_id",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "85icT7Vwmd73XwZv",
+          "name": "Supabase Lovable"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "$('Merge with client id').first().json.vehicleId = $input.last().json.id;\nreturn $('Merge with client id').all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2896,
+        224
+      ],
+      "id": "8cc46d2a-f3de-4749-9232-a25b3baf3d9f",
+      "name": "Merge with vehicle id"
+    },
+    {
+      "parameters": {
+        "jsCode": "$input.first().json.repairsForDB = [];\n$input.first().json.partsForDB = [];\n\nvar sinister_date = $input.first().json.sinister.date\nvar report_date = $input.first().json.date\n\nvar dateReport =  report_date.split(\"/\").reverse().join(\"-\");\nvar dateSinister =  sinister_date.split(\"/\").reverse().join(\"-\");\nif((dateReport.split(\"-\")[0]).length == 2)\n  dateReport = \"20\"+dateReport;\nif((dateSinister.split(\"-\")[0]).length == 2)\n  dateSinister = \"20\"+dateSinister;\n\n$input.first().json.date = dateReport;\n$input.first().json.sinister.date = dateSinister;\n\nlet i = 0;\n\nfor (const item of $input.first().json.repairs) {\n  let repair = {};\n  repair.id = 'repair_' + Date.now() + i;\n  repair.description = item.label;\n  repair.quantity = parseFloat(item.quantity);\n  repair.unitCost = item.unitCost;\n  repair.discount = item.discount || 0;\n  repair.vat = item.tax;\n  repair.total = item.finalAmount;\n  $input.first().json.repairsForDB.push(repair);\n  i++;\n}\n\ni = 0;\n\nfor (const item of $input.first().json.parts) {\n  let part = {};\n  part.id = 'part_' + Date.now() + i;\n  part.description = item.label;\n  part.quantity = parseFloat(item.quantity);\n  part.unitCost = item.unitCost;\n  part.discount = item.discount;\n  part.vat = item.tax;\n  part.total = item.finalAmount;\n  $input.first().json.partsForDB.push(part);\n  i++;\n}\n\n$input.first().json.globalDiscountsForDB = [];\n\nlet j = 0;\n\nfor (const item of $input.first().json.globalDiscounts || []) {\n  let discount = {};\n  discount.id = 'discount_' + Date.now() + j;\n  discount.label = item.label;\n  discount.rate = item.rate;\n  discount.subAmount = item.subAmount;\n  discount.taxAmount = item.taxAmount;\n  discount.finalAmount = item.finalAmount;\n  \n  $input.first().json.globalDiscountsForDB.push(discount);\n  j++;\n}\n\n\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3088,
+        224
+      ],
+      "id": "2109da35-a8f3-421f-bd5a-0a0f44612389",
+      "name": "Format Parts & Repairs"
+    },
+    {
+      "parameters": {
+        "jsCode": "$('Merge with origin').first().json.clientId = $input.last().json.id;\nreturn $('Merge with origin').all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1424,
+        96
+      ],
+      "id": "fa33cf9a-eb35-41c7-9948-77ddf5fb4216",
+      "name": "Merge with client id"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "imports",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Webhook1').item.json.body.importId }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "report_id",
+              "fieldValue": "={{ $json.id }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "Importé"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3680,
+        224
+      ],
+      "id": "cad6ab85-b293-4c87-a507-062aeec73a33",
+      "name": "Update import",
+      "credentials": {
+        "supabaseApi": {
+          "id": "85icT7Vwmd73XwZv",
+          "name": "Supabase Lovable"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "24802e43-4158-4677-b9fd-0c9a37ea6638",
+              "leftValue": "={{ $json.customer.name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -176,
+        576
+      ],
+      "id": "41818aef-060f-42db-b274-60e279e38fce",
+      "name": "If name is not empty"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "clients",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "first_name",
+              "keyValue": "={{ $json.firstName }}"
+            },
+            {
+              "keyName": "last_name",
+              "keyValue": "={{ $json.lastName }}"
+            },
+            {
+              "keyName": "company_id",
+              "keyValue": "={{ $json.companyId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        336,
+        352
+      ],
+      "id": "d78053e4-0097-401b-97b0-c6607860c11f",
+      "name": "Get client by name",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "85icT7Vwmd73XwZv",
+          "name": "Supabase Lovable"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let client = {};\nlet names = $('Merge with origin').first().json.customer.name.split(' ');\nclient.lastName = names[0];\nclient.firstName = names[1];\nclient.companyId = $('Merge with origin').first().json.companyId;\nreturn client;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        384
+      ],
+      "id": "489b3bf2-ab5c-4c64-ab99-a32842ad923f",
+      "name": "Extract names from client"
+    },
+    {
+      "parameters": {
+        "tableId": "vehicles",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "company_id",
+              "fieldValue": "={{ $('Merge with client id').item.json.companyId }}"
+            },
+            {
+              "fieldId": "client_id",
+              "fieldValue": "={{ $('Merge with client id').item.json.clientId }}"
+            },
+            {
+              "fieldId": "license_plate",
+              "fieldValue": "={{ $('Merge with origin').item.json.vehicle.registration }}"
+            },
+            {
+              "fieldId": "vin",
+              "fieldValue": "={{ $('Merge with origin').item.json.vehicle.vin }}"
+            },
+            {
+              "fieldId": "color",
+              "fieldValue": "={{ $('Merge with origin').item.json.vehicle.color }}"
+            },
+            {
+              "fieldId": "mileage",
+              "fieldValue": "={{ $('Merge with origin').item.json.vehicle.mileage }}"
+            },
+            {
+              "fieldId": "brand_id",
+              "fieldValue": "={{ $('Get Brand Id').item.json.id }}"
+            },
+            {
+              "fieldId": "model_id",
+              "fieldValue": "={{ $json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2368,
+        352
+      ],
+      "id": "2506ed3d-97a3-4b3f-86ef-7f5c27ec1bbb",
+      "name": "Add vehicle1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "85icT7Vwmd73XwZv",
+          "name": "Supabase Lovable"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bea5c887-c5b4-46ce-ae41-15aceffdcc07",
+              "leftValue": "={{ $json.id == null }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2048,
+        528
+      ],
+      "id": "22d07e1d-1cca-4aa6-916d-78669a06b8b3",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "tableId": "vehicles",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "company_id",
+              "fieldValue": "={{ $('Merge with client id').item.json.companyId }}"
+            },
+            {
+              "fieldId": "client_id",
+              "fieldValue": "={{ $('Merge with client id').item.json.clientId }}"
+            },
+            {
+              "fieldId": "license_plate",
+              "fieldValue": "={{ $('Merge with origin').item.json.vehicle.registration }}"
+            },
+            {
+              "fieldId": "vin",
+              "fieldValue": "={{ $('Merge with origin').item.json.vehicle.vin }}"
+            },
+            {
+              "fieldId": "color",
+              "fieldValue": "={{ $('Merge with origin').item.json.vehicle.color }}"
+            },
+            {
+              "fieldId": "mileage",
+              "fieldValue": "={{ $('Merge with origin').item.json.vehicle.mileage }}"
+            },
+            {
+              "fieldId": "brand_id",
+              "fieldValue": "={{ $('Get Brand Id').item.json.id }}"
+            },
+            {
+              "fieldId": "model_id",
+              "fieldValue": "={{ $json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2560,
+        576
+      ],
+      "id": "140c43cc-8163-4686-9e2c-c5b3140ee6b3",
+      "name": "Add vehicle2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "85icT7Vwmd73XwZv",
+          "name": "Supabase Lovable"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "car_models",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('Format Brand').item.json.vehicle.model }}"
+            },
+            {
+              "fieldId": "brand_id",
+              "fieldValue": "={{ $('Get Brand Id').item.json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2352,
+        576
+      ],
+      "id": "1e15aab8-4106-4cf1-89de-b215e175b654",
+      "name": "Add Model",
+      "credentials": {
+        "supabaseApi": {
+          "id": "85icT7Vwmd73XwZv",
+          "name": "Supabase Lovable"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "car_models",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "=$('Merge with client id').item.json.vehicle.model"
+            },
+            {
+              "fieldId": "brand_id",
+              "fieldValue": "={{ $json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2112,
+        720
+      ],
+      "id": "dfffdd07-13e5-4e57-9920-816ae3cee6e7",
+      "name": "Add Model1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "85icT7Vwmd73XwZv",
+          "name": "Supabase Lovable"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "car_brands",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('Merge with client id').item.json.vehicle.make }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1696,
+        720
+      ],
+      "id": "e57e834b-eaae-479c-929c-54ada87839df",
+      "name": "Add Brand",
+      "credentials": {
+        "supabaseApi": {
+          "id": "85icT7Vwmd73XwZv",
+          "name": "Supabase Lovable"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "car_brands",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "name",
+              "keyValue": "={{ $json.vehicle.make }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        624
+      ],
+      "id": "08fe39ab-3f49-4f10-9b62-3658c70885a9",
+      "name": "Get Brand Id",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "85icT7Vwmd73XwZv",
+          "name": "Supabase Lovable"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9971153c-36c3-4a08-adbe-27142be3d4d6",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1424,
+        624
+      ],
+      "id": "ba3c5679-71c9-4033-b9e8-f9da11332261",
+      "name": "If brand exists1",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "jsCode": "var brand = $('Merge with client id').first().json.vehicle.make.toLowerCase();\nvar result =  $('Merge with client id').first().json;\nfunction capitalizeFirstLetter(val) {\n    return String(val).charAt(0).toUpperCase() + String(val).slice(1);\n}\nresult.vehicle.make = capitalizeFirstLetter(brand);\nreturn result;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        336
+      ],
+      "id": "a0b4e30f-cd2c-4512-8e22-309f2b694c2e",
+      "name": "Format Brand"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "aef3a1de-8b92-46bd-8ae4-3e5e11dc554b",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2592,
+        288
+      ],
+      "id": "b69562ee-aa45-4a14-a997-901a91cc0da0",
+      "name": "Webhook1",
+      "webhookId": "aef3a1de-8b92-46bd-8ae4-3e5e11dc554b"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "binaryPropertyName": "=",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -2528,
+        512
+      ],
+      "id": "cab258c9-28d1-450c-bb08-1c9a099fad70",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.URL }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2224,
+        288
+      ],
+      "id": "4d584895-cb5b-4e99-a453-1f6e76af8d9a",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -2032,
+        288
+      ],
+      "id": "3787d6cb-5c65-4a1c-a505-8a874fc327db",
+      "name": "Extract from File1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/ocr",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"mistral-ocr-latest\",\n  \"document\": {\n    \"type\": \"document_url\",\n    \"document_url\": \"data:application/pdf;base64,{{ $json.data }}\"\n  },\n\"include_image_base64\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2288,
+        768
+      ],
+      "id": "7d1b100e-2b23-4826-96c2-1f20b18a3750",
+      "name": "HTTP Request2",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "7EWrQ8Fsvy4VGpLb",
+          "name": "Mistral API Key (Prod)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"number\": \"AB3255054956G53\",\n  \"date\": \"2025-09-11\",\n  \"expert\": \"AHDI BOUAZIZ\",\n  \"sinister\": {\n    \"number\": \"101253649260\",\n    \"date\": \"2025-09-02\"\n  },\n  \"customer\": {\n    \"name\": \"LENOBLE THOMAS\",\n    \"address\": \"\",\n    \"phone\": \"\",\n    \"email\": \"\"\n  },\n  \"insurance\": {\n    \"name\": \"ACM IARD SA\",\n    \"address\": \"1 63, CHEMIN ANTOINE PARDON, 1 69814 TASSIN CEDEX\",\n    \"phone\": \"\",\n    \"email\": \"\",\n    \"contract\": \"\"\n  },\n  \"vehicle\": {\n    \"vin\": \"TMBJR7NU0LJ008760\",\n    \"registration\": \"FM-296-QN\",\n    \"mileage\": 55795,\n    \"make\": \"SEODA\",\n    \"model\": \"KAROQ 1.5 TSI ACT - 150 SPORTLINE\",\n    \"color\": \"BLANC\"\n  },\n  \"repairs\": [],\n  \"parts\": [],\n  \"globalDiscounts\": [],\n  \"subAmount\": 3370.15,\n  \"taxAmount\": 674.03,\n  \"finalAmount\": 4044.18\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -1280,
+        528
+      ],
+      "id": "cae2446c-f9b1-4d58-8802-93d48ef13afe",
+      "name": "Structured Output Parser3"
+    },
+    {
+      "parameters": {
+        "model": "mistral-large-latest",
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        -1328,
+        736
+      ],
+      "id": "a7b8c9d0-1234-5678-9abc-def012345678",
+      "name": "Mistral Cloud Chat Model5",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "mistral-api-id",
+          "name": "Mistral API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "claude-3-5-sonnet-20241022",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -1376,
+        624
+      ],
+      "id": "anthropic-model-id",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-api-id",
+          "name": "Anthropic API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.pages.map(p => p.markdown).join('\\n\\n') }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -1328,
+        288
+      ],
+      "id": "ai-agent-5-id",
+      "name": "AI Agent5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"pixtral-large-latest\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"Extract the data from this document in JSON format\"\n        },\n        {\n          \"type\": \"image_url\",\n          \"image_url\": \"data:application/pdf;base64,{{ $json.data }}\"\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2096,
+        512
+      ],
+      "id": "http-request-id",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/ocr",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"mistral-ocr-latest\",\n  \"document\": {\n    \"type\": \"document_url\",\n    \"document_url\": \"data:application/pdf;base64,{{ $json.data }}\"\n  },\n\"include_image_base64\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1840,
+        288
+      ],
+      "id": "http-request-3-id",
+      "name": "HTTP Request3",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "7EWrQ8Fsvy4VGpLb",
+          "name": "Mistral API Key (Prod)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Extract origin": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge with origin": {
+      "main": [
+        [
+          {
+            "node": "If phone is not empty",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add client": {
+      "main": [
+        [
+          {
+            "node": "Merge with client id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get client by phone": {
+      "main": [
+        [
+          {
+            "node": "If client exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If phone is not empty": {
+      "main": [
+        [
+          {
+            "node": "Get client by phone",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If e-mail is not empty",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If e-mail is not empty": {
+      "main": [
+        [
+          {
+            "node": "Get client by e-mail",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If name is not empty",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get client by e-mail": {
+      "main": [
+        [
+          {
+            "node": "If client exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If client exists": {
+      "main": [
+        [
+          {
+            "node": "Merge with client id",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If is Update": {
+      "main": [
+        [
+          {
+            "node": "Update report",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add report": {
+      "main": [
+        [
+          {
+            "node": "Update import",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update report": {
+      "main": [
+        [
+          {
+            "node": "Update import",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get vehicle by registration": {
+      "main": [
+        [
+          {
+            "node": "If vehicle exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If vehicle exists": {
+      "main": [
+        [
+          {
+            "node": "Merge with vehicle id",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Brand",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare client": {
+      "main": [
+        [
+          {
+            "node": "Add client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add vehicle": {
+      "main": [
+        [
+          {
+            "node": "Merge with vehicle id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get model_id": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge with vehicle id": {
+      "main": [
+        [
+          {
+            "node": "Format Parts & Repairs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Parts & Repairs": {
+      "main": [
+        [
+          {
+            "node": "If is Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge with client id": {
+      "main": [
+        [
+          {
+            "node": "Get vehicle by registration",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Brand Id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If name is not empty": {
+      "main": [
+        [
+          {
+            "node": "Extract names from client",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract names from client": {
+      "main": [
+        [
+          {
+            "node": "Get client by name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get client by name": {
+      "main": [
+        [
+          {
+            "node": "If client exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add vehicle1": {
+      "main": [
+        [
+          {
+            "node": "Merge with vehicle id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Add vehicle1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add Model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add vehicle2": {
+      "main": [
+        [
+          {
+            "node": "Merge with vehicle id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Model": {
+      "main": [
+        [
+          {
+            "node": "Add vehicle2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Model1": {
+      "main": [
+        [
+          {
+            "node": "Add vehicle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Brand": {
+      "main": [
+        [
+          {
+            "node": "Add Model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Brand Id": {
+      "main": [
+        [
+          {
+            "node": "If brand exists1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If brand exists1": {
+      "main": [
+        [
+          {
+            "node": "Get model_id",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add Brand",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Brand": {
+      "main": [
+        [
+          {
+            "node": "Get Brand Id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Extract origin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser3": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent5",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent5": {
+      "main": [
+        [
+          {
+            "node": "Merge with origin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent5",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "AI Agent5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}
