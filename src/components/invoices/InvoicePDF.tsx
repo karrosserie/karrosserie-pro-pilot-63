@@ -82,7 +82,7 @@ const defaultStyles = StyleSheet.create({
   detailLabel: {
     fontWeight: "bold",
     fontSize: 9,
-    width: 80,
+    width: 65,
   },
   detailValue: {
     fontSize: 9,
