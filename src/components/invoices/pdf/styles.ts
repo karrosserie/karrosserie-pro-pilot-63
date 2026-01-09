@@ -59,10 +59,14 @@ export const pdfStyles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 7,
     marginRight: 8,
+    flex: 1,
+    minWidth: 70,
   },
   detailValue: {
     fontSize: 7,
     textAlign: 'right',
+    flex: 1.5,
+    flexWrap: 'wrap',
   },
   table: {
     marginTop: 15,
