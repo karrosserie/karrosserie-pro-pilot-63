@@ -261,20 +261,26 @@ export const expertiseReportsService = {
       console.error('Error checking quotes dependencies:', quotesError);
     }
 
-    // Vérifier les ordres de réparation liés
+    // Vérifier les ordres de réparation liés (inclure signed_document_url pour savoir si signé)
     const { data: repairOrders, error: roError } = await supabase
       .from('repair_orders')
-      .select('id, reference, status')
+      .select('id, reference, status, signed_document_url')
       .or(`source_report_id.eq.${reportId},modificatif_report_id.eq.${reportId}`);
     
     if (roError) {
       console.error('Error checking repair orders dependencies:', roError);
     }
 
+    // Vérifier si un OR est signé (bloque la modification)
+    const hasSignedRepairOrder = (repairOrders || []).some(
+      (ro: any) => ro.signed_document_url !== null && ro.signed_document_url !== undefined
+    );
+
     return {
       quotes: quotes || [],
       repairOrders: repairOrders || [],
-      hasLinkedDocuments: (quotes?.length || 0) > 0 || (repairOrders?.length || 0) > 0
+      hasLinkedDocuments: (quotes?.length || 0) > 0 || (repairOrders?.length || 0) > 0,
+      hasSignedRepairOrder
     };
   }
 };

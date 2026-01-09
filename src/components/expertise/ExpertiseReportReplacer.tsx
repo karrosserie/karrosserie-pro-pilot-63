@@ -19,8 +19,9 @@ interface ExpertiseReportReplacerProps {
 
 interface Dependencies {
   quotes: { id: string; reference: string; status: string }[];
-  repairOrders: { id: string; reference: string; status: string }[];
+  repairOrders: { id: string; reference: string; status: string; signed_document_url?: string | null }[];
   hasLinkedDocuments: boolean;
+  hasSignedRepairOrder: boolean;
 }
 
 export const ExpertiseReportReplacer: React.FC<ExpertiseReportReplacerProps> = ({
@@ -205,7 +206,7 @@ export const ExpertiseReportReplacer: React.FC<ExpertiseReportReplacerProps> = (
       }
 
       toast({
-        title: "Remplacement réussi",
+        title: "Modification réussie",
         description: "Le nouveau document est en cours d'analyse par notre IA."
       });
 
@@ -233,6 +234,7 @@ export const ExpertiseReportReplacer: React.FC<ExpertiseReportReplacerProps> = (
   };
 
   const isProcessing = isUploading || isReplacing;
+  const isBlocked = dependencies?.hasSignedRepairOrder ?? false;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -240,7 +242,7 @@ export const ExpertiseReportReplacer: React.FC<ExpertiseReportReplacerProps> = (
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <RefreshCw className="h-5 w-5 text-orange-500" />
-            Remplacer le rapport d'expertise
+            Modifier le rapport d'expertise
           </DialogTitle>
           <DialogDescription>
             Importez un nouveau PDF pour mettre à jour ce rapport
@@ -284,8 +286,22 @@ export const ExpertiseReportReplacer: React.FC<ExpertiseReportReplacerProps> = (
               Vérification des dépendances...
             </div>
           )}
+
+          {/* Alerte si OR signé - bloque la modification */}
+          {dependencies?.hasSignedRepairOrder && (
+            <Alert variant="destructive" className="border-red-300 bg-red-50">
+              <AlertTriangle className="h-4 w-4 text-red-600" />
+              <AlertDescription className="text-red-800">
+                <span className="font-medium">Modification impossible</span>
+                <p className="text-sm mt-1">
+                  Un ordre de réparation lié à ce rapport a déjà été signé.
+                  La modification n'est plus autorisée.
+                </p>
+              </AlertDescription>
+            </Alert>
+          )}
           
-          {dependencies?.hasLinkedDocuments && (
+          {dependencies?.hasLinkedDocuments && !dependencies?.hasSignedRepairOrder && (
             <Alert variant="destructive" className="border-orange-200 bg-orange-50">
               <AlertTriangle className="h-4 w-4 text-orange-600" />
               <AlertDescription className="text-orange-800">
@@ -294,23 +310,25 @@ export const ExpertiseReportReplacer: React.FC<ExpertiseReportReplacerProps> = (
                   <p className="text-sm mt-1">• {dependencies.quotes.length} devis</p>
                 )}
                 {dependencies.repairOrders?.length > 0 && (
-                  <p className="text-sm">• {dependencies.repairOrders.length} ordres de réparation</p>
+                  <p className="text-sm">• {dependencies.repairOrders.length} ordres de réparation (non signés)</p>
                 )}
                 <p className="text-xs mt-2 opacity-80">
-                  Le remplacement conservera les liens existants.
+                  La modification conservera les liens existants.
                 </p>
               </AlertDescription>
             </Alert>
           )}
 
           {/* Avertissement */}
-          <Alert>
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
-              Cette action remplacera le document PDF et relancera l'analyse automatique.
-              Les données actuelles seront mises à jour avec les nouvelles informations extraites.
-            </AlertDescription>
-          </Alert>
+          {!dependencies?.hasSignedRepairOrder && (
+            <Alert>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                Cette action remplacera le document PDF et relancera l'analyse automatique.
+                Les données actuelles seront mises à jour avec les nouvelles informations extraites.
+              </AlertDescription>
+            </Alert>
+          )}
 
           {/* Upload zone */}
           <input
@@ -372,18 +390,18 @@ export const ExpertiseReportReplacer: React.FC<ExpertiseReportReplacerProps> = (
             </Button>
             <Button
               onClick={handleReplace}
-              disabled={!selectedFile || isProcessing}
+              disabled={!selectedFile || isProcessing || isBlocked}
               className="bg-orange-500 hover:bg-orange-600"
             >
               {isProcessing ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Remplacement en cours...
+                  Modification en cours...
                 </>
               ) : (
                 <>
                   <RefreshCw className="h-4 w-4 mr-2" />
-                  Remplacer le PDF
+                  Modifier le PDF
                 </>
               )}
             </Button>

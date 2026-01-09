@@ -107,8 +107,8 @@ const ExpertiseReportMobileCard: React.FC<ExpertiseReportMobileCardProps> = ({
             className="text-xs h-8 px-2 sm:px-3 text-orange-600 hover:text-orange-700"
           >
             <RefreshCw className="h-3 w-3 mr-1" />
-            <span className="hidden xs:inline">Remplacer</span>
-            <span className="xs:hidden">Rempl.</span>
+            <span className="hidden xs:inline">Modifier</span>
+            <span className="xs:hidden">Modif.</span>
           </Button>
           <Button
             variant="ghost"
