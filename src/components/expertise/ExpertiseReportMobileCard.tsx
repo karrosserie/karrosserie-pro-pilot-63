@@ -2,20 +2,26 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Pencil, Trash, FileText, Calendar, User, Car } from 'lucide-react';
+import { Pencil, Trash, FileText, Calendar, User, Car, RefreshCw } from 'lucide-react';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 
 interface ExpertiseReportMobileCardProps {
   report: ExpertiseReport;
   onEditReport: (report: ExpertiseReport) => void;
   onDeleteReport: (id: string) => void;
+  onModifyReport?: (report: ExpertiseReport) => void;
+  hasSignedRepairOrder?: boolean;
 }
 
 const ExpertiseReportMobileCard: React.FC<ExpertiseReportMobileCardProps> = ({
   report,
   onEditReport,
-  onDeleteReport
+  onDeleteReport,
+  onModifyReport,
+  hasSignedRepairOrder = false
 }) => {
+  const isAnalyzing = report.status === 'En cours d\'analyse';
+  const canModify = !isAnalyzing && !hasSignedRepairOrder;
   const formatAmount = (amount: number | null | undefined): string => {
     if (amount === null || amount === undefined) return '-';
     return amount.toLocaleString('fr-FR', { 
@@ -94,6 +100,19 @@ const ExpertiseReportMobileCard: React.FC<ExpertiseReportMobileCardProps> = ({
 
       {/* Actions */}
       <div className="flex items-center justify-end space-x-2 pt-2 border-t border-gray-100">
+        {onModifyReport && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onModifyReport(report)}
+            disabled={!canModify}
+            className="text-orange-500 hover:text-orange-700 text-xs h-8 px-2 sm:px-3"
+          >
+            <RefreshCw className="h-3 w-3 mr-1" />
+            <span className="hidden xs:inline">Modifier PDF</span>
+            <span className="xs:hidden">PDF</span>
+          </Button>
+        )}
         <Button
           variant="ghost"
           size="sm"
