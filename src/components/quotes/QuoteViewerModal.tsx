@@ -243,27 +243,37 @@ const QuoteViewerModal = ({ quote, open, onOpenChange }: QuoteViewerModalProps) 
   };
 
   const items = [];
-  items.push(...repairs.map((repair: any) => ({
-    ref: repair.ref || '',
-    description: repair.description || repair.label || '',
-    quantity: repair.quantity || 1,
-    discount: repair.discount || 0,
-    unitPrice: repair.unitCost || repair.price || 0,
-    vat: repair.vat || 20,
-    totalHT: (repair.unitCost || repair.price || 0) * (repair.quantity || 1) * (1 - (repair.discount || 0) / 100),
-    totalTTC: (repair.unitCost || repair.price || 0) * (repair.quantity || 1) * (1 - (repair.discount || 0) / 100) * (1 + (repair.vat || 20) / 100)
-  })));
+  items.push(...repairs
+    .filter((repair: any) => {
+      const qty = typeof repair.quantity === 'number' ? repair.quantity : 1;
+      return qty > 0;
+    })
+    .map((repair: any) => ({
+      ref: repair.ref || '',
+      description: repair.description || repair.label || '',
+      quantity: typeof repair.quantity === 'number' ? repair.quantity : 1,
+      discount: repair.discount || 0,
+      unitPrice: repair.unitCost || repair.price || 0,
+      vat: repair.vat || 20,
+      totalHT: (repair.unitCost || repair.price || 0) * (typeof repair.quantity === 'number' ? repair.quantity : 1) * (1 - (repair.discount || 0) / 100),
+      totalTTC: (repair.unitCost || repair.price || 0) * (typeof repair.quantity === 'number' ? repair.quantity : 1) * (1 - (repair.discount || 0) / 100) * (1 + (repair.vat || 20) / 100)
+    })));
 
-  items.push(...parts.map((part: any) => ({
-    ref: part.ref || '',
-    description: part.description || part.label || '',
-    quantity: part.quantity || 1,
-    discount: part.discount || 0,
-    unitPrice: part.unitCost || part.price || 0,
-    vat: part.vat || 20,
-    totalHT: (part.unitCost || part.price || 0) * (part.quantity || 1) * (1 - (part.discount || 0) / 100),
-    totalTTC: (part.unitCost || part.price || 0) * (part.quantity || 1) * (1 - (part.discount || 0) / 100) * (1 + (part.vat || 20) / 100)
-  })));
+  items.push(...parts
+    .filter((part: any) => {
+      const qty = typeof part.quantity === 'number' ? part.quantity : 1;
+      return qty > 0;
+    })
+    .map((part: any) => ({
+      ref: part.ref || '',
+      description: part.description || part.label || '',
+      quantity: typeof part.quantity === 'number' ? part.quantity : 1,
+      discount: part.discount || 0,
+      unitPrice: part.unitCost || part.price || 0,
+      vat: part.vat || 20,
+      totalHT: (part.unitCost || part.price || 0) * (typeof part.quantity === 'number' ? part.quantity : 1) * (1 - (part.discount || 0) / 100),
+      totalTTC: (part.unitCost || part.price || 0) * (typeof part.quantity === 'number' ? part.quantity : 1) * (1 - (part.discount || 0) / 100) * (1 + (part.vat || 20) / 100)
+    })));
 
   // Calculer le montant total des remises globales
   const globalDiscountAmount = discounts.reduce((sum, d) => {
