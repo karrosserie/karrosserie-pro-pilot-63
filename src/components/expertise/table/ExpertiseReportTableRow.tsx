@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Pencil, Trash, Download, ArrowRight, Loader2 } from 'lucide-react';
+import { Pencil, Trash, Download, ArrowRight, Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
@@ -12,8 +12,10 @@ interface ExpertiseReportTableRowProps {
   onEditReport: (report: ExpertiseReport) => void;
   onDeleteReport: (id: string) => void;
   onConvertToQuote?: (report: ExpertiseReport) => void;
+  onModifyReport?: (report: ExpertiseReport) => void;
   isConverting?: boolean;
   isConverted?: boolean;
+  hasSignedRepairOrder?: boolean;
 }
 
 const getStatusColor = (status: string) => {
@@ -48,9 +50,13 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
   onEditReport,
   onDeleteReport,
   onConvertToQuote,
+  onModifyReport,
   isConverting = false,
-  isConverted = false
+  isConverted = false,
+  hasSignedRepairOrder = false
 }) => {
+  const isAnalyzing = report.status === 'En cours d\'analyse';
+  const canModify = !isAnalyzing && !hasSignedRepairOrder;
   const getStatusDisplay = () => {
     const status = isConverted ? 'Converti' : (report.status || 'Importé');
     return (
@@ -120,6 +126,31 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
                 {!report.document_url ? 'Aucun document disponible' : 'Télécharger le rapport'}
               </TooltipContent>
             </Tooltip>
+
+            {onModifyReport && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="text-orange-500 hover:text-orange-700 border-orange-500 hover:border-orange-700"
+                    onClick={() => onModifyReport(report)}
+                    disabled={!canModify}
+                  >
+                    <RefreshCw className="h-4 w-4 mr-1" />
+                    Modifier PDF
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {isAnalyzing 
+                    ? 'Analyse en cours, veuillez patienter'
+                    : hasSignedRepairOrder 
+                      ? 'Modification impossible: OR signé'
+                      : 'Modifier le PDF et relancer l\'analyse'
+                  }
+                </TooltipContent>
+              </Tooltip>
+            )}
 
             {onConvertToQuote && !isConverted && (
               <Tooltip>

@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useConfirmation } from '@/hooks/use-confirmation';
 import { ExpertiseReportUploader } from '@/components/expertise/ExpertiseReportUploader';
 import ExpertiseReportDialog from '@/components/expertise/ExpertiseReportDialog';
-import { ExpertiseReport } from '@/services/supabase/expertise-reports';
+import { ExpertiseReport, expertiseReportsService } from '@/services/supabase/expertise-reports';
 import ExpertiseReportHeader from '@/components/expertise/ExpertiseReportHeader';
 import ExpertiseReportFilters, { ExpertiseSortOption } from '@/components/expertise/ExpertiseReportFilters';
 import ExpertiseReportTable from '@/components/expertise/ExpertiseReportTable';
@@ -24,6 +24,7 @@ import { ClientDataValidationReport } from '@/components/expertise/ClientDataVal
 import { useNavigate } from 'react-router-dom';
 import { usePagination } from '@/hooks/use-pagination';
 import { DocumentPagination } from '@/components/ui/document-pagination';
+import { ExpertiseReportModifier } from '@/components/expertise/ExpertiseReportModifier';
 
 const ExpertiseReports = () => {
   const { reports, isLoading, error, deleteReport } = useExpertiseReports();
@@ -36,8 +37,11 @@ const ExpertiseReports = () => {
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
+  const [modifyDialogOpen, setModifyDialogOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<ExpertiseReport | null>(null);
+  const [reportToModify, setReportToModify] = useState<ExpertiseReport | null>(null);
   const [prefilledQuoteData, setPrefilledQuoteData] = useState<Partial<Quote> | null>(null);
+  const [signedRepairOrderReports, setSignedRepairOrderReports] = useState<Set<string>>(new Set());
   const { toast } = useToast();
   const { confirm } = useConfirmation();
   const navigate = useNavigate();
@@ -158,6 +162,21 @@ const ExpertiseReports = () => {
     const initializeReports = async () => {
       if (filteredAndSortedReports && filteredAndSortedReports.length > 0 && !initialCheckComplete) {
         await checkMultipleReports(filteredAndSortedReports);
+        
+        // Vérifier les dépendances OR signés pour chaque rapport
+        const signedReports = new Set<string>();
+        for (const report of filteredAndSortedReports) {
+          try {
+            const deps = await expertiseReportsService.checkDependencies(report.id);
+            if (deps.hasSignedRepairOrder) {
+              signedReports.add(report.id);
+            }
+          } catch (e) {
+            console.error('Error checking dependencies for report:', report.id, e);
+          }
+        }
+        setSignedRepairOrderReports(signedReports);
+        
         setInitialCheckComplete(true);
       }
     };
@@ -228,6 +247,11 @@ const ExpertiseReports = () => {
     return Object.keys(convertedReports).find(id => isConverting(id)) || null;
   };
   
+  const handleModifyReport = (report: ExpertiseReport) => {
+    setReportToModify(report);
+    setModifyDialogOpen(true);
+  };
+  
   const handleEditClient = () => {
     if (!notification) return;
     
@@ -274,8 +298,10 @@ const ExpertiseReports = () => {
         onEditReport={handleEditReport}
         onDeleteReport={handleDeleteReport}
         onConvertToQuote={handleConvertToQuote}
+        onModifyReport={handleModifyReport}
         getConvertingReportId={getConvertingReportId}
         convertedReports={convertedReports}
+        signedRepairOrderReports={signedRepairOrderReports}
       />
 
       {/* Import Rapport Dialog */}
@@ -331,6 +357,16 @@ const ExpertiseReports = () => {
         />
       )}
 
+      {/* Modify Report Dialog */}
+      <ExpertiseReportModifier
+        report={reportToModify}
+        open={modifyDialogOpen}
+        onClose={() => {
+          setModifyDialogOpen(false);
+          setReportToModify(null);
+        }}
+      />
+
     </div>
   );
 };
@@ -344,8 +380,10 @@ interface PaginatedReportsSectionProps {
   onEditReport: (report: ExpertiseReport) => void;
   onDeleteReport: (id: string) => void;
   onConvertToQuote: (report: ExpertiseReport) => void;
+  onModifyReport: (report: ExpertiseReport) => void;
   getConvertingReportId: () => string | null;
   convertedReports: Record<string, boolean>;
+  signedRepairOrderReports: Set<string>;
 }
 
 function PaginatedReportsSection({
@@ -356,8 +394,10 @@ function PaginatedReportsSection({
   onEditReport,
   onDeleteReport,
   onConvertToQuote,
+  onModifyReport,
   getConvertingReportId,
-  convertedReports
+  convertedReports,
+  signedRepairOrderReports
 }: PaginatedReportsSectionProps) {
   const {
     currentPage,
@@ -380,8 +420,10 @@ function PaginatedReportsSection({
         onEditReport={onEditReport}
         onDeleteReport={onDeleteReport}
         onConvertToQuote={onConvertToQuote}
+        onModifyReport={onModifyReport}
         convertingReportId={getConvertingReportId()}
         convertedReports={convertedReports}
+        signedRepairOrderReports={signedRepairOrderReports}
       />
       <DocumentPagination
         currentPage={currentPage}
