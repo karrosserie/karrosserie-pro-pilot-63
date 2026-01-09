@@ -78,18 +78,18 @@ const defaultStyles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 3,
     fontSize: 9,
+    gap: 4,
   },
   detailLabel: {
     fontWeight: 'bold',
     fontSize: 9,
-    flex: 1,
-    minWidth: 80,
+    width: 65,
   },
   detailValue: {
     fontSize: 9,
     textAlign: 'right',
-    flex: 1.5,
-    flexWrap: 'wrap',
+    flex: 1,
+    lineHeight: 1.2,
   },
   table: {
     marginTop: 15,
