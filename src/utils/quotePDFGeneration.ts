@@ -208,29 +208,34 @@ export const prepareQuoteDataForPDF = async (quote: Quote, companyData: any) => 
         vehicle: vehicleData?.vehicle || '',
         billingDate: quote.created_at ? new Date(quote.created_at).toLocaleDateString('fr-FR') : '',
         notes: quote.notes || '',
-        items: items.map((item: any) => {
-          const unitPrice = item.unitCost || 0;
-          const quantity = item.quantity || 1;
-          const discount = item.discount || 0;
-          const vat = item.vat || 20;
-          const subtotal = quantity * unitPrice;
-          const discountAmount = subtotal * (discount / 100);
-          const afterDiscount = subtotal - discountAmount;
-          const vatAmount = afterDiscount * (vat / 100);
-          const totalTTC = afterDiscount + vatAmount;
-          const totalHT = afterDiscount;
-          
-          return {
-            ref: (item as any).ref || '',
-            description: item.description || '',
-            quantity: quantity,
-            discount: discount,
-            unitPrice: unitPrice,
-            vat: vat,
-            totalHT: totalHT,
-            totalTTC: totalTTC
-          };
-        }),
+        items: items
+          .filter((item: any) => {
+            const qty = typeof item.quantity === 'number' ? item.quantity : 1;
+            return qty > 0;
+          })
+          .map((item: any) => {
+            const unitPrice = item.unitCost || 0;
+            const quantity = typeof item.quantity === 'number' ? item.quantity : 1;
+            const discount = item.discount || 0;
+            const vat = item.vat || 20;
+            const subtotal = quantity * unitPrice;
+            const discountAmount = subtotal * (discount / 100);
+            const afterDiscount = subtotal - discountAmount;
+            const vatAmount = afterDiscount * (vat / 100);
+            const totalTTC = afterDiscount + vatAmount;
+            const totalHT = afterDiscount;
+            
+            return {
+              ref: (item as any).ref || '',
+              description: item.description || '',
+              quantity: quantity,
+              discount: discount,
+              unitPrice: unitPrice,
+              vat: vat,
+              totalHT: totalHT,
+              totalTTC: totalTTC
+            };
+          }),
         totals: {
           totalHT: `${totals.subTotal.toFixed(2).replace('.', ',')} €`,
           totalVAT: `${totals.totalVat.toFixed(2).replace('.', ',')} €`,
