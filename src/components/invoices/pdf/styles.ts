@@ -59,7 +59,7 @@ export const pdfStyles = StyleSheet.create({
   detailLabel: {
     fontWeight: 'bold',
     fontSize: 7,
-    width: 65,
+    width: 75,
   },
   detailValue: {
     fontSize: 7,
