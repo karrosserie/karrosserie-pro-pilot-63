@@ -28,9 +28,11 @@ export function useExpertiseReportReplace() {
       );
     },
     onSuccess: (data, variables) => {
+      // Invalider les rapports ET les quotes pour permettre la reconversion
       queryClient.invalidateQueries({ queryKey: ['expertiseReports'] });
+      queryClient.invalidateQueries({ queryKey: ['quotes'] });
       toast({
-        title: "Rapport remplacé",
+        title: "Rapport modifié",
         description: "Le nouveau document est en cours d'analyse."
       });
       

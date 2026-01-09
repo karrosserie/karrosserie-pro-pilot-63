@@ -123,7 +123,7 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
               </TooltipContent>
             </Tooltip>
 
-            {/* Bouton Remplacer */}
+            {/* Bouton Modifier */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button 
@@ -131,23 +131,21 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
                   size="sm"
                   className="text-orange-600 hover:text-orange-700 border-orange-300 hover:border-orange-400"
                   onClick={() => setShowReplacer(true)}
-                  disabled={isConverted || report.status === 'En cours d\'analyse'}
+                  disabled={report.status === 'En cours d\'analyse'}
                 >
                   <RefreshCw className="h-4 w-4 mr-1" />
-                  Remplacer
+                  Modifier
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                {isConverted 
-                  ? 'Impossible de remplacer un rapport converti' 
-                  : report.status === 'En cours d\'analyse'
-                    ? 'Attendez la fin de l\'analyse'
-                    : 'Remplacer par un nouveau PDF'
+                {report.status === 'En cours d\'analyse'
+                  ? 'Attendez la fin de l\'analyse'
+                  : 'Modifier avec un nouveau PDF'
                 }
               </TooltipContent>
             </Tooltip>
 
-            {onConvertToQuote && !isConverted && (
+            {onConvertToQuote && (
               <Tooltip>
                 <TooltipTrigger asChild>
             <Button 

@@ -13,10 +13,19 @@ export const useReportToQuote = () => {
   const [convertedReports, setConvertedReports] = useState<Record<string, any>>({});
 
   // Vérifier si un rapport a déjà été converti en devis
-  const checkConvertedStatus = async (reportId: string) => {
+  const checkConvertedStatus = async (reportId: string, reportUpdatedAt?: string) => {
     try {
       const existingQuote = await quotesService.getByReportId(reportId);
       if (existingQuote) {
+        // Si le rapport a été mis à jour après la création du devis, autoriser la reconversion
+        if (reportUpdatedAt && existingQuote.created_at) {
+          const reportDate = new Date(reportUpdatedAt);
+          const quoteDate = new Date(existingQuote.created_at);
+          if (reportDate > quoteDate) {
+            // Le rapport a été modifié après le devis, permettre la reconversion
+            return false;
+          }
+        }
         setConvertedReports(prev => ({ ...prev, [reportId]: existingQuote }));
         return true;
       }
@@ -36,10 +45,26 @@ export const useReportToQuote = () => {
     
     // Utiliser une requête batch au lieu de N requêtes individuelles
     const reportIds = reports.map(r => r.id);
-    const results = await quotesService.getByReportIds(reportIds);
+    const quotesMap = await quotesService.getByReportIds(reportIds);
     
-    setConvertedReports(results);
-    return results;
+    // Filtrer: ne marquer comme "converti" que si le rapport n'a pas été modifié après le devis
+    const filteredResults: Record<string, any> = {};
+    for (const report of reports) {
+      const quote = quotesMap[report.id];
+      if (quote) {
+        // Vérifier si le rapport a été modifié après la création du devis
+        const reportDate = new Date(report.updated_at);
+        const quoteDate = new Date(quote.created_at);
+        if (reportDate <= quoteDate) {
+          // Le rapport n'a pas été modifié après le devis, le marquer comme converti
+          filteredResults[report.id] = quote;
+        }
+        // Sinon, ne pas l'inclure = le bouton Convertir sera actif
+      }
+    }
+    
+    setConvertedReports(filteredResults);
+    return filteredResults;
   };
 
   // Convertir un rapport d'expertise en devis
@@ -53,8 +78,8 @@ export const useReportToQuote = () => {
       return null;
     }
 
-    // Vérifier si déjà converti
-    const isAlreadyConverted = await checkConvertedStatus(report.id);
+    // Vérifier si déjà converti (en tenant compte de la date de mise à jour)
+    const isAlreadyConverted = await checkConvertedStatus(report.id, report.updated_at);
     if (isAlreadyConverted) {
       toast({
         title: "Information",
