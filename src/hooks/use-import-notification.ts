@@ -1,20 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
-import { quotesService } from '@/services/supabase/quotes';
-import { useNavigate } from 'react-router-dom';
-import { sendDocumentsRequest } from '@/services/documentsRequestService';
-import { useClientValidation } from './use-client-validation';
-import { useClientValidationNotification } from '@/contexts/ClientValidationNotificationContext';
-import { clientEssentialFieldsChecker } from '@/services/clientEssentialFieldsChecker';
 
 export function useImportNotification() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const { checkMissingClientData, validateClientData } = useClientValidation();
-  const { setNotification } = useClientValidationNotification();
 
   useEffect(() => {
     // Fonction pour nettoyer les IDs de plus de 7 jours
@@ -42,7 +33,7 @@ export function useImportNotification() {
     // Fonction pour récupérer les imports déjà traités depuis localStorage
     const getProcessedImportIds = (): Set<string> => {
       try {
-        cleanOldProcessedIds(); // Nettoyer les anciens IDs à chaque récupération
+        cleanOldProcessedIds();
         const stored = localStorage.getItem('processed_import_ids');
         return stored ? new Set(JSON.parse(stored)) : new Set();
       } catch (error) {
@@ -58,7 +49,6 @@ export function useImportNotification() {
         ids.add(id);
         localStorage.setItem('processed_import_ids', JSON.stringify([...ids]));
         
-        // Stocker également le timestamp pour le nettoyage futur
         const timestamps = JSON.parse(localStorage.getItem('processed_import_ids_timestamps') || '{}');
         timestamps[id] = Date.now();
         localStorage.setItem('processed_import_ids_timestamps', JSON.stringify(timestamps));
@@ -95,12 +85,11 @@ export function useImportNotification() {
 
     // Polling pour vérifier les changements de statut
     let intervalId: NodeJS.Timeout;
-    let isChecking = false; // Prevent concurrent checks
+    let isChecking = false;
     const processedIds = getProcessedImportIds();
     console.log('🔧 Initialized with processed imports from localStorage:', Array.from(processedIds));
 
     const checkImports = async () => {
-      // Skip if tab is not focused or already checking
       if (!document.hasFocus() || isChecking) {
         return;
       }
@@ -110,7 +99,6 @@ export function useImportNotification() {
       try {
         console.log('🔍 useImportNotification - Checking for completed imports...');
         
-        // Filtrer les imports des 2 dernières heures pour éviter le flood sur anciens comptes
         const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
         
         const { data: imports } = await supabase
@@ -127,207 +115,22 @@ export function useImportNotification() {
           console.log('🆔 Current import IDs (< 2h):', Array.from(currentImportIds));
           console.log('🆔 Processed import IDs (from localStorage):', Array.from(processedIds));
           
-          // Vérifier s'il y a de nouveaux imports terminés qui n'ont pas encore été traités
           for (const id of currentImportIds) {
             if (!processedIds.has(id)) {
               console.log('🎉 New import completed:', id);
               
-              // Marquer l'import comme traité IMMÉDIATEMENT pour éviter le double traitement
               addProcessedImportId(id);
-              
-              // Jouer le signal sonore
               playNotificationSound();
               
-              try {
-                // Récupérer les détails de l'import pour obtenir le rapport d'expertise
-                const { data: importData } = await supabase
-                  .from('imports')
-                  .select(`
-                    report_id,
-                    expertise_reports (
-                      *,
-                      clients (id, first_name, last_name),
-                      vehicles (id, license_plate, car_brands(name), car_models(name))
-                    )
-                  `)
-                  .eq('id', id)
-                  .single();
-
-                console.log('📋 Import data for conversion:', importData);
-
-                if (importData?.expertise_reports) {
-                  const report = importData.expertise_reports;
-                  
-                  console.log('📦 Report data for quote creation:', {
-                    id: report.id,
-                    global_discount_data: report.global_discount_data,
-                    repairs_data: !!report.repairs_data,
-                    parts_data: !!report.parts_data,
-                    amount: report.amount,
-                    client_id: report.client_id,
-                    vehicle_id: report.vehicle_id
-                  });
-                  
-                  // Vérifier si le rapport a un client et un véhicule (requis pour la conversion)
-                  if (report.clients && report.vehicles) {
-                    // Récupérer les données complètes du client pour vérifier les champs manquants
-                    const { data: fullClientData } = await supabase
-                      .from('clients')
-                      .select('*')
-                      .eq('id', report.clients.id)
-                      .single();
-                    
-                    // ✅ GUARD CLAUSE - Stopper si impossible de récupérer les données client
-                    if (!fullClientData) {
-                      console.log('⚠️ Cannot retrieve full client data - skipping quote conversion');
-                      queryClient.invalidateQueries({ queryKey: ['expertiseReports'] });
-                      queryClient.invalidateQueries({ queryKey: ['imports', 'pending'] });
-                      continue;
-                    }
-                    
-                    console.log('📋 Full client data retrieved:', fullClientData);
-                    
-                    // 0. Vérifier les champs essentiels (nom, prénom, email, téléphone)
-                    const { data: reportData } = await supabase
-                      .from('expertise_reports')
-                      .select('company_id')
-                      .eq('id', report.id)
-                      .single();
-                    
-                    const essentialCheck = await clientEssentialFieldsChecker.checkEssentialFields(
-                      fullClientData,
-                      reportData?.company_id || ''
-                    );
-                    
-                    console.log('📋 Essential fields check:', essentialCheck);
-                    
-                    // 1. Vérifier les champs manquants
-                    const missingValidation = checkMissingClientData(fullClientData);
-                    
-                    // 2. Valider la véracité des données présentes
-                    const dataValidation = await validateClientData(fullClientData);
-                    
-                    console.log('🔍 Client data validation:', { missingValidation, dataValidation });
-                    
-                    // Si des données manquent OU si des erreurs/warnings
-                    const hasIssues = 
-                      missingValidation.missingCount > 0 ||
-                      dataValidation.errors.length > 0 ||
-                      dataValidation.warnings.length > 0;
-                    
-                    if (hasIssues) {
-                      // Publier la notification pour afficher la pop-up
-                      setNotification({
-                        clientId: fullClientData.id,
-                        clientName: `${fullClientData.first_name} ${fullClientData.last_name}`,
-                        reportId: report.id,
-                        companyId: reportData?.company_id || '',
-                        validationResults: {
-                          missing: {
-                            missingFields: missingValidation.missingFields,
-                            missingCount: missingValidation.missingCount,
-                            isComplete: missingValidation.isComplete
-                          },
-                          validation: {
-                            errors: dataValidation.errors,
-                            warnings: dataValidation.warnings,
-                            isValid: dataValidation.isValid
-                          }
-                        },
-                        timestamp: new Date()
-                      });
-                      
-                      // Toast informatif (moins intrusif)
-                      toast({
-                        title: "⚠️ Validation client requise",
-                        description: "Des informations manquantes ou invalides ont été détectées.",
-                      });
-                      
-                      // ⛔ STOP - Ne pas créer le devis si validation échouée
-                      console.log('⏸️ Devis non créé - validation client requise');
-                      
-                      // Invalider les caches après conversion réussie - grouper les invalidations
-                      queryClient.invalidateQueries({ 
-                        predicate: (query) => 
-                          query.queryKey[0] === 'expertiseReports' || 
-                          query.queryKey[0] === 'imports'
-                      });
-                      
-                      continue; // Passer à l'import suivant sans créer de devis
-                    }
-
-                    // ✅ Code de conversion - S'exécute UNIQUEMENT si validation réussie
-                    console.log('✅ Client data is complete and valid - proceeding to quote creation');
-                    
-                    // Vérifier si un devis existe déjà pour ce rapport
-                    const existingQuote = await quotesService.getByReportId(report.id);
-                    
-                    if (existingQuote) {
-                      console.log('📄 Quote already exists for report:', report.id, 'Quote ID:', existingQuote.id);
-                      console.log('🚀 Navigating to quote:', `/documents/devis?openQuote=${existingQuote.id}`);
-                      
-                      // Rediriger vers le devis existant (après 3s pour laisser le temps à la pop-up d'onboarding)
-                      setTimeout(() => {
-                        navigate(`/documents/devis?openQuote=${existingQuote.id}`);
-                      }, 3000);
-                      
-                      toast({
-                        title: "Import terminé",
-                        description: "Redirection vers le devis existant...",
-                      });
-                    } else {
-                      console.log('🔄 Converting report to quote:', report.id);
-                      
-                      // Convertir le rapport en devis
-                      const newQuote = await quotesService.createFromReport(report);
-                      console.log('✅ Quote created:', newQuote);
-                      console.log('🚀 Navigating to new quote:', `/documents/devis?openQuote=${newQuote.id}`);
-                      
-                      // Rediriger vers le nouveau devis (après 3s pour laisser le temps à la pop-up d'onboarding)
-                      setTimeout(() => {
-                        navigate(`/documents/devis?openQuote=${newQuote.id}`);
-                      }, 3000);
-                      
-                      toast({
-                        title: "Import et conversion terminés",
-                        description: "Le rapport a été converti en devis. Toutes les données client sont complètes et validées !",
-                      });
-                    }
-                    
-                    // Invalider les caches après conversion réussie - grouper les invalidations
-                    queryClient.invalidateQueries({ 
-                      predicate: (query) => 
-                        query.queryKey[0] === 'expertiseReports' || 
-                        query.queryKey[0] === 'quotes' ||
-                        query.queryKey[0] === 'imports'
-                    });
-                  } else {
-                    console.log('⚠️ Cannot convert report: missing client or vehicle data');
-                    toast({
-                      title: "Import terminé",
-                      description: "Le rapport nécessite un client et un véhicule pour être converti en devis",
-                    });
-                  }
-                } else {
-                  console.log('⚠️ No expertise report found for import:', id);
-                  toast({
-                    title: "Import terminé",
-                    description: "Un rapport d'expertise a été importé avec succès",
-                  });
-                }
-              } catch (conversionError) {
-                console.error('❌ Error during automatic conversion:', conversionError);
-                toast({
-                  title: "Import terminé",
-                  description: "Le rapport a été importé mais la conversion en devis a échoué",
-                });
-              }
+              toast({
+                title: "Import terminé",
+                description: "Le rapport d'expertise a été importé avec succès. Vous pouvez le convertir en devis manuellement.",
+              });
               
-              // Invalider les caches pour rafraîchir les données - grouper les invalidations
+              // Invalider les caches pour rafraîchir les données
               queryClient.invalidateQueries({ 
                 predicate: (query) => 
                   query.queryKey[0] === 'expertiseReports' || 
-                  query.queryKey[0] === 'quotes' ||
                   query.queryKey[0] === 'imports'
               });
             }
@@ -340,14 +143,12 @@ export function useImportNotification() {
       }
     };
 
-    // Vérifier immédiatement puis toutes les 20 secondes (au lieu de 5s)
     checkImports();
     intervalId = setInterval(checkImports, 20000);
 
-    // Pause polling when tab is not visible
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        checkImports(); // Check immediately when tab becomes visible
+        checkImports();
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
