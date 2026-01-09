@@ -17,10 +17,8 @@ interface ExpertiseReportTableProps {
   onEditReport: (report: ExpertiseReport) => void;
   onDeleteReport: (id: string) => void;
   onConvertToQuote?: (report: ExpertiseReport) => void;
-  onModifyReport?: (report: ExpertiseReport) => void;
   convertingReportId?: string | null;
   convertedReports?: Record<string, any>;
-  signedRepairOrderReports?: Set<string>;
 }
 
 const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
@@ -30,10 +28,8 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
   onEditReport,
   onDeleteReport,
   onConvertToQuote,
-  onModifyReport,
   convertingReportId,
-  convertedReports = {},
-  signedRepairOrderReports = new Set()
+  convertedReports = {}
 }) => {
   const isMobile = useIsMobile();
 
@@ -47,8 +43,6 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
             report={report}
             onEditReport={onEditReport}
             onDeleteReport={onDeleteReport}
-            onModifyReport={onModifyReport}
-            hasSignedRepairOrder={signedRepairOrderReports.has(report.id)}
           />
         ))}
       </div>
@@ -82,10 +76,8 @@ const ExpertiseReportTable: React.FC<ExpertiseReportTableProps> = ({
                   onEditReport={onEditReport}
                   onDeleteReport={onDeleteReport}
                   onConvertToQuote={onConvertToQuote}
-                  onModifyReport={onModifyReport}
                   isConverting={convertingReportId === report.id}
                   isConverted={!!convertedReports[report.id]}
-                  hasSignedRepairOrder={signedRepairOrderReports.has(report.id)}
                 />
               ))
             ) : (
