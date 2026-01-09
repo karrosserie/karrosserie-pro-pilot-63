@@ -1,11 +1,11 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Pencil, Trash, Download, ArrowRight, Loader2 } from 'lucide-react';
+import { Trash, Download, ArrowRight, Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ExpertiseReport } from '@/services/supabase/expertise-reports';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { ExpertiseReportReplacer } from '@/components/expertise/ExpertiseReportReplacer';
 
 interface ExpertiseReportTableRowProps {
   report: ExpertiseReport;
@@ -51,6 +51,8 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
   isConverting = false,
   isConverted = false
 }) => {
+  const [showReplacer, setShowReplacer] = useState(false);
+
   const getStatusDisplay = () => {
     const status = isConverted ? 'Converti' : (report.status || 'Importé');
     return (
@@ -121,6 +123,30 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
               </TooltipContent>
             </Tooltip>
 
+            {/* Bouton Remplacer */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="text-orange-600 hover:text-orange-700 border-orange-300 hover:border-orange-400"
+                  onClick={() => setShowReplacer(true)}
+                  disabled={isConverted || report.status === 'En cours d\'analyse'}
+                >
+                  <RefreshCw className="h-4 w-4 mr-1" />
+                  Remplacer
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {isConverted 
+                  ? 'Impossible de remplacer un rapport converti' 
+                  : report.status === 'En cours d\'analyse'
+                    ? 'Attendez la fin de l\'analyse'
+                    : 'Remplacer par un nouveau PDF'
+                }
+              </TooltipContent>
+            </Tooltip>
+
             {onConvertToQuote && !isConverted && (
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -169,6 +195,16 @@ export const ExpertiseReportTableRow: React.FC<ExpertiseReportTableRowProps> = (
           </div>
         </TableCell>
       </TableRow>
+
+      {/* Dialog de remplacement */}
+      <ExpertiseReportReplacer
+        existingReport={report}
+        open={showReplacer}
+        onOpenChange={setShowReplacer}
+        onSuccess={() => {
+          // Le hook invalide déjà le cache
+        }}
+      />
     </>
   );
 };
